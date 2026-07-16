@@ -121,8 +121,6 @@ import { RegistroVendaGtaFisicaPage } from "./pages/GTA/RegistroVendaGTAFisica/R
 import { AdicionarRegistroVendaGtaFisicaPage } from "./pages/GTA/RegistroVendaGTAFisica/AdicionarRegistroVendaGTAFisica";
 import { FinalidadeTransitoPage } from "./pages/GTA/FinalidadeTransito/FinalidadeTransito";
 import { AdicionarFinalidadeTransitoPage } from "./pages/GTA/FinalidadeTransito/AdicionarFinalidadeTransito";
-import { IsencaoTaxaGtaPage } from "./pages/GTA/IsencaoTaxaGTA/IsencaoTaxaGTA";
-import { AdicionarIsencaoTaxaGtaPage } from "./pages/GTA/IsencaoTaxaGTA/AdicionarIsencaoTaxaGTA";
 
 // CONTROLE
 import { UsuariosPage } from "./pages/Controle/Usuarios/Usuarios";
@@ -250,9 +248,7 @@ export type Screen =
   | "papeis"
   | "adicionar-papeis"
   | "visualizar-papel"
-  | "editar-papel"
-  | "isencao-taxa-gta"
-  | "adicionar-isencao-taxa-gta";
+  | "editar-papel";
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>("login");
@@ -1154,20 +1150,7 @@ export default function App() {
           onNavigate={handleNavigate}
         />
       );
-    case "isencao-taxa-gta":
-      return (
-        <IsencaoTaxaGtaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
-    case "adicionar-isencao-taxa-gta":
-      return (
-        <AdicionarIsencaoTaxaGtaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+
     default:
       return (
         <DashboardPage
