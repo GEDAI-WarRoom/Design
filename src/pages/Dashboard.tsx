@@ -135,6 +135,11 @@ export const cadastrosCategories: MenuCategory[] = [
         route: "revendedora-agropecuario",
         icon: <Store size={16} />,
       },
+      {
+        label: "Instituição de Ensino e Pesquisa",
+        route: "instituicao-ensino-pesquisa",
+        icon: <Store size={16} />,
+      },
     ],
   },
   {
@@ -340,11 +345,7 @@ export const secondaryCategories: MenuCategory[] = [
         label: "Doação/Partilha de Vacina",
         route: "partilha-vacina",
         icon: (
-          <img
-            src={Icons.iconeDoacaoUrl}
-            alt="Doação"
-            className="w-4 h-4"
-          />
+          <img src={Icons.iconeDoacaoUrl} alt="Doação" className="w-4 h-4" />
         ),
       },
       {
@@ -396,11 +397,7 @@ export const secondaryCategories: MenuCategory[] = [
         label: "Doença",
         route: "doenca",
         icon: (
-          <img
-            src={Icons.iconeDoencaUrl}
-            alt="Doença"
-            className="w-4 h-4"
-          />
+          <img src={Icons.iconeDoencaUrl} alt="Doença" className="w-4 h-4" />
         ),
       },
       {
@@ -581,9 +578,7 @@ export function DashboardPage({ onLogout, onNavigate }: any) {
               className="w-3 h-3 rounded-full"
               style={{ backgroundColor: GREEN }}
             />
-            <span className="text-sm text-gray-700">
-              Concluído
-            </span>
+            <span className="text-sm text-gray-700">Concluído</span>
           </div>
         </div>
 
@@ -594,11 +589,7 @@ export function DashboardPage({ onLogout, onNavigate }: any) {
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {cadastrosCategories.map((cat) => (
-              <CategoryCard
-                key={cat.title}
-                cat={cat}
-                onNavigate={onNavigate}
-              />
+              <CategoryCard key={cat.title} cat={cat} onNavigate={onNavigate} />
             ))}
           </div>
         </div>
@@ -607,11 +598,7 @@ export function DashboardPage({ onLogout, onNavigate }: any) {
         <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {secondaryCategories.map((cat) => (
-              <CategoryCard
-                key={cat.title}
-                cat={cat}
-                onNavigate={onNavigate}
-              />
+              <CategoryCard key={cat.title} cat={cat} onNavigate={onNavigate} />
             ))}
           </div>
         </div>
@@ -620,11 +607,7 @@ export function DashboardPage({ onLogout, onNavigate }: any) {
         <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {thirdCategories.map((cat) => (
-              <CategoryCard
-                key={cat.title}
-                cat={cat}
-                onNavigate={onNavigate}
-              />
+              <CategoryCard key={cat.title} cat={cat} onNavigate={onNavigate} />
             ))}
           </div>
         </div>
@@ -632,11 +615,7 @@ export function DashboardPage({ onLogout, onNavigate }: any) {
         <div className="bg-white rounded-xl shadow-sm p-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {fourthCategories.map((cat) => (
-              <CategoryCard
-                key={cat.title}
-                cat={cat}
-                onNavigate={onNavigate}
-              />
+              <CategoryCard key={cat.title} cat={cat} onNavigate={onNavigate} />
             ))}
           </div>
         </div>

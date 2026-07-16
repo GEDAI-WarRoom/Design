@@ -34,6 +34,7 @@ import { EditarRevendedoraAgropecuarioPage } from "./pages/Geral/RevendedoraAgro
 import { AdicionarRevendedoraAgropecuarioPage } from "./pages/Geral/RevendedoraAgropecuaria/AdicionarRevendedoraAgropecuaria";
 import { AeroportoPorto } from "./pages/Geral/AeroportoPorto/AeroportoPorto";
 import { AdicionarAeroportoPorto } from "./pages/Geral/AeroportoPorto/AdicionarAeroportoPorto";
+import { InstituicaoEnsinoPesquisa } from "./pages/Geral/InstituiçãoEnsinoPesquisa/InstituiçãoEnsinoPesquisa";
 
 // ANIMAL
 import { CertificadoraSISBOVPage } from "./pages/Animal/CertificadoraSISBOV/CertificadoraSISBOV";
@@ -248,7 +249,8 @@ export type Screen =
   | "papeis"
   | "adicionar-papeis"
   | "visualizar-papel"
-  | "editar-papel";
+  | "editar-papel"
+  | "instituicao-ensino-pesquisa";
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>("login");
@@ -268,23 +270,15 @@ export default function App() {
 
   switch (screen) {
     case "login":
-      return (
-        <LoginPage onLogin={() => setScreen("dashboard")} />
-      );
+      return <LoginPage onLogin={() => setScreen("dashboard")} />;
     case "dashboard":
       return (
-        <DashboardPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <DashboardPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
 
     case "pessoa-fisica":
       return (
-        <PessoaFisicaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <PessoaFisicaPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "adicionar-pessoa-fisica":
       return (
@@ -347,10 +341,7 @@ export default function App() {
       );
     case "produto":
       return (
-        <ProdutoPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <ProdutoPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "adicionar-produto":
       return (
@@ -403,10 +394,7 @@ export default function App() {
       );
     case "receita":
       return (
-        <ReceitaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <ReceitaPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "adicionar-receita":
       return (
@@ -465,10 +453,7 @@ export default function App() {
 
     case "laboratorio":
       return (
-        <LaboratorioPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <LaboratorioPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "adicionar-laboratorio":
       return (
@@ -579,12 +564,7 @@ export default function App() {
         />
       );
     case "doenca":
-      return (
-        <DoencaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <DoencaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-doenca":
       return (
         <AdicionarDoencaPage
@@ -664,10 +644,7 @@ export default function App() {
 
     case "vacinador":
       return (
-        <VacinadorPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <VacinadorPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
 
     case "adicionar-vacinador":
@@ -709,10 +686,7 @@ export default function App() {
       );
     case "usuarios":
       return (
-        <UsuariosPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <UsuariosPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "adicionar-usuario":
       return (
@@ -745,10 +719,7 @@ export default function App() {
       );
     case "especie":
       return (
-        <EspeciePage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <EspeciePage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "adicionar-especie":
       return (
@@ -889,10 +860,7 @@ export default function App() {
       );
     case "valor-indice":
       return (
-        <ValorIndicePage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <ValorIndicePage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "adicionar-valor-indice":
       return (
@@ -920,10 +888,7 @@ export default function App() {
       );
     case "aeroporto-porto":
       return (
-        <AeroportoPorto
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <AeroportoPorto onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "adicionar-aeroporto-porto":
       return (
@@ -1060,10 +1025,7 @@ export default function App() {
 
     case "cultura":
       return (
-        <CulturaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <CulturaPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
 
     case "adicionar-cultura":
@@ -1075,12 +1037,7 @@ export default function App() {
       );
 
     case "praga":
-      return (
-        <PragaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <PragaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 
     case "adicionar-praga":
       return (
@@ -1122,12 +1079,7 @@ export default function App() {
         />
       );
     case "papeis":
-      return (
-        <PapeisPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <PapeisPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 
     case "adicionar-papeis":
       return (
@@ -1145,7 +1097,11 @@ export default function App() {
       );
     case "editar-papel":
       return (
-        <EditarPapelPage
+        <EditarPapelPage onLogout={handleLogout} onNavigate={handleNavigate} />
+      );
+    case "instituicao-ensino-pesquisa":
+      return (
+        <InstituicaoEnsinoPesquisa
           onLogout={handleLogout}
           onNavigate={handleNavigate}
         />
@@ -1153,10 +1109,7 @@ export default function App() {
 
     default:
       return (
-        <DashboardPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <DashboardPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
   }
 }
