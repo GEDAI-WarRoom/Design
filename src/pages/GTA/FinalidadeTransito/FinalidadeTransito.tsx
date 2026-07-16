@@ -409,7 +409,7 @@ export function FinalidadeTransitoPage({
               <div className="overflow-x-auto rounded-lg">
                 <table className="w-full text-sm border-collapse">
                   <thead>
-                    <tr className="border-b border-gray-300">
+                    <tr className="bg-gray-50 border-b border-gray-100">
                       <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-normal uppercase">
                         Finalidade de Trânsito
                       </th>
