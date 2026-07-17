@@ -108,6 +108,8 @@ import { EditarTipoInsumoExamePage } from "./pages/Vacinacao/TipoInsumoExame/Edi
 //ARRECADACAO
 import { ValorIndicePage } from "./pages/Arrecadacao/ValorIndice/ValorIndice";
 import { AdicionarValorIndicePage } from "./pages/Arrecadacao/ValorIndice/AdicionarValorIndice";
+import { ItemReceitaPage } from "./pages/Arrecadacao/ItemReceita/ItemReceita";
+import { AdicionarItemReceitaPage } from "./pages/Arrecadacao/ItemReceita/AdicionarItemReceita";
 
 // GTA
 import { AdicionarDistribuicaoFormulariosGta } from "./pages/GTA/DistribuicaoFormulariosGta/AdicionarDistribuicaoFormulariosGta";
@@ -252,7 +254,9 @@ export type Screen =
   | "visualizar-papel"
   | "editar-papel"
   | "isencao-taxa-gta"
-  | "adicionar-isencao-taxa-gta";
+  | "adicionar-isencao-taxa-gta"
+  | "item-receita"
+  | "adicionar-item-receita";
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>("login");
@@ -1164,6 +1168,20 @@ export default function App() {
     case "adicionar-isencao-taxa-gta":
       return (
         <AdicionarIsencaoTaxaGtaPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "item-receita":
+      return (
+        <ItemReceitaPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "adicionar-item-receita":
+      return (
+        <AdicionarItemReceitaPage
           onLogout={handleLogout}
           onNavigate={handleNavigate}
         />
