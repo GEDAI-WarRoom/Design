@@ -38,7 +38,8 @@ import iconePragaUrl from "./Ícone=Praga.svg";
 import iconeVinculacoesUrl from "./Ícone=Vinculações.svg";
 import iconeProfissionaisUrl from "./Ícone=Profissionais.svg";
 import iconeHabilitacaoUrl from "./Ícone=Habilitação.svg";
-import iconePapeisUrl from "./Ícone=Papéis.svg";
+import iconePontuacaoUrl from "./Ícone=Pontuação.svg";
+import iconeInsumoUrl from "./Ícone=Tipo de Insumo.svg";
 
 
 export {
@@ -48,14 +49,14 @@ export {
   iconeDoencaUrl,
   iconeDestinatarioUrl,
   iconeFornecedorUrl,
-  iconeNotaFiscalUrl, 
-  iconeNucleoProducaoUrl, 
+  iconeNotaFiscalUrl,
+  iconeNucleoProducaoUrl,
   iconeVacinadorUrl,
-  iconeProfissionalAnimalUrl, 
-  iconeUnidadeAdministrativaUrl, 
-  iconeRebanhoBrancoUrl, 
-  iconeVegetalBrancoUrl, 
-  iconeCertificadoraUrl, 
+  iconeProfissionalAnimalUrl,
+  iconeUnidadeAdministrativaUrl,
+  iconeRebanhoBrancoUrl,
+  iconeVegetalBrancoUrl,
+  iconeCertificadoraUrl,
   iconeEstabelecimentoAgroindustrialUrl,
   iconeAnimalUrl,
   iconeVegetalUrl,
@@ -74,7 +75,7 @@ export {
   iconeGTAFisicaUrl,
   iconeFormularioUrl,
   iconeGrupoUrl,
-  iconePromotoraUrl, 
+  iconePromotoraUrl,
   iconeProfissionalVegetalUrl,
   iconeUnidadeConsolidacaoUrl,
   iconeCulturaUrl,
@@ -82,5 +83,6 @@ export {
   iconeVinculacoesUrl,
   iconeProfissionaisUrl,
   iconeHabilitacaoUrl,
-  iconePapeisUrl
+  iconePontuacaoUrl,
+  iconeInsumoUrl
 };
