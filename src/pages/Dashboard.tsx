@@ -499,6 +499,11 @@ export const thirdCategories: MenuCategory[] = [
         route: "valor-indice",
         icon: <ReceiptText size={16} />,
       },
+      {
+        label: "Item da Receita",
+        route: "item-receita",
+        icon: <Package size={16} />,
+      },
     ],
   },
 ];
