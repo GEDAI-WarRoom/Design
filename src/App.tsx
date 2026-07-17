@@ -66,6 +66,8 @@ import { RevendedoraAnimaisPage } from "./pages/Animal/RevendedoraAnimais/Revend
 import { AdicionarRevendedoraAnimaisPage } from "./pages/Animal/RevendedoraAnimais/AdicionarRevendedoraAnimais";
 import { VisualizarRevendedoraAnimaisPage } from "./pages/Animal/RevendedoraAnimais/VisualizarRevendedoraAnimais";
 import { VisualizarEstabelecimentoAgroindustrialOutrasInspecoesPage } from "./pages/Animal/EstabelecimentoAgroindustrialOutrasInspecoes/VisualizarEstabelecimentoAgroindustrialOutrasInspecoes";
+import { TipoVeiculoPage } from "./pages/Animal/TipoVeiculo/TipoVeiculo";
+import { AdicionarTipoVeiculoPage } from "./pages/Animal/TipoVeiculo/AdicionarTipoVeiculo";
 
 // VEGETAL
 import { UnidadeConsolidacaoPage } from "./pages/Vegetal/UnidadeConsolidacao/UnidadeConsolidacao";
@@ -257,6 +259,8 @@ export type Screen =
   | "adicionar-isencao-taxa-gta"
   | "item-receita"
   | "adicionar-item-receita";
+  | "tipo-veiculo"
+  | "adicionar-tipo-veiculo";
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>("login");
@@ -1179,6 +1183,13 @@ export default function App() {
           onNavigate={handleNavigate}
         />
       );
+    case "tipo-veiculo":
+      return (
+        <TipoVeiculoPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
     case "adicionar-item-receita":
       return (
         <AdicionarItemReceitaPage
@@ -1186,6 +1197,14 @@ export default function App() {
           onNavigate={handleNavigate}
         />
       );
+    case "adicionar-tipo-veiculo":
+      return (
+        <AdicionarTipoVeiculoPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+
     default:
       return (
         <DashboardPage
