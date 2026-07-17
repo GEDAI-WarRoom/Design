@@ -214,6 +214,11 @@ export const cadastrosCategories: MenuCategory[] = [
         icon: <Calendar size={16} />,
       },
       {
+        label: "Local de Realização de Exame",
+        route: "local-realizacao-exame",
+        icon: <FlaskConical size={16} />,
+      },
+      {
         label: "Integradora Cooperativa",
         route: "integradora-cooperativa",
         icon: (
