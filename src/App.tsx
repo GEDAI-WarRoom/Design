@@ -36,6 +36,8 @@ import { AeroportoPorto } from "./pages/Geral/AeroportoPorto/AeroportoPorto";
 import { AdicionarAeroportoPorto } from "./pages/Geral/AeroportoPorto/AdicionarAeroportoPorto";
 import { InstituicaoEnsinoPesquisa } from "./pages/Geral/InstituiçãoEnsinoPesquisa/InstituiçãoEnsinoPesquisa";
 import { AdicionarInstituicaoEnsinoPesquisaPage } from "./pages/Geral/InstituiçãoEnsinoPesquisa/AdicionarInstituiçãoEnsinoPesquisa";
+import { VisualizarInstituicaoEnsinoPesquisaPage } from "./pages/Geral/InstituiçãoEnsinoPesquisa/VisualizarInstituicaoEnsinoPesquisa";
+import { EditarInstituicaoEnsinoPesquisaPage } from "./pages/Geral/InstituiçãoEnsinoPesquisa/EditarInstituicaoEnsinoPesquisa";
 
 // ANIMAL
 import { CertificadoraSISBOVPage } from "./pages/Animal/CertificadoraSISBOV/CertificadoraSISBOV";
@@ -79,7 +81,6 @@ import { AdicionarPragaPage } from "./pages/Vegetal/Praga/AdicionarPraga";
 import { ProfissionalVegetalPage } from "./pages/Vegetal/ProfissionalVegetal/ProfissionalVegetal";
 import { AdicionarProfissionalVegetalPage } from "./pages/Vegetal/ProfissionalVegetal/AdicionarProfissionalVegetal";
 import { VisualizarEstabelecimentoAgroindustrialPOVPage } from "./pages/Vegetal/EstabelecimentoAgroindustrialPOV/VisualizarEstabelecimentoAgroindustrialPOV";
-import { VisualizarInstituicaoEnsinoPesquisaPage } from "./pages/Geral/InstituicaoEnsinoPesquisa/VisualizarInstituicaoEnsinoPesquisa";
 
 // VACINAÇÃO
 import { LaboratorioPage } from "./pages/Vacinacao/Laboratorio/Laboratorio";
@@ -212,7 +213,6 @@ export type Screen =
   | "visualizar-estabelecimento-poa"
   | "visualizar-agroindustrial-outras-inspecoes"
   | "visualizar-agroindustrial-pov"
-  | "visualizar-instituicao-ensino-pesquisa"
   | "distribuicao-formularios-gta"
   | "adicionar-distribuicao-formularios-gta"
   | "valor-indice"
@@ -252,7 +252,9 @@ export type Screen =
   | "visualizar-papel"
   | "editar-papel"
   | "instituicao-ensino-pesquisa"
-  | "adicionar-instituicao-ensino-pesquisa";
+  | "adicionar-instituicao-ensino-pesquisa"
+  | "visualizar-instituicao-ensino-pesquisa"
+  | "editar-instituicao-ensino-pesquisa";
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>("login");
@@ -845,14 +847,6 @@ export default function App() {
           dados={screenData}
         />
       );
-    case "visualizar-instituicao-ensino-pesquisa":
-      return (
-        <VisualizarInstituicaoEnsinoPesquisaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-          dados={screenData}
-        />
-      );
     case "passaporte-equestre":
       return (
         <PassaporteEquestrePage
@@ -1113,6 +1107,23 @@ export default function App() {
         <AdicionarInstituicaoEnsinoPesquisaPage
           onLogout={handleLogout}
           onNavigate={handleNavigate}
+        />
+      );
+
+    case "visualizar-instituicao-ensino-pesquisa":
+      return (
+        <VisualizarInstituicaoEnsinoPesquisaPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          instituicao={screenData}
+        />
+      );
+    case "editar-instituicao-ensino-pesquisa":
+      return (
+        <EditarInstituicaoEnsinoPesquisaPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          instituicao={screenData}
         />
       );
 
