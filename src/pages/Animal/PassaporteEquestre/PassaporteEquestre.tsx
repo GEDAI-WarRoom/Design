@@ -1,7 +1,7 @@
 import { useState } from "react";
 import {
   ArrowLeft,
-  Plus,
+  Calendar,
   Search,
   SlidersHorizontal,
   ChevronLeft,
@@ -9,11 +9,6 @@ import {
   Eye as ViewIcon,
   Pencil,
   X,
-  Check,
-  Minus,
-  PauseCircle,
-  Clock,
-  Ban,
 } from "lucide-react";
 
 // 1. Importações Oficiais do Sistema
@@ -24,80 +19,14 @@ import {
 } from "../../../components/ui/FormKit";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
 import * as Icons from "../../../imports/icons";
+import {
+  ESTABELECIMENTOS_PASSAPORTE_MOCK,
+  EXPLORACOES_PASSAPORTE_MOCK,
+  PRODUTORES_PASSAPORTE_MOCK,
+  listarPassaportesEquestres,
+} from "./passaporteEquestreData";
 
 const GREEN = "#1A7A3C";
-
-// ==========================================================
-// MOCKS DE ENTIDADE
-// ==========================================================
-const ESTABELECIMENTOS_MOCK = [
-  {
-    id: 1,
-    codigo: "31001040005",
-    nome: "Fazenda Rio Preto",
-    municipio: "Lavras - MG",
-    proprietario: "333.888.777-11\n- Carlos Henrique Souza",
-  },
-  {
-    id: 2,
-    codigo: "10234567891",
-    nome: "Fazenda do Rio",
-    municipio: "Abadia dos Dourados - MG",
-    proprietario: "526.820.747-11\n- João de Souza",
-  },
-  {
-    id: 3,
-    codigo: "42001040005",
-    nome: "Fazenda Vertentes",
-    municipio: "Varginha - MG",
-    proprietario: "444.111.222-33\n- Maria Silva Mendes",
-  },
-];
-
-interface ProdutorEntidade {
-  id: number;
-  nome: string;
-  documento: string;
-}
-
-const PRODUTORES_MOCK: ProdutorEntidade[] = [
-  {
-    id: 1,
-    nome: "José Aarão Neto",
-    documento: "555.009.956-40",
-  },
-  {
-    id: 2,
-    nome: "Divino de Souza Sobrinho",
-    documento: "444.009.956-40",
-  },
-  {
-    id: 3,
-    nome: "Agropecuária Vale Verde Ltda.",
-    documento: "56.338.814/0001-95",
-  },
-];
-
-const EXPLORACOES_MOCK = [
-  {
-    id: 1,
-    codigo: "310010400050001",
-    estabNome: "Fazenda Rio Preto",
-    especie: "Equino",
-  },
-  {
-    id: 2,
-    codigo: "420010400050002",
-    estabNome: "Fazenda Vertentes",
-    especie: "Equino",
-  },
-  {
-    id: 3,
-    codigo: "100234567890001",
-    estabNome: "Fazenda do Rio",
-    especie: "Asinino",
-  },
-];
 
 const SITUACOES = [
   {
@@ -107,88 +36,6 @@ const SITUACOES = [
   { value: "Ativo", label: "Ativo" },
   { value: "Suspenso", label: "Suspenso" },
   { value: "Cancelado", label: "Cancelado" },
-];
-
-interface Passaporte {
-  id: number;
-  nomeEquino: string;
-  codigoMicrochip: string;
-  dataValidade: string;
-  produtor: { nome: string; documento: string };
-  estabelecimento: { codigo: string; nome: string };
-  exploracaoPecuaria: string;
-  situacao:
-    | "Aguardando Pagamento"
-    | "Ativo"
-    | "Suspenso"
-    | "Cancelado";
-}
-
-const PASSAPORTES_MOCK: Passaporte[] = [
-  {
-    id: 1,
-    nomeEquino: "Trovão",
-    codigoMicrochip: "981023000000001",
-    dataValidade: "2027-03-10",
-    produtor: {
-      nome: "José Aarão Neto",
-      documento: "555.009.956-40",
-    },
-    estabelecimento: {
-      codigo: "31001040005",
-      nome: "Fazenda Rio Preto",
-    },
-    exploracaoPecuaria: "310010400050001",
-    situacao: "Ativo",
-  },
-  {
-    id: 2,
-    nomeEquino: "Estrela do Sul",
-    codigoMicrochip: "981023000000002",
-    dataValidade: "—",
-    produtor: {
-      nome: "Agropecuária Vale Verde Ltda.",
-      documento: "56.338.814/0001-95",
-    },
-    estabelecimento: {
-      codigo: "42001040005",
-      nome: "Fazenda Vertentes",
-    },
-    exploracaoPecuaria: "420010400050002",
-    situacao: "Aguardando Pagamento",
-  },
-  {
-    id: 3,
-    nomeEquino: "Ventania",
-    codigoMicrochip: "981023000000003",
-    dataValidade: "2026-09-22",
-    produtor: {
-      nome: "Divino de Souza Sobrinho",
-      documento: "444.009.956-40",
-    },
-    estabelecimento: {
-      codigo: "10234567891",
-      nome: "Fazenda do Rio",
-    },
-    exploracaoPecuaria: "100234567890001",
-    situacao: "Suspenso",
-  },
-  {
-    id: 4,
-    nomeEquino: "Corisco",
-    codigoMicrochip: "981023000000004",
-    dataValidade: "2025-01-15",
-    produtor: {
-      nome: "José Aarão Neto",
-      documento: "555.009.956-40",
-    },
-    estabelecimento: {
-      codigo: "31001040005",
-      nome: "Fazenda Rio Preto",
-    },
-    exploracaoPecuaria: "310010400050001",
-    situacao: "Cancelado",
-  },
 ];
 
 function Chip({
@@ -222,10 +69,7 @@ interface BuscaPassaporteProps {
   onNavigate: (screen: string, data?: any) => void;
 }
 
-export function PassaporteEquestrePage(
-  { onLogout, onNavigate },
-  BuscaPassaporteProps,
-) {
+export function PassaporteEquestrePage({ onLogout, onNavigate }: BuscaPassaporteProps) {
   const [busca, setBusca] = useState("");
   const [validadeDe, setValidadeDe] = useState("");
   const [validadeAte, setValidadeAte] = useState("");
@@ -237,9 +81,9 @@ export function PassaporteEquestrePage(
     any | null
   >(null);
   const [situacao, setSituacao] = useState("");
+  const [passaportes] = useState(() => listarPassaportesEquestres());
 
-  const [showFilters, setShowFilters] = useState(false);
-  const [focusBusca, setFocusBusca] = useState(false);
+  const [showFilters, setShowFilters] = useState(true);
   const [hasSearched, setHasSearched] = useState(false);
   const [page, setPage] = useState(1);
   const perPage = 10;
@@ -249,12 +93,13 @@ export function PassaporteEquestrePage(
     setPage(1);
   };
 
-  const filtrados = PASSAPORTES_MOCK.filter((p) => {
+  const filtrados = passaportes.filter((p) => {
     const termo = busca.toLowerCase().trim();
+    const termoNumerico = busca.replace(/\D/g, "");
     const matchBusca =
       termo === "" ||
       p.nomeEquino.toLowerCase().includes(termo) ||
-      p.codigoMicrochip.includes(termo.replace(/\D/g, ""));
+      (termoNumerico !== "" && p.codigoMicrochip.includes(termoNumerico));
     const matchValidadeDe =
       validadeDe === "" ||
       (p.dataValidade !== "—" && p.dataValidade >= validadeDe);
@@ -268,7 +113,7 @@ export function PassaporteEquestrePage(
       p.estabelecimento.codigo === estabelecimento.codigo;
     const matchExploracao =
       !exploracaoPecuaria ||
-      p.exploracaoPecuaria === exploracaoPecuaria.codigo;
+      p.exploracaoPecuaria.codigo === exploracaoPecuaria.codigo;
     const matchSituacao =
       situacao === "" || p.situacao === situacao;
     return (
@@ -316,7 +161,7 @@ export function PassaporteEquestrePage(
         <div className="flex flex-col gap-3">
           <button
             type="button"
-            onClick={() => onNavigate("inicial")}
+            onClick={() => onNavigate("dashboard")}
             className="flex items-center gap-1 text-sm transition hover:opacity-70 self-start"
             style={{ color: GREEN }}
           >
@@ -325,25 +170,18 @@ export function PassaporteEquestrePage(
           </button>
 
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full">
-            <div>
-              <h1 className="text-2xl font-semibold text-gray-900">
-                Passaportes Equestres
-              </h1>
-              <p className="text-sm text-gray-500 mt-1">
-                Consulte ou adicione novos passaportes emitidos
-                para equídeos.
-              </p>
-            </div>
+            <h1 className="text-2xl font-semibold text-gray-900">
+              Passaporte Equestre
+            </h1>
 
             {/* Botão de Adicionar */}
             <button
               type="button"
               onClick={() =>
                 onNavigate("adicionar-passaporte-equestre")
-              } // Altere para a rota correta do seu fluxo
+              }
               className="flex items-center justify-center gap-2 px-5 h-11 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-bold rounded-xl transition shadow-sm self-stretch sm:self-auto"
             >
-              <Plus size={18} />
               Adicionar Passaporte
             </button>
           </div>
@@ -351,25 +189,19 @@ export function PassaporteEquestrePage(
 
         {/* CONTAINER BRANCO ÚNICO */}
         <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col gap-5">
-          {/* Barra Superior do Filtro (Nome do Animal / Código do Microchip e Botão de Expansão) */}
+          {/* Barra Superior do Filtro (Nome do Animal ou Código do Microchip) */}
           <div className="flex gap-3 items-stretch w-full">
-            <div className="flex-1 bg-white border border-gray-200 rounded-md px-3 h-12 transition-all relative flex items-end pb-1.5 focus-within:border-[#1A7A3C] focus-within:ring-1 focus-within:ring-[#1A7A3C]">
-              <label
-                className={`absolute left-3 transition-all duration-200 pointer-events-none ${focusBusca || busca ? "top-1 text-[10px] text-gray-400 font-medium" : "top-1/2 -translate-y-1/2 text-sm text-gray-400"}`}
-              >
-                Nome do Animal ou Código do Microchip
-              </label>
-
+            <div className="flex-1 bg-white border border-gray-200 rounded-md px-3 h-12 transition-all relative flex items-center focus-within:border-[#1A7A3C] focus-within:ring-1 focus-within:ring-[#1A7A3C]">
               <div className="flex items-center w-full">
                 <input
                   type="text"
+                  maxLength={255}
                   value={busca}
-                  onFocus={() => setFocusBusca(true)}
-                  onBlur={() => setFocusBusca(false)}
                   onChange={(e) => setBusca(e.target.value)}
                   onKeyDown={(e) =>
                     e.key === "Enter" && handlePesquisar()
                   }
+                  placeholder="Nome do Animal ou Código do Microchip"
                   className="w-full bg-transparent text-sm text-gray-800 outline-none h-6"
                 />
 
@@ -398,7 +230,7 @@ export function PassaporteEquestrePage(
           {/* Filtros Internos Avançados */}
           {showFilters && (
             <div className="animate-fadeIn flex flex-col gap-3 w-full">
-              {/* FILEIRA 1: Período de Validade + Botão Pesquisar */}
+              {/* FILEIRA 1: Período de validade e ação de pesquisa */}
               <div className="flex flex-col lg:flex-row items-end gap-3 w-full">
                 <div className="w-full lg:flex-1">
                   <FloatInput
@@ -406,6 +238,7 @@ export function PassaporteEquestrePage(
                     type="date"
                     value={validadeDe}
                     onChange={setValidadeDe}
+                    icon={<Calendar size={18} />}
                   />
                 </div>
                 <div className="w-full lg:flex-1">
@@ -414,6 +247,7 @@ export function PassaporteEquestrePage(
                     type="date"
                     value={validadeAte}
                     onChange={setValidadeAte}
+                    icon={<Calendar size={18} />}
                   />
                 </div>
 
@@ -440,7 +274,7 @@ export function PassaporteEquestrePage(
                   label="Produtor"
                   placeholder="Buscar pelo nome ou documento do produtor."
                   value={produtor ? produtor.nome : ""}
-                  data={PRODUTORES_MOCK}
+                  data={PRODUTORES_PASSAPORTE_MOCK}
                   searchKeys={["nome", "documento"]}
                   columns={[
                     { label: "Nome", key: "nome" },
@@ -464,21 +298,12 @@ export function PassaporteEquestrePage(
                   value={
                     estabelecimento ? estabelecimento.nome : ""
                   }
-                  data={ESTABELECIMENTOS_MOCK}
-                  searchKeys={[
-                    "codigo",
-                    "nome",
-                    "municipio",
-                    "proprietario",
-                  ]}
+                  data={ESTABELECIMENTOS_PASSAPORTE_MOCK}
+                  searchKeys={["codigo", "nome", "municipio"]}
                   columns={[
                     { label: "Código", key: "codigo" },
                     { label: "Estabelecimento", key: "nome" },
                     { label: "Município", key: "municipio" },
-                    {
-                      label: "Proprietário",
-                      key: "proprietario",
-                    },
                   ]}
                   icon={
                     <img
@@ -489,7 +314,6 @@ export function PassaporteEquestrePage(
                   }
                   title="Buscar Estabelecimento Agropecuário"
                   subtitle="Busque por um estabelecimento cadastrado:"
-                  className="[&_td]:whitespace-pre-line"
                   onChange={(ent) => setEstabelecimento(ent)}
                 />
 
@@ -501,7 +325,7 @@ export function PassaporteEquestrePage(
                       ? exploracaoPecuaria.codigo
                       : ""
                   }
-                  data={EXPLORACOES_MOCK}
+                  data={EXPLORACOES_PASSAPORTE_MOCK}
                   searchKeys={[
                     "codigo",
                     "estabNome",
@@ -652,7 +476,7 @@ export function PassaporteEquestrePage(
                           <div>{p.estabelecimento.nome}</div>
                         </td>
                         <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">
-                          {p.exploracaoPecuaria}
+                          {p.exploracaoPecuaria.codigo}
                         </td>
                         <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">
                           {p.situacao}

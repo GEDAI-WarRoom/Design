@@ -37,6 +37,7 @@ import {
   BriefcaseBusiness,
   Truck,
   Landmark,
+  BadgePercent,
 } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import * as Icons from "../imports/icons";
@@ -472,6 +473,11 @@ export const secondaryCategories: MenuCategory[] = [
           />
         ),
       },
+      {
+        label: "Isenção de Taxa de GTA",
+        route: "isencao-taxa-gta",
+        icon: <BadgePercent size={16} />,
+      },
     ],
   },
 ];
@@ -490,6 +496,11 @@ export const thirdCategories: MenuCategory[] = [
         label: "Valor Por Índice",
         route: "valor-indice",
         icon: <ReceiptText size={16} />,
+      },
+      {
+        label: "Item da Receita",
+        route: "item-receita",
+        icon: <Package size={16} />,
       },
     ],
   },

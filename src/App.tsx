@@ -57,6 +57,8 @@ import { EstabelecimentoAgroindustrialSIEMGPage } from "./pages/Animal/Estabelec
 import { AdicionarEstabelecimentoAgroindustrialSIEMGPage } from "./pages/Animal/EstabelecimentoAgroindustrialSIEMG/AdicionarEstabelecimentoAgroindustrialSIEMG";
 import { VisualizarEstabelecimentoAgroindustrialSIEMGPage } from "./pages/Animal/EstabelecimentoAgroindustrialSIEMG/VisualizarEstabelecimentoAgroindustrialSIEMG";
 import { PassaporteEquestrePage } from "./pages/Animal/PassaporteEquestre/PassaporteEquestre";
+import { AdicionarPassaporteEquestrePage } from "./pages/Animal/PassaporteEquestre/AdicionarPassaporteEquestre";
+import { VisualizarPassaporteEquestrePage } from "./pages/Animal/PassaporteEquestre/VisualizarPassaporteEquestre";
 import { EstabelecimentoEventoPecuarioPage } from "./pages/Animal/EstabelecimentoEventoPecuario/EstabelecimentoEventoPecuario";
 import { AdicionarEstabelecimentoEventoPecuarioPage } from "./pages/Animal/EstabelecimentoEventoPecuario/AdicionarEstabelecimentoEventoPecuario";
 import { IntegradoraCooperativaPage } from "./pages/Animal/IntegradoraCooperativa/IntegradoraCooperativa";
@@ -70,6 +72,8 @@ import { RevendedoraAnimaisPage } from "./pages/Animal/RevendedoraAnimais/Revend
 import { AdicionarRevendedoraAnimaisPage } from "./pages/Animal/RevendedoraAnimais/AdicionarRevendedoraAnimais";
 import { VisualizarRevendedoraAnimaisPage } from "./pages/Animal/RevendedoraAnimais/VisualizarRevendedoraAnimais";
 import { VisualizarEstabelecimentoAgroindustrialOutrasInspecoesPage } from "./pages/Animal/EstabelecimentoAgroindustrialOutrasInspecoes/VisualizarEstabelecimentoAgroindustrialOutrasInspecoes";
+import { TipoVeiculoPage } from "./pages/Animal/TipoVeiculo/TipoVeiculo";
+import { AdicionarTipoVeiculoPage } from "./pages/Animal/TipoVeiculo/AdicionarTipoVeiculo";
 
 // VEGETAL
 import { UnidadeConsolidacaoPage } from "./pages/Vegetal/UnidadeConsolidacao/UnidadeConsolidacao";
@@ -111,6 +115,8 @@ import { EditarTipoInsumoExamePage } from "./pages/Vacinacao/TipoInsumoExame/Edi
 //ARRECADACAO
 import { ValorIndicePage } from "./pages/Arrecadacao/ValorIndice/ValorIndice";
 import { AdicionarValorIndicePage } from "./pages/Arrecadacao/ValorIndice/AdicionarValorIndice";
+import { ItemReceitaPage } from "./pages/Arrecadacao/ItemReceita/ItemReceita";
+import { AdicionarItemReceitaPage } from "./pages/Arrecadacao/ItemReceita/AdicionarItemReceita";
 
 // GTA
 import { AdicionarDistribuicaoFormulariosGta } from "./pages/GTA/DistribuicaoFormulariosGta/AdicionarDistribuicaoFormulariosGta";
@@ -124,6 +130,8 @@ import { RegistroVendaGtaFisicaPage } from "./pages/GTA/RegistroVendaGTAFisica/R
 import { AdicionarRegistroVendaGtaFisicaPage } from "./pages/GTA/RegistroVendaGTAFisica/AdicionarRegistroVendaGTAFisica";
 import { FinalidadeTransitoPage } from "./pages/GTA/FinalidadeTransito/FinalidadeTransito";
 import { AdicionarFinalidadeTransitoPage } from "./pages/GTA/FinalidadeTransito/AdicionarFinalidadeTransito";
+import { IsencaoTaxaGtaPage } from "./pages/GTA/IsencaoTaxaGTA/IsencaoTaxaGTA";
+import { AdicionarIsencaoTaxaGtaPage } from "./pages/GTA/IsencaoTaxaGTA/AdicionarIsencaoTaxaGTA";
 
 // CONTROLE
 import { UsuariosPage } from "./pages/Controle/Usuarios/Usuarios";
@@ -166,6 +174,8 @@ export type Screen =
   | "visualizar-exploracao-pecuaria" // 🚀 Adicionado
   | "passaporte-equestre"
   | "adicionar-passaporte-equestre"
+  | "visualizar-passaporte-equestre"
+  | "editar-passaporte-equestre"
   | "laboratorio"
   | "adicionar-laboratorio"
   | "partilha-vacina"
@@ -254,7 +264,13 @@ export type Screen =
   | "instituicao-ensino-pesquisa"
   | "adicionar-instituicao-ensino-pesquisa"
   | "visualizar-instituicao-ensino-pesquisa"
-  | "editar-instituicao-ensino-pesquisa";
+  | "editar-instituicao-ensino-pesquisa"
+  | "isencao-taxa-gta"
+  | "adicionar-isencao-taxa-gta"
+  | "item-receita"
+  | "adicionar-item-receita"
+  | "tipo-veiculo"
+  | "adicionar-tipo-veiculo";
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>("login");
@@ -854,6 +870,30 @@ export default function App() {
           onNavigate={handleNavigate}
         />
       );
+    case "adicionar-passaporte-equestre":
+      return (
+        <AdicionarPassaporteEquestrePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "visualizar-passaporte-equestre":
+      return (
+        <VisualizarPassaporteEquestrePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
+        />
+      );
+    case "editar-passaporte-equestre":
+      return (
+        <AdicionarPassaporteEquestrePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
+          modo="editar"
+        />
+      );
     case "valor-indice":
       return (
         <ValorIndicePage onLogout={handleLogout} onNavigate={handleNavigate} />
@@ -865,9 +905,6 @@ export default function App() {
           onNavigate={handleNavigate}
         />
       );
-    //  case "adicionar-passaporte-equestre":
-    //  return <AdicionarPassaporteEquestrePage onLogout={handleLogout} onNavigate={handleNavigate} />;
-
     case "distribuicao-formularios-gta":
       return (
         <DistribuicaoFormulariosGta
@@ -1105,6 +1142,42 @@ export default function App() {
     case "adicionar-instituicao-ensino-pesquisa":
       return (
         <AdicionarInstituicaoEnsinoPesquisaPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "isencao-taxa-gta":
+      return (
+        <IsencaoTaxaGtaPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "adicionar-isencao-taxa-gta":
+      return (
+        <AdicionarIsencaoTaxaGtaPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "item-receita":
+      return (
+        <ItemReceitaPage onLogout={handleLogout} onNavigate={handleNavigate} />
+      );
+    case "tipo-veiculo":
+      return (
+        <TipoVeiculoPage onLogout={handleLogout} onNavigate={handleNavigate} />
+      );
+    case "adicionar-item-receita":
+      return (
+        <AdicionarItemReceitaPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "adicionar-tipo-veiculo":
+      return (
+        <AdicionarTipoVeiculoPage
           onLogout={handleLogout}
           onNavigate={handleNavigate}
         />
