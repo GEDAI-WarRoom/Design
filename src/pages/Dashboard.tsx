@@ -499,6 +499,11 @@ export const thirdCategories: MenuCategory[] = [
         route: "valor-indice",
         icon: <ReceiptText size={16} />,
       },
+      {
+        label: "Fundo de Arrecadação",
+        route: "fundo-arrecadacao",
+        icon: <DollarSign size={16} />,
+      },
     ],
   },
 ];

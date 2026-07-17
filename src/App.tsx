@@ -108,6 +108,12 @@ import { EditarTipoInsumoExamePage } from "./pages/Vacinacao/TipoInsumoExame/Edi
 //ARRECADACAO
 import { ValorIndicePage } from "./pages/Arrecadacao/ValorIndice/ValorIndice";
 import { AdicionarValorIndicePage } from "./pages/Arrecadacao/ValorIndice/AdicionarValorIndice";
+import { FundoArrecadacaoPage } from "./pages/Arrecadacao/FundoArrecadacao/FundoArrecadacao";
+import {
+  AdicionarFundoArrecadacaoPage,
+  EditarFundoArrecadacaoPage,
+  VisualizarFundoArrecadacaoPage,
+} from "./pages/Arrecadacao/FundoArrecadacao/FundoArrecadacaoDetalhe";
 
 // GTA
 import { AdicionarDistribuicaoFormulariosGta } from "./pages/GTA/DistribuicaoFormulariosGta/AdicionarDistribuicaoFormulariosGta";
@@ -252,7 +258,11 @@ export type Screen =
   | "visualizar-papel"
   | "editar-papel"
   | "isencao-taxa-gta"
-  | "adicionar-isencao-taxa-gta";
+  | "adicionar-isencao-taxa-gta"
+  | "fundo-arrecadacao"
+  | "adicionar-fundo-arrecadacao"
+  | "visualizar-fundo-arrecadacao"
+  | "editar-fundo-arrecadacao";
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>("login");
@@ -901,6 +911,36 @@ export default function App() {
     case "adicionar-valor-indice":
       return (
         <AdicionarValorIndicePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "fundo-arrecadacao":
+      return (
+        <FundoArrecadacaoPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "adicionar-fundo-arrecadacao":
+      return (
+        <AdicionarFundoArrecadacaoPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "visualizar-fundo-arrecadacao":
+      return (
+        <VisualizarFundoArrecadacaoPage
+          dados={screenData}
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "editar-fundo-arrecadacao":
+      return (
+        <EditarFundoArrecadacaoPage
+          dados={screenData}
           onLogout={handleLogout}
           onNavigate={handleNavigate}
         />
