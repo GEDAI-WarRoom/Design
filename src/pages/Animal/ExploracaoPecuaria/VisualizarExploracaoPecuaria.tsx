@@ -4,19 +4,80 @@ import {
   Pencil, Check, Calendar, ShieldAlert, Info, History, Plus
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
-import {
-  FloatInput,
-  FloatSelect,
-  LargeTextArea,
-  CheckboxGroup,
+import { 
+  FloatInput, 
+  FloatSelect, 
+  LargeTextArea, 
+  CheckboxGroup, 
   SimNao,
   HistoryCard,
-  AccordionCardGroup,
-  EvaluationActiveCard
+  AccordionCardGroup, 
+  EvaluationActiveCard,
+  
 } from "../../../components/ui/FormKit";
 import * as Icons from "../../../imports/icons";
-import { EntitySearchInput } from "../../../components/ui/EntitySearch";
 
+// --- mock ---
+
+export interface CicloProducaoDistribuicao {
+  id: number;
+  situacao: "Ativo" | "Inativo";
+  capacidade: string;
+  unidade: string;
+  quantidade: string;
+  quantidadeTanques: string;
+}
+
+export const CICLO_UP_MOCK: CicloProducaoDistribuicao[] = [
+  {
+    id: 1,
+    situacao: "Ativo",
+    capacidade: "500",
+    unidade: "m³",
+    quantidade: "120",
+    quantidadeTanques: "5",
+  },
+  {
+    id: 2,
+    situacao: "Inativo",
+    capacidade: "350",
+    unidade: "m³",
+    quantidade: "90",
+    quantidadeTanques: "4",
+  },
+  {
+    id: 3,
+    situacao: "Inativo",
+    capacidade: "750",
+    unidade: "m²",
+    quantidade: "180",
+    quantidadeTanques: "7",
+  },
+  {
+    id: 4,
+    situacao: "Inativo",
+    capacidade: "1200",
+    unidade: "L",
+    quantidade: "450",
+    quantidadeTanques: "12",
+  },
+  {
+    id: 5,
+    situacao: "Inativo",
+    capacidade: "640",
+    unidade: "m³",
+    quantidade: "150",
+    quantidadeTanques: "6",
+  },
+  {
+    id: 6,
+    situacao: "Inativo",
+    capacidade: "980",
+    unidade: "m²",
+    quantidade: "220",
+    quantidadeTanques: "9",
+  },
+];
 
 // ==========================================================
 // COMPONENTE GENÉRICO: MODAL BASE ESTILIZADO
@@ -62,10 +123,10 @@ export function ModalBase({
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
       <div
         className="bg-white rounded-[15px] flex flex-col gap-[12px] items-center px-[45px] py-[40px] overflow-x-clip overflow-y-auto w-full max-w-[95vw]"
-        style={{
-          border: "1px solid #d6d6d6",
+        style={{ 
+          border: "1px solid #d6d6d6", 
           maxHeight: "90vh",
-          width: width.includes("px") || width.includes("%") ? width : undefined
+          width: width.includes("px") || width.includes("%") ? width : undefined 
         }}
       >
         {/* Botão de Fechar */}
@@ -142,13 +203,6 @@ export function ModalBase({
   );
 }
 
-const PROFISSIONAIS_OFICIAIS_MOCK = [
-  { id: 1, nome: "Dr. Ricardo Alvarenga", crmv: "CRMV-MG 12345", cpf: "123.456.789-00" },
-  { id: 2, nome: "Dra. Mariana Souza", crmv: "CRMV-MG 67890", cpf: "987.654.321-11" },
-  { id: 3, nome: "Dr. Carlos Eduardo Lima", crmv: "CRMV-MG 54321", cpf: "456.789.123-22" },
-  { id: 4, nome: "Dra. Ana Beatris Mendes", crmv: "CRMV-MG 98765", cpf: "321.654.987-33" },
-];
-
 // ==========================================================
 // PATHS SVG REUTILIZÁVEIS
 // ==========================================================
@@ -167,7 +221,7 @@ const DEFAULT_VULN_COLORS: Record<string, string> = {
 function Section({ title, children, defaultOpen = true }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className=" rounded-xl border border-gray-150 shadow-sm">
+    <div className="bg-white rounded-xl shadow-sm">
       <button
         type="button"
         onClick={() => setOpen(!open)}
@@ -198,7 +252,7 @@ function EntidadeLeitura({ label, value, icon, onVer }: { label: string; value: 
   return (
     <div className="flex items-center gap-2 w-full">
       <div className="flex-1">
-        <FloatInput label={label} value={value} icon={icon} disabled onChange={() => { }} />
+        <FloatInput label={label} value={value} icon={icon} disabled onChange={() => {}} />
       </div>
       {onVer && (
         <button
@@ -226,10 +280,10 @@ function CicloProducaoLeitura({
   return (
     <SubGrupo titulo={titulo} comDivisor>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-        <FloatInput label={labelQuantidade} value={ciclo.quantidade} disabled onChange={() => { }} />
-        <FloatInput label="Unidade de Medida dos Tanques" value={ciclo.unidade} disabled onChange={() => { }} />
-        <FloatInput label="Tamanho médio dos tanques" value={ciclo.tamanho} disabled onChange={() => { }} />
-        <FloatInput label="Quantidade de Tanques" value={ciclo.quantidadeTanques} disabled onChange={() => { }} />
+        <FloatInput label={labelQuantidade} value={ciclo.quantidade} disabled onChange={() => {}} />
+        <FloatInput label="Unidade de Medida dos Tanques" value={ciclo.unidade} disabled onChange={() => {}} />
+        <FloatInput label="Tamanho médio dos tanques" value={ciclo.tamanho} disabled onChange={() => {}} />
+        <FloatInput label="Quantidade de Tanques" value={ciclo.quantidadeTanques} disabled onChange={() => {}} />
       </div>
     </SubGrupo>
   );
@@ -354,40 +408,45 @@ interface PageProps {
 }
 
 export function VisualizarExploracaoPecuariaPage({
-  onLogout = () => { },
+  onLogout = () => {},
   onNavigate = (screen: any) => console.log("navigate:", screen),
 }: PageProps = {}) {
   const r = REGISTRO;
+  const d = CICLO_UP_MOCK;
+  const ativos = d.filter(
+      (c) => c.situacao === "Ativo"
+  );
+  const inativos = d.filter(
+      (c) => c.situacao === "Inativo"
+  );
 
   const [activeTab, setActiveTab] = useState("cadastro");
   const [biosseguridades, setBiosseguridades] = useState<Biosseguridade[]>(BIOSSEGURIDADES_MOCK);
-  const [modalAberto, setModalAberto] = useState(false);
+  const [modalBiosseguiradadeAberto, setModalBiosseguiradadeAberto] = useState(false);
+  const [modalCicloAberto, setModalCicloAberto] = useState(false);
   // ==========================================================
-  // ESTADOS DA AVALIAÇÃO DE BIOSSEGURIDADE (CONFORME O PDF)
-  // ==========================================================
-  const [profissional, setProfissional] = useState("");
-  const [dataLevantamento, setDataLevantamento] = useState("");
+// ESTADOS DA AVALIAÇÃO DE BIOSSEGURIDADE (CONFORME O PDF)
+// ==========================================================
+const [profissional, setProfissional] = useState("");
+const [dataLevantamento, setDataLevantamento] = useState("");
+const [livreAnimais, setLivreAnimais] = useState<boolean | null>(null);
+const [assistenciaSanitaria, setAssistenciaSanitaria] = useState<boolean | null>(null);
+const [controleTransito, setControleTransito] = useState<boolean | null>(null);
+const [desinfeccaoVeiculos, setDesinfeccaoVeiculos] = useState<boolean | null>(null);
+const [usaProbiotico, setUsaProbiotico] = useState<boolean | null>(null);
+const [equipamentosExclusivos, setEquipamentosExclusivos] = useState<boolean | null>(null);
+const [barreirasAnimais, setBarreirasAnimais] = useState<boolean | null>(null);
+const [desinfeccaoTanques, setDesinfeccaoTanques] = useState<boolean | null>(null);
+const [quarentenaIntroducao, setQuarentenaIntroducao] = useState<boolean | null>(null);
+const [protegidaInundacoes, setProtegidaInundacoes] = useState<boolean | null>(null);
+const [recebeImportados, setRecebeImportados] = useState<boolean | null>(null);
+const [recebeAlimentoVivo, setRecebeAlimentoVivo] = useState<boolean | null>(null);
 
-
-
-  const [livreAnimais, setLivreAnimais] = useState<boolean | null>(null);
-  const [assistenciaSanitaria, setAssistenciaSanitaria] = useState<boolean | null>(null);
-  const [controleTransito, setControleTransito] = useState<boolean | null>(null);
-  const [desinfeccaoVeiculos, setDesinfeccaoVeiculos] = useState<boolean | null>(null);
-  const [usaProbiotico, setUsaProbiotico] = useState<boolean | null>(null);
-  const [equipamentosExclusivos, setEquipamentosExclusivos] = useState<boolean | null>(null);
-  const [barreirasAnimais, setBarreirasAnimais] = useState<boolean | null>(null);
-  const [desinfeccaoTanques, setDesinfeccaoTanques] = useState<boolean | null>(null);
-  const [quarentenaIntroducao, setQuarentenaIntroducao] = useState<boolean | null>(null);
-  const [protegidaInundacoes, setProtegidaInundacoes] = useState<boolean | null>(null);
-  const [recebeImportados, setRecebeImportados] = useState<boolean | null>(null);
-  const [recebeAlimentoVivo, setRecebeAlimentoVivo] = useState<boolean | null>(null);
-
-  // Opções de profissionais oficiais de exemplo para o FloatSelect
-  const profissionaisOficiais = [
-    { value: "Miriam Souza Sabino", label: "Miriam Souza Sabino" },
-    { value: "Jailton Antônio Silveira", label: "Jailton Antônio Silveira" }
-  ];
+// Opções de profissionais oficiais de exemplo para o FloatSelect
+const profissionaisOficiais = [
+  { value: "Miriam Souza Sabino", label: "Miriam Souza Sabino" },
+  { value: "Jailton Antônio Silveira", label: "Jailton Antônio Silveira" }
+];
 
   const [novoTipo, setNovoTipo] = useState("");
   const [novaMedida, setNovaMedida] = useState("");
@@ -418,10 +477,14 @@ export function VisualizarExploracaoPecuariaPage({
     setNovaObs("");
   };
 
-  const abrirModal = () => {
+  const abrirModalBiosseguridade = () => {
     limparModal();
-    setModalAberto(true);
+    setModalBiosseguiradadeAberto(true);
   };
+
+  const abrirModalCiclo =() => {
+    setModalCicloAberto(true);
+  }
 
   const salvarBiosseguridade = () => {
     if (!novoTipo || !novaMedida) {
@@ -451,63 +514,104 @@ export function VisualizarExploracaoPecuariaPage({
         vigente: true,
       },
     ]);
-    setModalAberto(false);
+    setModalBiosseguiradadeAberto(false);
     limparModal();
   };
 
   const TABS = [
     { id: "cadastro", label: "Cadastro", icon: <FileText size={16} /> },
     { id: "biosseguridade", label: "Biosseguridade", icon: <ShieldCheck size={16} /> },
+    { id: "producao/distribuicao", label: "Ciclo de produção/distribuição", icon: <History size={16} /> },
   ];
 
+  const renderActionButton = () => {
+  switch (activeTab) {
+    case "cadastro":
+      return (
+        <button
+          type="button"
+          onClick={() => onNavigate("editar-exploracao-pecuaria", r)}
+          className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2"
+        >
+          Editar
+        </button>
+      );
+
+    case "biosseguridade":
+      return (
+        <button
+          type="button"
+          onClick={abrirModalBiosseguridade}
+          className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2"
+        >
+          Adicionar Biosseguridade
+        </button>
+      );
+    
+    case "producao/distribuicao":
+      return (
+        <button
+          type="button"
+          onClick={abrirModalCiclo}
+          className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2"
+        >
+          Adicionar Ciclo
+        </button>
+      );
+
+    default:
+      return null;
+  }
+};
+
   // ==========================================================
-  // CÁLCULO DINÂMICO DA NOTA E VULNERABILIDADE (0 a 10)
-  // ==========================================================
-  const resultadoAvaliacao = React.useMemo(() => {
-    const perguntas = [
-      { valor: livreAnimais, favoravel: true },          // Sim é favorável
-      { valor: assistenciaSanitaria, favoravel: true },  // Sim é favorável
-      { valor: controleTransito, favoravel: true },      // Sim é favorável
-      { valor: desinfeccaoVeiculos, favoravel: true },   // Sim é favorável
-      { valor: usaProbiotico, favoravel: true },         // Sim é favorável
-      { valor: equipamentosExclusivos, favoravel: true },// Sim é favorável
-      { valor: barreirasAnimais, favoravel: true },      // Sim é favorável
-      { valor: desinfeccaoTanques, favoravel: true },    // Sim é favorável
-      { valor: quarentenaIntroducao, favoravel: true },  // Sim é favorável
-      { valor: protegidaInundacoes, favoravel: true },   // Sim é favorável
-      { valor: recebeImportados, favoravel: false },     // Não é favorável (menor risco)
-      { valor: recebeAlimentoVivo, favoravel: false },   // Não é favorável (menor risco)
-    ];
+// CÁLCULO DINÂMICO DA NOTA E VULNERABILIDADE (0 a 10)
+// ==========================================================
+const resultadoAvaliacao = React.useMemo(() => {
+  const perguntas = [
+    { valor: livreAnimais, favoravel: true },          // Sim é favorável
+    { valor: assistenciaSanitaria, favoravel: true },  // Sim é favorável
+    { valor: controleTransito, favoravel: true },      // Sim é favorável
+    { valor: desinfeccaoVeiculos, favoravel: true },   // Sim é favorável
+    { valor: usaProbiotico, favoravel: true },         // Sim é favorável
+    { valor: equipamentosExclusivos, favoravel: true },// Sim é favorável
+    { valor: barreirasAnimais, favoravel: true },      // Sim é favorável
+    { valor: desinfeccaoTanques, favoravel: true },    // Sim é favorável
+    { valor: quarentenaIntroducao, favoravel: true },  // Sim é favorável
+    { valor: protegidaInundacoes, favoravel: true },   // Sim é favorável
+    { valor: recebeImportados, favoravel: false },     // Não é favorável (menor risco)
+    { valor: recebeAlimentoVivo, favoravel: false },   // Não é favorável (menor risco)
+  ];
 
-    // Filtra apenas as perguntas que já foram respondidas (não nulas)
-    const respondidas = perguntas.filter(p => p.valor !== null);
+  // Filtra apenas as perguntas que já foram respondidas (não nulas)
+  const respondidas = perguntas.filter(p => p.valor !== null);
+  
+  if (respondidas.length === 0) {
+    return { nota: "0.0", classe: "D", texto: "Sem respostas", cor: "#6B7280" };
+  }
 
-    if (respondidas.length === 0) {
-      return { nota: "0.0", classe: "D", texto: "Sem respostas", cor: "#6B7280" };
-    }
+  // Conta os acertos (respostas que batem com o comportamento seguro)
+  const acertos = respondidas.filter(p => p.valor === p.favoravel).length;
+  
+  // Calcula a nota proporcional com base no total de respondidas (máximo 10)
+  const notaCalculada = ((acertos / respondidas.length) * 10).toFixed(1);
+  const notaNum = parseFloat(notaCalculada);
 
-    // Conta os acertos (respostas que batem com o comportamento seguro)
-    const acertos = respondidas.filter(p => p.valor === p.favoravel).length;
-
-    // Calcula a nota proporcional com base no total de respondidas (máximo 10)
-    const notaCalculada = ((acertos / respondidas.length) * 10).toFixed(1);
-    const notaNum = parseFloat(notaCalculada);
-
-    // Define o nível e a cor com base na nota calculada
-    if (notaNum >= 9.0) {
-      return { nota: notaCalculada, classe: "A", texto: "Bem Protegida", cor: "#008446" };
-    } else if (notaNum >= 7.0) {
-      return { nota: notaCalculada, classe: "B", texto: "Vulnerabilidade Baixa", cor: "#1570EF" };
-    } else if (notaNum >= 5.0) {
-      return { nota: notaCalculada, classe: "C", texto: "Vulnerabilidade Moderada", cor: "#F79009" };
-    } else {
-      return { nota: notaCalculada, classe: "D", texto: "Vulnerabilidade Alta", cor: "#D92D20" };
-    }
-  }, [
-    livreAnimais, assistenciaSanitaria, controleTransito, desinfeccaoVeiculos,
-    usaProbiotico, equipamentosExclusivos, barreirasAnimais, desinfeccaoTanques,
-    quarentenaIntroducao, protegidaInundacoes, recebeImportados, recebeAlimentoVivo
-  ]);
+  // Define o nível e a cor com base na nota calculada
+  if (notaNum >= 9.0) {
+    return { nota: notaCalculada, classe: "A", texto: "Bem Protegida", cor: "#008446" };
+  } else if (notaNum >= 7.0) {
+    return { nota: notaCalculada, classe: "B", texto: "Vulnerabilidade Baixa", cor: "#1570EF" };
+  } else if (notaNum >= 5.0) {
+    return { nota: notaCalculada, classe: "C", texto: "Vulnerabilidade Moderada", cor: "#F79009" };
+  } else {
+    return { nota: notaCalculada, classe: "D", texto: "Vulnerabilidade Alta", cor: "#D92D20" };
+  }
+}, [
+  livreAnimais, assistenciaSanitaria, controleTransito, desinfeccaoVeiculos,
+  usaProbiotico, equipamentosExclusivos, barreirasAnimais, desinfeccaoTanques,
+  quarentenaIntroducao, protegidaInundacoes, recebeImportados, recebeAlimentoVivo
+]);
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
@@ -532,23 +636,7 @@ export function VisualizarExploracaoPecuariaPage({
             </div>
 
             {/* Botão dinâmico conforme a aba ativa */}
-            {activeTab === "cadastro" ? (
-              <button
-                type="button"
-                onClick={() => onNavigate("editar-exploracao-pecuaria", r)}
-                className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2"
-              >
-                Editar
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={abrirModal}
-                className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2"
-              >
-                Adicionar Biosseguridade
-              </button>
-            )}
+            {renderActionButton()}
           </div>
         </div>
 
@@ -558,8 +646,9 @@ export function VisualizarExploracaoPecuariaPage({
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 py-2 px-4 border-b-2 text-sm font-medium transition ${activeTab === tab.id ? "border-[#1A7A3C] text-[#1A7A3C]" : "border-transparent text-gray-500 hover:text-gray-700"
-                }`}
+              className={`flex items-center gap-2 py-2 px-4 border-b-2 text-sm font-medium transition ${
+                activeTab === tab.id ? "border-[#1A7A3C] text-[#1A7A3C]" : "border-transparent text-gray-500 hover:text-gray-700"
+              }`}
             >
               {tab.icon}
               {tab.label}
@@ -570,15 +659,15 @@ export function VisualizarExploracaoPecuariaPage({
         {/* ================= ABA CADASTRO ================= */}
         {activeTab === "cadastro" && (
           <div className="flex flex-col gap-4">
-
-            <Section title="Estabelecimento Agropecuário">
+           
+          <Section title="Estabelecimento Agropecuário">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
                 {/* 1º Elemento: Código do Estabelecimento (Lado Esquerdo) */}
-                <FloatInput
-                  label="Código do Estabelecimento"
-                  value={r.estabelecimento.codigo}
-                  disabled
-                  onChange={() => { }}
+                <FloatInput 
+                  label="Código do Estabelecimento" 
+                  value={r.estabelecimento.codigo} 
+                  disabled 
+                  onChange={() => {}} 
                 />
 
                 {/* 2º Elemento: Nome do Estabelecimento com a ação "Ver" (Lado Direito / Depois do código) */}
@@ -592,13 +681,13 @@ export function VisualizarExploracaoPecuariaPage({
 
             <Section title="Informações de Área">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-                <FloatSelect label="Unidade de Medida da Área" value={r.unidadeArea} onChange={() => { }} disabled options={toOptions([r.unidadeArea])} />
-                <FloatInput label="Área Produtiva do Estabelecimento" value={r.areaProdutiva} disabled onChange={() => { }} />
+                <FloatSelect label="Unidade de Medida da Área" value={r.unidadeArea} onChange={() => {}} disabled options={toOptions([r.unidadeArea])} />
+                <FloatInput label="Área Produtiva do Estabelecimento" value={r.areaProdutiva} disabled onChange={() => {}} />
                 <FloatInput
                   label="Área Útil da Exploração"
                   value={r.areaUtil}
                   disabled
-                  onChange={() => { }}
+                  onChange={() => {}}
                   hasTooltip
                   tooltipText="A área útil da exploração deve respeitar os limites da área produtiva disponível para a abertura de explorações no estabelecimento agropecuário."
                 />
@@ -608,7 +697,7 @@ export function VisualizarExploracaoPecuariaPage({
             <Section title="Produtores">
               <SubGrupo titulo="Produtor Titular">
                 <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-4 items-center">
-                  <FloatSelect label="Tipo de Produtor" value={r.titularTipo} onChange={() => { }} disabled options={toOptions([r.titularTipo])} />
+                  <FloatSelect label="Tipo de Produtor" value={r.titularTipo} onChange={() => {}} disabled options={toOptions([r.titularTipo])} />
                   <EntidadeLeitura
                     label="Produtor"
                     value={`${r.produtorTitular.documento} — ${r.produtorTitular.nome}`}
@@ -622,7 +711,7 @@ export function VisualizarExploracaoPecuariaPage({
               <div className="flex flex-col gap-6">
                 <SubGrupo titulo="Espécie">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-                    <FloatInput label="Grupo" value={r.especie.grupo} icon={<Dna size={18} color={GREEN} />} disabled onChange={() => { }} />
+                    <FloatInput label="Grupo" value={r.especie.grupo} icon={<Dna size={18} color={GREEN} />} disabled onChange={() => {}} />
                     <EntidadeLeitura
                       label="Espécie"
                       value={r.especie.nome}
@@ -656,8 +745,8 @@ export function VisualizarExploracaoPecuariaPage({
                   <SubGrupo titulo="Informações Complementares" comDivisor>
                     <div className="flex flex-col gap-6 mt-2">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-                        <FloatSelect label="Aptidão" value={r.aptidao} onChange={() => { }} disabled options={toOptions([r.aptidao])} />
-                        <FloatSelect label="Bacia Hidrográfica" value={r.bacia} onChange={() => { }} disabled options={toOptions([r.bacia])} />
+                        <FloatSelect label="Aptidão" value={r.aptidao} onChange={() => {}} disabled options={toOptions([r.aptidao])} />
+                        <FloatSelect label="Bacia Hidrográfica" value={r.bacia} onChange={() => {}} disabled options={toOptions([r.bacia])} />
                       </div>
 
                       <CheckboxGroup
@@ -665,7 +754,7 @@ export function VisualizarExploracaoPecuariaPage({
                         actionLabel=""
                         options={toCheck(r.origemCaptacao)}
                         defaultValue={r.origemCaptacao}
-                        onChange={() => { }}
+                        onChange={() => {}}
                         orientation="horizontal"
                       />
                       <CheckboxGroup
@@ -673,13 +762,13 @@ export function VisualizarExploracaoPecuariaPage({
                         actionLabel=""
                         options={toCheck(r.fonteCaptacao)}
                         defaultValue={r.fonteCaptacao}
-                        onChange={() => { }}
+                        onChange={() => {}}
                         orientation="grid"
                       />
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {r.fonteCaptacao.includes("Rio") && (
-                          <FloatInput label="Nome do Rio" value={r.nomeRio} disabled onChange={() => { }} />
+                          <FloatInput label="Nome do Rio" value={r.nomeRio} disabled onChange={() => {}} />
                         )}
                       </div>
                     </div>
@@ -692,9 +781,9 @@ export function VisualizarExploracaoPecuariaPage({
               <Section title="Caracterização do Sistema Produtivo">
                 <div className="flex flex-col gap-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-                    <FloatSelect label="Finalidade de Production" value={r.finalidadeProducao} onChange={() => { }} disabled options={toOptions([r.finalidadeProducao])} />
+                    <FloatSelect label="Finalidade de Production" value={r.finalidadeProducao} onChange={() => {}} disabled options={toOptions([r.finalidadeProducao])} />
                     {isOrnamental && (
-                      <FloatSelect label="Tipo de Piscicultura Ornamental" value={r.tipoPiscicultura} onChange={() => { }} disabled options={toOptions([r.tipoPiscicultura])} />
+                      <FloatSelect label="Tipo de Piscicultura Ornamental" value={r.tipoPiscicultura} onChange={() => {}} disabled options={toOptions([r.tipoPiscicultura])} />
                     )}
                   </div>
 
@@ -703,12 +792,12 @@ export function VisualizarExploracaoPecuariaPage({
                     actionLabel=""
                     options={toCheck(r.origemMatrizes)}
                     defaultValue={r.origemMatrizes}
-                    onChange={() => { }}
+                    onChange={() => {}}
                     orientation="horizontal"
                   />
 
                   <div className="w-full md:w-1/3">
-                    <FloatSelect label="Sistema de Produção" value={r.sistemaProducao} onChange={() => { }} disabled options={toOptions([r.sistemaProducao])} />
+                    <FloatSelect label="Sistema de Produção" value={r.sistemaProducao} onChange={() => {}} disabled options={toOptions([r.sistemaProducao])} />
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
@@ -718,7 +807,7 @@ export function VisualizarExploracaoPecuariaPage({
                         actionLabel=""
                         options={toCheck(r.sistFechado)}
                         defaultValue={r.sistFechado}
-                        onChange={() => { }}
+                        onChange={() => {}}
                         orientation="vertical"
                       />
                     )}
@@ -727,7 +816,7 @@ export function VisualizarExploracaoPecuariaPage({
                       actionLabel=""
                       options={toCheck(r.abastecimento)}
                       defaultValue={r.abastecimento}
-                      onChange={() => { }}
+                      onChange={() => {}}
                       orientation="vertical"
                     />
                     <CheckboxGroup
@@ -735,12 +824,12 @@ export function VisualizarExploracaoPecuariaPage({
                       actionLabel=""
                       options={toCheck(r.localDescarte)}
                       defaultValue={r.localDescarte}
-                      onChange={() => { }}
+                      onChange={() => {}}
                       orientation="vertical"
                     />
                   </div>
 
-                  <SimNao label="Realiza depuração de peixes?" name="depuracao-view" value={r.realizaDepuracao} onChange={() => { }} disabled />
+                  <SimNao label="Realiza depuração de peixes?" name="depuracao-view" value={r.realizaDepuracao} onChange={() => {}} disabled />
 
                   <SubGrupo titulo="Destino dos Animais" comDivisor>
                     <CheckboxGroup
@@ -748,7 +837,7 @@ export function VisualizarExploracaoPecuariaPage({
                       actionLabel=""
                       options={toCheck(r.tipoDestino)}
                       defaultValue={r.tipoDestino}
-                      onChange={() => { }}
+                      onChange={() => {}}
                       orientation="horizontal"
                     />
                     <CheckboxGroup
@@ -756,7 +845,7 @@ export function VisualizarExploracaoPecuariaPage({
                       actionLabel=""
                       options={toCheck(r.escalaComercio)}
                       defaultValue={r.escalaComercio}
-                      onChange={() => { }}
+                      onChange={() => {}}
                       orientation="horizontal"
                     />
                   </SubGrupo>
@@ -769,7 +858,7 @@ export function VisualizarExploracaoPecuariaPage({
                           actionLabel=""
                           options={toCheck(r.tratAfluente)}
                           defaultValue={r.tratAfluente}
-                          onChange={() => { }}
+                          onChange={() => {}}
                           orientation="vertical"
                         />
                         <CheckboxGroup
@@ -777,7 +866,7 @@ export function VisualizarExploracaoPecuariaPage({
                           actionLabel=""
                           options={toCheck(r.tratEfluente)}
                           defaultValue={r.tratEfluente}
-                          onChange={() => { }}
+                          onChange={() => {}}
                           orientation="vertical"
                         />
                       </div>
@@ -812,7 +901,7 @@ export function VisualizarExploracaoPecuariaPage({
                   label="É um Subarrendamento/Subcomodato?"
                   name="sub-exploracao-view"
                   value={r.isSub}
-                  onChange={() => { }}
+                  onChange={() => {}}
                   disabled
                   hasTooltip
                   tooltipText="Para casos em que a exploração pecuária é uma sub alocação dentro de outra exploração pecuária."
@@ -836,10 +925,10 @@ export function VisualizarExploracaoPecuariaPage({
                     </div>
                     <div className="flex-1 flex gap-3 items-start">
                       <div className="w-[340px]">
-                        <FloatInput label="Documento" value={anexo.nome} disabled onChange={() => { }} />
+                        <FloatInput label="Documento" value={anexo.nome} disabled onChange={() => {}} />
                       </div>
                       <div className="flex-1">
-                        <FloatInput label="Descrição" value={anexo.descricao || "—"} disabled onChange={() => { }} />
+                        <FloatInput label="Descrição" value={anexo.descricao || "—"} disabled onChange={() => {}} />
                       </div>
                       <div className="h-12 flex items-center">
                         <button
@@ -862,7 +951,7 @@ export function VisualizarExploracaoPecuariaPage({
               <LargeTextArea
                 label="Observação"
                 value={r.observacao}
-                onChange={() => { }}
+                onChange={() => {}}
                 disabled
                 hasTooltip
                 tooltipText="Informações adicionais pertinentes ao cadastro."
@@ -871,8 +960,8 @@ export function VisualizarExploracaoPecuariaPage({
 
             <Section title="Alterações do Cadastro" defaultOpen={false}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-                <FloatInput label="Usuário" value={r.usuarioAlteracao} disabled onChange={() => { }} />
-                <FloatInput label="Data e Hora da Última Modificação" value={r.dataAlteracao} disabled onChange={() => { }} />
+                <FloatInput label="Usuário" value={r.usuarioAlteracao} disabled onChange={() => {}} />
+                <FloatInput label="Data e Hora da Última Modificação" value={r.dataAlteracao} disabled onChange={() => {}} />
               </div>
             </Section>
           </div>
@@ -881,39 +970,39 @@ export function VisualizarExploracaoPecuariaPage({
         {/* ================= ABA BIOSSEGURIDADE ================= */}
         {activeTab === "biosseguridade" && (
           <div className="flex flex-col gap-6 mt-2">
-
+            
             {/* Legenda de Vulnerabilidade */}
             <div className="w-full max-w-[1088px] mx-auto bg-white border border-gray-200 rounded-2xl p-5 flex flex-wrap items-center justify-around gap-4 shadow-sm">
               <div className="flex items-center gap-3">
                 <span className="w-5 h-5 rounded-full bg-[#D92D20] shrink-0" />
                 <span className="text-sm font-medium text-gray-700">Vulnerabilidade Alta</span>
               </div>
-
+              
               <div className="flex items-center gap-3">
                 <span className="w-5 h-5 rounded-full bg-[#F79009] shrink-0" />
                 <span className="text-sm font-medium text-gray-700">Vulnerabilidade Moderada</span>
               </div>
-
+              
               <div className="flex items-center gap-3">
                 <span className="w-5 h-5 rounded-full bg-[#1570EF] shrink-0" />
                 <span className="text-sm font-medium text-gray-700">Vulnerabilidade Baixa</span>
               </div>
-
+              
               <div className="flex items-center gap-3">
                 <span className="w-5 h-5 rounded-full bg-[#129356] shrink-0" />
                 <span className="text-sm font-medium text-gray-700">Bem Protegida</span>
               </div>
             </div>
-
+            
             {/* Grupo de Cards */}
             <AccordionCardGroup
               title="Avaliações de Biosseguridade"
               activeCountText={`${ativas} de ${biosseguridades.length} ativas`}
               icon={<ShieldCheck className="w-5 h-5" />}
-              onAddClick={abrirModal}
+              onAddClick={abrirModalBiosseguridade}
               variant="sem-vinculacao"
               grid="unico"
-
+              
               historicoTitle="Histórico de Avaliações"
               historicoChildren={
                 historico.map((b) => (
@@ -924,8 +1013,7 @@ export function VisualizarExploracaoPecuariaPage({
                     topBarSvgPath={TOP_BAR_HISTORY}
                     icon={<History size={18} className="text-gray-500" />}
                     actionIcon={<Eye size={16} className="text-gray-500 hover:text-[#008446] transition-colors" />}
-                    onActionClick={() => onNavigate("visualizar-biosseguridade", b)}
-                  />
+                    onActionClick={() => onNavigate("visualizar-biosseguridade", b)} actionIconPath={""}                  />
                 ))
               }
             >
@@ -948,17 +1036,305 @@ export function VisualizarExploracaoPecuariaPage({
             </AccordionCardGroup>
           </div>
         )}
+
+        {/* ================= Aba de ciclo de produção/distribuição ================= */}
+        {activeTab === "producao/distribuicao" && (
+          <div className="flex flex-col gap-6 mt-2">
+            <Section title="Ciclos de Produção/Distribuição" defaultOpen={true}>
+              <div className="flex flex-col gap-4">
+                <AccordionCardGroup
+                  title="Ciclos de Produção/Distribuição"
+                  activeCountText={`${ativas} de ${d.length} ativos`}
+                  icon={<History className="w-5 h-5" />}
+                  onAddClick={abrirModalCiclo}
+                  variant="sem-vinculacao"
+                  grid="unico"
+                  historicoTitle="Histórico de Ciclos Inativos"
+                  historicoChildren={inativos.map((c) => (
+                    <article
+                      key={c.id}
+                      className="bg-white border border-gray-100 shadow-sm rounded-sm overflow-hidden min-w-0 w-full"
+                    >
+                      <div className="h-1 bg-gray-300" />
+                      <div className="p-4 flex flex-col gap-4">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-base font-semibold text-gray-800">
+                            Ciclo de Produção/Distribuição
+                          </h3>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+                          <FloatInput
+                            label="Capacidade de Produção/Distribuição"
+                            className="rounded-sm"
+                            value={c.quantidade}
+                            disabled
+                            onChange={() => {}}
+                          />
+                          <FloatInput
+                            label="Unidade de Medida dos Tanques"
+                            className="rounded-sm"
+                            value={c.unidade}
+                            disabled
+                            onChange={() => {}}
+                          />
+                          <FloatInput
+                            label="Tamanho médio dos Tanques"
+                            className="rounded-sm"
+                            value={c.capacidade}
+                            disabled
+                            onChange={() => {}}
+                          />
+                          <FloatInput
+                            label="Quantidade de Tanques"
+                            className="rounded-sm"
+                            value={c.quantidadeTanques}
+                            disabled
+                            onChange={() => {}}
+                          />
+                        </div>
+                      </div>
+                    </article>
+                  ))} children={
+                    ativos.map((c) => (
+                      <article
+                        key={c.id}
+                        className="bg-white border border-gray-100 shadow-sm rounded-sm overflow-hidden min-w-0 w-full"
+                      >
+                        <div className="h-1 bg-[#1A7A3C]" />
+                        <div className="p-4 flex flex-col gap-4">
+                          <div className="flex items-center justify-between">
+                            <h3 className="text-base font-semibold text-gray-800">
+                              Ciclo de Produção/Distribuição
+                            </h3>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+                            <FloatInput
+                              label="Capacidade de Produção/Distribuição"
+                              className="rounded-sm"
+                              value={c.quantidade}
+                              disabled
+                              onChange={() => {}}
+                            />
+                            <FloatInput
+                              label="Unidade de Medida dos Tanques"
+                              className="rounded-sm"
+                              value={c.unidade}
+                              disabled
+                              onChange={() => {}}
+                            />
+                            <FloatInput
+                              label="Tamanho médio dos Tanques"
+                              className="rounded-sm"
+                              value={c.capacidade}
+                              disabled
+                              onChange={() => {}}
+                            />
+                            <FloatInput
+                              label="Quantidade de Tanques"
+                              className="rounded-sm"
+                              value={c.quantidadeTanques}
+                              disabled
+                              onChange={() => {}}
+                            />
+                          </div>
+                        </div>
+                      </article>
+                    ))
+                  }
+                />
+              </div>
+            </Section>
+          </div>
+        )}
       </main>
 
-      {/* ==========================================================
-          MODAL DE CADASTRO DE BIOSSEGURIDADE (USANDO O NOVO MODALBASE E SECTIONS)
-          ========================================================== */}
-      {/* ==========================================================
+      {/* ================= Modal de ciclo de produção/distribuição ================= */}
+
+      <ModalBase
+        open={modalCicloAberto}
+        onClose={() => setModalCicloAberto(false)}
+        title="Adicionar Ciclo de Produção/Distribuição"
+        subtitle="Preencha todos os campos para realizar a criação do ciclo de produção/distribuição:"
+        icon={<History size={24} />}
+        saveText="Salvar"
+        cancelText="Cancelar"
+      >
+        <div className="w-full flex flex-col gap-6">
+          <Section title="Ciclo de Produção" defaultOpen={true}>
+            <div className="flex flex-col gap-4">
+              <span className="text-sm text-red-600 w-full text-center">(Exibição dos campos condicionais, aqui está exibindo todos para fins de demonstração)</span>
+              <SubGrupo titulo="Engorda">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FloatInput
+                    label="Capacidade de Produção/Distribuição"
+                    className="rounded-sm"
+                    value={""} 
+                    required
+                    onChange={() => {}}
+                  />
+                  <FloatInput
+                    label="Unidade de Medida dos Tanques"
+                    className="rounded-sm"
+                    value={""}
+                    required
+                    onChange={() => {}}
+                  />
+                  <FloatInput
+                    label="Tamanho médio dos Tanques"
+                    className="rounded-sm"
+                    value={""}
+                    required
+                    onChange={() => {}}
+                  />
+                  <FloatInput
+                    label="Quantidade de Tanques"
+                    className="rounded-sm"
+                    value={""}
+                    required
+                    onChange={() => {}}
+                  />
+                </div>
+              </SubGrupo>
+              <SubGrupo titulo="Cria/Recria">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FloatInput
+                    label="Capacidade de Produção/Distribuição"
+                    className="rounded-sm"
+                    value={""}
+                    required
+                    onChange={() => {}}
+                  />
+                  <FloatInput
+                    label="Unidade de Medida dos Tanques"
+                    className="rounded-sm"
+                    value={""}
+                    required
+                    onChange={() => {}}
+                  />
+                  <FloatInput
+                    label="Tamanho médio dos Tanques"
+                    className="rounded-sm"
+                    value={""}
+                    required
+                    onChange={() => {}}
+                  />
+                  <FloatInput
+                    label="Quantidade de Tanques"
+                    className="rounded-sm"
+                    value={""}
+                    required
+                    onChange={() => {}}
+                  />
+                </div>
+              </SubGrupo>
+              <SubGrupo titulo="Reprodução/Larvicultura">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FloatInput
+                    label="Capacidade de Produção/Distribuição"
+                    className="rounded-sm"
+                    value={""}
+                    required
+                    onChange={() => {}}
+                  />
+                  <FloatInput
+                    label="Unidade de Medida dos Tanques"
+                    className="rounded-sm"
+                    value={""}
+                    required
+                    onChange={() => {}}
+                  />
+                  <FloatInput
+                    label="Tamanho médio dos Tanques"
+                    className="rounded-sm"
+                    value={""}
+                    required
+                    onChange={() => {}}
+                  />
+                  <FloatInput
+                    label="Quantidade de Tanques"
+                    className="rounded-sm"
+                    value={""}
+                    required
+                    onChange={() => {}}
+                  />
+                </div>
+              </SubGrupo>
+              <SubGrupo titulo="Ciclo Completo">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FloatInput
+                    label="Capacidade de Produção/Distribuição"
+                    className="rounded-sm"
+                    value={""}
+                    required
+                    onChange={() => {}}
+                  />
+                  <FloatInput
+                    label="Unidade de Medida dos Tanques"
+                    className="rounded-sm"
+                    value={""}
+                    required
+                    onChange={() => {}}
+                  />
+                  <FloatInput
+                    label="Tamanho médio dos Tanques"
+                    className="rounded-sm"
+                    value={""}
+                    required
+                    onChange={() => {}}
+                  />
+                  <FloatInput
+                    label="Quantidade de Tanques"
+                    className="rounded-sm"
+                    value={""}
+                    required
+                    onChange={() => {}}
+                  />
+                </div>
+              </SubGrupo>
+            </div>
+          </Section>
+          <Section title="Ciclo de Distribuição" defaultOpen={true}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FloatInput
+                    label="Capacidade de Comercialização/Mês"
+                    className="rounded-sm"
+                    value={""}
+                    required
+                    onChange={() => {}}
+                  />
+                  <FloatInput
+                    label="Unidade de Medida dos Tanques/Aquários"
+                    className="rounded-sm"
+                    value={""}
+                    required
+                    onChange={() => {}}
+                  />
+                  <FloatInput
+                    label="Tamanho médio dos Tanques/Aquários"
+                    className="rounded-sm"
+                    value={""}
+                    required
+                    onChange={() => {}}
+                  />
+                  <FloatInput
+                    label="Quantidade de Tanques/Aquários"
+                    className="rounded-sm"
+                    value={""}
+                    required
+                    onChange={() => {}}
+                  />
+                </div>
+          </Section>
+        </div>
+      </ModalBase>
+
+
+    {/* ==========================================================
           MODAL DE CADASTRO DE BIOSSEGURIDADE (USANDO O NOVO MODALBASE E SECTIONS)
           ========================================================== */}
       <ModalBase
-        open={modalAberto}
-        onClose={() => setModalAberto(false)}
+        open={modalBiosseguiradadeAberto}
+        onClose={() => setModalBiosseguiradadeAberto(false)}
         title="Adicionar Avaliação de Biosseguridade"
         subtitle="Preencha todos os campos para realizar a avaliação e gerar a pontuação de biosseguridade:"
         icon={<ShieldCheck size={24} />}
@@ -967,171 +1343,119 @@ export function VisualizarExploracaoPecuariaPage({
         cancelText="Cancelar"
       >
         <div className="w-full flex flex-col gap-6">
-
+          
           {/* Seção de Informações Gerais */}
           <Section title="Informações Gerais" defaultOpen={true}>
-            <div className="flex flex-col gap-5 w-full">
-
-              {/* Linha 1: Profissional e CPF (Condicional) */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 w-full items-end">
-                {/* Campo de Busca do Profissional */}
-                <EntitySearchInput
-                  label="Profissional da Área Animal Oficial"
-                  placeholder="Buscar profissional"
-                  required
-                  value={profissional ? profissional.nome : ""}
-                  data={PROFISSIONAIS_OFICIAIS_MOCK}
-                  searchKeys={["nome", "cpf", "crmv"]}
-                  columns={[
-                    { label: "Nome", key: "nome" },
-                    { label: "CRMV", key: "crmv" }
-                  ]}
-                  icon={<img src={Icons.iconeProfissionalAnimalUrl || (Icons as any).iconeprofissionalanimalurl} alt="Profissional Animal" className="w-5 h-5 object-contain" />}
-                  title="Buscar Profissional"
-                  subtitle="Busque por profissional cadastrado:"
-                  onChange={(entidadeSelecionada) => setProfissional(entidadeSelecionada)}
-                />
-
-                {/* 💡 O CPF e o Olhinho só aparecem se 'profissional' estiver selecionado */}
-                {profissional ? (
-                  <div className="flex gap-2 items-end w-full animate-fade-in">
-                    <div className="flex-1">
-                      <FloatInput
-                        label="CPF"
-                        disabled
-                        required
-                        value={profissional.cpf}
-                        onChange={() => { }}
-                        placeholder="000.000.000-00"
-                      />
-                    </div>
-
-                    {/* Botão do Olhinho */}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        alert(`Visualizar detalhes de: ${profissional.nome}\nCRMV: ${profissional.crmv}\nCPF: ${profissional.cpf}`);
-                      }}
-                      className="flex items-center justify-center h-10 w-10 rounded-lg  hover:bg-gray-50 text-gray-600 cursor-pointer transition"
-                      title="Visualizar detalhes do profissional"
-                    >
-                      <Eye size={18} className="text-[#1A7A3C]" />
-                    </button>
-                  </div>
-                ) : (
-                  /* Elemento fantasma para manter o alinhamento do Grid (50% de largura) quando o CPF não estiver visível */
-                  <div className="hidden md:block" />
-                )}
-              </div>
-
-              {/* Linha 2: Data de Levantamento */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 w-full items-end">
-                <FloatInput
-                  label="Data de Levantamento"
-                  required
-                  type="date"
-                  icon={<Calendar size={18} />}
-                  value={dataLevantamento}
-                  onChange={setDataLevantamento}
-                />
-                <div className="hidden md:block" />
-              </div>
-
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 w-full">
+              <FloatSelect 
+                label="Profissional da Área Animal Oficial *" 
+                required 
+                value={profissional} 
+                onChange={setProfissional} 
+                options={profissionaisOficiais} 
+              />
+              <FloatInput 
+                label="Data de Levantamento *" 
+                type="date" 
+                icon={<Calendar size={20} color={GREEN} />} 
+                value={dataLevantamento} 
+                onChange={(e: any) => setDataLevantamento(e?.target ? e.target.value : e)} 
+              />
             </div>
           </Section>
 
           {/* Seção de Perguntas de Avaliação */}
           <Section title="Perguntas de Avaliação de Biosseguridade" defaultOpen={true}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5 w-full">
-              <SimNao
-                label="Livre de animais alheios à produção? *"
-                name="livreAnimais"
-                value={livreAnimais}
-                onChange={setLivreAnimais}
+              <SimNao 
+                label="Livre de animais alheios à produção? *" 
+                name="livreAnimais" 
+                value={livreAnimais} 
+                onChange={setLivreAnimais} 
               />
-              <SimNao
-                label="Assistência técnica sanitária? *"
-                name="assistenciaSanitaria"
-                value={assistenciaSanitaria}
-                onChange={setAssistenciaSanitaria}
+              <SimNao 
+                label="Assistência técnica sanitária? *" 
+                name="assistenciaSanitaria" 
+                value={assistenciaSanitaria} 
+                onChange={setAssistenciaSanitaria} 
               />
-              <SimNao
-                label="É feito controle de trânsito de pessoas e veículos? *"
-                name="controleTransito"
-                value={controleTransito}
-                onChange={setControleTransito}
+              <SimNao 
+                label="É feito controle de trânsito de pessoas e veículos? *" 
+                name="controleTransito" 
+                value={controleTransito} 
+                onChange={setControleTransito} 
               />
-              <SimNao
-                label="É feita desinfecção de veículos e funcionários? *"
-                name="desinfeccaoVeiculos"
-                value={desinfeccaoVeiculos}
-                onChange={setDesinfeccaoVeiculos}
+              <SimNao 
+                label="É feita desinfecção de veículos e funcionários? *" 
+                name="desinfeccaoVeiculos" 
+                value={desinfeccaoVeiculos} 
+                onChange={setDesinfeccaoVeiculos} 
               />
-              <SimNao
-                label="Usa probiótico ou prebiótico? *"
-                name="usaProbiotico"
-                value={usaProbiotico}
-                onChange={setUsaProbiotico}
+              <SimNao 
+                label="Usa probiótico ou prebiótico? *" 
+                name="usaProbiotico" 
+                value={usaProbiotico} 
+                onChange={setUsaProbiotico} 
               />
-              <SimNao
-                label="Os equipamentos de manejo são exclusivos da exploração? *"
-                name="equipamentosExclusivos"
-                value={equipamentosExclusivos}
-                onChange={setEquipamentosExclusivos}
+              <SimNao 
+                label="Os equipamentos de manejo são exclusivos da exploração? *" 
+                name="equipamentosExclusivos" 
+                value={equipamentosExclusivos} 
+                onChange={setEquipamentosExclusivos} 
               />
-              <SimNao
-                label="Usa barreiras para impedir a entrada e saída de animais nocivos? *"
-                name="barreirasAnimais"
-                value={barreirasAnimais}
-                onChange={setBarreirasAnimais}
+              <SimNao 
+                label="Usa barreiras para impedir a entrada e saída de animais nocivos? *" 
+                name="barreirasAnimais" 
+                value={barreirasAnimais} 
+                onChange={setBarreirasAnimais} 
               />
-              <SimNao
-                label="Realiza desinfecção dos tanques? *"
-                name="desinfeccaoTanques"
-                value={desinfeccaoTanques}
-                onChange={setDesinfeccaoTanques}
+              <SimNao 
+                label="Realiza desinfecção dos tanques? *" 
+                name="desinfeccaoTanques" 
+                value={desinfeccaoTanques} 
+                onChange={setDesinfeccaoTanques} 
               />
-              <SimNao
-                label="Realiza quarentena para introdução de animais? *"
-                name="quarentenaIntroducao"
-                value={quarentenaIntroducao}
-                onChange={setQuarentenaIntroducao}
+              <SimNao 
+                label="Realiza quarentena para introdução de animais? *" 
+                name="quarentenaIntroducao" 
+                value={quarentenaIntroducao} 
+                onChange={setQuarentenaIntroducao} 
               />
-              <SimNao
-                label="A exploração pecuária é protegida de inundações? *"
-                name="protegidaInundacoes"
-                value={protegidaInundacoes}
-                onChange={setProtegidaInundacoes}
+              <SimNao 
+                label="A exploração pecuária é protegida de inundações? *" 
+                name="protegidaInundacoes" 
+                value={protegidaInundacoes} 
+                onChange={setProtegidaInundacoes} 
               />
-              <SimNao
-                label="Recebe animais vivos/material de multiplicação animal importado? *"
-                name="recebeImportados"
-                value={recebeImportados}
-                onChange={setRecebeImportados}
+              <SimNao 
+                label="Recebe animais vivos/material de multiplicação animal importado? *" 
+                name="recebeImportados" 
+                value={recebeImportados} 
+                onChange={setRecebeImportados} 
               />
-              <SimNao
-                label="Recebe alimento vivo? *"
-                name="recebeAlimentoVivo"
-                value={recebeAlimentoVivo}
-                onChange={setRecebeAlimentoVivo}
+              <SimNao 
+                label="Recebe alimento vivo? *" 
+                name="recebeAlimentoVivo" 
+                value={recebeAlimentoVivo} 
+                onChange={setRecebeAlimentoVivo} 
               />
             </div>
           </Section>
 
-          {/* Seção 3: Painel de Resultados (Design Exato) */}
+         {/* Seção 3: Painel de Resultados (Design Exato) */}
           <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm relative overflow-hidden">
             {/* Barra fina na margem superior com cor dinâmica */}
-            <div
+            <div 
               className="absolute top-0 left-0 right-0 h-1.5 transition-colors duration-300"
               style={{ backgroundColor: resultadoAvaliacao.cor }}
             />
 
             {/* Cabeçalho do Painel: Ícone, Título e Tooltip */}
             <div className="flex items-center gap-2 mb-4 mt-1">
-              <img
-                src={Icons.iconePontuacaoUrl}
-                className="w-[18px] h-[18px] object-contain flex-shrink-0"
-                alt="Ícone de Pontuação"
+              <img 
+                src={Icons.iconePontuacaoUrl} 
+                className="w-[18px] h-[18px] object-contain flex-shrink-0" 
+                alt="Ícone de Pontuação" 
                 onError={(e) => {
                   // Fallback caso a URL falhe ou não esteja carregada
                   e.currentTarget.style.display = 'none';
@@ -1142,23 +1466,23 @@ export function VisualizarExploracaoPecuariaPage({
                 Pontuação
               </span>
 
-              {/* Tooltip Interativo */}
+           {/* Tooltip Interativo */}
               <div className="relative group cursor-help flex items-center">
                 <Info size={14} className="text-gray-400 hover:text-gray-600 transition-colors z-10" />
-
+                
                 {/* Balão do Tooltip (Aparece à direita ao passar o mouse) */}
                 <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 bg-gray-200 text-black text-[11px] p-2.5 rounded-lg shadow-md z-50 font-normal normal-case leading-normal pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                   A pontuação e a classe de vulnerabilidade são calculadas em tempo real com base nas respostas dadas às perguntas de biosseguridade.
-
+                  
                   {/* Triângulo do Tooltip (Apontando para a esquerda) */}
                   <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-gray-950" />
                 </div>
               </div>
             </div>
 
-            {/* Dados da Avaliação */}
+           {/* Dados da Avaliação */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
-
+              
               {/* Card de Pontuação */}
               <div className="flex flex-col gap-1 bg-gray-50 border border-gray-100 rounded-xm p-4 transition-all">
                 <span className="text-xs text-gray-400 ">
@@ -1185,7 +1509,7 @@ export function VisualizarExploracaoPecuariaPage({
                   Nível de Vulnerabilidade
                 </span>
                 <div className="flex items-center gap-2 mt-1">
-
+               
                   <span className="text-xl text-gray-800 ">
                     {resultadoAvaliacao.texto}
                   </span>
@@ -1196,9 +1520,9 @@ export function VisualizarExploracaoPecuariaPage({
           </div>
 
         </div>
-      </ModalBase>
+      </ModalBase>  
     </div>
   );
-}
+}  
 
 export default VisualizarExploracaoPecuariaPage;
