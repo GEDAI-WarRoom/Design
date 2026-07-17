@@ -1,7 +1,6 @@
 import { useMemo, useState, type ReactNode } from "react";
 import {
   ArrowLeft,
-  Building2,
   Check,
   CalendarClock,
   ChevronDown,
@@ -19,6 +18,7 @@ import {
   Pencil,
   PlusCircle,
   X,
+  Trash2
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import {
@@ -33,6 +33,7 @@ import {
   BlocoEnderecoFields,
   DynamicListWrapper,
   EntitySearchInput,
+  PessoaJuridicaInput
 } from "../../../components/ui/EntitySearch";
 import {
   adicionarConvenio,
@@ -42,12 +43,10 @@ import {
   emptyContatos,
   emptyConvenio,
   emptyEndereco,
-  PESSOAS_JURIDICAS_FUNDO,
   SITUACOES,
   TIPOS_FUNDO,
   type Convenio,
   type FundoArrecadacao,
-  type PessoaJuridicaFundo,
   type Situacao,
   type TipoFundo,
 } from "./fundoArrecadacaoData";
@@ -55,6 +54,56 @@ import {
 type Mode = "add" | "edit" | "view";
 type FundoDraft = Omit<FundoArrecadacao, "id" | "nome">;
 type ConvenioMode = "add" | "edit" | "view";
+
+// Altere ou verifique em seu arquivo "fundoArrecadacaoData.ts":
+
+export interface PessoaJuridicaFundo {
+  id: number;
+  nome: string;        // razão social (chave usada por PessoaJuridicaInput)
+  documento: string;   // CNPJ (chave usada por PessoaJuridicaInput)
+  cnpj: string;
+  razaoSocial: string;
+  nomeFantasia: string;
+  proprietarios: Array<{
+    id: number;
+    nome: string;
+    cpf: string;
+    email?: string;
+    telefone?: string;
+  }>;
+}
+
+export const PESSOAS_JURIDICAS_FUNDO: PessoaJuridicaFundo[] = [
+  {
+    id: 1,
+    nome: "Fundo Estadual de Desenvolvimento Agropecuário",
+    documento: "12.345.678/0001-90",
+    cnpj: "12.345.678/0001-90",
+    razaoSocial: "Fundo Estadual de Desenvolvimento Agropecuário",
+    nomeFantasia: "FEDA - Agro",
+    proprietarios: [
+      { id: 101, nome: "José Alencar", cpf: "111.222.333-44", email: "jose@feda.gov.br", telefone: "(31) 99999-8888" }
+    ]
+  },
+  {
+    id: 2,
+    nome: "Instituto de Defesa Sanitária Animal e Vegetal",
+    documento: "98.765.432/0001-10",
+    cnpj: "98.765.432/0001-10",
+    razaoSocial: "Instituto de Defesa Sanitária Animal e Vegetal",
+    nomeFantasia: "Defesa Agropecuária",
+    proprietarios: []
+  },
+  {
+    id: 3,
+    nome: "Fundo de Apoio à Cultura e Pecuária de Corte",
+    documento: "55.444.333/0002-22",
+    cnpj: "55.444.333/0002-22",
+    razaoSocial: "Fundo de Apoio à Cultura e Pecuária de Corte",
+    nomeFantasia: "FACUPEC",
+    proprietarios: []
+  }
+];
 
 interface PageProps {
   dados?: FundoArrecadacao;
@@ -117,6 +166,8 @@ const newDraft = (): FundoDraft => ({
 
 const cloneFundo = (fundo: FundoArrecadacao): FundoArrecadacao => JSON.parse(JSON.stringify(fundo));
 
+
+
 function ReadOnlyLocation({ fundo }: { fundo: FundoDraft | FundoArrecadacao }) {
   const fields = [
     ["Zona", fundo.endereco.zona], ["CEP", fundo.endereco.cep], ["Estado", fundo.endereco.estado], ["Município", fundo.endereco.municipio],
@@ -156,36 +207,76 @@ function ReadOnlyContacts({ fundo }: { fundo: FundoDraft | FundoArrecadacao }) {
   );
 }
 
+
+
 function BasicData({ mode, fundo, setFundo, onNavigate }: { mode: Mode; fundo: FundoDraft | FundoArrecadacao; setFundo: (value: any) => void; onNavigate: PageProps["onNavigate"] }) {
   const disabled = mode === "view";
   const selectedPessoa = fundo.pessoaJuridica;
   const update = <K extends keyof typeof fundo>(field: K, value: (typeof fundo)[K]) => setFundo({ ...fundo, [field]: value });
+  const [anexos, setAnexos] = useState<any[]>([]);
+  const [observacao, setObservacao] = useState("");
+
 
   return (
     <div className="flex flex-col gap-4">
       <Section title="Informações Básicas">
         <div className="grid grid-cols-1 items-end gap-4 md:grid-cols-12">
-          <div className="md:col-span-5">
+
+          {/* Bloco da Pessoa Jurídica (Se for "add" usa o componente de busca, se não exibe o input travado) */}
+          <div className="md:col-span-12">
             {mode === "add" ? (
-              <EntitySearchInput
-                label="CNPJ"
-                placeholder="Busque pelo CNPJ ou razão social"
-                value={selectedPessoa?.cnpj || ""}
+              <PessoaJuridicaInput
+                value={selectedPessoa?.nome || selectedPessoa?.razaoSocial || ""}
                 data={PESSOAS_JURIDICAS_FUNDO}
-                searchKeys={["cnpj", "razaoSocial", "nomeFantasia"]}
-                columns={[{ label: "CNPJ", key: "cnpj" }, { label: "Razão Social", key: "razaoSocial" }, { label: "Nome Fantasia", key: "nomeFantasia" }]}
-                icon={<Building2 size={18} />}
+                onChange={(pessoa: any) => update("pessoaJuridica", pessoa)}
+                onEyeClick={() => selectedPessoa && onNavigate("visualizar-pessoa-juridica", selectedPessoa)}
                 required
-                title="Buscar Pessoa Jurídica"
-                subtitle="Selecione uma Pessoa Jurídica cadastrada no sistema:"
-                onChange={(pessoa: PessoaJuridicaFundo) => update("pessoaJuridica", pessoa)}
               />
-            ) : <FloatInput label="CNPJ" required value={selectedPessoa?.cnpj || ""} disabled />}
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center w-full">
+                <FloatInput label="Razão Social / Nome" value={selectedPessoa?.razaoSocial || ""} disabled />
+                <div className="flex items-center gap-2 w-full">
+                  <div className="flex-1">
+                    <FloatInput label="CNPJ" required value={selectedPessoa?.cnpj || ""} disabled />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => selectedPessoa && onNavigate("visualizar-pessoa-juridica", selectedPessoa)}
+                    className="p-2.5 text-[#1A7A3C] hover:bg-green-50 rounded-md transition mt-2"
+                    title="Visualizar Pessoa Jurídica"
+                  >
+                    <Eye size={20} />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
-          <div className="md:col-span-6"><FloatInput label="Nome do Fundo de Arrecadação" value={selectedPessoa?.nomeFantasia || selectedPessoa?.razaoSocial || ""} disabled /></div>
-          <button type="button" disabled={!selectedPessoa} onClick={() => selectedPessoa && onNavigate("visualizar-pessoa-juridica", selectedPessoa)} className="flex h-12 items-center justify-center rounded-md text-[#1A7A3C] hover:bg-green-50 disabled:cursor-not-allowed disabled:opacity-30 md:col-span-1" title="Visualizar Pessoa Jurídica"><Eye size={20} /></button>
-          <div className="md:col-span-6"><FloatSelect label="Tipo do Fundo de Arrecadação" required value={fundo.tipo} onChange={(value) => update("tipo", value as TipoFundo)} options={TIPOS_FUNDO} disabled={disabled} /></div>
-          {mode !== "add" && <div className="md:col-span-6"><FloatSelect label="Situação" required value={fundo.situacao} onChange={(value) => update("situacao", value as Situacao)} options={SITUACOES} disabled={disabled} /></div>}
+
+          {/* Linha de Baixo: Tipo do Fundo e Situação */}
+          <div className={mode === "add" ? "md:col-span-12" : "md:col-span-6"}>
+            <FloatSelect
+              label="Tipo do Fundo de Arrecadação"
+              required
+              value={fundo.tipo}
+              onChange={(value) => update("tipo", value as TipoFundo)}
+              options={TIPOS_FUNDO}
+              disabled={disabled}
+            />
+          </div>
+
+          {mode !== "add" && (
+            <div className="md:col-span-6">
+              <FloatSelect
+                label="Situação"
+                required
+                value={fundo.situacao}
+                onChange={(value) => update("situacao", value as Situacao)}
+                options={SITUACOES}
+                disabled={disabled}
+              />
+            </div>
+          )}
+
         </div>
       </Section>
 
@@ -211,36 +302,94 @@ function BasicData({ mode, fundo, setFundo, onNavigate }: { mode: Mode; fundo: F
         )}
       </Section>
 
-      <Section title="Anexos e Observações">
+
+      {/* Seção Anexo Geral Dinâmica com Numeração */}
+      <Section title="Anexo">
         <div className="flex flex-col gap-6">
-          {disabled ? (
-            fundo.anexos.length ? fundo.anexos.map((anexo, index) => (
-              <div key={anexo.id} className="flex items-center gap-4 rounded-lg border border-gray-200 p-4">
-                <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[#1A7A3C] text-xs font-bold text-white">{index + 1}</span>
-                <div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold text-gray-800">{anexo.nome}</p><p className="text-xs text-gray-500">{anexo.descricao || "Sem descrição"}</p></div>
-                <button type="button" className="rounded-md p-2 text-[#1A7A3C] hover:bg-green-50" title="Baixar documento"><Download size={18} /></button>
+          {anexos.map((anexo, index) => (
+            <div key={anexo.id} className="flex gap-4 items-start relative w-full rounded-xl p-4 bg-white">
+
+              {/* Número indicador do anexo (Igual ao Representante Legal) */}
+              <div className="flex items-center justify-center bg-[#1A7A3C] text-white text-xs font-bold rounded-full w-6 h-6 flex-shrink-0 mt-3">
+                {index + 1}
               </div>
-            )) : <p className="text-sm italic text-gray-400">Nenhum anexo informado.</p>
-          ) : (
-            <DynamicListWrapper
-              items={fundo.anexos}
-              behavior="zero-or-more"
-              variant="plain"
-              addButtonLabel="Adicionar Anexo"
-              itemLabel="Anexo"
-              onAddItem={() => update("anexos", [...fundo.anexos, { id: `anexo-${Date.now()}`, nome: "", descricao: "" }])}
-              onRemoveItem={(index) => update("anexos", fundo.anexos.filter((_, itemIndex) => itemIndex !== index))}
-            >
-              {(anexo, index) => (
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <UploadField label="Documento" required fileName={anexo.nome} onSelectFile={() => update("anexos", fundo.anexos.map((item, itemIndex) => itemIndex === index ? { ...item, nome: `documento_fundo_${index + 1}.pdf` } : item))} />
-                  <FloatInput label="Descrição" value={anexo.descricao} maxLength={255} onChange={(value) => update("anexos", fundo.anexos.map((item, itemIndex) => itemIndex === index ? { ...item, descricao: value } : item))} />
+              <div className="flex-1 flex flex-col gap-4">
+                <div className="flex gap-3 items-start w-full">
+
+                  <UploadField
+                    label="Documento"
+                    required
+                    fileName={anexo.nome}
+                    onSelectFile={() =>
+                      setAnexos(prev =>
+                        prev.map((a, i) =>
+                          i === index ? { ...a, nome: `documento_geral_${index + 1}.pdf` } : a
+                        )
+                      )
+                    }
+                  />
+
+
+
+                  {/* Campos de Descrição e Download (Só abrem se houver documento anexado) */}
+                  {anexo.nome && (
+                    <>
+                      <div className="flex-1">
+                        <FloatInput
+                          label="Descrição"
+                          value={anexo.descricao || ""}
+                          placeholder="Descrição opcional..."
+                          onChange={(v) => setAnexos(prev => prev.map((a, i) => i === index ? { ...a, descricao: v } : a))}
+                        />
+                      </div>
+                      <div className="h-12 flex items-center">
+                        <button
+                          type="button"
+                          onClick={() => alert(`Fazendo download de: ${anexo.nome}`)}
+                          className="p-2.5 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"
+                        >
+                          <Download size={20} />
+                        </button>
+                      </div>
+                    </>
+                  )}
+
+                  {/* Botão de Excluir o Anexo */}
+                  <div className="h-12 flex items-center">
+                    <button
+                      type="button"
+                      onClick={() => setAnexos(prev => prev.filter(a => a.id !== anexo.id))}
+                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+                    >
+                      <Trash2 size={20} />
+                    </button>
+                  </div>
+
                 </div>
-              )}
-            </DynamicListWrapper>
-          )}
-          <LargeTextArea label="Observações" value={fundo.observacao} onChange={(value) => update("observacao", value)} maxLength={1500} disabled={disabled} />
+              </div>
+            </div>
+          ))}
+
+          {/* Botão para Adicionar Novo Anexo */}
+          <button
+            type="button"
+            onClick={() => setAnexos(prev => [...prev, { id: String(Date.now()), nome: "", descricao: "" }])}
+            className="flex items-center gap-2 text-sm font-semibold px-4 py-2.5 rounded-md border border-[#1A7A3C] text-[#1A7A3C] hover:bg-green-50 self-start transition"
+          >
+            <PlusCircle size={16} /> Adicionar Anexo
+          </button>
         </div>
+      </Section>
+
+      {/* Seção Observação Geral */}
+      <Section title="Observação">
+        <LargeTextArea
+          label="Observação"
+          value={observacao}
+          onChange={setObservacao}
+          hasTooltip
+          tooltipText="Informações adicionais pertinentes ao cadastro."
+        />
       </Section>
     </div>
   );
