@@ -1,14 +1,11 @@
 import { useState } from "react";
 import {
   ArrowLeft,
-  Search,
   ChevronLeft,
   ChevronRight,
   Eye as ViewIcon,
   Pencil,
   X,
-  Check,
-  Minus,
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatSelect } from "../../../components/ui/FormKit";

@@ -36,6 +36,7 @@ import {
   Settings,
   BriefcaseBusiness,
   Truck,
+  Landmark,
 } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import * as Icons from "../imports/icons";
@@ -138,7 +139,7 @@ export const cadastrosCategories: MenuCategory[] = [
       {
         label: "Instituição de Ensino e Pesquisa",
         route: "instituicao-ensino-pesquisa",
-        icon: <Store size={16} />,
+        icon: <Landmark size={16} />,
       },
     ],
   },

@@ -35,6 +35,7 @@ import { AdicionarRevendedoraAgropecuarioPage } from "./pages/Geral/RevendedoraA
 import { AeroportoPorto } from "./pages/Geral/AeroportoPorto/AeroportoPorto";
 import { AdicionarAeroportoPorto } from "./pages/Geral/AeroportoPorto/AdicionarAeroportoPorto";
 import { InstituicaoEnsinoPesquisa } from "./pages/Geral/InstituiçãoEnsinoPesquisa/InstituiçãoEnsinoPesquisa";
+import { AdicionarInstituicaoEnsinoPesquisaPage } from "./pages/Geral/InstituiçãoEnsinoPesquisa/AdicionarInstituiçãoEnsinoPesquisa";
 
 // ANIMAL
 import { CertificadoraSISBOVPage } from "./pages/Animal/CertificadoraSISBOV/CertificadoraSISBOV";
@@ -250,7 +251,8 @@ export type Screen =
   | "adicionar-papeis"
   | "visualizar-papel"
   | "editar-papel"
-  | "instituicao-ensino-pesquisa";
+  | "instituicao-ensino-pesquisa"
+  | "adicionar-instituicao-ensino-pesquisa";
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>("login");
@@ -1102,6 +1104,13 @@ export default function App() {
     case "instituicao-ensino-pesquisa":
       return (
         <InstituicaoEnsinoPesquisa
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "adicionar-instituicao-ensino-pesquisa":
+      return (
+        <AdicionarInstituicaoEnsinoPesquisaPage
           onLogout={handleLogout}
           onNavigate={handleNavigate}
         />
