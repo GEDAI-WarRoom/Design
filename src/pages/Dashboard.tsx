@@ -478,7 +478,7 @@ export const secondaryCategories: MenuCategory[] = [
       {
         label: "Isenção de Taxa de GTA",
         route: "isencao-taxa-gta",
-       icon: <BadgePercent size={16} />,
+        icon: <BadgePercent size={16} />,
       },
     ],
   },
@@ -503,6 +503,9 @@ export const thirdCategories: MenuCategory[] = [
         label: "Fundo de Arrecadação",
         route: "fundo-arrecadacao",
         icon: <DollarSign size={16} />,
+      },
+
+      {
         label: "Item da Receita",
         route: "item-receita",
         icon: <Package size={16} />,
