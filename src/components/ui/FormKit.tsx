@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, ChevronsUpDown, Info, 
-         Paperclip, Search, Check, X, FileText, Calendar, Scale,
-       Plus, Eye, PlusCircle, SquareArrowOutUpRight, MoreVertical} from "lucide-react";
+import {
+  ChevronDown, ChevronLeft, ChevronRight, ChevronUp, ChevronsUpDown, Info,
+  Paperclip, Search, Check, X, FileText, Calendar, Scale,
+  Plus, Eye, PlusCircle, SquareArrowOutUpRight, MoreVertical
+} from "lucide-react";
 
 import * as Icons from "../../imports/icons";
 
@@ -11,16 +13,16 @@ const GREEN = "#1A7A3C";
 // ==========================================
 // 9. TOOLTIP (Corrigido para aceitar interações do mouse)
 // ==========================================
-export function  FieldTooltip({ text }: { text?: string }) {
+export function FieldTooltip({ text }: { text?: string }) {
   if (!text) return null;
   return (
     /* Forçado o pointer-events-auto para anular o pointer-events-none do elemento pai */
     <div className="cursor-pointer text-gray-400 hover:text-gray-600 transition flex items-center relative group pointer-events-auto">
       <Info size={13} />
-        <div className="absolute left-6 bottom-1 bg-[#e0e0e0] border border-gray-300 text-black text-[11px] py-1.5 px-3 rounded shadow-md z-[9999] pointer-events-none hidden group-hover:flex items-start gap-1.5 w-72 max-w-xs normal-case font-normal leading-relaxed">        <Info size={12} className="text-gray-600 flex-shrink-0" />
+      <div className="absolute left-6 bottom-1 bg-[#e0e0e0] border border-gray-300 text-black text-[11px] py-1.5 px-3 rounded shadow-md z-[9999] pointer-events-none hidden group-hover:flex items-start gap-1.5 w-72 max-w-xs normal-case font-normal leading-relaxed">        <Info size={12} className="text-gray-600 flex-shrink-0" />
         <span className="text-xs text-black whitespace-pre-line">
-        {text}
-      </span>
+          {text}
+        </span>
       </div>
     </div>
   );
@@ -64,7 +66,7 @@ export function FloatInput({
 }: FloatInputProps) {
   const [focused, setFocused] = useState(false);
   const internalRef = useRef<HTMLInputElement>(null);
-  
+
   const active =
     focused ||
     (value !== undefined && value !== null && String(value).length > 0);
@@ -81,7 +83,7 @@ export function FloatInput({
     if (isMonthVariant) {
       // Remove tudo que não for número
       val = val.replace(/\D/g, "");
-      
+
       // Limita a 6 caracteres (2 do mês + 4 do ano)
       val = val.slice(0, 6);
 
@@ -218,7 +220,7 @@ export function FloatSelect({
         ${active ? "top-1 text-[10px] text-gray-400 font-medium" : "top-1/2 -translate-y-1/2 text-sm text-gray-400"}`}
       >
         <span>{label}{required && <span className="text-red-500 ml-0.5">*</span>}</span>
-        {hasTooltip && <FieldTooltip text={tooltipText}  />}
+        {hasTooltip && <FieldTooltip text={tooltipText} />}
       </label>
       <div className="w-full flex items-center h-6 text-sm text-gray-800">
         <span className={`flex-1 truncate ${disabled ? "text-gray-500" : ""}`}>{selectedLabel}</span>
@@ -265,9 +267,9 @@ export function FloatCombobox({
   const [focused, setFocused] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const active = focused || isOpen || (value && value.length > 0);
-const filtrados = options
-  .filter((opt) => (opt ?? "").toLowerCase().includes((value ?? "").toLowerCase()))
-  .sort((a, b) => (a ?? "").localeCompare(b ?? ""));
+  const filtrados = options
+    .filter((opt) => (opt ?? "").toLowerCase().includes((value ?? "").toLowerCase()))
+    .sort((a, b) => (a ?? "").localeCompare(b ?? ""));
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) setIsOpen(false);
@@ -405,9 +407,9 @@ export function LargeTextArea({ label, value, required, onChange, rows = 4, maxL
       <div className="flex items-center gap-1.5 text-[12px] text-gray-400 font-medium mb-1 tracking-wide relative w-fit">
         <span>{label} {required && <span className="text-red-500">*</span>}</span>
         {hasTooltip && <FieldTooltip text={tooltipText} />}
-      
+
       </div>
-        
+
       <textarea
         value={value}
         disabled={disabled}
@@ -539,7 +541,7 @@ export function SearchModal<T extends { id: string | number }>({
 
         {/* 🌟 CONTAINER COMPARTILHADO: Aqui controlamos a linha horizontal perfeita */}
         <div className="flex flex-row items-end gap-3 w-full relative">
-          
+
           {/* Se houver ações ou filtros passados, eles renderizam colados à esquerda */}
           {headerActions && (
             <div className="w-[180px] flex-shrink-0 z-20">
@@ -691,8 +693,8 @@ export interface MultiSearchModalProps<T extends { id: string | number }> {
   columns: MultiSearchModalColumn<T>[];
   searchKeys: (keyof T)[];
   searchPlaceholder?: string;
-  selectedItems: T[]; 
-  onConfirm: (selected: T[]) => void; 
+  selectedItems: T[];
+  onConfirm: (selected: T[]) => void;
   confirmLabel?: string;
 }
 
@@ -836,9 +838,8 @@ export function MultiSearchModal<T extends { id: string | number }>({
                           <td className="py-3 pr-2">
                             <div className="flex items-center justify-center">
                               <div
-                                className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${
-                                  isChecked ? "bg-[#1A7A3C] border-[#1A7A3C] text-white" : "border-gray-300 bg-white"
-                                }`}
+                                className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${isChecked ? "bg-[#1A7A3C] border-[#1A7A3C] text-white" : "border-gray-300 bg-white"
+                                  }`}
                               >
                                 {isChecked && <Check size={11} strokeWidth={3} />}
                               </div>
@@ -915,7 +916,7 @@ export function MultiSearchModal<T extends { id: string | number }>({
 
 interface CheckboxOption {
   id?: string;
-  value?: string; 
+  value?: string;
   label: string;
   tooltipText?: string; // Suporta tooltip individual por opção
 }
@@ -926,7 +927,7 @@ interface CheckboxGroupProps {
   options: CheckboxOption[];
   defaultValue?: string[];
   onChange?: (selectedIds: string[]) => void;
-  orientation?: "horizontal" | "vertical" | "grid"; 
+  orientation?: "horizontal" | "vertical" | "grid";
   required?: boolean;
 }
 
@@ -971,20 +972,19 @@ export function CheckboxGroup({
           orientation === "grid"
             ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-3 w-full"
             : orientation === "horizontal"
-            ? "flex flex-wrap items-center gap-x-6 gap-y-3 w-full"
-            : "flex flex-col gap-3 w-full"
+              ? "flex flex-wrap items-center gap-x-6 gap-y-3 w-full"
+              : "flex flex-col gap-3 w-full"
         }
       >
         {options.map((option, index) => {
           const currentId = option.value || option.id || String(index);
           const isChecked = selected.includes(currentId);
-          
+
           return (
-            <div 
-              key={currentId} 
-              className={`flex items-start gap-1.5 ${
-                orientation === "grid" ? "w-full" : "w-fit"
-              }`}
+            <div
+              key={currentId}
+              className={`flex items-start gap-1.5 ${orientation === "grid" ? "w-full" : "w-fit"
+                }`}
             >
               {/* O label mantém a estrutura flex original do grupo */}
               <label className="inline-flex items-center gap-3 cursor-pointer group w-full">
@@ -1004,7 +1004,7 @@ export function CheckboxGroup({
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
-                >
+                  >
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
@@ -1136,7 +1136,7 @@ export function SimNao({
 }
 
 
-  // FLOATMULTI SELECT
+// FLOATMULTI SELECT
 
 export function FloatMultiSelect({
   label,
@@ -1176,8 +1176,8 @@ export function FloatMultiSelect({
   if (value.length > 0) {
     const textoCompleto = value.join(", ");
     // Se o texto for muito longo, trunca e adiciona as reticências (...)
-    labelExibicao = textoCompleto.length > 35 
-      ? `${textoCompleto.substring(0, 35)}...` 
+    labelExibicao = textoCompleto.length > 35
+      ? `${textoCompleto.substring(0, 35)}...`
       : textoCompleto;
   }
 
@@ -1189,15 +1189,14 @@ export function FloatMultiSelect({
         className="w-full bg-white border border-gray-200 rounded-md px-3 h-12 relative flex items-end pb-1.5 cursor-pointer focus-within:border-[#1A7A3C] focus-within:ring-1 focus-within:ring-[#1A7A3C] transition-all"
       >
         <label
-          className={`absolute left-3 transition-all duration-200 pointer-events-none ${
-            isOpen || value.length > 0
-              ? "top-1 text-[10px] text-gray-400 font-medium"
-              : "top-1/2 -translate-y-1/2 text-sm text-gray-400"
-          }`}
+          className={`absolute left-3 transition-all duration-200 pointer-events-none ${isOpen || value.length > 0
+            ? "top-1 text-[10px] text-gray-400 font-medium"
+            : "top-1/2 -translate-y-1/2 text-sm text-gray-400"
+            }`}
         >
           {label}
         </label>
-        
+
         <div className="flex items-center justify-between w-full pr-1">
           <span className="text-sm text-gray-800 truncate h-6 block leading-6 pr-4">
             {labelExibicao}
@@ -1211,52 +1210,49 @@ export function FloatMultiSelect({
 
       {/* Dropdown com os Checkboxes */}
       {/* Dropdown com os Checkboxes */}
-{isOpen && (
-  <div className="absolute left-0 mt-1 w-full max-h-60 overflow-y-auto bg-white border border-gray-200 rounded-md shadow-lg z-[999] py-1 animate-fadeIn">
-    {options.map((option) => {
-      const isChecked = value.includes(option);
-      return (
-        <label
-          key={option}
-          className={`flex items-start gap-3 px-3 py-2 cursor-pointer select-none transition-colors group ${
-            isChecked ? "bg-gray-100/70" : "hover:bg-gray-50"
-          }`}
-        >
-          {/* CHECKBOX TOTALMENTE CUSTOMIZADO (Sem o preto nativo do navegador) */}
-          <div className="relative flex items-center h-5 mt-0.5 flex-shrink-0">
-            <input
-              type="checkbox"
-              checked={isChecked}
-              onChange={() => handleToggleOption(option)}
-              className="sr-only peer" /* Esconde o checkbox nativo preto */
-            />
-            
-            {/* Quadrado customizado: Fundo cinza bem claro por padrão e borda suave */}
-            <div className="w-4 h-4 bg-gray-100 border border-gray-300 rounded transition-all peer-checked:bg-[#1A7A3C] peer-checked:border-[#1A7A3C] flex items-center justify-center group-hover:border-gray-400 peer-focus-visible:ring-2 peer-focus-visible:ring-[#1A7A3C]/30">
-              {/* Ícone de Check (Seta branca) — Só aparece se peer-checked estiver ativo */}
-              <svg
-                className={`w-2.5 h-2.5 text-white stroke-[3] transition-opacity ${
-                  isChecked ? "opacity-100" : "opacity-0"
-                }`}
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+      {isOpen && (
+        <div className="absolute left-0 mt-1 w-full max-h-60 overflow-y-auto bg-white border border-gray-200 rounded-md shadow-lg z-[999] py-1 animate-fadeIn">
+          {options.map((option) => {
+            const isChecked = value.includes(option);
+            return (
+              <label
+                key={option}
+                className={`flex items-start gap-3 px-3 py-2 cursor-pointer select-none transition-colors group ${isChecked ? "bg-gray-100/70" : "hover:bg-gray-50"
+                  }`}
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-          </div>
+                {/* CHECKBOX TOTALMENTE CUSTOMIZADO (Sem o preto nativo do navegador) */}
+                <div className="relative flex items-center h-5 mt-0.5 flex-shrink-0">
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
+                    onChange={() => handleToggleOption(option)}
+                    className="sr-only peer" /* Esconde o checkbox nativo preto */
+                  />
 
-          <span className={`text-sm leading-normal break-words pr-2 transition-colors ${
-            isChecked ? "text-gray-900 font-medium" : "text-gray-700"
-          }`}>
-            {option}
-          </span>
-        </label>
-      );
-    })}
-  </div>
-)}
+                  {/* Quadrado customizado: Fundo cinza bem claro por padrão e borda suave */}
+                  <div className="w-4 h-4 bg-gray-100 border border-gray-300 rounded transition-all peer-checked:bg-[#1A7A3C] peer-checked:border-[#1A7A3C] flex items-center justify-center group-hover:border-gray-400 peer-focus-visible:ring-2 peer-focus-visible:ring-[#1A7A3C]/30">
+                    {/* Ícone de Check (Seta branca) — Só aparece se peer-checked estiver ativo */}
+                    <svg
+                      className={`w-2.5 h-2.5 text-white stroke-[3] transition-opacity ${isChecked ? "opacity-100" : "opacity-0"
+                        }`}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                </div>
+
+                <span className={`text-sm leading-normal break-words pr-2 transition-colors ${isChecked ? "text-gray-900 font-medium" : "text-gray-700"
+                  }`}>
+                  {option}
+                </span>
+              </label>
+            );
+          })}
+        </div>
+      )}
 
     </div>
   );
@@ -1299,9 +1295,9 @@ export function Tabs({ activeTab, setActiveTab, tabs }: TabsProps) {
                 {tab.icon(isActive)}
               </span>
               {tab.label}
-              
+
               {isActive && (
-                <div 
+                <div
                   className="absolute bottom-0 left-0 right-0 h-[2px] rounded-t-full"
                   style={{ backgroundColor: GREEN }}
                 />
@@ -1354,7 +1350,7 @@ export function AccordionCardGroup({
 
   return (
     <div className="w-full max-w-5xl mx-auto bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
-      
+
       {/* ─── CABEÇALHO DO ACCORDION ─── */}
       <div
         onClick={() => setIsOpen(!isOpen)}
@@ -1394,7 +1390,7 @@ export function AccordionCardGroup({
       {/* ─── CORPO DO ACCORDION ─── */}
       {isOpen && (
         <div className="flex flex-col gap-6 p-5 bg-white w-full">
-          
+
           {/* 1. Secção de Vigentes */}
           {hasActiveChildren ? (
             <div className={activeContainerClass}>
@@ -1411,7 +1407,7 @@ export function AccordionCardGroup({
             <div>
               <span>Itens por página: 6</span>
             </div>
-            
+
             <div className="flex gap-6 items-center">
               <div className="flex gap-2 items-center">
                 <span>1 - 10 de 60</span>
@@ -1438,13 +1434,13 @@ export function AccordionCardGroup({
               <hr className="w-full border-gray-100 my-2" />
 
               <div className="w-full flex flex-col gap-4">
-                <div 
+                <div
                   onClick={() => setIsHistoryOpen(!isHistoryOpen)}
                   className="flex items-center gap-2 text-sm font-medium text-[#1A7A3C] px-2 cursor-pointer select-none hover:opacity-80 w-fit transition-opacity"
                 >
-                  <ChevronUp 
-                    size={16} 
-                    className={`stroke-[2.5] transition-transform duration-200 ${isHistoryOpen ? "" : "rotate-180"}`} 
+                  <ChevronUp
+                    size={16}
+                    className={`stroke-[2.5] transition-transform duration-200 ${isHistoryOpen ? "" : "rotate-180"}`}
                   />
                   <span>{historicoTitle}</span>
                 </div>
@@ -1473,11 +1469,11 @@ export function AccordionCardGroup({
 interface GenericHistoryCardProps {
   label: string;
   subLabel: string;
-  topBarSvgPath: string; 
-  icon?: React.ReactNode; 
+  topBarSvgPath: string;
+  icon?: React.ReactNode;
   actionIcon?: React.ReactNode; // 🟢 Usamos apenas esta agora!
   onActionClick?: () => void;
-  customColor?: string; 
+  customColor?: string;
   variant?: "com-historico" | "sem-historico";
 }
 export function HistoryCard({
@@ -1494,11 +1490,11 @@ export function HistoryCard({
   const exibirDetalhes = variant !== "sem-historico";
 
   return (
-    <div 
+    <div
       className="bg-white flex flex-1 flex-col items-start min-w-0 rounded-[8px] relative transition-all hover:shadow-md w-full"
-      style={{ 
-        boxShadow: "0px 1px 2px rgba(0,0,0,0.08)", 
-        border: "1px solid rgba(210,210,210,0.4)" 
+      style={{
+        boxShadow: "0px 1px 2px rgba(0,0,0,0.08)",
+        border: "1px solid rgba(210,210,210,0.4)"
       }}
     >
       <div className="h-[7px] w-full rounded-t-[8px] overflow-hidden">
@@ -1524,10 +1520,10 @@ export function HistoryCard({
 
         {/* 🟢 Botão de ação simplificado com o componente Lucide */}
         {exibirDetalhes && actionIcon && (
-          <button 
+          <button
             onClick={onActionClick}
             type="button"
-className="flex items-center justify-center p-[6px] rounded-full cursor-pointer bg-white transition border border-gray-200 text-[#008446] hover:bg-[#eff8f3] hover:border-[#eff8f3] shrink-0"          >
+            className="flex items-center justify-center p-[6px] rounded-full cursor-pointer bg-white transition border border-gray-200 text-[#008446] hover:bg-[#eff8f3] hover:border-[#eff8f3] shrink-0"          >
             {actionIcon}
           </button>
         )}
@@ -1572,13 +1568,13 @@ export function ModalBase({
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4 overflow-hidden">
-      
+
       <div
         className="bg-white rounded-[15px] flex flex-col gap-[12px] items-center px-[45px] py-[40px] overflow-y-auto overflow-x-hidden w-full max-w-[95vw] no-scrollbar"
-        style={{ 
-          border: "1px solid #d6d6d6", 
+        style={{
+          border: "1px solid #d6d6d6",
           maxHeight: "90vh",
-          width: width.includes("px") || width.includes("%") ? width : undefined 
+          width: width.includes("px") || width.includes("%") ? width : undefined
         }}
       >
         <style>{`
@@ -1595,9 +1591,9 @@ export function ModalBase({
 
         {/* Botão de Fechar Corrigido */}
         <div className="flex items-center justify-end w-full">
-          <button 
-            type="button" 
-            className="cursor-pointer hover:opacity-70 transition flex items-center justify-center size-[24px]" 
+          <button
+            type="button"
+            className="cursor-pointer hover:opacity-70 transition flex items-center justify-center size-[24px]"
             onClick={onClose}
           >
             <X size={24} color={GREEN} />
@@ -1675,9 +1671,9 @@ export function ModalBase({
 // Mapeamento padrão de cores (pode ser customizado ou estendido via prop se necessário)
 const DEFAULT_VULN_COLORS: Record<string, string> = {
   "Bem Protegida": "#008446",
-  "Baixa":          "#1976D2",
-  "Moderada":       "#F9A825",
-  "Alta":           "#C94141",
+  "Baixa": "#1976D2",
+  "Moderada": "#F9A825",
+  "Alta": "#C94141",
 };
 
 // ─── 1. HISTORY CARD GENÉRICO ──────────────────────────────────────────────────
@@ -1685,14 +1681,14 @@ interface GenericHistoryCardProps {
   label: string;
   subLabel: string;
   // Permite passar qualquer Path de SVG para a faixa do topo
-  topBarSvgPath: string; 
+  topBarSvgPath: string;
   // Permite passar qualquer componente de Ícone (ex: Lucide, SVG interno, etc.)
-  icon?: React.ReactNode; 
+  icon?: React.ReactNode;
   // O path do ícone do botão de ação (Olho)
   actionIconPath: string;
   onActionClick?: () => void;
   // Cor customizada opcional para sobrescrever o padrão
-  customColor?: string; 
+  customColor?: string;
 }
 
 
@@ -1732,12 +1728,12 @@ export function ActiveCard({
   moreActionsIconPath,
   onMoreActionsClick
 }: ActiveCardProps) {
-  
+
   // Limpa prefixos manuais para tratar o texto de forma padronizada
   const cleanDate = dateLabel.replace(/^[Aa]tualizada:\s*/, "");
 
   return (
-    <div 
+    <div
       className="bg-white rounded-[3px] relative w-full max-w-[552px] h-[193px] flex flex-col justify-between overflow-hidden"
       style={{ boxShadow: "0px 2px 2px rgba(0,0,0,0.15)" }}
     >
@@ -1750,7 +1746,7 @@ export function ActiveCard({
 
       {/* Conteúdo Principal com espaçamento garantido para descolar da barra superior */}
       <div className="flex-1 flex flex-col pt-[24px] pb-[8px] px-[20px] gap-[10px]">
-        
+
         {/* Cabeçalho do Card */}
         <div className="flex items-center justify-between w-full px-[5px]">
           {/* Layout estruturado para dar o respiro correto entre o texto fixo e a variável */}
@@ -1795,17 +1791,17 @@ export function ActiveCard({
       {/* Rodapé fixado na base do Card pelo flex-col */}
       <div className="flex items-center justify-end pb-[14px] px-[25px] w-full bg-white z-10">
         <div className="flex gap-[10px] items-center">
-          <button 
+          <button
             onClick={onButtonClick}
             type="button"
             className="bg-[#008446] hover:bg-green-700 transition flex h-[34px] items-center justify-center px-[21px] rounded-[4px] min-w-[114px] cursor-pointer shadow-sm"
           >
             <span className="text-[14px] font-bold text-white">{buttonText}</span>
           </button>
-          
-          <button 
+
+          <button
             onClick={onMoreActionsClick}
-            type="button" 
+            type="button"
             className="overflow-clip relative shrink-0 size-[24px] cursor-pointer hover:bg-gray-100 rounded p-0.5 transition flex items-center justify-center"
           >
             <svg className="absolute block inset-0 size-full p-0.5" fill="none" preserveAspectRatio="none" viewBox="0 0 24 24">
@@ -1849,7 +1845,7 @@ export function EvaluationActiveCard({
   topBarColor = "#1570EF", // Azul padrão da barra superior do print
 }: EvaluationActiveCardProps) {
   return (
-<div className="w-full bg-white border border-gray-200 shadow-sm flex flex-col relative rounded-xl overflow-hidden">      <div className="h-[6px] w-full" style={{ backgroundColor: topBarColor }} />
+    <div className="w-full bg-white border border-gray-200 shadow-sm flex flex-col relative rounded-xl overflow-hidden">      <div className="h-[6px] w-full" style={{ backgroundColor: topBarColor }} />
 
       {/* ─── CABEÇALHO DO CARD ─── */}
       <div className="flex justify-between items-center px-5 pt-4 pb-2">
@@ -1863,17 +1859,17 @@ export function EvaluationActiveCard({
 
       {/* ─── CORPO PRINCIPAL ─── */}
       <div className="flex flex-col md:flex-row gap-6 items-center px-5 pb-5 pt-2">
-        
+
         {/* Bloco de Métricas (Destaque Cinza da Esquerda) */}
         <div className="bg-[#f3f4f6]/70 rounded-2xl p-4 flex items-center gap-5 w-full md:w-auto shrink-0 border border-gray-100">
           {/* Ícone de Alvo Verde */}
-<div className="shrink-0">
-    <img 
-      src={Icons.iconePontuacaoUrl} 
-      alt="Pontuação" 
-      className="w-12 h-12 object-contain" 
-    />
-  </div>
+          <div className="shrink-0">
+            <img
+              src={Icons.iconePontuacaoUrl}
+              alt="Pontuação"
+              className="w-12 h-12 object-contain"
+            />
+          </div>
 
           {/* Dados */}
           <div className="flex gap-4">
@@ -1892,27 +1888,27 @@ export function EvaluationActiveCard({
           </div>
         </div>
 
-       {/* Informações do Avaliador (Direita) */}
-<div className="flex items-start gap-2 w-full md:flex-1 min-w-0">
-  
-  {/* 🟢 Ícone do Profissional Animal usando a URL de imagem mapeada no Icons */}
-  <div className="  p-2 shrink-0 flex items-center justify-center">
-    <img 
-      src={Icons.iconeProfissionalAnimalUrl} // Substitua pelo nome exato da sua constante de ícone
-      alt="Profissional Animal" 
-      className="w-6 h-6 object-contain" 
-    />
-  </div>
+        {/* Informações do Avaliador (Direita) */}
+        <div className="flex items-start gap-2 w-full md:flex-1 min-w-0">
 
-  {/* Textos de identificação */}
-  <div className="flex flex-col min-w-0">
-    <span className="text-base font-medium text-gray-800 truncate">{evaluatorName}</span>
-    <span className="text-xs text-gray-400 mt-0.5">{evaluatorDoc}</span>
-    <span className="text-xs text-gray-400 mt-0.5">{evaluatorRole}</span>
-  </div>
-</div>
+          {/* 🟢 Ícone do Profissional Animal usando a URL de imagem mapeada no Icons */}
+          <div className="  p-2 shrink-0 flex items-center justify-center">
+            <img
+              src={Icons.iconeProfissionalAnimalUrl} // Substitua pelo nome exato da sua constante de ícone
+              alt="Profissional Animal"
+              className="w-6 h-6 object-contain"
+            />
+          </div>
 
-         
+          {/* Textos de identificação */}
+          <div className="flex flex-col min-w-0">
+            <span className="text-base font-medium text-gray-800 truncate">{evaluatorName}</span>
+            <span className="text-xs text-gray-400 mt-0.5">{evaluatorDoc}</span>
+            <span className="text-xs text-gray-400 mt-0.5">{evaluatorRole}</span>
+          </div>
+        </div>
+
+
       </div>
 
       {/* ─── RODAPÉ DE AÇÕES ─── */}
@@ -1920,10 +1916,10 @@ export function EvaluationActiveCard({
         <button
           onClick={onViewClick}
           type="button"
-className="bg-[#008446] hover:bg-[#006e3a] text-white font-bold text-sm px-6 py-2 rounded-lg transition duration-200 cursor-pointer shadow-sm"        >
+          className="bg-[#008446] hover:bg-[#006e3a] text-white font-bold text-sm px-6 py-2 rounded-lg transition duration-200 cursor-pointer shadow-sm"        >
           Visualizar
         </button>
-        
+
         {onMenuClick && (
           <button
             onClick={onMenuClick}
@@ -1993,8 +1989,8 @@ export function GenericFormModal({
       >
         {/* Botão Superior Fechar (X) */}
         <div className="flex items-center justify-end w-full">
-          <button 
-            className="cursor-pointer text-xl text-[#008446] font-bold hover:opacity-80 transition" 
+          <button
+            className="cursor-pointer text-xl text-[#008446] font-bold hover:opacity-80 transition"
             onClick={onClose}
           >
             ✕
@@ -2041,8 +2037,8 @@ export function GenericFormModal({
               {cancelLabel}
             </span>
           </button>
-          
-          <button 
+
+          <button
             type="button"
             onClick={onSave}
             className="bg-[#008446] hover:bg-[#006b38] flex h-[43px] items-center justify-center px-[24px] py-[8px] rounded-[4px] cursor-pointer transition shadow-sm"
