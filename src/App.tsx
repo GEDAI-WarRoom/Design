@@ -112,6 +112,12 @@ import { EditarTipoInsumoExamePage } from "./pages/Vacinacao/TipoInsumoExame/Edi
 //ARRECADACAO
 import { ValorIndicePage } from "./pages/Arrecadacao/ValorIndice/ValorIndice";
 import { AdicionarValorIndicePage } from "./pages/Arrecadacao/ValorIndice/AdicionarValorIndice";
+import { FundoArrecadacaoPage } from "./pages/Arrecadacao/FundoArrecadacao/FundoArrecadacao";
+import {
+  AdicionarFundoArrecadacaoPage,
+  EditarFundoArrecadacaoPage,
+  VisualizarFundoArrecadacaoPage,
+} from "./pages/Arrecadacao/FundoArrecadacao/FundoArrecadacaoDetalhe";
 import { ItemReceitaPage } from "./pages/Arrecadacao/ItemReceita/ItemReceita";
 import { AdicionarItemReceitaPage } from "./pages/Arrecadacao/ItemReceita/AdicionarItemReceita";
 
@@ -261,6 +267,10 @@ export type Screen =
   | "editar-papel"
   | "isencao-taxa-gta"
   | "adicionar-isencao-taxa-gta"
+  | "fundo-arrecadacao"
+  | "adicionar-fundo-arrecadacao"
+  | "visualizar-fundo-arrecadacao"
+  | "editar-fundo-arrecadacao"
   | "item-receita"
   | "adicionar-item-receita"
   | "tipo-veiculo"
@@ -941,6 +951,39 @@ export default function App() {
           onNavigate={handleNavigate}
         />
       );
+    case "fundo-arrecadacao":
+      return (
+        <FundoArrecadacaoPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "adicionar-fundo-arrecadacao":
+      return (
+        <AdicionarFundoArrecadacaoPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "visualizar-fundo-arrecadacao":
+      return (
+        <VisualizarFundoArrecadacaoPage
+          dados={screenData}
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "editar-fundo-arrecadacao":
+      return (
+        <EditarFundoArrecadacaoPage
+          dados={screenData}
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    //  case "adicionar-passaporte-equestre":
+    //  return <AdicionarPassaporteEquestrePage onLogout={handleLogout} onNavigate={handleNavigate} />;
+
     case "distribuicao-formularios-gta":
       return (
         <DistribuicaoFormulariosGta
