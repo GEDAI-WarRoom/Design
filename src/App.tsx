@@ -34,6 +34,10 @@ import { EditarRevendedoraAgropecuarioPage } from "./pages/Geral/RevendedoraAgro
 import { AdicionarRevendedoraAgropecuarioPage } from "./pages/Geral/RevendedoraAgropecuaria/AdicionarRevendedoraAgropecuaria";
 import { AeroportoPorto } from "./pages/Geral/AeroportoPorto/AeroportoPorto";
 import { AdicionarAeroportoPorto } from "./pages/Geral/AeroportoPorto/AdicionarAeroportoPorto";
+import { ClassificacaoSanitariaEstadoPage } from "./pages/Geral/ClassificacaoSanitariaEstado/ClassificacaoSanitariaEstado";
+import { AdicionarClassificacaoSanitariaEstadoPage } from "./pages/Geral/ClassificacaoSanitariaEstado/AdicionarClassificacaoSanitariaEstado";
+import { VisualizarClassificacaoSanitariaEstadoPage } from "./pages/Geral/ClassificacaoSanitariaEstado/VisualizarClassificacaoSanitariaEstado";
+import { EditarClassificacaoSanitariaEstadoPage } from "./pages/Geral/ClassificacaoSanitariaEstado/EditarClassificacaoSanitariaEstado";
 
 // ANIMAL
 import { CertificadoraSISBOVPage } from "./pages/Animal/CertificadoraSISBOV/CertificadoraSISBOV";
@@ -137,6 +141,10 @@ import { EditarPapelPage } from "./pages/Controle/Papeis/EditarPapel";
 export type Screen =
   | "login"
   | "dashboard"
+  | "classificacao-sanitaria-estado"
+  | "adicionar-classificacao-sanitaria-estado"
+  | "visualizar-classificacao-sanitaria-estado"
+  | "editar-classificacao-sanitaria-estado"
   | "pessoa-fisica"
   | "adicionar-pessoa-fisica"
   | "visualizar-pessoa-fisica"
@@ -280,6 +288,36 @@ export default function App() {
         <DashboardPage
           onLogout={handleLogout}
           onNavigate={handleNavigate}
+        />
+      );
+    case "classificacao-sanitaria-estado":
+      return (
+        <ClassificacaoSanitariaEstadoPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "adicionar-classificacao-sanitaria-estado":
+      return (
+        <AdicionarClassificacaoSanitariaEstadoPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "visualizar-classificacao-sanitaria-estado":
+      return (
+        <VisualizarClassificacaoSanitariaEstadoPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
+        />
+      );
+    case "editar-classificacao-sanitaria-estado":
+      return (
+        <EditarClassificacaoSanitariaEstadoPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
         />
       );
 
