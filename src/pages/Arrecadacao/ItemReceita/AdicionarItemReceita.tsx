@@ -293,10 +293,8 @@ export function AdicionarItemReceitaPage({
               data={UNIDADES_MEDIDA_ENTIDADE}
               searchKeys={["nome", "sigla", "descricao"]}
               columns={[
-                { label: "Codigo", key: "codigo" },
-                { label: "Sigla", key: "sigla" },
-                { label: "Nome", key: "nome" },
-                { label: "Descrição", key: "descricao" },
+                { label: "Unidade de Medida", key: "sigla" },
+                { label: "Descrição", key: "nome" },
               ]}
               icon={<Ruler size={18} color={GREEN} />}
               title="Buscar Unidade de Medida"

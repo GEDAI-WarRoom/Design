@@ -9,6 +9,7 @@ import {
   Pencil,
   X,
   Ruler,
+  FileText,
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatSelect } from "../../../components/ui/FormKit";
@@ -406,10 +407,8 @@ export function ItemReceitaPage({
                   data={UNIDADES_MEDIDA_ENTIDADE}
                   searchKeys={["nome", "sigla", "descricao"]}
                   columns={[
-                    { label: "Codigo", key: "codigo" },
-                    { label: "Sigla", key: "sigla" },
-                    { label: "Nome", key: "nome" },
-                    { label: "Descrição", key: "descricao" },
+                    { label: "Unidade de Medida", key: "sigla" },
+                    { label: "Descrição", key: "nome" },
                   ]}
                   icon={<Ruler size={18} color={GREEN} />}
                   title="Buscar Unidade de Medida"
@@ -420,11 +419,33 @@ export function ItemReceitaPage({
                 />
               </div>
               <div className="w-full lg:flex-1">
-                <FloatSelect
+                {/* <FloatSelect
                   label="Receita"
                   value={receita}
                   onChange={setReceita}
                   options={RECEITAS_ENTIDADE_INPUT}
+                /> */}
+                <EntitySearchInput
+                  label="Receitas"
+                  placeholder="Buscar por receita"
+                  value={receita ? receita : ""}
+                  data={RECEITAS_ENTIDADE}
+                  searchKeys={["nome", "sigla", "descricao"]}
+                  columns={[
+                    { label: "Nome", key: "nome" },
+                    {
+                      label: "Unidade de Medida",
+                      key: "unidadeMedida",
+                    },
+                    { label: "Descrição", key: "descricao" },
+                  ]}
+                  icon={<FileText size={18} color={GREEN} />}
+                  title="Buscar Receita"
+                  subtitle="Busque por uma receita cadastrada:"
+                  onChange={(ent) => {
+                    setReceita(ent.nome);
+                  }}
+                  required
                 />
               </div>
               <div className="w-full lg:flex-1">
