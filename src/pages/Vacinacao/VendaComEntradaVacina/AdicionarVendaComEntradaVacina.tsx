@@ -2,7 +2,7 @@ import React, { useState, useMemo } from "react";
 import { ArrowLeft, ChevronUp, ChevronDown, Check, Info, FlaskConical, Calendar } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, FloatSelect, FloatCombobox } from "../../../components/ui/FormKit";
-import { EntitySearchInput, DynamicListWrapper , RevendedoraInput, FornecedorVacinaInput} from "../../../components/ui/EntitySearch";
+import { EntitySearchInput, DynamicListWrapper, RevendedoraInput, FornecedorVacinaInput } from "../../../components/ui/EntitySearch";
 
 import * as Icons from "../../../imports/icons";
 
@@ -49,7 +49,7 @@ const ESTADOS_BR = [
 function Section({ title, children, defaultOpen = true }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="bg-white rounded-xl shadow-sm">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100">
       <button type="button" onClick={() => setOpen(!open)} className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50 transition">
         <span className="text-base font-semibold text-gray-800">{title}</span>
         {open ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
@@ -59,12 +59,10 @@ function Section({ title, children, defaultOpen = true }: { title: string; child
   );
 }
 
-
-
 function SubGrupo({ titulo, children, comDivisor = false }: { titulo: string; children: React.ReactNode; comDivisor?: boolean }) {
   return (
     <>
-      {comDivisor && <hr className="border-gray-100" />}
+      {comDivisor && <hr className="border-gray-100 my-2" />}
       <div className="flex flex-col gap-4">
         <span className="text-sm font-semibold text-gray-700">{titulo}</span>
         {children}
@@ -74,13 +72,14 @@ function SubGrupo({ titulo, children, comDivisor = false }: { titulo: string; ch
 }
 
 const uid = (p: string) => `${p}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-const novaApresentacao = () => ({ uid: uid("ap"), frascos: "", dosesPorFrasco: "", validade: "" });
-const novoLote = () => ({ uid: uid("lt"), numeroPartida: "", laboratorio: null as any, doenca: null as any, tipoVacina: "", apresentacoes: [novaApresentacao()] });
+// 💡 Removido "validade" daqui
+const novaApresentacao = () => ({ uid: uid("ap"), frascos: "", dosesPorFrasco: "" });
+// 💡 Adicionado "validade" ao nível do lote
+const novoLote = () => ({ uid: uid("lt"), numeroPartida: "", laboratorio: null as any, doenca: null as any, tipoVacina: "", validade: "", apresentacoes: [novaApresentacao()] });
 
 const totalDosesApresentacao = (frascos: string, dosesPorFrasco: string) =>
   (Number(frascos) || 0) * (Number(dosesPorFrasco) || 0);
 
-// 💡 1. INTERFACE CORRIGIDA: Adicionada a declaração das propriedades do LoteCardItemProps
 interface LoteCardItemProps {
   lote: any;
   index: number;
@@ -105,7 +104,7 @@ export function LoteCardItem({
   removeApresentacao,
   updateApresentacao,
 }: LoteCardItemProps) {
-  
+
   const totalDosesLote = lote.apresentacoes?.reduce((sum: number, ap: any) => {
     return sum + totalDosesApresentacao(ap.frascos, ap.dosesPorFrasco);
   }, 0) || 0;
@@ -113,10 +112,10 @@ export function LoteCardItem({
   const doencaTemTipo = lote.doenca && lote.doenca.tiposVacina && lote.doenca.tiposVacina.length > 0;
 
   return (
-    <div className="flex flex-col gap-4 w-full">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+    <div className="flex flex-col gap-4 w-full p-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
         <FloatInput
-          label="Número da Partida"
+          label="Número de Partida"
           required
           placeholder="0013225/19"
           value={lote.numeroPartida}
@@ -124,23 +123,34 @@ export function LoteCardItem({
           maxLength={10}
         />
 
-        
-          <EntitySearchInput
-            label="Laboratório"
-            placeholder="Buscar laboratório..."
-            value={lote.laboratorio ? lote.laboratorio.nome : ""}
-            data={LABORATORIOS_MOCK}
-            searchKeys={["nome"]}
-            columns={[{ label: "Nome do Laboratório", key: "nome" }]}
-            icon={<FlaskConical size={18} color={GREEN} />}
-            title="Buscar Laboratório"
-            subtitle="Busque por um laboratório cadastrado:"
-            onChange={(ent) => updateLote(lote.uid, { laboratorio: ent })}
-          />
-        
+        <EntitySearchInput
+          label="Laboratório"
+          placeholder="Buscar laboratório..."
+          required
+          value={lote.laboratorio ? lote.laboratorio.nome : ""}
+          data={LABORATORIOS_MOCK}
+          searchKeys={["nome"]}
+          columns={[{ label: "Nome do Laboratório", key: "nome" }]}
+          icon={<FlaskConical size={18} color={GREEN} />}
+          title="Buscar Laboratório"
+          subtitle="Busque por um laboratório cadastrado:"
+          onChange={(ent) => updateLote(lote.uid, { laboratorio: ent })}
+        />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+      {/* Grid contendo Doença, Tipo de Vacina (se houver) e Validade alinhados */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+
+        {/* 💡 Validade movida com sucesso para o Lote inteiro */}
+        <FloatInput
+          label="Validade"
+          required
+          icon={<Calendar size={18} />}
+          type="month"
+          placeholder="mm/aaaa"
+          value={lote.validade || ""}
+          onChange={(v) => updateLote(lote.uid, { validade: v })}
+        />
         <EntitySearchInput
           label="Doença"
           placeholder="Buscar doença..."
@@ -148,44 +158,42 @@ export function LoteCardItem({
           data={DOENCAS_MOCK}
           searchKeys={["nome"]}
           columns={[{ label: "Nome da Doença", key: "nome" }]}
-          icon={<img src={Icons.iconeDoencaUrl} alt="Doença" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}              
+          icon={<img src={Icons.iconeDoencaUrl || (Icons as any).iconedoencaurl} alt="Doença" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}
           title="Buscar Doença"
           subtitle="Busque por uma doença cadastrada:"
           onChange={(ent) => updateLote(lote.uid, { doenca: ent, tipoVacina: "" })}
         />
-        
-        {doencaTemTipo && (
+
+        {doencaTemTipo ? (
           <FloatSelect
             label="Tipo de Vacina"
             value={lote.tipoVacina}
             onChange={(v) => updateLote(lote.uid, { tipoVacina: v })}
             options={lote.doenca.tiposVacina.map((t: string) => ({ value: t, label: t }))}
           />
+        ) : (
+          /* Elemento fantasma para manter o alinhamento de 3 colunas do grid se a doença não tiver tipo */
+          <div className="hidden md:block" />
         )}
+
+
       </div>
 
       <SubGrupo titulo="Apresentação de Vacinas" comDivisor>
-        {/* 💡 2. O seu wrapper com variant="plain", showCounter e smallCounter já está perfeitamente configurado aqui */}
         <DynamicListWrapper
           items={lote.apresentacoes}
           behavior="at-least-one"
           addButtonLabel="Adicionar Apresentação"
-          itemLabel="" 
+          itemLabel=""
           onAddItem={() => addApresentacao(lote.uid)}
           onRemoveItem={(i: number) => removeApresentacao(lote.uid, i)}
           variant="plain"
           showCounter={true}
-          smallCounter={true} 
+          smallCounter={true}
         >
           {(ap: any) => (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-center w-full">
-              <FloatInput
-                label="Nº de Frascos Adquiridos"
-                required
-                type="text"
-                value={ap.frascos}
-                onChange={(v) => updateApresentacao(lote.uid, ap.uid, { frascos: v.replace(/\D/g, "").slice(0, 10) })}
-              />
+            // Grid de apresentações agora possui apenas 3 colunas, ficando visualmente mais limpo e espaçoso!
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end w-full">
               <FloatInput
                 label="Nº de Doses por Frasco"
                 required
@@ -194,20 +202,19 @@ export function LoteCardItem({
                 onChange={(v) => updateApresentacao(lote.uid, ap.uid, { dosesPorFrasco: v.replace(/\D/g, "").slice(0, 10) })}
               />
               <FloatInput
+                label="Nº de Frascos Adquiridos"
+                required
+                type="text"
+                value={ap.frascos}
+                onChange={(v) => updateApresentacao(lote.uid, ap.uid, { frascos: v.replace(/\D/g, "").slice(0, 10) })}
+              />
+
+              <FloatInput
                 label="Total de Doses"
                 required
                 disabled
                 value={String(totalDosesApresentacao(ap.frascos, ap.dosesPorFrasco) || "")}
-                onChange={() => {}}
-              />
-              <FloatInput
-                label="Validade"
-                required
-                icon={<Calendar size={18} />}
-                type="month"
-                placeholder="mm/aaaa"
-                value={ap.validade}
-                onChange={(v) => updateApresentacao(lote.uid, ap.uid, { validade: v })}
+                onChange={() => { }}
               />
             </div>
           )}
@@ -215,7 +222,7 @@ export function LoteCardItem({
       </SubGrupo>
 
       <SubGrupo titulo="Total do Lote" comDivisor>
-        <FloatInput label="Total de Doses Adquiridas" required disabled value={String(totalDosesLote || "")} onChange={() => {}} className="md:w-1/2" />
+        <FloatInput label="Total de Doses Adquiridas" required disabled value={String(totalDosesLote || "")} onChange={() => { }} className="md:w-1/2" />
       </SubGrupo>
     </div>
   );
@@ -270,115 +277,114 @@ export function AdicionarVendaComEntradaVacinaPage({ onLogout, onNavigate }: Pag
     <div className="min-h-screen bg-[#f2f3f5]">
       <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="venda-entrada-vacina" hideSearch />
 
-      <main className="max-w-[1088px] mx-auto px-4 md:px-6 py-6">
-        
+      <main className="max-w-[1088px] mx-auto px-4 md:px-6 py-6 flex flex-col gap-4">
+
+        <div>
           <button type="button" onClick={() => onNavigate("venda-entrada-vacina")} className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70" style={{ color: GREEN }}>
             <ArrowLeft size={15} />
             Todas Vendas com Entrada de Vacina
           </button>
           <div className="flex justify-between items-center w-full">
             <h1 className="text-2xl font-semibold text-gray-900">Adicionar Venda com Entrada de Vacina</h1>
-            <button type="button" onClick={() => setIsSucesso(true)} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm">
+            <button type="button" onClick={() => setIsSucesso(true)} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm cursor-pointer">
               Adicionar
             </button>
           </div>
+        </div>
 
-
-        <div className="flex flex-col gap-6 mt-4">
-            <div className="w-full bg-white border border-gray-100 rounded-lg p-5 shadow-sm flex items-center gap-3 mt-4 mb-6">
-              <div className="text-gray-500 flex-shrink-0">
-                <Info size={20} className="stroke-[2.5]" />
-              </div>
-              
-              <p className="text-sm text-gray-600 font-medium leading-relaxed">
-                Campos indicados com <span className="text-red-500 font-bold">*</span> são obrigatórios e deverão ser preenchidos.
-              </p>
+        <div className="flex flex-col gap-6">
+          <div className="w-full bg-white border border-gray-100 rounded-lg p-5 shadow-sm flex items-center gap-3">
+            <div className="text-gray-500 flex-shrink-0">
+              <Info size={20} className="stroke-[2.5]" />
             </div>
-
-
-        <Section title="Estabelecimento Recebedor de Vacinas">
-          <div className="flex flex-col gap-3">
-            <RevendedoraInput
-              value={revendedora ? revendedora.codigo : ""}
-              required
-              onChange={(entidadeSelecionada) => setRevendedora(entidadeSelecionada)}
-              onEyeClick={() => {
-                if (revendedora?.codigo) alert(`Visualizar detalhes: ${revendedora.codigo}`);
-                else alert("Por favor, digite ou selecione uma revendedora primeiro.");
-              }}
-            />
+            <p className="text-sm text-gray-600 font-medium leading-relaxed">
+              Campos indicados com <span className="text-red-500 font-bold">*</span> são obrigatórios e deverão ser preenchidos.
+            </p>
           </div>
-        </Section>
-              
-        <Section title="Origem das Vacinas Adquiridas">
-          <div className="flex flex-col gap-3">
-            <FornecedorVacinaInput
-              value={fornecedor ? fornecedor.codigo : ""}
-              required
-              tooltipText="Não encontrou a Fornecedora de Vacina? Entre em contato com o Escritório Seccional do IMA de sua região."
-              onChange={(entidadeSelecionada) => setFornecedor(entidadeSelecionada)}
-              onEyeClick={() => {
-                if (fornecedor?.codigo) alert(`Visualizar detalhes: ${fornecedor.codigo}`);
-                else alert("Por favor, digite ou selecione um fornecedor primeiro.");
-              }}
-            />
-          </div>
-        </Section>
 
-        <Section title="Nota Fiscal">
-          <div className="flex flex-col gap-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-              <FloatInput
-                label="Número da Nota Fiscal"
+          <Section title="Emitente">
+            <div className="flex flex-col gap-3">
+              <FornecedorVacinaInput
+                value={fornecedor ? fornecedor.codigo : ""}
                 required
-                type="text"
-                value={numeroNotaFiscal}
-                onChange={(v) => setNumeroNotaFiscal(v.replace(/\D/g, "").slice(0, 10))}
+                tooltipText="Não encontrou a Fornecedora de Vacina? Entre em contato com o Escritório Seccional do IMA de sua região."
+                onChange={(entidadeSelecionada) => setFornecedor(entidadeSelecionada)}
+                onEyeClick={() => {
+                  if (fornecedor?.codigo) alert(`Visualizar detalhes: ${fornecedor.codigo}`);
+                  else alert("Por favor, digite ou selecione um fornecedor primeiro.");
+                }}
               />
-              <FloatCombobox label="UF da Nota Fiscal" required value={ufNotaFiscal} onChange={setUfNotaFiscal} options={ESTADOS_BR} />
             </div>
+          </Section>
 
-            <DynamicListWrapper
-              items={lotes}
-              behavior="at-least-one"
-              addButtonLabel="Adicionar Lote"
-              itemLabel="Lote de Vacina" 
-              onAddItem={addLote}
-              onRemoveItem={removeLote}
-              showCounter={false}
-            >
-              {(lote: any, index: number) => (
-                <LoteCardItem
-                  key={lote.uid}
-                  lote={lote}
-                  index={index}
-                  fornecedor={fornecedor}
-                  fornecedorEhLaboratorio={fornecedorEhLaboratorio}
-                  updateLote={updateLote}
-                  addApresentacao={addApresentacao}
-                  removeApresentacao={removeApresentacao}
-                  updateApresentacao={updateApresentacao}
+          <Section title="Destinatário">
+            <div className="flex flex-col gap-3">
+              <RevendedoraInput
+                value={revendedora ? revendedora.codigo : ""}
+                required
+                onChange={(entidadeSelecionada) => setRevendedora(entidadeSelecionada)}
+                onEyeClick={() => {
+                  if (revendedora?.codigo) alert(`Visualizar detalhes: ${revendedora.codigo}`);
+                  else alert("Por favor, digite ou selecione uma revendedora primeiro.");
+                }}
+              />
+            </div>
+          </Section>
+
+          <Section title="Nota Fiscal">
+            <div className="flex flex-col gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+                <FloatInput
+                  label="Número da Nota Fiscal"
+                  required
+                  type="text"
+                  value={numeroNotaFiscal}
+                  onChange={(v) => setNumeroNotaFiscal(v.replace(/\D/g, "").slice(0, 10))}
                 />
-              )}
-            </DynamicListWrapper>
+                <FloatCombobox label="UF da Nota Fiscal" required value={ufNotaFiscal} onChange={setUfNotaFiscal} options={ESTADOS_BR} />
+              </div>
 
-            <SubGrupo titulo="Total da Nota" comDivisor>
-              {totaisPorDoenca.length === 0 ? (
-                <span className="text-sm text-gray-400">Selecione a doença e as doses nos lotes para ver os totais.</span>
-              ) : (
-                <div className="flex flex-col gap-3">
-                  {totaisPorDoenca.map((t) => (
-                    <div key={t.doenca} className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-                      <FloatInput label="Doença" disabled value={t.doenca} onChange={() => {}} />
-                      <FloatInput label="Total de Doses Adquiridas" disabled value={String(t.total)} onChange={() => {}} />
-                    </div>
-                  ))}
-                </div>
-              )}
-            </SubGrupo>
-          </div>
-        </Section>
-          </div>
+              <DynamicListWrapper
+                items={lotes}
+                behavior="at-least-one"
+                addButtonLabel="Adicionar Lote"
+                itemLabel="Lote de Vacina"
+                onAddItem={addLote}
+                onRemoveItem={removeLote}
+                showCounter={false}
+              >
+                {(lote: any, index: number) => (
+                  <LoteCardItem
+                    key={lote.uid}
+                    lote={lote}
+                    index={index}
+                    fornecedor={fornecedor}
+                    fornecedorEhLaboratorio={fornecedorEhLaboratorio}
+                    updateLote={updateLote}
+                    addApresentacao={addApresentacao}
+                    removeApresentacao={removeApresentacao}
+                    updateApresentacao={updateApresentacao}
+                  />
+                )}
+              </DynamicListWrapper>
+
+              <SubGrupo titulo="Total da Nota" comDivisor>
+                {totaisPorDoenca.length === 0 ? (
+                  <span className="text-sm text-gray-400 italic pl-1">Selecione a doença e as doses nos lotes para ver os totais.</span>
+                ) : (
+                  <div className="flex flex-col gap-3">
+                    {totaisPorDoenca.map((t) => (
+                      <div key={t.doenca} className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+                        <FloatInput label="Doença" disabled value={t.doenca} onChange={() => { }} />
+                        <FloatInput label="Total de Doses Adquiridas" disabled value={String(t.total)} onChange={() => { }} />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </SubGrupo>
+            </div>
+          </Section>
+        </div>
       </main>
 
       {/* Modal de Sucesso */}
@@ -393,10 +399,10 @@ export function AdicionarVendaComEntradaVacinaPage({ onLogout, onNavigate }: Pag
               {numeroNotaFiscal ? `Nota Fiscal nº ${numeroNotaFiscal}` : "A venda"} foi registrada.
             </p>
             <div className="flex gap-3 justify-center mt-6">
-              <button onClick={() => { setIsSucesso(false); onNavigate("venda-entrada-vacina"); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition">
+              <button onClick={() => { setIsSucesso(false); onNavigate("venda-entrada-vacina"); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition cursor-pointer">
                 Voltar
               </button>
-              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-venda-entrada-vacina"); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">
+              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-venda-entrada-vacina"); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition cursor-pointer">
                 Visualizar
               </button>
             </div>
@@ -406,3 +412,5 @@ export function AdicionarVendaComEntradaVacinaPage({ onLogout, onNavigate }: Pag
     </div>
   );
 }
+
+export default AdicionarVendaComEntradaVacinaPage;

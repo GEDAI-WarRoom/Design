@@ -198,11 +198,11 @@ export function VendaComEntradaVacinaPage({ onLogout, onNavigate }: PageProps) {
 
         {/* Card Unificado (Busca + Listagem juntos no mesmo box) */}
         <div className="bg-white rounded-xl shadow-sm overflow-hidden flex flex-col">
-          
+
           {/* Seção Superior do Bloco: Filtros */}
           <div className="p-6 border-b border-gray-100 bg-white">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.2fr_0.8fr_1.2fr] gap-3 items-end">
-              
+
               {/* Revendedora */}
               <EntitySearchInput
                 label="Revendedora de Produtos Agropecuários"
@@ -222,7 +222,7 @@ export function VendaComEntradaVacinaPage({ onLogout, onNavigate }: PageProps) {
                   limparErro();
                 }}
               />
-          
+
               {/* Fornecedor */}
               <EntitySearchInput
                 label="Fornecedor"
@@ -236,7 +236,7 @@ export function VendaComEntradaVacinaPage({ onLogout, onNavigate }: PageProps) {
                   { label: "Código", key: "codigo" },
                   { label: "UF", key: "uf" },
                 ]}
-                icon={<img src={Icons.iconeFornecedorUrl} alt="Fornecedor" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}              
+                icon={<img src={Icons.iconeFornecedorUrl} alt="Fornecedor" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}
                 title="Buscar Fornecedor de Vacina"
                 subtitle="Busque por laboratórios ou revendedoras cadastrados:"
                 onChange={(ent) => {
@@ -244,30 +244,28 @@ export function VendaComEntradaVacinaPage({ onLogout, onNavigate }: PageProps) {
                   limparErro();
                 }}
               />
-          
-              {/* Doença + Botão Pesquisar */}
+
+
+              {/*+ Botão Pesquisar */}
               <div className="flex items-end gap-2 w-full">
-                <div className="flex-1">
-                  <EntitySearchInput
-                    label="Doença"
-                    placeholder="Buscar pelo nome da doença."
-                    value={doenca ? doenca.nome : ""}
-                    data={DOENCAS_MOCK}
-                    searchKeys={["nome"]}
-                    columns={[
-                      { label: "Nome da Doença", key: "nome" },
-                    ]}
-                    icon={<img src={Icons.iconeDoencaUrl} alt="Doença" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}              
-                    title="Buscar Doença"
-                    subtitle="Busque por uma doença cadastrada:"
-                    onChange={(ent) => {
-                      setDoenca(ent);
-                      setTipoVacina("");
+                {/* Número da Nota Fiscal */}
+                <div className="relative border border-gray-300 rounded-md h-12 flex items-end px-3 pb-1.5 bg-white focus-within:border-[#1A7A3C] focus-within:ring-1 focus-within:ring-[#1A7A3C]">
+                  <label className={`absolute left-3 transition-all ${numeroNotaFiscal ? "top-1 text-[10px] text-gray-400 font-medium" : "top-1/2 -translate-y-1/2 text-sm text-gray-400"}`}>
+                    Número da Nota Fiscal
+                  </label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={10}
+                    value={numeroNotaFiscal}
+                    onChange={(e) => {
+                      setNumeroNotaFiscal(e.target.value.replace(/\D/g, ""));
                       limparErro();
                     }}
+                    className="w-full bg-transparent text-sm text-gray-800 outline-none h-6"
                   />
                 </div>
-                
+
                 <button
                   onClick={handlePesquisar}
                   className="h-12 px-5 rounded-md text-white text-sm font-semibold transition hover:opacity-90 flex items-center justify-center flex-shrink-0"
@@ -276,31 +274,15 @@ export function VendaComEntradaVacinaPage({ onLogout, onNavigate }: PageProps) {
                   Pesquisar
                 </button>
               </div>
-          
+
               {/* SEGUNDA LINHA */}
-              
-              {/* Número da Nota Fiscal */}
-              <div className="relative border border-gray-300 rounded-md h-12 flex items-end px-3 pb-1.5 bg-white focus-within:border-[#1A7A3C] focus-within:ring-1 focus-within:ring-[#1A7A3C]">
-                <label className={`absolute left-3 transition-all ${numeroNotaFiscal ? "top-1 text-[10px] text-gray-400 font-medium" : "top-1/2 -translate-y-1/2 text-sm text-gray-400"}`}>
-                  Número da Nota Fiscal
-                </label>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={10}
-                  value={numeroNotaFiscal}
-                  onChange={(e) => {
-                    setNumeroNotaFiscal(e.target.value.replace(/\D/g, ""));
-                    limparErro();
-                  }}
-                  className="w-full bg-transparent text-sm text-gray-800 outline-none h-6"
-                />
-              </div>
-          
+
+
+
               {/* Número da Partida */}
               <div className="relative border border-gray-300 rounded-md h-12 flex items-end px-3 pb-1.5 bg-white focus-within:border-[#1A7A3C] focus-within:ring-1 focus-within:ring-[#1A7A3C]">
                 <label className={`absolute left-3 transition-all ${numeroPartida ? "top-1 text-[10px] text-gray-400 font-medium" : "top-1/2 -translate-y-1/2 text-sm text-gray-400"}`}>
-                  Número da Partida
+                  Número de Partida
                 </label>
                 <input
                   type="text"
@@ -312,7 +294,28 @@ export function VendaComEntradaVacinaPage({ onLogout, onNavigate }: PageProps) {
                   className="w-full bg-transparent text-sm text-gray-800 outline-none h-6"
                 />
               </div>
-          
+
+              <div className="flex-1">
+                <EntitySearchInput
+                  label="Doença"
+                  placeholder="Buscar pelo nome da doença."
+                  value={doenca ? doenca.nome : ""}
+                  data={DOENCAS_MOCK}
+                  searchKeys={["nome"]}
+                  columns={[
+                    { label: "Nome da Doença", key: "nome" },
+                  ]}
+                  icon={<img src={Icons.iconeDoencaUrl} alt="Doença" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}
+                  title="Buscar Doença"
+                  subtitle="Busque por uma doença cadastrada:"
+                  onChange={(ent) => {
+                    setDoenca(ent);
+                    setTipoVacina("");
+                    limparErro();
+                  }}
+                />
+              </div>
+
               {/* Tipo de Vacina */}
               {doencaTemTipoVacina ? (
                 <FloatSelect
@@ -325,16 +328,16 @@ export function VendaComEntradaVacinaPage({ onLogout, onNavigate }: PageProps) {
                   options={tiposVacinaDisponiveis}
                 />
               ) : null}
-          
+
               {/* Situação */}
-              <FloatSelect 
-                label="Situação" 
-                value={situacao} 
+              <FloatSelect
+                label="Situação"
+                value={situacao}
                 onChange={(val) => {
                   setSituacao(val);
                   limparErro();
-                }} 
-                options={SITUACOES} 
+                }}
+                options={SITUACOES}
               />
             </div>
 
@@ -376,27 +379,27 @@ export function VendaComEntradaVacinaPage({ onLogout, onNavigate }: PageProps) {
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm border-collapse">
                     <thead>
-                    <tr className="bg-gray-30 border-b border-gray-100">
-                      <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap uppercase text-xs tracking-wider">
-                        Revendedora de Produtos <br /> Agropecuários
-                      </th>
-                      <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap uppercase text-xs tracking-wider">
-                        Número da <br /> Nota Fiscal
-                      </th>
-                      <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap uppercase text-xs tracking-wider">
-                        Número da <br /> Partida
-                      </th>
-                      <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap uppercase text-xs tracking-wider">
-                        Fornecedor
-                      </th>
-                      <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap uppercase text-xs tracking-wider">
-                        Doença
-                      </th>
-                      <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap uppercase text-xs tracking-wider">
-                        Situação
-                      </th>
-                      <th className="px-4 py-3" />
-                    </tr>
+                      <tr className="bg-gray-30 border-b border-gray-100">
+                        <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap uppercase text-xs tracking-wider">
+                          Revendedora de Produtos <br /> Agropecuários
+                        </th>
+                        <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap uppercase text-xs tracking-wider">
+                          Número da <br /> Nota Fiscal
+                        </th>
+                        <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap uppercase text-xs tracking-wider">
+                          Número da <br /> Partida
+                        </th>
+                        <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap uppercase text-xs tracking-wider">
+                          Fornecedor
+                        </th>
+                        <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap uppercase text-xs tracking-wider">
+                          Doença
+                        </th>
+                        <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap uppercase text-xs tracking-wider">
+                          Situação
+                        </th>
+                        <th className="px-4 py-3" />
+                      </tr>
                     </thead>
                     <tbody>
                       {pagina.map((v) => (
