@@ -171,7 +171,7 @@ export function PassaporteEquestrePage({ onLogout, onNavigate }: BuscaPassaporte
 
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full">
             <h1 className="text-2xl font-semibold text-gray-900">
-              Passaportes Equestres
+              Passaporte Equestre
             </h1>
 
             {/* Botão de Adicionar */}

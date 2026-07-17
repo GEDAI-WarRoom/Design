@@ -407,16 +407,16 @@ export function AdicionarPassaporteEquestrePage({
 
   const estabelecimentosDisponiveis = produtor
     ? ESTABELECIMENTOS_PASSAPORTE_MOCK.filter((item) =>
-        item.produtorDocumentos.includes(produtor.documento),
-      )
+      item.produtorDocumentos.includes(produtor.documento),
+    )
     : [];
   const exploracoesDisponiveis = produtor && estabelecimento
     ? EXPLORACOES_PASSAPORTE_MOCK.filter(
-        (item) =>
-          item.estabCodigo === estabelecimento.codigo &&
-          item.produtorDocumentos.includes(produtor.documento) &&
-          item.grupo === "Equídeos",
-      )
+      (item) =>
+        item.estabCodigo === estabelecimento.codigo &&
+        item.produtorDocumentos.includes(produtor.documento) &&
+        item.grupo === "Equídeos",
+    )
     : [];
   const dataVencimentoAnemia = calcularVencimentoDocumento(dataEmissaoAnemia);
   const dataVencimentoMormo = calcularVencimentoDocumento(dataEmissaoMormo);
@@ -456,40 +456,6 @@ export function AdicionarPassaporteEquestrePage({
       nomeInfluenza &&
       dataInfluenza;
 
-    if (!obrigatoriosPreenchidos) {
-      setErroFormulario("Preencha todos os campos obrigatórios antes de continuar.");
-      return;
-    }
-    if (!/^\d{15}$/.test(codigoMicrochip)) {
-      setErroFormulario("O código do microchip deve conter exatamente 15 dígitos numéricos.");
-      return;
-    }
-    if ([dataEmissaoAnemia, dataInfluenza, dataEmissaoMormo, dataAntirrabica]
-      .filter(Boolean)
-      .some((data) => data > hoje)) {
-      setErroFormulario("As datas de emissão dos exames e atestados não podem ser futuras.");
-      return;
-    }
-    if (possuiMormo && (!nomeMormo || !dataEmissaoMormo)) {
-      setErroFormulario("Informe o documento e a data de emissão do exame de Mormo.");
-      return;
-    }
-    if (possuiAntirrabica && (!nomeAntirrabica || !dataAntirrabica)) {
-      setErroFormulario("Informe o documento e a data de emissão do atestado de vacinação antirrábica.");
-      return;
-    }
-    if (Object.values(allViews).some((view) => !view.photo)) {
-      setErroFormulario("Anexe uma foto para cada uma das seis vistas da resenha eletrônica.");
-      return;
-    }
-    if (
-      Object.values(allViews).some((view) =>
-        view.markers.some((marker) => !marker.description.trim()),
-      )
-    ) {
-      setErroFormulario("Descreva todas as características marcadas na resenha eletrônica.");
-      return;
-    }
 
     const dadosRegistro: Omit<PassaporteEquestreRegistro, "id"> = {
       nomeEquino: nomeAnimal.trim(),
@@ -512,13 +478,13 @@ export function AdicionarPassaporteEquestrePage({
         },
         ...(possuiMormo
           ? {
-              mormo: {
-                fileName: nomeMormo,
-                descricao: descricaoMormo,
-                emissao: dataEmissaoMormo,
-                vencimento: dataVencimentoMormo,
-              },
-            }
+            mormo: {
+              fileName: nomeMormo,
+              descricao: descricaoMormo,
+              emissao: dataEmissaoMormo,
+              vencimento: dataVencimentoMormo,
+            },
+          }
           : {}),
       },
       atestados: {
@@ -529,12 +495,12 @@ export function AdicionarPassaporteEquestrePage({
         },
         ...(possuiAntirrabica
           ? {
-              antirrabica: {
-                fileName: nomeAntirrabica,
-                descricao: descricaoAntirrabica,
-                emissao: dataAntirrabica,
-              },
-            }
+            antirrabica: {
+              fileName: nomeAntirrabica,
+              descricao: descricaoAntirrabica,
+              emissao: dataAntirrabica,
+            },
+          }
           : {}),
       },
       views: allViews,
@@ -675,7 +641,7 @@ export function AdicionarPassaporteEquestrePage({
                   icon={<Calendar className="w-5 h-5 object-contain" />}
                   required
                   value={dataValidade}
-                  onChange={() => {}}
+                  onChange={() => { }}
                   disabled
                 />
               )}
@@ -749,7 +715,7 @@ export function AdicionarPassaporteEquestrePage({
               {produtor && (
                 <div className="flex gap-2 items-end">
                   <div className="flex-1">
-                    <FloatInput label="CPF / CNPJ" required value={produtor.documento} onChange={() => {}} disabled />
+                    <FloatInput label="CPF / CNPJ" required value={produtor.documento} onChange={() => { }} disabled />
                   </div>
                   <button type="button" onClick={() => alert(`Visualizar produtor: ${produtor.documento}`)} className="h-12 p-3 text-[#1A7A3C] hover:bg-green-50 rounded-md transition" title="Visualizar produtor">
                     <Eye size={20} />
@@ -783,7 +749,7 @@ export function AdicionarPassaporteEquestrePage({
                 {estabelecimento && (
                   <div className="flex gap-2 items-end">
                     <div className="flex-1">
-                      <FloatInput label="Código do Estabelecimento" required value={estabelecimento.codigo} onChange={() => {}} disabled />
+                      <FloatInput label="Código do Estabelecimento" required value={estabelecimento.codigo} onChange={() => { }} disabled />
                     </div>
                     <button type="button" onClick={() => alert(`Visualizar estabelecimento: ${estabelecimento.codigo}`)} className="h-12 p-3 text-[#1A7A3C] hover:bg-green-50 rounded-md transition" title="Visualizar estabelecimento">
                       <Eye size={20} />
@@ -815,7 +781,7 @@ export function AdicionarPassaporteEquestrePage({
                 {exploracaoPecuaria && (
                   <div className="flex gap-2 items-end">
                     <div className="flex-1">
-                      <FloatInput label="Espécie Explorada" required value={exploracaoPecuaria.especie ?? especie?.nome ?? "Equídeos"} onChange={() => {}} disabled />
+                      <FloatInput label="Espécie Explorada" required value={exploracaoPecuaria.especie ?? especie?.nome ?? "Equídeos"} onChange={() => { }} disabled />
                     </div>
                     <button type="button" onClick={() => alert(`Visualizar exploração: ${exploracaoPecuaria.codigo}`)} className="h-12 p-3 text-[#1A7A3C] hover:bg-green-50 rounded-md transition" title="Visualizar exploração">
                       <Eye size={20} />
@@ -886,7 +852,7 @@ export function AdicionarPassaporteEquestrePage({
                         icon={<Calendar className="w-5 h-5 object-contain" />}
                         required
                         value={dataVencimentoAnemia}
-                        onChange={() => {}}
+                        onChange={() => { }}
                         disabled
                       />
                     </div>
@@ -904,67 +870,67 @@ export function AdicionarPassaporteEquestrePage({
             />
             {possuiMormo && (
               <div
-              className="border border-gray-200 border-l-4 rounded-r-xl rounded-l-md p-5 bg-white shadow-sm"
-              style={{ borderLeftColor: GREEN }}
+                className="border border-gray-200 border-l-4 rounded-r-xl rounded-l-md p-5 bg-white shadow-sm"
+                style={{ borderLeftColor: GREEN }}
               >
-              <SubGrupo titulo="Exame de Mormo">
-                <div className="flex flex-col gap-4 mt-1">
-                  <div className="flex gap-3 items-start w-full">
-                    <UploadField
-                      label="Documento"
-                      required
-                      fileName={nomeMormo}
-                      onSelectFile={() =>
-                        setNomeMormo(`exame_mormo_${uid("doc")}.pdf`)
-                      }
-                    />
+                <SubGrupo titulo="Exame de Mormo">
+                  <div className="flex flex-col gap-4 mt-1">
+                    <div className="flex gap-3 items-start w-full">
+                      <UploadField
+                        label="Documento"
+                        required
+                        fileName={nomeMormo}
+                        onSelectFile={() =>
+                          setNomeMormo(`exame_mormo_${uid("doc")}.pdf`)
+                        }
+                      />
+
+                      {nomeMormo && (
+                        <>
+                          <div className="flex-1 animate-fadeIn">
+                            <FloatInput
+                              label="Descrição"
+                              value={descricaoMormo}
+                              onChange={setDescricaoMormo}
+                              placeholder="Descrição do exame de mormo..."
+                            />
+                          </div>
+                          <div className="h-12 flex items-center animate-fadeIn">
+                            <button
+                              type="button"
+                              onClick={() => alert(`Fazendo download de: ${nomeMormo}`)}
+                              className="p-2.5 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"
+                            >
+                              <Download size={20} />
+                            </button>
+                          </div>
+                        </>
+                      )}
+                    </div>
 
                     {nomeMormo && (
-                      <>
-                        <div className="flex-1 animate-fadeIn">
-                          <FloatInput
-                            label="Descrição"
-                            value={descricaoMormo}
-                            onChange={setDescricaoMormo}
-                            placeholder="Descrição do exame de mormo..."
-                          />
-                        </div>
-                        <div className="h-12 flex items-center animate-fadeIn">
-                          <button
-                            type="button"
-                            onClick={() => alert(`Fazendo download de: ${nomeMormo}`)}
-                            className="p-2.5 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"
-                          >
-                            <Download size={20} />
-                          </button>
-                        </div>
-                      </>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 animate-fadeIn">
+                        <FloatInput
+                          label="Data de Emissão"
+                          type="date"
+                          icon={<Calendar className="w-5 h-5 object-contain" />}
+                          required
+                          value={dataEmissaoMormo}
+                          onChange={setDataEmissaoMormo}
+                        />
+                        <FloatInput
+                          label="Data de Vencimento"
+                          type="date"
+                          icon={<Calendar className="w-5 h-5 object-contain" />}
+                          required
+                          value={dataVencimentoMormo}
+                          onChange={() => { }}
+                          disabled
+                        />
+                      </div>
                     )}
                   </div>
-
-                  {nomeMormo && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 animate-fadeIn">
-                      <FloatInput
-                        label="Data de Emissão"
-                        type="date"
-                        icon={<Calendar className="w-5 h-5 object-contain" />}
-                        required
-                        value={dataEmissaoMormo}
-                        onChange={setDataEmissaoMormo}
-                      />
-                      <FloatInput
-                        label="Data de Vencimento"
-                        type="date"
-                        icon={<Calendar className="w-5 h-5 object-contain" />}
-                        required
-                        value={dataVencimentoMormo}
-                        onChange={() => {}}
-                        disabled
-                      />
-                    </div>
-                  )}
-                </div>
-              </SubGrupo>
+                </SubGrupo>
               </div>
             )}
           </div>
@@ -1038,58 +1004,58 @@ export function AdicionarPassaporteEquestrePage({
             />
             {possuiAntirrabica && (
               <div
-              className="border border-gray-200 border-l-4 rounded-r-xl rounded-l-md p-5 bg-white shadow-sm"
-              style={{ borderLeftColor: GREEN }}
+                className="border border-gray-200 border-l-4 rounded-r-xl rounded-l-md p-5 bg-white shadow-sm"
+                style={{ borderLeftColor: GREEN }}
               >
-              <SubGrupo titulo="Atestado de Vacinação contra Antirrábica">
-                <div className="flex flex-col gap-4 mt-1">
-                  <div className="flex gap-3 items-start w-full">
-                    <UploadField
-                      label="Documento"
-                      required
-                      fileName={nomeAntirrabica}
-                      onSelectFile={() =>
-                        setNomeAntirrabica(`atestado_antirrabica_${uid("doc")}.pdf`)
-                      }
-                    />
+                <SubGrupo titulo="Atestado de Vacinação contra Antirrábica">
+                  <div className="flex flex-col gap-4 mt-1">
+                    <div className="flex gap-3 items-start w-full">
+                      <UploadField
+                        label="Documento"
+                        required
+                        fileName={nomeAntirrabica}
+                        onSelectFile={() =>
+                          setNomeAntirrabica(`atestado_antirrabica_${uid("doc")}.pdf`)
+                        }
+                      />
+
+                      {nomeAntirrabica && (
+                        <>
+                          <div className="flex-1 animate-fadeIn">
+                            <FloatInput
+                              label="Descrição"
+                              value={descricaoAntirrabica}
+                              onChange={setDescricaoAntirrabica}
+                              placeholder="Descrição do atestado de raiva..."
+                            />
+                          </div>
+                          <div className="h-12 flex items-center animate-fadeIn">
+                            <button
+                              type="button"
+                              onClick={() => alert(`Fazendo download de: ${nomeAntirrabica}`)}
+                              className="p-2.5 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"
+                            >
+                              <Download size={20} />
+                            </button>
+                          </div>
+                        </>
+                      )}
+                    </div>
 
                     {nomeAntirrabica && (
-                      <>
-                        <div className="flex-1 animate-fadeIn">
-                          <FloatInput
-                            label="Descrição"
-                            value={descricaoAntirrabica}
-                            onChange={setDescricaoAntirrabica}
-                            placeholder="Descrição do atestado de raiva..."
-                          />
-                        </div>
-                        <div className="h-12 flex items-center animate-fadeIn">
-                          <button
-                            type="button"
-                            onClick={() => alert(`Fazendo download de: ${nomeAntirrabica}`)}
-                            className="p-2.5 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"
-                          >
-                            <Download size={20} />
-                          </button>
-                        </div>
-                      </>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 animate-fadeIn">
+                        <FloatInput
+                          label="Data de Emissão"
+                          type="date"
+                          icon={<Calendar className="w-5 h-5 object-contain" />}
+                          required
+                          value={dataAntirrabica}
+                          onChange={setDataAntirrabica}
+                        />
+                      </div>
                     )}
                   </div>
-
-                  {nomeAntirrabica && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 animate-fadeIn">
-                      <FloatInput
-                        label="Data de Emissão"
-                        type="date"
-                        icon={<Calendar className="w-5 h-5 object-contain" />}
-                        required
-                        value={dataAntirrabica}
-                        onChange={setDataAntirrabica}
-                      />
-                    </div>
-                  )}
-                </div>
-              </SubGrupo>
+                </SubGrupo>
               </div>
             )}
           </div>
@@ -1111,12 +1077,11 @@ export function AdicionarPassaporteEquestrePage({
                     type="button"
                     onClick={() => setActiveViewId(v.id)}
                     className={`group flex flex-col sm:flex-row items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-bold rounded-lg transition-all flex-1 text-center sm:text-left
-                      ${
-                        isActive
-                          ? "bg-white text-[#1A7A3C] shadow-sm ring-1 ring-black/5"
-                          : hasPhoto
-                            ? "bg-green-50/40 text-gray-700 hover:bg-green-50 border border-transparent"
-                            : "text-gray-500 hover:text-gray-800 bg-white hover:bg-gray-50 border border-dashed border-gray-200"
+                      ${isActive
+                        ? "bg-white text-[#1A7A3C] shadow-sm ring-1 ring-black/5"
+                        : hasPhoto
+                          ? "bg-green-50/40 text-gray-700 hover:bg-green-50 border border-transparent"
+                          : "text-gray-500 hover:text-gray-800 bg-white hover:bg-gray-50 border border-dashed border-gray-200"
                       }`}
                   >
                     <div className="flex items-center gap-1.5">
@@ -1236,7 +1201,7 @@ export function AdicionarPassaporteEquestrePage({
                 ) : (
                   <div className="flex flex-col gap-3">
                     <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">
-                      Características mapeadas nesta vista 
+                      Características mapeadas nesta vista
                     </span>
                     {current.markers.map((m) => (
                       <div
@@ -1406,7 +1371,7 @@ export function AdicionarPassaporteEquestrePage({
         onChange={handleFileChange}
       />
 
-     {/* Modal de Sucesso */}
+      {/* Modal de Sucesso */}
       {isSucesso && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
@@ -1421,7 +1386,7 @@ export function AdicionarPassaporteEquestrePage({
             <p className="text-sm text-gray-500 mt-1">
               Os dados do passaporte de {nomeAnimal ? `"${nomeAnimal}"` : "animal"} foram salvos.
             </p>
-            
+
             {/* Botões de Ação */}
             <div className="flex gap-3 justify-center mt-6">
               <button
@@ -1434,7 +1399,7 @@ export function AdicionarPassaporteEquestrePage({
               >
                 Voltar
               </button>
-              
+
               <button
                 type="button"
                 onClick={() => {

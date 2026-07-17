@@ -9,6 +9,7 @@ import {
   Calendar,
   Camera,
   Pencil,
+  CreditCard
 } from "lucide-react";
 
 // 1. Importações Oficiais do System
@@ -204,7 +205,7 @@ export function VisualizarPassaporteEquestrePage({
 
   const diasAteVencimento = Math.ceil(
     (new Date(`${registro.dataValidade}T23:59:59`).getTime() - Date.now()) /
-      (1000 * 60 * 60 * 24),
+    (1000 * 60 * 60 * 24),
   );
 
   return (
@@ -240,7 +241,7 @@ export function VisualizarPassaporteEquestrePage({
               className="flex items-center justify-center gap-2 px-5 h-10 rounded-md text-white text-sm font-semibold transition hover:opacity-90"
               style={{ backgroundColor: GREEN }}
             >
-              <Pencil size={16} />
+
               {registro.pago ? "Alterar Situação" : "Editar"}
             </button>
           </div>
@@ -249,25 +250,25 @@ export function VisualizarPassaporteEquestrePage({
         {/* Alerta Informativo de Pagamento Pendente */}
         {!registro.pago && (
           <div className="w-full bg-[#FFF9E6] border border-[#FFE0B2] rounded-xl p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-2">
-          <div className="flex items-start gap-3">
-            <div className="text-[#F57C00] flex-shrink-0 mt-0.5">
-              <Info size={20} className="stroke-[2.5]" />
+            <div className="flex items-start gap-3">
+              <div className="text-[#F57C00] flex-shrink-0 mt-0.5">
+                <Info size={20} className="stroke-[2.5]" />
+              </div>
+              <div className="space-y-0.5">
+                <span className="text-sm font-bold text-gray-800">Pagamento Pendente</span>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  Para concluir o processo de emissão do passaporte efetue o pagamento da taxa.
+                </p>
+              </div>
             </div>
-            <div className="space-y-0.5">
-              <span className="text-sm font-bold text-gray-800">Pagamento Pendente</span>
-              <p className="text-sm text-gray-600 leading-relaxed">
-                Para concluir o processo de emissão do passaporte efetue o pagamento da taxa.
-              </p>
-            </div>
-          </div>
-          {/* Botão de Pagamento Dentro do Alerta */}
-          <button
-            type="button"
-            disabled
-            className="flex items-center justify-center px-4 py-2.5 bg-gray-200 text-gray-500 rounded-lg text-xs font-bold self-start sm:self-center shrink-0 cursor-not-allowed"
-          >
-            Pagamento indisponível
-          </button>
+            {/* Botão de Pagamento Dentro do Alerta */}
+            <button
+              type="button"
+              className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#F57C00] hover:bg-[#E65100] text-white rounded-lg text-xs font-bold transition self-start sm:self-center shrink-0"
+            >
+              <CreditCard size={15} />
+              Pagar Taxa
+            </button>
           </div>
         )}
 
@@ -297,14 +298,14 @@ export function VisualizarPassaporteEquestrePage({
                 label="Nome do Animal"
                 required
                 value={nomeAnimal}
-                onChange={() => {}}
+                onChange={() => { }}
                 disabled
               />
               <FloatInput
                 label="Código do Microchip"
                 required
                 value={codigoMicrochip}
-                onChange={() => {}}
+                onChange={() => { }}
                 disabled
               />
               <FloatInput
@@ -312,7 +313,7 @@ export function VisualizarPassaporteEquestrePage({
                 icon={<Calendar className="w-5 h-5 object-contain" />}
                 required
                 value={dataMicrochip}
-                onChange={() => {}}
+                onChange={() => { }}
                 disabled
               />
             </div>
@@ -322,7 +323,7 @@ export function VisualizarPassaporteEquestrePage({
                 label="Sexo do Animal"
                 required
                 value={sexoAnimal}
-                onChange={() => {}}
+                onChange={() => { }}
                 options={[
                   { value: "macho", label: "Macho" },
                   { value: "fêmea", label: "Fêmea" },
@@ -334,7 +335,7 @@ export function VisualizarPassaporteEquestrePage({
                 icon={<Calendar className="w-5 h-5 object-contain" />}
                 required
                 value={dataNascimento}
-                onChange={() => {}}
+                onChange={() => { }}
                 disabled
               />
               <FloatInput
@@ -343,7 +344,7 @@ export function VisualizarPassaporteEquestrePage({
                 icon={<Calendar className="w-5 h-5 object-contain" />}
                 required
                 value={registro.dataValidade}
-                onChange={() => {}}
+                onChange={() => { }}
                 disabled
               />
             </div>
@@ -354,7 +355,7 @@ export function VisualizarPassaporteEquestrePage({
                 label="Espécie"
                 required
                 value={especie ? especie.nome : "Não informada"}
-                onChange={() => {}}
+                onChange={() => { }}
                 disabled
               />
 
@@ -363,7 +364,7 @@ export function VisualizarPassaporteEquestrePage({
                 label="Raça"
                 required
                 value={raca ? raca.nome : "Não informada"}
-                onChange={() => {}}
+                onChange={() => { }}
                 disabled
               />
             </div>
@@ -373,14 +374,14 @@ export function VisualizarPassaporteEquestrePage({
         {/* 1.1 Dados da Exploração (Modo Visualização usando FloatInput desabilitado) */}
         <Section title="Dados da Exploração">
           <div className="flex flex-col gap-5">
-            
+
             {/* Bloco do Produtor */}
             <div className="flex gap-3 items-end w-full">
               <div className="flex-1">
                 <FloatInput
                   label="Produtor"
                   value={produtor ? `${produtor.nome} - CPF/CNPJ: ${produtor.documento}` : "Não informado"}
-                  onChange={() => {}}
+                  onChange={() => { }}
                   disabled
                 />
               </div>
@@ -423,7 +424,7 @@ export function VisualizarPassaporteEquestrePage({
                   <FloatInput
                     label="Estabelecimento Agropecuário"
                     value={estabelecimento ? `${estabelecimento.nome} - Código: ${estabelecimento.codigo}` : "Não informado"}
-                    onChange={() => {}}
+                    onChange={() => { }}
                     disabled
                   />
                 </div>
@@ -466,7 +467,7 @@ export function VisualizarPassaporteEquestrePage({
                   <FloatInput
                     label="Exploração Pecuária"
                     value={exploracaoPecuaria ? `Código: ${exploracaoPecuaria.codigo} - Espécie: ${especie?.nome || "Equídeos"}` : "Não informado"}
-                    onChange={() => {}}
+                    onChange={() => { }}
                     disabled
                   />
                 </div>
@@ -520,7 +521,7 @@ export function VisualizarPassaporteEquestrePage({
                       label="Documento"
                       required
                       fileName={nomeAnemia}
-                      onSelectFile={() => {}}
+                      onSelectFile={() => { }}
                       disabled
                     />
                     <div className="flex-1 animate-fadeIn">
@@ -528,7 +529,7 @@ export function VisualizarPassaporteEquestrePage({
                         label="Descrição"
                         required
                         value={descricaoAnemia}
-                        onChange={() => {}}
+                        onChange={() => { }}
                         disabled
                       />
                     </div>
@@ -550,7 +551,7 @@ export function VisualizarPassaporteEquestrePage({
                       icon={<Calendar className="w-5 h-5 object-contain" />}
                       required
                       value={dataEmissaoAnemia}
-                      onChange={() => {}}
+                      onChange={() => { }}
                       disabled
                     />
                     <FloatInput
@@ -559,7 +560,7 @@ export function VisualizarPassaporteEquestrePage({
                       icon={<Calendar className="w-5 h-5 object-contain" />}
                       required
                       value={dataVencimentoAnemia}
-                      onChange={() => {}}
+                      onChange={() => { }}
                       disabled
                     />
                   </div>
@@ -570,61 +571,61 @@ export function VisualizarPassaporteEquestrePage({
             {/* Bloco 2: Exame de Mormo */}
             {nomeMormo && (
               <div
-              className="border border-gray-200 border-l-4 rounded-r-xl rounded-l-md p-5 bg-white shadow-sm"
-              style={{ borderLeftColor: GREEN }}
+                className="border border-gray-200 border-l-4 rounded-r-xl rounded-l-md p-5 bg-white shadow-sm"
+                style={{ borderLeftColor: GREEN }}
               >
-              <SubGrupo titulo="Exame de Mormo">
-                <div className="flex flex-col gap-4 mt-1">
-                  <div className="flex gap-3 items-start w-full">
-                    <UploadField
-                      label="Documento"
-                      required
-                      fileName={nomeMormo}
-                      onSelectFile={() => {}}
-                      disabled
-                    />
-                    <div className="flex-1 animate-fadeIn">
-                      <FloatInput
-                        label="Descrição"
+                <SubGrupo titulo="Exame de Mormo">
+                  <div className="flex flex-col gap-4 mt-1">
+                    <div className="flex gap-3 items-start w-full">
+                      <UploadField
+                        label="Documento"
                         required
-                        value={descricaoMormo}
-                        onChange={() => {}}
+                        fileName={nomeMormo}
+                        onSelectFile={() => { }}
+                        disabled
+                      />
+                      <div className="flex-1 animate-fadeIn">
+                        <FloatInput
+                          label="Descrição"
+                          required
+                          value={descricaoMormo}
+                          onChange={() => { }}
+                          disabled
+                        />
+                      </div>
+                      <div className="h-12 flex items-center">
+                        <button
+                          type="button"
+                          onClick={() => alert(`Fazendo download de: ${nomeMormo}`)}
+                          className="p-2.5 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"
+                        >
+                          <Download size={20} />
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <FloatInput
+                        label="Data de Emissão"
+                        type="date"
+                        icon={<Calendar className="w-5 h-5 object-contain" />}
+                        required
+                        value={dataEmissaoMormo}
+                        onChange={() => { }}
+                        disabled
+                      />
+                      <FloatInput
+                        label="Data de Vencimento"
+                        type="date"
+                        icon={<Calendar className="w-5 h-5 object-contain" />}
+                        required
+                        value={dataVencimentoMormo}
+                        onChange={() => { }}
                         disabled
                       />
                     </div>
-                    <div className="h-12 flex items-center">
-                      <button
-                        type="button"
-                        onClick={() => alert(`Fazendo download de: ${nomeMormo}`)}
-                        className="p-2.5 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"
-                      >
-                        <Download size={20} />
-                      </button>
-                    </div>
                   </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <FloatInput
-                      label="Data de Emissão"
-                      type="date"
-                      icon={<Calendar className="w-5 h-5 object-contain" />}
-                      required
-                      value={dataEmissaoMormo}
-                      onChange={() => {}}
-                      disabled
-                    />
-                    <FloatInput
-                      label="Data de Vencimento"
-                      type="date"
-                      icon={<Calendar className="w-5 h-5 object-contain" />}
-                      required
-                      value={dataVencimentoMormo}
-                      onChange={() => {}}
-                      disabled
-                    />
-                  </div>
-                </div>
-              </SubGrupo>
+                </SubGrupo>
               </div>
             )}
           </div>
@@ -645,7 +646,7 @@ export function VisualizarPassaporteEquestrePage({
                       label="Documento"
                       required
                       fileName={nomeInfluenza}
-                      onSelectFile={() => {}}
+                      onSelectFile={() => { }}
                       disabled
                     />
                     <div className="flex-1 animate-fadeIn">
@@ -653,7 +654,7 @@ export function VisualizarPassaporteEquestrePage({
                         label="Descrição"
                         required
                         value={descricaoInfluenza}
-                        onChange={() => {}}
+                        onChange={() => { }}
                         disabled
                       />
                     </div>
@@ -675,7 +676,7 @@ export function VisualizarPassaporteEquestrePage({
                       icon={<Calendar className="w-5 h-5 object-contain" />}
                       required
                       value={dataInfluenza}
-                      onChange={() => {}}
+                      onChange={() => { }}
                       disabled
                     />
                   </div>
@@ -686,52 +687,52 @@ export function VisualizarPassaporteEquestrePage({
             {/* Bloco 4: Antirrábica */}
             {nomeAntirrabica && (
               <div
-              className="border border-gray-200 border-l-4 rounded-r-xl rounded-l-md p-5 bg-white shadow-sm"
-              style={{ borderLeftColor: GREEN }}
+                className="border border-gray-200 border-l-4 rounded-r-xl rounded-l-md p-5 bg-white shadow-sm"
+                style={{ borderLeftColor: GREEN }}
               >
-              <SubGrupo titulo="Atestado de Vacinação contra Antirrábica">
-                <div className="flex flex-col gap-4 mt-1">
-                  <div className="flex gap-3 items-start w-full">
-                    <UploadField
-                      label="Documento"
-                      required
-                      fileName={nomeAntirrabica}
-                      onSelectFile={() => {}}
-                      disabled
-                    />
-                    <div className="flex-1 animate-fadeIn">
-                      <FloatInput
-                        label="Descrição"
+                <SubGrupo titulo="Atestado de Vacinação contra Antirrábica">
+                  <div className="flex flex-col gap-4 mt-1">
+                    <div className="flex gap-3 items-start w-full">
+                      <UploadField
+                        label="Documento"
                         required
-                        value={descricaoAntirrabica}
-                        onChange={() => {}}
+                        fileName={nomeAntirrabica}
+                        onSelectFile={() => { }}
+                        disabled
+                      />
+                      <div className="flex-1 animate-fadeIn">
+                        <FloatInput
+                          label="Descrição"
+                          required
+                          value={descricaoAntirrabica}
+                          onChange={() => { }}
+                          disabled
+                        />
+                      </div>
+                      <div className="h-12 flex items-center">
+                        <button
+                          type="button"
+                          onClick={() => alert(`Fazendo download de: ${nomeAntirrabica}`)}
+                          className="p-2.5 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"
+                        >
+                          <Download size={20} />
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <FloatInput
+                        label="Data de Emissão"
+                        type="date"
+                        icon={<Calendar className="w-5 h-5 object-contain" />}
+                        required
+                        value={dataAntirrabica}
+                        onChange={() => { }}
                         disabled
                       />
                     </div>
-                    <div className="h-12 flex items-center">
-                      <button
-                        type="button"
-                        onClick={() => alert(`Fazendo download de: ${nomeAntirrabica}`)}
-                        className="p-2.5 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"
-                      >
-                        <Download size={20} />
-                      </button>
-                    </div>
                   </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <FloatInput
-                      label="Data de Emissão"
-                      type="date"
-                      icon={<Calendar className="w-5 h-5 object-contain" />}
-                      required
-                      value={dataAntirrabica}
-                      onChange={() => {}}
-                      disabled
-                    />
-                  </div>
-                </div>
-              </SubGrupo>
+                </SubGrupo>
               </div>
             )}
           </div>
@@ -752,10 +753,9 @@ export function VisualizarPassaporteEquestrePage({
                     type="button"
                     onClick={() => setActiveViewId(v.id)}
                     className={`group flex flex-col sm:flex-row items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-bold rounded-lg transition-all flex-1 text-center sm:text-left
-                      ${
-                        isActive
-                          ? "bg-white text-[#1A7A3C] shadow-sm ring-1 ring-black/5"
-                          : "bg-green-50/40 text-gray-700 hover:bg-green-50 border border-transparent"
+                      ${isActive
+                        ? "bg-white text-[#1A7A3C] shadow-sm ring-1 ring-black/5"
+                        : "bg-green-50/40 text-gray-700 hover:bg-green-50 border border-transparent"
                       }`}
                   >
                     <div className="flex items-center gap-1.5">
@@ -856,7 +856,7 @@ export function VisualizarPassaporteEquestrePage({
                           <FloatInput
                             label={`Detalhes da característica do marcador nº ${m.number}`}
                             value={m.description}
-                            onChange={() => {}}
+                            onChange={() => { }}
                             disabled
                           />
                         </div>
@@ -940,7 +940,7 @@ export function VisualizarPassaporteEquestrePage({
           <LargeTextArea
             label="Observações Gerais do Passaporte"
             value={observacoesGerais}
-            onChange={() => {}}
+            onChange={() => { }}
             hasTooltip
             tooltipText="Observações e notas adicionais relativas ao passaporte."
             disabled
@@ -952,7 +952,7 @@ export function VisualizarPassaporteEquestrePage({
             label="Situação"
             required
             value={registro.situacao}
-            onChange={() => {}}
+            onChange={() => { }}
             disabled
           />
         </Section>
