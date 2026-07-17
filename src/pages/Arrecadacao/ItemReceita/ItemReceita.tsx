@@ -346,11 +346,10 @@ export function ItemReceitaPage({
           <div className="flex gap-3 items-stretch w-full">
             <div className="flex-1 bg-white border border-gray-300 rounded-md px-3 h-12 transition-all relative flex items-end pb-1.5 focus-within:border-[#1A7A3C] focus-within:ring-1 focus-within:ring-[#1A7A3C]">
               <label
-                className={`absolute left-3 transition-all duration-200 pointer-events-none ${
-                  focusItemReceita || itemReceita
+                className={`absolute left-3 transition-all duration-200 pointer-events-none ${focusItemReceita || itemReceita
                     ? "top-1 text-[10px] text-gray-400 font-medium"
                     : "top-1/2 -translate-y-1/2 text-sm text-gray-400"
-                }`}
+                  }`}
               >
                 Item de Receita
               </label>
@@ -445,7 +444,7 @@ export function ItemReceitaPage({
                   onChange={(ent) => {
                     setReceita(ent.nome);
                   }}
-                  required
+
                 />
               </div>
               <div className="w-full lg:flex-1">

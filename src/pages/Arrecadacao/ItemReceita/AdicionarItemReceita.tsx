@@ -129,7 +129,7 @@ export const RECEITAS_ENTIDADE = [
     ativo: false,
   },
 ];
-const INDICES = ["UFEMG", "UFEMG"];
+const INDICES = ["UFEMG"];
 const CONTRIBUICAO_FUNDO = ["Sim", "Não"];
 const SITUACOES = ["Ativo", "Inativo"];
 
