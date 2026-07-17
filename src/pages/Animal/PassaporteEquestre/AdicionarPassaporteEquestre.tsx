@@ -104,7 +104,7 @@ const VIEWS: ViewConfig[] = [
   },
   {
     id: "rosto",
-    label: "Rosto",
+    label: "Face",
     guideHint:
       "Aproxime a foto focando nos detalhes da cabeça e focinho",
     guideImage: imgRostoFocinho,

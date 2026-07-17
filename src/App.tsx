@@ -55,7 +55,6 @@ import { VisualizarEstabelecimentoAgroindustrialSIEMGPage } from "./pages/Animal
 import { PassaporteEquestrePage } from "./pages/Animal/PassaporteEquestre/PassaporteEquestre";
 import { AdicionarPassaporteEquestrePage } from "./pages/Animal/PassaporteEquestre/AdicionarPassaporteEquestre";
 import { VisualizarPassaporteEquestrePage } from "./pages/Animal/PassaporteEquestre/VisualizarPassaporteEquestre";
-import { PagamentoPassaporteEquestrePage } from "./pages/Animal/PassaporteEquestre/PagamentoPassaporteEquestre";
 import { EstabelecimentoEventoPecuarioPage } from "./pages/Animal/EstabelecimentoEventoPecuario/EstabelecimentoEventoPecuario";
 import { AdicionarEstabelecimentoEventoPecuarioPage } from "./pages/Animal/EstabelecimentoEventoPecuario/AdicionarEstabelecimentoEventoPecuario";
 import { IntegradoraCooperativaPage } from "./pages/Animal/IntegradoraCooperativa/IntegradoraCooperativa";
@@ -170,7 +169,6 @@ export type Screen =
   | "adicionar-passaporte-equestre"
   | "visualizar-passaporte-equestre"
   | "editar-passaporte-equestre"
-  | "pagamento-passaporte-equestre"
   | "laboratorio"
   | "adicionar-laboratorio"
   | "partilha-vacina"
@@ -919,14 +917,6 @@ export default function App() {
           onNavigate={handleNavigate}
           dados={screenData}
           modo="editar"
-        />
-      );
-    case "pagamento-passaporte-equestre":
-      return (
-        <PagamentoPassaporteEquestrePage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-          dados={screenData}
         />
       );
     case "valor-indice":

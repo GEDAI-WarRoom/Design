@@ -8,7 +8,6 @@ import {
   Download,
   Calendar,
   Camera,
-  CreditCard,
   Pencil,
 } from "lucide-react";
 
@@ -87,7 +86,7 @@ const VIEWS: ViewConfig[] = [
   },
   {
     id: "rosto",
-    label: "Rosto",
+    label: "Face",
     guideHint: "Aproxime a foto focando nos detalhes da cabeça e focinho",
     guideImage: imgRostoFocinho,
   },
@@ -203,10 +202,6 @@ export function VisualizarPassaporteEquestrePage({
   const activeView = VIEWS.find((v) => v.id === activeViewId)!;
   const current = allViews[activeViewId];
 
-  const handlePagamento = () => {
-    onNavigate("pagamento-passaporte-equestre", registro);
-  };
-
   const diasAteVencimento = Math.ceil(
     (new Date(`${registro.dataValidade}T23:59:59`).getTime() - Date.now()) /
       (1000 * 60 * 60 * 24),
@@ -268,11 +263,10 @@ export function VisualizarPassaporteEquestrePage({
           {/* Botão de Pagamento Dentro do Alerta */}
           <button
             type="button"
-            onClick={handlePagamento}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#F57C00] hover:bg-[#E65100] text-white rounded-lg text-xs font-bold transition self-start sm:self-center shrink-0"
+            disabled
+            className="flex items-center justify-center px-4 py-2.5 bg-gray-200 text-gray-500 rounded-lg text-xs font-bold self-start sm:self-center shrink-0 cursor-not-allowed"
           >
-            <CreditCard size={15} />
-            Pagar Taxa
+            Pagamento indisponível
           </button>
           </div>
         )}

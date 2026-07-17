@@ -1,7 +1,7 @@
 import { useState } from "react";
 import {
   ArrowLeft,
-  Plus,
+  Calendar,
   Search,
   SlidersHorizontal,
   ChevronLeft,
@@ -71,7 +71,6 @@ interface BuscaPassaporteProps {
 
 export function PassaporteEquestrePage({ onLogout, onNavigate }: BuscaPassaporteProps) {
   const [busca, setBusca] = useState("");
-  const [nomeAnimal, setNomeAnimal] = useState("");
   const [validadeDe, setValidadeDe] = useState("");
   const [validadeAte, setValidadeAte] = useState("");
   const [produtor, setProdutor] = useState<any | null>(null);
@@ -84,8 +83,7 @@ export function PassaporteEquestrePage({ onLogout, onNavigate }: BuscaPassaporte
   const [situacao, setSituacao] = useState("");
   const [passaportes] = useState(() => listarPassaportesEquestres());
 
-  const [showFilters, setShowFilters] = useState(false);
-  const [focusBusca, setFocusBusca] = useState(false);
+  const [showFilters, setShowFilters] = useState(true);
   const [hasSearched, setHasSearched] = useState(false);
   const [page, setPage] = useState(1);
   const perPage = 10;
@@ -96,11 +94,12 @@ export function PassaporteEquestrePage({ onLogout, onNavigate }: BuscaPassaporte
   };
 
   const filtrados = passaportes.filter((p) => {
-    const termo = busca.replace(/\D/g, "");
-    const matchBusca = termo === "" || p.codigoMicrochip.includes(termo);
-    const matchNome =
-      nomeAnimal.trim() === "" ||
-      p.nomeEquino.toLowerCase().includes(nomeAnimal.toLowerCase().trim());
+    const termo = busca.toLowerCase().trim();
+    const termoNumerico = busca.replace(/\D/g, "");
+    const matchBusca =
+      termo === "" ||
+      p.nomeEquino.toLowerCase().includes(termo) ||
+      (termoNumerico !== "" && p.codigoMicrochip.includes(termoNumerico));
     const matchValidadeDe =
       validadeDe === "" ||
       (p.dataValidade !== "—" && p.dataValidade >= validadeDe);
@@ -119,7 +118,6 @@ export function PassaporteEquestrePage({ onLogout, onNavigate }: BuscaPassaporte
       situacao === "" || p.situacao === situacao;
     return (
       matchBusca &&
-      matchNome &&
       matchValidadeDe &&
       matchValidadeAte &&
       matchProdutor &&
@@ -141,7 +139,6 @@ export function PassaporteEquestrePage({ onLogout, onNavigate }: BuscaPassaporte
   );
 
   const temFiltroAtivo = !!(
-    nomeAnimal ||
     validadeDe ||
     validadeAte ||
     produtor ||
@@ -164,7 +161,7 @@ export function PassaporteEquestrePage({ onLogout, onNavigate }: BuscaPassaporte
         <div className="flex flex-col gap-3">
           <button
             type="button"
-            onClick={() => onNavigate("inicial")}
+            onClick={() => onNavigate("dashboard")}
             className="flex items-center gap-1 text-sm transition hover:opacity-70 self-start"
             style={{ color: GREEN }}
           >
@@ -173,25 +170,18 @@ export function PassaporteEquestrePage({ onLogout, onNavigate }: BuscaPassaporte
           </button>
 
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full">
-            <div>
-              <h1 className="text-2xl font-semibold text-gray-900">
-                Passaportes Equestres
-              </h1>
-              <p className="text-sm text-gray-500 mt-1">
-                Consulte ou adicione novos passaportes emitidos
-                para equídeos.
-              </p>
-            </div>
+            <h1 className="text-2xl font-semibold text-gray-900">
+              Passaportes Equestres
+            </h1>
 
             {/* Botão de Adicionar */}
             <button
               type="button"
               onClick={() =>
                 onNavigate("adicionar-passaporte-equestre")
-              } // Altere para a rota correta do seu fluxo
+              }
               className="flex items-center justify-center gap-2 px-5 h-11 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-bold rounded-xl transition shadow-sm self-stretch sm:self-auto"
             >
-              <Plus size={18} />
               Adicionar Passaporte
             </button>
           </div>
@@ -199,27 +189,19 @@ export function PassaporteEquestrePage({ onLogout, onNavigate }: BuscaPassaporte
 
         {/* CONTAINER BRANCO ÚNICO */}
         <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col gap-5">
-          {/* Barra Superior do Filtro (Código do Microchip e Botão de Expansão) */}
+          {/* Barra Superior do Filtro (Nome do Animal ou Código do Microchip) */}
           <div className="flex gap-3 items-stretch w-full">
-            <div className="flex-1 bg-white border border-gray-200 rounded-md px-3 h-12 transition-all relative flex items-end pb-1.5 focus-within:border-[#1A7A3C] focus-within:ring-1 focus-within:ring-[#1A7A3C]">
-              <label
-                className={`absolute left-3 transition-all duration-200 pointer-events-none ${focusBusca || busca ? "top-1 text-[10px] text-gray-400 font-medium" : "top-1/2 -translate-y-1/2 text-sm text-gray-400"}`}
-              >
-                Código do Microchip
-              </label>
-
+            <div className="flex-1 bg-white border border-gray-200 rounded-md px-3 h-12 transition-all relative flex items-center focus-within:border-[#1A7A3C] focus-within:ring-1 focus-within:ring-[#1A7A3C]">
               <div className="flex items-center w-full">
                 <input
                   type="text"
-                  inputMode="numeric"
-                  maxLength={15}
+                  maxLength={255}
                   value={busca}
-                  onFocus={() => setFocusBusca(true)}
-                  onBlur={() => setFocusBusca(false)}
-                  onChange={(e) => setBusca(e.target.value.replace(/\D/g, ""))}
+                  onChange={(e) => setBusca(e.target.value)}
                   onKeyDown={(e) =>
                     e.key === "Enter" && handlePesquisar()
                   }
+                  placeholder="Nome do Animal ou Código do Microchip"
                   className="w-full bg-transparent text-sm text-gray-800 outline-none h-6"
                 />
 
@@ -248,21 +230,15 @@ export function PassaporteEquestrePage({ onLogout, onNavigate }: BuscaPassaporte
           {/* Filtros Internos Avançados */}
           {showFilters && (
             <div className="animate-fadeIn flex flex-col gap-3 w-full">
-              {/* FILEIRA 1: Nome, período de validade e ação de pesquisa */}
+              {/* FILEIRA 1: Período de validade e ação de pesquisa */}
               <div className="flex flex-col lg:flex-row items-end gap-3 w-full">
-                <div className="w-full lg:flex-1">
-                  <FloatInput
-                    label="Nome do Animal"
-                    value={nomeAnimal}
-                    onChange={setNomeAnimal}
-                  />
-                </div>
                 <div className="w-full lg:flex-1">
                   <FloatInput
                     label="Validade do Passaporte - De"
                     type="date"
                     value={validadeDe}
                     onChange={setValidadeDe}
+                    icon={<Calendar size={18} />}
                   />
                 </div>
                 <div className="w-full lg:flex-1">
@@ -271,6 +247,7 @@ export function PassaporteEquestrePage({ onLogout, onNavigate }: BuscaPassaporte
                     type="date"
                     value={validadeAte}
                     onChange={setValidadeAte}
+                    icon={<Calendar size={18} />}
                   />
                 </div>
 
@@ -387,12 +364,6 @@ export function PassaporteEquestrePage({ onLogout, onNavigate }: BuscaPassaporte
           {/* Chips de Filtros Ativos */}
           {temFiltroAtivo && (
             <div className="flex flex-wrap gap-2 animate-fadeIn">
-              {nomeAnimal && (
-                <Chip
-                  label={`Animal: ${nomeAnimal}`}
-                  onRemove={() => setNomeAnimal("")}
-                />
-              )}
               {validadeDe && (
                 <Chip
                   label={`Validade de: ${fmtData(validadeDe)}`}
