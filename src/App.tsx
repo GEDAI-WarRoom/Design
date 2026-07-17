@@ -258,7 +258,7 @@ export type Screen =
   | "isencao-taxa-gta"
   | "adicionar-isencao-taxa-gta"
   | "item-receita"
-  | "adicionar-item-receita";
+  | "adicionar-item-receita"
   | "tipo-veiculo"
   | "adicionar-tipo-veiculo";
 
