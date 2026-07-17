@@ -53,6 +53,8 @@ import { EstabelecimentoAgroindustrialSIEMGPage } from "./pages/Animal/Estabelec
 import { AdicionarEstabelecimentoAgroindustrialSIEMGPage } from "./pages/Animal/EstabelecimentoAgroindustrialSIEMG/AdicionarEstabelecimentoAgroindustrialSIEMG";
 import { VisualizarEstabelecimentoAgroindustrialSIEMGPage } from "./pages/Animal/EstabelecimentoAgroindustrialSIEMG/VisualizarEstabelecimentoAgroindustrialSIEMG";
 import { PassaporteEquestrePage } from "./pages/Animal/PassaporteEquestre/PassaporteEquestre";
+import { AdicionarPassaporteEquestrePage } from "./pages/Animal/PassaporteEquestre/AdicionarPassaporteEquestre";
+import { VisualizarPassaporteEquestrePage } from "./pages/Animal/PassaporteEquestre/VisualizarPassaporteEquestre";
 import { EstabelecimentoEventoPecuarioPage } from "./pages/Animal/EstabelecimentoEventoPecuario/EstabelecimentoEventoPecuario";
 import { AdicionarEstabelecimentoEventoPecuarioPage } from "./pages/Animal/EstabelecimentoEventoPecuario/AdicionarEstabelecimentoEventoPecuario";
 import { IntegradoraCooperativaPage } from "./pages/Animal/IntegradoraCooperativa/IntegradoraCooperativa";
@@ -169,6 +171,8 @@ export type Screen =
   | "visualizar-exploracao-pecuaria" // 🚀 Adicionado
   | "passaporte-equestre"
   | "adicionar-passaporte-equestre"
+  | "visualizar-passaporte-equestre"
+  | "editar-passaporte-equestre"
   | "laboratorio"
   | "adicionar-laboratorio"
   | "partilha-vacina"
@@ -899,6 +903,30 @@ export default function App() {
           onNavigate={handleNavigate}
         />
       );
+    case "adicionar-passaporte-equestre":
+      return (
+        <AdicionarPassaporteEquestrePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "visualizar-passaporte-equestre":
+      return (
+        <VisualizarPassaporteEquestrePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
+        />
+      );
+    case "editar-passaporte-equestre":
+      return (
+        <AdicionarPassaporteEquestrePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
+          modo="editar"
+        />
+      );
     case "valor-indice":
       return (
         <ValorIndicePage
@@ -913,9 +941,6 @@ export default function App() {
           onNavigate={handleNavigate}
         />
       );
-    //  case "adicionar-passaporte-equestre":
-    //  return <AdicionarPassaporteEquestrePage onLogout={handleLogout} onNavigate={handleNavigate} />;
-
     case "distribuicao-formularios-gta":
       return (
         <DistribuicaoFormulariosGta
