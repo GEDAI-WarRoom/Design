@@ -369,8 +369,7 @@ export function AdicionarInstituicaoEnsinoPesquisaPage({
               Instituição de Ensino e Pesquisa cadastrada com sucesso!
             </h3>
             <p className="text-sm text-gray-500 mt-1">
-              O cadastro foi realizado e a situação inicial será definida como
-              Ativo.
+              O cadastro foi realizado com sucesso.
             </p>
             <div className="flex gap-3 justify-center mt-6">
               <button
