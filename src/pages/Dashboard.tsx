@@ -36,6 +36,7 @@ import {
   Settings,
   BriefcaseBusiness,
   Truck,
+  BadgePercent,
 } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import * as Icons from "../imports/icons";
@@ -473,6 +474,11 @@ export const secondaryCategories: MenuCategory[] = [
             className="w-4 h-4 object-contain"
           />
         ),
+      },
+      {
+        label: "Isenção de Taxa de GTA",
+        route: "isencao-taxa-gta",
+       icon: <BadgePercent size={16} />,
       },
     ],
   },
