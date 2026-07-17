@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import {
   ArrowLeft, ChevronUp, ChevronDown, Minus, PauseCircle, Download, Dna, Eye, ShieldCheck, FileText,
-  Pencil, Check, Calendar, ShieldAlert, Info, History, Plus
+  Pencil, Check, Calendar, ShieldAlert, Info, History, Plus, Ruler
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import {
@@ -13,11 +13,70 @@ import {
   HistoryCard,
   AccordionCardGroup,
   EvaluationActiveCard,
-
 } from "../../../components/ui/FormKit";
+import { EntitySearchInput } from "../../../components/ui/EntitySearch";
 import * as Icons from "../../../imports/icons";
 
 // --- mock ---
+
+export const UNIDADES_MEDIDA_ENTIDADE = [
+  {
+    id: 1,
+    codigo: "UND",
+    sigla: "un",
+    nome: "Unidade",
+    descricao: "Quantidade unitária",
+  },
+  {
+    id: 2,
+    codigo: "KG",
+    sigla: "kg",
+    nome: "Quilograma",
+    descricao: "Massa em quilogramas",
+  },
+  {
+    id: 3,
+    codigo: "G",
+    sigla: "g",
+    nome: "Grama",
+    descricao: "Massa em gramas",
+  },
+  {
+    id: 4,
+    codigo: "L",
+    sigla: "L",
+    nome: "Litro",
+    descricao: "Volume em litros",
+  },
+  {
+    id: 5,
+    codigo: "ML",
+    sigla: "mL",
+    nome: "Mililitro",
+    descricao: "Volume em mililitros",
+  },
+  {
+    id: 6,
+    codigo: "CX",
+    sigla: "cx",
+    nome: "Caixa",
+    descricao: "Quantidade por caixa",
+  },
+  {
+    id: 7,
+    codigo: "SC",
+    sigla: "sc",
+    nome: "Saca",
+    descricao: "Quantidade por saca",
+  },
+  {
+    id: 8,
+    codigo: "FR",
+    sigla: "fr",
+    nome: "Frasco",
+    descricao: "Quantidade por frasco",
+  },
+];
 
 export interface CicloProducaoDistribuicao {
   id: number;
@@ -467,6 +526,7 @@ export function VisualizarExploracaoPecuariaPage({
   const vigentes = biosseguridades.filter((b) => b.vigente);
   const historico = biosseguridades.filter((b) => !b.vigente);
   const ativas = biosseguridades.filter((b) => b.situacao === "Ativa").length;
+  const [unidadeMedida, setUnidadeMedida] = useState("");
 
   const limparModal = () => {
     setNovoTipo("");
@@ -1165,12 +1225,30 @@ export function VisualizarExploracaoPecuariaPage({
                     required
                     onChange={() => { }}
                   />
-                  <FloatInput
+                  {/* <FloatInput
                     label="Unidade de Medida dos Tanques"
                     className="rounded-sm"
                     value={""}
                     required
                     onChange={() => { }}
+                  /> */}
+                  <EntitySearchInput
+                    label="Unidade de Medida dos Tanques"
+                    placeholder="Buscar por unidade de medida dos tanques"
+                    value={unidadeMedida ? unidadeMedida : ""}
+                    data={UNIDADES_MEDIDA_ENTIDADE}
+                    searchKeys={["nome", "sigla", "descricao"]}
+                    columns={[
+                      { label: "Unidade de Medida", key: "sigla" },
+                      { label: "Descrição", key: "nome" },
+                    ]}
+                    icon={<Ruler size={18} color={GREEN} />}
+                    title="Buscar Unidade de Medida"
+                    subtitle="Busque por uma unidade de medida cadastrada:"
+                    onChange={(ent) => {
+                      setUnidadeMedida(ent.nome);
+                    }}
+                    required
                   />
                   <FloatInput
                     label="Tamanho médio dos Tanques"
@@ -1197,12 +1275,30 @@ export function VisualizarExploracaoPecuariaPage({
                     required
                     onChange={() => { }}
                   />
-                  <FloatInput
+                  {/* <FloatInput
                     label="Unidade de Medida dos Tanques"
                     className="rounded-sm"
                     value={""}
                     required
                     onChange={() => { }}
+                  /> */}
+                  <EntitySearchInput
+                    label="Unidade de Medida dos Tanques"
+                    placeholder="Buscar por unidade de medidas do tanques"
+                    value={unidadeMedida ? unidadeMedida : ""}
+                    data={UNIDADES_MEDIDA_ENTIDADE}
+                    searchKeys={["nome", "sigla", "descricao"]}
+                    columns={[
+                      { label: "Unidade de Medida", key: "sigla" },
+                      { label: "Descrição", key: "nome" },
+                    ]}
+                    icon={<Ruler size={18} color={GREEN} />}
+                    title="Buscar Unidade de Medida"
+                    subtitle="Busque por uma unidade de medida cadastrada:"
+                    onChange={(ent) => {
+                      setUnidadeMedida(ent.nome);
+                    }}
+                    required
                   />
                   <FloatInput
                     label="Tamanho médio dos Tanques"
@@ -1229,12 +1325,30 @@ export function VisualizarExploracaoPecuariaPage({
                     required
                     onChange={() => { }}
                   />
-                  <FloatInput
+                  {/* <FloatInput
                     label="Unidade de Medida dos Tanques"
                     className="rounded-sm"
                     value={""}
                     required
                     onChange={() => { }}
+                  /> */}
+                  <EntitySearchInput
+                    label="Unidade de Medida dos Tanques"
+                    placeholder="Buscar por unidade de medidas do tanques"
+                    value={unidadeMedida ? unidadeMedida : ""}
+                    data={UNIDADES_MEDIDA_ENTIDADE}
+                    searchKeys={["nome", "sigla", "descricao"]}
+                    columns={[
+                      { label: "Unidade de Medida", key: "sigla" },
+                      { label: "Descrição", key: "nome" },
+                    ]}
+                    icon={<Ruler size={18} color={GREEN} />}
+                    title="Buscar Unidade de Medida"
+                    subtitle="Busque por uma unidade de medida cadastrada:"
+                    onChange={(ent) => {
+                      setUnidadeMedida(ent.nome);
+                    }}
+                    required
                   />
                   <FloatInput
                     label="Tamanho médio dos Tanques"
@@ -1261,12 +1375,30 @@ export function VisualizarExploracaoPecuariaPage({
                     required
                     onChange={() => { }}
                   />
-                  <FloatInput
+                  {/* <FloatInput
                     label="Unidade de Medida dos Tanques"
                     className="rounded-sm"
                     value={""}
                     required
                     onChange={() => { }}
+                  /> */}
+                  <EntitySearchInput
+                    label="Unidade de Medida dos Tanques"
+                    placeholder="Buscar por unidade de medidas do tanques"
+                    value={unidadeMedida ? unidadeMedida : ""}
+                    data={UNIDADES_MEDIDA_ENTIDADE}
+                    searchKeys={["nome", "sigla", "descricao"]}
+                    columns={[
+                      { label: "Unidade de Medida", key: "sigla" },
+                      { label: "Descrição", key: "nome" },
+                    ]}
+                    icon={<Ruler size={18} color={GREEN} />}
+                    title="Buscar Unidade de Medida"
+                    subtitle="Busque por uma unidade de medida cadastrada:"
+                    onChange={(ent) => {
+                      setUnidadeMedida(ent.nome);
+                    }}
+                    required
                   />
                   <FloatInput
                     label="Tamanho médio dos Tanques"
@@ -1295,13 +1427,31 @@ export function VisualizarExploracaoPecuariaPage({
                 required
                 onChange={() => { }}
               />
-              <FloatInput
+              {/* <FloatInput
                 label="Unidade de Medida dos Tanques/Aquários"
                 className="rounded-sm"
                 value={""}
                 required
                 onChange={() => { }}
-              />
+              /> */}
+              <EntitySearchInput
+                    label="Unidade de Medida dos Tanques/Aquários"
+                    placeholder="Buscar por unidade de medida dos tanques/aquários"
+                    value={unidadeMedida ? unidadeMedida : ""}
+                    data={UNIDADES_MEDIDA_ENTIDADE}
+                    searchKeys={["nome", "sigla", "descricao"]}
+                    columns={[
+                      { label: "Unidade de Medida", key: "sigla" },
+                      { label: "Descrição", key: "nome" },
+                    ]}
+                    icon={<Ruler size={18} color={GREEN} />}
+                    title="Buscar Unidade de Medida"
+                    subtitle="Busque por uma unidade de medida cadastrada:"
+                    onChange={(ent) => {
+                      setUnidadeMedida(ent.nome);
+                    }}
+                    required
+                  />
               <FloatInput
                 label="Tamanho médio dos Tanques/Aquários"
                 className="rounded-sm"
