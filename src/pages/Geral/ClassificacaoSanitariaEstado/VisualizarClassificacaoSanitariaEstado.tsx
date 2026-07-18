@@ -28,7 +28,7 @@ export function VisualizarClassificacaoSanitariaEstadoPage({
           <div className="flex items-center justify-between gap-3">
             <h1 className="text-2xl font-semibold text-gray-900">Visualizar Classificação Sanitária por Estado</h1>
             <button type="button" onClick={() => onNavigate("editar-classificacao-sanitaria-estado", value)} className="px-5 h-10 bg-[#1A7A3C] text-white text-xs font-bold rounded-md flex items-center gap-2">
-              <Pencil size={15} />Editar
+              Editar
             </button>
           </div>
         </div>

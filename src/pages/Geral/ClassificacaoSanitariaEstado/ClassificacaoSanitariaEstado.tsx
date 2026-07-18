@@ -8,6 +8,7 @@ import {
   Search,
   SlidersHorizontal,
   X,
+  Dna
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatSelect } from "../../../components/ui/FormKit";
@@ -19,7 +20,8 @@ import {
   ESTADOS_BRASILEIROS,
   PRAGAS_MOCK,
 } from "./classificacaoSanitariaData";
-import { DOENCAS_MOCK } from "../../../components/ui/EntitySearch";
+import { DOENCAS_MOCK, EntitySearchInput } from "../../../components/ui/EntitySearch";
+import * as Icons from "../../../imports/icons";
 
 const GREEN = "#1A7A3C";
 
@@ -42,8 +44,8 @@ export function ClassificacaoSanitariaEstadoPage({
   const [classificacao, setClassificacao] = useState("");
   const [estado, setEstado] = useState("");
   const [tipo, setTipo] = useState("");
-  const [doenca, setDoenca] = useState("");
-  const [praga, setPraga] = useState("");
+  const [doenca, setDoenca] = useState<any>(null);
+  const [praga, setPraga] = useState<any>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [searched, setSearched] = useState(false);
   const [error, setError] = useState(false);
@@ -95,64 +97,74 @@ export function ClassificacaoSanitariaEstadoPage({
         </div>
 
         <section className="bg-white rounded-xl shadow-sm p-6 flex flex-col gap-5">
-          <div className="flex gap-3 items-stretch">
-            <div className="flex-1">
-              <FloatSelect
-                label="Classificação Sanitária"
+          {/* Grid Principal - 4 campos por linha em telas grandes (lg) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 w-full">
+
+
+            <FloatSelect label="Estado" value={estado} onChange={setEstado} options={ESTADOS_BRASILEIROS} />
+
+            <FloatSelect
+              label="Classificação Sanitária"
+              required
+              value={classificacao}
+              onChange={(next) => { setClassificacao(next); setError(false); }}
+              options={CLASSIFICACOES_SANITARIAS}
+            />
+            <FloatSelect
+              label="Animal ou Vegetal?"
+              value={tipo}
+              onChange={alterarTipo}
+              options={[
+                { value: "Animal", label: "Animal" },
+                { value: "Vegetal", label: "Vegetal" },
+              ]}
+            />
+
+            {/* Ocupa o quarto slot perfeitamente se "Animal" estiver ativo */}
+            {tipo === "Animal" && (
+              <EntitySearchInput
+                label="Doença"
                 required
-                value={classificacao}
-                onChange={(next) => { setClassificacao(next); setError(false); }}
-                options={CLASSIFICACOES_SANITARIAS}
+                placeholder="Buscar pelo nome da doença."
+                value={doenca ? doenca.nome : ""}
+                data={DOENCAS_MOCK}
+                searchKeys={["nome"]}
+                columns={[{ label: "Doença", key: "nome" }]}
+                icon={<Dna size={18} color={GREEN} />} // Se não tiver a variável GREEN declarada neste arquivo, use uma cor string ex: "#1A7A3C"
+                title="Buscar Doença"
+                subtitle="Busque por uma doença cadastrada:"
+                onChange={(ent) => setDoenca(ent)} // Garanta que seu estado 'doenca' armazene o objeto ou ajuste para setDoenca(ent ? ent.nome : "") se preferir salvar apenas a string
               />
-            </div>
+            )}
+
+            {/* Ocupa o quarto slot perfeitamente se "Vegetal" estiver ativo */}
+            {tipo === "Vegetal" && (
+              <EntitySearchInput
+                label="Praga"
+                required
+                placeholder="Buscar pelo nome da praga."
+                value={praga ? praga.nome : ""}
+                data={PRAGAS_MOCK}
+                searchKeys={["nome"]}
+                columns={[{ label: "Praga", key: "nome" }]}
+                icon={<img src={Icons.iconePragaUrl} alt="Praga" className="w-5 h-5 object-contain" />}
+                title="Buscar Praga"
+                subtitle="Busque por uma praga cadastrada:"
+                onChange={(ent) => setPraga(ent)} // Garanta que seu estado 'praga' armazene o objeto ou ajuste para setPraga(ent ? ent.nome : "") se necessário
+              />
+            )}
+
             <button
               type="button"
-              onClick={() => setFiltersOpen(!filtersOpen)}
-              className={`px-4 border rounded-md ${filtersOpen ? "text-[#1A7A3C] bg-white" : "text-white bg-[#1A7A3C]"}`}
-              style={{ borderColor: GREEN }}
-              title="Filtros"
+              onClick={pesquisar}
+              className="px-5 py-2 rounded-md text-white text-sm font-semibold bg-[#1A7A3C] hover:bg-[#15612F] flex items-center gap-2 transition-colors"
             >
-              <SlidersHorizontal size={17} />
-            </button>
-            <button type="button" onClick={pesquisar} className="px-5 rounded-md text-white text-sm font-semibold bg-[#1A7A3C] hover:bg-[#15612F] flex items-center gap-2">
               <Search size={17} />Pesquisar
             </button>
           </div>
 
-          {filtersOpen && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <FloatSelect label="Estado" value={estado} onChange={setEstado} options={ESTADOS_BRASILEIROS} />
-              <FloatSelect
-                label="Animal ou Vegetal?"
-                value={tipo}
-                onChange={alterarTipo}
-                options={[
-                  { value: "Animal", label: "Animal" },
-                  { value: "Vegetal", label: "Vegetal" },
-                ]}
-              />
-              {tipo === "Animal" && (
-                <FloatSelect
-                  label="Doença"
-                  value={doenca}
-                  onChange={setDoenca}
-                  options={DOENCAS_MOCK.map((item) => ({ value: item.nome, label: item.nome }))}
-                  className="lg:col-span-2"
-                />
-              )}
-              {tipo === "Vegetal" && (
-                <FloatSelect
-                  label="Praga"
-                  value={praga}
-                  onChange={setPraga}
-                  options={PRAGAS_MOCK.map((item) => ({ value: item.nome, label: item.nome }))}
-                  className="lg:col-span-2"
-                />
-              )}
-            </div>
-          )}
 
-          {error && <p className="text-sm text-red-500 font-medium">Selecione a Classificação Sanitária para realizar a pesquisa.</p>}
+          {error && <p className="text-sm text-red-500 font-medium">Busque por uma classificação sanitária por estado utilizando o campo de busca e os filtros acima.</p>}
 
           {(classificacao || estado || tipo || doenca || praga) && (
             <div className="flex flex-wrap gap-2">
@@ -165,7 +177,7 @@ export function ClassificacaoSanitariaEstadoPage({
           )}
 
           {!searched ? (
-            <div className="py-12 text-center text-sm text-gray-500">Selecione a classificação sanitária e utilize os filtros para visualizar os resultados.</div>
+            <div className="py-12 text-center text-sm text-gray-500">Busque por uma classificação sanitária por estado utilizando o campo de busca e os filtros acima.</div>
           ) : results.length === 0 ? (
             <div className="py-12 text-center text-sm text-gray-500">Nenhum resultado foi encontrado.</div>
           ) : (
@@ -211,6 +223,6 @@ export function ClassificacaoSanitariaEstadoPage({
           )}
         </section>
       </main>
-    </div>
+    </div >
   );
 }

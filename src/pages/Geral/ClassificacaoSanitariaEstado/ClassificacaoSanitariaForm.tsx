@@ -13,6 +13,7 @@ import {
   MUNICIPIOS_POR_ESTADO,
   PRAGAS_MOCK,
 } from "./classificacaoSanitariaData";
+import * as Icons from "../../../imports/icons";
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   const [open, setOpen] = useState(true);
@@ -97,7 +98,7 @@ export function ClassificacaoSanitariaForm({ value, onChange, disabled = false }
 
           {value.tipo === "Animal" && (
             disabled ? (
-              <FloatInput label="Doença" required value={value.doenca} disabled onChange={() => {}} />
+              <FloatInput label="Doença" required value={value.doenca} disabled onChange={() => { }} />
             ) : (
               <DoencaInput
                 required
@@ -109,7 +110,7 @@ export function ClassificacaoSanitariaForm({ value, onChange, disabled = false }
 
           {value.tipo === "Vegetal" && (
             disabled ? (
-              <FloatInput label="Praga" required value={value.praga} disabled onChange={() => {}} />
+              <FloatInput label="Praga" required value={value.praga} disabled onChange={() => { }} />
             ) : (
               <EntitySearchInput
                 label="Praga"
@@ -117,12 +118,11 @@ export function ClassificacaoSanitariaForm({ value, onChange, disabled = false }
                 required
                 value={value.praga}
                 data={PRAGAS_MOCK}
-                searchKeys={["codigo", "nome"]}
+                searchKeys={["nome"]}
                 columns={[
-                  { label: "Código", key: "codigo" },
                   { label: "Praga", key: "nome" },
                 ]}
-                icon={<Bug size={20} className="text-[#1A7A3C]" />}
+                icon={<img src={Icons.iconePragaUrl} alt="Praga" className="w-5 h-5 object-contain" />}
                 onChange={(praga) => update("praga", praga.nome)}
               />
             )
@@ -130,18 +130,18 @@ export function ClassificacaoSanitariaForm({ value, onChange, disabled = false }
         </div>
       </Section>
 
-      <Section title="Classificação Sanitária por Município (Zero ou mais)">
+      <Section title="Classificação Sanitária por Município">
         {disabled ? (
           value.municipios.length ? (
             <div className="flex flex-col gap-4">
               {value.municipios.map((item) => (
                 <div key={item.id} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FloatInput label="Município" required value={item.municipio} disabled onChange={() => {}} />
+                  <FloatInput label="Município" required value={item.municipio} disabled onChange={() => { }} />
                   <FloatSelect
                     label="Classificação Sanitária para Município"
                     required
                     value={item.classificacao}
-                    onChange={() => {}}
+                    onChange={() => { }}
                     options={CLASSIFICACOES_SANITARIAS}
                     disabled
                   />
@@ -157,7 +157,7 @@ export function ClassificacaoSanitariaForm({ value, onChange, disabled = false }
             behavior="any"
             variant="plain"
             itemLabel="município"
-            addButtonLabel="Adicionar Município"
+            addButtonLabel="Adicionar Classificação"
             onAddItem={() => value.estado && update("municipios", [
               ...value.municipios,
               { id: `municipio-${Date.now()}`, municipio: "", classificacao: "" },
