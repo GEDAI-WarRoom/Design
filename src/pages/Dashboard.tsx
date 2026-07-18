@@ -602,8 +602,8 @@ export function DashboardPage({ onLogout, onNavigate }: any) {
         </div>
 
         {/* Bloco de Cadastros (Exatamente como estava) */}
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-6">
+        <div className="flex flex-col bg-white rounded-xl shadow-sm p-6 mb-6 gap-6">
+          <h2 className="text-xl font-semibold text-gray-800">
             Cadastros
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -611,25 +611,19 @@ export function DashboardPage({ onLogout, onNavigate }: any) {
               <CategoryCard key={cat.title} cat={cat} onNavigate={onNavigate} />
             ))}
           </div>
-        </div>
-
-        {/* Bloco Secundário (Exatamente como estava, adicionado mb-6 para afastar o próximo) */}
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {secondaryCategories.map((cat) => (
               <CategoryCard key={cat.title} cat={cat} onNavigate={onNavigate} />
             ))}
           </div>
-        </div>
 
-        {/* 🚀 TERCEIRO BLOCO ADICIONADO */}
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {thirdCategories.map((cat) => (
               <CategoryCard key={cat.title} cat={cat} onNavigate={onNavigate} />
             ))}
           </div>
         </div>
+
 
         <div className="bg-white rounded-xl shadow-sm p-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
