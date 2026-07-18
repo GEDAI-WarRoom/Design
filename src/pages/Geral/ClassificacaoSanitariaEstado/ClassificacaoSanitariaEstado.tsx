@@ -124,7 +124,6 @@ export function ClassificacaoSanitariaEstadoPage({
             {tipo === "Animal" && (
               <EntitySearchInput
                 label="Doença"
-                required
                 placeholder="Buscar pelo nome da doença."
                 value={doenca ? doenca.nome : ""}
                 data={DOENCAS_MOCK}
@@ -141,7 +140,6 @@ export function ClassificacaoSanitariaEstadoPage({
             {tipo === "Vegetal" && (
               <EntitySearchInput
                 label="Praga"
-                required
                 placeholder="Buscar pelo nome da praga."
                 value={praga ? praga.nome : ""}
                 data={PRAGAS_MOCK}
@@ -157,9 +155,9 @@ export function ClassificacaoSanitariaEstadoPage({
             <button
               type="button"
               onClick={pesquisar}
-              className="px-5 py-2 rounded-md text-white text-sm font-semibold bg-[#1A7A3C] hover:bg-[#15612F] flex items-center gap-2 transition-colors"
+              className="px-5 py-2 rounded-md text-white text-sm font-semibold bg-[#1A7A3C] hover:bg-[#15612F] flex items-center justify-center gap-2 transition-colors w-full md:w-auto"
             >
-              <Search size={17} />Pesquisar
+              <span>Pesquisar</span>
             </button>
           </div>
 

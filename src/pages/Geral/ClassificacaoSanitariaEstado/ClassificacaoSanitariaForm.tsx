@@ -187,11 +187,7 @@ export function ClassificacaoSanitariaForm({ value, onChange, disabled = false }
             )}
           </DynamicListWrapper>
         )}
-        {!value.estado && !disabled && (
-          <div className="mt-4 flex items-center gap-2 text-sm text-gray-500">
-            <MapPin size={16} /> Selecione o estado antes de adicionar municípios.
-          </div>
-        )}
+
       </Section>
     </>
   );
