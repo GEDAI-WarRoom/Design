@@ -76,6 +76,10 @@ import { RevendedoraAnimaisPage } from "./pages/Animal/RevendedoraAnimais/Revend
 import { AdicionarRevendedoraAnimaisPage } from "./pages/Animal/RevendedoraAnimais/AdicionarRevendedoraAnimais";
 import { VisualizarRevendedoraAnimaisPage } from "./pages/Animal/RevendedoraAnimais/VisualizarRevendedoraAnimais";
 import { VisualizarEstabelecimentoAgroindustrialOutrasInspecoesPage } from "./pages/Animal/EstabelecimentoAgroindustrialOutrasInspecoes/VisualizarEstabelecimentoAgroindustrialOutrasInspecoes";
+import { LocalRealizacaoExamePage } from "./pages/Animal/LocalRealizacaoExame/LocalRealizacaoExame";
+import { AdicionarLocalRealizacaoExamePage } from "./pages/Animal/LocalRealizacaoExame/AdicionarLocalRealizacaoExame";
+import { VisualizarLocalRealizacaoExamePage } from "./pages/Animal/LocalRealizacaoExame/VisualizarLocalRealizacaoExame";
+import { EditarLocalRealizacaoExamePage } from "./pages/Animal/LocalRealizacaoExame/EditarLocalRealizacaoExame";
 import { TipoVeiculoPage } from "./pages/Animal/TipoVeiculo/TipoVeiculo";
 import { AdicionarTipoVeiculoPage } from "./pages/Animal/TipoVeiculo/AdicionarTipoVeiculo";
 
@@ -247,6 +251,10 @@ export type Screen =
   | "adicionar-registro-venda-gta-fisica"
   | "estabelecimento-evento-pecuario"
   | "adicionar-estabelecimento-evento-pecuario"
+  | "local-realizacao-exame"
+  | "adicionar-local-realizacao-exame"
+  | "visualizar-local-realizacao-exame"
+  | "editar-local-realizacao-exame"
   | "integradora-cooperativa"
   | "adicionar-integradora-cooperativa"
   | "visualizar-integradora-cooperativa"
@@ -1038,6 +1046,37 @@ export default function App() {
         <AdicionarEstabelecimentoEventoPecuarioPage
           onLogout={handleLogout}
           onNavigate={handleNavigate}
+        />
+      );
+
+    case "local-realizacao-exame":
+      return (
+        <LocalRealizacaoExamePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "adicionar-local-realizacao-exame":
+      return (
+        <AdicionarLocalRealizacaoExamePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "visualizar-local-realizacao-exame":
+      return (
+        <VisualizarLocalRealizacaoExamePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
+        />
+      );
+    case "editar-local-realizacao-exame":
+      return (
+        <EditarLocalRealizacaoExamePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
         />
       );
 

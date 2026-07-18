@@ -224,6 +224,7 @@ export const cadastrosCategories: MenuCategory[] = [
         route: "estabelecimento-evento-pecuario",
         icon: <Calendar size={16} />,
       },
+
       {
         label: "Integradora Cooperativa",
         route: "integradora-cooperativa",
@@ -422,6 +423,11 @@ export const secondaryCategories: MenuCategory[] = [
             className="w-4 h-4"
           />
         ),
+      },
+      {
+        label: "Local de Realização de Exame",
+        route: "local-realizacao-exame",
+        icon: <FlaskConical size={16} />,
       },
     ],
   },
