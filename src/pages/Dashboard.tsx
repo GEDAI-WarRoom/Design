@@ -23,6 +23,7 @@ import {
   ShoppingCart,
   Store,
   Syringe,
+  TestTube,
   TowerControl,
   Truck,
   User,
@@ -401,7 +402,7 @@ export const secondaryCategories: MenuCategory[] = [
       {
         label: "Tipo de Insumo de Exame",
         route: "tipo-insumo-exame",
-        icon: <FileText size={16} />,
+        icon: <TestTube size={16} />,
       },
       {
         label: "Vacinador Contra Brucelose",
