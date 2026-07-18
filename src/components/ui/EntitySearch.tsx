@@ -222,7 +222,7 @@ export function EntitySearchInput({
         open={modalAberto}
         onClose={() => setModalAberto(false)}
         title={title || `Buscar ${label}`}
-        subtitle={subtitle || `Selecione um registro na lista de ${label.toLowerCase()}s:`}
+        subtitle={subtitle || `Busque por ${label.toLowerCase()} cadastradas:`}
         icon={icon}
         data={data}
         columns={columns}

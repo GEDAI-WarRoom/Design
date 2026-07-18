@@ -74,6 +74,11 @@ export const cadastrosCategories: MenuCategory[] = [
         icon: <Map size={16} />,
       },
       {
+        label: "Classificação Sanitária por Estado",
+        route: "classificacao-sanitaria-estado",
+        icon: <ShieldCheck size={16} />,
+      },
+      {
         label: "Estabelecimento Agropecuário",
         route: "estabelecimento-agropecuario",
         icon: (
