@@ -1936,6 +1936,8 @@ export function EvaluationActiveCard({
 }
 // MODAL GENÉRICO
 
+
+// MODAL GENÉRICO
 interface GenericFormModalProps {
   open: boolean;
   onClose: () => void;
@@ -1945,7 +1947,8 @@ interface GenericFormModalProps {
   saveLabel?: string;
   cancelLabel?: string;
   children: React.ReactNode;
-  maxWidth?: string; // Permite customizar a largura se necessário
+  maxWidth?: string;
+  icon?: React.ReactNode; // Já estava aqui 👍
 }
 
 export function GenericFormModal({
@@ -1958,6 +1961,7 @@ export function GenericFormModal({
   cancelLabel = "Cancelar",
   children,
   maxWidth = "1000px",
+  icon, // ✨ PASSO 1: Desestruturar o icon aqui!
 }: GenericFormModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const LAT = { fontFamily: "'Lato', sans-serif" } as const;
@@ -1999,7 +2003,11 @@ export function GenericFormModal({
 
         {/* Título Principal */}
         <div className="flex gap-[12px] items-center justify-center w-full">
-          <div className="flex h-[40px] items-center justify-center">
+          <div className="flex min-h-[40px] items-center justify-center gap-2"> {/* Adicionado gap-2 para espaçamento */}
+
+            {/* ✨ PASSO 2: Renderizar o ícone caso ele exista */}
+            {icon && <div className="flex items-center text-[#1d1d1f]">{icon}</div>}
+
             <span style={{ ...LAT, fontSize: 24, fontWeight: 700, color: "#1d1d1f", textAlign: "center" }}>
               {title}
             </span>

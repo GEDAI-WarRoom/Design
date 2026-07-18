@@ -336,8 +336,10 @@ export function AdicionarPrevisaoMigracaoModal({
         open={open && !registroSalvo}
         onClose={limparEFechar}
         onSave={salvar}
+        icon={<CalendarClock size={24} color="#008446" />}
+
         title="Adicionar Previsão de Migração"
-        subtitle="Campos indicados com * são obrigatórios."
+        subtitle="Preencha os campos abaixo para adicionar uma nova previsão de migração:"
         saveLabel="Adicionar"
         maxWidth="1000px"
       >

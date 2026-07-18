@@ -46,7 +46,7 @@ const GREEN = "#1A7A3C";
 
 const PROFISSIONAIS_ANIMAL = PROFISSIONAIS_ANIMAL_CADASTRADOS.map((profissional) => ({
   id: profissional.id, // Mantido o mapeamento original corrigido
-  nome: profissional.nome, 
+  nome: profissional.nome,
   documento: profissional.cpf,
   habilitadoGta: profissional.habilitacoes.includes("Emissão de GTA"),
 }));
@@ -71,7 +71,7 @@ interface PageProps {
   dados?: Revendedora;
 }
 
-  interface Anexo {
+interface Anexo {
   id: string;
   nome: string;
   descricao?: string;
@@ -84,22 +84,21 @@ function formatarData(data?: string) {
 
 function Section({ title, children, defaultOpen = true }: { title: string; children: ReactNode; defaultOpen?: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
-  
+
   return (
     // Removido o overflow-hidden daqui
     <section className="bg-white rounded-xl border border-gray-100 shadow-sm">
-      <button 
-        type="button" 
-        onClick={() => setOpen((value) => !value)} 
+      <button
+        type="button"
+        onClick={() => setOpen((value) => !value)}
         // Arredonda o botão de acordo com o estado para não vazar o hover cinza
-        className={`w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50 transition ${
-          open ? "rounded-t-xl" : "rounded-xl"
-        }`}
+        className={`w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50 transition ${open ? "rounded-t-xl" : "rounded-xl"
+          }`}
       >
         <span className="text-base font-semibold text-gray-800">{title}</span>
         <ChevronDown size={18} className={`text-gray-400 transition ${open ? "rotate-180" : ""}`} />
       </button>
-      
+
       {open && (
         <div className="border-t border-gray-100 p-6">
           {children}
@@ -130,7 +129,7 @@ function ProfessionalCard({ item, onView }: { item: ProfissionalVinculado; onVie
           </span>
           <span>{item.situacao}</span>
         </div>
-        
+
         {/* Ícone de Usuário */}
         <div className="flex items-start gap-3">
           <div className="mt-0.5 shrink-0">
@@ -171,7 +170,7 @@ export function VisualizarRevendedoraAgropecuarioPage({ onLogout, onNavigate, da
   const [modalOpen, setModalOpen] = useState(false);
   const [somenteLeitura, setSomenteLeitura] = useState(false);
   const [profissionalId, setProfissionalId] = useState("");
- const [tipo, setTipo] = useState<TipoProfissional | null>(null);
+  const [tipo, setTipo] = useState<TipoProfissional | null>(null);
   const [profissional, setProfissional] = useState<any | null>(null);
   const [dataArt, setDataArt] = useState("");
   const [arquivoArt, setArquivoArt] = useState("");
@@ -182,39 +181,34 @@ export function VisualizarRevendedoraAgropecuarioPage({ onLogout, onNavigate, da
     novo: ProfissionalVinculado;
   } | null>(null);
 
-const [anexos, setAnexos] = useState<Anexo[]>([]);
-const [descricaoAnexo, setDescricaoAnexo] = useState<string>("");
+  const [anexos, setAnexos] = useState<Anexo[]>([]);
+  const [descricaoAnexo, setDescricaoAnexo] = useState<string>("");
   const tabs = [
-    { 
-      id: "cadastro", 
-      label: "Cadastro", 
-      icon: (isActive: boolean) => <FileText size={19} className={isActive ? "text-[#1A7A3C]" : "text-gray-400"} /> 
-    },
-    { 
-      id: "vinculacoes", 
-      label: "Vinculações", 
-      icon: (isActive: boolean) => (
-        <img 
-          src={Icons.iconeVinculacoesUrl} 
-          alt="Vinculações" 
-          className={`w-[19px] h-[19px] object-contain transition-all duration-200 ${
-            isActive 
-              ? "grayscale-0 opacity-100" 
-              : "grayscale opacity-40 group-hover:opacity-70"
-          }`} 
-        />
-      ) 
-    },
-    { 
-      id: "responsaveis", 
-      label: "Responsáveis Técnicos", 
-      icon: (isActive: boolean) => <UsersRound size={19} className={isActive ? "text-[#1A7A3C]" : "text-gray-400"} /> 
+    {
+      id: "cadastro",
+      label: "Cadastro",
+      icon: (isActive: boolean) => <FileText size={19} className={isActive ? "text-[#1A7A3C]" : "text-gray-400"} />
     },
     {
-      id: "funcionarios",
-      label: "Funcionários",
-      icon: (isActive: boolean) => <User size={19} className={isActive ? "text-[#1A7A3C]" : "text-gray-400"} />,
+      id: "vinculacoes",
+      label: "Vinculações",
+      icon: (isActive: boolean) => (
+        <img
+          src={Icons.iconeVinculacoesUrl}
+          alt="Vinculações"
+          className={`w-[19px] h-[19px] object-contain transition-all duration-200 ${isActive
+            ? "grayscale-0 opacity-100"
+            : "grayscale opacity-40 group-hover:opacity-70"
+            }`}
+        />
+      )
     },
+    {
+      id: "responsaveis",
+      label: "Profissionais",
+      icon: (isActive: boolean) => <UsersRound size={19} className={isActive ? "text-[#1A7A3C]" : "text-gray-400"} />
+    },
+
 
   ];
 
@@ -234,9 +228,9 @@ const [descricaoAnexo, setDescricaoAnexo] = useState<string>("");
   const contatosProprietarios = (contatos?.proprietariosDisponiveis || []).filter((proprietario) =>
     contatos?.proprietariosSelecionados.map(String).includes(String(proprietario.id)),
   );
-  
+
   const isResponsavelArt = tipo === "Responsável Técnico Animal" || tipo === "Responsável Técnico Vegetal";
-  
+
   const dadosBusca = tipo === "Responsável Técnico Vegetal"
     ? PROFISSIONAIS_VEGETAL
     : tipo === "Funcionário"
@@ -344,7 +338,7 @@ const [descricaoAnexo, setDescricaoAnexo] = useState<string>("");
               <button type="button" onClick={() => onNavigate("editar-revendedora-agropecuario", revendedora)} className="h-10 px-6 rounded bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold">Editar</button>
             )}
             {activeTab === "responsaveis" && (
-              <button type="button" onClick={() => abrirNovo(false)} className="h-10 px-5 rounded bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold">Adicionar Responsável Técnico</button>
+              <button type="button" onClick={() => abrirNovo(false)} className="h-10 px-5 rounded bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold">Adicionar Profissional</button>
             )}
             {activeTab === "funcionarios" && (
               <button type="button" onClick={() => abrirNovo(true)} className="h-10 px-5 rounded bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold">Adicionar Funcionário</button>
@@ -414,7 +408,7 @@ const [descricaoAnexo, setDescricaoAnexo] = useState<string>("");
                           <FloatInput label="CPF/CNPJ" value={proprietario.cpf} disabled />
                           <FloatInput label="E-mail" value={proprietario.email || "Não informado"} disabled />
                           <FloatInput label="Telefone" value={proprietario.telefone || "Não informado"} disabled />
-                          <LargeTextArea label="Observação" value={proprietario.observacao || ""} onChange={() => {}} disabled />
+                          <LargeTextArea label="Observação" value={proprietario.observacao || ""} onChange={() => { }} disabled />
                         </div>
                       ))}
                     </div>
@@ -423,8 +417,8 @@ const [descricaoAnexo, setDescricaoAnexo] = useState<string>("");
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FloatInput label="E-mail" value={contatos?.emailFixo || ""} disabled />
                     <FloatInput label="Telefone" value={contatos?.telefoneFixo || ""} disabled />
-                    <LargeTextArea label="Observação do E-mail" value={contatos?.emailFixoObs || ""} onChange={() => {}} disabled />
-                    <LargeTextArea label="Observação do Telefone" value={contatos?.telefoneFixoObs || ""} onChange={() => {}} disabled />
+                    <LargeTextArea label="Observação do E-mail" value={contatos?.emailFixoObs || ""} onChange={() => { }} disabled />
+                    <LargeTextArea label="Observação do Telefone" value={contatos?.telefoneFixoObs || ""} onChange={() => { }} disabled />
                   </div>
                 )}
                 {(contatos?.contatosAdicionais || []).length > 0 && (
@@ -434,7 +428,7 @@ const [descricaoAnexo, setDescricaoAnexo] = useState<string>("");
                       <div key={contato.id} className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <FloatInput label={`Tipo do Contato ${index + 1}`} value={contato.tipo} disabled />
                         <FloatInput label={contato.tipo === "E-mail" ? "E-mail" : "Número"} value={contato.tipo === "E-mail" ? contato.email : contato.telefone} disabled />
-                        <LargeTextArea label="Observação" value={contato.observacao || ""} onChange={() => {}} disabled />
+                        <LargeTextArea label="Observação" value={contato.observacao || ""} onChange={() => { }} disabled />
                       </div>
                     ))}
                   </div>
@@ -451,7 +445,7 @@ const [descricaoAnexo, setDescricaoAnexo] = useState<string>("");
                     <span className="text-gray-400">{anexo.descricao}</span>
                   </div>
                 ))}
-                <LargeTextArea label="Observação" value={revendedora.observacao || ""} onChange={() => {}} disabled />
+                <LargeTextArea label="Observação" value={revendedora.observacao || ""} onChange={() => { }} disabled />
               </div>
             </Section>
           </div>
@@ -468,15 +462,15 @@ const [descricaoAnexo, setDescricaoAnexo] = useState<string>("");
         {activeTab === "responsaveis" && (
           <div className="flex flex-col gap-5">
             {/* ─── RT ÁREA ANIMAL ─── */}
-            <AccordionCardGroup 
-              title="Responsável Técnico da Área Animal" 
-               activeCountText={`${animalAtivos.length} cadastros ativos`}
+            <AccordionCardGroup
+              title="Responsável Técnico da Área Animal"
+              activeCountText={`${animalAtivos.length} cadastros ativos`}
               variant="sem-vinculacao"
               historicoTitle="Histórico de Responsáveis Técnicos"
               icon={
-                <img 
-                  src={Icons.iconeProfissionalAnimalUrl} 
-                  alt="Profissional Animal" 
+                <img
+                  src={Icons.iconeProfissionalAnimalUrl}
+                  alt="Profissional Animal"
                   className="w-6 h-6 object-contain invert brightness-0"
                 />
               }
@@ -492,15 +486,15 @@ const [descricaoAnexo, setDescricaoAnexo] = useState<string>("");
             </AccordionCardGroup>
 
             {/* ─── RT ÁREA VEGETAL ─── */}
-            <AccordionCardGroup 
-              title="Responsável Técnico da Área Vegetal" 
+            <AccordionCardGroup
+              title="Responsável Técnico da Área Vegetal"
               activeCountText={`${vegetalAtivos.length} cadastros ativos`}
               variant="sem-vinculacao"
               historicoTitle="Histórico de Responsáveis Técnicos"
               icon={
-                <img 
-                  src={Icons.iconeProfissionalVegetalUrl} 
-                  alt="Profissional Vegetal" 
+                <img
+                  src={Icons.iconeProfissionalVegetalUrl}
+                  alt="Profissional Vegetal"
                   className="w-6 h-6 object-contain invert brightness-0"
                 />
               }
@@ -516,15 +510,15 @@ const [descricaoAnexo, setDescricaoAnexo] = useState<string>("");
             </AccordionCardGroup>
 
             {/* ─── HABILITADOS GTA ─── */}
-            <AccordionCardGroup 
-              title="Habilitado para Emissão de GTA" 
-               activeCountText={`${gtaAtivos.length} cadastros ativos`}
+            <AccordionCardGroup
+              title="Habilitado para Emissão de GTA"
+              activeCountText={`${gtaAtivos.length} cadastros ativos`}
               variant="sem-vinculacao"
               historicoTitle="Histórico de Profissionais Habilitados"
               icon={
-                <img 
-                  src={Icons.iconeHabilitacaoUrl} 
-                  alt="Habilitação" 
+                <img
+                  src={Icons.iconeHabilitacaoUrl}
+                  alt="Habilitação"
                   className="w-7 h-7 object-contain invert brightness-0"
                 />
               }
@@ -565,7 +559,7 @@ const [descricaoAnexo, setDescricaoAnexo] = useState<string>("");
       </main>
 
       {/* ─── MODAL DE CADASTRO / DETALHES ─── */}
-     {/* ─── MODAL DE CADASTRO / DETALHES ─── */}
+      {/* ─── MODAL DE CADASTRO / DETALHES ─── */}
       <ModalBase
         open={modalOpen}
         onClose={() => setModalOpen(false)}
@@ -577,20 +571,20 @@ const [descricaoAnexo, setDescricaoAnexo] = useState<string>("");
         width="820px"
       >
         <div className="flex flex-col gap-6 w-full">
-          
+
           {/* SEÇÃO 1: Identificação, Busca do Vínculo e Anexo Único */}
           <Section title="Informações Básicas" defaultOpen={true}>
             <div className="flex flex-col gap-6">
-              
+
               {/* Grid superior apenas para a seleção do Tipo */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FloatSelect
                   label="Tipo de Profissional"
                   required
                   value={tipo}
-                  onChange={(value) => { 
-                    setTipo(value as TipoProfissional); 
-                    setProfissional(null); 
+                  onChange={(value) => {
+                    setTipo(value as TipoProfissional);
+                    setProfissional(null);
                     setDataArt(""); // Reseta a data ao mudar o tipo
                   }}
                   options={tipo === "Funcionário"
@@ -602,7 +596,7 @@ const [descricaoAnexo, setDescricaoAnexo] = useState<string>("");
 
               {/* Linha dinâmica: Mostra apenas a Busca ou Busca + CPF + Olhinho após seleção */}
               <div className="flex items-end gap-3 w-full transition-all duration-300">
-                
+
                 {/* 1. O Input de Busca (EntitySearchInput) que se ajusta de tamanho */}
                 <div className="flex-1 min-w-0">
                   <EntitySearchInput
@@ -612,23 +606,23 @@ const [descricaoAnexo, setDescricaoAnexo] = useState<string>("");
                     data={dadosBusca}
                     searchKeys={["nome", "documento"]}
                     columns={[
-                      { label: "Nome", key: "nome" }, 
+                      { label: "Nome", key: "nome" },
                       { label: "CPF", key: "documento" }
                     ]}
                     icon={
                       tipo === "Responsável Técnico Vegetal" ? (
-                        <img 
-                          src={Icons.iconeProfissionalVegetalUrl} 
-                          alt="Vegetal" 
-                          className="w-[18px] h-[18px] object-contain" 
+                        <img
+                          src={Icons.iconeProfissionalVegetalUrl}
+                          alt="Vegetal"
+                          className="w-[18px] h-[18px] object-contain"
                         />
                       ) : tipo === "Funcionário" ? (
                         <User size={18} color={GREEN} />
                       ) : (
-                        <img 
-                          src={Icons.iconeProfissionalAnimalUrl} 
-                          alt="Animal" 
-                          className="w-[18px] h-[18px] object-contain" 
+                        <img
+                          src={Icons.iconeProfissionalAnimalUrl}
+                          alt="Animal"
+                          className="w-[18px] h-[18px] object-contain"
                         />
                       )
                     }
@@ -656,9 +650,9 @@ const [descricaoAnexo, setDescricaoAnexo] = useState<string>("");
 
                     {/* 3. Botão do Olhinho em Verde */}
                     <div className="flex items-center h-10 mb-[2px] shrink-0 animate-fade-in">
-                      <button 
-                        type="button" 
-                        onClick={() => window.open(`/profissionais/visualizar/${profissional.id || profissionalId}`, "_blank")} 
+                      <button
+                        type="button"
+                        onClick={() => window.open(`/profissionais/visualizar/${profissional.id || profissionalId}`, "_blank")}
                         className="p-2 bg-white hover:bg-green-50 text-[#1A7A3C] hover:text-[#15612F] transition"
                         title="Visualizar Detalhes"
                       >
@@ -671,7 +665,7 @@ const [descricaoAnexo, setDescricaoAnexo] = useState<string>("");
               </div>
 
               {/* Data da ART integrada aqui dentro caso seja Responsável Técnico */}
-         {/* Seção Integrada de ART (Data + Upload) exibida apenas para Responsável Técnico */}
+              {/* Seção Integrada de ART (Data + Upload) exibida apenas para Responsável Técnico */}
               {isResponsavelArt && (
                 <div className="flex flex-col gap-4 w-full animate-fade-in mt-2">
                   {/* Divisor e Subtítulo */}
@@ -684,14 +678,14 @@ const [descricaoAnexo, setDescricaoAnexo] = useState<string>("");
 
                   {/* Campo de Data */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FloatInput 
-                      label="Data da ART" 
+                    <FloatInput
+                      label="Data da ART"
                       type="date"
                       icon={<Calendar size={16} color={GREEN} />}
-                      value={dataArt} 
-                      onChange={setDataArt} 
-                      required 
-                      disabled={somenteLeitura} 
+                      value={dataArt}
+                      onChange={setDataArt}
+                      required
+                      disabled={somenteLeitura}
                     />
                   </div>
 
@@ -700,7 +694,7 @@ const [descricaoAnexo, setDescricaoAnexo] = useState<string>("");
                     <div className="flex gap-4 items-start relative w-full">
                       <div className="flex-1 flex flex-col gap-4">
                         <div className="flex gap-3 items-start w-full">
-                          
+
                           <UploadField
                             label="ART"
                             required
@@ -734,7 +728,7 @@ const [descricaoAnexo, setDescricaoAnexo] = useState<string>("");
                             </>
                           )}
 
-                          
+
 
                         </div>
                       </div>
@@ -744,7 +738,7 @@ const [descricaoAnexo, setDescricaoAnexo] = useState<string>("");
               )}
 
 
-             
+
 
             </div>
           </Section>
@@ -753,20 +747,20 @@ const [descricaoAnexo, setDescricaoAnexo] = useState<string>("");
           {!!profissionalId && (
             <Section title="Status do Vínculo" defaultOpen={true}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FloatSelect 
-                  label="Situação" 
-                  required 
-                  value={situacao} 
-                  onChange={(value) => setSituacao(value as "Ativo" | "Inativo")} 
-                  options={[{ value: "Ativo", label: "Ativo" }, { value: "Inativo", label: "Inativo" }]} 
-                  disabled={somenteLeitura} 
+                <FloatSelect
+                  label="Situação"
+                  required
+                  value={situacao}
+                  onChange={(value) => setSituacao(value as "Ativo" | "Inativo")}
+                  options={[{ value: "Ativo", label: "Ativo" }, { value: "Inativo", label: "Inativo" }]}
+                  disabled={somenteLeitura}
                 />
               </div>
             </Section>
           )}
 
         </div>
-        
+
         {erro && <p className="text-sm text-red-600 mt-2">{erro}</p>}
       </ModalBase>
 
