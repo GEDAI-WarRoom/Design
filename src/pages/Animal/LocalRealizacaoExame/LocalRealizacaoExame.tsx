@@ -84,7 +84,7 @@ export function LocalRealizacaoExamePage({ onLogout, onNavigate }: PageProps) {
             <ArrowLeft size={15} /> Inicial
           </button>
           <div className="flex items-center justify-between gap-4">
-            <h1 className="text-2xl font-semibold text-gray-900">Locais de Realização de Exame</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">Local de Realização de Exame</h1>
             <button
               type="button"
               onClick={() => onNavigate("adicionar-local-realizacao-exame")}
@@ -158,7 +158,6 @@ export function LocalRealizacaoExamePage({ onLogout, onNavigate }: PageProps) {
                 columns={[
                   { label: "Médico Veterinário", key: "nome" },
                   { label: "CPF", key: "cpf" },
-                  { label: "Exames", key: "examesFormatados" },
                 ]}
                 icon={<img src={Icons.iconeProfissionalAnimalUrl} alt="Médico Veterinário" className="w-5 h-5 object-contain" />}
                 title="Buscar Médico Veterinário"

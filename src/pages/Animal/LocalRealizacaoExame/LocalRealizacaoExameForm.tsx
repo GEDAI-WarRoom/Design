@@ -1,5 +1,5 @@
 import { useMemo, useState, type ReactNode } from "react";
-import { ChevronDown, ChevronUp, Info, PlusCircle, X } from "lucide-react";
+import { ChevronDown, ChevronUp, Info, PlusCircle, Trash2 } from "lucide-react";
 import { FloatInput, FloatSelect, MultiSearchModal, SimNao } from "../../../components/ui/FormKit";
 import {
   BlocoEnderecoFields,
@@ -269,17 +269,14 @@ export function LocalRealizacaoExameForm({
                 onClick={() => setModalVeterinariosAberto(true)}
                 className="flex items-center gap-2 px-4 h-10 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50 transition"
               >
-                <PlusCircle size={16} /> Selecionar Médicos Veterinários
+                <PlusCircle size={16} /> Adicionar Médicos Veterinários
               </button>
             </div>
           )}
-
-          {value.veterinarios.length === 0 ? (
-            <p className="text-sm text-gray-400 italic">Nenhum médico veterinário selecionado.</p>
-          ) : (
+          {value.veterinarios.length === 0 ? null : (
             <div className="flex flex-col gap-4">
               {value.veterinarios.map((veterinario, index) => (
-                <article key={veterinario.id} className="rounded-xl border border-gray-100 bg-gray-50/40 p-4">
+                <article key={veterinario.id} className="rounded-xl p-4">
                   <div className="flex items-start gap-3">
                     <div className="w-7 h-7 rounded-full bg-[#1A7A3C] text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-2">
                       {index + 1}
@@ -305,7 +302,7 @@ export function LocalRealizacaoExameForm({
                         className="p-2 text-red-500 hover:bg-red-50 rounded-md transition mt-2"
                         title="Remover médico veterinário"
                       >
-                        <X size={17} />
+                        <Trash2 size={17} />
                       </button>
                     )}
                   </div>
@@ -320,16 +317,15 @@ export function LocalRealizacaoExameForm({
         open={modalVeterinariosAberto}
         onClose={() => setModalVeterinariosAberto(false)}
         title="Buscar Médicos Veterinários"
-        subtitle="Selecione profissionais habilitados que ainda não estejam vinculados a outro local de realização de exame."
+        subtitle="Busque por médicos veterinários cadastrados."
         icon={<img src={Icons.iconeProfissionalAnimalUrl} alt="Médico Veterinário" className="w-6 h-6 object-contain" />}
         data={veterinariosDisponiveis}
         columns={[
           { label: "Médico Veterinário", key: "nome" },
           { label: "CPF", key: "cpf" },
-          { label: "Exames que Realiza", key: "examesFormatados" },
         ]}
-        searchKeys={["nome", "cpf", "examesFormatados"]}
-        searchPlaceholder="Buscar por nome, CPF ou exame"
+        searchKeys={["nome", "cpf"]}
+        searchPlaceholder="Buscar por nome ou CPF"
         selectedItems={value.veterinarios}
         confirmLabel="Salvar Selecionados"
         onConfirm={(veterinarios) => {

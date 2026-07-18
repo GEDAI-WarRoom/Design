@@ -213,11 +213,7 @@ export const cadastrosCategories: MenuCategory[] = [
         route: "estabelecimento-evento-pecuario",
         icon: <Calendar size={16} />,
       },
-      {
-        label: "Local de Realização de Exame",
-        route: "local-realizacao-exame",
-        icon: <FlaskConical size={16} />,
-      },
+
       {
         label: "Integradora Cooperativa",
         route: "integradora-cooperativa",
@@ -425,6 +421,11 @@ export const secondaryCategories: MenuCategory[] = [
           />
         ),
       },
+      {
+        label: "Local de Realização de Exame",
+        route: "local-realizacao-exame",
+        icon: <FlaskConical size={16} />,
+      },
     ],
   },
   {
@@ -483,7 +484,7 @@ export const secondaryCategories: MenuCategory[] = [
       {
         label: "Isenção de Taxa de GTA",
         route: "isencao-taxa-gta",
-       icon: <BadgePercent size={16} />,
+        icon: <BadgePercent size={16} />,
       },
     ],
   },
