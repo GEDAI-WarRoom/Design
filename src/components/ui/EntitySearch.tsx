@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Eye, PlusCircle, Trash2, Store, Info, ViewIcon, Map, MapPin, UserRound, X, ChevronUp, ChevronDown, UserRoundCheck  } from "lucide-react";
-import { FloatInput, SearchModal, FloatSelect, FloatCombobox, CheckboxGroup,  LargeTextArea, CustomRadio, MultiSearchModal, FieldTooltip, SimNao} from "../../components/ui/FormKit"; // Centralizado em uma única importação
+import { Eye, PlusCircle, Trash2, Store, Info, ViewIcon, Map, MapPin, UserRound, X, ChevronUp, ChevronDown, UserRoundCheck } from "lucide-react";
+import { FloatInput, SearchModal, FloatSelect, FloatCombobox, CheckboxGroup, LargeTextArea, CustomRadio, MultiSearchModal, FieldTooltip, SimNao } from "../../components/ui/FormKit"; // Centralizado em uma única importação
 
 // Importação dos Ícones Padrão do Projeto
 
@@ -49,7 +49,7 @@ export const EXPLORACOES_MOCK = [
     grupoEspecieFormatado: "Abelhas\n - Abelha com Ferrão",
     produtoresFormatado: "333.888.777-11\n- Carlos Henrique Souza",
   },
-   {
+  {
     id: 4,
     codigo: "540010400070088",
     especie: "Bovinos",
@@ -66,12 +66,12 @@ export const EXPLORACOES_MOCK = [
 
 export const ESTABELECIMENTOS_MOCK = [
   {
-    id:1,
+    id: 1,
     codigo: "10234567891",
     nome: "Fazenda do Rio",
     municipio: "Lavras",
     proprietario: "333.888.777-11\n- Carlos Henrique Souza",
-    areaProdutivaHa: 1000, areaProdutivaM2: 10000000 
+    areaProdutivaHa: 1000, areaProdutivaM2: 10000000
   },
   {
     id: 2,
@@ -80,7 +80,7 @@ export const ESTABELECIMENTOS_MOCK = [
     municipio: "Uberlândia",
     proprietario: "444.111.222-33\n- Maria Silva Mendes",
     areaProdutivaHa: 500, areaProdutivaM2: 5000000
-   }
+  }
 ];
 
 export const PRODUTORES_MOCK = [
@@ -97,33 +97,33 @@ export const REVENDEDORAS_MOCK = [
 ];
 
 export const FORNECEDORES_VACINA_MOCK = [
-  { 
-    id: 1, 
-    codigo: "3251987753", 
-    nome: "Laboratório BioMed Brasil Ltda", 
-    tipo: "Laboratório", 
-    uf: "SP" 
+  {
+    id: 1,
+    codigo: "3251987753",
+    nome: "Laboratório BioMed Brasil Ltda",
+    tipo: "Laboratório",
+    uf: "SP"
   },
-  { 
-    id: 2, 
-    codigo: "3190987753", 
-    nome: "Vacinas Imunotech S.A.", 
-    tipo: "Laboratório", 
-    uf: "RJ" 
+  {
+    id: 2,
+    codigo: "3190987753",
+    nome: "Vacinas Imunotech S.A.",
+    tipo: "Laboratório",
+    uf: "RJ"
   },
-  { 
-    id: 3, 
-    codigo: "4510938999", 
-    nome: "Agro Comercial Sul do País", 
-    tipo: "Revendedora", 
-    uf: "PR" 
+  {
+    id: 3,
+    codigo: "4510938999",
+    nome: "Agro Comercial Sul do País",
+    tipo: "Revendedora",
+    uf: "PR"
   },
-  { 
-    id: 4, 
-    codigo: "8546938777", 
-    nome: "Distribuidora de Vacinas Pantanal", 
-    tipo: "Revendedora", 
-    uf: "MS" 
+  {
+    id: 4,
+    codigo: "8546938777",
+    nome: "Distribuidora de Vacinas Pantanal",
+    tipo: "Revendedora",
+    uf: "MS"
   },
 ];
 
@@ -167,8 +167,8 @@ interface EntitySearchInputProps {
   required?: boolean;
   hasTooltip?: boolean;
   tooltipText?: string;
-  
-  
+
+
   // Proriedades para customização dinâmica do modal interno
   title?: string;
   subtitle?: string;
@@ -178,21 +178,21 @@ interface EntitySearchInputProps {
   especiesPermitidas?: any[];
 }
 
-export function EntitySearchInput({ 
-  label, 
-  placeholder, 
-  value, 
-  data, 
-  searchKeys, 
-  columns, 
-  icon, 
-  onChange, 
+export function EntitySearchInput({
+  label,
+  placeholder,
+  value,
+  data,
+  searchKeys,
+  columns,
+  icon,
+  onChange,
   required,
   title,
   subtitle,
   confirmLabel = "Confirmar",
   className,
-  headerActions, 
+  headerActions,
   hasTooltip,
   tooltipText,
   especiesPermitidas,
@@ -207,13 +207,13 @@ export function EntitySearchInput({
             label={label}
             required={required}
             value={value}
-            onChange={() => {}}
+            onChange={() => { }}
             hasTooltip={hasTooltip}
             tooltipText={tooltipText}
             icon={icon}
             placeholder={placeholder}
             className="w-full"
-            readOnly 
+            readOnly
           />
         </div>
       </div>
@@ -222,18 +222,18 @@ export function EntitySearchInput({
         open={modalAberto}
         onClose={() => setModalAberto(false)}
         title={title || `Buscar ${label}`}
-        subtitle={subtitle || `Selecione um registro na lista de ${label.toLowerCase()}s:`}
+        subtitle={subtitle || `Busque por ${label.toLowerCase()} cadastradas:`}
         icon={icon}
         data={data}
         columns={columns}
         searchKeys={searchKeys}
         searchPlaceholder={placeholder}
         confirmLabel={confirmLabel}
-        className={className} 
+        className={className}
         headerActions={headerActions} // 🔥 Repassa o nó de ações/filtros para o SearchModal real da biblioteca
         onConfirm={(entidadeSelecionada) => {
-          onChange(entidadeSelecionada); 
-          setModalAberto(false);         
+          onChange(entidadeSelecionada);
+          setModalAberto(false);
         }}
       />
     </>
@@ -263,10 +263,10 @@ interface DynamicListWrapperProps {
   items: any[];
   behavior?: "at-least-one" | "zero-or-more";
   addButtonLabel: string;
-  itemLabel?: string; 
+  itemLabel?: string;
   onAddItem: () => void;
   onRemoveItem: (index: number) => void;
-  showCounter?: boolean; 
+  showCounter?: boolean;
   renderHeaderBadge?: (item: any) => React.ReactNode;
   variant?: "default" | "plain";
   smallCounter?: boolean; // 💡 Controla o tamanho reduzido do contador exclusivamente para o lote card
@@ -277,10 +277,10 @@ export function DynamicListWrapper({
   items,
   behavior = "at-least-one",
   addButtonLabel,
-  itemLabel = "Item", 
+  itemLabel = "Item",
   onAddItem,
   onRemoveItem,
-  showCounter = true, 
+  showCounter = true,
   renderHeaderBadge,
   variant = "default",
   smallCounter = false, // Por padrão, mantém o contador normal
@@ -302,7 +302,7 @@ export function DynamicListWrapper({
         <div className="flex flex-col gap-3 w-full">
           {items.map((item, index) => (
             <div key={item.uid || item.id || index} className="flex items-center gap-3 w-full">
-              
+
               {showCounter && (
                 /* 💡 Se 'smallCounter' for true, aplica o círculo pequeno, opaco e alinhado */
                 smallCounter ? (
@@ -316,7 +316,7 @@ export function DynamicListWrapper({
                   </div>
                 )
               )}
-              
+
               {/* Renderiza os campos de input de formulário */}
               <div className="flex-1 min-w-0">
                 {children(item, index)}
@@ -325,14 +325,14 @@ export function DynamicListWrapper({
               {/* Botão de excluir inline à direita dos campos */}
               {!(behavior === "at-least-one" && items.length === 1) && (
                 <button
-                      type="button"
-                      onClick={() => onRemoveItem(index)}
-                      /* 🔴 Vermelho fixo em todas as possibilidades para a variante default */
-                      className="p-1.5 rounded-lg text-red-500 hover:text-red-700 hover:bg-red-50 transition flex items-center justify-center cursor-pointer"
-                      title={`Remover ${itemLabel}`}
-                    >
-                      <Trash2 size={16} />
-                    </button>
+                  type="button"
+                  onClick={() => onRemoveItem(index)}
+                  /* 🔴 Vermelho fixo em todas as possibilidades para a variante default */
+                  className="p-1.5 rounded-lg text-red-500 hover:text-red-700 hover:bg-red-50 transition flex items-center justify-center cursor-pointer"
+                  title={`Remover ${itemLabel}`}
+                >
+                  <Trash2 size={16} />
+                </button>
               )}
             </div>
           ))}
@@ -363,8 +363,8 @@ export function DynamicListWrapper({
           const isMinimizado = !!minimizados[index];
 
           return (
-            <div 
-              key={item.uid || item.id || index} 
+            <div
+              key={item.uid || item.id || index}
               className="border-l-4 border-l-[#1A7A3C] rounded-r-xl rounded-l-md bg-gray-50/40 border border-gray-100 flex flex-col w-full px-3 relative transition-all"
             >
               {/* Cabeçalho Único sem a borda cinza divisória */}
@@ -377,8 +377,8 @@ export function DynamicListWrapper({
                     </span>
                   </div>
                   <span className="text-sm font-semibold text-gray-600 tracking-wide">
-                {itemLabel}
-              </span>
+                    {itemLabel}
+                  </span>
 
                   {renderHeaderBadge && renderHeaderBadge(item)}
                 </div>
@@ -394,14 +394,14 @@ export function DynamicListWrapper({
                   </button>
 
                   {!(behavior === "at-least-one" && items.length === 1) && (
-                 <button
-                  type="button"
-                  onClick={() => onRemoveItem(index)}
-                  /* 🔴 Vermelho fixo em todas as possibilidades para a variante plain */
-                  className="p-1.5 rounded-lg transition mt-4 cursor-pointer flex-shrink-0 text-red-500 hover:text-red-700 hover:bg-red-50"
-                >
-                  <Trash2 size={16} />
-                </button>
+                    <button
+                      type="button"
+                      onClick={() => onRemoveItem(index)}
+                      /* 🔴 Vermelho fixo em todas as possibilidades para a variante plain */
+                      className="p-1.5 rounded-lg transition mt-4 cursor-pointer flex-shrink-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <Trash2 size={16} />
+                    </button>
                   )}
                 </div>
               </div>
@@ -455,7 +455,7 @@ export function ExploracaoPecuariaInput({ value, onChange, onEyeClick, required 
   return (
     <div className="flex flex-col gap-3 w-full">
       <div className={value ? "grid grid-cols-1 md:grid-cols-2 gap-4 items-center w-full" : "w-full"}>
-        
+
         {/* Input Genérico configurado com as regras exatas do seu Modal */}
         <EntitySearchInput
           label="Exploração Pecuária"
@@ -463,7 +463,7 @@ export function ExploracaoPecuariaInput({ value, onChange, onEyeClick, required 
           required={required}
           value={value || ""}
           data={EXPLORACOES_MOCK}
-          
+
           // 🔥 Configurações de exibição exatas passadas por você:
           title="Buscar Exploração Pecuária"
           subtitle="Busque por uma exploração pecuária cadastrada:"
@@ -478,7 +478,7 @@ export function ExploracaoPecuariaInput({ value, onChange, onEyeClick, required 
           searchPlaceholder="Buscar por código, estabelecimento, espécie ou produtor."
           confirmLabel="Confirmar"
           className="[&_td]:whitespace-pre-line" // Garante a quebra de linha correta do \n na tabela
-          
+
           onChange={onChange}
         />
 
@@ -490,7 +490,7 @@ export function ExploracaoPecuariaInput({ value, onChange, onEyeClick, required 
                 label="Espécie Explorada"
                 required={required}
                 value={entidadeSelecionada.especie}
-                onChange={() => {}}
+                onChange={() => { }}
                 disabled
                 className="w-full"
               />
@@ -512,13 +512,13 @@ export function EstabelecimentoAgropecuarioInput({ value, onChange, onEyeClick, 
   // 🔥 Transforma os dados injetando o "proprietarioFormatado" exatamente como o seu modal fazia na página!
   const dadosFormatadosParaModal = ESTABELECIMENTOS_MOCK.map(estab => ({
     ...estab,
- 
+
   }));
 
   return (
     <div className="flex flex-col gap-3 w-full">
       <div className={value ? "grid grid-cols-1 md:grid-cols-2 gap-4 items-center w-full" : "w-full"}>
-        
+
         {/* Barramento genérico parametrizado com as regras passadas por você */}
         <EntitySearchInput
           label="Estabelecimento Agropecuário"
@@ -526,7 +526,7 @@ export function EstabelecimentoAgropecuarioInput({ value, onChange, onEyeClick, 
           required={required}
           value={entidadeSelecionada?.nome || ""} // Passa o nome para exibição amigável no input
           data={dadosFormatadosParaModal}         // Passa os dados injetados com a string formatada
-          
+
           // 🔥 Suas propriedades exatas de tela:
           title="Buscar Estabelecimento Agropecuário"
           subtitle="Busque por um estabelecimento agropecuário cadastrado:"
@@ -540,7 +540,7 @@ export function EstabelecimentoAgropecuarioInput({ value, onChange, onEyeClick, 
           searchKeys={["codigo", "nome", "municipio", "proprietario"]}
           searchPlaceholder="Buscar por código, nome, município ou proprietário."
           confirmLabel="Confirmar"
-          
+
           onChange={onChange}
         />
 
@@ -552,7 +552,7 @@ export function EstabelecimentoAgropecuarioInput({ value, onChange, onEyeClick, 
                 label="Código do Estabelecimento Agropecuário"
                 required={required}
                 value={entidadeSelecionada.codigo}
-                onChange={() => {}}
+                onChange={() => { }}
                 disabled
                 className="w-full"
               />
@@ -573,33 +573,33 @@ export function ProdutorInput({ value, onChange, onEyeClick, required = false }:
   // Encontra o produtor selecionado para exibir no campo reboque se necessário
   const entidadeSelecionada = PRODUTORES_MOCK.find((x) => x.nome === value || x.documento === value);
 
-  const databaseFiltrada = tipoPessoa 
+  const databaseFiltrada = tipoPessoa
     ? PRODUTORES_MOCK.filter(p => p.tipo === tipoPessoa)
     : PRODUTORES_MOCK;
 
   // 💡 Correção aqui: Define dinamicamente o Nome e o Documento com base no tipo escolhido
   const colunasModal = [
-    { 
-      label: tipoPessoa === "PF" ? "Nome" : tipoPessoa === "PJ" ? "Razão Social" : "Nome / Razão Social", 
-      key: "nome" 
+    {
+      label: tipoPessoa === "PF" ? "Nome" : tipoPessoa === "PJ" ? "Razão Social" : "Nome / Razão Social",
+      key: "nome"
     },
-    { 
-      label: tipoPessoa === "PJ" ? "CNPJ" : tipoPessoa === "PF" ? "CPF" : "CPF / CNPJ", 
-      key: "documento" 
+    {
+      label: tipoPessoa === "PJ" ? "CNPJ" : tipoPessoa === "PF" ? "CPF" : "CPF / CNPJ",
+      key: "documento"
     }
   ];
 
   return (
     <div className="flex flex-col gap-3 w-full">
       <div className={value ? "grid grid-cols-1 md:grid-cols-2 gap-4 items-center w-full" : "w-full"}>
-        
+
         <EntitySearchInput
           label="Produtor"
           placeholder="Buscar pelo produtor."
           required={required}
           value={entidadeSelecionada?.nome || ""} // Exibe o nome amigável no input
           data={databaseFiltrada}                 // Passa os dados filtrados dinamicamente
-          
+
           // 🔥 Suas propriedades exatas de tela:
           title="Buscar Produtor"
           subtitle="Busque por um produtor cadastrado no sistema:"
@@ -608,7 +608,7 @@ export function ProdutorInput({ value, onChange, onEyeClick, required = false }:
           searchKeys={["nome", "documento"]}
           searchPlaceholder="Buscar Proprietário"
           confirmLabel="Confirmar"
-          
+
           // Intercepta e reseta o filtro do tipo de pessoa ao fechar/confirmar se o EntitySearchInput permitir customização
           onChange={(p) => {
             onChange(p);
@@ -617,7 +617,7 @@ export function ProdutorInput({ value, onChange, onEyeClick, required = false }:
 
           // 🔥 Injeta o FloatSelect customizado direto nas ações do cabeçalho do modal base
           headerActions={
-            <div className="w-48 !mr-4 pr-1 relative z-10 flex-shrink-0"> 
+            <div className="w-48 !mr-4 pr-1 relative z-10 flex-shrink-0">
               <FloatSelect
                 label="Tipo de Pessoa"
                 required
@@ -640,7 +640,7 @@ export function ProdutorInput({ value, onChange, onEyeClick, required = false }:
                 label={entidadeSelecionada.tipo === "PJ" ? "CNPJ" : "CPF"}
                 required={required}
                 value={entidadeSelecionada.documento}
-                onChange={() => {}}
+                onChange={() => { }}
                 disabled
                 className="w-full"
               />
@@ -699,7 +699,7 @@ export function RevendedoraInput({ value, onChange, onEyeClick, required = false
                 label="Código"
                 required={required}
                 value={entidadeSelecionada.codigo}
-                onChange={() => {}}
+                onChange={() => { }}
                 disabled
                 className="w-full"
               />
@@ -723,21 +723,21 @@ interface FornecedorVacinaInputProps {
   data?: any[]; // <-- Recebe os dados de fora de forma limpa
 }
 
-export function FornecedorVacinaInput({ 
-  value, 
-  onChange, 
-  onEyeClick, 
-  required = false, 
+export function FornecedorVacinaInput({
+  value,
+  onChange,
+  onEyeClick,
+  required = false,
   tooltipText,
   data = FORNECEDORES_VACINA_MOCK // <-- Fallback usando o mock local se nenhum dado for passado
 }: FornecedorVacinaInputProps) {
-  
+
   const entidadeSelecionada = data.find((x: any) => x.codigo === value);
 
   return (
     <div className="flex flex-col gap-3 w-full">
       <div className={value ? "grid grid-cols-1 md:grid-cols-2 gap-4 items-center w-full" : "w-full"}>
- 
+
         {/* 1. Campo de Busca Principal com Tooltip nativo */}
         <div className="w-full">
           <EntitySearchInput
@@ -749,7 +749,7 @@ export function FornecedorVacinaInput({
             searchKeys={["codigo", "nome", "tipo"]}
             title="Buscar Fornecedor de Vacina"
             subtitle="Busque por laboratórios ou revendedoras cadastrados:"
-            icon={<img src={Icons.iconeFornecedorUrl} alt="Fornecedor" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}              
+            icon={<img src={Icons.iconeFornecedorUrl} alt="Fornecedor" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}
             columns={[
               { label: "Tipo", key: "tipo" },
               { label: "Nome", key: "nome" },
@@ -758,13 +758,13 @@ export function FornecedorVacinaInput({
             ]}
             confirmLabel="Confirmar"
             onChange={onChange}
-            
+
             // 🔥 Vinculado ao comportamento padrão do seu FormKit!
             hasTooltip={!!tooltipText}
             tooltipText={tooltipText}
           />
         </div>
-         
+
         {/* 2. Campo Extra Lateral (Código desabilitado + Olhinho) */}
         {value && entidadeSelecionada && (
           <div className="flex items-center gap-2 animate-fadeIn w-full">
@@ -773,13 +773,13 @@ export function FornecedorVacinaInput({
                 label="Código do Fornecedor"
                 required={required}
                 value={entidadeSelecionada.codigo}
-                onChange={() => {}}
+                onChange={() => { }}
                 disabled
                 className="w-full"
               />
             </div>
-            
-         <EyeAction onClick={onEyeClick} />
+
+            <EyeAction onClick={onEyeClick} />
 
           </div>
         )}
@@ -810,47 +810,47 @@ export function DoencaInput({
   data = DOENCAS_MOCK,
   apenasVacinaveis = false, // 👈 Inicializa como false por padrão
 }: DoencaInputProps) {
-  
+
   // 💡 Se 'apenasVacinaveis' for true, você pode filtrar os dados aqui se o seu mock tiver esse campo,
   // ou apenas repassar a lista completa por enquanto.
-  const dadosFiltrados = apenasVacinaveis 
+  const dadosFiltrados = apenasVacinaveis
     ? data.filter((d: any) => d.vacinavel !== false) // Exemplo caso seu mock tenha essa flag
     : data;
 
   const BlacklistedOuSelecionada = dadosFiltrados.find((x: any) => x.nome === value || x.codigo === value);
 
   return (
-   <div className="flex flex-col gap-3 w-full">
-  {/* Mudamos de grid para flex para permitir que o input ocupe 100% da largura útil */}
-  <div className="flex items-end gap-2 w-full">
-    
-    {/* O container do input agora ganha 'flex-1' para empurrar o olho para o canto */}
-    <div className="flex-1 w-full">
-      <EntitySearchInput
-        label="Doença"
-        placeholder="Buscar por nome da doença."
-        required={required}
-        value={BlacklistedOuSelecionada?.nome || ""}
-        data={dadosFiltrados}
-        searchKeys={["nome"]}
-        title="Buscar Doença"
-        subtitle={apenasVacinaveis ? "Busque por uma doença cadastrada:" : "Busque por uma doença cadastrada:"}
-        icon={<img src={Icons.iconeDoencaUrl} alt="Doença" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}              
-        columns={[
-          { label: "Doença", key: "nome" },
-        ]}
-        confirmLabel="Confirmar"
-        onChange={onChange}
-        hasTooltip={!!tooltipText}
-        tooltipText={tooltipText}
-      />
+    <div className="flex flex-col gap-3 w-full">
+      {/* Mudamos de grid para flex para permitir que o input ocupe 100% da largura útil */}
+      <div className="flex items-end gap-2 w-full">
+
+        {/* O container do input agora ganha 'flex-1' para empurrar o olho para o canto */}
+        <div className="flex-1 w-full">
+          <EntitySearchInput
+            label="Doença"
+            placeholder="Buscar por nome da doença."
+            required={required}
+            value={BlacklistedOuSelecionada?.nome || ""}
+            data={dadosFiltrados}
+            searchKeys={["nome"]}
+            title="Buscar Doença"
+            subtitle={apenasVacinaveis ? "Busque por uma doença cadastrada:" : "Busque por uma doença cadastrada:"}
+            icon={<img src={Icons.iconeDoencaUrl} alt="Doença" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}
+            columns={[
+              { label: "Doença", key: "nome" },
+            ]}
+            confirmLabel="Confirmar"
+            onChange={onChange}
+            hasTooltip={!!tooltipText}
+            tooltipText={tooltipText}
+          />
+        </div>
+
+        {value && BlacklistedOuSelecionada && (
+          <EyeAction onClick={onEyeClick} />
+        )}
+      </div>
     </div>
-     
-    {value && BlacklistedOuSelecionada && (
-      <EyeAction onClick={onEyeClick} />
-    )}
-  </div>
-</div>
   );
 }
 
@@ -864,26 +864,26 @@ export function ProprietarioInput({ value, onChange, onEyeClick, required = fals
 
   const entidadeSelecionada = PRODUTORES_MOCK.find((x) => x.nome === value || x.documento === value);
 
-  const databaseFiltrada = tipoPessoa 
+  const databaseFiltrada = tipoPessoa
     ? PRODUTORES_MOCK.filter(p => p.tipo === tipoPessoa)
     : PRODUTORES_MOCK;
 
   // Definição estrita das colunas baseada no estado atual
   const colunasModal = [
-    { 
-      label: tipoPessoa === "PF" ? "Nome" : tipoPessoa === "PJ" ? "Razão Social" : "Nome / Razão Social", 
-      key: "nome" 
+    {
+      label: tipoPessoa === "PF" ? "Nome" : tipoPessoa === "PJ" ? "Razão Social" : "Nome / Razão Social",
+      key: "nome"
     },
-    { 
-      label: tipoPessoa === "PJ" ? "CNPJ" : tipoPessoa === "PF" ? "CPF" : "CPF / CNPJ", 
-      key: "documento" 
+    {
+      label: tipoPessoa === "PJ" ? "CNPJ" : tipoPessoa === "PF" ? "CPF" : "CPF / CNPJ",
+      key: "documento"
     }
   ];
 
   return (
     <div className="flex flex-col gap-3 w-full">
       <div className={value ? "grid grid-cols-1 md:grid-cols-2 gap-4 items-center w-full" : "w-full"}>
-        
+
         <EntitySearchInput
           label="Proprietário"
           placeholder="Buscar pelo nome do proprietário."
@@ -897,12 +897,12 @@ export function ProprietarioInput({ value, onChange, onEyeClick, required = fals
           searchKeys={["nome", "documento"]}
           searchPlaceholder="Buscar Proprietário"
           confirmLabel="Confirmar"
-          
+
           // 💡 APENAS repassa a entidade sem resetar o estado prematuramente aqui
           onChange={onChange}
 
           headerActions={
-            <div className="w-48 !mr-4 pr-1 relative z-10 flex-shrink-0"> 
+            <div className="w-48 !mr-4 pr-1 relative z-10 flex-shrink-0">
               <FloatSelect
                 label="Tipo de Pessoa"
                 required
@@ -925,7 +925,7 @@ export function ProprietarioInput({ value, onChange, onEyeClick, required = fals
                 label={entidadeSelecionada.tipo === "PJ" ? "CNPJ" : "CPF"}
                 required={required}
                 value={entidadeSelecionada.documento}
-                onChange={() => {}}
+                onChange={() => { }}
                 disabled
                 className="w-full"
               />
@@ -958,25 +958,25 @@ export function FornecedorInput({ value, onChange, onEyeClick, required = false 
   // Encontra a entidade selecionada para exibir no campo reboque
   const entidadeSelecionada = PRODUTORES_MOCK.find((x) => x.nome === value || x.documento === value);
 
-  const databaseFiltrada = tipoPessoa 
+  const databaseFiltrada = tipoPessoa
     ? PRODUTORES_MOCK.filter(p => p.tipo === tipoPessoa)
     : PRODUTORES_MOCK;
 
   const colunasModal = [
-    { 
-      label: tipoPessoa === "PF" ? "Nome" : tipoPessoa === "PJ" ? "Razão Social" : "Nome / Razão Social", 
-      key: "nome" 
+    {
+      label: tipoPessoa === "PF" ? "Nome" : tipoPessoa === "PJ" ? "Razão Social" : "Nome / Razão Social",
+      key: "nome"
     },
-    { 
-      label: tipoPessoa === "PJ" ? "CNPJ" : tipoPessoa === "PF" ? "CPF" : "CPF / CNPJ", 
-      key: "documento" 
+    {
+      label: tipoPessoa === "PJ" ? "CNPJ" : tipoPessoa === "PF" ? "CPF" : "CPF / CNPJ",
+      key: "documento"
     }
   ];
 
   return (
     <div className="flex flex-col gap-3 w-full">
       <div className={value ? "grid grid-cols-1 md:grid-cols-2 gap-4 items-center w-full" : "w-full"}>
-        
+
         <EntitySearchInput
           label="Fornecedor"
           placeholder="Buscar pelo fornecedor."
@@ -992,10 +992,10 @@ export function FornecedorInput({ value, onChange, onEyeClick, required = false 
           confirmLabel="Confirmar"
           onChange={(p) => {
             onChange(p);
-            setTipoPessoa(""); 
+            setTipoPessoa("");
           }}
           headerActions={
-            <div className="w-48 !mr-4 pr-1 relative z-10 flex-shrink-0"> 
+            <div className="w-48 !mr-4 pr-1 relative z-10 flex-shrink-0">
               <FloatSelect
                 label="Tipo de Pessoa"
                 required
@@ -1018,7 +1018,7 @@ export function FornecedorInput({ value, onChange, onEyeClick, required = false 
                 label={entidadeSelecionada.tipo === "PJ" ? "CNPJ" : "CPF"}
                 required={required}
                 value={entidadeSelecionada.documento}
-                onChange={() => {}}
+                onChange={() => { }}
                 disabled
                 className="w-full"
               />
@@ -1041,25 +1041,25 @@ export function DestinatarioInput({ value, onChange, onEyeClick, required = fals
   // Encontra a entidade selecionada para exibir no campo reboque
   const entidadeSelecionada = PRODUTORES_MOCK.find((x) => x.nome === value || x.documento === value);
 
-  const databaseFiltrada = tipoPessoa 
+  const databaseFiltrada = tipoPessoa
     ? PRODUTORES_MOCK.filter(p => p.tipo === tipoPessoa)
     : PRODUTORES_MOCK;
 
   const colunasModal = [
-    { 
-      label: tipoPessoa === "PF" ? "Nome" : tipoPessoa === "PJ" ? "Razão Social" : "Nome / Razão Social", 
-      key: "nome" 
+    {
+      label: tipoPessoa === "PF" ? "Nome" : tipoPessoa === "PJ" ? "Razão Social" : "Nome / Razão Social",
+      key: "nome"
     },
-    { 
-      label: tipoPessoa === "PJ" ? "CNPJ" : tipoPessoa === "PF" ? "CPF" : "CPF / CNPJ", 
-      key: "documento" 
+    {
+      label: tipoPessoa === "PJ" ? "CNPJ" : tipoPessoa === "PF" ? "CPF" : "CPF / CNPJ",
+      key: "documento"
     }
   ];
 
   return (
     <div className="flex flex-col gap-3 w-full">
       <div className={value ? "grid grid-cols-1 md:grid-cols-2 gap-4 items-center w-full" : "w-full"}>
-        
+
         <EntitySearchInput
           label="Destinatário"
           placeholder="Buscar pelo destinatário."
@@ -1075,10 +1075,10 @@ export function DestinatarioInput({ value, onChange, onEyeClick, required = fals
           confirmLabel="Confirmar"
           onChange={(p) => {
             onChange(p);
-            setTipoPessoa(""); 
+            setTipoPessoa("");
           }}
           headerActions={
-            <div className="w-48 !mr-4 pr-1 relative z-10 flex-shrink-0"> 
+            <div className="w-48 !mr-4 pr-1 relative z-10 flex-shrink-0">
               <FloatSelect
                 label="Tipo de Pessoa"
                 required
@@ -1101,7 +1101,7 @@ export function DestinatarioInput({ value, onChange, onEyeClick, required = fals
                 label={entidadeSelecionada.tipo === "PJ" ? "CNPJ" : "CPF"}
                 required={required}
                 value={entidadeSelecionada.documento}
-                onChange={() => {}}
+                onChange={() => { }}
                 disabled
                 className="w-full"
               />
@@ -1173,9 +1173,9 @@ function MapModal({ onClose, onConfirm, initialLat, initialLng }: MapModalProps)
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 px-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl p-8 flex flex-col gap-6 relative font-sans text-gray-800 animate-in fade-in zoom-in-95 duration-150">
-        <button 
-          type="button" 
-          onClick={onClose} 
+        <button
+          type="button"
+          onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-lg font-bold transition p-1"
         >
           ✕
@@ -1192,16 +1192,16 @@ function MapModal({ onClose, onConfirm, initialLat, initialLng }: MapModalProps)
         {/* Simulador visual do mapa */}
         <div className="w-full h-[240px] rounded-xl border border-gray-200 overflow-hidden relative bg-gray-100 flex items-center justify-center">
           <div className="absolute top-3 right-3 z-10 bg-white rounded-lg shadow-sm border border-gray-200 p-0.5 flex gap-0.5">
-            <button 
-              type="button" 
-              onClick={() => setMapType("mapa")} 
+            <button
+              type="button"
+              onClick={() => setMapType("mapa")}
               className={`text-[10px] font-bold px-3 py-1.5 rounded transition ${mapType === "mapa" ? "bg-[#1A7A3C] text-white" : "text-gray-600 hover:bg-gray-50"}`}
             >
               Mapa
             </button>
-            <button 
-              type="button" 
-              onClick={() => setMapType("satelite")} 
+            <button
+              type="button"
+              onClick={() => setMapType("satelite")}
               className={`text-[10px] font-bold px-3 py-1.5 rounded transition ${mapType === "satelite" ? "bg-[#1A7A3C] text-white" : "text-gray-600 hover:bg-gray-50"}`}
             >
               Satélite
@@ -1251,9 +1251,9 @@ function MapModal({ onClose, onConfirm, initialLat, initialLng }: MapModalProps)
         </div>
 
         <div className="flex justify-center items-center gap-3 w-full pt-2">
-          <button 
-            type="button" 
-            onClick={onClose} 
+          <button
+            type="button"
+            onClick={onClose}
             className="px-10 py-2.5 bg-white text-[#1A7A3C] text-sm font-semibold rounded-md border border-[#1A7A3C] hover:bg-gray-50 shadow-sm transition"
           >
             Cancelar
@@ -1305,9 +1305,9 @@ export function BlocoEnderecoFields({
   onChange,
   onSetMultipleFields,
 }: BlocoEnderecoFieldsProps) {
-  
+
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+
   // Estado interno para controlar a pergunta de geolocalização herdada
   const [mesmaGeoEstab, setMesmaGeoEstab] = useState<boolean | "">("");
 
@@ -1351,7 +1351,7 @@ export function BlocoEnderecoFields({
     const formatado = aplicarMascaraCEP(val);
     onChange("cep", formatado);
     const apenasNumeros = formatado.replace(/\D/g, "");
-    
+
     if (apenasNumeros.length === 8) {
       try {
         const response = await fetch(`https://viacep.com.br/ws/${apenasNumeros}/json/`);
@@ -1379,7 +1379,7 @@ export function BlocoEnderecoFields({
   return (
     <div className="flex flex-col gap-4 border-t border-gray-100 pt-4 first:border-0 first:pt-0">
       <h3 className="text-sm font-semibold text-gray-700">{title}</h3>
-      
+
       {/* Grid de campos básicos de Endereço */}
       <div className={`grid grid-cols-1 gap-3 ${isRural ? "md:grid-cols-3" : "md:grid-cols-5"}`}>
         <FloatSelect label="Zona" required value={data.zona} onChange={handleZonaChange} disabled={isGlobalDisabled} options={[{ value: "Urbana", label: "Urbana" }, { value: "Rural", label: "Rural" }]} />
@@ -1410,7 +1410,7 @@ export function BlocoEnderecoFields({
           SUBSTITUIÇÃO: SEÇÃO DE COORDENADAS REESTRUTURADA 
          ========================================================= */}
       <hr className="border-gray-100 my-1" />
-      
+
       {/* Se o cadastro for do IMA (travado), exibe a pergunta de geolocalização espelhada */}
       {isGlobalDisabled && (
         <div className="flex flex-col gap-3">
@@ -1421,7 +1421,7 @@ export function BlocoEnderecoFields({
             value={mesmaGeoEstab}
             onChange={setMesmaGeoEstab}
           />
-         
+
         </div>
       )}
 
@@ -1429,18 +1429,18 @@ export function BlocoEnderecoFields({
       {isGlobalDisabled ? (
         // Se for do IMA, mostra os campos direto em formato de Grid com base no Sim/Não
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 items-end">
-          <FloatInput 
-            label="Latitude" 
-            value={data.latitude} 
-            onChange={(v) => onChange("latitude", v)} 
-            disabled={mesmaGeoEstab === true || mesmaGeoEstab === ""} 
+          <FloatInput
+            label="Latitude"
+            value={data.latitude}
+            onChange={(v) => onChange("latitude", v)}
+            disabled={mesmaGeoEstab === true || mesmaGeoEstab === ""}
             placeholder="-19.165827"
           />
-          <FloatInput 
-            label="Longitude" 
-            value={data.longitude} 
-            onChange={(v) => onChange("longitude", v)} 
-            disabled={mesmaGeoEstab === true || mesmaGeoEstab === ""} 
+          <FloatInput
+            label="Longitude"
+            value={data.longitude}
+            onChange={(v) => onChange("longitude", v)}
+            disabled={mesmaGeoEstab === true || mesmaGeoEstab === ""}
             placeholder="-44.362871"
           />
         </div>
@@ -1569,7 +1569,7 @@ export function BlocoContatoFields({
         </div>
       </div>
 
-    {/* CASO SIM: Contato de Proprietários */}
+      {/* CASO SIM: Contato de Proprietários */}
       {data.utilizarContatoProprietario === "Sim" && (
         <div className="flex flex-col gap-4 border-t border-gray-100 pt-4 animate-in fade-in duration-200">
           <div className="flex items-center justify-between">
@@ -1588,19 +1588,19 @@ export function BlocoContatoFields({
             <p className="text-xs text-gray-400 italic">Nenhum proprietário selecionado para contato.</p>
           ) : (
             <div className="flex flex-col gap-2">
-              {(proprietariosDisponiveis && proprietariosDisponiveis.length > 0 
-                ? proprietariosDisponiveis 
+              {(proprietariosDisponiveis && proprietariosDisponiveis.length > 0
+                ? proprietariosDisponiveis
                 : [
-                    { id: "prop-1", nome: "Carlos Henrique Silva", email: "carlos.silva@email.com", telefone: "(11) 98888-7777", observacoes: "Contato principal da fazenda" },
-                    { id: "prop-2", nome: "Maria Fernanda Oliveira", email: "maria.fernanda@email.com", telefone: "(21) 99999-8888" },
-                    { id: "prop-3", nome: "Antônio Marcos de Souza", email: "antonio.marcos@email.com", telefone: "(31) 97777-6666" },
-                    { id: "prop-4", nome: "Juliana Costa Rezende", email: "juliana.costa@email.com", telefone: "(61) 96666-5555" }
-                  ]
+                  { id: "prop-1", nome: "Carlos Henrique Silva", email: "carlos.silva@email.com", telefone: "(11) 98888-7777", observacoes: "Contato principal da fazenda" },
+                  { id: "prop-2", nome: "Maria Fernanda Oliveira", email: "maria.fernanda@email.com", telefone: "(21) 99999-8888" },
+                  { id: "prop-3", nome: "Antônio Marcos de Souza", email: "antonio.marcos@email.com", telefone: "(31) 97777-6666" },
+                  { id: "prop-4", nome: "Juliana Costa Rezende", email: "juliana.costa@email.com", telefone: "(61) 96666-5555" }
+                ]
               )
                 .filter((p) => data.proprietariosSelecionados.map(String).includes(String(p.id)))
                 .map((p, index) => (
-                  <div 
-                    key={p.id} 
+                  <div
+                    key={p.id}
                     className="bg-white border border-gray-200 rounded-xl shadow-sm px-4 py-3 flex flex-col gap-1.5"
                   >
                     {/* Header row */}
@@ -1631,7 +1631,7 @@ export function BlocoContatoFields({
                       </button>
                     </div>
 
-                   {/* Details (Email, Telefone na primeira linha e Observação se houver na próxima) */}
+                    {/* Details (Email, Telefone na primeira linha e Observação se houver na próxima) */}
                     <div className="pl-9 flex flex-col gap-0.5">
                       <div className="flex flex-wrap gap-x-8 gap-y-0.5">
                         <span className="text-xs text-gray-600">
@@ -1643,7 +1643,7 @@ export function BlocoContatoFields({
                           {(p as any).telefone || "Não informado"}
                         </span>
                       </div>
-                      
+
                       {/* Linha adicional para observações com checagem segura contra o erro de tipo */}
                       {((p as any).observacoes || (p as any).observacao || (p as any).obs) && (
                         <span className="text-xs text-gray-600">
@@ -1664,14 +1664,14 @@ export function BlocoContatoFields({
             title="Contato de Proprietários"
             subtitle="Selecione os proprietários para vincular as informações de contato:"
             icon={<img src={Icons.iconeProdutorUrl} alt="Proprietário" className="w-8 h-8 object-contain" />}
-            data={proprietariosDisponiveis && proprietariosDisponiveis.length > 0 
+            data={proprietariosDisponiveis && proprietariosDisponiveis.length > 0
               ? proprietariosDisponiveis.map((p: any) => ({ id: p.id, nome: p.nome }))
               : [
-                  { id: "prop-1", nome: "Carlos Henrique Silva" },
-                  { id: "prop-2", nome: "Maria Fernanda Oliveira" },
-                  { id: "prop-3", nome: "Antônio Marcos de Souza" },
-                  { id: "prop-4", nome: "Juliana Costa Rezende" }
-                ]
+                { id: "prop-1", nome: "Carlos Henrique Silva" },
+                { id: "prop-2", nome: "Maria Fernanda Oliveira" },
+                { id: "prop-3", nome: "Antônio Marcos de Souza" },
+                { id: "prop-4", nome: "Juliana Costa Rezende" }
+              ]
             }
             searchKeys={["nome"]}
             searchPlaceholder="Busque pelo nome do proprietário."
@@ -1693,7 +1693,7 @@ export function BlocoContatoFields({
         </div>
       )}
 
-      
+
       {/* CASO NÃO: Campos Fixos Obrigatórios */}
       {data.utilizarContatoProprietario === "Não" && (
         <div className="flex flex-col gap-4 border-t border-dashed border-gray-100 pt-4 animate-in fade-in duration-200">
@@ -1735,78 +1735,78 @@ export function BlocoContatoFields({
         </div>
       )}
 
-<div className="border-t border-gray-100 pt-4 mt-2">
-  
-  <div className="flex items-center gap-1.5 mb-3 select-none">
-    <span className="text-sm font-semibold text-gray-700">Outros Contatos</span>
-    <FieldTooltip text="Além do contato principal, você também pode adicionar outros contatos opcionais" />
-  </div>
+      <div className="border-t border-gray-100 pt-4 mt-2">
 
-  <DynamicListWrapper
-    title="" 
-    items={data.contatosAdicionais || []}
-    behavior="zero-or-more"
-   variant="plain"
-    addButtonLabel="Adicionar Contato" 
-    onAddItem={() => {
-      const novo: ContatoAdicional = { id: String(Date.now()), tipo: "E-mail", email: "", telefone: "", observacao: "" };
-      handleFieldChange("contatosAdicionais", [...(data.contatosAdicionais || []), novo]);
-    }}
-    onRemoveItem={(index: number) => {
-      const list = data.contatosAdicionais.filter((_, i) => i !== index);
-      handleFieldChange("contatosAdicionais", list);
-    }}
-  >
-    {(cont: ContatoAdicional, index: number) => (
-      <div key={cont.id} className="grid grid-cols-1 md:grid-cols-12 gap-4 items-start relative animate-in slide-in-from-top-2 duration-150 w-full mb-4">
-        <div className="md:col-span-2">
-          <FloatSelect
-            label="Tipo"
-            required
-            value={cont.tipo}
-            onChange={(v) => {
-              const list = data.contatosAdicionais.map((c, i) => i === index ? { ...c, tipo: v as "E-mail" | "Telefone", email: "", telefone: "" } : c);
-              handleFieldChange("contatosAdicionais", list);
-            }}
-            options={[{ value: "E-mail", label: "E-mail" }, { value: "Telefone", label: "Telefone" }]}
-          />
+        <div className="flex items-center gap-1.5 mb-3 select-none">
+          <span className="text-sm font-semibold text-gray-700">Outros Contatos</span>
+          <FieldTooltip text="Além do contato principal, você também pode adicionar outros contatos opcionais" />
         </div>
 
-        {cont.tipo === "E-mail" ? (
-          <div className="md:col-span-4">
-            <FloatInput label="E-mail" required value={cont.email} onChange={(v) => {
-              const list = data.contatosAdicionais.map((c, i) => i === index ? { ...c, email: v } : c);
-              handleFieldChange("contatosAdicionais", list);
-            }} />
-          </div>
-        ) : (
-          <div className="md:col-span-4">
-            <FloatInput label="Número" required placeholder="(00) 00000-0000" value={cont.telefone} onChange={(v) => {
-              const list = data.contatosAdicionais.map((c, i) => i === index ? { ...c, telefone: aplicarMascaraTelefone(v) } : c);
-              handleFieldChange("contatosAdicionais", list);
-            }} maxLength={15} />
-          </div>
-        )}
+        <DynamicListWrapper
+          title=""
+          items={data.contatosAdicionais || []}
+          behavior="zero-or-more"
+          variant="plain"
+          addButtonLabel="Adicionar Contato"
+          onAddItem={() => {
+            const novo: ContatoAdicional = { id: String(Date.now()), tipo: "E-mail", email: "", telefone: "", observacao: "" };
+            handleFieldChange("contatosAdicionais", [...(data.contatosAdicionais || []), novo]);
+          }}
+          onRemoveItem={(index: number) => {
+            const list = data.contatosAdicionais.filter((_, i) => i !== index);
+            handleFieldChange("contatosAdicionais", list);
+          }}
+        >
+          {(cont: ContatoAdicional, index: number) => (
+            <div key={cont.id} className="grid grid-cols-1 md:grid-cols-12 gap-4 items-start relative animate-in slide-in-from-top-2 duration-150 w-full mb-4">
+              <div className="md:col-span-2">
+                <FloatSelect
+                  label="Tipo"
+                  required
+                  value={cont.tipo}
+                  onChange={(v) => {
+                    const list = data.contatosAdicionais.map((c, i) => i === index ? { ...c, tipo: v as "E-mail" | "Telefone", email: "", telefone: "" } : c);
+                    handleFieldChange("contatosAdicionais", list);
+                  }}
+                  options={[{ value: "E-mail", label: "E-mail" }, { value: "Telefone", label: "Telefone" }]}
+                />
+              </div>
 
-        <div className="md:col-span-6">
-          <div className="relative border border-gray-300 rounded-md p-3 bg-white">
-            <label className="block text-[10px] text-gray-400 font-medium mb-1">Observação</label>
-            <textarea
-              value={cont.observacao || ""}
-              onChange={(e) => {
-                const list = data.contatosAdicionais.map((c, i) => i === index ? { ...c, observacao: e.target.value.slice(0, 1500) } : c);
-                handleFieldChange("contatosAdicionais", list);
-              }}
-              rows={3}
-              className="w-full bg-transparent text-sm text-gray-800 outline-none resize-none"
-            />
-            <div className="text-right text-xs text-gray-400 mt-1">{(cont.observacao || "").length}/1500</div>
-          </div>
-        </div>
+              {cont.tipo === "E-mail" ? (
+                <div className="md:col-span-4">
+                  <FloatInput label="E-mail" required value={cont.email} onChange={(v) => {
+                    const list = data.contatosAdicionais.map((c, i) => i === index ? { ...c, email: v } : c);
+                    handleFieldChange("contatosAdicionais", list);
+                  }} />
+                </div>
+              ) : (
+                <div className="md:col-span-4">
+                  <FloatInput label="Número" required placeholder="(00) 00000-0000" value={cont.telefone} onChange={(v) => {
+                    const list = data.contatosAdicionais.map((c, i) => i === index ? { ...c, telefone: aplicarMascaraTelefone(v) } : c);
+                    handleFieldChange("contatosAdicionais", list);
+                  }} maxLength={15} />
+                </div>
+              )}
+
+              <div className="md:col-span-6">
+                <div className="relative border border-gray-300 rounded-md p-3 bg-white">
+                  <label className="block text-[10px] text-gray-400 font-medium mb-1">Observação</label>
+                  <textarea
+                    value={cont.observacao || ""}
+                    onChange={(e) => {
+                      const list = data.contatosAdicionais.map((c, i) => i === index ? { ...c, observacao: e.target.value.slice(0, 1500) } : c);
+                      handleFieldChange("contatosAdicionais", list);
+                    }}
+                    rows={3}
+                    className="w-full bg-transparent text-sm text-gray-800 outline-none resize-none"
+                  />
+                  <div className="text-right text-xs text-gray-400 mt-1">{(cont.observacao || "").length}/1500</div>
+                </div>
+              </div>
+            </div>
+          )}
+        </DynamicListWrapper>
       </div>
-    )}
-  </DynamicListWrapper>
-</div>
     </div>
   );
 }
@@ -1819,10 +1819,10 @@ export function BlocoContatoFields({
 interface SelectedChipsContainerProps {
   title: string;
   // 💡 Estendemos o item para opcionalmente receber uma lista de sub-itens (como faixas etárias)
-  items: Array<{ 
-    id: string | number; 
-    label: string; 
-    subItems?: string[]; 
+  items: Array<{
+    id: string | number;
+    label: string;
+    subItems?: string[];
   }>;
   onRemoveItem: (id: any) => void;
   emptyText?: string;
@@ -1855,22 +1855,22 @@ export function SelectedChipsContainer({
             <div
               key={item.id}
               // 💡 Ajustado para flex-col se houver sub-itens, permitindo que a lista quebre para baixo perfeitamente
-className="flex flex-col bg-white border border-gray-200 rounded-xl p-2.5 min-w-[180px] shadow-sm transition hover:border-gray-300 relative group"            >
+              className="flex flex-col bg-white border border-gray-200 rounded-xl p-2.5 min-w-[180px] shadow-sm transition hover:border-gray-300 relative group"            >
               {/* Topo do Card: Título da Espécie e Botão de Remover */}
-<div className="flex items-center justify-between gap-4 w-full mb-1">
-  <span className="text-sm font-bold text-[#1A7A3C]">{item.label}</span>
+              <div className="flex items-center justify-between gap-4 w-full mb-1">
+                <span className="text-sm font-bold text-[#1A7A3C]">{item.label}</span>
                 <button
                   type="button"
                   onClick={() => onRemoveItem(item.id)}
-className="text-gray-400 hover:text-red-500 transition-colors p-0.5 rounded-md hover:bg-gray-50 cursor-pointer"                >
+                  className="text-gray-400 hover:text-red-500 transition-colors p-0.5 rounded-md hover:bg-gray-50 cursor-pointer"                >
                   <X size={16} />
                 </button>
               </div>
 
               {/* 💡 Lista de Faixas Etárias (Aparece apenas se existirem subItems) */}
               {item.subItems && item.subItems.length > 0 && (
-<ul className="flex flex-col gap-1 text-xs text-gray-600 font-medium list-disc pl-4">
-  {item.subItems.map((sub, idx) => (
+                <ul className="flex flex-col gap-1 text-xs text-gray-600 font-medium list-disc pl-4">
+                  {item.subItems.map((sub, idx) => (
                     <li key={idx} className="marker:text-gray-400">
                       {sub}
                     </li>
@@ -1900,7 +1900,7 @@ export const NUCLEOS_MOCK = [
 // COMPONENTE: NucleoInput
 // ==========================================================
 export function NucleoInput({ value, onChange, onEyeClick, required = false }: DomainInputProps) {
-  
+
   // Encontra a entidade selecionada para carregar e exibir o código no campo extra
   const entidadeSelecionada = NUCLEOS_MOCK.find((x) => x.nome === value || x.codigo === value);
 
@@ -1908,7 +1908,7 @@ export function NucleoInput({ value, onChange, onEyeClick, required = false }: D
     <div className="flex flex-col gap-3 w-full">
       {/* Se houver valor selecionado, vira grid de 2 colunas para colocar o código + olhinho do lado */}
       <div className={value ? "grid grid-cols-1 md:grid-cols-2 gap-4 items-center w-full" : "w-full"}>
-        
+
         <EntitySearchInput
           label="Núcleo de Produção"
           placeholder="Buscar por nome ou código"
@@ -1938,7 +1938,7 @@ export function NucleoInput({ value, onChange, onEyeClick, required = false }: D
                 label="Código do Núcleo"
                 required={required}
                 value={entidadeSelecionada.codigo}
-                onChange={() => {}}
+                onChange={() => { }}
                 disabled
                 className="w-full"
               />
@@ -1980,14 +1980,14 @@ export const MedicoVeterinarioInput: React.FC<MedicoVeterinarioInputProps> = ({
   required = false,
   data = VETERINARIOS_MOCK,
 }) => {
-  
+
   // Encontra a entidade selecionada no array para capturar o CPF
   const entidadeSelecionada = data.find((item) => item.nome === value);
 
   return (
     /* 💡 Grid Inteligente: Se houver valor selecionado, vira 2 colunas horizontais, senão fica 1 coluna full */
     <div className={`grid grid-cols-1 ${value && entidadeSelecionada ? "md:grid-cols-2" : "w-full"} gap-4 items-end w-full`}>
-      
+
       {/* Coluna 1: Barra de Busca Principal */}
       <div className="w-full">
         <EntitySearchInput
@@ -2002,7 +2002,7 @@ export const MedicoVeterinarioInput: React.FC<MedicoVeterinarioInputProps> = ({
             { label: "Nome", key: "nome" },
             { label: "CPF", key: "cpf" },
           ]}
-          icon={<img src={Icons.iconeProfissionalAnimalUrl} alt="Médico Veterinário" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}              
+          icon={<img src={Icons.iconeProfissionalAnimalUrl} alt="Médico Veterinário" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}
           title="Buscar Médico Veterinário"
           subtitle="Busque por um médico veterinário cadastrado no sistema:"
           onChange={onChange}
@@ -2018,7 +2018,7 @@ export const MedicoVeterinarioInput: React.FC<MedicoVeterinarioInputProps> = ({
               label="CPF do Veterinário"
               required={required}
               value={entidadeSelecionada.cpf}
-              onChange={() => {}}
+              onChange={() => { }}
               disabled
               className="w-full"
             />
@@ -2060,14 +2060,14 @@ export const VacinadorBruceloseInput: React.FC<VacinadorBruceloseInputProps> = (
   required = false,
   data = VACINADORES_BRUCELOSE_MOCK,
 }) => {
-  
+
   // Encontra a entidade selecionada no array para capturar o CPF/Documento
   const entidadeSelecionada = data.find((item) => item.nome === value);
 
   return (
     /* 💡 Grid Inteligente: Se houver valor selecionado, vira 2 colunas horizontais, senão fica 1 coluna full */
     <div className={`grid grid-cols-1 ${value && entidadeSelecionada ? "md:grid-cols-2" : "w-full"} gap-4 items-end w-full`}>
-      
+
       {/* Coluna 1: Barra de Busca Principal */}
       <div className="w-full">
         <EntitySearchInput
@@ -2098,7 +2098,7 @@ export const VacinadorBruceloseInput: React.FC<VacinadorBruceloseInputProps> = (
               label="CPF do Vacinador"
               required={required}
               value={entidadeSelecionada.documento}
-              onChange={() => {}}
+              onChange={() => { }}
               disabled
               className="w-full"
             />
@@ -2142,14 +2142,14 @@ export const ProfissionalAnimalInput: React.FC<ProfissionalAreaAnimalInputProps>
   required = false,
   data = PROFISSIONAIS_AREA_ANIMAL_MOCK,
 }) => {
-  
+
   // Encontra a entidade selecionada no array para capturar o CPF (chave 'documento')
   const entidadeSelecionada = data.find((item) => item.nome === value);
 
   return (
     /* 💡 Grid Inteligente: Se houver valor selecionado, vira 2 colunas horizontais, senão fica 1 coluna full */
     <div className={`grid grid-cols-1 ${value && entidadeSelecionada ? "md:grid-cols-2" : "w-full"} gap-4 items-end w-full`}>
-      
+
       {/* Coluna 1: Barra de Busca Principal */}
       <div className="w-full">
         <EntitySearchInput
@@ -2164,7 +2164,7 @@ export const ProfissionalAnimalInput: React.FC<ProfissionalAreaAnimalInputProps>
             { label: "Nome", key: "nome" },
             { label: "CPF", key: "documento" },
           ]}
-          icon={<img src={Icons.iconeProfissionalAnimalUrl} alt="Profissional da Área Animal" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}              
+          icon={<img src={Icons.iconeProfissionalAnimalUrl} alt="Profissional da Área Animal" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}
           title="Buscar Profissional Responsável"
           subtitle="Busque por um profissional da área animal cadastrado:"
           onChange={onChange}
@@ -2180,7 +2180,7 @@ export const ProfissionalAnimalInput: React.FC<ProfissionalAreaAnimalInputProps>
               label="CPF do Profissional"
               required={required}
               value={entidadeSelecionada.documento} // Mapeado para utilizar a chave 'documento' do mock
-              onChange={() => {}}
+              onChange={() => { }}
               disabled
               className="w-full"
             />
@@ -2213,14 +2213,14 @@ interface PessoaFisicaInputProps {
   data?: any[];
 }
 
-export function PessoaFisicaInput({ 
-  value, 
-  onChange, 
-  onEyeClick, 
-  required = false, 
+export function PessoaFisicaInput({
+  value,
+  onChange,
+  onEyeClick,
+  required = false,
   disabled = false,
   error = false,
-  data = PESSOAS_FISICAS_MOCK 
+  data = PESSOAS_FISICAS_MOCK
 }: PessoaFisicaInputProps) {
 
   // Encontra a entidade selecionada para exibir no campo reboque se necessário
@@ -2236,7 +2236,7 @@ export function PessoaFisicaInput({
     <div className="flex flex-col gap-3 w-full">
       {/* 💡 Grid Inteligente: Vira 2 colunas se tiver valor selecionado, senão fica 1 coluna full */}
       <div className={value && entidadeSelecionada ? "grid grid-cols-1 md:grid-cols-2 gap-4 items-center w-full" : "w-full"}>
-        
+
         {/* Coluna 1: Input de Busca com Modal Acoplado */}
         <div className="w-full">
           <EntitySearchInput
@@ -2244,20 +2244,20 @@ export function PessoaFisicaInput({
             placeholder="Buscar por nome ou CPF."
             required={required}
             disabled={disabled}
-              
+
             error={error}
             value={entidadeSelecionada?.nome || ""} // Exibe o nome amigável no input principal
             data={data}
-            
+
             // Configurações do Cabeçalho e comportamento do Modal
             title="Buscar Pessoa Física"
             subtitle="Busque por uma pessoa física cadstrada:"
-          icon={<UserRound size={18} />}
+            icon={<UserRound size={18} />}
             columns={colunasModal}
             searchKeys={["nome", "documento"]}
             searchPlaceholder="Buscar por nome ou CPF..."
             confirmLabel="Confirmar"
-            
+
             onChange={onChange}
           />
         </div>
@@ -2270,7 +2270,7 @@ export function PessoaFisicaInput({
                 label="CPF"
                 required={required}
                 value={entidadeSelecionada.documento}
-                onChange={() => {}}
+                onChange={() => { }}
                 disabled
                 className="w-full"
               />
@@ -2283,6 +2283,105 @@ export function PessoaFisicaInput({
   );
 }
 
+
+
+// ─── MOCK DE EXEMPLO ──────────────────────────────────────────────────────────
+export const PESSOAS_JURIDICAS_MOCK = [
+  { id: 1, nome: "Agropecuária Vale Verde Ltda", documento: "12.345.678/0001-90" },
+  { id: 2, nome: "Nutrição Animal Planalto S.A.", documento: "98.765.432/0001-10" },
+  { id: 3, nome: "Cooperativa de Produtores Unidos", documento: "55.444.333/0002-22" },
+];
+
+interface PessoaJuridicaInputProps {
+  value: string;
+  onChange: (entidade: any) => void;
+  onEyeClick?: () => void;
+  required?: boolean;
+  disabled?: boolean;
+  error?: boolean;
+  data?: any[];
+}
+
+export function PessoaJuridicaInput({
+  value,
+  onChange,
+  onEyeClick,
+  required = false,
+  disabled = false,
+  error = false,
+  data = PESSOAS_JURIDICAS_MOCK,
+}: PessoaJuridicaInputProps) {
+
+  // Encontra a empresa selecionada para exibir no campo reboque
+  const entidadeSelecionada = data.find(
+    (x) => x.nome === value || x.documento === value
+  );
+
+  // Colunas parametrizadas para Pessoa Jurídica (Razão Social/Nome e CNPJ)
+  const colunasModal = [
+    { label: "Razão Social / Nome", key: "nome" },
+    { label: "CNPJ", key: "documento" },
+  ];
+
+  return (
+    <div className="flex flex-col gap-3 w-full">
+      {/* 💡 Grid Inteligente: Vira 2 colunas se tiver valor selecionado, senão fica 1 coluna full */}
+      <div
+        className={
+          value && entidadeSelecionada
+            ? "grid grid-cols-1 md:grid-cols-2 gap-4 items-center w-full"
+            : "w-full"
+        }
+      >
+        {/* Coluna 1: Input de Busca com Modal Acoplado */}
+        <div className="w-full">
+          <EntitySearchInput
+            label="Pessoa Jurídica"
+            placeholder="Buscar por nome ou CNPJ."
+            required={required}
+            disabled={disabled}
+            error={error}
+            value={entidadeSelecionada?.nome || ""} // Exibe o nome amigável no input principal
+            data={data}
+
+            // Configurações do Cabeçalho e comportamento do Modal
+            title="Buscar Pessoa Jurídica"
+            subtitle="Busque por uma pessoa jurídica cadastrada:"
+            icon={
+              Icons.iconeUnidadeAdministrativaUrl ? (
+                <img src={Icons.iconePessoaJuridicaUrl} alt="Pessoa Juridica" className="w-5 h-5 object-contain" />
+              ) : undefined
+            }
+            columns={colunasModal}
+            searchKeys={["nome", "documento"]}
+            searchPlaceholder="Buscar por razão social ou CNPJ..."
+            confirmLabel="Confirmar"
+            onChange={onChange}
+          />
+        </div>
+
+        {/* Coluna 2: Campo Extra reboque: CNPJ fixo (Apenas se houver seleção) */}
+        {value && entidadeSelecionada && (
+          <div className="flex items-center gap-2 animate-fadeIn w-full">
+            <div className="flex-1">
+              <FloatInput
+                label="CNPJ"
+                required={required}
+                value={entidadeSelecionada.documento}
+                onChange={() => { }}
+                disabled
+                className="w-full"
+              />
+            </div>
+            <EyeAction onClick={onEyeClick} />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+
 // ==========================================================
 // COMPONENTE DE BUSCA DE UNIDADE ADMINISTRATIVA (US064)
 // ==========================================================
@@ -2293,7 +2392,7 @@ const UNIDADES_ADMINISTRATIVAS_DATA = [
   { id: 4, nome: "Escritório Local de Juiz de Fora" },
 ];
 export function UnidadeAdministrativaInput({ value, onChange, onEyeClick, required = false }: DomainInputProps) {
-  
+
   // Procura a unidade selecionada pelo nome ou id para manter o estado síncrono
   const entidadeSelecionada = UNIDADES_ADMINISTRATIVAS_DATA.find(
     (x) => x.nome === value || String(x.id) === String(value)
@@ -2308,7 +2407,7 @@ export function UnidadeAdministrativaInput({ value, onChange, onEyeClick, requir
     <div className="flex flex-col gap-3 w-full">
       {/* 💡 Se houver valor selecionado, o grid ganha 2 colunas para acomodar o botão visualizador ao lado */}
       <div className={value ? "grid grid-cols-1 md:grid-cols-2 gap-4 items-center w-full" : "w-full"}>
-        
+
         {/* Usando o EntitySearchInput padrão do seu arquivo */}
         <EntitySearchInput
           label="Unidade Administrativa"
@@ -2316,7 +2415,7 @@ export function UnidadeAdministrativaInput({ value, onChange, onEyeClick, requir
           required={required}
           value={entidadeSelecionada?.nome || ""} // Nome amigável no input
           data={UNIDADES_ADMINISTRATIVAS_DATA}     // Base de dados mockada
-          
+
           title="Buscar Unidade Administrativa"
           subtitle="Busque por uma unidade administrativa cadastrada no sistema:"
           icon={
@@ -2328,7 +2427,7 @@ export function UnidadeAdministrativaInput({ value, onChange, onEyeClick, requir
           searchKeys={["nome"]}
           searchPlaceholder="Digite o nome para pesquisar..."
           confirmLabel="Confirmar"
-          
+
           onChange={(unidadeSelecionada) => {
             // Retorna o objeto completo selecionado para a página
             onChange(unidadeSelecionada);
@@ -2377,14 +2476,14 @@ export const ResponsavelTecnicoInput: React.FC<ResponsavelTecnicoInputProps> = (
   required = false,
   data = RESPONSAVEIS_TECNICOS_MOCK,
 }) => {
-  
+
   // Encontra a entidade selecionada no array para capturar o Documento (CPF)
   const entidadeSelecionada = data.find((item) => item.nome === value);
 
   return (
     /* 💡 Grid Inteligente: Se houver valor selecionado, vira 2 colunas horizontais, senão fica 1 coluna full */
     <div className={`grid grid-cols-1 ${value && entidadeSelecionada ? "md:grid-cols-2" : "w-full"} gap-4 items-end w-full`}>
-      
+
       {/* Coluna 1: Barra de Busca Principal */}
       <div className="w-full">
         <EntitySearchInput
@@ -2399,7 +2498,7 @@ export const ResponsavelTecnicoInput: React.FC<ResponsavelTecnicoInputProps> = (
             { label: "Nome", key: "nome" },
             { label: "CPF", key: "documento" },
           ]}
-          icon={<UserRoundCheck size={18} color={GREEN} className="mr-2 -ml-1 flex-shrink-0" />}              
+          icon={<UserRoundCheck size={18} color={GREEN} className="mr-2 -ml-1 flex-shrink-0" />}
           title="Buscar Responsável Técnico"
           subtitle="Busque por um profissional responsável técnico cadastrado:"
           onChange={onChange}
@@ -2415,7 +2514,7 @@ export const ResponsavelTecnicoInput: React.FC<ResponsavelTecnicoInputProps> = (
               label="CPF do Responsável"
               required={required}
               value={entidadeSelecionada.documento} // 💡 Mapeado para .documento conforme seu mock
-              onChange={() => {}}
+              onChange={() => { }}
               disabled
               className="w-full"
             />
@@ -2460,14 +2559,14 @@ export const CertificadoraInput: React.FC<CertificadoraInputProps> = ({
   required = false,
   data = CERTIFICADORAS_INPUT_MOCK,
 }) => {
-  
+
   // Encontra a entidade selecionada no array para capturar as informações adicionais (ex: Proprietário ou Status)
   const entidadeSelecionada = data.find((item) => item.nome === value);
 
   return (
     /* 💡 Grid Inteligente: Se houver valor selecionado, vira 2 colunas horizontais, senão fica 1 coluna full */
     <div className={`grid grid-cols-1 ${value && entidadeSelecionada ? "md:grid-cols-2" : "w-full"} gap-4 items-end w-full`}>
-      
+
       {/* Coluna 1: Barra de Busca Principal */}
       <div className="w-full">
         <EntitySearchInput
@@ -2480,13 +2579,13 @@ export const CertificadoraInput: React.FC<CertificadoraInputProps> = ({
           searchKeys={["nome", "proprietario"]}
           columns={[
             { label: "Nome", key: "nome" },
-         
+
           ]}
           icon={
             Icons.iconeUnidadeAdministrativaUrl ? (
               <img src={Icons.iconeCertificadoraUrl} alt="Certificadora SISBOV" className="w-5 h-5 object-contain" />
             ) : undefined
-          }            
+          }
           title="Buscar Certificadora SISBOV"
           subtitle="Busque por uma certificadora cadastrada no sistema:"
           onChange={onChange}
@@ -2497,7 +2596,7 @@ export const CertificadoraInput: React.FC<CertificadoraInputProps> = ({
       {/* Coluna 2: Informação complementar (Proprietário/CNPJ) e Botão Olho lado a lado */}
       {value && entidadeSelecionada && (
         <div className="flex items-center gap-2 animate-fadeIn w-full">
-         
+
           <EyeAction onClick={onEyeClick} />
         </div>
       )}

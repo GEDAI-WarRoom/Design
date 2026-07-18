@@ -34,6 +34,14 @@ import { EditarRevendedoraAgropecuarioPage } from "./pages/Geral/RevendedoraAgro
 import { AdicionarRevendedoraAgropecuarioPage } from "./pages/Geral/RevendedoraAgropecuaria/AdicionarRevendedoraAgropecuaria";
 import { AeroportoPorto } from "./pages/Geral/AeroportoPorto/AeroportoPorto";
 import { AdicionarAeroportoPorto } from "./pages/Geral/AeroportoPorto/AdicionarAeroportoPorto";
+import { ClassificacaoSanitariaEstadoPage } from "./pages/Geral/ClassificacaoSanitariaEstado/ClassificacaoSanitariaEstado";
+import { AdicionarClassificacaoSanitariaEstadoPage } from "./pages/Geral/ClassificacaoSanitariaEstado/AdicionarClassificacaoSanitariaEstado";
+import { VisualizarClassificacaoSanitariaEstadoPage } from "./pages/Geral/ClassificacaoSanitariaEstado/VisualizarClassificacaoSanitariaEstado";
+import { EditarClassificacaoSanitariaEstadoPage } from "./pages/Geral/ClassificacaoSanitariaEstado/EditarClassificacaoSanitariaEstado";
+import { InstituicaoEnsinoPesquisa } from "./pages/Geral/InstituiçãoEnsinoPesquisa/InstituiçãoEnsinoPesquisa";
+import { AdicionarInstituicaoEnsinoPesquisaPage } from "./pages/Geral/InstituiçãoEnsinoPesquisa/AdicionarInstituiçãoEnsinoPesquisa";
+import { VisualizarInstituicaoEnsinoPesquisaPage } from "./pages/Geral/InstituiçãoEnsinoPesquisa/VisualizarInstituicaoEnsinoPesquisa";
+import { EditarInstituicaoEnsinoPesquisaPage } from "./pages/Geral/InstituiçãoEnsinoPesquisa/EditarInstituicaoEnsinoPesquisa";
 
 // ANIMAL
 import { CertificadoraSISBOVPage } from "./pages/Animal/CertificadoraSISBOV/CertificadoraSISBOV";
@@ -53,6 +61,8 @@ import { EstabelecimentoAgroindustrialSIEMGPage } from "./pages/Animal/Estabelec
 import { AdicionarEstabelecimentoAgroindustrialSIEMGPage } from "./pages/Animal/EstabelecimentoAgroindustrialSIEMG/AdicionarEstabelecimentoAgroindustrialSIEMG";
 import { VisualizarEstabelecimentoAgroindustrialSIEMGPage } from "./pages/Animal/EstabelecimentoAgroindustrialSIEMG/VisualizarEstabelecimentoAgroindustrialSIEMG";
 import { PassaporteEquestrePage } from "./pages/Animal/PassaporteEquestre/PassaporteEquestre";
+import { AdicionarPassaporteEquestrePage } from "./pages/Animal/PassaporteEquestre/AdicionarPassaporteEquestre";
+import { VisualizarPassaporteEquestrePage } from "./pages/Animal/PassaporteEquestre/VisualizarPassaporteEquestre";
 import { EstabelecimentoEventoPecuarioPage } from "./pages/Animal/EstabelecimentoEventoPecuario/EstabelecimentoEventoPecuario";
 import { AdicionarEstabelecimentoEventoPecuarioPage } from "./pages/Animal/EstabelecimentoEventoPecuario/AdicionarEstabelecimentoEventoPecuario";
 import { IntegradoraCooperativaPage } from "./pages/Animal/IntegradoraCooperativa/IntegradoraCooperativa";
@@ -70,6 +80,8 @@ import { LocalRealizacaoExamePage } from "./pages/Animal/LocalRealizacaoExame/Lo
 import { AdicionarLocalRealizacaoExamePage } from "./pages/Animal/LocalRealizacaoExame/AdicionarLocalRealizacaoExame";
 import { VisualizarLocalRealizacaoExamePage } from "./pages/Animal/LocalRealizacaoExame/VisualizarLocalRealizacaoExame";
 import { EditarLocalRealizacaoExamePage } from "./pages/Animal/LocalRealizacaoExame/EditarLocalRealizacaoExame";
+import { TipoVeiculoPage } from "./pages/Animal/TipoVeiculo/TipoVeiculo";
+import { AdicionarTipoVeiculoPage } from "./pages/Animal/TipoVeiculo/AdicionarTipoVeiculo";
 
 // VEGETAL
 import { UnidadeConsolidacaoPage } from "./pages/Vegetal/UnidadeConsolidacao/UnidadeConsolidacao";
@@ -81,7 +93,6 @@ import { AdicionarPragaPage } from "./pages/Vegetal/Praga/AdicionarPraga";
 import { ProfissionalVegetalPage } from "./pages/Vegetal/ProfissionalVegetal/ProfissionalVegetal";
 import { AdicionarProfissionalVegetalPage } from "./pages/Vegetal/ProfissionalVegetal/AdicionarProfissionalVegetal";
 import { VisualizarEstabelecimentoAgroindustrialPOVPage } from "./pages/Vegetal/EstabelecimentoAgroindustrialPOV/VisualizarEstabelecimentoAgroindustrialPOV";
-import { VisualizarInstituicaoEnsinoPesquisaPage } from "./pages/Geral/InstituicaoEnsinoPesquisa/VisualizarInstituicaoEnsinoPesquisa";
 
 // VACINAÇÃO
 import { LaboratorioPage } from "./pages/Vacinacao/Laboratorio/Laboratorio";
@@ -112,6 +123,14 @@ import { EditarTipoInsumoExamePage } from "./pages/Vacinacao/TipoInsumoExame/Edi
 //ARRECADACAO
 import { ValorIndicePage } from "./pages/Arrecadacao/ValorIndice/ValorIndice";
 import { AdicionarValorIndicePage } from "./pages/Arrecadacao/ValorIndice/AdicionarValorIndice";
+import { FundoArrecadacaoPage } from "./pages/Arrecadacao/FundoArrecadacao/FundoArrecadacao";
+import {
+  AdicionarFundoArrecadacaoPage,
+  EditarFundoArrecadacaoPage,
+  VisualizarFundoArrecadacaoPage,
+} from "./pages/Arrecadacao/FundoArrecadacao/FundoArrecadacaoDetalhe";
+import { ItemReceitaPage } from "./pages/Arrecadacao/ItemReceita/ItemReceita";
+import { AdicionarItemReceitaPage } from "./pages/Arrecadacao/ItemReceita/AdicionarItemReceita";
 
 // GTA
 import { AdicionarDistribuicaoFormulariosGta } from "./pages/GTA/DistribuicaoFormulariosGta/AdicionarDistribuicaoFormulariosGta";
@@ -141,6 +160,10 @@ import { EditarPapelPage } from "./pages/Controle/Papeis/EditarPapel";
 export type Screen =
   | "login"
   | "dashboard"
+  | "classificacao-sanitaria-estado"
+  | "adicionar-classificacao-sanitaria-estado"
+  | "visualizar-classificacao-sanitaria-estado"
+  | "editar-classificacao-sanitaria-estado"
   | "pessoa-fisica"
   | "adicionar-pessoa-fisica"
   | "visualizar-pessoa-fisica"
@@ -169,6 +192,8 @@ export type Screen =
   | "visualizar-exploracao-pecuaria" // 🚀 Adicionado
   | "passaporte-equestre"
   | "adicionar-passaporte-equestre"
+  | "visualizar-passaporte-equestre"
+  | "editar-passaporte-equestre"
   | "laboratorio"
   | "adicionar-laboratorio"
   | "partilha-vacina"
@@ -216,7 +241,6 @@ export type Screen =
   | "visualizar-estabelecimento-poa"
   | "visualizar-agroindustrial-outras-inspecoes"
   | "visualizar-agroindustrial-pov"
-  | "visualizar-instituicao-ensino-pesquisa"
   | "distribuicao-formularios-gta"
   | "adicionar-distribuicao-formularios-gta"
   | "valor-indice"
@@ -259,8 +283,20 @@ export type Screen =
   | "adicionar-papeis"
   | "visualizar-papel"
   | "editar-papel"
+  | "instituicao-ensino-pesquisa"
+  | "adicionar-instituicao-ensino-pesquisa"
+  | "visualizar-instituicao-ensino-pesquisa"
+  | "editar-instituicao-ensino-pesquisa"
   | "isencao-taxa-gta"
-  | "adicionar-isencao-taxa-gta";
+  | "adicionar-isencao-taxa-gta"
+  | "fundo-arrecadacao"
+  | "adicionar-fundo-arrecadacao"
+  | "visualizar-fundo-arrecadacao"
+  | "editar-fundo-arrecadacao"
+  | "item-receita"
+  | "adicionar-item-receita"
+  | "tipo-veiculo"
+  | "adicionar-tipo-veiculo";
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>("login");
@@ -280,23 +316,45 @@ export default function App() {
 
   switch (screen) {
     case "login":
-      return (
-        <LoginPage onLogin={() => setScreen("dashboard")} />
-      );
+      return <LoginPage onLogin={() => setScreen("dashboard")} />;
     case "dashboard":
       return (
-        <DashboardPage
+        <DashboardPage onLogout={handleLogout} onNavigate={handleNavigate} />
+      );
+    case "classificacao-sanitaria-estado":
+      return (
+        <ClassificacaoSanitariaEstadoPage
           onLogout={handleLogout}
           onNavigate={handleNavigate}
+        />
+      );
+    case "adicionar-classificacao-sanitaria-estado":
+      return (
+        <AdicionarClassificacaoSanitariaEstadoPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "visualizar-classificacao-sanitaria-estado":
+      return (
+        <VisualizarClassificacaoSanitariaEstadoPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
+        />
+      );
+    case "editar-classificacao-sanitaria-estado":
+      return (
+        <EditarClassificacaoSanitariaEstadoPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
         />
       );
 
     case "pessoa-fisica":
       return (
-        <PessoaFisicaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <PessoaFisicaPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "adicionar-pessoa-fisica":
       return (
@@ -359,10 +417,7 @@ export default function App() {
       );
     case "produto":
       return (
-        <ProdutoPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <ProdutoPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "adicionar-produto":
       return (
@@ -415,10 +470,7 @@ export default function App() {
       );
     case "receita":
       return (
-        <ReceitaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <ReceitaPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "adicionar-receita":
       return (
@@ -477,10 +529,7 @@ export default function App() {
 
     case "laboratorio":
       return (
-        <LaboratorioPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <LaboratorioPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "adicionar-laboratorio":
       return (
@@ -591,12 +640,7 @@ export default function App() {
         />
       );
     case "doenca":
-      return (
-        <DoencaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <DoencaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-doenca":
       return (
         <AdicionarDoencaPage
@@ -676,10 +720,7 @@ export default function App() {
 
     case "vacinador":
       return (
-        <VacinadorPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <VacinadorPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
 
     case "adicionar-vacinador":
@@ -721,10 +762,7 @@ export default function App() {
       );
     case "usuarios":
       return (
-        <UsuariosPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <UsuariosPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "adicionar-usuario":
       return (
@@ -757,10 +795,7 @@ export default function App() {
       );
     case "especie":
       return (
-        <EspeciePage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <EspeciePage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "adicionar-especie":
       return (
@@ -884,14 +919,6 @@ export default function App() {
           dados={screenData}
         />
       );
-    case "visualizar-instituicao-ensino-pesquisa":
-      return (
-        <VisualizarInstituicaoEnsinoPesquisaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-          dados={screenData}
-        />
-      );
     case "passaporte-equestre":
       return (
         <PassaporteEquestrePage
@@ -899,16 +926,67 @@ export default function App() {
           onNavigate={handleNavigate}
         />
       );
-    case "valor-indice":
+    case "adicionar-passaporte-equestre":
       return (
-        <ValorIndicePage
+        <AdicionarPassaporteEquestrePage
           onLogout={handleLogout}
           onNavigate={handleNavigate}
         />
       );
+    case "visualizar-passaporte-equestre":
+      return (
+        <VisualizarPassaporteEquestrePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
+        />
+      );
+    case "editar-passaporte-equestre":
+      return (
+        <AdicionarPassaporteEquestrePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
+          modo="editar"
+        />
+      );
+    case "valor-indice":
+      return (
+        <ValorIndicePage onLogout={handleLogout} onNavigate={handleNavigate} />
+      );
     case "adicionar-valor-indice":
       return (
         <AdicionarValorIndicePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "fundo-arrecadacao":
+      return (
+        <FundoArrecadacaoPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "adicionar-fundo-arrecadacao":
+      return (
+        <AdicionarFundoArrecadacaoPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "visualizar-fundo-arrecadacao":
+      return (
+        <VisualizarFundoArrecadacaoPage
+          dados={screenData}
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "editar-fundo-arrecadacao":
+      return (
+        <EditarFundoArrecadacaoPage
+          dados={screenData}
           onLogout={handleLogout}
           onNavigate={handleNavigate}
         />
@@ -932,10 +1010,7 @@ export default function App() {
       );
     case "aeroporto-porto":
       return (
-        <AeroportoPorto
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <AeroportoPorto onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "adicionar-aeroporto-porto":
       return (
@@ -1103,10 +1178,7 @@ export default function App() {
 
     case "cultura":
       return (
-        <CulturaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <CulturaPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
 
     case "adicionar-cultura":
@@ -1118,12 +1190,7 @@ export default function App() {
       );
 
     case "praga":
-      return (
-        <PragaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <PragaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 
     case "adicionar-praga":
       return (
@@ -1165,12 +1232,7 @@ export default function App() {
         />
       );
     case "papeis":
-      return (
-        <PapeisPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <PapeisPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 
     case "adicionar-papeis":
       return (
@@ -1188,7 +1250,18 @@ export default function App() {
       );
     case "editar-papel":
       return (
-        <EditarPapelPage
+        <EditarPapelPage onLogout={handleLogout} onNavigate={handleNavigate} />
+      );
+    case "instituicao-ensino-pesquisa":
+      return (
+        <InstituicaoEnsinoPesquisa
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "adicionar-instituicao-ensino-pesquisa":
+      return (
+        <AdicionarInstituicaoEnsinoPesquisaPage
           onLogout={handleLogout}
           onNavigate={handleNavigate}
         />
@@ -1207,12 +1280,49 @@ export default function App() {
           onNavigate={handleNavigate}
         />
       );
-    default:
+    case "item-receita":
       return (
-        <DashboardPage
+        <ItemReceitaPage onLogout={handleLogout} onNavigate={handleNavigate} />
+      );
+    case "tipo-veiculo":
+      return (
+        <TipoVeiculoPage onLogout={handleLogout} onNavigate={handleNavigate} />
+      );
+    case "adicionar-item-receita":
+      return (
+        <AdicionarItemReceitaPage
           onLogout={handleLogout}
           onNavigate={handleNavigate}
         />
+      );
+    case "adicionar-tipo-veiculo":
+      return (
+        <AdicionarTipoVeiculoPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+
+    case "visualizar-instituicao-ensino-pesquisa":
+      return (
+        <VisualizarInstituicaoEnsinoPesquisaPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          instituicao={screenData}
+        />
+      );
+    case "editar-instituicao-ensino-pesquisa":
+      return (
+        <EditarInstituicaoEnsinoPesquisaPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          instituicao={screenData}
+        />
+      );
+
+    default:
+      return (
+        <DashboardPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
   }
 }

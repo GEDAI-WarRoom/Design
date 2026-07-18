@@ -7,10 +7,9 @@ import {
   Info,
   Download,
   Calendar,
-  X,
-  Dna,
   Camera,
-  CreditCard,
+  Pencil,
+  CreditCard
 } from "lucide-react";
 
 // 1. Importações Oficiais do System
@@ -22,11 +21,10 @@ import {
   UploadField,
 } from "../../../components/ui/FormKit";
 import {
-  EntitySearchInput,
-  ProdutorInput,
-  EstabelecimentoAgropecuarioInput,
-  ExploracaoPecuariaInput,
-} from "../../../components/ui/EntitySearch";
+  PassaporteEquestreRegistro,
+  listarPassaportesEquestres,
+  obterPassaporteEquestre,
+} from "./passaporteEquestreData";
 
 // 2. Importação das Imagens de Guia
 import imgLadoDireito from "./imgs/lado_direito.png";
@@ -89,7 +87,7 @@ const VIEWS: ViewConfig[] = [
   },
   {
     id: "rosto",
-    label: "Rosto",
+    label: "Face",
     guideHint: "Aproxime a foto focando nos detalhes da cabeça e focinho",
     guideImage: imgRostoFocinho,
   },
@@ -166,102 +164,49 @@ function SubGrupo({
 interface PageProps {
   onLogout?: () => void;
   onNavigate: (screen: string, data?: any) => void;
+  dados?: Partial<PassaporteEquestreRegistro>;
 }
 
 export function VisualizarPassaporteEquestrePage({
   onLogout,
   onNavigate,
+  dados,
 }: PageProps) {
-  // Valores Mockados e Desabilitados nos mesmos estados originais
-  const [nomeAnimal] = useState("Vento Divino");
-  const [codigoMicrochip] = useState("981023000123456");
-  const [dataMicrochip] = useState("12/10/2024");
-  const [sexoAnimal] = useState("macho");
-  const [dataNascimento] = useState("05/04/2019");
-
-  // Mock de Espécie e Raça
-  const [especie] = useState({ id: 1, nome: "Equino" });
-  const [raca] = useState({ id: 1, nome: "Mangalarga Marchador" });
-
-  // Mock dos Dados da Exploração
-  const [produtor, setProdutor] = useState<any | null>({
-    nome: "José Alencar Ramos",
-    documento: "123.456.789-00"
-  });
-  const [estabelecimento, setEstabelecimento] = useState<any | null>({
-    nome: "Fazenda Bela Vista",
-    codigo: "3106200"
-  });
-  const [exploracaoPecuaria, setExploracaoPecuaria] = useState<any | null>({
-    codigo: "EXP-992-B"
-  });
-
-  // Exames Mockados
-  const [nomeAnemia] = useState("exame_anemia_2026.pdf");
-  const [descricaoAnemia] = useState("Exame negativo de AIE dentro da validade");
-  const [dataEmissaoAnemia] = useState("2026-02-10");
-  const [dataVencimentoAnemia] = useState("2026-08-10");
-
-  const [nomeMormo] = useState("exame_mormo_2026.pdf");
-  const [descricaoMormo] = useState("Exame de mormo realizado via ELISA negativo");
-  const [dataEmissaoMormo] = useState("2026-02-10");
-  const [dataVencimentoMormo] = useState("2026-08-10");
-
-  // Atestados Mockados
-  const [nomeInfluenza] = useState("atestado_influenza_2026.pdf");
-  const [descricaoInfluenza] = useState("Vacina anual contra Influenza aplicada");
-  const [dataInfluenza] = useState("2026-01-15");
-
-  const [nomeAntirrabica] = useState("atestado_antirrabica_2026.pdf");
-  const [descricaoAntirrabica] = useState("Vacina antirrábica obrigatória aplicada");
-  const [dataAntirrabica] = useState("2026-01-15");
-
-  const [observacoesGerais] = useState(
-    "Animal sem restrições sanitárias. Cicatriz na paleta direita devidamente descrita nos marcadores da resenha gráfica."
-  );
+  const registro =
+    (dados?.id ? obterPassaporteEquestre(dados.id) : undefined) ??
+    (dados as PassaporteEquestreRegistro | undefined) ??
+    listarPassaportesEquestres()[0];
+  const nomeAnimal = registro.nomeEquino;
+  const { codigoMicrochip, dataMicrochip, sexoAnimal, dataNascimento } = registro;
+  const { especie, raca, produtor, estabelecimento, exploracaoPecuaria } = registro;
+  const nomeAnemia = registro.exames.aie.fileName;
+  const descricaoAnemia = registro.exames.aie.descricao;
+  const dataEmissaoAnemia = registro.exames.aie.emissao;
+  const dataVencimentoAnemia = registro.exames.aie.vencimento ?? "";
+  const nomeMormo = registro.exames.mormo?.fileName ?? "";
+  const descricaoMormo = registro.exames.mormo?.descricao ?? "";
+  const dataEmissaoMormo = registro.exames.mormo?.emissao ?? "";
+  const dataVencimentoMormo = registro.exames.mormo?.vencimento ?? "";
+  const nomeInfluenza = registro.atestados.influenza.fileName;
+  const descricaoInfluenza = registro.atestados.influenza.descricao;
+  const dataInfluenza = registro.atestados.influenza.emissao;
+  const nomeAntirrabica = registro.atestados.antirrabica?.fileName ?? "";
+  const descricaoAntirrabica = registro.atestados.antirrabica?.descricao ?? "";
+  const dataAntirrabica = registro.atestados.antirrabica?.emissao ?? "";
+  const observacoesGerais = registro.observacoesGerais;
 
   const [activeViewId, setActiveViewId] = useState<ViewId>("lado_direito");
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Pré-carregando todas as visualizações com as IMAGENS DE REFERÊNCIA originais para servir como ilustração
-  const [allViews] = useState<Record<ViewId, ViewState>>({
-    lado_direito: {
-      photo: imgLadoDireito,
-      markers: [
-        { id: "m1", x: 45, y: 35, number: 1, description: "Redemoinho de pelos na tábua do pescoço" },
-        { id: "m2", x: 62, y: 55, number: 2, description: "Cicatriz linear na altura da paleta" },
-      ],
-    },
-    lado_esquerdo: {
-      photo: imgLadoEsquerdo,
-      markers: [],
-    },
-    frente: {
-      photo: imgFrente,
-      markers: [],
-    },
-    rosto: {
-      photo: imgRostoFocinho,
-      markers: [{ id: "m3", x: 50, y: 45, number: 1, description: "Estrela na testa / Filete despigmentado" }],
-    },
-    pescoco_inferior: {
-      photo: imgPescocoInferior,
-      markers: [],
-    },
-    traseiro: {
-      photo: imgTraseiro,
-      markers: [],
-    },
-  });
+  const allViews = registro.views as Record<ViewId, ViewState>;
 
   const activeView = VIEWS.find((v) => v.id === activeViewId)!;
   const current = allViews[activeViewId];
 
-  const handlePagamento = () => {
-    // Insira aqui o redirecionamento ou lógica para o gateway de pagamento
-    alert("Redirecionando para a tela de pagamento do passaporte...");
-    onNavigate("pagamento"); 
-  };
+  const diasAteVencimento = Math.ceil(
+    (new Date(`${registro.dataValidade}T23:59:59`).getTime() - Date.now()) /
+    (1000 * 60 * 60 * 24),
+  );
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
@@ -290,33 +235,60 @@ export function VisualizarPassaporteEquestrePage({
                 Visualização de Passaporte Equestre
               </h1>
             </div>
-          
+            <button
+              type="button"
+              onClick={() => onNavigate("editar-passaporte-equestre", registro)}
+              className="flex items-center justify-center gap-2 px-5 h-10 rounded-md text-white text-sm font-semibold transition hover:opacity-90"
+              style={{ backgroundColor: GREEN }}
+            >
+
+              {registro.pago ? "Alterar Situação" : "Editar"}
+            </button>
           </div>
         </div>
 
         {/* Alerta Informativo de Pagamento Pendente */}
-        <div className="w-full bg-[#FFF9E6] border border-[#FFE0B2] rounded-xl p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-2">
-          <div className="flex items-start gap-3">
-            <div className="text-[#F57C00] flex-shrink-0 mt-0.5">
-              <Info size={20} className="stroke-[2.5]" />
+        {!registro.pago && (
+          <div className="w-full bg-[#FFF9E6] border border-[#FFE0B2] rounded-xl p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-2">
+            <div className="flex items-start gap-3">
+              <div className="text-[#F57C00] flex-shrink-0 mt-0.5">
+                <Info size={20} className="stroke-[2.5]" />
+              </div>
+              <div className="space-y-0.5">
+                <span className="text-sm font-bold text-gray-800">Pagamento Pendente</span>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  Para concluir o processo de emissão do passaporte efetue o pagamento da taxa.
+                </p>
+              </div>
             </div>
-            <div className="space-y-0.5">
-              <span className="text-sm font-bold text-gray-800">Pagamento Pendente</span>
-              <p className="text-sm text-gray-600 leading-relaxed">
-                Para concluir o processo de emissão do passaporte efetue o pagamento da taxa.
-              </p>
-            </div>
+            {/* Botão de Pagamento Dentro do Alerta */}
+            <button
+              type="button"
+              className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#F57C00] hover:bg-[#E65100] text-white rounded-lg text-xs font-bold transition self-start sm:self-center shrink-0"
+            >
+              <CreditCard size={15} />
+              Pagar Taxa
+            </button>
           </div>
-          {/* Botão de Pagamento Dentro do Alerta */}
-          <button
-            type="button"
-            onClick={handlePagamento}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#F57C00] hover:bg-[#E65100] text-white rounded-lg text-xs font-bold transition self-start sm:self-center shrink-0"
-          >
-            <CreditCard size={15} />
-            Pagar Taxa
-          </button>
-        </div>
+        )}
+
+        {registro.situacao === "Ativo" && (
+          <div className="w-full bg-green-50 border border-green-200 rounded-xl p-5 flex items-start gap-3">
+            <Info size={20} className="text-[#1A7A3C] mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-gray-700 leading-relaxed">
+              Este passaporte está válido. O equídeo possui isenção de GTA e o produtor precisa apenas emitir a notificação de trânsito do animal.
+            </p>
+          </div>
+        )}
+
+        {registro.situacao === "Ativo" && diasAteVencimento >= 0 && diasAteVencimento <= 30 && (
+          <div className="w-full bg-amber-50 border border-amber-200 rounded-xl p-5 flex items-start gap-3">
+            <Info size={20} className="text-amber-700 mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-gray-700 leading-relaxed">
+              Passaporte próximo do vencimento. O produtor deve ser notificado com o código do microchip e a data de validade.
+            </p>
+          </div>
+        )}
 
         {/* 1. Informações do Animal */}
         <Section title="Informações Básicas">
@@ -326,14 +298,14 @@ export function VisualizarPassaporteEquestrePage({
                 label="Nome do Animal"
                 required
                 value={nomeAnimal}
-                onChange={() => {}}
+                onChange={() => { }}
                 disabled
               />
               <FloatInput
                 label="Código do Microchip"
                 required
                 value={codigoMicrochip}
-                onChange={() => {}}
+                onChange={() => { }}
                 disabled
               />
               <FloatInput
@@ -341,17 +313,17 @@ export function VisualizarPassaporteEquestrePage({
                 icon={<Calendar className="w-5 h-5 object-contain" />}
                 required
                 value={dataMicrochip}
-                onChange={() => {}}
+                onChange={() => { }}
                 disabled
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               <FloatSelect
                 label="Sexo do Animal"
                 required
                 value={sexoAnimal}
-                onChange={() => {}}
+                onChange={() => { }}
                 options={[
                   { value: "macho", label: "Macho" },
                   { value: "fêmea", label: "Fêmea" },
@@ -363,7 +335,16 @@ export function VisualizarPassaporteEquestrePage({
                 icon={<Calendar className="w-5 h-5 object-contain" />}
                 required
                 value={dataNascimento}
-                onChange={() => {}}
+                onChange={() => { }}
+                disabled
+              />
+              <FloatInput
+                label="Data de Validade do Passaporte"
+                type="date"
+                icon={<Calendar className="w-5 h-5 object-contain" />}
+                required
+                value={registro.dataValidade}
+                onChange={() => { }}
                 disabled
               />
             </div>
@@ -374,7 +355,7 @@ export function VisualizarPassaporteEquestrePage({
                 label="Espécie"
                 required
                 value={especie ? especie.nome : "Não informada"}
-                onChange={() => {}}
+                onChange={() => { }}
                 disabled
               />
 
@@ -383,7 +364,7 @@ export function VisualizarPassaporteEquestrePage({
                 label="Raça"
                 required
                 value={raca ? raca.nome : "Não informada"}
-                onChange={() => {}}
+                onChange={() => { }}
                 disabled
               />
             </div>
@@ -393,14 +374,14 @@ export function VisualizarPassaporteEquestrePage({
         {/* 1.1 Dados da Exploração (Modo Visualização usando FloatInput desabilitado) */}
         <Section title="Dados da Exploração">
           <div className="flex flex-col gap-5">
-            
+
             {/* Bloco do Produtor */}
             <div className="flex gap-3 items-end w-full">
               <div className="flex-1">
                 <FloatInput
                   label="Produtor"
                   value={produtor ? `${produtor.nome} - CPF/CNPJ: ${produtor.documento}` : "Não informado"}
-                  onChange={() => {}}
+                  onChange={() => { }}
                   disabled
                 />
               </div>
@@ -443,7 +424,7 @@ export function VisualizarPassaporteEquestrePage({
                   <FloatInput
                     label="Estabelecimento Agropecuário"
                     value={estabelecimento ? `${estabelecimento.nome} - Código: ${estabelecimento.codigo}` : "Não informado"}
-                    onChange={() => {}}
+                    onChange={() => { }}
                     disabled
                   />
                 </div>
@@ -486,7 +467,7 @@ export function VisualizarPassaporteEquestrePage({
                   <FloatInput
                     label="Exploração Pecuária"
                     value={exploracaoPecuaria ? `Código: ${exploracaoPecuaria.codigo} - Espécie: ${especie?.nome || "Equídeos"}` : "Não informado"}
-                    onChange={() => {}}
+                    onChange={() => { }}
                     disabled
                   />
                 </div>
@@ -540,7 +521,7 @@ export function VisualizarPassaporteEquestrePage({
                       label="Documento"
                       required
                       fileName={nomeAnemia}
-                      onSelectFile={() => {}}
+                      onSelectFile={() => { }}
                       disabled
                     />
                     <div className="flex-1 animate-fadeIn">
@@ -548,7 +529,7 @@ export function VisualizarPassaporteEquestrePage({
                         label="Descrição"
                         required
                         value={descricaoAnemia}
-                        onChange={() => {}}
+                        onChange={() => { }}
                         disabled
                       />
                     </div>
@@ -570,7 +551,7 @@ export function VisualizarPassaporteEquestrePage({
                       icon={<Calendar className="w-5 h-5 object-contain" />}
                       required
                       value={dataEmissaoAnemia}
-                      onChange={() => {}}
+                      onChange={() => { }}
                       disabled
                     />
                     <FloatInput
@@ -579,7 +560,7 @@ export function VisualizarPassaporteEquestrePage({
                       icon={<Calendar className="w-5 h-5 object-contain" />}
                       required
                       value={dataVencimentoAnemia}
-                      onChange={() => {}}
+                      onChange={() => { }}
                       disabled
                     />
                   </div>
@@ -588,63 +569,65 @@ export function VisualizarPassaporteEquestrePage({
             </div>
 
             {/* Bloco 2: Exame de Mormo */}
-            <div
-              className="border border-gray-200 border-l-4 rounded-r-xl rounded-l-md p-5 bg-white shadow-sm"
-              style={{ borderLeftColor: GREEN }}
-            >
-              <SubGrupo titulo="Exame de Mormo">
-                <div className="flex flex-col gap-4 mt-1">
-                  <div className="flex gap-3 items-start w-full">
-                    <UploadField
-                      label="Documento"
-                      required
-                      fileName={nomeMormo}
-                      onSelectFile={() => {}}
-                      disabled
-                    />
-                    <div className="flex-1 animate-fadeIn">
-                      <FloatInput
-                        label="Descrição"
+            {nomeMormo && (
+              <div
+                className="border border-gray-200 border-l-4 rounded-r-xl rounded-l-md p-5 bg-white shadow-sm"
+                style={{ borderLeftColor: GREEN }}
+              >
+                <SubGrupo titulo="Exame de Mormo">
+                  <div className="flex flex-col gap-4 mt-1">
+                    <div className="flex gap-3 items-start w-full">
+                      <UploadField
+                        label="Documento"
                         required
-                        value={descricaoMormo}
-                        onChange={() => {}}
+                        fileName={nomeMormo}
+                        onSelectFile={() => { }}
+                        disabled
+                      />
+                      <div className="flex-1 animate-fadeIn">
+                        <FloatInput
+                          label="Descrição"
+                          required
+                          value={descricaoMormo}
+                          onChange={() => { }}
+                          disabled
+                        />
+                      </div>
+                      <div className="h-12 flex items-center">
+                        <button
+                          type="button"
+                          onClick={() => alert(`Fazendo download de: ${nomeMormo}`)}
+                          className="p-2.5 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"
+                        >
+                          <Download size={20} />
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <FloatInput
+                        label="Data de Emissão"
+                        type="date"
+                        icon={<Calendar className="w-5 h-5 object-contain" />}
+                        required
+                        value={dataEmissaoMormo}
+                        onChange={() => { }}
+                        disabled
+                      />
+                      <FloatInput
+                        label="Data de Vencimento"
+                        type="date"
+                        icon={<Calendar className="w-5 h-5 object-contain" />}
+                        required
+                        value={dataVencimentoMormo}
+                        onChange={() => { }}
                         disabled
                       />
                     </div>
-                    <div className="h-12 flex items-center">
-                      <button
-                        type="button"
-                        onClick={() => alert(`Fazendo download de: ${nomeMormo}`)}
-                        className="p-2.5 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"
-                      >
-                        <Download size={20} />
-                      </button>
-                    </div>
                   </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <FloatInput
-                      label="Data de Emissão"
-                      type="date"
-                      icon={<Calendar className="w-5 h-5 object-contain" />}
-                      required
-                      value={dataEmissaoMormo}
-                      onChange={() => {}}
-                      disabled
-                    />
-                    <FloatInput
-                      label="Data de Vencimento"
-                      type="date"
-                      icon={<Calendar className="w-5 h-5 object-contain" />}
-                      required
-                      value={dataVencimentoMormo}
-                      onChange={() => {}}
-                      disabled
-                    />
-                  </div>
-                </div>
-              </SubGrupo>
-            </div>
+                </SubGrupo>
+              </div>
+            )}
           </div>
         </Section>
 
@@ -663,7 +646,7 @@ export function VisualizarPassaporteEquestrePage({
                       label="Documento"
                       required
                       fileName={nomeInfluenza}
-                      onSelectFile={() => {}}
+                      onSelectFile={() => { }}
                       disabled
                     />
                     <div className="flex-1 animate-fadeIn">
@@ -671,7 +654,7 @@ export function VisualizarPassaporteEquestrePage({
                         label="Descrição"
                         required
                         value={descricaoInfluenza}
-                        onChange={() => {}}
+                        onChange={() => { }}
                         disabled
                       />
                     </div>
@@ -693,7 +676,7 @@ export function VisualizarPassaporteEquestrePage({
                       icon={<Calendar className="w-5 h-5 object-contain" />}
                       required
                       value={dataInfluenza}
-                      onChange={() => {}}
+                      onChange={() => { }}
                       disabled
                     />
                   </div>
@@ -702,54 +685,56 @@ export function VisualizarPassaporteEquestrePage({
             </div>
 
             {/* Bloco 4: Antirrábica */}
-            <div
-              className="border border-gray-200 border-l-4 rounded-r-xl rounded-l-md p-5 bg-white shadow-sm"
-              style={{ borderLeftColor: GREEN }}
-            >
-              <SubGrupo titulo="Atestado de Vacinação contra Antirrábica">
-                <div className="flex flex-col gap-4 mt-1">
-                  <div className="flex gap-3 items-start w-full">
-                    <UploadField
-                      label="Documento"
-                      required
-                      fileName={nomeAntirrabica}
-                      onSelectFile={() => {}}
-                      disabled
-                    />
-                    <div className="flex-1 animate-fadeIn">
-                      <FloatInput
-                        label="Descrição"
+            {nomeAntirrabica && (
+              <div
+                className="border border-gray-200 border-l-4 rounded-r-xl rounded-l-md p-5 bg-white shadow-sm"
+                style={{ borderLeftColor: GREEN }}
+              >
+                <SubGrupo titulo="Atestado de Vacinação contra Antirrábica">
+                  <div className="flex flex-col gap-4 mt-1">
+                    <div className="flex gap-3 items-start w-full">
+                      <UploadField
+                        label="Documento"
                         required
-                        value={descricaoAntirrabica}
-                        onChange={() => {}}
+                        fileName={nomeAntirrabica}
+                        onSelectFile={() => { }}
+                        disabled
+                      />
+                      <div className="flex-1 animate-fadeIn">
+                        <FloatInput
+                          label="Descrição"
+                          required
+                          value={descricaoAntirrabica}
+                          onChange={() => { }}
+                          disabled
+                        />
+                      </div>
+                      <div className="h-12 flex items-center">
+                        <button
+                          type="button"
+                          onClick={() => alert(`Fazendo download de: ${nomeAntirrabica}`)}
+                          className="p-2.5 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"
+                        >
+                          <Download size={20} />
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <FloatInput
+                        label="Data de Emissão"
+                        type="date"
+                        icon={<Calendar className="w-5 h-5 object-contain" />}
+                        required
+                        value={dataAntirrabica}
+                        onChange={() => { }}
                         disabled
                       />
                     </div>
-                    <div className="h-12 flex items-center">
-                      <button
-                        type="button"
-                        onClick={() => alert(`Fazendo download de: ${nomeAntirrabica}`)}
-                        className="p-2.5 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"
-                      >
-                        <Download size={20} />
-                      </button>
-                    </div>
                   </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <FloatInput
-                      label="Data de Vacinação"
-                      type="date"
-                      icon={<Calendar className="w-5 h-5 object-contain" />}
-                      required
-                      value={dataAntirrabica}
-                      onChange={() => {}}
-                      disabled
-                    />
-                  </div>
-                </div>
-              </SubGrupo>
-            </div>
+                </SubGrupo>
+              </div>
+            )}
           </div>
         </Section>
 
@@ -768,10 +753,9 @@ export function VisualizarPassaporteEquestrePage({
                     type="button"
                     onClick={() => setActiveViewId(v.id)}
                     className={`group flex flex-col sm:flex-row items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-bold rounded-lg transition-all flex-1 text-center sm:text-left
-                      ${
-                        isActive
-                          ? "bg-white text-[#1A7A3C] shadow-sm ring-1 ring-black/5"
-                          : "bg-green-50/40 text-gray-700 hover:bg-green-50 border border-transparent"
+                      ${isActive
+                        ? "bg-white text-[#1A7A3C] shadow-sm ring-1 ring-black/5"
+                        : "bg-green-50/40 text-gray-700 hover:bg-green-50 border border-transparent"
                       }`}
                   >
                     <div className="flex items-center gap-1.5">
@@ -872,7 +856,7 @@ export function VisualizarPassaporteEquestrePage({
                           <FloatInput
                             label={`Detalhes da característica do marcador nº ${m.number}`}
                             value={m.description}
-                            onChange={() => {}}
+                            onChange={() => { }}
                             disabled
                           />
                         </div>
@@ -956,9 +940,19 @@ export function VisualizarPassaporteEquestrePage({
           <LargeTextArea
             label="Observações Gerais do Passaporte"
             value={observacoesGerais}
-            onChange={() => {}}
+            onChange={() => { }}
             hasTooltip
             tooltipText="Observações e notas adicionais relativas ao passaporte."
+            disabled
+          />
+        </Section>
+
+        <Section title="Situação">
+          <FloatInput
+            label="Situação"
+            required
+            value={registro.situacao}
+            onChange={() => { }}
             disabled
           />
         </Section>
