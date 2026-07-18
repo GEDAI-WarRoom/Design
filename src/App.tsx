@@ -34,6 +34,10 @@ import { EditarRevendedoraAgropecuarioPage } from "./pages/Geral/RevendedoraAgro
 import { AdicionarRevendedoraAgropecuarioPage } from "./pages/Geral/RevendedoraAgropecuaria/AdicionarRevendedoraAgropecuaria";
 import { AeroportoPorto } from "./pages/Geral/AeroportoPorto/AeroportoPorto";
 import { AdicionarAeroportoPorto } from "./pages/Geral/AeroportoPorto/AdicionarAeroportoPorto";
+import { ClassificacaoSanitariaEstadoPage } from "./pages/Geral/ClassificacaoSanitariaEstado/ClassificacaoSanitariaEstado";
+import { AdicionarClassificacaoSanitariaEstadoPage } from "./pages/Geral/ClassificacaoSanitariaEstado/AdicionarClassificacaoSanitariaEstado";
+import { VisualizarClassificacaoSanitariaEstadoPage } from "./pages/Geral/ClassificacaoSanitariaEstado/VisualizarClassificacaoSanitariaEstado";
+import { EditarClassificacaoSanitariaEstadoPage } from "./pages/Geral/ClassificacaoSanitariaEstado/EditarClassificacaoSanitariaEstado";
 import { InstituicaoEnsinoPesquisa } from "./pages/Geral/InstituiçãoEnsinoPesquisa/InstituiçãoEnsinoPesquisa";
 import { AdicionarInstituicaoEnsinoPesquisaPage } from "./pages/Geral/InstituiçãoEnsinoPesquisa/AdicionarInstituiçãoEnsinoPesquisa";
 import { VisualizarInstituicaoEnsinoPesquisaPage } from "./pages/Geral/InstituiçãoEnsinoPesquisa/VisualizarInstituicaoEnsinoPesquisa";
@@ -72,6 +76,10 @@ import { RevendedoraAnimaisPage } from "./pages/Animal/RevendedoraAnimais/Revend
 import { AdicionarRevendedoraAnimaisPage } from "./pages/Animal/RevendedoraAnimais/AdicionarRevendedoraAnimais";
 import { VisualizarRevendedoraAnimaisPage } from "./pages/Animal/RevendedoraAnimais/VisualizarRevendedoraAnimais";
 import { VisualizarEstabelecimentoAgroindustrialOutrasInspecoesPage } from "./pages/Animal/EstabelecimentoAgroindustrialOutrasInspecoes/VisualizarEstabelecimentoAgroindustrialOutrasInspecoes";
+import { LocalRealizacaoExamePage } from "./pages/Animal/LocalRealizacaoExame/LocalRealizacaoExame";
+import { AdicionarLocalRealizacaoExamePage } from "./pages/Animal/LocalRealizacaoExame/AdicionarLocalRealizacaoExame";
+import { VisualizarLocalRealizacaoExamePage } from "./pages/Animal/LocalRealizacaoExame/VisualizarLocalRealizacaoExame";
+import { EditarLocalRealizacaoExamePage } from "./pages/Animal/LocalRealizacaoExame/EditarLocalRealizacaoExame";
 import { TipoVeiculoPage } from "./pages/Animal/TipoVeiculo/TipoVeiculo";
 import { AdicionarTipoVeiculoPage } from "./pages/Animal/TipoVeiculo/AdicionarTipoVeiculo";
 
@@ -152,6 +160,10 @@ import { EditarPapelPage } from "./pages/Controle/Papeis/EditarPapel";
 export type Screen =
   | "login"
   | "dashboard"
+  | "classificacao-sanitaria-estado"
+  | "adicionar-classificacao-sanitaria-estado"
+  | "visualizar-classificacao-sanitaria-estado"
+  | "editar-classificacao-sanitaria-estado"
   | "pessoa-fisica"
   | "adicionar-pessoa-fisica"
   | "visualizar-pessoa-fisica"
@@ -239,6 +251,10 @@ export type Screen =
   | "adicionar-registro-venda-gta-fisica"
   | "estabelecimento-evento-pecuario"
   | "adicionar-estabelecimento-evento-pecuario"
+  | "local-realizacao-exame"
+  | "adicionar-local-realizacao-exame"
+  | "visualizar-local-realizacao-exame"
+  | "editar-local-realizacao-exame"
   | "integradora-cooperativa"
   | "adicionar-integradora-cooperativa"
   | "visualizar-integradora-cooperativa"
@@ -304,6 +320,36 @@ export default function App() {
     case "dashboard":
       return (
         <DashboardPage onLogout={handleLogout} onNavigate={handleNavigate} />
+      );
+    case "classificacao-sanitaria-estado":
+      return (
+        <ClassificacaoSanitariaEstadoPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "adicionar-classificacao-sanitaria-estado":
+      return (
+        <AdicionarClassificacaoSanitariaEstadoPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "visualizar-classificacao-sanitaria-estado":
+      return (
+        <VisualizarClassificacaoSanitariaEstadoPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
+        />
+      );
+    case "editar-classificacao-sanitaria-estado":
+      return (
+        <EditarClassificacaoSanitariaEstadoPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
+        />
       );
 
     case "pessoa-fisica":
@@ -1000,6 +1046,37 @@ export default function App() {
         <AdicionarEstabelecimentoEventoPecuarioPage
           onLogout={handleLogout}
           onNavigate={handleNavigate}
+        />
+      );
+
+    case "local-realizacao-exame":
+      return (
+        <LocalRealizacaoExamePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "adicionar-local-realizacao-exame":
+      return (
+        <AdicionarLocalRealizacaoExamePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "visualizar-local-realizacao-exame":
+      return (
+        <VisualizarLocalRealizacaoExamePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
+        />
+      );
+    case "editar-local-realizacao-exame":
+      return (
+        <EditarLocalRealizacaoExamePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
         />
       );
 

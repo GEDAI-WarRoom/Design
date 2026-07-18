@@ -1,43 +1,34 @@
 import {
+  BadgePercent,
+  BriefcaseBusiness,
+  Calendar,
+  ChartColumn,
+  ClipboardList,
+  Dna,
+  DollarSign,
+  FileText,
   FlaskConical,
+  Globe,
+  Landmark,
+  ListTree,
+  Map,
+  MapPinned,
   PackageMinus,
   PackagePlus,
-  Gift,
-  FilePlus2,
-  CalendarDays,
-  ShieldCheck,
-  ClipboardCheck,
-  Activity,
-  UserCheck,
-  Globe,
-  Syringe,
-  Map,
-  Home,
-  User,
-  Building2,
-  Package,
-  Briefcase,
-  Network,
-  Ruler,
-  Store,
-  ShoppingCart,
-  Dna,
-  Layers,
-  FileText,
-  DollarSign,
   ReceiptText,
-  ClipboardList,
-  TowerControl,
-  Receipt,
-  Calendar,
-  Group,
   Route,
-  Users,
+  Ruler,
   Settings,
-  BriefcaseBusiness,
+  ShieldCheck,
+  ShoppingCart,
+  Store,
+  Syringe,
+  TestTube,
+  TowerControl,
   Truck,
-  Landmark,
-  BadgePercent,
+  User,
+  Users,
+  Wallet,
 } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import * as Icons from "../imports/icons";
@@ -72,6 +63,11 @@ export const cadastrosCategories: MenuCategory[] = [
         label: "Divisão Municipal",
         route: "divisao-municipal",
         icon: <Map size={16} />,
+      },
+      {
+        label: "Classificação Sanitária por Estado",
+        route: "classificacao-sanitaria-estado",
+        icon: <ShieldCheck size={16} />,
       },
       {
         label: "Estabelecimento Agropecuário",
@@ -219,6 +215,7 @@ export const cadastrosCategories: MenuCategory[] = [
         route: "estabelecimento-evento-pecuario",
         icon: <Calendar size={16} />,
       },
+
       {
         label: "Integradora Cooperativa",
         route: "integradora-cooperativa",
@@ -405,7 +402,7 @@ export const secondaryCategories: MenuCategory[] = [
       {
         label: "Tipo de Insumo de Exame",
         route: "tipo-insumo-exame",
-        icon: <FileText size={16} />,
+        icon: <TestTube size={16} />,
       },
       {
         label: "Vacinador Contra Brucelose",
@@ -417,6 +414,11 @@ export const secondaryCategories: MenuCategory[] = [
             className="w-4 h-4"
           />
         ),
+      },
+      {
+        label: "Local de Realização de Exame",
+        route: "local-realizacao-exame",
+        icon: <MapPinned size={16} />,
       },
     ],
   },
@@ -484,8 +486,8 @@ export const secondaryCategories: MenuCategory[] = [
 
 export const thirdCategories: MenuCategory[] = [
   {
-    title: "Arrecadação", // Altere o título conforme o seu Figma
-    icon: <DollarSign size={28} color={GREEN} />, // Altere o ícone se precisar
+    title: "Arrecadação",
+    icon: <DollarSign size={28} color={GREEN} />,
     items: [
       {
         label: "Receita",
@@ -495,18 +497,17 @@ export const thirdCategories: MenuCategory[] = [
       {
         label: "Valor Por Índice",
         route: "valor-indice",
-        icon: <ReceiptText size={16} />,
+        icon: <ChartColumn size={16} />,
       },
       {
         label: "Fundo de Arrecadação",
         route: "fundo-arrecadacao",
-        icon: <DollarSign size={16} />,
+        icon: <Wallet size={16} />,
       },
-
       {
         label: "Item da Receita",
         route: "item-receita",
-        icon: <Package size={16} />,
+        icon: <ListTree size={16} />,
       },
     ],
   },
@@ -601,8 +602,8 @@ export function DashboardPage({ onLogout, onNavigate }: any) {
         </div>
 
         {/* Bloco de Cadastros (Exatamente como estava) */}
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-6">
+        <div className="flex flex-col bg-white rounded-xl shadow-sm p-6 mb-6 gap-6">
+          <h2 className="text-xl font-semibold text-gray-800">
             Cadastros
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -610,25 +611,19 @@ export function DashboardPage({ onLogout, onNavigate }: any) {
               <CategoryCard key={cat.title} cat={cat} onNavigate={onNavigate} />
             ))}
           </div>
-        </div>
-
-        {/* Bloco Secundário (Exatamente como estava, adicionado mb-6 para afastar o próximo) */}
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {secondaryCategories.map((cat) => (
               <CategoryCard key={cat.title} cat={cat} onNavigate={onNavigate} />
             ))}
           </div>
-        </div>
 
-        {/* 🚀 TERCEIRO BLOCO ADICIONADO */}
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {thirdCategories.map((cat) => (
               <CategoryCard key={cat.title} cat={cat} onNavigate={onNavigate} />
             ))}
           </div>
         </div>
+
 
         <div className="bg-white rounded-xl shadow-sm p-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
