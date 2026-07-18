@@ -1,43 +1,34 @@
 import {
+  BadgePercent,
+  BriefcaseBusiness,
+  Calendar,
+  ChartColumn,
+  ClipboardList,
+  Dna,
+  DollarSign,
+  FileText,
   FlaskConical,
+  Globe,
+  Landmark,
+  ListTree,
+  Map,
+  MapPinned,
   PackageMinus,
   PackagePlus,
-  Gift,
-  FilePlus2,
-  CalendarDays,
-  ShieldCheck,
-  ClipboardCheck,
-  Activity,
-  UserCheck,
-  Globe,
-  Syringe,
-  Map,
-  Home,
-  User,
-  Building2,
-  Package,
-  Briefcase,
-  Network,
-  Ruler,
-  Store,
-  ShoppingCart,
-  Dna,
-  Layers,
-  FileText,
-  DollarSign,
   ReceiptText,
-  ClipboardList,
-  TowerControl,
-  Receipt,
-  Calendar,
-  Group,
   Route,
-  Users,
+  Ruler,
   Settings,
-  BriefcaseBusiness,
+  ShieldCheck,
+  ShoppingCart,
+  Store,
+  Syringe,
+  TestTube,
+  TowerControl,
   Truck,
-  Landmark,
-  BadgePercent,
+  User,
+  Users,
+  Wallet,
 } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import * as Icons from "../imports/icons";
@@ -411,7 +402,7 @@ export const secondaryCategories: MenuCategory[] = [
       {
         label: "Tipo de Insumo de Exame",
         route: "tipo-insumo-exame",
-        icon: <FileText size={16} />,
+        icon: <TestTube size={16} />,
       },
       {
         label: "Vacinador Contra Brucelose",
@@ -427,7 +418,7 @@ export const secondaryCategories: MenuCategory[] = [
       {
         label: "Local de Realização de Exame",
         route: "local-realizacao-exame",
-        icon: <FlaskConical size={16} />,
+        icon: <MapPinned size={16} />,
       },
     ],
   },
@@ -495,8 +486,8 @@ export const secondaryCategories: MenuCategory[] = [
 
 export const thirdCategories: MenuCategory[] = [
   {
-    title: "Arrecadação", // Altere o título conforme o seu Figma
-    icon: <DollarSign size={28} color={GREEN} />, // Altere o ícone se precisar
+    title: "Arrecadação",
+    icon: <DollarSign size={28} color={GREEN} />,
     items: [
       {
         label: "Receita",
@@ -506,18 +497,17 @@ export const thirdCategories: MenuCategory[] = [
       {
         label: "Valor Por Índice",
         route: "valor-indice",
-        icon: <ReceiptText size={16} />,
+        icon: <ChartColumn size={16} />,
       },
       {
         label: "Fundo de Arrecadação",
         route: "fundo-arrecadacao",
-        icon: <DollarSign size={16} />,
+        icon: <Wallet size={16} />,
       },
-
       {
         label: "Item da Receita",
         route: "item-receita",
-        icon: <Package size={16} />,
+        icon: <ListTree size={16} />,
       },
     ],
   },
