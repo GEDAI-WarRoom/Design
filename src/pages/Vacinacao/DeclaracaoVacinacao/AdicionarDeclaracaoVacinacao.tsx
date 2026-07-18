@@ -5,22 +5,23 @@ import {
   ReceiptText,
   CheckCircle2,
   Info,
-  Calendar, 
-  FlaskConical, PlusCircle, ChevronUp, ChevronDown, Trash2, Receipt, Store, Check, RotateCcw  } from "lucide-react";
+  Calendar,
+  FlaskConical, PlusCircle, ChevronUp, ChevronDown, Trash2, Receipt, Store, Check, RotateCcw, Package
+} from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
-import { FloatInput, FloatSelect, SearchModal, CustomRadio, MultiSearchModal} from "../../../components/ui/FormKit";
-import { 
+import { FloatInput, FloatSelect, SearchModal, CustomRadio, MultiSearchModal } from "../../../components/ui/FormKit";
+import {
   EntitySearchInput,
-  DynamicListWrapper, 
-  VacinadorBruceloseInput, 
-  MedicoVeterinarioInput, 
-  NucleoInput, 
-  EstabelecimentoAgropecuarioInput, 
-  ProdutorInput, 
-  ExploracaoPecuariaInput , 
-  
+  DynamicListWrapper,
+  VacinadorBruceloseInput,
+  MedicoVeterinarioInput,
+  NucleoInput,
+  EstabelecimentoAgropecuarioInput,
+  ProdutorInput,
+  ExploracaoPecuariaInput,
+
 } from "../../../components/ui/EntitySearch";
-import { PieChart, Pie, Cell, Sector} from "recharts";
+import { PieChart, Pie, Cell, Sector } from "recharts";
 import iconeNotaFiscalUrl from "../../../imports/icons/Ícone=Nota Fiscal.png";
 
 
@@ -291,7 +292,7 @@ function DonutChart({ data, size = 110 }: { data: DoseCategory[]; size?: number 
   const total = data.reduce((s, d) => s + d.value, 0);
   const active = activeIndex !== null ? data[activeIndex] : null;
   const pct = active ? ((active.value / total) * 100).toFixed(1) : null;
-  
+
   const onEnter = useCallback((_: unknown, i: number) => setActiveIndex(i), []);
   const onLeave = useCallback(() => setActiveIndex(null), []);
 
@@ -299,17 +300,17 @@ function DonutChart({ data, size = 110 }: { data: DoseCategory[]; size?: number 
     <div className="relative flex-shrink-0 select-none" style={{ width: size, height: size }}>
       <PieChart width={size} height={size}>
         <Pie
-          data={data} 
-          cx={size / 2} 
+          data={data}
+          cx={size / 2}
           cy={size / 2}
           // Ajustado proporcionalmente para caber o anel de destaque externo dentro da área demarcada
-          innerRadius={Math.round(size * 0.26)} 
+          innerRadius={Math.round(size * 0.26)}
           outerRadius={Math.round(size * 0.36)}
-          startAngle={90} 
-          endAngle={-270} 
+          startAngle={90}
+          endAngle={-270}
           dataKey="value"
           paddingAngle={2}
-          activeIndex={activeIndex ?? undefined} 
+          activeIndex={activeIndex ?? undefined}
           activeShape={(props: Record<string, unknown>) => {
             const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } = props as {
               cx: number; cy: number; innerRadius: number; outerRadius: number;
@@ -318,38 +319,38 @@ function DonutChart({ data, size = 110 }: { data: DoseCategory[]; size?: number 
             return (
               <g>
                 {/* Fatia Principal com Opacidade Total */}
-                <Sector 
-                  cx={cx} 
-                  cy={cy} 
-                  innerRadius={innerRadius} 
+                <Sector
+                  cx={cx}
+                  cy={cy}
+                  innerRadius={innerRadius}
                   outerRadius={outerRadius}
-                  startAngle={startAngle} 
-                  endAngle={endAngle} 
-                  fill={fill} 
+                  startAngle={startAngle}
+                  endAngle={endAngle}
+                  fill={fill}
                 />
                 {/* Arco de Destaque Externo Espelhado da sua Imagem */}
-                <Sector 
-                  cx={cx} 
-                  cy={cy} 
-                  innerRadius={outerRadius + 2} 
+                <Sector
+                  cx={cx}
+                  cy={cy}
+                  innerRadius={outerRadius + 2}
                   outerRadius={outerRadius + 5}
-                  startAngle={startAngle} 
-                  endAngle={endAngle} 
-                  fill={fill} 
+                  startAngle={startAngle}
+                  endAngle={endAngle}
+                  fill={fill}
                   opacity={0.8}
                 />
               </g>
             );
           }}
-          onMouseEnter={onEnter} 
-          onMouseLeave={onLeave} 
+          onMouseEnter={onEnter}
+          onMouseLeave={onLeave}
           stroke="none"
         >
           {data.map((e, i) => (
-            <Cell 
-              key={i} 
-              fill={e.color} 
-              className="cursor-pointer transition-all duration-200 outline-none" 
+            <Cell
+              key={i}
+              fill={e.color}
+              className="cursor-pointer transition-all duration-200 outline-none"
             />
           ))}
         </Pie>
@@ -572,81 +573,81 @@ function TabelaFaixas({
   const mostraNaoVacinados = regime === "Vacina Oficial" || regime === "Primeira Dose";
   const colStatusLabel = mostraNaoVacinados ? "Não Vacinados" : "Já Vacinados";
 
-return (
-  <div className="w-full">
-    <h3 className="text-sm font-semibold text-gray-700 mb-2">{genero}</h3>
-    
-    {/* Contêiner Geral da Tabela */}
-    <div className="w-full border border-gray-100 rounded-lg overflow-hidden bg-white">
-      
-      {/* CADASTRANDO O CABEÇALHO COM GRID (4 colunas iguais) */}
-      <div className="grid grid-cols-4 bg-gray-50 border-b border-gray-100 items-center text-center">
-        <div className="px-4 py-3 font-semibold text-gray-600 text-xs sm:text-sm">Faixa Etária</div>
-        <div className="px-4 py-3 font-semibold text-gray-600 text-xs sm:text-sm">Existentes</div>
-        <div className="px-4 py-3 font-semibold text-gray-600 text-xs sm:text-sm truncate">{colStatusLabel}</div>
-        <div className="px-4 py-3 font-semibold text-gray-600 text-xs sm:text-sm">Vacinados</div>
-      </div>
+  return (
+    <div className="w-full">
+      <h3 className="text-sm font-semibold text-gray-700 mb-2">{genero}</h3>
 
-      {/* CADASTRANDO AS LINHAS COM GRID (Mesma estrutura de 4 colunas do cabeçalho) */}
-      <div className="flex flex-col divide-y divide-gray-50">
-        {faixas.map((f) => {
-          const existentes = genero === "Macho" ? f.machoExistentes : f.femeaExistentes;
-          return (
-            <div 
-              key={f.faixa} 
-              className="grid grid-cols-4 items-center text-center py-2.5 hover:bg-gray-50/30 transition-colors"
-            >
-              {/* Coluna 1: Faixa Etária */}
-              <div className="px-4 text-gray-600 font-medium text-sm truncate">{f.faixa}</div>
-              
-              {/* Coluna 2: Existentes */}
-              <div className="px-4 text-gray-500 text-base font-semibold">{existentes}</div>
-              
-              {/* Coluna 3: Não Vacinados / Status */}
-              <div className="px-4 text-gray-500 text-base font-semibold">{existentes}</div>
-              
-              {/* Coluna 4: Stepper Input de Vacinados */}
-              <div className="px-4 flex justify-center items-center">
-                <div className="flex items-center border border-gray-200 rounded-full bg-white shadow-sm overflow-hidden h-9 select-none">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const atual = Number(vacinados[f.faixa] || 0);
-                      if (atual > 0) onVacinadosChange(f.faixa, String(atual - 1));
-                    }}
-                    className="px-3 h-full text-gray-400 hover:bg-gray-50 hover:text-gray-600 transition-colors font-medium text-lg border-r border-gray-100"
-                  >
-                    −
-                  </button>
-                  
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    aria-label={`Animais vacinados — ${genero} — ${f.faixa}`}
-                    value={vacinados[f.faixa] ?? "0"}
-                    onChange={(e) => onVacinadosChange(f.faixa, e.target.value.replace(/\D/g, ""))}
-                    className="w-12 h-full text-center text-sm font-bold text-blue-600 focus:outline-none bg-transparent"
-                  />
+      {/* Contêiner Geral da Tabela */}
+      <div className="w-full border border-gray-100 rounded-lg overflow-hidden bg-white">
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const atual = Number(vacinados[f.faixa] || 0);
-                      if (atual < existentes) onVacinadosChange(f.faixa, String(atual + 1));
-                    }}
-                    className="px-3 h-full text-gray-400 hover:bg-gray-50 hover:text-gray-600 transition-colors font-medium text-lg border-l border-gray-100"
-                  >
-                    +
-                  </button>
+        {/* CADASTRANDO O CABEÇALHO COM GRID (4 colunas iguais) */}
+        <div className="grid grid-cols-4 bg-gray-50 border-b border-gray-100 items-center text-center">
+          <div className="px-4 py-3 font-semibold text-gray-600 text-xs sm:text-sm">Faixa Etária</div>
+          <div className="px-4 py-3 font-semibold text-gray-600 text-xs sm:text-sm">Existentes</div>
+          <div className="px-4 py-3 font-semibold text-gray-600 text-xs sm:text-sm truncate">{colStatusLabel}</div>
+          <div className="px-4 py-3 font-semibold text-gray-600 text-xs sm:text-sm">Vacinados</div>
+        </div>
+
+        {/* CADASTRANDO AS LINHAS COM GRID (Mesma estrutura de 4 colunas do cabeçalho) */}
+        <div className="flex flex-col divide-y divide-gray-50">
+          {faixas.map((f) => {
+            const existentes = genero === "Macho" ? f.machoExistentes : f.femeaExistentes;
+            return (
+              <div
+                key={f.faixa}
+                className="grid grid-cols-4 items-center text-center py-2.5 hover:bg-gray-50/30 transition-colors"
+              >
+                {/* Coluna 1: Faixa Etária */}
+                <div className="px-4 text-gray-600 font-medium text-sm truncate">{f.faixa}</div>
+
+                {/* Coluna 2: Existentes */}
+                <div className="px-4 text-gray-500 text-base font-semibold">{existentes}</div>
+
+                {/* Coluna 3: Não Vacinados / Status */}
+                <div className="px-4 text-gray-500 text-base font-semibold">{existentes}</div>
+
+                {/* Coluna 4: Stepper Input de Vacinados */}
+                <div className="px-4 flex justify-center items-center">
+                  <div className="flex items-center border border-gray-200 rounded-full bg-white shadow-sm overflow-hidden h-9 select-none">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const atual = Number(vacinados[f.faixa] || 0);
+                        if (atual > 0) onVacinadosChange(f.faixa, String(atual - 1));
+                      }}
+                      className="px-3 h-full text-gray-400 hover:bg-gray-50 hover:text-gray-600 transition-colors font-medium text-lg border-r border-gray-100"
+                    >
+                      −
+                    </button>
+
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      aria-label={`Animais vacinados — ${genero} — ${f.faixa}`}
+                      value={vacinados[f.faixa] ?? "0"}
+                      onChange={(e) => onVacinadosChange(f.faixa, e.target.value.replace(/\D/g, ""))}
+                      className="w-12 h-full text-center text-sm font-bold text-blue-600 focus:outline-none bg-transparent"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const atual = Number(vacinados[f.faixa] || 0);
+                        if (atual < existentes) onVacinadosChange(f.faixa, String(atual + 1));
+                      }}
+                      className="px-3 h-full text-gray-400 hover:bg-gray-50 hover:text-gray-600 transition-colors font-medium text-lg border-l border-gray-100"
+                    >
+                      +
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
 }
 
 function SubGrupo({ titulo, children, comDivisor = false }: { titulo: string; children: React.ReactNode; comDivisor?: boolean }) {
@@ -751,7 +752,7 @@ export function LoteCardItem({
   removeApresentacao,
   updateApresentacao,
 }: LoteCardItemProps) {
-  
+
   const totalDosesLote = lote.apresentacoes?.reduce((sum: number, ap: any) => {
     return sum + totalDosesApresentacao(ap.frascos, ap.dosesPorFrasco);
   }, 0) || 0;
@@ -771,7 +772,7 @@ export function LoteCardItem({
         />
 
         {fornecedorEhLaboratorio ? (
-          <FloatInput label="Laboratório" value={fornecedor?.nome || ""} onChange={() => {}} disabled />
+          <FloatInput label="Laboratório" value={fornecedor?.nome || ""} onChange={() => { }} disabled />
         ) : (
           <EntitySearchInput
             label="Laboratório"
@@ -796,12 +797,12 @@ export function LoteCardItem({
           data={DOENCAS_MOCK}
           searchKeys={["nome"]}
           columns={[{ label: "Nome da Doença", key: "nome" }]}
-          icon={<img src={Icons.iconeDoencaUrl} alt="Doença" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}              
+          icon={<img src={Icons.iconeDoencaUrl} alt="Doença" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}
           title="Buscar Doença"
           subtitle="Busque por uma doença cadastrada:"
           onChange={(ent) => updateLote(lote.uid, { doenca: ent, tipoVacina: "" })}
         />
-        
+
         {doencaTemTipo && (
           <FloatSelect
             label="Tipo de Vacina"
@@ -817,16 +818,16 @@ export function LoteCardItem({
           items={lote.apresentacoes || []}
           behavior="at-least-one"
           addButtonLabel="Adicionar Apresentação"
-          itemLabel="" 
+          itemLabel=""
           onAddItem={() => addApresentacao(lote.uid)}
           onRemoveItem={(i: number) => removeApresentacao(lote.uid, i)}
           variant="plain"
           showCounter={true}
-          smallCounter={true} 
+          smallCounter={true}
         >
           {(ap: any) => (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-center w-full">
-              
+
               <FloatInput
                 label="Nº de Doses por Frasco"
                 required
@@ -839,7 +840,7 @@ export function LoteCardItem({
                 required
                 disabled
                 value={String(totalDosesApresentacao(ap.frascos, ap.dosesPorFrasco) || "")}
-                onChange={() => {}}
+                onChange={() => { }}
               />
               <FloatInput
                 label="Validade"
@@ -856,7 +857,7 @@ export function LoteCardItem({
       </SubGrupo>
 
       <SubGrupo titulo="Total do Lote" comDivisor>
-        <FloatInput label="Total de Doses Adquiridas" required disabled value={String(totalDosesLote || "")} onChange={() => {}} className="md:w-1/2" />
+        <FloatInput label="Total de Doses Adquiridas" required disabled value={String(totalDosesLote || "")} onChange={() => { }} className="md:w-1/2" />
       </SubGrupo>
     </div>
   );
@@ -869,7 +870,7 @@ interface PageProps {
 }
 
 export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
- // ---- Informações Básicas ----
+  // ---- Informações Básicas ----
   const [produtor, setProdutor] = useState<any | null>(null);
   const [estabelecimento, setEstabelecimento] = useState<any | null>(null);
   const [exploracao, setExploracao] = useState<any | null>(null);
@@ -916,7 +917,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageP
 
   // 2. REGRAS DERIVADAS DA DOENÇA (useMemo movidos para o topo)
   const exigeNucleo = useMemo(() => {
-    return doenca?.exigeNucleo || false; 
+    return doenca?.exigeNucleo || false;
   }, [doenca]);
 
   const doencaExigeReceituario = useMemo(() => {
@@ -1027,7 +1028,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageP
     setSucesso(true);
   };
 
-  const err = (cond: boolean, customMessage?: string) => 
+  const err = (cond: boolean, customMessage?: string) =>
     (tentouSalvar && cond ? (customMessage || "Campo obrigatório.") : undefined);
 
   const onChangeProdutor = (ent: any) => {
@@ -1062,10 +1063,10 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageP
 
   const addApresentacao = (loteUid: string) =>
     setLotes((ls) => ls.map((l) => (l.uid === loteUid ? { ...l, apresentacoes: [...l.apresentacoes, novaApresentacao()] } : l)));
-    
+
   const removeApresentacao = (loteUid: string, index: number) =>
     setLotes((ls) => ls.map((l) => (l.uid === loteUid ? { ...l, apresentacoes: l.apresentacoes.filter((_: any, i: number) => i !== index) } : l)));
-    
+
   const updateApresentacao = (loteUid: string, apUid: string, patch: any) =>
     setLotes((ls) => ls.map((l) => (l.uid === loteUid
       ? { ...l, apresentacoes: l.apresentacoes.map((a: any) => (a.uid === apUid ? { ...a, ...patch } : a)) }
@@ -1082,7 +1083,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageP
           </button>
           <h1 className="text-2xl font-semibold text-gray-900">Declaração de Vacinação</h1>
         </div>
-        
+
         <div className="w-full bg-white border border-gray-100 rounded-lg p-5 shadow-sm flex items-center gap-3 mt-4 mb-6">
           <div className="text-gray-500 flex-shrink-0">
             <Info size={20} className="stroke-[2.5]" />
@@ -1153,549 +1154,570 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageP
           </div>
         </SectionCard>
 
-       {/* ============ INFORMAÇÕES DE VACINAÇÃO ============ */}
-      <SectionCard title="Informações de Vacinação">
-        {/* Trocamos 'grid' por 'flex flex-wrap' com gap-4 para permitir o deslocamento natural para a esquerda */}
-        <div className="flex flex-wrap gap-4 items-end w-full">
-          
-          {/* 1. Doença (Ocupa no mínimo 280px e cresce para preencher até 1/3 do espaço) */}
-          <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
-            <EntitySearchInput
-              label="Doença"
-              required
-              placeholder="Buscar por doença"
-              value={doenca ? doenca.nome : ""}
-              data={DOENCAS_MOCK}
-              searchKeys={["nome"]}
-              columns={[{ label: "Doença", key: "nome" }]}
-               icon={<img src={Icons.iconeDoencaUrl} alt="Doença" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}
-              title="Buscar Doença"
-              subtitle="Busque por uma doença cadastrada:"
-              onChange={onChangeDoenca}
-              error={err(!doenca)}
-            />
-          </div>
+        {/* ============ INFORMAÇÕES DE VACINAÇÃO ============ */}
+        <SectionCard title="Informações de Vacinação">
+          {/* Trocamos 'grid' por 'flex flex-wrap' com gap-4 para permitir o deslocamento natural para a esquerda */}
+          <div className="flex flex-wrap gap-4 items-end w-full">
 
-          {/* 2. Tipo de Vacina (SÓ É RENDERIZADO SE FOR VÁLIDO. Se sumir, os outros colam na esquerda) */}
-          {doenca && tipoVacinaDisponivel && (
+            {/* 1. Doença (Ocupa no mínimo 280px e cresce para preencher até 1/3 do espaço) */}
             <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
-              <FloatSelect
-                label="Tipo de Vacina" 
-                value={tipoVacina}
-                onChange={setTipoVacina}
-                options={(doenca?.tiposVacina ?? []).map((t: string) => ({ value: t, label: t }))}
-              />
-            </div>
-          )}
-
-          {/* 3. Tipo de Vacinação / Dose (Regime) */}
-          {doenca && (
-            <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
-              <FloatSelect
-                label={isBrucelose ? "Tipo de Vacinação" : "Tipo de Vacinação"}
+              <EntitySearchInput
+                label="Doença"
                 required
-                value={regime}
-                onChange={(v: string) => {
-                  setRegime(v);
-                  setVacinados(AGE_RANGES.map(() => ({ machos: 0, femeas: 0 })));
-                }}
-                options={opcoesRegime.map((o) => ({ value: o, label: o }))}
-                error={err(regime === "")}
+                placeholder="Buscar por doença"
+                value={doenca ? doenca.nome : ""}
+                data={DOENCAS_MOCK}
+                searchKeys={["nome"]}
+                columns={[{ label: "Doença", key: "nome" }]}
+                icon={<img src={Icons.iconeDoencaUrl} alt="Doença" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}
+                title="Buscar Doença"
+                subtitle="Busque por uma doença cadastrada:"
+                onChange={onChangeDoenca}
+                error={err(!doenca)}
               />
             </div>
-          )}
 
-          {/* 4. Data da Vacinação */}
-          <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
-            <FloatInput
-              label="Data da Vacinação"
-              required
-              type="date"
-              icon={<Calendar size={18} color={GREEN} />}
-              max={hoje}
-              value={dataVacinacao}
-              onChange={setDataVacinacao}
-              error={err(dataVacinacao === "") || (erroDataVac ? "Deve ser menor ou igual à data atual." : undefined)}
-            />
-          </div>
-
-          {/* 5. Data de Atestado de Vacinação */}
-          <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
-            <FloatInput
-              label="Data de Atestado de Vacinação"
-              required
-              type="date"
-              icon={<Calendar size={18} color={GREEN} />}
-              min={dataVacinacao || undefined}
-              max={hoje}
-              value={dataAtestado}
-              onChange={setDataAtestado}
-              error={err(dataAtestado === "") || (erroDataAtestado ? "Entre a Data de Vacinação e hoje." : undefined)}
-            />
-          </div>
-
-          {/* Médicos e Vacinadores ocupando a largura total restante */}
-          <div className="w-full mt-2">
-            <MedicoVeterinarioInput
-              value={veterinario ? veterinario.nome : ""}
-              required
-              onChange={(entidadeSelecionada) => setVeterinario(entidadeSelecionada)}
-              error={err(!veterinario)}
-              onEyeClick={() => {
-                if (veterinario?.cpf) alert(`Visualizar detalhes do veterinário CPF: ${veterinario.cpf}`);
-                else alert("Por favor, selecione um médico veterinário primeiro.");
-              }}
-            />
-          </div>
-
-          {isBrucelose && (
-            <div className="w-full mt-1">
-              <VacinadorBruceloseInput
-                value={vacinadorBrucelose ? vacinadorBrucelose.nome : ""}
-                disabled={!veterinario}
-                data={veterinario ? VACINADORES_MOCK.filter((v: any) => v.vetId === veterinario.id) : []} 
-                onChange={(entidadeSelecionada) => setVacinadorBrucelose(entidadeSelecionada)}
-                error={err(isBrucelose && !vacinadorBrucelose)}
-                onEyeClick={() => {
-                  if (vacinadorBrucelose?.documento) alert(`Visualizar detalhes do vacinador CPF: ${vacinadorBrucelose.documento}`);
-                  else alert("Por favor, selecione um vacinador primeiro.");
-                }}
-              />
-            </div>
-          )}
-
-          {isRaiva && (
-            <div className="w-full flex flex-col gap-2 mt-2  p-3 rounded-lg ">
-              <span className="text-xs font-semibold text-gray-700">
-                Observou mordidas de morcegos no rebanho recentemente? <span className="text-red-500">*</span>
-              </span>
-              <div className="flex items-center gap-6 mt-1">
-                <CustomRadio
-                  label="Sim"
-                  name="mordidaMorcego"
-                  checked={mordidaMorcego === "Sim"}
-                  onChange={() => setMordidaMorcego("Sim")}
-                  error={err(isRaiva && mordidaMorcego === "")}
-                />
-                <CustomRadio
-                  label="Não"
-                  name="mordidaMorcego"
-                  checked={mordidaMorcego === "Não"}
-                  onChange={() => setMordidaMorcego("Não")}
-                  error={err(isRaiva && mordidaMorcego === "")}
+            {/* 2. Tipo de Vacina (SÓ É RENDERIZADO SE FOR VÁLIDO. Se sumir, os outros colam na esquerda) */}
+            {doenca && tipoVacinaDisponivel && (
+              <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
+                <FloatSelect
+                  label="Tipo de Vacina"
+                  value={tipoVacina}
+                  onChange={setTipoVacina}
+                  options={(doenca?.tiposVacina ?? []).map((t: string) => ({ value: t, label: t }))}
                 />
               </div>
+            )}
+
+            {/* 3. Tipo de Vacinação / Dose (Regime) */}
+            {doenca && (
+              <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
+                <FloatSelect
+                  label={isBrucelose ? "Tipo de Vacinação" : "Tipo de Vacinação"}
+                  required
+                  value={regime}
+                  onChange={(v: string) => {
+                    setRegime(v);
+                    setVacinados(AGE_RANGES.map(() => ({ machos: 0, femeas: 0 })));
+                  }}
+                  options={opcoesRegime.map((o) => ({ value: o, label: o }))}
+                  error={err(regime === "")}
+                />
+              </div>
+            )}
+
+            {/* 4. Data da Vacinação */}
+            <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
+              <FloatInput
+                label="Data da Vacinação"
+                required
+                type="date"
+                icon={<Calendar size={18} color={GREEN} />}
+                max={hoje}
+                value={dataVacinacao}
+                onChange={setDataVacinacao}
+                error={err(dataVacinacao === "") || (erroDataVac ? "Deve ser menor ou igual à data atual." : undefined)}
+              />
             </div>
-          )}
 
-        </div>
-      </SectionCard>
+            {/* 5. Data de Atestado de Vacinação */}
+            <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
+              <FloatInput
+                label="Data de Atestado de Vacinação"
+                required
+                type="date"
+                icon={<Calendar size={18} color={GREEN} />}
+                min={dataVacinacao || undefined}
+                max={hoje}
+                value={dataAtestado}
+                onChange={setDataAtestado}
+                error={err(dataAtestado === "") || (erroDataAtestado ? "Entre a Data de Vacinação e hoje." : undefined)}
+              />
+            </div>
 
-       
+            {/* Médicos e Vacinadores ocupando a largura total restante */}
+            <div className="w-full mt-2">
+              <MedicoVeterinarioInput
+                value={veterinario ? veterinario.nome : ""}
+                required
+                onChange={(entidadeSelecionada) => setVeterinario(entidadeSelecionada)}
+                error={err(!veterinario)}
+                onEyeClick={() => {
+                  if (veterinario?.cpf) alert(`Visualizar detalhes do veterinário CPF: ${veterinario.cpf}`);
+                  else alert("Por favor, selecione um médico veterinário primeiro.");
+                }}
+              />
+            </div>
 
-{/* Seção 2: Nota Fiscal de Origem — só após Produtor + Doença */}
-{mostrarVacinacaoENota && (
-<Section title="Nota Fiscal">
-  <div className="flex flex-col gap-4">
-    
-    {/* Topo da seção: Título interno, Total de Doses Adquiridas e o Botão Padronizado */}
-    <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-      <div className="flex items-center gap-3">
-        <div className="flex flex-col">
-          <span className="text-xs text-gray-500 font-medium">Partidas vinculadas a esta vacinação</span>
-        </div>
-        
-        {/* Badge do Total de Doses Adquiridas (SÓ APARECE SE HOUVER DOSES) */}
-        {notasFiscaisOrigem.length > 0 && (
-          <div className="flex items-center gap-1.5 bg-green-50 border border-green-200 px-2.5 py-1 rounded-lg animate-fadeIn">
-            <span className="text-[11px] font-semibold text-gray-500">DOSES UTILIZADAS:</span>
-            <span className="text-[11px] font-black text-[#1A7A3C]">
-                {notasFiscaisOrigem.reduce((sum, item) => sum + (item.quantidadeDoses || 0), 0)} doses
-            </span>
+            {isBrucelose && (
+              <div className="w-full mt-1">
+                <VacinadorBruceloseInput
+                  value={vacinadorBrucelose ? vacinadorBrucelose.nome : ""}
+                  disabled={!veterinario}
+                  data={veterinario ? VACINADORES_MOCK.filter((v: any) => v.vetId === veterinario.id) : []}
+                  onChange={(entidadeSelecionada) => setVacinadorBrucelose(entidadeSelecionada)}
+                  error={err(isBrucelose && !vacinadorBrucelose)}
+                  onEyeClick={() => {
+                    if (vacinadorBrucelose?.documento) alert(`Visualizar detalhes do vacinador CPF: ${vacinadorBrucelose.documento}`);
+                    else alert("Por favor, selecione um vacinador primeiro.");
+                  }}
+                />
+              </div>
+            )}
+
+            {isRaiva && (
+              <div className="w-full flex flex-col gap-2 mt-2  p-3 rounded-lg ">
+                <span className="text-xs font-semibold text-gray-700">
+                  Observou mordidas de morcegos no rebanho recentemente? <span className="text-red-500">*</span>
+                </span>
+                <div className="flex items-center gap-6 mt-1">
+                  <CustomRadio
+                    label="Sim"
+                    name="mordidaMorcego"
+                    checked={mordidaMorcego === "Sim"}
+                    onChange={() => setMordidaMorcego("Sim")}
+                    error={err(isRaiva && mordidaMorcego === "")}
+                  />
+                  <CustomRadio
+                    label="Não"
+                    name="mordidaMorcego"
+                    checked={mordidaMorcego === "Não"}
+                    onChange={() => setMordidaMorcego("Não")}
+                    error={err(isRaiva && mordidaMorcego === "")}
+                  />
+                </div>
+              </div>
+            )}
+
           </div>
-        )}
-      </div>
-      
-      <button
-        type="button"
-        disabled={!produtor} 
-        onClick={(e) => {
-          e.preventDefault();    
-          e.stopPropagation();   
-          setModalNotaOrigemOpen(true);
-        }}
-        className={`flex items-center gap-2 text-sm font-semibold px-4 h-11 rounded-lg border w-fit transition shadow-sm ${
-          produtor 
-            ? "border-[#1A7A3C] text-[#1A7A3C] hover:bg-green-50 cursor-pointer" 
-            : "border-gray-200 text-gray-300 bg-gray-100 cursor-not-allowed"
-        }`}
-      >
-        <PlusCircle size={18} />
-        Adicionar Nota
-      </button>
-    </div>
+        </SectionCard>
 
-    {/* CONDICIONAL 1: Sem revendedora selecionado ainda */}
-    {!produtor && (
-      <div className="text-left py-4">
-        <p className="text-xs text-gray-400 italic">É necessário selecionar uma Revendedora para pesquisar notas fiscais de origem.</p>
-      </div>
-    )}
 
-    {/* CONDICIONAL 2: Fornecedor selecionado, mas nenhuma nota fiscal adicionada ainda */}
-    {produtor && notasFiscaisOrigem.length === 0 && (
-      <div className="w-full border border-dashed border-gray-200 rounded-xl py-8 px-4 text-center bg-gray-50/20">
-        <p className="text-sm text-gray-400 italic">Nenhuma nota fiscal vinculada até o momento.</p>
-      </div>
-    )}
 
-    {/* Dashboard de Lotes Atrelados Agrupados por NF */}
-    {notasFiscaisOrigem.length > 0 && (
-      <div className="flex flex-col gap-6 animate-fadeIn">
-        {Object.values(
-          notasFiscaisOrigem.reduce((acc: Record<string, any>, item) => {
-            if (!acc[item.nome]) {
-              acc[item.nome] = { nome: item.nome, partidas: [] };
-            }
-            acc[item.nome].partidas.push(item);
-            return acc;
-          }, {})
-        ).map((grupo: any) => {
-          // Nota Fiscal: Aberta por padrão
-          const isNotaMinimizada = notasListasMinimizadas[grupo.nome] || false;
+        {/* Seção 2: Nota Fiscal de Origem — só após Produtor + Doença */}
+        {mostrarVacinacaoENota && (
+          <Section title="Nota Fiscal">
+            <div className="flex flex-col gap-4">
 
-          return (
-            <div key={`grupo-${grupo.nome}`} className="border border-gray-200 rounded-xl p-4 bg-gray-50/30 relative">
-              
-              {/* Cabeçalho da Nota Fiscal */}
-              <div className="flex items-center justify-between mb-4 px-1">
-                <div 
-                  className="flex items-center gap-2 cursor-pointer select-none group/title"
-                  onClick={() => setNotasListasMinimizadas(prev => ({ ...prev, [grupo.nome]: !isNotaMinimizada }))}
-                >
-                  <img src={iconeNotaFiscalUrl} alt="Nota Fiscal" className="w-6 h-6 object-contain" />
-                  
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-sm font-bold text-gray-800 group-hover/title:text-gray-600 transition-colors">
-                      {grupo.nome}
-                    </span>
-                    
-                    <span className="px-1.5 py-0.5 bg-gray-100/60 border border-gray-200 text-gray-700 text-[10px] font-medium rounded uppercase tracking-wider">
-                      UF: {grupo.partidas[0]?.uf || "MG"}
-                    </span>
+              {/* Topo da seção: Título interno, Total de Doses Adquiridas e o Botão Padronizado */}
+              <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+                <div className="flex items-center gap-3">
+                  <div className="flex flex-col">
+                    <span className="text-xs text-gray-500 font-medium">Saldo de doses</span>
                   </div>
-              
-                  {isNotaMinimizada ? (
-                    <ChevronDown size={16} className="text-gray-400 group-hover/title:text-gray-600 mt-0.5" />
-                  ) : (
-                    <ChevronUp size={16} className="text-gray-400 group-hover/title:text-gray-600 mt-0.5" />
-                  )}
-                  
-                  {isNotaMinimizada && (
-                    <span className="text-[11px] text-gray-400 font-medium normal-case">
-                      ({grupo.partidas.length} {grupo.partidas.length === 1 ? 'partida oculta' : 'partidas ocultas'})
-                    </span>
+
+                  {/* Badge do Total de Doses Adquiridas (SÓ APARECE SE HOUVER DOSES) */}
+                  {notasFiscaisOrigem.length > 0 && (
+                    <div className="flex items-center gap-1.5 bg-green-50 border border-green-200 px-2.5 py-1 rounded-lg animate-fadeIn">
+                      <span className="text-[11px] font-semibold text-gray-500">DOSES UTILIZADAS:</span>
+                      <span className="text-[11px] font-black text-[#1A7A3C]">
+                        {notasFiscaisOrigem.reduce((sum, item) => sum + (item.quantidadeDoses || 0), 0)} doses
+                      </span>
+                    </div>
                   )}
                 </div>
-                
+
                 <button
                   type="button"
-                  onClick={() => {
-                    setNotasFiscaisOrigem(notasFiscaisOrigem.filter(item => item.nome !== grupo.nome));
+                  disabled={!produtor}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setModalNotaOrigemOpen(true);
                   }}
-                  className="text-gray-400 hover:text-red-500 p-1 rounded transition hover:bg-red-50"
-                  title="Remover Nota"
+                  className={`flex items-center gap-2 text-sm font-semibold px-4 h-11 rounded-lg border w-fit transition shadow-sm ${produtor
+                    ? "border-[#1A7A3C] text-[#1A7A3C] hover:bg-green-50 cursor-pointer"
+                    : "border-gray-200 text-gray-300 bg-gray-100 cursor-not-allowed"
+                    }`}
                 >
-                  <Trash2 size={16} />
+                  <PlusCircle size={18} />
+                  Adicionar Saldo
                 </button>
               </div>
 
-              {/* Grid de lotes internos */}
-              {!isNotaMinimizada && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start animate-slideDown">
-                  {grupo.partidas.map((nfItem: any) => {
-                    const DOSES_POR_FRASCO = nfItem.dosesPerFrasco || 20;
-                    const TOTAL_DISPONIVEL = nfItem.dosesDisponiveisTotais || 100;
-                    const validadeLote = nfItem.validade || "20/12/2026";
+              {/* CONDICIONAL 1: Sem revendedora selecionado ainda */}
+              {!produtor && (
+                <div className="text-left py-4">
+                  <p className="text-xs text-gray-400 italic">É necessário selecionar uma Revendedora para pesquisar notas fiscais de origem.</p>
+                </div>
+              )}
 
-                    // ALTERAÇÃO AQUI: Se não houver registro no estado, assume true (começa aberto/expandido)
-                    const isLoteExpandido = lotesMinimizados[nfItem.id] !== undefined ? lotesMinimizados[nfItem.id] : true;
-                    const isLoteMinimizado = !isLoteExpandido;
+              {/* CONDICIONAL 2: Fornecedor selecionado, mas nenhuma nota fiscal adicionada ainda */}
+              {produtor && notasFiscaisOrigem.length === 0 && (
+                <div className="w-full border border-dashed border-gray-200 rounded-xl py-8 px-4 text-center bg-gray-50/20">
+                  <p className="text-sm text-gray-400 italic">Nenhuma lote vinculado até o momento.</p>
+                </div>
+              )}
 
-                    const verificarVencimento = (dataStr: string) => {
-                      if (!dataStr) return false;
-                      const [dia, mes, ano] = dataStr.split("/").map(Number);
-                      const dataValidade = new Date(ano, mes - 1, dia);
-                      return dataValidade < new Date();
-                    };
-                    const isVencido = verificarVencimento(validadeLote);
-
-                    const dadosGrafico = isVencido 
-                      ? [
-                          { name: "Vencidas", value: TOTAL_DISPONIVEL, color: "#ef4444" },
-                          { name: "Descartadas", value: 0, color: "#9ca3af" },
-                          { name: "Partilhadas", value: 0, color: "#3b82f6" },
-                          { name: "Utilizadas", value: 0, color: "#f59e0b" },
-                          { name: "Disponíveis", value: 0, color: "#22c55e" },
-                        ]
-                      : [
-                          { name: "Vencidas", value: 0, color: "#ef4444" },
-                          { name: "Descartadas", value: 10, color: "#9ca3af" },
-                          { name: "Partilhadas", value: 20, color: "#3b82f6" },
-                          { name: "Utilizadas", value: 30, color: "#f59e0b" },
-                          { name: "Disponíveis", value: TOTAL_DISPONIVEL >= 60 ? TOTAL_DISPONIVEL - 60 : 40, color: "#22c55e" },
-                        ];
-
-                    const estaAtivoNesteLote = graficoAtivo?.loteId === nfItem.id;
-                    const fatiaAtiva = estaAtivoNesteLote ? dadosGrafico[graficoAtivo.index] : null;
-                    const totalDosesGrafico = dadosGrafico.reduce((s, d) => s + d.value, 0);
-                    const porcentagem = fatiaAtiva ? ((fatiaAtiva.value / totalDosesGrafico) * 100).toFixed(1) : null;
+              {/* Dashboard de Lotes Atrelados Agrupados por NF */}
+              {notasFiscaisOrigem.length > 0 && (
+                <div className="flex flex-col gap-6 animate-fadeIn">
+                  {Object.values(
+                    notasFiscaisOrigem.reduce((acc: Record<string, any>, item) => {
+                      if (!acc[item.nome]) {
+                        acc[item.nome] = { nome: item.nome, partidas: [] };
+                      }
+                      acc[item.nome].partidas.push(item);
+                      return acc;
+                    }, {})
+                  ).map((grupo: any) => {
+                    // Nota Fiscal: Aberta por padrão
+                    const isNotaMinimizada = notasListasMinimizadas[grupo.nome] || false;
 
                     return (
-                      <div 
-                        key={`lote-${nfItem.id}`} 
-                        className={`border border-gray-200 rounded-xl bg-white shadow-sm flex flex-col justify-between overflow-visible relative group transition-all duration-200 h-auto ${
-                          isLoteMinimizado ? "p-2.5 pb-2" : "p-4"
-                        }`}
-                      >
-                        
-                        {/* Botões de Ação do Card Superior Direito */}
-                        <div className="absolute top-2.5 right-2.5 flex items-center gap-1 z-10">
-                          <button
-                            type="button"
-                            onClick={() => setLotesMinimizados(prev => ({ ...prev, [nfItem.id]: !isLoteExpandido }))}
-                            className="text-gray-400 hover:text-gray-600 p-1 rounded-lg transition hover:bg-gray-100"
-                            title={isLoteMinimizado ? "Expandir Lote" : "Minimizar Lote"}
-                          >
-                            {isLoteMinimizado ? <ChevronDown size={15} /> : <ChevronUp size={15} />}
-                          </button>
+                      <div key={`grupo-${grupo.nome}`} className="border border-gray-200 rounded-xl p-4 bg-gray-50/30 relative">
 
-                          <button
-                            type="button"
-                            onClick={() => setNotasFiscaisOrigem(notasFiscaisOrigem.filter(item => item.id !== nfItem.id))}
-                            className="text-gray-400 hover:text-red-500 p-1 rounded-lg transition hover:bg-red-50"
-                            title="Remover Lote"
+                        {/* Cabeçalho da Nota Fiscal */}
+                        <div className="flex items-center justify-between mb-4 px-1">
+                          <div
+                            className="flex items-center gap-2 cursor-pointer select-none group/title"
+                            onClick={() => setNotasListasMinimizadas(prev => ({ ...prev, [grupo.nome]: !isNotaMinimizada }))}
                           >
-                            <Trash2 size={15} />
-                          </button>
-                        </div>
+                            <Package size={24} color={GREEN} />
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-sm font-bold text-gray-800 group-hover/title:text-gray-600 transition-colors">
+                                {grupo.nome}
+                              </span>
 
-                       {/* Cabeçalho da Partida */}
-                        <div className={`flex items-center justify-between border-gray-100 overflow-visible pr-14 ${
-                          isLoteMinimizado ? "border-none pb-0 mb-0" : "border-b pb-2 mb-3"
-                        }`}>
-                          <div className="flex items-center gap-1.5 relative group/info overflow-visible">
-                            <span className="text-xs font-semibold text-gray-800 select-none">
-                              Nº Partida: <span className="text-[#1A7A3C]">{nfItem.partida || "006/19"}</span>
-                            </span>
-                            
-                            {isLoteMinimizado && (
-                              <span className="text-[11px] text-gray-400 font-medium ml-2 animate-fadeIn">
-                                ({nfItem.quantidadeDoses || 0} doses utilizadas)
+                              <span className="px-1.5 py-0.5 bg-gray-100/60 border border-gray-200 text-gray-700 text-[10px] font-medium rounded uppercase tracking-wider">
+                                UF: {grupo.partidas[0]?.uf || "MG"}
+                              </span>
+                            </div>
+
+                            {isNotaMinimizada ? (
+                              <ChevronDown size={16} className="text-gray-400 group-hover/title:text-gray-600 mt-0.5" />
+                            ) : (
+                              <ChevronUp size={16} className="text-gray-400 group-hover/title:text-gray-600 mt-0.5" />
+                            )}
+
+                            {isNotaMinimizada && (
+                              <span className="text-[11px] text-gray-400 font-medium normal-case">
+                                ({grupo.partidas.length} {grupo.partidas.length === 1 ? 'partida oculta' : 'partidas ocultas'})
                               </span>
                             )}
                           </div>
 
-                          <div className={`px-2 py-0.5 rounded border font-semibold text-[10px] ${
-                            isVencido ? "bg-red-50 border-red-200 text-red-700" : "bg-green-50 border-green-200 text-green-700"
-                          }`}>
-                            Validade: {validadeLote} {isVencido && "(Vencida)"}
-                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setNotasFiscaisOrigem(notasFiscaisOrigem.filter(item => item.nome !== grupo.nome));
+                            }}
+                            className="text-gray-400 hover:text-red-500 p-1 rounded transition hover:bg-red-50"
+                            title="Remover Nota"
+                          >
+                            <Trash2 size={16} />
+                          </button>
                         </div>
 
-                        {/* Conteúdo Expansível da Partida */}
-                        {!isLoteMinimizado && (
-                          <div className="animate-slideDown">
-                            <div className="flex items-center gap-4 z-10 mt-3">
-                              
-                              {/* Gráfico de Pizza (PieChart) */}
-                              <div className="w-24 h-24 flex items-center justify-center relative select-none">
-                                <PieChart width={96} height={96} margin={{ top: 2, right: 2, bottom: 2, left: 2 }}>
-                                  <Pie
-                                    data={dadosGrafico}
-                                    cx="50%"
-                                    cy="50%"
-                                    innerRadius={26}
-                                    outerRadius={35}
-                                    paddingAngle={2}
-                                    dataKey="value"
-                                    stroke="none"
-                                    activeIndex={estaAtivoNesteLote ? graficoAtivo.index : undefined}
-                                    onMouseEnter={(_, index) => setGraficoAtivo({ loteId: nfItem.id, index })}
-                                    onMouseLeave={() => setGraficoAtivo(null)}
-                                  >
-                                    {dadosGrafico.map((entry, idx) => (
-                                      <Cell 
-                                        key={`cell-${idx}`} 
-                                        fill={entry.color} 
-                                        className="cursor-pointer transition-all duration-200 outline-none"
-                                      />
-                                    ))}
-                                  </Pie>
-                                </PieChart>
-                                
-                                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
-                                  {fatiaAtiva ? (
-                                    <div className="flex flex-col items-center justify-center">
-                                      <span className="text-xs font-bold leading-none animate-fadeIn" style={{ color: fatiaAtiva.color }}>
-                                        {fatiaAtiva.value}
+                        {/* Grid de lotes internos */}
+                        {!isNotaMinimizada && (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start animate-slideDown">
+                            {grupo.partidas.map((nfItem: any) => {
+                              const DOSES_POR_FRASCO = nfItem.dosesPerFrasco || 20;
+                              const TOTAL_DISPONIVEL = nfItem.dosesDisponiveisTotais || 100;
+                              const validadeLote = nfItem.validade || "20/12/2026";
+
+                              // ALTERAÇÃO AQUI: Se não houver registro no estado, assume true (começa aberto/expandido)
+                              const isLoteExpandido = lotesMinimizados[nfItem.id] !== undefined ? lotesMinimizados[nfItem.id] : true;
+                              const isLoteMinimizado = !isLoteExpandido;
+
+                              const verificarVencimento = (dataStr: string) => {
+                                if (!dataStr) return false;
+                                const [dia, mes, ano] = dataStr.split("/").map(Number);
+                                const dataValidade = new Date(ano, mes - 1, dia);
+                                return dataValidade < new Date();
+                              };
+                              const isVencido = verificarVencimento(validadeLote);
+
+                              const dadosGrafico = isVencido
+                                ? [
+                                  { name: "Vencidas", value: TOTAL_DISPONIVEL, color: "#ef4444" },
+                                  { name: "Descartadas", value: 0, color: "#9ca3af" },
+                                  { name: "Partilhadas", value: 0, color: "#3b82f6" },
+                                  { name: "Utilizadas", value: 0, color: "#f59e0b" },
+                                  { name: "Disponíveis", value: 0, color: "#22c55e" },
+                                ]
+                                : [
+                                  { name: "Vencidas", value: 0, color: "#ef4444" },
+                                  { name: "Descartadas", value: 10, color: "#9ca3af" },
+                                  { name: "Partilhadas", value: 20, color: "#3b82f6" },
+                                  { name: "Utilizadas", value: 30, color: "#f59e0b" },
+                                  { name: "Disponíveis", value: TOTAL_DISPONIVEL >= 60 ? TOTAL_DISPONIVEL - 60 : 40, color: "#22c55e" },
+                                ];
+
+                              const estaAtivoNesteLote = graficoAtivo?.loteId === nfItem.id;
+                              const fatiaAtiva = estaAtivoNesteLote ? dadosGrafico[graficoAtivo.index] : null;
+                              const totalDosesGrafico = dadosGrafico.reduce((s, d) => s + d.value, 0);
+                              const porcentagem = fatiaAtiva ? ((fatiaAtiva.value / totalDosesGrafico) * 100).toFixed(1) : null;
+
+
+                              return (
+                                <div
+                                  key={`lote-${nfItem.id}`}
+                                  className={`border border-gray-200 rounded-xl bg-white shadow-sm flex flex-col overflow-visible relative group transition-all duration-200 h-auto ${isLoteMinimizado ? "p-2.5 pb-2 justify-start" : "p-4 justify-between"
+                                    }`}
+                                >
+
+                                  <div className="absolute top-2.5 right-2.5 flex items-center gap-1 z-10">
+                                    <button
+                                      type="button"
+                                      onClick={() => setLotesMinimizados(prev => ({ ...prev, [nfItem.id]: !isLoteExpandido }))}
+                                      className="text-gray-400 hover:text-gray-600 p-1 rounded-lg transition hover:bg-gray-100"
+                                      title={isLoteMinimizado ? "Expandir Lote" : "Minimizar Lote"}
+                                    >
+                                      {isLoteMinimizado ? <ChevronDown size={15} /> : <ChevronUp size={15} />}
+                                    </button>
+
+                                    <button
+                                      type="button"
+                                      onClick={() => setNotasFiscaisOrigem(notasFiscaisOrigem.filter(item => item.id !== nfItem.id))}
+                                      className="text-gray-400 hover:text-red-500 p-1 rounded-lg transition hover:bg-red-50"
+                                      title="Remover Lote"
+                                    >
+                                      <Trash2 size={15} />
+                                    </button>
+                                  </div>
+
+                                  <div className={`flex items-center justify-between border-gray-100 overflow-visible pr-14 ${isLoteMinimizado ? "border-none pb-0 mb-0" : "border-b pb-2 mb-3"
+                                    }`}>
+                                    <div className="flex items-center gap-1.5 relative group/info overflow-visible">
+                                      <div className="relative cursor-help text-gray-400 hover:text-gray-600 transition pt-0.5 z-20">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></svg>
+                                        <div className="fixed inset-0 bg-black/15 hidden group-hover/info:block pointer-events-none z-[998] animate-fadeIn" />
+
+                                        <div className="absolute left-0 top-full mt-2 w-56 bg-white border border-gray-100 rounded-xl shadow-xl hidden group-hover/info:block animate-fadeIn z-[999] text-left overflow-hidden">
+                                          <div className="flex items-center gap-1.5 bg-gray-50 border-b border-gray-100 p-3">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-gray-500"><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></svg>
+                                            <span className="text-[11px] font-extrabold text-gray-800">Apresentação </span>
+                                          </div>
+                                          <div className="p-3 flex flex-col gap-2 text-[11px] text-gray-500 bg-white">
+                                            <div className="flex justify-between items-center">
+                                              <span>Laboratório:</span>
+                                              <span className="font-bold text-gray-700">BioMed/MG</span>
+                                            </div>
+                                            <div className="flex justify-between items-center">
+                                              <span>Doença:</span>
+                                              <span className="font-bold text-gray-700">Brucelose</span>
+                                            </div>
+                                            <div className="flex justify-between items-center">
+                                              <span>Tipo de Vacina:</span>
+                                              <span className="font-bold text-gray-700">B19</span>
+                                            </div>
+                                          </div>
+                                          <div className="bg-gray-50 border-t border-gray-100 p-3 flex justify-between items-center text-[11px] font-bold text-green-700">
+                                            <span>Doses Totais Lote:</span>
+                                            <span>{TOTAL_DISPONIVEL}</span>
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                      <span className="text-xs font-semibold text-gray-800 select-none">
+                                        Apresentação
                                       </span>
-                                      <span className="text-[7px] text-gray-500 font-semibold leading-tight uppercase truncate max-w-[50px] mt-0.5 animate-fadeIn">
-                                        {fatiaAtiva.name}
-                                      </span>
-                                      <span className="text-[8px] font-bold mt-0.5 animate-fadeIn" style={{ color: fatiaAtiva.color }}>
-                                        {porcentagem}%
-                                      </span>
+
+                                      {isLoteMinimizado && (
+                                        <span className="text-[11px] text-gray-400 font-medium ml-2 animate-fadeIn">
+                                          ({nfItem.quantidadeDoses || 0} doses lançadas)
+                                        </span>
+                                      )}
                                     </div>
-                                  ) : (
-                                    <div className="flex flex-col items-center justify-center">
-                                      <span className="text-sm font-black text-gray-800 leading-none">
-                                        {TOTAL_DISPONIVEL}
-                                      </span>
-                                      <span className="text-[8px] font-bold text-gray-400 mt-0.5 uppercase tracking-wider">
-                                        Disp
-                                      </span>
+
+                                    <div className={`px-2 py-0.5 rounded border font-semibold text-[10px] ${isVencido ? "bg-red-50 border-red-200 text-red-700" : "bg-green-50 border-green-200 text-green-700"
+                                      }`}>
+                                      Validade: {validadeLote} {isVencido && "(Vencida)"}
                                     </div>
+                                  </div>
+
+                                  {!isLoteMinimizado && (
+                                    <div className="animate-slideDown">
+                                      <div className="flex items-center gap-4 z-10 mt-3">
+
+                                        <div className="w-24 h-24 flex items-center justify-center relative select-none">
+                                          <PieChart width={96} height={96} margin={{ top: 2, right: 2, bottom: 2, left: 2 }}>
+                                            <Pie
+                                              data={dadosGrafico}
+                                              cx="50%"
+                                              cy="50%"
+                                              innerRadius={26}
+                                              outerRadius={35}
+                                              paddingAngle={2}
+                                              dataKey="value"
+                                              stroke="none"
+                                              activeIndex={estaAtivoNesteLote ? graficoAtivo.index : undefined}
+                                              activeShape={renderActiveShape}
+                                              onMouseEnter={(_, index) => setGraficoAtivo({ loteId: nfItem.id, index })}
+                                              onMouseLeave={() => setGraficoAtivo(null)}
+                                            >
+                                              {dadosGrafico.map((entry, idx) => (
+                                                <Cell
+                                                  key={`cell-${idx}`}
+                                                  fill={entry.color}
+                                                  className="cursor-pointer transition-all duration-200 outline-none"
+                                                />
+                                              ))}
+                                            </Pie>
+                                          </PieChart>
+
+                                          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
+                                            {fatiaAtiva ? (
+                                              <div className="flex flex-col items-center justify-center">
+                                                <span className="text-xs font-bold leading-none animate-fadeIn" style={{ color: fatiaAtiva.color }}>
+                                                  {fatiaAtiva.value}
+                                                </span>
+                                                <span className="text-[7px] text-gray-500 font-semibold leading-tight uppercase truncate max-w-[50px] mt-0.5 animate-fadeIn">
+                                                  {fatiaAtiva.name}
+                                                </span>
+                                                <span className="text-[8px] font-bold mt-0.5 animate-fadeIn" style={{ color: fatiaAtiva.color }}>
+                                                  {porcentagem}%
+                                                </span>
+                                              </div>
+                                            ) : (
+                                              <div className="flex flex-col items-center justify-center">
+                                                <span className="text-sm font-black text-gray-800 leading-none">
+                                                  {TOTAL_DISPONIVEL}
+                                                </span>
+                                                <span className="text-[8px] font-bold text-gray-400 mt-0.5 uppercase tracking-wider">
+                                                  Disp
+                                                </span>
+                                              </div>
+                                            )}
+                                          </div>
+                                        </div>
+
+                                        <div className="flex gap-2 flex-1 justify-start items-stretch">
+
+                                          <div className="flex flex-col border border-gray-200 rounded-xl px-2.5 py-2 w-full max-w-[130px] gap-1 bg-gray-50/80 justify-between">
+                                            <span className="text-[11px] text-gray-600 font-medium text-center">Total</span>
+
+                                            <div className="flex gap-2 items-end justify-center py-0.5">
+                                              <div className="flex flex-col items-center flex-1">
+                                                <span className="text-xs font-bold text-gray-700 leading-none">
+                                                  {Math.floor(TOTAL_DISPONIVEL / DOSES_POR_FRASCO)}
+                                                </span>
+                                                <span className="text-[9px] text-gray-400 font-medium mt-0.5">Frascos</span>
+                                              </div>
+                                              <div className="flex flex-col items-center flex-1">
+                                                <span className="text-xs font-bold text-gray-700 leading-none">
+                                                  {TOTAL_DISPONIVEL}
+                                                </span>
+                                                <span className="text-[9px] text-gray-400 font-medium mt-0.5">Doses</span>
+                                              </div>
+                                            </div>
+
+                                            <p className="text-[8px] text-gray-400 text-center leading-none mt-0.5">
+                                              {DOSES_POR_FRASCO} doses por frasco
+                                            </p>
+                                          </div>
+
+                                          <div className="flex flex-col border border-gray-200 rounded-xl px-2.5 py-2 w-full max-w-[130px] gap-1 bg-white justify-between">
+                                            <span className="text-[11px] text-gray-500 font-medium text-center">Partilhadas</span>
+
+                                            <div className="flex gap-1.5 items-end justify-center">
+                                              <div className="flex flex-col flex-1 min-w-[40px]">
+                                                <input
+                                                  type="number"
+                                                  min="0"
+                                                  value={nfItem.quantidadeFrascos || ""}
+                                                  placeholder="0"
+                                                  onChange={(e) => {
+                                                    const f = Number(e.target.value);
+                                                    const d = f * DOSES_POR_FRASCO;
+                                                    setNotasFiscaisOrigem(notasFiscaisOrigem.map(item =>
+                                                      item.id === nfItem.id ? { ...item, quantidadeDoses: d, quantidadeFrascos: f } : item
+                                                    ));
+                                                  }}
+                                                  className="w-full text-center bg-white border border-gray-200 rounded-lg text-xs font-black p-1 focus:outline-none focus:border-[#1A7A3C] text-gray-800 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                />
+                                                <span className="text-[9px] text-gray-400 font-semibold text-center mt-0.5">Frascos</span>
+                                              </div>
+
+                                              <div className="flex flex-col flex-1 min-w-[40px]">
+                                                <input
+                                                  type="number"
+                                                  min="0"
+                                                  value={nfItem.quantidadeDoses || ""}
+                                                  placeholder="0"
+                                                  onChange={(e) => {
+                                                    const d = Number(e.target.value);
+                                                    const f = Math.ceil(d / DOSES_POR_FRASCO);
+                                                    setNotasFiscaisOrigem(notasFiscaisOrigem.map(item =>
+                                                      item.id === nfItem.id ? { ...item, quantidadeDoses: d, quantidadeFrascos: f } : item
+                                                    ));
+                                                  }}
+                                                  className="w-full text-center bg-white border border-gray-200 rounded-lg text-xs font-black p-1 focus:outline-none focus:border-[#1A7A3C] text-gray-800 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                />
+                                                <span className="text-[9px] text-gray-400 font-semibold text-center mt-0.5">Doses</span>
+                                              </div>
+                                            </div>
+                                            <p className="text-[8px] text-gray-400 text-center leading-none mt-0.5"></p>
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                      <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 mt-3 pt-2 border-t border-gray-100 text-[9px] z-10">
+                                        {dadosGrafico.map((item) => (
+                                          <div key={item.name} className="flex items-center gap-1 bg-gray-50 px-1 py-0.5 rounded border border-gray-100">
+                                            <span className="w-1 h-1 rounded-full" style={{ backgroundColor: item.color }} />
+                                            <span className="text-gray-400 font-medium">{item.name}:</span>
+                                            <span className="font-bold text-gray-600">{item.value}</span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+
+
                                   )}
+
                                 </div>
-                              </div>
-
-                              {/* Bloco de Informações de Saldos Laterais */}
-                              <div className="flex gap-2 flex-1 justify-start items-stretch">
-                                <div className="flex flex-col border border-gray-200 rounded-xl px-2.5 py-2 w-full max-w-[130px] gap-1 bg-gray-50/80 justify-between">
-                                  <span className="text-[11px] text-gray-600 font-medium text-center">Disponíveis</span>
-                                  
-                                  <div className="flex gap-2 items-end justify-center py-0.5">
-                                    <div className="flex flex-col items-center flex-1">
-                                      <span className="text-xs font-bold text-gray-700 leading-none">
-                                        {Math.floor(TOTAL_DISPONIVEL / DOSES_POR_FRASCO)}
-                                      </span>
-                                      <span className="text-[9px] text-gray-400 font-medium mt-0.5">Frascos</span>
-                                    </div>
-                                    <div className="flex flex-col items-center flex-1">
-                                      <span className="text-xs font-bold text-gray-700 leading-none">
-                                        {TOTAL_DISPONIVEL}
-                                      </span>
-                                      <span className="text-[9px] text-gray-400 font-medium mt-0.5">Doses</span>
-                                    </div>
-                                  </div>
-
-                                  <p className="text-[8px] text-gray-400 text-center leading-none mt-0.5">
-                                    {DOSES_POR_FRASCO} doses por frasco
-                                  </p>
-                                </div>
-
-                                {/* Bloco Utilizadas */}
-                                <div className="flex flex-col border border-gray-200 rounded-xl px-2.5 py-2 w-full max-w-[130px] gap-1 bg-white justify-between">
-                                  <span className="text-[11px] text-gray-500 font-medium text-center">Utilizadas</span>
-                                  
-                                  <div className="flex gap-1.5 items-end justify-center">
-                                    {/* Input de Frascos */}
-                                    <div className="flex flex-col flex-1 min-w-[40px]">
-                                      <input
-                                        type="number"
-                                        min="0"
-                                        value={nfItem.quantidadeFrascos || ""}
-                                        placeholder="0"
-                                        onChange={(e) => {
-                                          const f = Number(e.target.value);
-                                          const d = f * DOSES_POR_FRASCO;
-                                          setNotasFiscaisOrigem(notasFiscaisOrigem.map(item => 
-                                            item.id === nfItem.id ? { ...item, quantidadeDoses: d, quantidadeFrascos: f } : item
-                                          ));
-                                        }}
-                                        className="w-full text-center bg-white border border-gray-200 rounded-lg text-xs font-black p-1 focus:outline-none focus:border-[#1A7A3C] text-gray-800 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                      />
-                                      <span className="text-[9px] text-gray-400 font-semibold text-center mt-0.5">Frascos</span>
-                                    </div>
-
-                                    {/* Input de Doses */}
-                                    <div className="flex flex-col flex-1 min-w-[40px]">
-                                      <input
-                                        type="number"
-                                        min="0"
-                                        value={nfItem.quantidadeDoses || ""}
-                                        placeholder="0"
-                                        onChange={(e) => {
-                                          const d = Number(e.target.value);
-                                          const f = Math.ceil(d / DOSES_POR_FRASCO);
-                                          setNotasFiscaisOrigem(notasFiscaisOrigem.map(item => 
-                                            item.id === nfItem.id ? { ...item, quantidadeDoses: d, quantidadeFrascos: f } : item
-                                          ));
-                                        }}
-                                        className="w-full text-center bg-white border border-gray-200 rounded-lg text-xs font-black p-1 focus:outline-none focus:border-[#1A7A3C] text-gray-800 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                      />
-                                      <span className="text-[9px] text-gray-400 font-semibold text-center mt-0.5">Doses</span>
-                                    </div>
-                                  </div>
-                                  <p className="text-[8px] text-gray-400 text-center leading-none mt-0.5"></p>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Legenda Dinâmica Inferior */}
-                            <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 mt-3 pt-2 border-t border-gray-100 text-[9px] z-10">
-                              {dadosGrafico.map((item) => (
-                                <div key={item.name} className="flex items-center gap-1 bg-gray-50 px-1 py-0.5 rounded border border-gray-100">
-                                  <span className="w-1 h-1 rounded-full" style={{ backgroundColor: item.color }} />
-                                  <span className="text-gray-400 font-medium">{item.name}:</span>
-                                  <span className="font-bold text-gray-600">{item.value}</span>
-                                </div>
-                              ))}
-                            </div>
+                              );
+                            })}
                           </div>
-                        )} 
-
+                        )}
                       </div>
                     );
                   })}
                 </div>
               )}
+
             </div>
+          </Section>
+        )}
+
+        {/* ── VACINAÇÃO — só após Produtor + Doença ── */}
+        {/* ── VACINAÇÃO — só após Produtor + Doença + Regime selecionado ── */}
+        {mostrarVacinacaoENota && regime !== "" && (() => {
+          // 1. Calcula o total disponível somando todas as notas fiscais selecionadas
+          const totalDisponivel = notasFiscaisOrigem.reduce((sum, item) => sum + (item.dosesDisponiveisTotais || 0), 0);
+
+          // 2. Calcula o saldo restante: Disponível menos Utilizado
+          const saldoRestante = totalDisponivel - (utilizadas || 0);
+
+          return (
+            <SectionCard title="Vacinação">
+
+              <SummaryCards
+                disponiveis={totalDisponivel}
+                utilizadas={utilizadas}
+                saldo={saldoRestante} // Passa o saldo calculado dinamicamente
+              />
+
+              <VaccinationTable
+                faixas={faixasTabela}
+                mostrarMachos={mostrarMachos}
+                mostrarFemeas={mostrarFemeas}
+                statusLabel={statusColLabel}
+                vacinados={vacinadosView}
+                onChange={handleChangeVacinados}
+                onReset={handleReset}
+              />
+            </SectionCard>
           );
-        })}
-      </div>
-    )}
+        })()}
 
-  </div>
-</Section>
-)}
 
-       {/* ── VACINAÇÃO — só após Produtor + Doença ── */}
-{/* ── VACINAÇÃO — só após Produtor + Doença + Regime selecionado ── */}
-{mostrarVacinacaoENota && regime !== "" && (() => {
-  // 1. Calcula o total disponível somando todas as notas fiscais selecionadas
-  const totalDisponivel = notasFiscaisOrigem.reduce((sum, item) => sum + (item.dosesDisponiveisTotais || 0), 0);
-  
-  // 2. Calcula o saldo restante: Disponível menos Utilizado
-  const saldoRestante = totalDisponivel - (utilizadas || 0);
-
-  return (
-    <SectionCard title="Vacinação">
-      
-      <SummaryCards 
-        disponiveis={totalDisponivel} 
-        utilizadas={utilizadas} 
-        saldo={saldoRestante} // Passa o saldo calculado dinamicamente
-      />
-
-      <VaccinationTable
-        faixas={faixasTabela}
-        mostrarMachos={mostrarMachos}
-        mostrarFemeas={mostrarFemeas}
-        statusLabel={statusColLabel}
-        vacinados={vacinadosView}
-        onChange={handleChangeVacinados}
-        onReset={handleReset}
-      />
-    </SectionCard>
-  );
-})()}
-
-       
       </main>
 
-      
+
       {/* ============ SEARCHMODAL DO PRODUTOR ============ */}
       <SearchModal<ProdutorEntidade>
         open={modalProdutor}
@@ -1724,39 +1746,31 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageP
         }
       />
 
-        
+
       <MultiSearchModal
         open={modalNotaOrigemOpen}
         onClose={() => setModalNotaOrigemOpen(false)}
-        title="Buscar Notas Fiscais"
-        subtitle="Selecione as notas desejadas para vincular a esta vacinação:"
-        icon={<img src={iconeNotaFiscalUrl} alt="Nota Fiscal" className="w-8 h-8 object-contain" />}
-        
-        /* Dados com os novos atributos: uf e dosesDisponiveisTotais */
+        title="Buscar Lotes de Vacinas"
+        subtitle="Selecione os lotes de vacina desejados para vincular a esta declaração:"
+        icon={<Package size={24} color={GREEN} />}
+        /* Dados continuam os mesmos */
         data={[
-          // --- EXEMPLO 1: Mesma Nota Fiscal (NF-31232) com duas Partidas Diferentes ---
-          { id: 1, nome: "NF-31232", partida: "0013225/24", uf: "MG", dosesDisponiveisTotais: 120, fornecedor: "Distribuidora de Vacinas Alfa LTDA" },
-          { id: 2, nome: "NF-31232", partida: "0013226/24", uf: "MG", dosesDisponiveisTotais: 80, fornecedor: "Distribuidora de Vacinas Alfa LTDA" },
-          
-          // --- EXEMPLO 2: Outra Nota Fiscal diferente com sua respectiva Partida ---
-          { id: 3, nome: "NF-45612", partida: "0014589/24", uf: "SP", dosesDisponiveisTotais: 250, fornecedor: "Comercial Agropecuária Beta S/A" },
-          
-          // Linha extra apenas para compor o mock se precisar
-          { id: 4, nome: "NF-78945", partida: "0015221/25", uf: "GO", dosesDisponiveisTotais: 50, fornecedor: "Laboratório Biovet Saúde Animal" }
+          { id: 1, nome: "Lote: 0013225/24", partida: "1", uf: "MG", dosesDisponiveisTotais: 120, fornecedor: "Distribuidora de Vacinas Alfa LTDA", doenca: "Brucelose", exigeReceituario: true },
+          { id: 2, nome: "Lote: 0013225/24", partida: "2", uf: "MG", dosesDisponiveisTotais: 80, fornecedor: "Distribuidora de Vacinas Alfa LTDA", doenca: "Febre Aftosa", exigeReceituario: true },
+          { id: 3, nome: "Lote: 0014589/24", partida: "1", uf: "SP", dosesDisponiveisTotais: 250, fornecedor: "Comercial Agropecuária Beta S/A", doenca: "Raiva dos Herbívoros", exigeReceituario: false },
+          { id: 4, nome: "Lote: 0014589/24", partida: "1", uf: "GO", dosesDisponiveisTotais: 50, fornecedor: "Laboratório Biovet Saúde Animal", doenca: "Brucelose", exigeReceituario: true }
         ]}
-        
-        /* Adicionado "uf" nas chaves de busca para caso queiram filtrar por estado */
+
         searchKeys={["nome", "partida", "fornecedor", "uf"]}
-        searchPlaceholder="Busque por número da NF, partida ou estado."
-        
-        /* Definição das colunas exibidas na tabela interna do modal */
+        searchPlaceholder="Busque por lote."
+
+        /* ALTERADO: Substituída a coluna de Partida pela de Saldo da Apresentação */
         columns={[
-          { label: "Número da NF", key: "nome" },
-          { label: "Número de Partida", key: "partida" },
-          { label: "UF", key: "uf" },
-          { label: "Doses Disp.", key: "dosesDisponiveisTotais" }
+          { label: "Lote/ Nº de Partida", key: "nome" },
+          { label: "Saldo da Apresentação", key: "dosesDisponiveisTotais" }, // <-- Mudança aqui
+          { label: "UF", key: "uf" }
         ]}
-        
+
         selectedItems={notasFiscaisOrigem}
         onConfirm={(selectedValues) => {
           setNotasFiscaisOrigem(selectedValues);
