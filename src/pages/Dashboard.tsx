@@ -138,6 +138,11 @@ export const cadastrosCategories: MenuCategory[] = [
         route: "instituicao-ensino-pesquisa",
         icon: <Landmark size={16} />,
       },
+      {
+        label: "Tipo de Veículo",
+        route: "tipo-veiculo",
+        icon: <Truck size={16} />,
+      },
     ],
   },
   {
@@ -255,11 +260,7 @@ export const cadastrosCategories: MenuCategory[] = [
         route: "revendedora-animais",
         icon: <Store size={16} />,
       },
-      {
-        label: "Tipo de Veículo",
-        route: "tipo-veiculo",
-        icon: <Truck size={16} />,
-      },
+
     ],
   },
   {
@@ -521,7 +522,7 @@ export const fourthCategories: MenuCategory[] = [
       {
         label: "Usuários",
         route: "usuarios",
-        icon: <Users size={16} />,
+        icon: <User size={16} />,
       },
       {
         label: "Papéis",
