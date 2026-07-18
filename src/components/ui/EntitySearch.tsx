@@ -2283,6 +2283,105 @@ export function PessoaFisicaInput({
   );
 }
 
+
+
+// ─── MOCK DE EXEMPLO ──────────────────────────────────────────────────────────
+export const PESSOAS_JURIDICAS_MOCK = [
+  { id: 1, nome: "Agropecuária Vale Verde Ltda", documento: "12.345.678/0001-90" },
+  { id: 2, nome: "Nutrição Animal Planalto S.A.", documento: "98.765.432/0001-10" },
+  { id: 3, nome: "Cooperativa de Produtores Unidos", documento: "55.444.333/0002-22" },
+];
+
+interface PessoaJuridicaInputProps {
+  value: string;
+  onChange: (entidade: any) => void;
+  onEyeClick?: () => void;
+  required?: boolean;
+  disabled?: boolean;
+  error?: boolean;
+  data?: any[];
+}
+
+export function PessoaJuridicaInput({
+  value,
+  onChange,
+  onEyeClick,
+  required = false,
+  disabled = false,
+  error = false,
+  data = PESSOAS_JURIDICAS_MOCK,
+}: PessoaJuridicaInputProps) {
+
+  // Encontra a empresa selecionada para exibir no campo reboque
+  const entidadeSelecionada = data.find(
+    (x) => x.nome === value || x.documento === value
+  );
+
+  // Colunas parametrizadas para Pessoa Jurídica (Razão Social/Nome e CNPJ)
+  const colunasModal = [
+    { label: "Razão Social / Nome", key: "nome" },
+    { label: "CNPJ", key: "documento" },
+  ];
+
+  return (
+    <div className="flex flex-col gap-3 w-full">
+      {/* 💡 Grid Inteligente: Vira 2 colunas se tiver valor selecionado, senão fica 1 coluna full */}
+      <div
+        className={
+          value && entidadeSelecionada
+            ? "grid grid-cols-1 md:grid-cols-2 gap-4 items-center w-full"
+            : "w-full"
+        }
+      >
+        {/* Coluna 1: Input de Busca com Modal Acoplado */}
+        <div className="w-full">
+          <EntitySearchInput
+            label="Pessoa Jurídica"
+            placeholder="Buscar por nome ou CNPJ."
+            required={required}
+            disabled={disabled}
+            error={error}
+            value={entidadeSelecionada?.nome || ""} // Exibe o nome amigável no input principal
+            data={data}
+
+            // Configurações do Cabeçalho e comportamento do Modal
+            title="Buscar Pessoa Jurídica"
+            subtitle="Busque por uma pessoa jurídica cadastrada:"
+            icon={
+              Icons.iconeUnidadeAdministrativaUrl ? (
+                <img src={Icons.iconePessoaJuridicaUrl} alt="Pessoa Juridica" className="w-5 h-5 object-contain" />
+              ) : undefined
+            }
+            columns={colunasModal}
+            searchKeys={["nome", "documento"]}
+            searchPlaceholder="Buscar por razão social ou CNPJ..."
+            confirmLabel="Confirmar"
+            onChange={onChange}
+          />
+        </div>
+
+        {/* Coluna 2: Campo Extra reboque: CNPJ fixo (Apenas se houver seleção) */}
+        {value && entidadeSelecionada && (
+          <div className="flex items-center gap-2 animate-fadeIn w-full">
+            <div className="flex-1">
+              <FloatInput
+                label="CNPJ"
+                required={required}
+                value={entidadeSelecionada.documento}
+                onChange={() => { }}
+                disabled
+                className="w-full"
+              />
+            </div>
+            <EyeAction onClick={onEyeClick} />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+
 // ==========================================================
 // COMPONENTE DE BUSCA DE UNIDADE ADMINISTRATIVA (US064)
 // ==========================================================

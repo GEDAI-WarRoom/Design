@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import {
   ArrowLeft, ChevronUp, ChevronDown, Minus, PauseCircle, Download, Dna, Eye, ShieldCheck, FileText,
-  Pencil, Check, Calendar, ShieldAlert, Info, History, Plus
+  Pencil, Check, Calendar, ShieldAlert, Info, History, Plus, Ruler
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import {
@@ -12,11 +12,131 @@ import {
   SimNao,
   HistoryCard,
   AccordionCardGroup,
-  EvaluationActiveCard
+  EvaluationActiveCard,
 } from "../../../components/ui/FormKit";
-import * as Icons from "../../../imports/icons";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
+import * as Icons from "../../../imports/icons";
 
+// --- mock ---
+
+export const UNIDADES_MEDIDA_ENTIDADE = [
+  {
+    id: 1,
+    codigo: "UND",
+    sigla: "un",
+    nome: "Unidade",
+    descricao: "Quantidade unitária",
+  },
+  {
+    id: 2,
+    codigo: "KG",
+    sigla: "kg",
+    nome: "Quilograma",
+    descricao: "Massa em quilogramas",
+  },
+  {
+    id: 3,
+    codigo: "G",
+    sigla: "g",
+    nome: "Grama",
+    descricao: "Massa em gramas",
+  },
+  {
+    id: 4,
+    codigo: "L",
+    sigla: "L",
+    nome: "Litro",
+    descricao: "Volume em litros",
+  },
+  {
+    id: 5,
+    codigo: "ML",
+    sigla: "mL",
+    nome: "Mililitro",
+    descricao: "Volume em mililitros",
+  },
+  {
+    id: 6,
+    codigo: "CX",
+    sigla: "cx",
+    nome: "Caixa",
+    descricao: "Quantidade por caixa",
+  },
+  {
+    id: 7,
+    codigo: "SC",
+    sigla: "sc",
+    nome: "Saca",
+    descricao: "Quantidade por saca",
+  },
+  {
+    id: 8,
+    codigo: "FR",
+    sigla: "fr",
+    nome: "Frasco",
+    descricao: "Quantidade por frasco",
+  },
+];
+
+export interface CicloProducaoDistribuicao {
+  id: number;
+  situacao: "Ativo" | "Inativo";
+  capacidade: string;
+  unidade: string;
+  quantidade: string;
+  quantidadeTanques: string;
+}
+
+export const CICLO_UP_MOCK: CicloProducaoDistribuicao[] = [
+  {
+    id: 1,
+    situacao: "Ativo",
+    capacidade: "500",
+    unidade: "m³",
+    quantidade: "120",
+    quantidadeTanques: "5",
+  },
+  {
+    id: 2,
+    situacao: "Inativo",
+    capacidade: "350",
+    unidade: "m³",
+    quantidade: "90",
+    quantidadeTanques: "4",
+  },
+  {
+    id: 3,
+    situacao: "Inativo",
+    capacidade: "750",
+    unidade: "m²",
+    quantidade: "180",
+    quantidadeTanques: "7",
+  },
+  {
+    id: 4,
+    situacao: "Inativo",
+    capacidade: "1200",
+    unidade: "L",
+    quantidade: "450",
+    quantidadeTanques: "12",
+  },
+  {
+    id: 5,
+    situacao: "Inativo",
+    capacidade: "640",
+    unidade: "m³",
+    quantidade: "150",
+    quantidadeTanques: "6",
+  },
+  {
+    id: 6,
+    situacao: "Inativo",
+    capacidade: "980",
+    unidade: "m²",
+    quantidade: "220",
+    quantidadeTanques: "9",
+  },
+];
 
 // ==========================================================
 // COMPONENTE GENÉRICO: MODAL BASE ESTILIZADO
@@ -142,13 +262,6 @@ export function ModalBase({
   );
 }
 
-const PROFISSIONAIS_OFICIAIS_MOCK = [
-  { id: 1, nome: "Dr. Ricardo Alvarenga", crmv: "CRMV-MG 12345", cpf: "123.456.789-00" },
-  { id: 2, nome: "Dra. Mariana Souza", crmv: "CRMV-MG 67890", cpf: "987.654.321-11" },
-  { id: 3, nome: "Dr. Carlos Eduardo Lima", crmv: "CRMV-MG 54321", cpf: "456.789.123-22" },
-  { id: 4, nome: "Dra. Ana Beatris Mendes", crmv: "CRMV-MG 98765", cpf: "321.654.987-33" },
-];
-
 // ==========================================================
 // PATHS SVG REUTILIZÁVEIS
 // ==========================================================
@@ -167,7 +280,7 @@ const DEFAULT_VULN_COLORS: Record<string, string> = {
 function Section({ title, children, defaultOpen = true }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className=" rounded-xl border border-gray-150 shadow-sm">
+    <div className="bg-white rounded-xl shadow-sm">
       <button
         type="button"
         onClick={() => setOpen(!open)}
@@ -358,18 +471,23 @@ export function VisualizarExploracaoPecuariaPage({
   onNavigate = (screen: any) => console.log("navigate:", screen),
 }: PageProps = {}) {
   const r = REGISTRO;
+  const d = CICLO_UP_MOCK;
+  const ativos = d.filter(
+    (c) => c.situacao === "Ativo"
+  );
+  const inativos = d.filter(
+    (c) => c.situacao === "Inativo"
+  );
 
   const [activeTab, setActiveTab] = useState("cadastro");
   const [biosseguridades, setBiosseguridades] = useState<Biosseguridade[]>(BIOSSEGURIDADES_MOCK);
-  const [modalAberto, setModalAberto] = useState(false);
+  const [modalBiosseguiradadeAberto, setModalBiosseguiradadeAberto] = useState(false);
+  const [modalCicloAberto, setModalCicloAberto] = useState(false);
   // ==========================================================
   // ESTADOS DA AVALIAÇÃO DE BIOSSEGURIDADE (CONFORME O PDF)
   // ==========================================================
   const [profissional, setProfissional] = useState("");
   const [dataLevantamento, setDataLevantamento] = useState("");
-
-
-
   const [livreAnimais, setLivreAnimais] = useState<boolean | null>(null);
   const [assistenciaSanitaria, setAssistenciaSanitaria] = useState<boolean | null>(null);
   const [controleTransito, setControleTransito] = useState<boolean | null>(null);
@@ -408,6 +526,7 @@ export function VisualizarExploracaoPecuariaPage({
   const vigentes = biosseguridades.filter((b) => b.vigente);
   const historico = biosseguridades.filter((b) => !b.vigente);
   const ativas = biosseguridades.filter((b) => b.situacao === "Ativa").length;
+  const [unidadeMedida, setUnidadeMedida] = useState("");
 
   const limparModal = () => {
     setNovoTipo("");
@@ -418,10 +537,14 @@ export function VisualizarExploracaoPecuariaPage({
     setNovaObs("");
   };
 
-  const abrirModal = () => {
+  const abrirModalBiosseguridade = () => {
     limparModal();
-    setModalAberto(true);
+    setModalBiosseguiradadeAberto(true);
   };
+
+  const abrirModalCiclo = () => {
+    setModalCicloAberto(true);
+  }
 
   const salvarBiosseguridade = () => {
     if (!novoTipo || !novaMedida) {
@@ -451,14 +574,55 @@ export function VisualizarExploracaoPecuariaPage({
         vigente: true,
       },
     ]);
-    setModalAberto(false);
+    setModalBiosseguiradadeAberto(false);
     limparModal();
   };
 
   const TABS = [
     { id: "cadastro", label: "Cadastro", icon: <FileText size={16} /> },
     { id: "biosseguridade", label: "Biosseguridade", icon: <ShieldCheck size={16} /> },
+    { id: "producao/distribuicao", label: "Ciclo de produção/distribuição", icon: <History size={16} /> },
   ];
+
+  const renderActionButton = () => {
+    switch (activeTab) {
+      case "cadastro":
+        return (
+          <button
+            type="button"
+            onClick={() => onNavigate("editar-exploracao-pecuaria", r)}
+            className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2"
+          >
+            Editar
+          </button>
+        );
+
+      case "biosseguridade":
+        return (
+          <button
+            type="button"
+            onClick={abrirModalBiosseguridade}
+            className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2"
+          >
+            Adicionar Biosseguridade
+          </button>
+        );
+
+      case "producao/distribuicao":
+        return (
+          <button
+            type="button"
+            onClick={abrirModalCiclo}
+            className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2"
+          >
+            Adicionar Ciclo
+          </button>
+        );
+
+      default:
+        return null;
+    }
+  };
 
   // ==========================================================
   // CÁLCULO DINÂMICO DA NOTA E VULNERABILIDADE (0 a 10)
@@ -532,23 +696,7 @@ export function VisualizarExploracaoPecuariaPage({
             </div>
 
             {/* Botão dinâmico conforme a aba ativa */}
-            {activeTab === "cadastro" ? (
-              <button
-                type="button"
-                onClick={() => onNavigate("editar-exploracao-pecuaria", r)}
-                className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2"
-              >
-                Editar
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={abrirModal}
-                className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2"
-              >
-                Adicionar Biosseguridade
-              </button>
-            )}
+            {renderActionButton()}
           </div>
         </div>
 
@@ -910,7 +1058,7 @@ export function VisualizarExploracaoPecuariaPage({
               title="Avaliações de Biosseguridade"
               activeCountText={`${ativas} de ${biosseguridades.length} ativas`}
               icon={<ShieldCheck className="w-5 h-5" />}
-              onAddClick={abrirModal}
+              onAddClick={abrirModalBiosseguridade}
               variant="sem-vinculacao"
               grid="unico"
 
@@ -924,8 +1072,7 @@ export function VisualizarExploracaoPecuariaPage({
                     topBarSvgPath={TOP_BAR_HISTORY}
                     icon={<History size={18} className="text-gray-500" />}
                     actionIcon={<Eye size={16} className="text-gray-500 hover:text-[#008446] transition-colors" />}
-                    onActionClick={() => onNavigate("visualizar-biosseguridade", b)}
-                  />
+                    onActionClick={() => onNavigate("visualizar-biosseguridade", b)} actionIconPath={""} />
                 ))
               }
             >
@@ -948,17 +1095,389 @@ export function VisualizarExploracaoPecuariaPage({
             </AccordionCardGroup>
           </div>
         )}
+
+        {/* ================= Aba de ciclo de produção/distribuição ================= */}
+        {activeTab === "producao/distribuicao" && (
+          <AccordionCardGroup
+            title="Ciclos de Produção/Distribuição"
+            activeCountText={`${ativas} cadastro ativo`}
+            icon={<History className="w-5 h-5" />}
+            onAddClick={abrirModalCiclo}
+            variant="sem-vinculacao"
+            grid="unico"
+            historicoTitle="Histórico de Ciclos Inativos"
+            historicoChildren={inativos.map((c) => (
+              <article
+                key={c.id}
+                className="bg-white border border-gray-100 shadow-sm rounded-sm overflow-hidden min-w-0 w-full"
+              >
+                <div className="h-1 bg-gray-300" />
+                <div className="p-4 flex flex-col gap-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-base font-semibold text-gray-800">
+                      Ciclo de Produção/Distribuição
+                    </h3>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+                    <FloatInput
+                      label="Capacidade de Produção/Distribuição"
+                      className="rounded-sm"
+                      value={c.quantidade}
+                      disabled
+                      onChange={() => { }}
+                    />
+                    <FloatInput
+                      label="Unidade de Medida dos Tanques"
+                      className="rounded-sm"
+                      value={c.unidade}
+                      disabled
+                      onChange={() => { }}
+                    />
+                    <FloatInput
+                      label="Tamanho médio dos Tanques"
+                      className="rounded-sm"
+                      value={c.capacidade}
+                      disabled
+                      onChange={() => { }}
+                    />
+                    <FloatInput
+                      label="Quantidade de Tanques"
+                      className="rounded-sm"
+                      value={c.quantidadeTanques}
+                      disabled
+                      onChange={() => { }}
+                    />
+                  </div>
+                </div>
+              </article>
+            ))} children={
+              ativos.map((c) => (
+                <article
+                  key={c.id}
+                  className="bg-white border border-gray-100 shadow-sm rounded-sm overflow-hidden min-w-0 w-full"
+                >
+                  <div className="h-1 bg-[#1A7A3C]" />
+                  <div className="p-4 flex flex-col gap-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-base font-semibold text-gray-800">
+                        Ciclo de Produção/Distribuição
+                      </h3>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+                      <FloatInput
+                        label="Capacidade de Produção/Distribuição"
+                        className="rounded-sm"
+                        value={c.quantidade}
+                        disabled
+                        onChange={() => { }}
+                      />
+                      <FloatInput
+                        label="Unidade de Medida dos Tanques"
+                        className="rounded-sm"
+                        value={c.unidade}
+                        disabled
+                        onChange={() => { }}
+                      />
+                      <FloatInput
+                        label="Tamanho médio dos Tanques"
+                        className="rounded-sm"
+                        value={c.capacidade}
+                        disabled
+                        onChange={() => { }}
+                      />
+                      <FloatInput
+                        label="Quantidade de Tanques"
+                        className="rounded-sm"
+                        value={c.quantidadeTanques}
+                        disabled
+                        onChange={() => { }}
+                      />
+                    </div>
+                  </div>
+                </article>
+              ))
+            }
+          />
+        )}
       </main>
+
+      {/* ================= Modal de ciclo de produção/distribuição ================= */}
+
+      <ModalBase
+        open={modalCicloAberto}
+        onClose={() => setModalCicloAberto(false)}
+        title="Adicionar Ciclo de Produção/Distribuição"
+        subtitle="Preencha todos os campos para realizar a criação do ciclo de produção/distribuição:"
+        icon={<History size={24} />}
+        saveText="Salvar"
+        cancelText="Cancelar"
+      >
+        <div className="w-full flex flex-col gap-6">
+          <Section title="Ciclo de Produção" defaultOpen={true}>
+            <div className="flex flex-col gap-4">
+              <span className="text-sm text-red-600 w-full text-center">(Exibição dos campos condicionais, aqui está exibindo todos para fins de demonstração no protótipo)</span>
+              <SubGrupo titulo="Engorda">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FloatInput
+                    label="Capacidade de Produção/Distribuição"
+                    className="rounded-sm"
+                    value={""}
+                    required
+                    onChange={() => { }}
+                  />
+                  {/* <FloatInput
+                    label="Unidade de Medida dos Tanques"
+                    className="rounded-sm"
+                    value={""}
+                    required
+                    onChange={() => { }}
+                  /> */}
+                  <EntitySearchInput
+                    label="Unidade de Medida dos Tanques"
+                    placeholder="Buscar por unidade de medida dos tanques"
+                    value={unidadeMedida ? unidadeMedida : ""}
+                    data={UNIDADES_MEDIDA_ENTIDADE}
+                    searchKeys={["nome", "sigla", "descricao"]}
+                    columns={[
+                      { label: "Unidade de Medida", key: "sigla" },
+                      { label: "Descrição", key: "nome" },
+                    ]}
+                    icon={<Ruler size={18} color={GREEN} />}
+                    title="Buscar Unidade de Medida"
+                    subtitle="Busque por uma unidade de medida cadastrada:"
+                    onChange={(ent) => {
+                      setUnidadeMedida(ent.nome);
+                    }}
+                    required
+                  />
+                  <FloatInput
+                    label="Tamanho médio dos Tanques"
+                    className="rounded-sm"
+                    value={""}
+                    required
+                    onChange={() => { }}
+                  />
+                  <FloatInput
+                    label="Quantidade de Tanques"
+                    className="rounded-sm"
+                    value={""}
+                    required
+                    onChange={() => { }}
+                  />
+                </div>
+              </SubGrupo>
+              <SubGrupo titulo="Cria/Recria">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FloatInput
+                    label="Capacidade de Produção/Distribuição"
+                    className="rounded-sm"
+                    value={""}
+                    required
+                    onChange={() => { }}
+                  />
+                  {/* <FloatInput
+                    label="Unidade de Medida dos Tanques"
+                    className="rounded-sm"
+                    value={""}
+                    required
+                    onChange={() => { }}
+                  /> */}
+                  <EntitySearchInput
+                    label="Unidade de Medida dos Tanques"
+                    placeholder="Buscar por unidade de medidas do tanques"
+                    value={unidadeMedida ? unidadeMedida : ""}
+                    data={UNIDADES_MEDIDA_ENTIDADE}
+                    searchKeys={["nome", "sigla", "descricao"]}
+                    columns={[
+                      { label: "Unidade de Medida", key: "sigla" },
+                      { label: "Descrição", key: "nome" },
+                    ]}
+                    icon={<Ruler size={18} color={GREEN} />}
+                    title="Buscar Unidade de Medida"
+                    subtitle="Busque por uma unidade de medida cadastrada:"
+                    onChange={(ent) => {
+                      setUnidadeMedida(ent.nome);
+                    }}
+                    required
+                  />
+                  <FloatInput
+                    label="Tamanho médio dos Tanques"
+                    className="rounded-sm"
+                    value={""}
+                    required
+                    onChange={() => { }}
+                  />
+                  <FloatInput
+                    label="Quantidade de Tanques"
+                    className="rounded-sm"
+                    value={""}
+                    required
+                    onChange={() => { }}
+                  />
+                </div>
+              </SubGrupo>
+              <SubGrupo titulo="Reprodução/Larvicultura">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FloatInput
+                    label="Capacidade de Produção/Distribuição"
+                    className="rounded-sm"
+                    value={""}
+                    required
+                    onChange={() => { }}
+                  />
+                  {/* <FloatInput
+                    label="Unidade de Medida dos Tanques"
+                    className="rounded-sm"
+                    value={""}
+                    required
+                    onChange={() => { }}
+                  /> */}
+                  <EntitySearchInput
+                    label="Unidade de Medida dos Tanques"
+                    placeholder="Buscar por unidade de medidas do tanques"
+                    value={unidadeMedida ? unidadeMedida : ""}
+                    data={UNIDADES_MEDIDA_ENTIDADE}
+                    searchKeys={["nome", "sigla", "descricao"]}
+                    columns={[
+                      { label: "Unidade de Medida", key: "sigla" },
+                      { label: "Descrição", key: "nome" },
+                    ]}
+                    icon={<Ruler size={18} color={GREEN} />}
+                    title="Buscar Unidade de Medida"
+                    subtitle="Busque por uma unidade de medida cadastrada:"
+                    onChange={(ent) => {
+                      setUnidadeMedida(ent.nome);
+                    }}
+                    required
+                  />
+                  <FloatInput
+                    label="Tamanho médio dos Tanques"
+                    className="rounded-sm"
+                    value={""}
+                    required
+                    onChange={() => { }}
+                  />
+                  <FloatInput
+                    label="Quantidade de Tanques"
+                    className="rounded-sm"
+                    value={""}
+                    required
+                    onChange={() => { }}
+                  />
+                </div>
+              </SubGrupo>
+              <SubGrupo titulo="Ciclo Completo">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FloatInput
+                    label="Capacidade de Produção/Distribuição"
+                    className="rounded-sm"
+                    value={""}
+                    required
+                    onChange={() => { }}
+                  />
+                  {/* <FloatInput
+                    label="Unidade de Medida dos Tanques"
+                    className="rounded-sm"
+                    value={""}
+                    required
+                    onChange={() => { }}
+                  /> */}
+                  <EntitySearchInput
+                    label="Unidade de Medida dos Tanques"
+                    placeholder="Buscar por unidade de medidas do tanques"
+                    value={unidadeMedida ? unidadeMedida : ""}
+                    data={UNIDADES_MEDIDA_ENTIDADE}
+                    searchKeys={["nome", "sigla", "descricao"]}
+                    columns={[
+                      { label: "Unidade de Medida", key: "sigla" },
+                      { label: "Descrição", key: "nome" },
+                    ]}
+                    icon={<Ruler size={18} color={GREEN} />}
+                    title="Buscar Unidade de Medida"
+                    subtitle="Busque por uma unidade de medida cadastrada:"
+                    onChange={(ent) => {
+                      setUnidadeMedida(ent.nome);
+                    }}
+                    required
+                  />
+                  <FloatInput
+                    label="Tamanho médio dos Tanques"
+                    className="rounded-sm"
+                    value={""}
+                    required
+                    onChange={() => { }}
+                  />
+                  <FloatInput
+                    label="Quantidade de Tanques"
+                    className="rounded-sm"
+                    value={""}
+                    required
+                    onChange={() => { }}
+                  />
+                </div>
+              </SubGrupo>
+            </div>
+          </Section>
+          <Section title="Ciclo de Distribuição" defaultOpen={true}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FloatInput
+                label="Capacidade de Comercialização/Mês"
+                className="rounded-sm"
+                value={""}
+                required
+                onChange={() => { }}
+              />
+              {/* <FloatInput
+                label="Unidade de Medida dos Tanques/Aquários"
+                className="rounded-sm"
+                value={""}
+                required
+                onChange={() => { }}
+              /> */}
+              <EntitySearchInput
+                    label="Unidade de Medida dos Tanques/Aquários"
+                    placeholder="Buscar por unidade de medida dos tanques/aquários"
+                    value={unidadeMedida ? unidadeMedida : ""}
+                    data={UNIDADES_MEDIDA_ENTIDADE}
+                    searchKeys={["nome", "sigla", "descricao"]}
+                    columns={[
+                      { label: "Unidade de Medida", key: "sigla" },
+                      { label: "Descrição", key: "nome" },
+                    ]}
+                    icon={<Ruler size={18} color={GREEN} />}
+                    title="Buscar Unidade de Medida"
+                    subtitle="Busque por uma unidade de medida cadastrada:"
+                    onChange={(ent) => {
+                      setUnidadeMedida(ent.nome);
+                    }}
+                    required
+                  />
+              <FloatInput
+                label="Tamanho médio dos Tanques/Aquários"
+                className="rounded-sm"
+                value={""}
+                required
+                onChange={() => { }}
+              />
+              <FloatInput
+                label="Quantidade de Tanques/Aquários"
+                className="rounded-sm"
+                value={""}
+                required
+                onChange={() => { }}
+              />
+            </div>
+          </Section>
+        </div>
+      </ModalBase>
+
 
       {/* ==========================================================
           MODAL DE CADASTRO DE BIOSSEGURIDADE (USANDO O NOVO MODALBASE E SECTIONS)
           ========================================================== */}
-      {/* ==========================================================
-          MODAL DE CADASTRO DE BIOSSEGURIDADE (USANDO O NOVO MODALBASE E SECTIONS)
-          ========================================================== */}
       <ModalBase
-        open={modalAberto}
-        onClose={() => setModalAberto(false)}
+        open={modalBiosseguiradadeAberto}
+        onClose={() => setModalBiosseguiradadeAberto(false)}
         title="Adicionar Avaliação de Biosseguridade"
         subtitle="Preencha todos os campos para realizar a avaliação e gerar a pontuação de biosseguridade:"
         icon={<ShieldCheck size={24} />}
@@ -970,73 +1489,21 @@ export function VisualizarExploracaoPecuariaPage({
 
           {/* Seção de Informações Gerais */}
           <Section title="Informações Gerais" defaultOpen={true}>
-            <div className="flex flex-col gap-5 w-full">
-
-              {/* Linha 1: Profissional e CPF (Condicional) */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 w-full items-end">
-                {/* Campo de Busca do Profissional */}
-                <EntitySearchInput
-                  label="Profissional da Área Animal Oficial"
-                  placeholder="Buscar profissional"
-                  required
-                  value={profissional ? profissional.nome : ""}
-                  data={PROFISSIONAIS_OFICIAIS_MOCK}
-                  searchKeys={["nome", "cpf", "crmv"]}
-                  columns={[
-                    { label: "Nome", key: "nome" },
-                    { label: "CRMV", key: "crmv" }
-                  ]}
-                  icon={<img src={Icons.iconeProfissionalAnimalUrl || (Icons as any).iconeprofissionalanimalurl} alt="Profissional Animal" className="w-5 h-5 object-contain" />}
-                  title="Buscar Profissional"
-                  subtitle="Busque por profissional cadastrado:"
-                  onChange={(entidadeSelecionada) => setProfissional(entidadeSelecionada)}
-                />
-
-                {/* 💡 O CPF e o Olhinho só aparecem se 'profissional' estiver selecionado */}
-                {profissional ? (
-                  <div className="flex gap-2 items-end w-full animate-fade-in">
-                    <div className="flex-1">
-                      <FloatInput
-                        label="CPF"
-                        disabled
-                        required
-                        value={profissional.cpf}
-                        onChange={() => { }}
-                        placeholder="000.000.000-00"
-                      />
-                    </div>
-
-                    {/* Botão do Olhinho */}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        alert(`Visualizar detalhes de: ${profissional.nome}\nCRMV: ${profissional.crmv}\nCPF: ${profissional.cpf}`);
-                      }}
-                      className="flex items-center justify-center h-10 w-10 rounded-lg  hover:bg-gray-50 text-gray-600 cursor-pointer transition"
-                      title="Visualizar detalhes do profissional"
-                    >
-                      <Eye size={18} className="text-[#1A7A3C]" />
-                    </button>
-                  </div>
-                ) : (
-                  /* Elemento fantasma para manter o alinhamento do Grid (50% de largura) quando o CPF não estiver visível */
-                  <div className="hidden md:block" />
-                )}
-              </div>
-
-              {/* Linha 2: Data de Levantamento */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 w-full items-end">
-                <FloatInput
-                  label="Data de Levantamento"
-                  required
-                  type="date"
-                  icon={<Calendar size={18} />}
-                  value={dataLevantamento}
-                  onChange={setDataLevantamento}
-                />
-                <div className="hidden md:block" />
-              </div>
-
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 w-full">
+              <FloatSelect
+                label="Profissional da Área Animal Oficial *"
+                required
+                value={profissional}
+                onChange={setProfissional}
+                options={profissionaisOficiais}
+              />
+              <FloatInput
+                label="Data de Levantamento *"
+                type="date"
+                icon={<Calendar size={20} color={GREEN} />}
+                value={dataLevantamento}
+                onChange={(e: any) => setDataLevantamento(e?.target ? e.target.value : e)}
+              />
             </div>
           </Section>
 
