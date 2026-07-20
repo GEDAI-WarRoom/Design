@@ -896,7 +896,7 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate }: Adici
                           </button>
                         </div>
                       </div>
-
+                      {/* Grid de lotes internos da respectiva Nota Fiscal (SÓ APARECE SE A NOTA NÃO ESTIVER MINIMIZADA) */}
                       {/* Grid de lotes internos da respectiva Nota Fiscal (SÓ APARECE SE A NOTA NÃO ESTIVER MINIMIZADA) */}
                       {!isNotaMinimizada && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start animate-slideDown">
