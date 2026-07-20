@@ -16,6 +16,9 @@ import { AdicionarDivisaoMunicipalPage } from "./pages/Geral/DivisaoMunicipal/Ad
 import { EstabelecimentoAgropecuarioPage } from "./pages/Geral/EstabelecimentoAgropecuario/EstabelecimentoAgropecuario";
 import { AdicionarEstabelecimentoAgropecuarioPage } from "./pages/Geral/EstabelecimentoAgropecuario/AdicionarEstabelecimentoAgropecuario";
 import { VisualizarEstabelecimentoAgropecuarioPage } from "./pages/Geral/EstabelecimentoAgropecuario/VisualizarEstabelecimentoAgropecuario";
+import { VendaPropriedadePage } from "./pages/Geral/VendaPropriedade/VendaPropriedade";
+import { AdicionarVendaPropriedadePage } from "./pages/Geral/VendaPropriedade/AdicionarVendaPropriedade";
+import { VisualizarVendaPropriedadePage } from "./pages/Geral/VendaPropriedade/VisualizarVendaPropriedade";
 import { ProdutoPage } from "./pages/Geral/Produto/Produto";
 import { AdicionarProdutoPage } from "./pages/Geral/Produto/AdicionarProduto";
 import { ProfissionalOficialPage } from "./pages/Geral/ProfissionalOficial/ProfissionalOficial";
@@ -177,6 +180,9 @@ export type Screen =
   | "estabelecimento-agropecuario"
   | "adicionar-estabelecimento-agropecuario"
   | "visualizar-estabelecimento-agropecuario"
+  | "venda-propriedade"
+  | "adicionar-venda-propriedade"
+  | "visualizar-venda-propriedade"
   | "venda-saida-vacina"
   | "adicionar-venda-saida-vacina"
   | "venda-entrada-vacina"
@@ -410,6 +416,28 @@ export default function App() {
     case "visualizar-estabelecimento-agropecuario":
       return (
         <VisualizarEstabelecimentoAgropecuarioPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
+        />
+      );
+    case "venda-propriedade":
+      return (
+        <VendaPropriedadePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "adicionar-venda-propriedade":
+      return (
+        <AdicionarVendaPropriedadePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "visualizar-venda-propriedade":
+      return (
+        <VisualizarVendaPropriedadePage
           onLogout={handleLogout}
           onNavigate={handleNavigate}
           dados={screenData}
