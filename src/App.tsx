@@ -82,6 +82,10 @@ import { VisualizarLocalRealizacaoExamePage } from "./pages/Animal/LocalRealizac
 import { EditarLocalRealizacaoExamePage } from "./pages/Animal/LocalRealizacaoExame/EditarLocalRealizacaoExame";
 import { TipoVeiculoPage } from "./pages/Animal/TipoVeiculo/TipoVeiculo";
 import { AdicionarTipoVeiculoPage } from "./pages/Animal/TipoVeiculo/AdicionarTipoVeiculo";
+import { StatusAnimalPage } from "./pages/Animal/StatusAnimal/StatusAnimal";
+import { AdicionarStatusAnimalPage } from "./pages/Animal/StatusAnimal/AdicionarStatusAnimal";
+import { VisualizarStatusAnimalPage } from "./pages/Animal/StatusAnimal/VisualizarStatusAnimal";
+import { EditarStatusAnimalPage } from "./pages/Animal/StatusAnimal/EditarStatusAnimal";
 
 // VEGETAL
 import { UnidadeConsolidacaoPage } from "./pages/Vegetal/UnidadeConsolidacao/UnidadeConsolidacao";
@@ -296,7 +300,11 @@ export type Screen =
   | "item-receita"
   | "adicionar-item-receita"
   | "tipo-veiculo"
-  | "adicionar-tipo-veiculo";
+  | "adicionar-tipo-veiculo"
+  | "status-animal"
+  | "adicionar-status-animal"
+  | "visualizar-status-animal"
+  | "editar-status-animal";
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>("login");
@@ -1300,6 +1308,36 @@ export default function App() {
         <AdicionarTipoVeiculoPage
           onLogout={handleLogout}
           onNavigate={handleNavigate}
+        />
+      );
+    case "status-animal":
+      return (
+        <StatusAnimalPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "adicionar-status-animal":
+      return (
+        <AdicionarStatusAnimalPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "visualizar-status-animal":
+      return (
+        <VisualizarStatusAnimalPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
+        />
+      );
+    case "editar-status-animal":
+      return (
+        <EditarStatusAnimalPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
         />
       );
 

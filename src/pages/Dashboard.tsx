@@ -260,6 +260,11 @@ export const cadastrosCategories: MenuCategory[] = [
         route: "revendedora-animais",
         icon: <Store size={16} />,
       },
+      {
+        label: "Status Animal",
+        route: "status-animal",
+        icon: <ListTree size={16} />,
+      },
 
     ],
   },
