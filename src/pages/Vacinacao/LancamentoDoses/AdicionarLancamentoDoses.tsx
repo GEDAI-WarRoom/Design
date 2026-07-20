@@ -429,12 +429,16 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate }: Pag
                             const totalDosesGrafico = dadosGrafico.reduce((s, d) => s + d.value, 0);
                             const porcentagem = fatiaAtiva ? ((fatiaAtiva.value / totalDosesGrafico) * 100).toFixed(1) : null;
 
+                            // Doses efetivamente disponíveis (o número que decide o lançamento)
+                            const DOSES_DISPONIVEIS = dadosGrafico.find(d => d.name === "Disponíveis")?.value ?? 0;
+                            const FRASCOS_DISPONIVEIS = Math.floor(DOSES_DISPONIVEIS / DOSES_POR_FRASCO);
+
                             const isLoteMinimizado = lotesMinimizados[nfItem.id] || false;
 
                             return (
                               <div
                                 key={`lote-${nfItem.id}`}
-                                className={`border border-gray-200 rounded-xl bg-white shadow-sm flex flex-col justify-between overflow-visible relative group transition-all duration-200 h-auto ${isLoteMinimizado ? "p-2.5 pb-2" : "p-4"
+                                className={`border border-gray-200 rounded-xl bg-white shadow-sm flex flex-col overflow-visible relative group transition-all duration-200 h-auto ${isLoteMinimizado ? "p-2.5 pb-2 justify-start" : "p-4 justify-between"
                                   }`}
                               >
 
@@ -477,7 +481,7 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate }: Pag
                                           </div>
                                           <div className="flex justify-between items-center">
                                             <span>Doença:</span>
-                                            <span className="font-bold text-gray-700">Brucelose</span>
+                                            <span className="font-bold text-gray-700">{nfItem.doenca || "—"}</span>
                                           </div>
                                           <div className="flex justify-between items-center">
                                             <span>Tipo de Vacina:</span>
@@ -497,7 +501,7 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate }: Pag
 
                                     {isLoteMinimizado && (
                                       <span className="text-[11px] text-gray-400 font-medium ml-2 animate-fadeIn">
-                                        ({nfItem.quantidadeDoses || 0} doses lançadas)
+                                        ({DOSES_DISPONIVEIS} disp. · {nfItem.quantidadeDoses || 0} lançadas)
                                       </span>
                                     )}
                                   </div>
@@ -553,11 +557,11 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate }: Pag
                                             </div>
                                           ) : (
                                             <div className="flex flex-col items-center justify-center">
-                                              <span className="text-sm font-black text-gray-800 leading-none">
-                                                {TOTAL_DISPONIVEL}
+                                              <span className="text-base font-black text-gray-800 leading-none">
+                                                {DOSES_DISPONIVEIS}
                                               </span>
-                                              <span className="text-[8px] font-bold text-gray-400 mt-0.5 uppercase tracking-wider">
-                                                Disp
+                                              <span className="text-[7px] font-bold text-gray-400 mt-0.5 uppercase tracking-wider">
+                                                Disponíveis
                                               </span>
                                             </div>
                                           )}
@@ -567,18 +571,18 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate }: Pag
                                       <div className="flex gap-2 flex-1 justify-start items-stretch">
 
                                         <div className="flex flex-col border border-gray-200 rounded-xl px-2.5 py-2 w-full max-w-[130px] gap-1 bg-gray-50/80 justify-between">
-                                          <span className="text-[11px] text-gray-600 font-medium text-center">Total</span>
+                                          <span className="text-[11px] text-gray-600 font-medium text-center">Disponíveis</span>
 
                                           <div className="flex gap-2 items-end justify-center py-0.5">
                                             <div className="flex flex-col items-center flex-1">
-                                              <span className="text-xs font-bold text-gray-700 leading-none">
-                                                {Math.floor(TOTAL_DISPONIVEL / DOSES_POR_FRASCO)}
+                                              <span className="text-sm font-bold text-gray-700 leading-none">
+                                                {FRASCOS_DISPONIVEIS}
                                               </span>
                                               <span className="text-[9px] text-gray-400 font-medium mt-0.5">Frascos</span>
                                             </div>
                                             <div className="flex flex-col items-center flex-1">
-                                              <span className="text-xs font-bold text-gray-700 leading-none">
-                                                {TOTAL_DISPONIVEL}
+                                              <span className="text-sm font-bold text-gray-700 leading-none">
+                                                {DOSES_DISPONIVEIS}
                                               </span>
                                               <span className="text-[9px] text-gray-400 font-medium mt-0.5">Doses</span>
                                             </div>
@@ -661,13 +665,20 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate }: Pag
                                       />
                                     </div>
                                     <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 mt-3 pt-2 border-t border-gray-100 text-[9px] z-10">
-                                      {dadosGrafico.map((item) => (
-                                        <div key={item.name} className="flex items-center gap-1 bg-gray-50 px-1 py-0.5 rounded border border-gray-100">
-                                          <span className="w-1 h-1 rounded-full" style={{ backgroundColor: item.color }} />
-                                          <span className="text-gray-400 font-medium">{item.name}:</span>
-                                          <span className="font-bold text-gray-600">{item.value}</span>
-                                        </div>
-                                      ))}
+                                      {dadosGrafico
+                                        .filter((item) => item.name !== "Disponíveis")
+                                        .map((item) => (
+                                          <div key={item.name} className="flex items-center gap-1 bg-gray-50 px-1 py-0.5 rounded border border-gray-100">
+                                            <span className="w-1 h-1 rounded-full" style={{ backgroundColor: item.color }} />
+                                            <span className="text-gray-400 font-medium">{item.name}:</span>
+                                            <span className="font-bold text-gray-600">{item.value}</span>
+                                          </div>
+                                        ))}
+
+                                      <div className="flex items-center gap-1 px-1 py-0.5 ml-auto">
+                                        <span className="text-gray-400 font-medium">Total do lote:</span>
+                                        <span className="font-bold text-gray-600">{totalDosesGrafico}</span>
+                                      </div>
                                     </div>
                                   </div>
                                 )}
