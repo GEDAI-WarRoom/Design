@@ -131,6 +131,11 @@ import {
 } from "./pages/Arrecadacao/FundoArrecadacao/FundoArrecadacaoDetalhe";
 import { ItemReceitaPage } from "./pages/Arrecadacao/ItemReceita/ItemReceita";
 import { AdicionarItemReceitaPage } from "./pages/Arrecadacao/ItemReceita/AdicionarItemReceita";
+import { LotePagamentoPage } from "./pages/Arrecadacao/LotePagamento/LotePagamento";
+import { AdicionarLotePagamentoPage } from "./pages/Arrecadacao/LotePagamento/AdicionarLotePagamento";
+import { VisualizarLotePagamentoPage } from "./pages/Arrecadacao/LotePagamento/VisualizarLotePagamento";
+import { VisualizarDocumentoLotePagamentoPage } from "./pages/Arrecadacao/LotePagamento/VisualizarDocumentoLotePagamento";
+import { VisualizarDaeLotePagamentoPage } from "./pages/Arrecadacao/LotePagamento/VisualizarDaeLotePagamento";
 
 // GTA
 import { AdicionarDistribuicaoFormulariosGta } from "./pages/GTA/DistribuicaoFormulariosGta/AdicionarDistribuicaoFormulariosGta";
@@ -295,6 +300,11 @@ export type Screen =
   | "editar-fundo-arrecadacao"
   | "item-receita"
   | "adicionar-item-receita"
+  | "lote-pagamento"
+  | "adicionar-lote-pagamento"
+  | "visualizar-lote-pagamento"
+  | "visualizar-documento-lote-pagamento"
+  | "visualizar-dae-lote-pagamento"
   | "tipo-veiculo"
   | "adicionar-tipo-veiculo";
 
@@ -1291,6 +1301,44 @@ export default function App() {
     case "adicionar-item-receita":
       return (
         <AdicionarItemReceitaPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "lote-pagamento":
+      return (
+        <LotePagamentoPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "adicionar-lote-pagamento":
+      return (
+        <AdicionarLotePagamentoPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "visualizar-lote-pagamento":
+      return (
+        <VisualizarLotePagamentoPage
+          dados={screenData}
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "visualizar-documento-lote-pagamento":
+      return (
+        <VisualizarDocumentoLotePagamentoPage
+          dados={screenData}
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "visualizar-dae-lote-pagamento":
+      return (
+        <VisualizarDaeLotePagamentoPage
+          dados={screenData}
           onLogout={handleLogout}
           onNavigate={handleNavigate}
         />
