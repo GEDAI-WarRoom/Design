@@ -146,6 +146,16 @@ import { FinalidadeTransitoPage } from "./pages/GTA/FinalidadeTransito/Finalidad
 import { AdicionarFinalidadeTransitoPage } from "./pages/GTA/FinalidadeTransito/AdicionarFinalidadeTransito";
 import { IsencaoTaxaGtaPage } from "./pages/GTA/IsencaoTaxaGTA/IsencaoTaxaGTA";
 import { AdicionarIsencaoTaxaGtaPage } from "./pages/GTA/IsencaoTaxaGTA/AdicionarIsencaoTaxaGTA";
+import { RecolhimentoMensalGTAPage } from "./pages/GTA/RecolhimentoMensalGTA/RecolhimentoMensalGTA";
+import { AdicionarRecolhimentoMensalGTAPage } from "./pages/GTA/RecolhimentoMensalGTA/AdicionarRecolhimentoMensalGTA";
+import {
+  EditarRecolhimentoMensalGTAPage,
+  VisualizarRecolhimentoMensalGTAPage,
+} from "./pages/GTA/RecolhimentoMensalGTA/RecolhimentoMensalGTADetalhe";
+import {
+  VisualizarBoletoRecolhimentoGTAPage,
+  VisualizarDAERecolhimentoGTAPage,
+} from "./pages/GTA/RecolhimentoMensalGTA/VisualizarDocumentosRecolhimentoGTA";
 
 // CONTROLE
 import { UsuariosPage } from "./pages/Controle/Usuarios/Usuarios";
@@ -289,6 +299,12 @@ export type Screen =
   | "editar-instituicao-ensino-pesquisa"
   | "isencao-taxa-gta"
   | "adicionar-isencao-taxa-gta"
+  | "recolhimento-mensal-gta"
+  | "adicionar-recolhimento-mensal-gta"
+  | "visualizar-recolhimento-mensal-gta"
+  | "editar-recolhimento-mensal-gta"
+  | "visualizar-boleto-recolhimento-gta"
+  | "visualizar-dae-recolhimento-gta"
   | "fundo-arrecadacao"
   | "adicionar-fundo-arrecadacao"
   | "visualizar-fundo-arrecadacao"
@@ -1278,6 +1294,52 @@ export default function App() {
         <AdicionarIsencaoTaxaGtaPage
           onLogout={handleLogout}
           onNavigate={handleNavigate}
+        />
+      );
+    case "recolhimento-mensal-gta":
+      return (
+        <RecolhimentoMensalGTAPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "adicionar-recolhimento-mensal-gta":
+      return (
+        <AdicionarRecolhimentoMensalGTAPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "visualizar-recolhimento-mensal-gta":
+      return (
+        <VisualizarRecolhimentoMensalGTAPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
+        />
+      );
+    case "editar-recolhimento-mensal-gta":
+      return (
+        <EditarRecolhimentoMensalGTAPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
+        />
+      );
+    case "visualizar-boleto-recolhimento-gta":
+      return (
+        <VisualizarBoletoRecolhimentoGTAPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
+        />
+      );
+    case "visualizar-dae-recolhimento-gta":
+      return (
+        <VisualizarDAERecolhimentoGTAPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
         />
       );
     case "item-receita":

@@ -481,6 +481,11 @@ export const secondaryCategories: MenuCategory[] = [
         route: "isencao-taxa-gta",
         icon: <BadgePercent size={16} />,
       },
+      {
+        label: "Recolhimento Mensal de GTAs",
+        route: "recolhimento-mensal-gta",
+        icon: <ReceiptText size={16} />,
+      },
     ],
   },
 ];
