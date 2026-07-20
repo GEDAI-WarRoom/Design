@@ -421,6 +421,10 @@ export const secondaryCategories: MenuCategory[] = [
         route: "local-realizacao-exame",
         icon: <MapPinned size={16} />,
       },
+      {
+        label: "Atestado De Exame",
+        route: "atestado-exame",
+      },
     ],
   },
   {

@@ -120,6 +120,11 @@ import { AdicionarTipoInsumoExamePage } from "./pages/Vacinacao/TipoInsumoExame/
 import { VisualizarTipoInsumoExamePage } from "./pages/Vacinacao/TipoInsumoExame/VisualizarTipoInsumoExame";
 import { EditarTipoInsumoExamePage } from "./pages/Vacinacao/TipoInsumoExame/EditarTipoInsumoExame";
 
+import { AtestadoExamePage } from "./pages/Vacinacao/AtestadoExame/AtestadoExame";
+import { AdicionarAtestadoExamePage } from "./pages/Vacinacao/AtestadoExame/AdicionarAtestadoExame";
+import { VisualizarAtestadoExamePage } from "./pages/Vacinacao/AtestadoExame/VisualizarAtestadoExame";
+import { EditarAtestadoExamePage } from "./pages/Vacinacao/AtestadoExame/EditarAtestadoExame";
+
 //ARRECADACAO
 import { ValorIndicePage } from "./pages/Arrecadacao/ValorIndice/ValorIndice";
 import { AdicionarValorIndicePage } from "./pages/Arrecadacao/ValorIndice/AdicionarValorIndice";
@@ -296,7 +301,11 @@ export type Screen =
   | "item-receita"
   | "adicionar-item-receita"
   | "tipo-veiculo"
-  | "adicionar-tipo-veiculo";
+  | "adicionar-tipo-veiculo"
+  | "atestado-exame"
+  | "adicionar-atestado-exame"
+  | "visualizar-atestado-exame"
+  | "editar-atestado-exame"
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>("login");
@@ -1317,6 +1326,35 @@ export default function App() {
           onLogout={handleLogout}
           onNavigate={handleNavigate}
           instituicao={screenData}
+        />
+      );
+    
+      case "atestado-exame":
+      return (
+        <AtestadoExamePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+      case "adicionar-atestado-exame":
+      return (
+        <AdicionarAtestadoExamePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+      case "visualizar-atestado-exame":
+      return (
+        <VisualizarAtestadoExamePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+      case "editar-atestado-exame":
+      return (
+        <EditarAtestadoExamePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
         />
       );
 
