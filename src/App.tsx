@@ -131,6 +131,9 @@ import {
 } from "./pages/Arrecadacao/FundoArrecadacao/FundoArrecadacaoDetalhe";
 import { ItemReceitaPage } from "./pages/Arrecadacao/ItemReceita/ItemReceita";
 import { AdicionarItemReceitaPage } from "./pages/Arrecadacao/ItemReceita/AdicionarItemReceita";
+import { DAEBuscaPage } from "./pages/Arrecadacao/DAE/DAE";
+import { AdicionarDAEPage } from "./pages/Arrecadacao/DAE/AdicionarDAE";
+import { VisualizarDAEPage } from "./pages/Arrecadacao/DAE/VisualizarDAE";
 
 // GTA
 import { AdicionarDistribuicaoFormulariosGta } from "./pages/GTA/DistribuicaoFormulariosGta/AdicionarDistribuicaoFormulariosGta";
@@ -295,6 +298,9 @@ export type Screen =
   | "editar-fundo-arrecadacao"
   | "item-receita"
   | "adicionar-item-receita"
+  | "dae"
+  | "adicionar-dae"
+  | "visualizar-dae"
   | "tipo-veiculo"
   | "adicionar-tipo-veiculo";
 
@@ -1293,6 +1299,22 @@ export default function App() {
         <AdicionarItemReceitaPage
           onLogout={handleLogout}
           onNavigate={handleNavigate}
+        />
+      );
+    case "dae":
+      return (
+        <DAEBuscaPage onLogout={handleLogout} onNavigate={handleNavigate} />
+      );
+    case "adicionar-dae":
+      return (
+        <AdicionarDAEPage onLogout={handleLogout} onNavigate={handleNavigate} />
+      );
+    case "visualizar-dae":
+      return (
+        <VisualizarDAEPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dae={screenData}
         />
       );
     case "adicionar-tipo-veiculo":
