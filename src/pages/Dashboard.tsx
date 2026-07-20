@@ -498,7 +498,13 @@ export const thirdCategories: MenuCategory[] = [
       {
         label: "Valor Por Índice",
         route: "valor-indice",
-        icon: <ChartColumn size={16} />,
+        icon: (
+          <img
+            src={Icons.iconeIndiceUrl}
+            alt="Valor por Índice"
+            className="w-4 h-4 object-contain"
+          />
+        ),
       },
       {
         label: "Fundo de Arrecadação",

@@ -40,6 +40,7 @@ import iconeProfissionaisUrl from "./Ícone=Profissionais.svg";
 import iconeHabilitacaoUrl from "./Ícone=Habilitação.svg";
 import iconePontuacaoUrl from "./Ícone=Pontuação.svg";
 import iconeInsumoUrl from "./Ícone=Tipo de Insumo.svg";
+import iconeIndiceUrl from "./Ícone=Valor por Indice.svg";
 
 
 export {
@@ -84,5 +85,6 @@ export {
   iconeProfissionaisUrl,
   iconeHabilitacaoUrl,
   iconePontuacaoUrl,
-  iconeInsumoUrl
+  iconeInsumoUrl,
+  iconeIndiceUrl
 };
