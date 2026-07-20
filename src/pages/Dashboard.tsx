@@ -2,11 +2,9 @@ import {
   BadgePercent,
   BriefcaseBusiness,
   Calendar,
-  ChartColumn,
   ClipboardList,
   Dna,
   DollarSign,
-  FileText,
   FlaskConical,
   Globe,
   Landmark,
@@ -27,7 +25,6 @@ import {
   TowerControl,
   Truck,
   User,
-  Users,
   Wallet,
 } from "lucide-react";
 import { Navbar } from "../components/Navbar";
@@ -260,7 +257,6 @@ export const cadastrosCategories: MenuCategory[] = [
         route: "revendedora-animais",
         icon: <Store size={16} />,
       },
-
     ],
   },
   {
@@ -339,6 +335,11 @@ export const secondaryCategories: MenuCategory[] = [
       {
         label: "Venda com Entrada de Vacina",
         route: "venda-entrada-vacina",
+        icon: <PackagePlus size={16} />,
+      },
+      {
+        label: "Venda com Entrada de Insumos para Exames",
+        route: "venda-entrada-insumos-exames",
         icon: <PackagePlus size={16} />,
       },
       {
@@ -610,9 +611,7 @@ export function DashboardPage({ onLogout, onNavigate }: any) {
 
         {/* Bloco de Cadastros (Exatamente como estava) */}
         <div className="flex flex-col bg-white rounded-xl shadow-sm p-6 mb-6 gap-6">
-          <h2 className="text-xl font-semibold text-gray-800">
-            Cadastros
-          </h2>
+          <h2 className="text-xl font-semibold text-gray-800">Cadastros</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {cadastrosCategories.map((cat) => (
               <CategoryCard key={cat.title} cat={cat} onNavigate={onNavigate} />
@@ -630,7 +629,6 @@ export function DashboardPage({ onLogout, onNavigate }: any) {
             ))}
           </div>
         </div>
-
 
         <div className="bg-white rounded-xl shadow-sm p-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">

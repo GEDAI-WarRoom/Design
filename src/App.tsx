@@ -1,160 +1,162 @@
 import { useState } from "react";
-import { LoginPage } from "./pages/Login";
 import { DashboardPage } from "./pages/Dashboard";
+import { LoginPage } from "./pages/Login";
 
 // GERAL
-import { PessoaFisicaPage } from "./pages/Geral/PessoaFisica/PessoaFisica";
-import { AdicionarPessoaFisicaPage } from "./pages/Geral/PessoaFisica/AdicionarPessoaFisica";
-import { VisualizarPessoaFisica } from "./pages/Geral/PessoaFisica/VisualizarPessoaFisica";
-import { EditarPessoaFisica } from "./pages/Geral/PessoaFisica/EditarPessoaFisica";
-import { PessoaJuridicaPage } from "./pages/Geral/PessoaJuridica/PessoaJuridica";
-import { AdicionarPessoaJuridicaPage } from "./pages/Geral/PessoaJuridica/AdicionarPessoaJuridica";
-import { VisualizarPessoaJuridicaPage } from "./pages/Geral/PessoaJuridica/VisualizarPessoaJuridica";
-import { EditarPessoaJuridicaPage } from "./pages/Geral/PessoaJuridica/EditarPessoaJuridica";
-import { DivisaoMunicipalPage } from "./pages/Geral/DivisaoMunicipal/DivisaoMunicipal";
-import { AdicionarDivisaoMunicipalPage } from "./pages/Geral/DivisaoMunicipal/AdicionarDivisaoMunicipal";
-import { EstabelecimentoAgropecuarioPage } from "./pages/Geral/EstabelecimentoAgropecuario/EstabelecimentoAgropecuario";
-import { AdicionarEstabelecimentoAgropecuarioPage } from "./pages/Geral/EstabelecimentoAgropecuario/AdicionarEstabelecimentoAgropecuario";
-import { VisualizarEstabelecimentoAgropecuarioPage } from "./pages/Geral/EstabelecimentoAgropecuario/VisualizarEstabelecimentoAgropecuario";
-import { ProdutoPage } from "./pages/Geral/Produto/Produto";
-import { AdicionarProdutoPage } from "./pages/Geral/Produto/AdicionarProduto";
-import { ProfissionalOficialPage } from "./pages/Geral/ProfissionalOficial/ProfissionalOficial";
-import { AdicionarProfissionalOficialPage } from "./pages/Geral/ProfissionalOficial/AdicionarProfissionalOficial";
-import { UnidadeAdministrativaPage } from "./pages/Geral/UnidadeAdministrativa/UnidadeAdministrativa";
-import { AdicionarUnidadeAdministrativaPage } from "./pages/Geral/UnidadeAdministrativa/AdicionarUnidadeAdministrativa";
-import { UnidadeMedidaPage } from "./pages/Geral/UnidadeMedida/UnidadeMedida";
-import { AdicionarUnidadeMedidaPage } from "./pages/Geral/UnidadeMedida/AdicionarUnidadeMedida";
-import { ReceitaPage } from "./pages/Arrecadacao/Receita/Receita";
 import { AdicionarReceitaPage } from "./pages/Arrecadacao/Receita/AdicionarReceita";
 import { EditarReceitaPage } from "./pages/Arrecadacao/Receita/EditarReceita";
+import { ReceitaPage } from "./pages/Arrecadacao/Receita/Receita";
 import { VisualizarReceitaPage } from "./pages/Arrecadacao/Receita/VisualizarReceita";
+import { AdicionarAeroportoPorto } from "./pages/Geral/AeroportoPorto/AdicionarAeroportoPorto";
+import { AeroportoPorto } from "./pages/Geral/AeroportoPorto/AeroportoPorto";
+import { AdicionarClassificacaoSanitariaEstadoPage } from "./pages/Geral/ClassificacaoSanitariaEstado/AdicionarClassificacaoSanitariaEstado";
+import { ClassificacaoSanitariaEstadoPage } from "./pages/Geral/ClassificacaoSanitariaEstado/ClassificacaoSanitariaEstado";
+import { EditarClassificacaoSanitariaEstadoPage } from "./pages/Geral/ClassificacaoSanitariaEstado/EditarClassificacaoSanitariaEstado";
+import { VisualizarClassificacaoSanitariaEstadoPage } from "./pages/Geral/ClassificacaoSanitariaEstado/VisualizarClassificacaoSanitariaEstado";
+import { AdicionarDivisaoMunicipalPage } from "./pages/Geral/DivisaoMunicipal/AdicionarDivisaoMunicipal";
+import { DivisaoMunicipalPage } from "./pages/Geral/DivisaoMunicipal/DivisaoMunicipal";
+import { AdicionarEstabelecimentoAgropecuarioPage } from "./pages/Geral/EstabelecimentoAgropecuario/AdicionarEstabelecimentoAgropecuario";
+import { EstabelecimentoAgropecuarioPage } from "./pages/Geral/EstabelecimentoAgropecuario/EstabelecimentoAgropecuario";
+import { VisualizarEstabelecimentoAgropecuarioPage } from "./pages/Geral/EstabelecimentoAgropecuario/VisualizarEstabelecimentoAgropecuario";
+import { AdicionarInstituicaoEnsinoPesquisaPage } from "./pages/Geral/InstituiçãoEnsinoPesquisa/AdicionarInstituiçãoEnsinoPesquisa";
+import { EditarInstituicaoEnsinoPesquisaPage } from "./pages/Geral/InstituiçãoEnsinoPesquisa/EditarInstituicaoEnsinoPesquisa";
+import { InstituicaoEnsinoPesquisa } from "./pages/Geral/InstituiçãoEnsinoPesquisa/InstituiçãoEnsinoPesquisa";
+import { VisualizarInstituicaoEnsinoPesquisaPage } from "./pages/Geral/InstituiçãoEnsinoPesquisa/VisualizarInstituicaoEnsinoPesquisa";
+import { AdicionarPessoaFisicaPage } from "./pages/Geral/PessoaFisica/AdicionarPessoaFisica";
+import { EditarPessoaFisica } from "./pages/Geral/PessoaFisica/EditarPessoaFisica";
+import { PessoaFisicaPage } from "./pages/Geral/PessoaFisica/PessoaFisica";
+import { VisualizarPessoaFisica } from "./pages/Geral/PessoaFisica/VisualizarPessoaFisica";
+import { AdicionarPessoaJuridicaPage } from "./pages/Geral/PessoaJuridica/AdicionarPessoaJuridica";
+import { EditarPessoaJuridicaPage } from "./pages/Geral/PessoaJuridica/EditarPessoaJuridica";
+import { PessoaJuridicaPage } from "./pages/Geral/PessoaJuridica/PessoaJuridica";
+import { VisualizarPessoaJuridicaPage } from "./pages/Geral/PessoaJuridica/VisualizarPessoaJuridica";
+import { AdicionarProdutoPage } from "./pages/Geral/Produto/AdicionarProduto";
+import { ProdutoPage } from "./pages/Geral/Produto/Produto";
+import { AdicionarProfissionalOficialPage } from "./pages/Geral/ProfissionalOficial/AdicionarProfissionalOficial";
+import { ProfissionalOficialPage } from "./pages/Geral/ProfissionalOficial/ProfissionalOficial";
+import { AdicionarRevendedoraAgropecuarioPage } from "./pages/Geral/RevendedoraAgropecuaria/AdicionarRevendedoraAgropecuaria";
+import { EditarRevendedoraAgropecuarioPage } from "./pages/Geral/RevendedoraAgropecuaria/EditarRevendedoraAgropecuaria";
 import { RevendedoraAgropecuarioPage } from "./pages/Geral/RevendedoraAgropecuaria/RevendedoraAgropecuaria";
 import { VisualizarRevendedoraAgropecuarioPage } from "./pages/Geral/RevendedoraAgropecuaria/VisualizarRevendedoraAgropecuaria";
-import { EditarRevendedoraAgropecuarioPage } from "./pages/Geral/RevendedoraAgropecuaria/EditarRevendedoraAgropecuaria";
-import { AdicionarRevendedoraAgropecuarioPage } from "./pages/Geral/RevendedoraAgropecuaria/AdicionarRevendedoraAgropecuaria";
-import { AeroportoPorto } from "./pages/Geral/AeroportoPorto/AeroportoPorto";
-import { AdicionarAeroportoPorto } from "./pages/Geral/AeroportoPorto/AdicionarAeroportoPorto";
-import { ClassificacaoSanitariaEstadoPage } from "./pages/Geral/ClassificacaoSanitariaEstado/ClassificacaoSanitariaEstado";
-import { AdicionarClassificacaoSanitariaEstadoPage } from "./pages/Geral/ClassificacaoSanitariaEstado/AdicionarClassificacaoSanitariaEstado";
-import { VisualizarClassificacaoSanitariaEstadoPage } from "./pages/Geral/ClassificacaoSanitariaEstado/VisualizarClassificacaoSanitariaEstado";
-import { EditarClassificacaoSanitariaEstadoPage } from "./pages/Geral/ClassificacaoSanitariaEstado/EditarClassificacaoSanitariaEstado";
-import { InstituicaoEnsinoPesquisa } from "./pages/Geral/InstituiçãoEnsinoPesquisa/InstituiçãoEnsinoPesquisa";
-import { AdicionarInstituicaoEnsinoPesquisaPage } from "./pages/Geral/InstituiçãoEnsinoPesquisa/AdicionarInstituiçãoEnsinoPesquisa";
-import { VisualizarInstituicaoEnsinoPesquisaPage } from "./pages/Geral/InstituiçãoEnsinoPesquisa/VisualizarInstituicaoEnsinoPesquisa";
-import { EditarInstituicaoEnsinoPesquisaPage } from "./pages/Geral/InstituiçãoEnsinoPesquisa/EditarInstituicaoEnsinoPesquisa";
+import { AdicionarUnidadeAdministrativaPage } from "./pages/Geral/UnidadeAdministrativa/AdicionarUnidadeAdministrativa";
+import { UnidadeAdministrativaPage } from "./pages/Geral/UnidadeAdministrativa/UnidadeAdministrativa";
+import { AdicionarUnidadeMedidaPage } from "./pages/Geral/UnidadeMedida/AdicionarUnidadeMedida";
+import { UnidadeMedidaPage } from "./pages/Geral/UnidadeMedida/UnidadeMedida";
 
 // ANIMAL
-import { CertificadoraSISBOVPage } from "./pages/Animal/CertificadoraSISBOV/CertificadoraSISBOV";
 import { AdicionarCertificadoraSISBOVPage } from "./pages/Animal/CertificadoraSISBOV/AdicionarCertificadoraSISBOV";
-import { EspeciePage } from "./pages/Animal/Especie/Especie";
+import { CertificadoraSISBOVPage } from "./pages/Animal/CertificadoraSISBOV/CertificadoraSISBOV";
 import { AdicionarEspeciePage } from "./pages/Animal/Especie/AdicionarEspecie";
+import { EspeciePage } from "./pages/Animal/Especie/Especie";
 import { VisualizarEspeciePage } from "./pages/Animal/Especie/VisualizarEspecie";
-import { NucleoProducaoPage } from "./pages/Animal/NucleoProducao/NucleoProducao";
-import { AdicionarNucleoProducaoPage } from "./pages/Animal/NucleoProducao/AdicionarNucleoProducao";
-import { VisualizarNucleoProducaoPage } from "./pages/Animal/NucleoProducao/VisualizarNucleoProducao";
-import { EditarNucleoProducaoPage } from "./pages/Animal/NucleoProducao/EditarNucleoProducao";
-import { PrevisaoMigracaoDetalhePage } from "./pages/Animal/PrevisaoMigracao/PrevisaoMigracaoDetalhe";
-import { ExploracaoPecuariaPage } from "./pages/Animal/ExploracaoPecuaria/ExploracaoPecuaria";
-import { AdicionarExploracaoPecuariaPage } from "./pages/Animal/ExploracaoPecuaria/AdicionarExploracaoPecuaria";
-import { VisualizarExploracaoPecuariaPage } from "./pages/Animal/ExploracaoPecuaria/VisualizarExploracaoPecuaria";
-import { EstabelecimentoAgroindustrialSIEMGPage } from "./pages/Animal/EstabelecimentoAgroindustrialSIEMG/EstabelecimentoAgroindustrialSIEMG";
-import { AdicionarEstabelecimentoAgroindustrialSIEMGPage } from "./pages/Animal/EstabelecimentoAgroindustrialSIEMG/AdicionarEstabelecimentoAgroindustrialSIEMG";
-import { VisualizarEstabelecimentoAgroindustrialSIEMGPage } from "./pages/Animal/EstabelecimentoAgroindustrialSIEMG/VisualizarEstabelecimentoAgroindustrialSIEMG";
-import { PassaporteEquestrePage } from "./pages/Animal/PassaporteEquestre/PassaporteEquestre";
-import { AdicionarPassaporteEquestrePage } from "./pages/Animal/PassaporteEquestre/AdicionarPassaporteEquestre";
-import { VisualizarPassaporteEquestrePage } from "./pages/Animal/PassaporteEquestre/VisualizarPassaporteEquestre";
-import { EstabelecimentoEventoPecuarioPage } from "./pages/Animal/EstabelecimentoEventoPecuario/EstabelecimentoEventoPecuario";
-import { AdicionarEstabelecimentoEventoPecuarioPage } from "./pages/Animal/EstabelecimentoEventoPecuario/AdicionarEstabelecimentoEventoPecuario";
-import { IntegradoraCooperativaPage } from "./pages/Animal/IntegradoraCooperativa/IntegradoraCooperativa";
-import { AdicionarIntegradoraCooperativaPage } from "./pages/Animal/IntegradoraCooperativa/AdicionarIntegradoraCooperativa";
-import { VisualizarIntegradoraCooperativaPage } from "./pages/Animal/IntegradoraCooperativa/VisualizarIntegradoraCooperativa";
-import { ProfissionalAnimalPage } from "./pages/Animal/ProfissionalAnimal/ProfissionalAnimal";
-import { AdicionarProfissionalAnimalPage } from "./pages/Animal/ProfissionalAnimal/AdicionarProfissionalAnimal";
-import { PromotoraEventosPage } from "./pages/Animal/PromotoraEventos/PromotoraEventos";
-import { AdicionarPromotoraEventosPage } from "./pages/Animal/PromotoraEventos/AdicionarPromotoraEventos";
-import { RevendedoraAnimaisPage } from "./pages/Animal/RevendedoraAnimais/RevendedoraAnimais";
-import { AdicionarRevendedoraAnimaisPage } from "./pages/Animal/RevendedoraAnimais/AdicionarRevendedoraAnimais";
-import { VisualizarRevendedoraAnimaisPage } from "./pages/Animal/RevendedoraAnimais/VisualizarRevendedoraAnimais";
 import { VisualizarEstabelecimentoAgroindustrialOutrasInspecoesPage } from "./pages/Animal/EstabelecimentoAgroindustrialOutrasInspecoes/VisualizarEstabelecimentoAgroindustrialOutrasInspecoes";
-import { LocalRealizacaoExamePage } from "./pages/Animal/LocalRealizacaoExame/LocalRealizacaoExame";
+import { AdicionarEstabelecimentoAgroindustrialSIEMGPage } from "./pages/Animal/EstabelecimentoAgroindustrialSIEMG/AdicionarEstabelecimentoAgroindustrialSIEMG";
+import { EstabelecimentoAgroindustrialSIEMGPage } from "./pages/Animal/EstabelecimentoAgroindustrialSIEMG/EstabelecimentoAgroindustrialSIEMG";
+import { VisualizarEstabelecimentoAgroindustrialSIEMGPage } from "./pages/Animal/EstabelecimentoAgroindustrialSIEMG/VisualizarEstabelecimentoAgroindustrialSIEMG";
+import { AdicionarEstabelecimentoEventoPecuarioPage } from "./pages/Animal/EstabelecimentoEventoPecuario/AdicionarEstabelecimentoEventoPecuario";
+import { EstabelecimentoEventoPecuarioPage } from "./pages/Animal/EstabelecimentoEventoPecuario/EstabelecimentoEventoPecuario";
+import { AdicionarExploracaoPecuariaPage } from "./pages/Animal/ExploracaoPecuaria/AdicionarExploracaoPecuaria";
+import { ExploracaoPecuariaPage } from "./pages/Animal/ExploracaoPecuaria/ExploracaoPecuaria";
+import { VisualizarExploracaoPecuariaPage } from "./pages/Animal/ExploracaoPecuaria/VisualizarExploracaoPecuaria";
+import { AdicionarIntegradoraCooperativaPage } from "./pages/Animal/IntegradoraCooperativa/AdicionarIntegradoraCooperativa";
+import { IntegradoraCooperativaPage } from "./pages/Animal/IntegradoraCooperativa/IntegradoraCooperativa";
+import { VisualizarIntegradoraCooperativaPage } from "./pages/Animal/IntegradoraCooperativa/VisualizarIntegradoraCooperativa";
 import { AdicionarLocalRealizacaoExamePage } from "./pages/Animal/LocalRealizacaoExame/AdicionarLocalRealizacaoExame";
-import { VisualizarLocalRealizacaoExamePage } from "./pages/Animal/LocalRealizacaoExame/VisualizarLocalRealizacaoExame";
 import { EditarLocalRealizacaoExamePage } from "./pages/Animal/LocalRealizacaoExame/EditarLocalRealizacaoExame";
-import { TipoVeiculoPage } from "./pages/Animal/TipoVeiculo/TipoVeiculo";
+import { LocalRealizacaoExamePage } from "./pages/Animal/LocalRealizacaoExame/LocalRealizacaoExame";
+import { VisualizarLocalRealizacaoExamePage } from "./pages/Animal/LocalRealizacaoExame/VisualizarLocalRealizacaoExame";
+import { AdicionarNucleoProducaoPage } from "./pages/Animal/NucleoProducao/AdicionarNucleoProducao";
+import { EditarNucleoProducaoPage } from "./pages/Animal/NucleoProducao/EditarNucleoProducao";
+import { NucleoProducaoPage } from "./pages/Animal/NucleoProducao/NucleoProducao";
+import { VisualizarNucleoProducaoPage } from "./pages/Animal/NucleoProducao/VisualizarNucleoProducao";
+import { AdicionarPassaporteEquestrePage } from "./pages/Animal/PassaporteEquestre/AdicionarPassaporteEquestre";
+import { PassaporteEquestrePage } from "./pages/Animal/PassaporteEquestre/PassaporteEquestre";
+import { VisualizarPassaporteEquestrePage } from "./pages/Animal/PassaporteEquestre/VisualizarPassaporteEquestre";
+import { PrevisaoMigracaoDetalhePage } from "./pages/Animal/PrevisaoMigracao/PrevisaoMigracaoDetalhe";
+import { AdicionarProfissionalAnimalPage } from "./pages/Animal/ProfissionalAnimal/AdicionarProfissionalAnimal";
+import { ProfissionalAnimalPage } from "./pages/Animal/ProfissionalAnimal/ProfissionalAnimal";
+import { AdicionarPromotoraEventosPage } from "./pages/Animal/PromotoraEventos/AdicionarPromotoraEventos";
+import { PromotoraEventosPage } from "./pages/Animal/PromotoraEventos/PromotoraEventos";
+import { AdicionarRevendedoraAnimaisPage } from "./pages/Animal/RevendedoraAnimais/AdicionarRevendedoraAnimais";
+import { RevendedoraAnimaisPage } from "./pages/Animal/RevendedoraAnimais/RevendedoraAnimais";
+import { VisualizarRevendedoraAnimaisPage } from "./pages/Animal/RevendedoraAnimais/VisualizarRevendedoraAnimais";
 import { AdicionarTipoVeiculoPage } from "./pages/Animal/TipoVeiculo/AdicionarTipoVeiculo";
+import { TipoVeiculoPage } from "./pages/Animal/TipoVeiculo/TipoVeiculo";
 
 // VEGETAL
-import { UnidadeConsolidacaoPage } from "./pages/Vegetal/UnidadeConsolidacao/UnidadeConsolidacao";
-import { AdicionarUnidadeConsolidacaoPage } from "./pages/Vegetal/UnidadeConsolidacao/AdicionarUnidadeConsolidacao";
-import { CulturaPage } from "./pages/Vegetal/Cultura/Cultura";
 import { AdicionarCulturaPage } from "./pages/Vegetal/Cultura/AdicionarCultura";
-import { PragaPage } from "./pages/Vegetal/Praga/Praga";
-import { AdicionarPragaPage } from "./pages/Vegetal/Praga/AdicionarPraga";
-import { ProfissionalVegetalPage } from "./pages/Vegetal/ProfissionalVegetal/ProfissionalVegetal";
-import { AdicionarProfissionalVegetalPage } from "./pages/Vegetal/ProfissionalVegetal/AdicionarProfissionalVegetal";
+import { CulturaPage } from "./pages/Vegetal/Cultura/Cultura";
 import { VisualizarEstabelecimentoAgroindustrialPOVPage } from "./pages/Vegetal/EstabelecimentoAgroindustrialPOV/VisualizarEstabelecimentoAgroindustrialPOV";
+import { AdicionarPragaPage } from "./pages/Vegetal/Praga/AdicionarPraga";
+import { PragaPage } from "./pages/Vegetal/Praga/Praga";
+import { AdicionarProfissionalVegetalPage } from "./pages/Vegetal/ProfissionalVegetal/AdicionarProfissionalVegetal";
+import { ProfissionalVegetalPage } from "./pages/Vegetal/ProfissionalVegetal/ProfissionalVegetal";
+import { AdicionarUnidadeConsolidacaoPage } from "./pages/Vegetal/UnidadeConsolidacao/AdicionarUnidadeConsolidacao";
+import { UnidadeConsolidacaoPage } from "./pages/Vegetal/UnidadeConsolidacao/UnidadeConsolidacao";
 
 // VACINAÇÃO
-import { LaboratorioPage } from "./pages/Vacinacao/Laboratorio/Laboratorio";
-import { AdicionarLaboratorioPage } from "./pages/Vacinacao/Laboratorio/AdicionarLaboratorio";
-import { VendaComSaidaVacinaPage } from "./pages/Vacinacao/VendaComSaidaVacina/VendaComSaidaVacina";
-import { AdicionarVendaComSaidaVacinaPage } from "./pages/Vacinacao/VendaComSaidaVacina/AdicionarVendaComSaidaVacina";
-import { VendaComEntradaVacinaPage } from "./pages/Vacinacao/VendaComEntradaVacina/VendaComEntradaVacina";
-import { AdicionarVendaComEntradaVacinaPage } from "./pages/Vacinacao/VendaComEntradaVacina/AdicionarVendaComEntradaVacina";
-import { PartilhaVacinaPage } from "./pages/Vacinacao/PartilhaVacina/PartilhaVacina";
-import { AdicionarPartilhaVacinaPage } from "./pages/Vacinacao/PartilhaVacina/AdicionarPartilhaVacina";
-import { LancamentoDosesVacinaPage } from "./pages/Vacinacao/LancamentoDoses/LancamentoDoses";
-import { AdicionarLancamentoDosesVacinaPage } from "./pages/Vacinacao/LancamentoDoses/AdicionarLancamentoDoses";
-import { EtapaVacinacaoPage } from "./pages/Vacinacao/EtapaVacinacao/EtapaVacinacao";
-import { AdicionarEtapaVacinacaoPage } from "./pages/Vacinacao/EtapaVacinacao/AdicionarEtapaVacinacao";
-import { AutorizacaoVacinacaoPage } from "./pages/Vacinacao/AutorizacaoVacinacao/AutorizacaoVacinacao";
 import { AdicionarAutorizacaoVacinacaoPage } from "./pages/Vacinacao/AutorizacaoVacinacao/AdicionarAutorizacaoVacinacao";
-import { DeclaracaoVacinacaoPage } from "./pages/Vacinacao/DeclaracaoVacinacao/DeclaracaoVacinacao";
+import { AutorizacaoVacinacaoPage } from "./pages/Vacinacao/AutorizacaoVacinacao/AutorizacaoVacinacao";
 import { AdicionarDeclaracaoVacinacaoPage } from "./pages/Vacinacao/DeclaracaoVacinacao/AdicionarDeclaracaoVacinacao";
-import { DoencaPage } from "./pages/Vacinacao/Doenca/Doenca";
+import { DeclaracaoVacinacaoPage } from "./pages/Vacinacao/DeclaracaoVacinacao/DeclaracaoVacinacao";
 import { AdicionarDoencaPage } from "./pages/Vacinacao/Doenca/AdicionarDoenca";
-import { VacinadorPage } from "./pages/Vacinacao/Vacinador/Vacinador";
-import { AdicionarVacinadorPage } from "./pages/Vacinacao/Vacinador/AdicionarVacinador";
-import { TipoInsumoExamePage } from "./pages/Vacinacao/TipoInsumoExame/TipoInsumoExame";
+import { DoencaPage } from "./pages/Vacinacao/Doenca/Doenca";
+import { AdicionarEtapaVacinacaoPage } from "./pages/Vacinacao/EtapaVacinacao/AdicionarEtapaVacinacao";
+import { EtapaVacinacaoPage } from "./pages/Vacinacao/EtapaVacinacao/EtapaVacinacao";
+import { AdicionarLaboratorioPage } from "./pages/Vacinacao/Laboratorio/AdicionarLaboratorio";
+import { LaboratorioPage } from "./pages/Vacinacao/Laboratorio/Laboratorio";
+import { AdicionarLancamentoDosesVacinaPage } from "./pages/Vacinacao/LancamentoDoses/AdicionarLancamentoDoses";
+import { LancamentoDosesVacinaPage } from "./pages/Vacinacao/LancamentoDoses/LancamentoDoses";
+import { AdicionarPartilhaVacinaPage } from "./pages/Vacinacao/PartilhaVacina/AdicionarPartilhaVacina";
+import { PartilhaVacinaPage } from "./pages/Vacinacao/PartilhaVacina/PartilhaVacina";
 import { AdicionarTipoInsumoExamePage } from "./pages/Vacinacao/TipoInsumoExame/AdicionarTipoInsumoExame";
-import { VisualizarTipoInsumoExamePage } from "./pages/Vacinacao/TipoInsumoExame/VisualizarTipoInsumoExame";
 import { EditarTipoInsumoExamePage } from "./pages/Vacinacao/TipoInsumoExame/EditarTipoInsumoExame";
+import { TipoInsumoExamePage } from "./pages/Vacinacao/TipoInsumoExame/TipoInsumoExame";
+import { VisualizarTipoInsumoExamePage } from "./pages/Vacinacao/TipoInsumoExame/VisualizarTipoInsumoExame";
+import { AdicionarVacinadorPage } from "./pages/Vacinacao/Vacinador/AdicionarVacinador";
+import { VacinadorPage } from "./pages/Vacinacao/Vacinador/Vacinador";
+import { AdicionarVendaComEntradaInsumosExamesPage } from "./pages/Vacinacao/VendaComEntradaInsumosExames/AdicionarVendaComEntradaInsumosExames";
+import { VendaComEntradaInsumosExamesPage } from "./pages/Vacinacao/VendaComEntradaInsumosExames/VendaComEntradaInsumosExames";
+import { AdicionarVendaComEntradaVacinaPage } from "./pages/Vacinacao/VendaComEntradaVacina/AdicionarVendaComEntradaVacina";
+import { VendaComEntradaVacinaPage } from "./pages/Vacinacao/VendaComEntradaVacina/VendaComEntradaVacina";
+import { AdicionarVendaComSaidaVacinaPage } from "./pages/Vacinacao/VendaComSaidaVacina/AdicionarVendaComSaidaVacina";
+import { VendaComSaidaVacinaPage } from "./pages/Vacinacao/VendaComSaidaVacina/VendaComSaidaVacina";
 
 //ARRECADACAO
-import { ValorIndicePage } from "./pages/Arrecadacao/ValorIndice/ValorIndice";
-import { AdicionarValorIndicePage } from "./pages/Arrecadacao/ValorIndice/AdicionarValorIndice";
 import { FundoArrecadacaoPage } from "./pages/Arrecadacao/FundoArrecadacao/FundoArrecadacao";
 import {
   AdicionarFundoArrecadacaoPage,
   EditarFundoArrecadacaoPage,
   VisualizarFundoArrecadacaoPage,
 } from "./pages/Arrecadacao/FundoArrecadacao/FundoArrecadacaoDetalhe";
-import { ItemReceitaPage } from "./pages/Arrecadacao/ItemReceita/ItemReceita";
 import { AdicionarItemReceitaPage } from "./pages/Arrecadacao/ItemReceita/AdicionarItemReceita";
+import { ItemReceitaPage } from "./pages/Arrecadacao/ItemReceita/ItemReceita";
+import { AdicionarValorIndicePage } from "./pages/Arrecadacao/ValorIndice/AdicionarValorIndice";
+import { ValorIndicePage } from "./pages/Arrecadacao/ValorIndice/ValorIndice";
 
 // GTA
 import { AdicionarDistribuicaoFormulariosGta } from "./pages/GTA/DistribuicaoFormulariosGta/AdicionarDistribuicaoFormulariosGta";
 import { DistribuicaoFormulariosGta } from "./pages/GTA/DistribuicaoFormulariosGta/DistribuicaoFormulariosGta";
-import { RegistroVendaGTADigitalPage } from "./pages/GTA/RegistroVendaGTADigital/RegistroVendaGTADigital";
-import { AdicionarRegistroVendaGTADigitalPage } from "./pages/GTA/RegistroVendaGTADigital/AdicionarRegistroVendaGTADigital";
-import { VisualizarRegistroVendaGTADigitalPage } from "./pages/GTA/RegistroVendaGTADigital/VisualizarRegistroVendaGTADigital";
-import { EditarRegistroVendaGTADigitalPage } from "./pages/GTA/RegistroVendaGTADigital/EditarRegistroVendaGTADigital";
-import { VisualizarDAERegistroVendaGTAPage } from "./pages/GTA/RegistroVendaGTADigital/VisualizarDAERegistroVendaGTA";
-import { RegistroVendaGtaFisicaPage } from "./pages/GTA/RegistroVendaGTAFisica/RegistroVendaGTAFisica";
-import { AdicionarRegistroVendaGtaFisicaPage } from "./pages/GTA/RegistroVendaGTAFisica/AdicionarRegistroVendaGTAFisica";
-import { FinalidadeTransitoPage } from "./pages/GTA/FinalidadeTransito/FinalidadeTransito";
 import { AdicionarFinalidadeTransitoPage } from "./pages/GTA/FinalidadeTransito/AdicionarFinalidadeTransito";
-import { IsencaoTaxaGtaPage } from "./pages/GTA/IsencaoTaxaGTA/IsencaoTaxaGTA";
+import { FinalidadeTransitoPage } from "./pages/GTA/FinalidadeTransito/FinalidadeTransito";
 import { AdicionarIsencaoTaxaGtaPage } from "./pages/GTA/IsencaoTaxaGTA/AdicionarIsencaoTaxaGTA";
+import { IsencaoTaxaGtaPage } from "./pages/GTA/IsencaoTaxaGTA/IsencaoTaxaGTA";
+import { AdicionarRegistroVendaGTADigitalPage } from "./pages/GTA/RegistroVendaGTADigital/AdicionarRegistroVendaGTADigital";
+import { EditarRegistroVendaGTADigitalPage } from "./pages/GTA/RegistroVendaGTADigital/EditarRegistroVendaGTADigital";
+import { RegistroVendaGTADigitalPage } from "./pages/GTA/RegistroVendaGTADigital/RegistroVendaGTADigital";
+import { VisualizarDAERegistroVendaGTAPage } from "./pages/GTA/RegistroVendaGTADigital/VisualizarDAERegistroVendaGTA";
+import { VisualizarRegistroVendaGTADigitalPage } from "./pages/GTA/RegistroVendaGTADigital/VisualizarRegistroVendaGTADigital";
+import { AdicionarRegistroVendaGtaFisicaPage } from "./pages/GTA/RegistroVendaGTAFisica/AdicionarRegistroVendaGTAFisica";
+import { RegistroVendaGtaFisicaPage } from "./pages/GTA/RegistroVendaGTAFisica/RegistroVendaGTAFisica";
 
 // CONTROLE
-import { UsuariosPage } from "./pages/Controle/Usuarios/Usuarios";
-import { AdicionarUsuariosPage } from "./pages/Controle/Usuarios/AdicionarUsuarios";
-import { VisualizarUsuariosPage } from "./pages/Controle/Usuarios/VisualizarUsuarios";
-import { PapeisPage } from "./pages/Controle/Papeis/Papeis";
 import { AdicionarPapeisPage } from "./pages/Controle/Papeis/AdicionarPapeis";
-import { VisualizarPapelPage } from "./pages/Controle/Papeis/VisualizarPapel";
 import { EditarPapelPage } from "./pages/Controle/Papeis/EditarPapel";
+import { PapeisPage } from "./pages/Controle/Papeis/Papeis";
+import { VisualizarPapelPage } from "./pages/Controle/Papeis/VisualizarPapel";
+import { AdicionarUsuariosPage } from "./pages/Controle/Usuarios/AdicionarUsuarios";
+import { UsuariosPage } from "./pages/Controle/Usuarios/Usuarios";
+import { VisualizarUsuariosPage } from "./pages/Controle/Usuarios/VisualizarUsuarios";
 
 // 1. Adicionamos as novas rotas de Pessoa Jurídica no tipo Screen
 export type Screen =
@@ -296,7 +298,9 @@ export type Screen =
   | "item-receita"
   | "adicionar-item-receita"
   | "tipo-veiculo"
-  | "adicionar-tipo-veiculo";
+  | "adicionar-tipo-veiculo"
+  | "venda-entrada-insumos-exames"
+  | "adicionar-venda-entrada-insumos-exames";
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>("login");
@@ -1317,6 +1321,20 @@ export default function App() {
           onLogout={handleLogout}
           onNavigate={handleNavigate}
           instituicao={screenData}
+        />
+      );
+    case "venda-entrada-insumos-exames":
+      return (
+        <VendaComEntradaInsumosExamesPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "adicionar-venda-entrada-insumos-exames":
+      return (
+        <AdicionarVendaComEntradaInsumosExamesPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
         />
       );
 
