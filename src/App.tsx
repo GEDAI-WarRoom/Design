@@ -131,6 +131,7 @@ import {
 } from "./pages/Arrecadacao/FundoArrecadacao/FundoArrecadacaoDetalhe";
 import { ItemReceitaPage } from "./pages/Arrecadacao/ItemReceita/ItemReceita";
 import { AdicionarItemReceitaPage } from "./pages/Arrecadacao/ItemReceita/AdicionarItemReceita";
+import { NotificacoesEstabelecimentosPage } from "./pages/Arrecadacao/NotificacoesEstabelecimentos/NotificacoesEstabelecimentos";
 
 // GTA
 import { AdicionarDistribuicaoFormulariosGta } from "./pages/GTA/DistribuicaoFormulariosGta/AdicionarDistribuicaoFormulariosGta";
@@ -295,6 +296,7 @@ export type Screen =
   | "editar-fundo-arrecadacao"
   | "item-receita"
   | "adicionar-item-receita"
+  | "notificacoes-estabelecimentos"
   | "tipo-veiculo"
   | "adicionar-tipo-veiculo";
 
@@ -1283,6 +1285,13 @@ export default function App() {
     case "item-receita":
       return (
         <ItemReceitaPage onLogout={handleLogout} onNavigate={handleNavigate} />
+      );
+    case "notificacoes-estabelecimentos":
+      return (
+        <NotificacoesEstabelecimentosPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
       );
     case "tipo-veiculo":
       return (

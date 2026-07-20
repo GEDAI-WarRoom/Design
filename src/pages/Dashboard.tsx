@@ -1,5 +1,6 @@
 import {
   BadgePercent,
+  Bell,
   BriefcaseBusiness,
   Calendar,
   ChartColumn,
@@ -515,6 +516,11 @@ export const thirdCategories: MenuCategory[] = [
         label: "Item da Receita",
         route: "item-receita",
         icon: <ListTree size={16} />,
+      },
+      {
+        label: "Notificações dos Estabelecimentos",
+        route: "notificacoes-estabelecimentos",
+        icon: <Bell size={16} />,
       },
     ],
   },
