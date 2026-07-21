@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { ChevronDown, ChevronUp, Dna, Info } from "lucide-react";
+import { ChevronDown, ChevronUp, Dna, Info, Calendar } from "lucide-react";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
 import { FloatInput, FloatSelect } from "../../../components/ui/FormKit";
 import {
@@ -54,12 +54,11 @@ export function TaxaEmissaoGtaForm({ value, onChange, mode = "create" }: TaxaEmi
         {mode === "create" ? (
           <EntitySearchInput
             label="Espécie"
-            placeholder="Busque por código, espécie ou grupo"
-            value={value.especie.id ? `${value.especie.codigo} - ${value.especie.nome}` : ""}
+            placeholder="Busque por espécie ou grupo"
+            value={value.especie.id ? `${value.especie.nome}` : ""}
             data={ESPECIES_TAXA_MOCK}
-            searchKeys={["codigo", "nome", "grupo"]}
+            searchKeys={["nome", "grupo"]}
             columns={[
-              { label: "Código", key: "codigo" },
               { label: "Espécie", key: "nome" },
               { label: "Grupo", key: "grupo" },
             ]}
@@ -70,13 +69,13 @@ export function TaxaEmissaoGtaForm({ value, onChange, mode = "create" }: TaxaEmi
             subtitle="Selecione uma espécie cadastrada no sistema:"
           />
         ) : (
-          <FloatInput label="Espécie" required value={`${value.especie.codigo} - ${value.especie.nome}`} onChange={() => {}} disabled />
+          <FloatInput label="Espécie" required value={`${value.especie.codigo} - ${value.especie.nome}`} onChange={() => { }} disabled />
         )}
         <FloatSelect label="Tipo de Cobrança" required value={value.tipoCobranca} onChange={updateTipoCobranca} options={TIPOS_COBRANCA} disabled={disabled} />
         {(value.tipoCobranca === "Por Cabeça" || value.tipoCobranca === "Por Documento") && (
           <FloatSelect label="Item de Receita" required value={value.itemReceita} onChange={(next) => update("itemReceita", next)} options={ITENS_RECEITA} disabled={disabled} className="md:col-span-2" />
         )}
-        <FloatInput label="Data Início de Vigência" type="date" value={value.dataInicioVigencia} onChange={(next) => update("dataInicioVigencia", next)} disabled={disabled} />
+        <FloatInput label="Data Início de Vigência" type="date" value={value.dataInicioVigencia} icon={<Calendar size={18} />} onChange={(next) => update("dataInicioVigencia", next)} disabled={disabled} />
       </div>
       {value.tipoCobranca === "Por Quantidade" && (
         <div className="mt-6 pt-6 border-t border-gray-100">

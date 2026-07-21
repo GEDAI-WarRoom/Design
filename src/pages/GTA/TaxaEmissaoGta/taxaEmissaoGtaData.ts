@@ -19,11 +19,11 @@ export interface TaxaEmissaoGta {
 }
 export type TaxaEmissaoGtaDraft = Omit<TaxaEmissaoGta, "id">;
 export const ESPECIES_TAXA_MOCK: EspecieTaxa[] = [
-  { id: 1, codigo: "ESP-001", nome: "Bovino", grupo: "Bovídeos" },
+  { id: 1, codigo: "", nome: "Bovino", grupo: "Bovídeos" },
   { id: 2, codigo: "ESP-002", nome: "Bubalino", grupo: "Bovídeos" },
   { id: 3, codigo: "ESP-003", nome: "Equino", grupo: "Equídeos" },
   { id: 4, codigo: "ESP-004", nome: "Suíno", grupo: "Suídeos" },
-  { id: 5, codigo: "ESP-005", nome: "Galinha", grupo: "Aves" },
+  { id: 5, codigo: "", nome: "Galinha", grupo: "Aves" },
   { id: 6, codigo: "ESP-006", nome: "Abelha com Ferrão", grupo: "Abelhas" },
   { id: 7, codigo: "ESP-007", nome: "Tilápia", grupo: "Peixes" },
 ];

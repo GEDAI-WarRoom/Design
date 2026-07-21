@@ -45,15 +45,54 @@ export function TaxaEmissaoGtaPage({ onLogout, onNavigate }: { onLogout: () => v
           <div className="flex items-center justify-between gap-4"><h1 className="text-2xl font-semibold text-gray-900">Taxa de Emissão de GTA</h1><button type="button" onClick={() => onNavigate("adicionar-taxa-emissao-gta")} className="px-5 py-3 rounded-md text-white text-sm font-semibold bg-[#1A7A3C] hover:bg-[#15612F]">Adicionar Nova</button></div>
         </div>
         <section className="bg-white rounded-xl shadow-sm p-6 flex flex-col gap-5">
-          <div className="flex flex-col sm:flex-row gap-3 items-stretch">
-            <div className="flex-1"><EntitySearchInput label="Espécie" placeholder="Busque por código, espécie ou grupo" value={especie ? `${especie.codigo} - ${especie.nome}` : ""} data={ESPECIES_TAXA_MOCK} searchKeys={["codigo", "nome", "grupo"]} columns={[{ label: "Código", key: "codigo" }, { label: "Espécie", key: "nome" }, { label: "Grupo", key: "grupo" }]} icon={<Dna size={18} color="#1A7A3C" />} onChange={(item) => { setEspecie(item); setError(false); }} title="Buscar Espécie" /></div>
-            <button type="button" onClick={search} className="h-12 w-full sm:w-auto px-5 rounded-md text-white text-sm font-semibold bg-[#1A7A3C] hover:bg-[#15612F] transition">Pesquisar</button>
-            <button type="button" onClick={() => setFiltersOpen(!filtersOpen)} className={`h-12 w-12 self-end flex items-center justify-center border border-[#1A7A3C] rounded-md transition ${filtersOpen ? "text-[#1A7A3C] bg-white" : "text-white bg-[#1A7A3C]"}`} title="Filtros" aria-label="Exibir filtros"><SlidersHorizontal size={16} /></button>
+          <div className="flex flex-col sm:flex-row items-end gap-4 w-full">
+            {/* Campo 1: Espécie (ocupa 50% do espaço dos campos) */}
+            <div className="flex-1 w-full">
+              <EntitySearchInput
+                label="Espécie"
+                placeholder="Busque por espécie ou grupo"
+                value={especie ? `${especie.nome}` : ""}
+                data={ESPECIES_TAXA_MOCK}
+                searchKeys={["codigo", "nome", "grupo"]}
+                columns={[
+                  { label: "Espécie", key: "nome" },
+                  { label: "Grupo", key: "grupo" },
+                ]}
+                icon={<Dna size={18} color="#1A7A3C" />}
+                onChange={(item) => {
+                  setEspecie(item);
+                  setError(false);
+                }}
+                title="Buscar Espécie"
+              />
+            </div>
+
+            {/* Campo 2: Tipo de Cobrança (ocupa 50% do espaço dos campos) */}
+            <div className="flex-1 w-full">
+              <FloatSelect
+                label="Tipo de Cobrança"
+                value={tipoCobranca}
+                onChange={(next) => {
+                  setTipoCobranca(next);
+                  setError(false);
+                }}
+                options={TIPOS_COBRANCA}
+              />
+            </div>
+
+            {/* Botão de Pesquisar (com tamanho fixo baseado no conteúdo) */}
+            <button
+              type="button"
+              onClick={search}
+              className="h-12 w-full sm:w-auto px-5 rounded-md text-white text-sm font-semibold bg-[#1A7A3C] hover:bg-[#15612F] transition shrink-0"
+            >
+              Pesquisar
+            </button>
           </div>
-          {filtersOpen && <div className="animate-fadeIn"><FloatSelect label="Tipo de Cobrança" value={tipoCobranca} onChange={(next) => { setTipoCobranca(next); setError(false); }} options={TIPOS_COBRANCA} /></div>}
+
           {error && <p className="text-sm text-red-500 font-medium">Selecione ao menos um filtro para visualizar os resultados.</p>}
           {hasFilter && <div className="flex flex-wrap gap-2 animate-fadeIn">{especie && <Chip label={`Espécie: ${especie.nome}`} onRemove={() => setEspecie(null)} />}{tipoCobranca && <Chip label={`Tipo de Cobrança: ${tipoCobranca}`} onRemove={() => setTipoCobranca("")} />}</div>}
-          {!searched ? <div className="py-12 text-center text-sm text-gray-500">Busque taxas utilizando a espécie e os filtros acima.</div> : results.length === 0 ? <div className="py-12 text-center text-sm text-gray-500">Nenhum resultado foi encontrado.</div> : (
+          {!searched ? <div className="py-12 text-center text-sm text-gray-500">Busque taxas utilizando os filtros acima.</div> : results.length === 0 ? <div className="py-12 text-center text-sm text-gray-500">Nenhum resultado foi encontrado.</div> : (
             <div className="overflow-x-auto"><table className="w-full text-sm border-collapse"><thead><tr className="border-b border-gray-100">{(["especie", "tipoCobranca", "dataInicioVigencia"] as SortKey[]).map((key) => <th key={key} onClick={() => sort(key)} className="text-left px-4 py-3 font-semibold text-gray-600 uppercase cursor-pointer"><span className="inline-flex items-center gap-1">{label(key)}{sortKey === key && (sortAsc ? <ChevronUp size={14} /> : <ChevronDown size={14} />)}</span></th>)}<th /></tr></thead><tbody>{rows.map((item: TaxaEmissaoGta) => <tr key={item.id} className="border-b border-gray-50 hover:bg-gray-50"><td className="px-4 py-3 text-gray-700">{item.especie.nome}</td><td className="px-4 py-3 text-gray-700">{item.tipoCobranca}</td><td className="px-4 py-3 text-gray-700">{formatarData(item.dataInicioVigencia)}</td><td className="px-4 py-3"><div className="flex justify-end gap-1"><button type="button" onClick={() => onNavigate("visualizar-taxa-emissao-gta", item)} className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md" title="Visualizar"><Eye size={18} /></button><button type="button" onClick={() => onNavigate("editar-taxa-emissao-gta", item)} className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md" title="Editar"><Pencil size={17} /></button></div></td></tr>)}</tbody></table><div className="flex items-center justify-between pt-4 text-sm text-gray-500"><span>Itens por página: {perPage}</span><div className="flex items-center gap-4"><span>{start} - {end} de {results.length}</span><button type="button" onClick={() => setPage((value) => Math.max(1, value - 1))} disabled={currentPage === 1} className="p-1 disabled:opacity-30"><ChevronLeft size={18} /></button><button type="button" onClick={() => setPage((value) => Math.min(totalPages, value + 1))} disabled={currentPage === totalPages} className="p-1 disabled:opacity-30"><ChevronRight size={18} /></button></div></div></div>
           )}
         </section>
