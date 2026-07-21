@@ -138,6 +138,7 @@ import {
   VisualizarFundoArrecadacaoPage,
 } from "./pages/Arrecadacao/FundoArrecadacao/FundoArrecadacaoDetalhe";
 import { AdicionarItemReceitaPage } from "./pages/Arrecadacao/ItemReceita/AdicionarItemReceita";
+import { NotificacoesEstabelecimentosPage } from "./pages/Arrecadacao/NotificacoesEstabelecimentos/NotificacoesEstabelecimentos";
 import { ItemReceitaPage } from "./pages/Arrecadacao/ItemReceita/ItemReceita";
 import { AdicionarValorIndicePage } from "./pages/Arrecadacao/ValorIndice/AdicionarValorIndice";
 import { ValorIndicePage } from "./pages/Arrecadacao/ValorIndice/ValorIndice";
@@ -339,6 +340,7 @@ export type Screen =
   | "editar-fundo-arrecadacao"
   | "item-receita"
   | "adicionar-item-receita"
+  | "notificacoes-estabelecimentos"
   | "lote-pagamento"
   | "adicionar-lote-pagamento"
   | "visualizar-lote-pagamento"
@@ -1452,6 +1454,13 @@ export default function App() {
     case "item-receita":
       return (
         <ItemReceitaPage onLogout={handleLogout} onNavigate={handleNavigate} />
+      );
+    case "notificacoes-estabelecimentos":
+      return (
+        <NotificacoesEstabelecimentosPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
       );
     case "tipo-veiculo":
       return (

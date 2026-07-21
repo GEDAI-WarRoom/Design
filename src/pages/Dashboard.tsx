@@ -1,5 +1,6 @@
 import {
   BadgePercent,
+  Bell,
   BriefcaseBusiness,
   Calendar,
   ClipboardList,
@@ -27,6 +28,7 @@ import {
   Truck,
   User,
   Wallet,
+  Scale
 } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import * as Icons from "../imports/icons";
@@ -558,6 +560,9 @@ export const thirdCategories: MenuCategory[] = [
         icon: <ListTree size={16} />,
       },
       {
+        label: "Notificações dos Estabelecimentos",
+        route: "notificacoes-estabelecimentos",
+        icon: <Scale size={16} />,
         label: "Lote de Pagamento",
         route: "lote-pagamento",
         icon: <Layers3 size={16} />,
