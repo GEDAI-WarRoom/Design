@@ -90,6 +90,6 @@ export {
   iconePontuacaoUrl,
   iconeInsumoUrl,
   iconeIndiceUrl,
-  iconeVendaPropriedadeUrl
+  iconeVendaPropriedadeUrl,
   iconePapéisUrl
 };
