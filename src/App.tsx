@@ -153,6 +153,16 @@ import { FinalidadeTransitoPage } from "./pages/GTA/FinalidadeTransito/Finalidad
 import { AdicionarFinalidadeTransitoPage } from "./pages/GTA/FinalidadeTransito/AdicionarFinalidadeTransito";
 import { IsencaoTaxaGtaPage } from "./pages/GTA/IsencaoTaxaGTA/IsencaoTaxaGTA";
 import { AdicionarIsencaoTaxaGtaPage } from "./pages/GTA/IsencaoTaxaGTA/AdicionarIsencaoTaxaGTA";
+import { RecolhimentoMensalGTAPage } from "./pages/GTA/RecolhimentoMensalGTA/RecolhimentoMensalGTA";
+import { AdicionarRecolhimentoMensalGTAPage } from "./pages/GTA/RecolhimentoMensalGTA/AdicionarRecolhimentoMensalGTA";
+import {
+  EditarRecolhimentoMensalGTAPage,
+  VisualizarRecolhimentoMensalGTAPage,
+} from "./pages/GTA/RecolhimentoMensalGTA/RecolhimentoMensalGTADetalhe";
+import {
+  VisualizarBoletoRecolhimentoGTAPage,
+  VisualizarDAERecolhimentoGTAPage,
+} from "./pages/GTA/RecolhimentoMensalGTA/VisualizarDocumentosRecolhimentoGTA";
 import { TaxaEmissaoGtaPage } from "./pages/GTA/TaxaEmissaoGta/TaxaEmissaoGta";
 import { AdicionarTaxaEmissaoGtaPage } from "./pages/GTA/TaxaEmissaoGta/AdicionarTaxaEmissaoGta";
 import { VisualizarTaxaEmissaoGtaPage } from "./pages/GTA/TaxaEmissaoGta/VisualizarTaxaEmissaoGta";
@@ -303,6 +313,12 @@ export type Screen =
   | "editar-instituicao-ensino-pesquisa"
   | "isencao-taxa-gta"
   | "adicionar-isencao-taxa-gta"
+  | "recolhimento-mensal-gta"
+  | "adicionar-recolhimento-mensal-gta"
+  | "visualizar-recolhimento-mensal-gta"
+  | "editar-recolhimento-mensal-gta"
+  | "visualizar-boleto-recolhimento-gta"
+  | "visualizar-dae-recolhimento-gta"
   | "taxa-emissao-gta"
   | "adicionar-taxa-emissao-gta"
   | "visualizar-taxa-emissao-gta"
@@ -1324,6 +1340,9 @@ export default function App() {
           onNavigate={handleNavigate}
         />
       );
+    case "recolhimento-mensal-gta":
+      return (
+        <RecolhimentoMensalGTAPage
     case "taxa-emissao-gta":
       return (
         <TaxaEmissaoGtaPage
@@ -1331,6 +1350,9 @@ export default function App() {
           onNavigate={handleNavigate}
         />
       );
+    case "adicionar-recolhimento-mensal-gta":
+      return (
+        <AdicionarRecolhimentoMensalGTAPage
     case "adicionar-taxa-emissao-gta":
       return (
         <AdicionarTaxaEmissaoGtaPage
@@ -1338,6 +1360,9 @@ export default function App() {
           onNavigate={handleNavigate}
         />
       );
+    case "visualizar-recolhimento-mensal-gta":
+      return (
+        <VisualizarRecolhimentoMensalGTAPage
     case "visualizar-taxa-emissao-gta":
       return (
         <VisualizarTaxaEmissaoGtaPage
@@ -1346,6 +1371,25 @@ export default function App() {
           dados={screenData}
         />
       );
+    case "editar-recolhimento-mensal-gta":
+      return (
+        <EditarRecolhimentoMensalGTAPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
+        />
+      );
+    case "visualizar-boleto-recolhimento-gta":
+      return (
+        <VisualizarBoletoRecolhimentoGTAPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
+        />
+      );
+    case "visualizar-dae-recolhimento-gta":
+      return (
+        <VisualizarDAERecolhimentoGTAPage
     case "editar-taxa-emissao-gta":
       return (
         <EditarTaxaEmissaoGtaPage
