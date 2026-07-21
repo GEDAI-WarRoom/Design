@@ -16,6 +16,9 @@ import { AdicionarDivisaoMunicipalPage } from "./pages/Geral/DivisaoMunicipal/Ad
 import { EstabelecimentoAgropecuarioPage } from "./pages/Geral/EstabelecimentoAgropecuario/EstabelecimentoAgropecuario";
 import { AdicionarEstabelecimentoAgropecuarioPage } from "./pages/Geral/EstabelecimentoAgropecuario/AdicionarEstabelecimentoAgropecuario";
 import { VisualizarEstabelecimentoAgropecuarioPage } from "./pages/Geral/EstabelecimentoAgropecuario/VisualizarEstabelecimentoAgropecuario";
+import { VendaPropriedadePage } from "./pages/Geral/VendaPropriedade/VendaPropriedade";
+import { AdicionarVendaPropriedadePage } from "./pages/Geral/VendaPropriedade/AdicionarVendaPropriedade";
+import { VisualizarVendaPropriedadePage } from "./pages/Geral/VendaPropriedade/VisualizarVendaPropriedade";
 import { ProdutoPage } from "./pages/Geral/Produto/Produto";
 import { AdicionarProdutoPage } from "./pages/Geral/Produto/AdicionarProduto";
 import { ProfissionalOficialPage } from "./pages/Geral/ProfissionalOficial/ProfissionalOficial";
@@ -150,6 +153,10 @@ import { FinalidadeTransitoPage } from "./pages/GTA/FinalidadeTransito/Finalidad
 import { AdicionarFinalidadeTransitoPage } from "./pages/GTA/FinalidadeTransito/AdicionarFinalidadeTransito";
 import { IsencaoTaxaGtaPage } from "./pages/GTA/IsencaoTaxaGTA/IsencaoTaxaGTA";
 import { AdicionarIsencaoTaxaGtaPage } from "./pages/GTA/IsencaoTaxaGTA/AdicionarIsencaoTaxaGTA";
+import { TaxaEmissaoGtaPage } from "./pages/GTA/TaxaEmissaoGta/TaxaEmissaoGta";
+import { AdicionarTaxaEmissaoGtaPage } from "./pages/GTA/TaxaEmissaoGta/AdicionarTaxaEmissaoGta";
+import { VisualizarTaxaEmissaoGtaPage } from "./pages/GTA/TaxaEmissaoGta/VisualizarTaxaEmissaoGta";
+import { EditarTaxaEmissaoGtaPage } from "./pages/GTA/TaxaEmissaoGta/EditarTaxaEmissaoGta";
 
 // CONTROLE
 import { UsuariosPage } from "./pages/Controle/Usuarios/Usuarios";
@@ -181,6 +188,9 @@ export type Screen =
   | "estabelecimento-agropecuario"
   | "adicionar-estabelecimento-agropecuario"
   | "visualizar-estabelecimento-agropecuario"
+  | "venda-propriedade"
+  | "adicionar-venda-propriedade"
+  | "visualizar-venda-propriedade"
   | "venda-saida-vacina"
   | "adicionar-venda-saida-vacina"
   | "venda-entrada-vacina"
@@ -293,6 +303,10 @@ export type Screen =
   | "editar-instituicao-ensino-pesquisa"
   | "isencao-taxa-gta"
   | "adicionar-isencao-taxa-gta"
+  | "taxa-emissao-gta"
+  | "adicionar-taxa-emissao-gta"
+  | "visualizar-taxa-emissao-gta"
+  | "editar-taxa-emissao-gta"
   | "fundo-arrecadacao"
   | "adicionar-fundo-arrecadacao"
   | "visualizar-fundo-arrecadacao"
@@ -418,6 +432,28 @@ export default function App() {
     case "visualizar-estabelecimento-agropecuario":
       return (
         <VisualizarEstabelecimentoAgropecuarioPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
+        />
+      );
+    case "venda-propriedade":
+      return (
+        <VendaPropriedadePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "adicionar-venda-propriedade":
+      return (
+        <AdicionarVendaPropriedadePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "visualizar-venda-propriedade":
+      return (
+        <VisualizarVendaPropriedadePage
           onLogout={handleLogout}
           onNavigate={handleNavigate}
           dados={screenData}
@@ -1286,6 +1322,36 @@ export default function App() {
         <AdicionarIsencaoTaxaGtaPage
           onLogout={handleLogout}
           onNavigate={handleNavigate}
+        />
+      );
+    case "taxa-emissao-gta":
+      return (
+        <TaxaEmissaoGtaPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "adicionar-taxa-emissao-gta":
+      return (
+        <AdicionarTaxaEmissaoGtaPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "visualizar-taxa-emissao-gta":
+      return (
+        <VisualizarTaxaEmissaoGtaPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
+        />
+      );
+    case "editar-taxa-emissao-gta":
+      return (
+        <EditarTaxaEmissaoGtaPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
         />
       );
     case "item-receita":
