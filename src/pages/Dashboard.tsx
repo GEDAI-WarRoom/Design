@@ -3,14 +3,13 @@ import {
   Bell,
   BriefcaseBusiness,
   Calendar,
-  ChartColumn,
   ClipboardList,
   Dna,
   DollarSign,
-  FileText,
   FlaskConical,
   Globe,
   Landmark,
+  Layers3,
   ListTree,
   Map,
   MapPinned,
@@ -28,7 +27,6 @@ import {
   TowerControl,
   Truck,
   User,
-  Users,
   Wallet,
   Scale
 } from "lucide-react";
@@ -78,6 +76,17 @@ export const cadastrosCategories: MenuCategory[] = [
           <img
             src={Icons.iconeEstabelecimentoUrl}
             alt="Estabelecimento Agropecuário"
+            className="w-4 h-4"
+          />
+        ),
+      },
+      {
+        label: "Venda de Propriedade",
+        route: "venda-propriedade",
+        icon: (
+          <img
+            src={Icons.iconeVendaPropriedadeUrl}
+            alt="Venda Propriedade"
             className="w-4 h-4"
           />
         ),
@@ -262,7 +271,13 @@ export const cadastrosCategories: MenuCategory[] = [
         route: "revendedora-animais",
         icon: <Store size={16} />,
       },
-
+      {
+        label: "Status Animal",
+        route: "status-animal",
+        icon: (
+          <img src={Icons.iconeStatusUrl} alt="Status" className="w-4 h-4" />
+        ),
+      },
     ],
   },
   {
@@ -344,6 +359,11 @@ export const secondaryCategories: MenuCategory[] = [
         icon: <PackagePlus size={16} />,
       },
       {
+        label: "Venda com Entrada de Insumos para Exames",
+        route: "venda-entrada-insumos-exames",
+        icon: <PackagePlus size={16} />,
+      },
+      {
         label: "Doação/Partilha de Vacina",
         route: "partilha-vacina",
         icon: (
@@ -353,6 +373,17 @@ export const secondaryCategories: MenuCategory[] = [
       {
         label: "Ajuste de Doses de Vacina",
         route: "lancamento-doses-vacina",
+        icon: (
+          <img
+            src={Icons.iconeDoseVacinaUrl}
+            alt="Dose de Vacina"
+            className="w-4 h-4"
+          />
+        ),
+      },
+      {
+        label: "Ajuste de Doses de Insumo",
+        route: "ajuste-doses-insumo",
         icon: (
           <img
             src={Icons.iconeDoseVacinaUrl}
@@ -479,9 +510,19 @@ export const secondaryCategories: MenuCategory[] = [
         ),
       },
       {
+        label: "Taxa de Emissão de GTA",
+        route: "taxa-emissao-gta",
+        icon: <ReceiptText size={16} />,
+      },
+      {
         label: "Isenção de Taxa de GTA",
         route: "isencao-taxa-gta",
         icon: <BadgePercent size={16} />,
+      },
+      {
+        label: "Recolhimento Mensal de GTAs",
+        route: "recolhimento-mensal-gta",
+        icon: <ReceiptText size={16} />,
       },
     ],
   },
@@ -522,6 +563,9 @@ export const thirdCategories: MenuCategory[] = [
         label: "Notificações dos Estabelecimentos",
         route: "notificacoes-estabelecimentos",
         icon: <Scale size={16} />,
+        label: "Lote de Pagamento",
+        route: "lote-pagamento",
+        icon: <Layers3 size={16} />,
       },
     ],
   },
@@ -617,9 +661,7 @@ export function DashboardPage({ onLogout, onNavigate }: any) {
 
         {/* Bloco de Cadastros (Exatamente como estava) */}
         <div className="flex flex-col bg-white rounded-xl shadow-sm p-6 mb-6 gap-6">
-          <h2 className="text-xl font-semibold text-gray-800">
-            Cadastros
-          </h2>
+          <h2 className="text-xl font-semibold text-gray-800">Cadastros</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {cadastrosCategories.map((cat) => (
               <CategoryCard key={cat.title} cat={cat} onNavigate={onNavigate} />
@@ -637,7 +679,6 @@ export function DashboardPage({ onLogout, onNavigate }: any) {
             ))}
           </div>
         </div>
-
 
         <div className="bg-white rounded-xl shadow-sm p-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
