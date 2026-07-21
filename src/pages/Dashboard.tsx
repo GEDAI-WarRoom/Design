@@ -263,7 +263,13 @@ export const cadastrosCategories: MenuCategory[] = [
       {
         label: "Status Animal",
         route: "status-animal",
-        icon: <ListTree size={16} />,
+        icon: (
+          <img
+            src={Icons.iconeStatusUrl}
+            alt="Status"
+            className="w-4 h-4"
+          />
+        ),
       },
 
     ],
