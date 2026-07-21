@@ -397,7 +397,7 @@ export function LoteCardItem({
                 value={String(
                   totalDosesApresentacao(ap.frascos, ap.dosesPorFrasco) || "",
                 )}
-                onChange={() => {}}
+                onChange={() => { }}
               />
             </div>
           )}
@@ -410,7 +410,7 @@ export function LoteCardItem({
           required
           disabled
           value={String(totalDosesLote || "")}
-          onChange={() => {}}
+          onChange={() => { }}
           className="md:w-1/2"
         />
       </SubGrupo>
@@ -460,11 +460,11 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
       ls.map((l) =>
         l.uid === loteUid
           ? {
-              ...l,
-              apresentacoes: l.apresentacoes.filter(
-                (_: any, i: number) => i !== index,
-              ),
-            }
+            ...l,
+            apresentacoes: l.apresentacoes.filter(
+              (_: any, i: number) => i !== index,
+            ),
+          }
           : l,
       ),
     );
@@ -473,11 +473,11 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
       ls.map((l) =>
         l.uid === loteUid
           ? {
-              ...l,
-              apresentacoes: l.apresentacoes.map((a: any) =>
-                a.uid === apUid ? { ...a, ...patch } : a,
-              ),
-            }
+            ...l,
+            apresentacoes: l.apresentacoes.map((a: any) =>
+              a.uid === apUid ? { ...a, ...patch } : a,
+            ),
+          }
           : l,
       ),
     );
@@ -543,7 +543,7 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
             </p>
           </div>
 
-          <Section title="Origem dos Insumos Adquiridos">
+          <Section title="Emitente">
             <div className="flex flex-col gap-3">
               <FornecedorVacinaInput
                 value={fornecedor ? fornecedor.codigo : ""}
@@ -564,7 +564,7 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
             </div>
           </Section>
 
-          <Section title="Estabelecimento Recebedor de Insumos">
+          <Section title="Destinatário">
             <div className="flex flex-col gap-3">
               <RevendedoraInput
                 value={revendedora ? revendedora.codigo : ""}
@@ -645,13 +645,13 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
                           label="Doença"
                           disabled
                           value={t.doenca}
-                          onChange={() => {}}
+                          onChange={() => { }}
                         />
                         <FloatInput
                           label="Total de Doses Adquiridas"
                           disabled
                           value={String(t.total)}
-                          onChange={() => {}}
+                          onChange={() => { }}
                         />
                       </div>
                     ))}
