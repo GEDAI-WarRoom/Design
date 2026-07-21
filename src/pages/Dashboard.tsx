@@ -4,6 +4,7 @@ import {
   Calendar,
   ChartColumn,
   ClipboardList,
+  ClipboardPlus,
   Dna,
   DollarSign,
   FileText,
@@ -424,6 +425,7 @@ export const secondaryCategories: MenuCategory[] = [
       {
         label: "Atestado De Exame",
         route: "atestado-exame",
+        icon: <ClipboardPlus size={16} />,
       },
     ],
   },

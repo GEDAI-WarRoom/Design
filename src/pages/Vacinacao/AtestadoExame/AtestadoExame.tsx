@@ -8,22 +8,28 @@ import {
   Eye as ViewIcon,
   Pencil,
   X,
-  Check,
-  Minus
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatSelect } from "../../../components/ui/FormKit";
-import { DoencaInput } from "../../../components/ui/EntitySearch";
+import { EntitySearchInput } from "../../../components/ui/EntitySearch";
 import * as Icons from "../../../imports/icons";
 
 const GREEN = "#1A7A3C";
+
+// MOCKS DE DOENÇAS PARA O SEARCH
+const DOENCAS_MOCK = [
+  { id: 1, nome: "Brucelose" },
+  { id: 2, nome: "Febre Aftosa" },
+  { id: 3, nome: "Anemia Infecciosa Equina (AIE)" },
+  { id: 4, nome: "Raiva" },
+];
 
 // MOCKS DE ENTIDADE 
 const ATESTADOS_MOCK = [
   { id: 1, descricao: "Atestado de Brucelose", doenca: "Brucelose", situacao: "Ativo" },
   { id: 2, descricao: "Atestado de Febre Aftosa", doenca: "Febre Aftosa", situacao: "Inativo" },
   { id: 3, descricao: "Atestado de Anemia Infecciosa Equina", doenca: "Anemia Infecciosa Equina (AIE)", situacao: "Ativo" },
-  { id: 4, descricao: "Atestado de Raiva", doenca: "Raiva ", situacao: "Ativo" },
+  { id: 4, descricao: "Atestado de Raiva", doenca: "Raiva", situacao: "Ativo" },
 ];
 
 const SITUACOES = [
@@ -35,7 +41,9 @@ function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
     <div className="flex items-center gap-2 bg-[#1A7A3C] text-white text-xs font-medium px-3 py-1.5 rounded-md shadow-sm max-w-full">
       <span className="truncate">{label}</span>
-      <button onClick={onRemove} className="hover:opacity-80 transition flex-shrink-0"><X size={14} className="stroke-[2.5]" /></button>
+      <button onClick={onRemove} className="hover:opacity-80 transition flex-shrink-0">
+        <X size={14} className="stroke-[2.5]" />
+      </button>
     </div>
   );
 }
@@ -58,8 +66,7 @@ export function AtestadoExamePage({ onLogout, onNavigate }: PageProps) {
   const perPage = 10;
 
   const handlePesquisar = () => {
-    // AC2: exige o campo de busca OU pelo menos um filtro
-    if (!temFiltroAtivo) {
+    if (!descricao && !temFiltroAtivo) {
       setErroFiltro(true);
       setHasSearched(false);
       return;
@@ -71,7 +78,7 @@ export function AtestadoExamePage({ onLogout, onNavigate }: PageProps) {
 
   const filtrados = ATESTADOS_MOCK.filter((a) => {
     const matchDescricao = descricao === "" || a.descricao.toLowerCase().includes(descricao.toLowerCase());
-    const matchDoenca = !doenca || a.doenca === doenca.nome;
+    const matchDoenca = !doenca || a.doenca.trim() === doenca.nome.trim();
     const matchSituacao = situacao === "" || a.situacao === situacao;
     return matchDescricao && matchDoenca && matchSituacao;
   });
@@ -106,7 +113,7 @@ export function AtestadoExamePage({ onLogout, onNavigate }: PageProps) {
 
         {/* CONTAINER BRANCO ÚNICO */}
         <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col gap-5">
-          
+
           {/* Barra Superior do Filtro */}
           <div className="flex gap-3 items-stretch w-full">
             <div className="flex-1 bg-white border border-gray-200 rounded-md px-3 h-12 transition-all relative flex items-end pb-1.5 focus-within:border-[#1A7A3C] focus-within:ring-1 focus-within:ring-[#1A7A3C]">
@@ -137,19 +144,33 @@ export function AtestadoExamePage({ onLogout, onNavigate }: PageProps) {
           {showFilters && (
             <div className="animate-fadeIn flex flex-col lg:flex-row items-end gap-3 w-full">
               <div className="w-full lg:flex-1">
-                <DoencaInput
+                <EntitySearchInput
+                  label="Doença"
+                  placeholder="Selecione uma doença..."
                   value={doenca ? doenca.nome : ""}
-                  onChange={(ent) => setDoenca(ent)}
-                  onEyeClick={() => {}}
+                  data={DOENCAS_MOCK}
+                  searchKeys={["nome"]}
+                  columns={[{ label: "Nome da Doença", key: "nome" }]}
+                  title="Buscar Doença"
+                  subtitle="Busque por uma doença cadastrada:"
+                  icon={
+                    <img
+                      src={Icons.iconeDoencaUrl || (Icons as any).iconedoencaurl}
+                      alt="Doença"
+                      className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0"
+                    />
+                  }
+                  hideEye={true}
+                  onChange={(entidade) => setDoenca(entidade)}
                 />
               </div>
 
               <div className="w-full lg:w-1/4">
-                <FloatSelect 
-                  label="Situação" 
-                  value={situacao} 
-                  onChange={setSituacao} 
-                  options={SITUACOES} 
+                <FloatSelect
+                  label="Situação"
+                  value={situacao}
+                  onChange={setSituacao}
+                  options={SITUACOES}
                 />
               </div>
 
