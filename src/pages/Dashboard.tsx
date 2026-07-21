@@ -30,6 +30,7 @@ import {
   User,
   Users,
   Wallet,
+  Scale
 } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import * as Icons from "../imports/icons";
@@ -520,7 +521,7 @@ export const thirdCategories: MenuCategory[] = [
       {
         label: "Notificações dos Estabelecimentos",
         route: "notificacoes-estabelecimentos",
-        icon: <Bell size={16} />,
+        icon: <Scale size={16} />,
       },
     ],
   },

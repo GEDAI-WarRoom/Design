@@ -3,8 +3,6 @@ import {
   ArrowLeft,
   ChevronLeft,
   ChevronRight,
-  Eye,
-  SlidersHorizontal,
   X,
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
@@ -191,10 +189,11 @@ const formatarMoeda = (valor: number) =>
     currency: "BRL",
   }).format(valor);
 
+// 🌟 Formatação ajustada para 2 casas decimais
 const formatarUfemg = (valor: number) =>
   new Intl.NumberFormat("pt-BR", {
-    minimumFractionDigits: 4,
-    maximumFractionDigits: 4,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   }).format(valor);
 
 function FiltroAtivo({
@@ -228,7 +227,6 @@ export function NotificacoesEstabelecimentosPage({
   const [mes, setMes] = useState("");
   const [ano, setAno] = useState("");
   const [situacao, setSituacao] = useState("");
-  const [maisBuscasAberto, setMaisBuscasAberto] = useState(false);
   const [pesquisaRealizada, setPesquisaRealizada] = useState(false);
   const [erroAno, setErroAno] = useState(false);
   const [paginaAtual, setPaginaAtual] = useState(1);
@@ -265,7 +263,6 @@ export function NotificacoesEstabelecimentosPage({
     const anoInvalido = ano.length > 0 && ano.length !== 4;
     setErroAno(anoInvalido);
     if (anoInvalido) {
-      setMaisBuscasAberto(true);
       return;
     }
     setPesquisaRealizada(true);
@@ -300,125 +297,75 @@ export function NotificacoesEstabelecimentosPage({
           Notificações dos Estabelecimentos
         </h1>
 
-        <section className="flex flex-col gap-5 rounded-xl bg-white p-6 shadow-sm">
-          <div className="flex flex-col items-stretch gap-3 lg:flex-row lg:items-end">
-            <div className="w-full lg:flex-1">
-              <div
-                className={
-                  estabelecimento
-                    ? "grid grid-cols-1 items-end gap-4 md:grid-cols-2"
-                    : "w-full"
+        <section className="flex flex-col gap-4 rounded-xl bg-white p-6 shadow-sm">
+          {/* 1ª LINHA: ESTABELECIMENTO + BOTÃO PESQUISAR */}
+          <div className="flex flex-col items-stretch gap-3 md:flex-row md:items-end">
+            <div className="flex-1">
+              <EntitySearchInput
+                label="Estabelecimento"
+                placeholder="Buscar por razão social ou CNPJ..."
+                value={estabelecimento?.nome || ""}
+                data={ESTABELECIMENTOS}
+                searchKeys={["nome", "documento"]}
+                columns={[
+                  { label: "Razão Social / Nome", key: "nome" },
+                  { label: "CNPJ", key: "documento" },
+                ]}
+                icon={
+                  <img
+                    src={Icons.iconePessoaJuridicaUrl}
+                    alt="Pessoa jurídica"
+                    className="h-5 w-5 object-contain"
+                  />
                 }
-              >
-                <EntitySearchInput
-                  label="Estabelecimento"
-                  placeholder="Buscar por razão social ou CNPJ..."
-                  value={estabelecimento?.nome || ""}
-                  data={ESTABELECIMENTOS}
-                  searchKeys={["nome", "documento"]}
-                  columns={[
-                    { label: "Razão Social / Nome", key: "nome" },
-                    { label: "CNPJ", key: "documento" },
-                  ]}
-                  icon={
-                    <img
-                      src={Icons.iconePessoaJuridicaUrl}
-                      alt="Pessoa jurídica"
-                      className="h-5 w-5 object-contain"
-                    />
-                  }
-                  title="Buscar Estabelecimento"
-                  subtitle="Busque por uma pessoa jurídica cadastrada:"
-                  onChange={(entidade) => {
-                    setEstabelecimento(entidade);
-                    setPaginaAtual(1);
-                  }}
-                />
-
-                {estabelecimento && (
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1">
-                      <FloatInput
-                        label="CNPJ"
-                        value={estabelecimento.documento}
-                        disabled
-                      />
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        onNavigate(
-                          "visualizar-pessoa-juridica",
-                          estabelecimento,
-                        )
-                      }
-                      className="h-12 rounded-md p-2 text-[#1A7A3C] transition hover:bg-green-50"
-                      title="Visualizar Pessoa Jurídica"
-                    >
-                      <Eye size={20} />
-                    </button>
-                  </div>
-                )}
-              </div>
+                title="Buscar Estabelecimento"
+                subtitle="Busque por uma pessoa jurídica cadastrada:"
+                onChange={(entidade) => {
+                  setEstabelecimento(entidade);
+                  setPaginaAtual(1);
+                }}
+              />
             </div>
 
             <button
               type="button"
-              onClick={() => setMaisBuscasAberto((aberto) => !aberto)}
-              className={`flex h-12 w-12 flex-shrink-0 items-center justify-center self-end rounded-md border border-[#1A7A3C] transition ${
-                maisBuscasAberto
-                  ? "bg-white text-[#1A7A3C]"
-                  : "bg-[#1A7A3C] text-white"
-              }`}
-              aria-expanded={maisBuscasAberto}
-              aria-controls="filtros-adicionais-notificacoes"
-              aria-label="Mais buscas"
-              title="Mais buscas"
-            >
-              <SlidersHorizontal size={16} />
-            </button>
-
-            <button
-              type="button"
               onClick={pesquisar}
-              className="h-12 w-full rounded-md bg-[#1A7A3C] px-5 text-sm font-semibold text-white transition hover:bg-[#15612F] lg:w-auto"
+              className="h-12 w-full rounded-md bg-[#1A7A3C] px-8 text-sm font-semibold text-white transition hover:bg-[#15612F] md:w-auto"
             >
               Pesquisar
             </button>
           </div>
 
-          {maisBuscasAberto && (
-            <div
-              id="filtros-adicionais-notificacoes"
-              className="grid animate-fadeIn grid-cols-1 items-end gap-3 md:grid-cols-3"
-            >
-              <FloatSelect
-                label="Mês para referência"
-                value={mes}
-                onChange={(valor) => {
-                  setMes(valor);
-                  setPaginaAtual(1);
-                }}
-                options={MESES}
-              />
-              <FloatInput
-                label="Ano para referência"
-                value={ano}
-                onChange={atualizarAno}
-                placeholder="0000"
-                maxLength={4}
-              />
-              <FloatSelect
-                label="Situação"
-                value={situacao}
-                onChange={(valor) => {
-                  setSituacao(valor);
-                  setPaginaAtual(1);
-                }}
-                options={SITUACOES}
-              />
-            </div>
-          )}
+          {/* 2ª LINHA: MÊS REFERÊNCIA, ANO REFERÊNCIA E SITUAÇÃO */}
+          <div className="grid grid-cols-1 items-end gap-3 md:grid-cols-3">
+            <FloatSelect
+              label="Mês referência"
+              value={mes}
+              onChange={(valor) => {
+                setMes(valor);
+                setPaginaAtual(1);
+              }}
+              options={MESES}
+            />
+
+            <FloatInput
+              label="Ano referência"
+              value={ano}
+              onChange={atualizarAno}
+              placeholder="0000"
+              maxLength={4}
+            />
+
+            <FloatSelect
+              label="Situação"
+              value={situacao}
+              onChange={(valor) => {
+                setSituacao(valor);
+                setPaginaAtual(1);
+              }}
+              options={SITUACOES}
+            />
+          </div>
 
           {erroAno && (
             <p className="text-sm font-medium text-red-500">
@@ -427,7 +374,7 @@ export function NotificacoesEstabelecimentosPage({
           )}
 
           {(estabelecimento || mes || ano || situacao) && (
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 pt-1">
               {estabelecimento && (
                 <FiltroAtivo
                   label={`Estabelecimento: ${estabelecimento.nome}`}
@@ -460,7 +407,7 @@ export function NotificacoesEstabelecimentosPage({
 
           {!pesquisaRealizada ? (
             <div className="py-12 text-center text-sm text-gray-500">
-              Consulte as notificações utilizando os filtros acima.
+              Busque por notificações utilizando os filtros acima.
             </div>
           ) : resultados.length === 0 ? (
             <div className="py-12 text-center text-sm text-gray-500">
