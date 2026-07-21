@@ -29,7 +29,6 @@ export function VisualizarBoletoRecolhimentoGTAPage({ onLogout, onNavigate, dado
           <ArrowLeft size={15} /> Voltar ao Recolhimento Mensal de GTAs
         </button>
         <div className="flex items-center gap-3">
-          <ReceiptText size={28} className="text-[#1A7A3C]" />
           <h1 className="text-2xl font-semibold text-gray-900">Visualizar Boleto</h1>
         </div>
         <section className="rounded-xl bg-white p-6 shadow-sm">

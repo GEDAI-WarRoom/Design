@@ -56,12 +56,11 @@ function DetalhePage({ onLogout, onNavigate, dados, mode }: Props & { mode: "vie
           </button>
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <ReceiptText size={27} className="text-[#1A7A3C]" />
               <h1 className="text-2xl font-semibold text-gray-900">{mode === "view" ? "Visualizar" : "Editar"} Recolhimento Mensal de GTAs</h1>
             </div>
             {mode === "view" && (
               <button type="button" onClick={() => onNavigate("editar-recolhimento-mensal-gta", registro)} className="flex h-10 items-center gap-2 rounded-md bg-[#1A7A3C] px-5 text-sm font-semibold text-white hover:bg-[#15612F]">
-                <Pencil size={16} /> Editar
+                Editar
               </button>
             )}
           </div>

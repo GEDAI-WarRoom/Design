@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { ArrowLeft, Check, ChevronDown, ChevronUp, Info, Users } from "lucide-react";
+import { useMemo, useState } from "react";
+import { ArrowLeft, Check, ChevronDown, ChevronUp, Eye, Info, User } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, FloatSelect } from "../../../components/ui/FormKit";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
@@ -14,15 +14,30 @@ import {
 interface Props {
   onLogout: () => void;
   onNavigate: (screen: any, data?: any) => void;
+  onViewPessoa?: (pessoa: ContribuinteRecolhimento) => void;
 }
 
-export function AdicionarRecolhimentoMensalGTAPage({ onLogout, onNavigate }: Props) {
+export function AdicionarRecolhimentoMensalGTAPage({ onLogout, onNavigate, onViewPessoa }: Props) {
   const [contribuinte, setContribuinte] = useState<ContribuinteRecolhimento | null>(null);
+  const [tipoPessoaContribuinte, setTipoPessoaContribuinte] = useState("Pessoa física");
   const [ano, setAno] = useState("");
   const [mes, setMes] = useState("");
   const [secaoAberta, setSecaoAberta] = useState(true);
   const [tentouSalvar, setTentouSalvar] = useState(false);
   const [registroSalvo, setRegistroSalvo] = useState<RecolhimentoMensalGTA | null>(null);
+
+  // 🌟 Filtro dinâmico de contribuintes para o modal (Física vs Jurídica)
+  const contribuintesFiltrados = useMemo(() => {
+    return CONTRIBUINTES_RECOLHIMENTO.filter((c) => {
+      const doc = c.documento.replace(/\D/g, "");
+      if (tipoPessoaContribuinte === "Pessoa física") return doc.length <= 11;
+      if (tipoPessoaContribuinte === "Pessoa jurídica") return doc.length > 11;
+      return true;
+    });
+  }, [tipoPessoaContribuinte]);
+
+  // 🌟 Rótulo dinâmico baseado no tipo de pessoa
+  const labelDocumento = tipoPessoaContribuinte === "Pessoa física" ? "CPF" : "CNPJ";
 
   const anoValido = /^\d{4}$/.test(ano);
   const formularioValido = Boolean(contribuinte && anoValido && mes);
@@ -64,22 +79,67 @@ export function AdicionarRecolhimentoMensalGTAPage({ onLogout, onNavigate }: Pro
           {secaoAberta && (
             <div className="border-t border-gray-100 px-6 pb-6 pt-5">
               <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                <div className="md:col-span-2">
-                  <EntitySearchInput
-                    label="Contribuinte"
-                    placeholder="Buscar por nome, CPF ou CNPJ"
-                    required
-                    value={contribuinte?.nome ?? ""}
-                    data={CONTRIBUINTES_RECOLHIMENTO}
-                    searchKeys={["nome", "documento", "tipo"]}
-                    columns={[{ label: "Nome / Razão Social", key: "nome" }, { label: "CPF / CNPJ", key: "documento" }]}
-                    icon={<Users size={18} className="text-[#1A7A3C]" />}
-                    title="Buscar Contribuinte"
-                    subtitle="Busque por uma pessoa física ou jurídica cadastrada:"
-                    confirmLabel="Selecionar"
-                    onChange={setContribuinte}
-                  />
+
+                {/* 🌟 CONTRIBUINTE + CPF/CNPJ + OLHINHO */}
+                <div className="md:col-span-2 flex items-end gap-2">
+                  <div className="flex-1">
+                    <EntitySearchInput
+                      label="Contribuinte"
+                      placeholder="Buscar por nome, CPF ou CNPJ"
+                      required
+                      value={contribuinte?.nome ?? ""}
+                      data={contribuintesFiltrados}
+                      searchKeys={["nome", "documento", "tipo"]}
+                      columns={[
+                        { label: "Nome / Razão Social", key: "nome" },
+                        { label: labelDocumento, key: "documento" },
+                      ]}
+                      icon={<User size={18} className="text-[#1A7A3C]" />}
+                      title="Buscar Contribuinte"
+                      subtitle="Busque por uma pessoa física ou jurídica cadastrada:"
+                      confirmLabel="Selecionar"
+                      onChange={setContribuinte}
+                      headerActions={
+                        <FloatSelect
+                          label="Tipo de Pessoa"
+                          required
+                          value={tipoPessoaContribuinte}
+                          onChange={(v) => {
+                            setTipoPessoaContribuinte(v);
+                            setContribuinte(null); // Reseta para evitar conflitos de PF/PJ
+                          }}
+                          options={[
+                            { value: "Pessoa física", label: "Pessoa Física" },
+                            { value: "Pessoa jurídica", label: "Pessoa Jurídica" },
+                          ]}
+                        />
+                      }
+                    />
+                  </div>
+
+                  {/* CPF/CNPJ Dinâmico Desabilitado + Olhinho */}
+                  {contribuinte && (
+                    <>
+                      <div className="flex-1">
+                        <FloatInput
+                          label={`${labelDocumento} Contribuinte`}
+                          value={contribuinte.documento}
+                          disabled
+                        />
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => contribuinte && onViewPessoa?.(contribuinte)}
+                        className="h-12 w-12 flex items-center justify-center rounded-md text-[#1A7A3C] hover:bg-green-50 transition shrink-0"
+                        title="Visualizar Detalhes do Contribuinte"
+                      >
+                        <Eye size={20} />
+                      </button>
+                    </>
+                  )}
                 </div>
+
                 <FloatInput
                   label="Ano para referência"
                   required
