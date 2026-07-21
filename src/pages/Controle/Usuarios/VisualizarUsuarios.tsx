@@ -19,11 +19,12 @@ import {
   Minimize2,
   Settings,
   PlusCircle,
-  MapPin
+  MapPin,
+  BriefcaseBusiness
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, Tabs, AccordionCardGroup } from "../../../components/ui/FormKit";
-import { MultiSearchModal } from "../../../components/ui/FormKit"; 
+import { MultiSearchModal } from "../../../components/ui/FormKit";
 import * as Icons from "../../../imports/icons";
 
 const GREEN = "#1A7A3C";
@@ -31,8 +32,8 @@ const GREEN = "#1A7A3C";
 // Catálogo simplificado de papéis do sistema
 const TODOS_PAPEIS_SISTEMA = [
   { id: 1, nome: "Administrador", nivel: 1, exigeUnidade: false },
-  { id: 2, nome: "Responsável Técnico", nivel: 2, exigeUnidade: true }, // 👈 Exige informar a Unidade regional
-  { id: 3, nome: "Emissor de GTA", nivel: 2, exigeUnidade: true },      // 👈 Exige informar a Unidade regional
+  { id: 2, nome: "Responsável Técnico", nivel: 2, exigeUnidade: true }, // Exige informar a Unidade regional
+  { id: 3, nome: "Emissor de GTA", nivel: 2, exigeUnidade: true },      // Exige informar a Unidade regional
   { id: 4, nome: "Auxiliar de Cadastro", nivel: 2, exigeUnidade: false },
   { id: 5, nome: "Consultor de Relatórios", nivel: 2, exigeUnidade: false },
   { id: 6, nome: "Pessoa Física", nivel: 3, exigeUnidade: false }
@@ -94,7 +95,7 @@ interface PageProps {
 }
 
 export function VisualizarUsuariosPage({
-  onLogout = () => {},
+  onLogout = () => { },
   onNavigate = (screen: string) => console.log("navigate:", screen),
 }: PageProps = {}) {
   const u = USUARIO;
@@ -104,7 +105,7 @@ export function VisualizarUsuariosPage({
   const [isMultiSearchOpen, setIsMultiSearchOpen] = useState(false);
   const [zoomScale, setZoomScale] = useState(1);
 
-  // Estado inicial dos papéis atribuídos ao usuário (com a unidade regional preenchida onde necessário)
+  // Estado inicial dos papéis atribuídos ao usuário
   const [papeisAtribuidos, setPapeisAtribuidos] = useState([
     { id: 1, nome: "Administrador", nivel: 1, exigeUnidade: false },
     { id: 2, nome: "Responsável Técnico", nivel: 2, exigeUnidade: true, unidadeAtuacao: "Coordenadoria Regional de Lavras" },
@@ -115,16 +116,16 @@ export function VisualizarUsuariosPage({
   const [papeisSelecionadosForm, setPapeisSelecionadosForm] = useState<any[]>([]);
 
   const renderIconePapeis = (isActive: boolean, size = 19, forceWhite = false) => {
-    const iconSource = (Icons as any).iconePapeisUrl || (Icons as any).iconepapeisurl;
+    const iconSource = Icons.iconePapéisUrl || (Icons as any).iconepapeisurl;
 
     if (!iconSource) {
       const colorClass = forceWhite ? "text-white" : (isActive ? "text-[#1A7A3C]" : "text-gray-400");
-      return <Shield size={size} className={colorClass} />;
+      return <BriefcaseBusiness size={size} className={colorClass} />;
     }
 
     if (typeof iconSource === "string") {
-      const filterStyle = forceWhite 
-        ? "brightness(0) invert(1)" 
+      const filterStyle = forceWhite
+        ? "brightness(0) invert(1)"
         : (isActive ? "none" : "grayscale(100%) opacity(0.5)");
 
       return (
@@ -136,7 +137,7 @@ export function VisualizarUsuariosPage({
             height: `${size}px`,
             filter: filterStyle
           }}
-          className="object-contain transition-all"
+          className="object-contain transition-all shrink-0"
         />
       );
     }
@@ -146,7 +147,8 @@ export function VisualizarUsuariosPage({
     return (
       <IconComponent
         size={size}
-        className={colorClass}
+        style={{ width: `${size}px`, height: `${size}px` }}
+        className={`${colorClass} shrink-0 transition-all`}
       />
     );
   };
@@ -236,7 +238,7 @@ export function VisualizarUsuariosPage({
                 className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2"
               >
                 <Settings size={14} />
-                Gerenciar
+                Gerenciar Papéis
               </button>
             )}
           </div>
@@ -251,11 +253,11 @@ export function VisualizarUsuariosPage({
             <Section title="Informações Básicas">
               <div className="flex flex-col gap-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-                  <FloatInput label="CPF" value={u.cpf} disabled onChange={() => {}} />
-                  <FloatInput label="Nome" value={u.nome} disabled onChange={() => {}} />
+                  <FloatInput label="CPF" value={u.cpf} disabled onChange={() => { }} />
+                  <FloatInput label="Nome" value={u.nome} disabled onChange={() => { }} />
                 </div>
                 <div className="grid grid-cols-1 gap-4 items-center">
-                  <FloatInput label="Email" value={u.email || "—"} disabled onChange={() => {}} />
+                  <FloatInput label="Email" value={u.email || "—"} disabled onChange={() => { }} />
                 </div>
               </div>
             </Section>
@@ -265,20 +267,22 @@ export function VisualizarUsuariosPage({
         {/* PAPÉIS */}
         {activeTab === "papeis" && (
           <div className="flex flex-col gap-5 w-full">
-            <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={() => setIsModalOpen(true)}
-                className="flex items-center gap-1.5 text-xs font-semibold text-[#1A7A3C] hover:opacity-85 transition bg-green-50 px-3.5 py-2 rounded-lg border border-green-100 shadow-sm"
-              >
-                <Network size={14} />
-                Mapeamento de Hierarquia
-              </button>
-            </div>
-
             <AccordionCardGroup
-              title="Papéis Ativos"
-              activeCountText={`${papeisAtribuidos.length} papéis ativos`}
+              title="Papéis"
+              activeCountText={
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(true)}
+                    className="flex items-center gap-1 text-xs font-semibold text-[#1A7A3C] hover:underline transition"
+                  >
+                    <Network size={14} />
+                    Mapeamento de Hierarquia
+                  </button>
+                  <span className="text-gray-400 font-bold">·</span>
+                  <span>{papeisAtribuidos.length} papéis ativos</span>
+                </div>
+              }
               variant="sem-vinculacao"
               historicoTitle="Histórico de Papéis"
               icon={renderIconePapeis(true, 21, true)}
@@ -303,18 +307,24 @@ export function VisualizarUsuariosPage({
               }
             >
               {papeisAtribuidos.map((papel) => (
-                <article 
-                  key={papel.id} 
+                <article
+                  key={papel.id}
                   className="bg-white border border-gray-150 shadow-sm rounded-lg overflow-hidden flex flex-col justify-between w-full h-full transition-all hover:shadow-md"
                 >
                   <div>
                     <div className="h-1 bg-[#1A7A3C]" />
                     <div className="p-4 flex flex-col gap-3">
-                      <div className="flex justify-between gap-3 text-[10px] text-gray-500 items-center">
-                        <span><strong>Atribuído:</strong> {u.dataAlteracao.split(" ")[0]}</span>
+                      <div className="flex justify-between items-center gap-2 text-[10px] text-gray-500">
+                        <span>
+                          <strong>Atribuído:</strong> {u.dataAlteracao.split(" ")[0]}
+                        </span>
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] shrink-0">
+                          Ativo
+                        </span>
                       </div>
+
                       <div className="flex items-start gap-3 mt-1">
-                        <div className="shrink-0 p-2.5 bg-green-50/50 rounded-lg text-[#1A7A3C]">
+                        <div className="shrink-0 p-2.5 text-[#1A7A3C]">
                           {renderIconePapeis(true, 18)}
                         </div>
                         <div className="min-w-0 flex-1">
@@ -322,9 +332,9 @@ export function VisualizarUsuariosPage({
                             {papel.nome}
                           </p>
                           {papel.unidadeAtuacao && (
-                            <div className="flex items-center gap-1 mt-1.5 text-xs text-gray-600 font-medium">
-                              <MapPin size={12} className="text-emerald-600 shrink-0" />
-                              <span className="truncate" title={papel.unidadeAtuacao}>
+                            <div className="flex items-center gap-1.5 mt-2 text-xs font-semibold text-gray-800">
+                              <MapPin size={13} className="text-gray-400 shrink-0" />
+                              <span className="text-xs font-normal text-gray-700 leading-tight break-words" title={papel.unidadeAtuacao}>
                                 {papel.unidadeAtuacao}
                               </span>
                             </div>
@@ -364,15 +374,14 @@ export function VisualizarUsuariosPage({
                 <button type="button" onClick={() => setIsModalOpen(false)} className="p-1.5 hover:bg-gray-100 rounded-full text-gray-400 hover:text-gray-600 transition"><X size={20} /></button>
               </div>
             </header>
-            
+
             <div className="flex-1 overflow-auto bg-[#fafafa] relative p-8 flex items-center justify-center cursor-grab active:cursor-grabbing">
               <div style={{ transform: `scale(${zoomScale})`, transition: 'transform 0.15s ease-out' }} className="origin-center flex flex-col items-center w-full min-w-[600px] select-none">
-                
+
                 {/* NÍVEL 1 */}
                 <div className="flex flex-col items-center w-full">
                   <div className="flex items-center gap-2 mb-3 bg-white px-3 py-1 rounded-full border border-gray-200 shadow-sm">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Lvl 1 - Administrador</span>
                   </div>
                   <div className="flex flex-row justify-center gap-6 w-full px-4">
                     {papeisAtribuidos.filter(p => p.nivel === 1).map(p => (
@@ -393,7 +402,6 @@ export function VisualizarUsuariosPage({
                 <div className="flex flex-col items-center w-full">
                   <div className="flex items-center gap-2 mb-3 bg-white px-3 py-1 rounded-full border border-gray-200 shadow-sm">
                     <span className="w-1.5 h-1.5 rounded-full bg-gray-400" />
-                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Lvl 2 - Sub-papéis</span>
                   </div>
                   <div className="flex flex-row justify-center gap-6 w-full px-4">
                     {papeisAtribuidos.filter(p => p.nivel === 2).map(p => (
@@ -406,8 +414,8 @@ export function VisualizarUsuariosPage({
                         </div>
                         {p.unidadeAtuacao && (
                           <div className="flex items-center gap-1 mt-1 text-[11px] text-gray-500 font-medium pl-1">
-                            <MapPin size={11} className="text-emerald-600" />
-                            <span className="truncate">{p.unidadeAtuacao}</span>
+                            <MapPin size={11} className="text-emerald-600 shrink-0" />
+                            <span className="truncate" title={p.unidadeAtuacao}>{p.unidadeAtuacao}</span>
                           </div>
                         )}
                       </div>
@@ -421,7 +429,6 @@ export function VisualizarUsuariosPage({
                 <div className="flex flex-col items-center w-full">
                   <div className="flex items-center gap-2 mb-3 bg-white px-3 py-1 rounded-full border border-gray-200 shadow-sm">
                     <span className="w-1.5 h-1.5 rounded-full bg-gray-300" />
-                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Lvl 3 - Básico</span>
                   </div>
                   <div className="flex flex-row justify-center gap-6 w-full px-4">
                     {papeisAtribuidos.filter(p => p.nivel === 3).map(p => (
@@ -453,124 +460,125 @@ export function VisualizarUsuariosPage({
           ========================================================== */}
       {isGerenciarOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fadeIn">
-          <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-100 animate-scaleIn">
-            
-            <header className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-lg bg-green-50 text-[#1A7A3C]">
+          <div className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-100 animate-scaleIn relative">
+
+            {/* Botão Fechar no canto superior direito */}
+            <button
+              type="button"
+              onClick={() => setIsGerenciarOpen(false)}
+              className="absolute top-4 right-4 p-1.5 hover:bg-gray-100 rounded-full text-gray-400 hover:text-gray-600 transition z-10"
+            >
+              <X size={18} />
+            </button>
+
+            {/* Header Centralizado */}
+            <header className="px-6 pt-6 pb-4 flex flex-col items-center justify-center text-center">
+              <div className="flex items-center gap-2">
+                <div className="p-2 text-[#1A7A3C]">
                   <Settings size={18} />
                 </div>
-                <div>
-                  <h3 className="text-sm font-bold text-gray-800">Gerenciar Papéis do Usuário</h3>
-                  <p className="text-[10px] text-gray-500">Adicione ou remova permissões de {u.nome}</p>
-                </div>
+                <h3 className="text-base font-bold text-gray-800">Gerenciar Papéis do Usuário</h3>
               </div>
-              <button
-                type="button"
-                onClick={() => setIsGerenciarOpen(false)}
-                className="p-1.5 hover:bg-gray-100 rounded-full text-gray-400 hover:text-gray-600 transition"
-              >
-                <X size={18} />
-              </button>
+              <p className="text-xs text-gray-500 mt-1">
+                Adicione ou remova permissões de <strong className="text-gray-700">{u.nome}</strong>
+              </p>
             </header>
 
+            {/* Conteúdo Principal */}
             <div className="p-6 flex flex-col gap-5 overflow-y-auto max-h-[60vh]">
-              
-              <div className="flex items-center justify-between pb-3 border-b border-gray-100 relative">
-                <div className="flex items-center gap-3">
-                  <span className="text-sm font-semibold text-gray-600">Papéis Selecionados</span>
+
+              {/* Barra Superior do Form */}
+              <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+                <div className="flex items-center gap-2.5">
+                  <span className="text-xs font-bold text-gray-700">Papéis Selecionados</span>
                   {papeisSelecionadosForm.length > 0 && (
-                    <span className="text-xs font-bold bg-[#E6F4EA] text-[#1A7A3C] px-2.5 py-1 rounded-full">
-                      {papeisSelecionadosForm.length} {papeisSelecionadosForm.length === 1 ? "Selecionado" : "Selecionados"}
+                    <span className="text-[11px] font-bold bg-green-50 text-[#1A7A3C] px-2.5 py-0.5 rounded-full border border-green-200">
+                      {papeisSelecionadosForm.length} {papeisSelecionadosForm.length === 1 ? "papel" : "papéis"}
                     </span>
                   )}
                 </div>
 
-                <div>
-                  <button
-                    type="button"
-                    onClick={() => setIsMultiSearchOpen(true)}
-                    className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-md border border-[#1A7A3C] text-[#1A7A3C] hover:bg-green-50 transition cursor-pointer"
-                  >
-                    <PlusCircle size={14} /> Adicionar Papel
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsMultiSearchOpen(true)}
+                  className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg border border-[#1A7A3C] text-[#1A7A3C] hover:bg-green-50 transition cursor-pointer shadow-sm"
+                >
+                  <PlusCircle size={14} /> Adicionar Papel
+                </button>
               </div>
 
+              {/* Lista de Papéis */}
               <div className="flex flex-col gap-3">
-                {papeisSelecionadosForm.length === 0 ? (
-                  <p className="text-xs text-gray-400 italic py-6 text-center w-full bg-gray-50 rounded-xl border border-dashed border-gray-200">
-                    Nenhum papel selecionado para este usuário.
-                  </p>
-                ) : (
-                  papeisSelecionadosForm.map((papel) => (
-                    <div
-                      key={papel.id}
-                      className="flex flex-col md:flex-row md:items-center justify-between bg-white border border-gray-200 rounded-xl p-4 gap-4 shadow-sm transition hover:border-gray-300"
-                    >
-                      {/* Info do papel */}
-                      <div className="flex-1 min-w-0">
-                        <span className="text-sm font-bold text-gray-800 truncate block" title={papel.nome}>
-                          {papel.nome}
-                        </span>
+                {papeisSelecionadosForm.map((papel) => (
+                  <div
+                    key={papel.id}
+                    className="bg-white border border-gray-200 rounded-xl p-3.5 flex items-center justify-between gap-4 transition-all hover:border-gray-300 shadow-sm"
+                  >
+                    {/* Lado Esquerdo: Ícone + Nome do Papel */}
+                    <div className="flex items-center gap-2.5 min-w-[160px] flex-1">
+                      <div className="p-2 rounded-lg bg-green-50 text-[#1A7A3C] shrink-0">
+                        {renderIconePapeis(true, 16)}
                       </div>
+                      <span className="text-sm font-bold text-gray-800 truncate" title={papel.nome}>
+                        {papel.nome}
+                      </span>
+                    </div>
 
-                      {/* Vínculo de Atuação (Apenas se o papel exigir) */}
-                      {papel.exigeUnidade ? (
-                        <div className="flex-1 min-w-[220px]">
-                          <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">
-                            Vínculo de Atuação *
-                          </label>
+                    {/* Lado Direito: Seleção da Unidade Regional (quando exigida) + Botão Excluir */}
+                    <div className="flex items-center gap-3 shrink-0 justify-end">
+                      {papel.exigeUnidade && (
+                        <div className="relative w-[340px]">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                            <MapPin size={14} />
+                          </div>
                           <select
                             value={papel.unidadeAtuacao || ""}
                             onChange={(e) => handleAlterarUnidadeForm(papel.id, e.target.value)}
-                            className="w-full text-xs bg-gray-50 border border-gray-200 rounded-lg p-2 text-gray-700 focus:outline-none focus:border-[#1A7A3C] focus:ring-1 focus:ring-[#1A7A3C]"
-                            required
+                            title={papel.unidadeAtuacao || "Selecione a Regional"}
+                            className="w-full pl-9 pr-8 py-2 text-xs font-medium text-gray-700 bg-gray-50/70 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-[#1A7A3C] focus:bg-white transition cursor-pointer appearance-none truncate"
                           >
-                            <option value="">Selecione uma regional...</option>
+                            <option value="" disabled>Selecione a Regional</option>
                             {UNIDADES_REGIONAIS.map((regional) => (
-                              <option key={regional} value={regional}>
+                              <option key={regional} value={regional} className="truncate">
                                 {regional}
                               </option>
                             ))}
                           </select>
-                        </div>
-                      ) : (
-                        <div className="flex-1 text-xs text-gray-400 italic md:text-right">
-                          Não exige unidade regional
+                          <div className="absolute inset-y-0 right-0 pr-2.5 flex items-center pointer-events-none text-gray-400">
+                            <ChevronDown size={14} />
+                          </div>
                         </div>
                       )}
 
-                      {/* Botão de excluir */}
-                      <div className="shrink-0 flex justify-end">
-                        <button
-                          type="button"
-                          onClick={() => handleRemoverPapelForm(papel.id)}
-                          className="text-gray-400 hover:text-red-500 transition-colors p-1.5 rounded-md hover:bg-gray-50 cursor-pointer"
-                          title="Remover"
-                        >
-                          <X size={16} />
-                        </button>
-                      </div>
+                      {/* Botão de Excluir */}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoverPapelForm(papel.id)}
+                        className="p-2 text-gray-400 hover:text-red-500 rounded-lg hover:bg-gray-100 transition cursor-pointer shrink-0 ml-1"
+                        title="Remover papel"
+                      >
+                        <X size={16} />
+                      </button>
                     </div>
-                  ))
-                )}
+                  </div>
+                ))}
               </div>
 
             </div>
 
-            <footer className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+            {/* Footer com botões Centralizados */}
+            <footer className="px-6 py-4 flex justify-center items-center gap-3">
               <button
                 type="button"
                 onClick={() => setIsGerenciarOpen(false)}
-                className="px-4 py-2 text-xs font-bold text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition"
+                className="px-5 py-2 text-xs font-bold text-[#1A7A3C] border border-[#1A7A3C] hover:bg-green-50 rounded-lg transition"
               >
                 Cancelar
               </button>
               <button
                 type="button"
                 onClick={handleSalvarGerenciamento}
-                className="px-5 py-2 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm"
+                className="px-6 py-2 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-lg transition shadow-sm"
               >
                 Salvar Alterações
               </button>
