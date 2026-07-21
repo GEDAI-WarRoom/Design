@@ -12,6 +12,7 @@ export interface ItemNotaFiscalInsumo {
   id: string;
   numeroPartida: string;
   validade: string;
+  laboratorio: string;
   doenca: string;
   tipoInsumo: string;
   dosesPorFrasco: number;
@@ -104,6 +105,7 @@ export const NOTAS_FISCAIS_INSUMO_MOCK: NotaFiscalInsumo[] = [
         id: "item-insumo-1",
         numeroPartida: "0001245/26",
         validade: "2027-03-31",
+        laboratorio: "BioLab Diagnósticos",
         doenca: "Brucelose",
         tipoInsumo: "Antígeno Acidificado Tamponado",
         dosesPorFrasco: 50,
@@ -129,6 +131,7 @@ export const NOTAS_FISCAIS_INSUMO_MOCK: NotaFiscalInsumo[] = [
         id: "item-insumo-2",
         numeroPartida: "0002301/26",
         validade: "2027-05-30",
+        laboratorio: "Instituto Veterinário Mineiro",
         doenca: "Tuberculose Bovina",
         tipoInsumo: "Tuberculina PPD Bovina",
         dosesPorFrasco: 20,
@@ -143,6 +146,7 @@ export const NOTAS_FISCAIS_INSUMO_MOCK: NotaFiscalInsumo[] = [
         id: "item-insumo-3",
         numeroPartida: "0002302/26",
         validade: "2027-05-30",
+        laboratorio: "Instituto Veterinário Mineiro",
         doenca: "Tuberculose Bovina",
         tipoInsumo: "Tuberculina PPD Aviária",
         dosesPorFrasco: 20,
@@ -168,6 +172,7 @@ export const NOTAS_FISCAIS_INSUMO_MOCK: NotaFiscalInsumo[] = [
         id: "item-insumo-4",
         numeroPartida: "0000987/26",
         validade: "2027-01-31",
+        laboratorio: "AgroLab Diagnósticos",
         doenca: "Brucelose",
         tipoInsumo: "Antígeno para Teste do Anel em Leite",
         dosesPorFrasco: 25,
@@ -193,6 +198,7 @@ export const NOTAS_FISCAIS_INSUMO_MOCK: NotaFiscalInsumo[] = [
         id: "item-insumo-5",
         numeroPartida: "0000714/26",
         validade: "2026-12-31",
+        laboratorio: "BioCampo Laboratório",
         doenca: "Brucelose",
         tipoInsumo: "Antígeno Acidificado Tamponado",
         dosesPorFrasco: 50,

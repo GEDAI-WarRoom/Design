@@ -101,6 +101,15 @@ function DetalhesNotaFiscal({
   const [open, setOpen] = useState(true);
   const [itensMinimizados, setItensMinimizados] = useState<Record<string, boolean>>({});
   const [graficoAtivo, setGraficoAtivo] = useState<{ itemId: string; index: number } | null>(null);
+  const itemPrincipal = nota.itens[0];
+  const dosesTotaisLote = nota.itens.reduce((total, item) => (
+    total
+    + item.dosesVencidas
+    + item.dosesDescartadas
+    + item.dosesPartilhadas
+    + item.dosesUtilizadas
+    + item.dosesDisponiveis
+  ), 0);
 
   const alterarItem = (
     itemId: string,
@@ -134,14 +143,35 @@ function DetalhesNotaFiscal({
             <span className="text-sm font-bold text-gray-800">Lote:</span>
             <span className="text-sm font-bold text-gray-900">{nota.lote}</span>
           </div>
-          <div className="relative group/lote-info flex-shrink-0">
+          <div className="relative group/lote-info flex-shrink-0 z-20">
             <Info size={14} className="text-gray-400 cursor-help" />
-            <div className="absolute left-0 top-full mt-2 w-64 bg-white border border-gray-100 rounded-xl shadow-xl hidden group-hover/lote-info:block z-50 overflow-hidden">
-              <div className="bg-gray-50 border-b border-gray-100 p-3 text-[11px] font-extrabold text-gray-800">Detalhes do lote</div>
-              <div className="p-3 flex flex-col gap-2 text-[11px] text-gray-500">
-                <div className="flex justify-between gap-3"><span>Nota Fiscal:</span><span className="font-bold text-gray-700">{nota.numero}</span></div>
-                <div className="flex justify-between gap-3"><span>Emissão:</span><span className="font-bold text-gray-700">{nota.dataEmissao.split("-").reverse().join("/")}</span></div>
-                <div className="flex justify-between gap-3"><span>Apresentações:</span><span className="font-bold text-gray-700 text-right">{nota.itens.map((item) => item.tipoInsumo).join(", ")}</span></div>
+            <div className="fixed inset-0 bg-black/15 hidden group-hover/lote-info:block pointer-events-none z-[998] animate-fadeIn" />
+            <div className="absolute left-0 top-full mt-2 w-60 bg-white border border-gray-100 rounded-2xl shadow-xl hidden group-hover/lote-info:block animate-fadeIn z-[999] text-left overflow-hidden">
+              <div className="flex items-center gap-1.5 border-b border-gray-100 p-3">
+                <Package size={13} className="text-gray-500" />
+                <span className="text-[11px] font-extrabold text-gray-800">Nº de Partida: {nota.lote}</span>
+              </div>
+              <div className="p-3 flex flex-col gap-2.5 text-[11px] text-gray-500 bg-white">
+                <div className="flex justify-between items-center gap-3">
+                  <span>Doença:</span>
+                  <span className="font-bold text-gray-700 text-right">{itemPrincipal?.doenca ?? "—"}</span>
+                </div>
+                <div className="flex justify-between items-center gap-3">
+                  <span>Tipo de Insumo:</span>
+                  <span className="font-bold text-gray-700 text-right">{itemPrincipal?.tipoInsumo ?? "—"}</span>
+                </div>
+                <div className="flex justify-between items-center gap-3">
+                  <span>Laboratório:</span>
+                  <span className="font-bold text-gray-700 text-right">{itemPrincipal?.laboratorio ?? "—"}</span>
+                </div>
+                <div className="flex justify-between items-center gap-3">
+                  <span>Validade:</span>
+                  <span className="font-bold text-gray-700">{itemPrincipal?.validade.split("-").reverse().join("/") ?? "—"}</span>
+                </div>
+              </div>
+              <div className="bg-gray-50 border-t border-gray-100 p-3 flex justify-between items-center text-[11px] font-bold text-green-700">
+                <span>Doses Totais Lote:</span>
+                <span>{dosesTotaisLote}</span>
               </div>
             </div>
           </div>
