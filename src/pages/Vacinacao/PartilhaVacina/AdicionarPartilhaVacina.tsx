@@ -27,7 +27,8 @@ import {
   PlusCircle,
   Info,
   Download,
-  Package
+  Package,
+  PillBottle
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import {
@@ -400,28 +401,81 @@ export function AdicionarPartilhaVacinaPage({ onLogout, onNavigate }: AdicionarV
                   return (
                     <div key={`grupo-${grupo.nome}`} className="border border-gray-200 rounded-xl p-4 bg-gray-50/30 relative">
 
+                      {/* Cabeçalho limpo com gatilho de minimizar a Nota Fiscal inteira */}
                       <div className="flex items-center justify-between mb-4 px-1">
-                        <div
-                          className="flex items-center gap-2 cursor-pointer select-none group/title"
-                          onClick={() => setNotasListasMinimizadas(prev => ({ ...prev, [grupo.nome]: !isNotaMinimizada }))}
-                        >
-                          <Package size={24} color={GREEN} />
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="flex items-center gap-2 cursor-pointer select-none group/title"
+                            onClick={() => setNotasListasMinimizadas(prev => ({ ...prev, [grupo.nome]: !isNotaMinimizada }))}
+                          >
+                            <Package size={24} color={GREEN} />
 
-                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-sm font-bold text-gray-600 group-hover/title:text-gray-600 transition-colors">
+                              Lote:
+                            </span>
+
                             <span className="text-sm font-bold text-gray-800 group-hover/title:text-gray-600 transition-colors">
                               {grupo.nome}
                             </span>
-
-                            <span className="px-1.5 py-0.5 bg-gray-100/60 border border-gray-200 text-gray-700 text-[10px] font-medium rounded uppercase tracking-wider">
-                              UF: {grupo.partidas[0]?.uf || "MG"}
-                            </span>
                           </div>
 
-                          {isNotaMinimizada ? (
-                            <ChevronDown size={16} className="text-gray-400 group-hover/title:text-gray-600 mt-0.5" />
-                          ) : (
-                            <ChevronUp size={16} className="text-gray-400 group-hover/title:text-gray-600 mt-0.5" />
-                          )}
+                          {/* Tooltip com os detalhes do lote */}
+                          <div className="relative group/info overflow-visible flex items-center">
+                            <div className="relative cursor-help text-gray-400 hover:text-gray-600 transition z-20 flex items-center">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></svg>
+                              <div className="fixed inset-0 bg-black/15 hidden group-hover/info:block pointer-events-none z-[998] animate-fadeIn" />
+
+                              {/* Popover Flutuante com os dados do lote */}
+                              <div className="absolute left-0 top-full mt-2 w-60 bg-white border border-gray-100 rounded-xl shadow-xl hidden group-hover/info:block animate-fadeIn z-[999] text-left overflow-hidden">
+                                <div className="flex items-center gap-1.5 bg-gray-50 border-b border-gray-100 p-3">
+                                  <Package size={13} className="text-gray-500" />
+                                  <span className="text-[11px] font-extrabold text-gray-800">
+                                    Nº de Partida:{" "}{grupo.nome}
+                                  </span>                                </div>
+
+                                <div className="p-3 flex flex-col gap-2 text-[11px] text-gray-500 bg-white">
+
+                                  <div className="flex justify-between items-center gap-3">
+                                    <span>Doença:</span>
+                                    <span className="font-bold text-gray-700 text-right">
+                                      {[...new Set(grupo.partidas.map((p: any) => p.doenca).filter(Boolean))].join(", ") || "—"}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between items-center gap-3">
+                                    <span>Tipo de Vacina:</span>
+                                    <span className="font-bold text-gray-700 text-right">
+                                      {[...new Set(grupo.partidas.map((p: any) => p.tipoVacina).filter(Boolean))].join(", ") || "—"}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between items-center gap-3">
+                                    <span>Laboratório:</span>
+                                    <span className="font-bold text-gray-700 text-right">
+                                      {[...new Set(grupo.partidas.map((p: any) => p.laboratorio).filter(Boolean))].join(", ") || "—"}
+                                    </span>
+                                  </div>
+                                  <div className="flex justify-between items-center gap-3">
+                                    <span>Validade:</span>
+                                    <span className="font-bold text-gray-700 text-right">
+                                      {[...new Set(grupo.partidas.map((p: any) => p.validade).filter(Boolean))].join(", ") || "—"}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                {/* Rodapé destacado: total de doses do lote */}
+                                <div className="bg-gray-50 border-t border-gray-100 p-3 flex justify-between items-center text-[11px] font-bold text-green-700">
+                                  <span>Doses Totais Lote:</span>
+                                  <span>
+                                    {grupo.partidas.reduce(
+                                      (soma: number, p: any) => soma + (p.dosesDisponiveisTotais || 0),
+                                      0
+                                    )}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+
 
                           {isNotaMinimizada && (
                             <span className="text-[11px] text-gray-400 font-medium normal-case">
@@ -430,16 +484,32 @@ export function AdicionarPartilhaVacinaPage({ onLogout, onNavigate }: AdicionarV
                           )}
                         </div>
 
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setNotasFiscaisOrigem(notasFiscaisOrigem.filter(item => item.nome !== grupo.nome));
-                          }}
-                          className="text-gray-400 hover:text-red-500 p-1 rounded transition hover:bg-red-50"
-                          title="Remover Nota"
-                        >
-                          <Trash2 size={16} />
-                        </button>
+                        {/* Lado Direito: Ações (Chevron para expandir/minimizar + Botão de Excluir) */}
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => setNotasListasMinimizadas(prev => ({ ...prev, [grupo.nome]: !isNotaMinimizada }))}
+                            className="text-gray-400 hover:text-gray-600 p-1 rounded transition hover:bg-gray-100"
+                            title={isNotaMinimizada ? "Expandir" : "Minimizar"}
+                          >
+                            {isNotaMinimizada ? (
+                              <ChevronDown size={16} />
+                            ) : (
+                              <ChevronUp size={16} />
+                            )}
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setNotasFiscaisOrigem(notasFiscaisOrigem.filter(item => item.nome !== grupo.nome));
+                            }}
+                            className="text-gray-400 hover:text-red-500 p-1 rounded transition hover:bg-red-50"
+                            title="Remover Nota"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
                       </div>
 
                       {!isNotaMinimizada && (
@@ -514,38 +584,15 @@ export function AdicionarPartilhaVacinaPage({ onLogout, onNavigate }: AdicionarV
                                 <div className={`flex items-center justify-between border-gray-100 overflow-visible pr-14 ${isLoteMinimizado ? "border-none pb-0 mb-0" : "border-b pb-2 mb-3"
                                   }`}>
                                   <div className="flex items-center gap-1.5 relative group/info overflow-visible">
-                                    <div className="relative cursor-help text-gray-400 hover:text-gray-600 transition pt-0.5 z-20">
-                                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></svg>
-                                      <div className="fixed inset-0 bg-black/15 hidden group-hover/info:block pointer-events-none z-[998] animate-fadeIn" />
 
-                                      <div className="absolute left-0 top-full mt-2 w-56 bg-white border border-gray-100 rounded-xl shadow-xl hidden group-hover/info:block animate-fadeIn z-[999] text-left overflow-hidden">
-                                        <div className="flex items-center gap-1.5 bg-gray-50 border-b border-gray-100 p-3">
-                                          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-gray-500"><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></svg>
-                                          <span className="text-[11px] font-extrabold text-gray-800">Apresentação </span>
-                                        </div>
-                                        <div className="p-3 flex flex-col gap-2 text-[11px] text-gray-500 bg-white">
-                                          <div className="flex justify-between items-center">
-                                            <span>Laboratório:</span>
-                                            <span className="font-bold text-gray-700">BioMed/MG</span>
-                                          </div>
-                                          <div className="flex justify-between items-center">
-                                            <span>Doença:</span>
-                                            <span className="font-bold text-gray-700">{nfItem.doenca || "—"}</span>
-                                          </div>
-                                          <div className="flex justify-between items-center">
-                                            <span>Tipo de Vacina:</span>
-                                            <span className="font-bold text-gray-700">B19</span>
-                                          </div>
-                                        </div>
-                                        <div className="bg-gray-50 border-t border-gray-100 p-3 flex justify-between items-center text-[11px] font-bold text-green-700">
-                                          <span>Doses Totais Lote:</span>
-                                          <span>{TOTAL_DISPONIVEL}</span>
-                                        </div>
-                                      </div>
-                                    </div>
 
                                     <span className="text-xs font-semibold text-gray-800 select-none">
                                       Apresentação
+                                    </span>
+
+                                    <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-600 text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">
+                                      <PillBottle size={10} className="text-gray-400" />
+                                      {DOSES_POR_FRASCO} doses/frasco
                                     </span>
 
                                     {isLoteMinimizado && (
@@ -555,10 +602,7 @@ export function AdicionarPartilhaVacinaPage({ onLogout, onNavigate }: AdicionarV
                                     )}
                                   </div>
 
-                                  <div className={`px-2 py-0.5 rounded border font-semibold text-[10px] ${isVencido ? "bg-red-50 border-red-200 text-red-700" : "bg-green-50 border-green-200 text-green-700"
-                                    }`}>
-                                    Validade: {validadeLote} {isVencido && "(Vencida)"}
-                                  </div>
+
                                 </div>
 
                                 {!isLoteMinimizado && (
@@ -638,7 +682,6 @@ export function AdicionarPartilhaVacinaPage({ onLogout, onNavigate }: AdicionarV
                                           </div>
 
                                           <p className="text-[8px] text-gray-400 text-center leading-none mt-0.5">
-                                            {DOSES_POR_FRASCO} doses por frasco
                                           </p>
                                         </div>
 
@@ -698,9 +741,12 @@ export function AdicionarPartilhaVacinaPage({ onLogout, onNavigate }: AdicionarV
                                           </div>
                                         ))}
 
-                                      <div className="flex items-center gap-1 px-1 py-0.5 ml-auto">
-                                        <span className="text-gray-400 font-medium">Total do lote:</span>
-                                        <span className="font-bold text-gray-600">{totalDosesGrafico}</span>
+                                      <div className="flex flex-col items-end gap-0.5 px-1 py-0.5 ml-auto">
+                                        <div className="flex items-center gap-1">
+                                          <span className="text-gray-400 font-medium">Total de doses:</span>
+                                          <span className="font-bold text-gray-600">{totalDosesGrafico}</span>
+                                        </div>
+
                                       </div>
                                     </div>
                                   </div>
@@ -896,10 +942,10 @@ export function AdicionarPartilhaVacinaPage({ onLogout, onNavigate }: AdicionarV
         icon={<Package size={24} color={GREEN} />}
         /* Dados continuam os mesmos */
         data={[
-          { id: 1, nome: "Lote: 0013225/24", partida: "1", uf: "MG", dosesDisponiveisTotais: 120, fornecedor: "Distribuidora de Vacinas Alfa LTDA", doenca: "Brucelose", exigeReceituario: true },
-          { id: 2, nome: "Lote: 0013225/24", partida: "2", uf: "MG", dosesDisponiveisTotais: 80, fornecedor: "Distribuidora de Vacinas Alfa LTDA", doenca: "Febre Aftosa", exigeReceituario: true },
-          { id: 3, nome: "Lote: 0014589/24", partida: "1", uf: "SP", dosesDisponiveisTotais: 250, fornecedor: "Comercial Agropecuária Beta S/A", doenca: "Raiva dos Herbívoros", exigeReceituario: false },
-          { id: 4, nome: "Lote: 0014589/24", partida: "1", uf: "GO", dosesDisponiveisTotais: 50, fornecedor: "Laboratório Biovet Saúde Animal", doenca: "Brucelose", exigeReceituario: true }
+          { id: 1, nome: "0013225/24", partida: "1", uf: "MG", dosesDisponiveisTotais: 120, fornecedor: "Distribuidora de Vacinas Alfa LTDA", doenca: "Brucelose", exigeReceituario: true, tipoVacina: "B19", laboratorio: "BioMed/MG", validade: "20/12/2026" },
+          { id: 2, nome: "0013225/24", partida: "2", uf: "MG", dosesDisponiveisTotais: 80, fornecedor: "Distribuidora de Vacinas Alfa LTDA", doenca: "Brucelose", exigeReceituario: true, tipoVacina: "Oleosa", laboratorio: "BioMed/MG", validade: "20/12/2026" },
+          { id: 3, nome: "0014589/24", partida: "1", uf: "SP", dosesDisponiveisTotais: 250, fornecedor: "Comercial Agropecuária Beta S/A", doenca: "Raiva dos Herbívoros", exigeReceituario: false, tipoVacina: "Inativada", laboratorio: "Zoetis", validade: "15/08/2027" },
+          { id: 4, nome: "0014589/24", partida: "1", uf: "GO", dosesDisponiveisTotais: 50, fornecedor: "Laboratório Biovet Saúde Animal", doenca: "Raiva dos Herbívoros", exigeReceituario: true, tipoVacina: "B19", laboratorio: "Biovet", validade: "15/08/2027" }
         ]}
 
         searchKeys={["nome", "partida", "fornecedor", "uf"]}
