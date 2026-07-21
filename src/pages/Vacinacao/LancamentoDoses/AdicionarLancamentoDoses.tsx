@@ -558,10 +558,10 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate }: Pag
                                           ) : (
                                             <div className="flex flex-col items-center justify-center">
                                               <span className="text-base font-black text-gray-800 leading-none">
-                                                {DOSES_DISPONIVEIS}
+                                                {totalDosesGrafico}
                                               </span>
                                               <span className="text-[7px] font-bold text-gray-400 mt-0.5 uppercase tracking-wider">
-                                                Disponíveis
+                                                Total
                                               </span>
                                             </div>
                                           )}
@@ -588,9 +588,6 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate }: Pag
                                             </div>
                                           </div>
 
-                                          <p className="text-[8px] text-gray-400 text-center leading-none mt-0.5">
-                                            {DOSES_POR_FRASCO} doses por frasco
-                                          </p>
                                         </div>
 
                                         <div className="flex flex-col border border-gray-200 rounded-xl px-2.5 py-2 w-full max-w-[130px] gap-1 bg-white justify-between">
@@ -665,20 +662,13 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate }: Pag
                                       />
                                     </div>
                                     <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 mt-3 pt-2 border-t border-gray-100 text-[9px] z-10">
-                                      {dadosGrafico
-                                        .filter((item) => item.name !== "Disponíveis")
-                                        .map((item) => (
+                                      {dadosGrafico.map((item) => (
                                           <div key={item.name} className="flex items-center gap-1 bg-gray-50 px-1 py-0.5 rounded border border-gray-100">
                                             <span className="w-1 h-1 rounded-full" style={{ backgroundColor: item.color }} />
                                             <span className="text-gray-400 font-medium">{item.name}:</span>
                                             <span className="font-bold text-gray-600">{item.value}</span>
                                           </div>
                                         ))}
-
-                                      <div className="flex items-center gap-1 px-1 py-0.5 ml-auto">
-                                        <span className="text-gray-400 font-medium">Total do lote:</span>
-                                        <span className="font-bold text-gray-600">{totalDosesGrafico}</span>
-                                      </div>
                                     </div>
                                   </div>
                                 )}

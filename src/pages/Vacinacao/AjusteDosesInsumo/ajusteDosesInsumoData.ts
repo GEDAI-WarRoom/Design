@@ -17,11 +17,17 @@ export interface ItemNotaFiscalInsumo {
   dosesPorFrasco: number;
   frascosDisponiveis: number;
   dosesDisponiveis: number;
+  dosesVencidas: number;
+  dosesDescartadas: number;
+  dosesPartilhadas: number;
+  dosesUtilizadas: number;
 }
 
 export interface NotaFiscalInsumo {
   id: string;
   numero: string;
+  lote: string;
+  saldoApresentacao: number;
   dataEmissao: string;
   revendedoraCodigo: string;
   itens: ItemNotaFiscalInsumo[];
@@ -88,6 +94,8 @@ export const NOTAS_FISCAIS_INSUMO_MOCK: NotaFiscalInsumo[] = [
   {
     id: "nf-insumo-1",
     numero: "10458",
+    lote: "0001245/26",
+    saldoApresentacao: 600,
     dataEmissao: "2026-07-02",
     revendedoraCodigo: "3100000101",
     itensFormatados: "Brucelose - Antígeno Acidificado Tamponado",
@@ -101,12 +109,18 @@ export const NOTAS_FISCAIS_INSUMO_MOCK: NotaFiscalInsumo[] = [
         dosesPorFrasco: 50,
         frascosDisponiveis: 12,
         dosesDisponiveis: 600,
+        dosesVencidas: 0,
+        dosesDescartadas: 50,
+        dosesPartilhadas: 100,
+        dosesUtilizadas: 250,
       },
     ],
   },
   {
     id: "nf-insumo-2",
     numero: "10892",
+    lote: "0002301/26",
+    saldoApresentacao: 560,
     dataEmissao: "2026-07-08",
     revendedoraCodigo: "3100000101",
     itensFormatados: "Tuberculose Bovina - Tuberculina PPD Bovina e Aviária",
@@ -120,6 +134,10 @@ export const NOTAS_FISCAIS_INSUMO_MOCK: NotaFiscalInsumo[] = [
         dosesPorFrasco: 20,
         frascosDisponiveis: 18,
         dosesDisponiveis: 360,
+        dosesVencidas: 0,
+        dosesDescartadas: 20,
+        dosesPartilhadas: 40,
+        dosesUtilizadas: 180,
       },
       {
         id: "item-insumo-3",
@@ -130,12 +148,18 @@ export const NOTAS_FISCAIS_INSUMO_MOCK: NotaFiscalInsumo[] = [
         dosesPorFrasco: 20,
         frascosDisponiveis: 10,
         dosesDisponiveis: 200,
+        dosesVencidas: 0,
+        dosesDescartadas: 20,
+        dosesPartilhadas: 20,
+        dosesUtilizadas: 120,
       },
     ],
   },
   {
     id: "nf-insumo-3",
     numero: "77103",
+    lote: "0000987/26",
+    saldoApresentacao: 225,
     dataEmissao: "2026-06-18",
     revendedoraCodigo: "3100000102",
     itensFormatados: "Brucelose - Antígeno para Teste do Anel em Leite",
@@ -149,12 +173,18 @@ export const NOTAS_FISCAIS_INSUMO_MOCK: NotaFiscalInsumo[] = [
         dosesPorFrasco: 25,
         frascosDisponiveis: 9,
         dosesDisponiveis: 225,
+        dosesVencidas: 0,
+        dosesDescartadas: 25,
+        dosesPartilhadas: 50,
+        dosesUtilizadas: 150,
       },
     ],
   },
   {
     id: "nf-insumo-4",
     numero: "55021",
+    lote: "0000714/26",
+    saldoApresentacao: 350,
     dataEmissao: "2026-05-26",
     revendedoraCodigo: "3100000103",
     itensFormatados: "Brucelose - Antígeno Acidificado Tamponado",
@@ -168,6 +198,10 @@ export const NOTAS_FISCAIS_INSUMO_MOCK: NotaFiscalInsumo[] = [
         dosesPorFrasco: 50,
         frascosDisponiveis: 7,
         dosesDisponiveis: 350,
+        dosesVencidas: 0,
+        dosesDescartadas: 50,
+        dosesPartilhadas: 50,
+        dosesUtilizadas: 200,
       },
     ],
   },

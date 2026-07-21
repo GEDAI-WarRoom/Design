@@ -37,7 +37,7 @@ export function AdicionarAjusteDosesInsumoPage({ onLogout, onNavigate }: PagePro
     )));
 
     if (!form.revendedora || form.notasFiscais.length === 0 || !detalhesValidos) {
-      setErro("Selecione a revendedora e ao menos uma nota fiscal, informando as quantidades lançadas e a justificativa de cada insumo.");
+      setErro("Selecione a revendedora e ao menos um lote, informando as quantidades lançadas e a justificativa de cada insumo.");
       return;
     }
 

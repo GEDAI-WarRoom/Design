@@ -2,15 +2,15 @@ import { useState, type ReactNode } from "react";
 import {
   ChevronDown,
   ChevronUp,
-  FileText,
   Info,
+  Package,
   PlusCircle,
   Trash2,
 } from "lucide-react";
+import { Cell, Pie, PieChart, Sector } from "recharts";
 import {
   FloatInput,
   FloatSelect,
-  LargeTextArea,
   MultiSearchModal,
 } from "../../../components/ui/FormKit";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
@@ -74,6 +74,24 @@ interface DetalhesNotaFiscalProps {
   onRemove?: () => void;
 }
 
+const CORES_SALDO = {
+  vencidas: "#ef4444",
+  descartadas: "#9ca3af",
+  partilhadas: "#3b82f6",
+  utilizadas: "#f59e0b",
+  disponiveis: "#22c55e",
+};
+
+const renderActiveShape = (props: any) => {
+  const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } = props;
+  return (
+    <g>
+      <Sector cx={cx} cy={cy} innerRadius={innerRadius} outerRadius={outerRadius} startAngle={startAngle} endAngle={endAngle} fill={fill} />
+      <Sector cx={cx} cy={cy} innerRadius={outerRadius + 2} outerRadius={outerRadius + 5} startAngle={startAngle} endAngle={endAngle} fill={fill} />
+    </g>
+  );
+};
+
 function DetalhesNotaFiscal({
   nota,
   disabled,
@@ -81,6 +99,8 @@ function DetalhesNotaFiscal({
   onRemove,
 }: DetalhesNotaFiscalProps) {
   const [open, setOpen] = useState(true);
+  const [itensMinimizados, setItensMinimizados] = useState<Record<string, boolean>>({});
+  const [graficoAtivo, setGraficoAtivo] = useState<{ itemId: string; index: number } | null>(null);
 
   const alterarItem = (
     itemId: string,
@@ -94,109 +114,232 @@ function DetalhesNotaFiscal({
     });
   };
 
-  return (
-    <article className="border border-gray-200 rounded-xl overflow-hidden bg-white">
-      <div className="flex items-center justify-between gap-4 px-5 py-4 bg-gray-50/70 border-b border-gray-100">
-        <button
-          type="button"
-          onClick={() => setOpen((value) => !value)}
-          className="flex items-center gap-3 text-left min-w-0"
-        >
-          <img src={Icons.iconeNotaFiscalUrl} alt="Nota Fiscal" className="w-6 h-6 object-contain flex-shrink-0" />
-          <div className="min-w-0">
-            <p className="text-sm font-bold text-gray-800">Nota Fiscal nº {nota.numero}</p>
-            <p className="text-xs text-gray-500 truncate">{nota.itensFormatados}</p>
-          </div>
-          {open ? <ChevronUp size={17} className="text-gray-400 flex-shrink-0" /> : <ChevronDown size={17} className="text-gray-400 flex-shrink-0" />}
-        </button>
+  const removerItem = (itemId: string) => {
+    if (nota.itens.length === 1) {
+      onRemove?.();
+      return;
+    }
+    onChange({
+      ...nota,
+      itens: nota.itens.filter((item) => item.id !== itemId),
+    });
+  };
 
-        {!disabled && onRemove && (
+  return (
+    <article className="border border-gray-200 rounded-xl p-4 bg-gray-50/30 relative">
+      <div className={`flex items-center justify-between gap-4 px-1 ${open ? "mb-4" : ""}`}>
+        <div className="flex items-center gap-2 min-w-0">
+          <Package size={24} className="text-[#1A7A3C] flex-shrink-0" />
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="text-sm font-bold text-gray-800">Lote:</span>
+            <span className="text-sm font-bold text-gray-900">{nota.lote}</span>
+          </div>
+          <div className="relative group/lote-info flex-shrink-0">
+            <Info size={14} className="text-gray-400 cursor-help" />
+            <div className="absolute left-0 top-full mt-2 w-64 bg-white border border-gray-100 rounded-xl shadow-xl hidden group-hover/lote-info:block z-50 overflow-hidden">
+              <div className="bg-gray-50 border-b border-gray-100 p-3 text-[11px] font-extrabold text-gray-800">Detalhes do lote</div>
+              <div className="p-3 flex flex-col gap-2 text-[11px] text-gray-500">
+                <div className="flex justify-between gap-3"><span>Nota Fiscal:</span><span className="font-bold text-gray-700">{nota.numero}</span></div>
+                <div className="flex justify-between gap-3"><span>Emissão:</span><span className="font-bold text-gray-700">{nota.dataEmissao.split("-").reverse().join("/")}</span></div>
+                <div className="flex justify-between gap-3"><span>Apresentações:</span><span className="font-bold text-gray-700 text-right">{nota.itens.map((item) => item.tipoInsumo).join(", ")}</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-1 flex-shrink-0">
+          <button
+            type="button"
+            onClick={() => setOpen((value) => !value)}
+            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition"
+            title={open ? "Minimizar lote" : "Expandir lote"}
+          >
+            {open ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+          </button>
+          {!disabled && onRemove && (
           <button
             type="button"
             onClick={onRemove}
             className="p-2 text-red-500 hover:bg-red-50 rounded-md transition flex-shrink-0"
-            title="Remover nota fiscal"
+            title="Remover lote"
           >
             <Trash2 size={17} />
           </button>
-        )}
+          )}
+        </div>
       </div>
 
       {open && (
-        <div className="p-5 flex flex-col gap-5">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FloatInput label="Número da Nota Fiscal" value={nota.numero} disabled />
-            <FloatInput label="Data de Emissão" type="date" value={nota.dataEmissao} disabled />
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start animate-fadeIn">
+              {nota.itens.map((item) => (
+                (() => {
+                  const minimizado = itensMinimizados[item.id] ?? false;
+                  const saldo = [
+                    { name: "Vencidas", value: item.dosesVencidas, color: CORES_SALDO.vencidas },
+                    { name: "Descartadas", value: item.dosesDescartadas, color: CORES_SALDO.descartadas },
+                    { name: "Partilhadas", value: item.dosesPartilhadas, color: CORES_SALDO.partilhadas },
+                    { name: "Utilizadas", value: item.dosesUtilizadas, color: CORES_SALDO.utilizadas },
+                    { name: "Disponíveis", value: item.dosesDisponiveis, color: CORES_SALDO.disponiveis },
+                  ];
+                  const ativoNesteItem = graficoAtivo?.itemId === item.id;
+                  const fatiaAtiva = ativoNesteItem ? saldo[graficoAtivo.index] : null;
+                  const total = saldo.reduce((soma, categoria) => soma + categoria.value, 0);
+                  const porcentagem = fatiaAtiva && total > 0
+                    ? `${((fatiaAtiva.value / total) * 100).toFixed(1)}%`
+                    : "";
 
-          <div>
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">Lançadas</h3>
-            <div className="flex flex-col gap-4">
-              {nota.itens.map((item, index) => (
-                <div key={item.id} className="border border-gray-100 rounded-xl p-4 bg-gray-50/30">
-                  <div className="flex items-center gap-2 mb-4">
-                    <span className="w-6 h-6 rounded-full bg-[#1A7A3C] text-white text-xs font-bold flex items-center justify-center">
-                      {index + 1}
-                    </span>
-                    <span className="text-sm font-semibold text-gray-700">Insumo de exame</span>
-                  </div>
+                  return (
+                  <div key={item.id} className={`border border-gray-200 rounded-xl bg-white shadow-sm relative transition-all ${minimizado ? "p-2.5" : "p-4"}`}>
+                    <div className={`flex items-center justify-between ${minimizado ? "" : "border-b border-gray-100 pb-2 mb-3"}`}>
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="text-xs font-semibold text-gray-800">Apresentação</span>
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-gray-50 border border-gray-200 rounded text-[10px] font-semibold text-gray-600 whitespace-nowrap">
+                          <Package size={10} /> {item.dosesPorFrasco} doses/frasco
+                        </span>
+                        {minimizado && (
+                          <span className="text-[11px] text-gray-400 whitespace-nowrap">
+                            ({item.dosesDisponiveis} disp. · {item.dosesLancadas || 0} lançadas)
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => setItensMinimizados((atual) => ({ ...atual, [item.id]: !minimizado }))}
+                          className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 transition"
+                          title={minimizado ? "Expandir apresentação" : "Minimizar apresentação"}
+                        >
+                          {minimizado ? <ChevronDown size={15} /> : <ChevronUp size={15} />}
+                        </button>
+                        {!disabled && (
+                          <button
+                            type="button"
+                            onClick={() => removerItem(item.id)}
+                            className="text-gray-400 hover:text-red-500 p-1 rounded-lg hover:bg-red-50 transition"
+                            title="Remover apresentação"
+                          >
+                            <Trash2 size={15} />
+                          </button>
+                        )}
+                      </div>
+                    </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <FloatInput label="Número da Partida" value={item.numeroPartida} disabled />
-                    <FloatInput label="Validade" type="date" value={item.validade} disabled />
-                    <FloatInput label="Doença" value={item.doenca} disabled />
-                    <FloatInput label="Tipo de Insumo de Exame" value={item.tipoInsumo} disabled className="lg:col-span-2" />
-                    <FloatInput label="Doses por Frasco" value={String(item.dosesPorFrasco)} disabled />
-                    <FloatInput label="Frascos Disponíveis" value={String(item.frascosDisponiveis)} disabled />
-                    <FloatInput label="Doses Disponíveis" value={String(item.dosesDisponiveis)} disabled />
-                    <FloatInput
-                      label="Frascos Lançados"
-                      required
-                      type="number"
-                      value={item.frascosLancados}
-                      disabled={disabled}
-                      onChange={(frascos) => {
-                        const normalizado = frascos.replace(/\D/g, "");
-                        alterarItem(item.id, {
-                          frascosLancados: normalizado,
-                          dosesLancadas: normalizado === ""
-                            ? ""
-                            : String(Number(normalizado) * item.dosesPorFrasco),
-                        });
-                      }}
-                    />
-                    <FloatInput
-                      label="Doses Lançadas"
-                      required
-                      type="number"
-                      value={item.dosesLancadas}
-                      disabled={disabled}
-                      onChange={(doses) => {
-                        const normalizado = doses.replace(/\D/g, "");
-                        alterarItem(item.id, {
-                          dosesLancadas: normalizado,
-                          frascosLancados: normalizado === ""
-                            ? ""
-                            : String(Math.ceil(Number(normalizado) / item.dosesPorFrasco)),
-                        });
-                      }}
-                    />
-                    <div className="md:col-span-2 lg:col-span-3">
-                      <LargeTextArea
-                        label="Justificativa"
-                        required
+                    {!minimizado && (
+                      <div className="animate-fadeIn">
+                        <div className="flex flex-col sm:flex-row gap-4 items-center">
+                          <div className="w-24 h-24 flex items-center justify-center relative select-none flex-shrink-0">
+                            <PieChart width={96} height={96}>
+                              <Pie
+                                data={saldo}
+                                cx="50%"
+                                cy="50%"
+                                innerRadius={26}
+                                outerRadius={35}
+                                paddingAngle={2}
+                                dataKey="value"
+                                stroke="none"
+                                activeIndex={ativoNesteItem ? graficoAtivo.index : undefined}
+                                activeShape={renderActiveShape}
+                                onMouseEnter={(_, itemIndex) => setGraficoAtivo({ itemId: item.id, index: itemIndex })}
+                                onMouseLeave={() => setGraficoAtivo(null)}
+                              >
+                                {saldo.map((categoria) => <Cell key={categoria.name} fill={categoria.color} />)}
+                              </Pie>
+                            </PieChart>
+                            <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
+                              <span className="text-sm font-black leading-none" style={{ color: fatiaAtiva?.color ?? "#1f2937" }}>
+                                {fatiaAtiva?.value ?? total}
+                              </span>
+                              <span className="text-[7px] text-gray-500 font-semibold uppercase max-w-[52px] truncate mt-0.5">
+                                {fatiaAtiva?.name ?? "Total"}
+                              </span>
+                              {fatiaAtiva && <span className="text-[8px] font-bold" style={{ color: fatiaAtiva.color }}>{porcentagem}</span>}
+                            </div>
+                          </div>
+
+                          <div className="flex gap-2 flex-1 w-full justify-center">
+                            <div className="flex flex-col border border-gray-200 rounded-xl px-2.5 py-2 w-full max-w-[150px] gap-1 bg-gray-50/80 justify-between">
+                              <span className="text-[11px] text-gray-600 font-medium text-center">Disponíveis</span>
+                              <div className="flex gap-2 items-end justify-center py-0.5">
+                                <div className="flex flex-col items-center flex-1"><span className="text-sm font-bold text-gray-700">{item.frascosDisponiveis}</span><span className="text-[9px] text-gray-400">Frascos</span></div>
+                                <div className="flex flex-col items-center flex-1"><span className="text-sm font-bold text-gray-700">{item.dosesDisponiveis}</span><span className="text-[9px] text-gray-400">Doses</span></div>
+                              </div>
+                            </div>
+
+                            <div className="flex flex-col border border-gray-200 rounded-xl px-2.5 py-2 w-full max-w-[150px] gap-1 bg-white justify-between">
+                              <span className="text-[11px] text-gray-500 font-medium text-center">Lançadas <span className="text-red-500">*</span></span>
+                              <div className="flex gap-1.5 items-end justify-center">
+                                <label className="flex flex-col flex-1 min-w-0">
+                                  <input
+                                    aria-label={`Frascos lançados da partida ${item.numeroPartida}`}
+                                    type="number"
+                                    min="0"
+                                    value={item.frascosLancados}
+                                    disabled={disabled}
+                                    placeholder="0"
+                                    onChange={(event) => {
+                                      const frascos = event.target.value.replace(/\D/g, "");
+                                      alterarItem(item.id, {
+                                        frascosLancados: frascos,
+                                        dosesLancadas: frascos === "" ? "" : String(Number(frascos) * item.dosesPorFrasco),
+                                      });
+                                    }}
+                                    className="w-full text-center bg-white border border-gray-200 rounded-lg text-xs font-black p-1 focus:outline-none focus:border-[#1A7A3C] disabled:bg-gray-50 disabled:text-gray-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                  />
+                                  <span className="text-[9px] text-gray-400 font-semibold text-center mt-0.5">Frascos</span>
+                                </label>
+                                <label className="flex flex-col flex-1 min-w-0">
+                                  <input
+                                    aria-label={`Doses lançadas da partida ${item.numeroPartida}`}
+                                    type="number"
+                                    min="0"
+                                    value={item.dosesLancadas}
+                                    disabled={disabled}
+                                    placeholder="0"
+                                    onChange={(event) => {
+                                      const doses = event.target.value.replace(/\D/g, "");
+                                      alterarItem(item.id, {
+                                        dosesLancadas: doses,
+                                        frascosLancados: doses === "" ? "" : String(Math.ceil(Number(doses) / item.dosesPorFrasco)),
+                                      });
+                                    }}
+                                    className="w-full text-center bg-white border border-gray-200 rounded-lg text-xs font-black p-1 focus:outline-none focus:border-[#1A7A3C] disabled:bg-gray-50 disabled:text-gray-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                  />
+                                  <span className="text-[9px] text-gray-400 font-semibold text-center mt-0.5">Doses</span>
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                    <div className="w-full h-[52px] mt-4 bg-white border border-gray-200 rounded-lg px-3 py-1.5 flex flex-col justify-center text-left focus-within:border-[#1A7A3C] shadow-sm transition-colors">
+                      <span className="text-[10px] text-gray-500 select-none mb-0.5">Justificativa</span>
+                      <input
+                        type="text"
                         value={item.justificativa}
                         disabled={disabled}
-                        rows={3}
                         maxLength={1500}
-                        onChange={(justificativa) => alterarItem(item.id, { justificativa })}
+                        placeholder="Digite o motivo deste lançamento."
+                        onChange={(event) => alterarItem(item.id, { justificativa: event.target.value })}
+                        className="w-full bg-transparent border-none text-xs p-0 focus:outline-none focus:ring-0 text-gray-800 placeholder:text-gray-300 disabled:text-gray-500"
                       />
                     </div>
+
+                        <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 mt-3 pt-2 border-t border-gray-100 text-[9px]">
+                          {saldo.map((categoria) => (
+                            <div key={categoria.name} className="flex items-center gap-1 bg-gray-50 px-1 py-0.5 rounded border border-gray-100">
+                              <span className="w-1 h-1 rounded-full" style={{ backgroundColor: categoria.color }} />
+                              <span className="text-gray-400 font-medium">{categoria.name}:</span>
+                              <span className="font-bold text-gray-600">{categoria.value}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </div>
+                  );
+                })()
               ))}
-            </div>
-          </div>
         </div>
       )}
     </article>
@@ -255,17 +398,20 @@ export function AjusteDosesInsumoForm({
         )}
       </Section>
 
-      <Section title="Nota Fiscal (Uma ou mais)">
+      <Section title="Nota Fiscal">
         <div className="flex flex-col gap-5">
           {cadastro && (
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <p className="text-sm font-semibold text-gray-700">
-                  Notas Fiscais <span className="text-red-500">*</span>
-                </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  Selecione uma ou mais notas emitidas para a revendedora informada.
-                </p>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 pb-3">
+              <div className="flex items-center gap-3 flex-wrap">
+                <p className="text-xs text-gray-500 font-medium">Saldo de doses</p>
+                {value.notasFiscais.length > 0 && (
+                  <div className="flex items-center gap-1.5 bg-green-50 border border-green-200 px-2.5 py-1 rounded-lg w-fit">
+                    <span className="text-[11px] font-semibold text-gray-500">DOSES LANÇADAS:</span>
+                    <span className="text-[11px] font-black text-[#1A7A3C]">
+                      {value.notasFiscais.reduce((total, nota) => total + nota.itens.reduce((subtotal, item) => subtotal + Number(item.dosesLancadas || 0), 0), 0)} doses
+                    </span>
+                  </div>
+                )}
               </div>
               <button
                 type="button"
@@ -273,18 +419,18 @@ export function AjusteDosesInsumoForm({
                 onClick={() => setModalNotasAberto(true)}
                 className="flex items-center justify-center gap-2 px-4 h-10 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50 transition disabled:border-gray-200 disabled:text-gray-300 disabled:bg-gray-50 disabled:cursor-not-allowed"
               >
-                <PlusCircle size={16} /> Selecionar Notas Fiscais
+                <PlusCircle size={16} /> Adicionar Saldo
               </button>
             </div>
           )}
 
           {!value.revendedora && cadastro ? (
             <p className="text-sm text-gray-400 italic py-4">
-              Selecione a revendedora para consultar as notas fiscais disponíveis.
+              É necessário selecionar uma Revendedora de Insumos para pesquisar lotes.
             </p>
           ) : value.notasFiscais.length === 0 ? (
             <div className="border border-dashed border-gray-200 rounded-xl py-8 text-center">
-              <p className="text-sm text-gray-400">Nenhuma nota fiscal selecionada.</p>
+              <p className="text-sm text-gray-400 italic">Nenhum saldo vinculado a este ajuste até o momento.</p>
             </div>
           ) : (
             <div className="flex flex-col gap-4">
@@ -329,19 +475,19 @@ export function AjusteDosesInsumoForm({
       <MultiSearchModal<NotaFiscalInsumo>
         open={modalNotasAberto}
         onClose={() => setModalNotasAberto(false)}
-        title="Buscar Notas Fiscais"
-        subtitle="Busque pelas notas fiscais cadastradas no nome da revendedora selecionada:"
-        icon={<FileText size={21} className="text-[#1A7A3C]" />}
+        title="Buscar Lotes de Insumos"
+        subtitle="Selecione os lotes de insumo vinculados à revendedora informada:"
+        icon={<Package size={21} className="text-[#1A7A3C]" />}
         data={notasDisponiveis}
         columns={[
-          { label: "Número", key: "numero" },
-          { label: "Data de Emissão", key: "dataEmissao" },
-          { label: "Insumos", key: "itensFormatados" },
+          { label: "Lote/Nº de Partida", key: "lote" },
+          { label: "Saldo da Apresentação", key: "saldoApresentacao" },
+          { label: "Nota Fiscal", key: "numero" },
         ]}
-        searchKeys={["numero", "itensFormatados"]}
-        searchPlaceholder="Buscar por número, doença ou tipo de insumo."
+        searchKeys={["lote", "numero", "itensFormatados"]}
+        searchPlaceholder="Buscar por lote, nota fiscal ou insumo."
         selectedItems={value.notasFiscais}
-        confirmLabel="Salvar Selecionadas"
+        confirmLabel="Adicionar Lotes"
         onConfirm={selecionarNotas}
       />
     </>

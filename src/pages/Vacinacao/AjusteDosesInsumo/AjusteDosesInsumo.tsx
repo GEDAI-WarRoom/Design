@@ -7,7 +7,6 @@ import {
   Eye,
   Pencil,
   Search,
-  SlidersHorizontal,
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
@@ -43,7 +42,6 @@ export function AjusteDosesInsumoPage({ onLogout, onNavigate }: PageProps) {
   const [periodoDe, setPeriodoDe] = useState("");
   const [periodoAte, setPeriodoAte] = useState("");
   const [situacao, setSituacao] = useState("");
-  const [showFilters, setShowFilters] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [erro, setErro] = useState("");
   const [page, setPage] = useState(1);
@@ -131,7 +129,7 @@ export function AjusteDosesInsumoPage({ onLogout, onNavigate }: PageProps) {
 
         <section className="bg-white rounded-xl shadow-sm overflow-hidden">
           <div className="p-6 border-b border-gray-100 flex flex-col gap-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_48px_180px] gap-4 items-end">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_180px] gap-4 items-end">
               <EntitySearchInput
                 label="Revendedora de Insumos"
                 placeholder="Buscar por código ou nome."
@@ -168,21 +166,6 @@ export function AjusteDosesInsumoPage({ onLogout, onNavigate }: PageProps) {
               />
               <button
                 type="button"
-                onClick={() => setShowFilters((value) => !value)}
-                className="w-12 h-12 border rounded-md flex items-center justify-center transition flex-shrink-0"
-                style={{
-                  backgroundColor: showFilters ? "transparent" : GREEN,
-                  borderColor: GREEN,
-                  color: showFilters ? GREEN : "#ffffff",
-                }}
-                title="Mais filtros de busca"
-                aria-label="Mais filtros de busca"
-                aria-expanded={showFilters}
-              >
-                <SlidersHorizontal size={18} />
-              </button>
-              <button
-                type="button"
                 onClick={pesquisar}
                 className="h-12 px-6 rounded-md text-white text-sm font-semibold flex items-center justify-center gap-2 transition hover:opacity-90"
                 style={{ backgroundColor: GREEN }}
@@ -191,8 +174,7 @@ export function AjusteDosesInsumoPage({ onLogout, onNavigate }: PageProps) {
               </button>
             </div>
 
-            {showFilters && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end animate-fadeIn">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 items-end">
                 <FloatInput
                   label="Número da Nota Fiscal"
                   value={numeroNotaFiscal}
@@ -232,8 +214,7 @@ export function AjusteDosesInsumoPage({ onLogout, onNavigate }: PageProps) {
                   options={SITUACOES_AJUSTE_DOSES_INSUMO}
                   onChange={setSituacao}
                 />
-              </div>
-            )}
+            </div>
 
             {partidaInvalida && (
               <p className="text-xs text-red-500">O número da partida deve possuir 7 caracteres, barra e ano com 2 dígitos.</p>
