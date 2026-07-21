@@ -387,8 +387,8 @@ export const secondaryCategories: MenuCategory[] = [
         route: "ajuste-doses-insumo",
         icon: (
           <img
-            src={Icons.iconeInsumoUrl}
-            alt="Dose de Insumo"
+            src={Icons.iconeDoseVacinaUrl}
+            alt="Dose de Vacina"
             className="w-4 h-4"
           />
         ),
