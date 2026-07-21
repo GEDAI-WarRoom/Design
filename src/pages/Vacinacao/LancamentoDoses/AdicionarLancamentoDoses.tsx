@@ -347,32 +347,54 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate }: Pag
                   }, {})
                 ).map((grupo: any) => {
                   const isNotaMinimizada = notasListasMinimizadas[grupo.nome] || false;
+                  const lotePrincipal = grupo.partidas[0];
+                  const numeroLote = String(grupo.nome).replace(/^Lote:\s*/i, "");
+                  const dosesTotaisLote = grupo.partidas.reduce(
+                    (total: number, partida: any) => total + Number(partida.dosesDisponiveisTotais || 0),
+                    0,
+                  );
 
                   return (
                     <div key={`grupo-${grupo.nome}`} className="border border-gray-200 rounded-xl p-4 bg-gray-50/30 relative">
 
                       <div className="flex items-center justify-between mb-4 px-1">
-                        <div
-                          className="flex items-center gap-2 cursor-pointer select-none group/title"
-                          onClick={() => setNotasListasMinimizadas(prev => ({ ...prev, [grupo.nome]: !isNotaMinimizada }))}
-                        >
+                        <div className="flex items-center gap-2 select-none">
                           <Package size={24} color={GREEN} />
 
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-sm font-bold text-gray-800 group-hover/title:text-gray-600 transition-colors">
-                              {grupo.nome}
-                            </span>
+                          <span className="text-sm font-bold text-gray-800">Lote: {numeroLote}</span>
 
-                            <span className="px-1.5 py-0.5 bg-gray-100/60 border border-gray-200 text-gray-700 text-[10px] font-medium rounded uppercase tracking-wider">
-                              UF: {grupo.partidas[0]?.uf || "MG"}
-                            </span>
+                          <div className="relative group/lote-info flex-shrink-0 z-20">
+                            <Info size={14} className="text-gray-400 cursor-help" />
+                            <div className="fixed inset-0 bg-black/15 hidden group-hover/lote-info:block pointer-events-none z-[998] animate-fadeIn" />
+                            <div className="absolute left-0 top-full mt-2 w-60 bg-white border border-gray-100 rounded-2xl shadow-xl hidden group-hover/lote-info:block animate-fadeIn z-[999] text-left overflow-hidden">
+                              <div className="flex items-center gap-1.5 border-b border-gray-100 p-3">
+                                <Package size={13} className="text-gray-500" />
+                                <span className="text-[11px] font-extrabold text-gray-800">Nº de Partida: {numeroLote}</span>
+                              </div>
+                              <div className="p-3 flex flex-col gap-2.5 text-[11px] text-gray-500 bg-white">
+                                <div className="flex justify-between items-center gap-3">
+                                  <span>Doença:</span>
+                                  <span className="font-bold text-gray-700 text-right">{lotePrincipal?.doenca || "—"}</span>
+                                </div>
+                                <div className="flex justify-between items-center gap-3">
+                                  <span>Tipo de Vacina:</span>
+                                  <span className="font-bold text-gray-700">{lotePrincipal?.tipoVacina || "B19"}</span>
+                                </div>
+                                <div className="flex justify-between items-center gap-3">
+                                  <span>Laboratório:</span>
+                                  <span className="font-bold text-gray-700">{lotePrincipal?.laboratorio || "Biovet"}</span>
+                                </div>
+                                <div className="flex justify-between items-center gap-3">
+                                  <span>Validade:</span>
+                                  <span className="font-bold text-gray-700">{lotePrincipal?.validade || "15/08/2027"}</span>
+                                </div>
+                              </div>
+                              <div className="bg-gray-50 border-t border-gray-100 p-3 flex justify-between items-center text-[11px] font-bold text-green-700">
+                                <span>Doses Totais Lote:</span>
+                                <span>{dosesTotaisLote}</span>
+                              </div>
+                            </div>
                           </div>
-
-                          {isNotaMinimizada ? (
-                            <ChevronDown size={16} className="text-gray-400 group-hover/title:text-gray-600 mt-0.5" />
-                          ) : (
-                            <ChevronUp size={16} className="text-gray-400 group-hover/title:text-gray-600 mt-0.5" />
-                          )}
 
                           {isNotaMinimizada && (
                             <span className="text-[11px] text-gray-400 font-medium normal-case">
@@ -381,16 +403,26 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate }: Pag
                           )}
                         </div>
 
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setNotasFiscaisOrigem(notasFiscaisOrigem.filter(item => item.nome !== grupo.nome));
-                          }}
-                          className="text-gray-400 hover:text-red-500 p-1 rounded transition hover:bg-red-50"
-                          title="Remover Nota"
-                        >
-                          <Trash2 size={16} />
-                        </button>
+                        <div className="flex items-center gap-1 flex-shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => setNotasListasMinimizadas(prev => ({ ...prev, [grupo.nome]: !isNotaMinimizada }))}
+                            className="text-gray-400 hover:text-gray-600 p-1 rounded transition hover:bg-gray-100"
+                            title={isNotaMinimizada ? "Expandir lote" : "Minimizar lote"}
+                          >
+                            {isNotaMinimizada ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setNotasFiscaisOrigem(notasFiscaisOrigem.filter(item => item.nome !== grupo.nome));
+                            }}
+                            className="text-red-500 hover:text-red-600 p-1 rounded transition hover:bg-red-50"
+                            title="Remover lote"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
                       </div>
 
                       {!isNotaMinimizada && (
@@ -464,39 +496,12 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate }: Pag
 
                                 <div className={`flex items-center justify-between border-gray-100 overflow-visible pr-14 ${isLoteMinimizado ? "border-none pb-0 mb-0" : "border-b pb-2 mb-3"
                                   }`}>
-                                  <div className="flex items-center gap-1.5 relative group/info overflow-visible">
-                                    <div className="relative cursor-help text-gray-400 hover:text-gray-600 transition pt-0.5 z-20">
-                                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></svg>
-                                      <div className="fixed inset-0 bg-black/15 hidden group-hover/info:block pointer-events-none z-[998] animate-fadeIn" />
-
-                                      <div className="absolute left-0 top-full mt-2 w-56 bg-white border border-gray-100 rounded-xl shadow-xl hidden group-hover/info:block animate-fadeIn z-[999] text-left overflow-hidden">
-                                        <div className="flex items-center gap-1.5 bg-gray-50 border-b border-gray-100 p-3">
-                                          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-gray-500"><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></svg>
-                                          <span className="text-[11px] font-extrabold text-gray-800">Apresentação</span>
-                                        </div>
-                                        <div className="p-3 flex flex-col gap-2 text-[11px] text-gray-500 bg-white">
-                                          <div className="flex justify-between items-center">
-                                            <span>Laboratório:</span>
-                                            <span className="font-bold text-gray-700">BioMed/MG</span>
-                                          </div>
-                                          <div className="flex justify-between items-center">
-                                            <span>Doença:</span>
-                                            <span className="font-bold text-gray-700">{nfItem.doenca || "—"}</span>
-                                          </div>
-                                          <div className="flex justify-between items-center">
-                                            <span>Tipo de Vacina:</span>
-                                            <span className="font-bold text-gray-700">B19</span>
-                                          </div>
-                                        </div>
-                                        <div className="bg-gray-50 border-t border-gray-100 p-3 flex justify-between items-center text-[11px] font-bold text-green-700">
-                                          <span>Doses Totais Lote:</span>
-                                          <span>{TOTAL_DISPONIVEL}</span>
-                                        </div>
-                                      </div>
-                                    </div>
-
+                                  <div className="flex items-center gap-2 overflow-visible">
                                     <span className="text-xs font-semibold text-gray-800 select-none">
                                       Apresentação
+                                    </span>
+                                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-gray-50 border border-gray-200 rounded text-[10px] font-semibold text-gray-600 whitespace-nowrap">
+                                      <Package size={10} /> {DOSES_POR_FRASCO} doses/frasco
                                     </span>
 
                                     {isLoteMinimizado && (
@@ -506,10 +511,6 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate }: Pag
                                     )}
                                   </div>
 
-                                  <div className={`px-2 py-0.5 rounded border font-semibold text-[10px] ${isVencido ? "bg-red-50 border-red-200 text-red-700" : "bg-green-50 border-green-200 text-green-700"
-                                    }`}>
-                                    Validade: {validadeLote} {isVencido && "(Vencida)"}
-                                  </div>
                                 </div>
 
                                 {!isLoteMinimizado && (
@@ -591,7 +592,7 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate }: Pag
                                         </div>
 
                                         <div className="flex flex-col border border-gray-200 rounded-xl px-2.5 py-2 w-full max-w-[130px] gap-1 bg-white justify-between">
-                                          <span className="text-[11px] text-gray-500 font-medium text-center">Lançadas</span>
+                                          <span className="text-[11px] text-gray-500 font-medium text-center">Lançadas <span className="text-red-500">*</span></span>
 
                                           <div className="flex gap-1.5 items-end justify-center">
                                             <div className="flex flex-col flex-1 min-w-[40px]">
