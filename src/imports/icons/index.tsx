@@ -41,6 +41,10 @@ import iconeHabilitacaoUrl from "./Ícone=Habilitação.svg";
 import iconePontuacaoUrl from "./Ícone=Pontuação.svg";
 import iconeInsumoUrl from "./Ícone=Tipo de Insumo.svg";
 import iconeIndiceUrl from "./Ícone=Valor por Indice.svg";
+import iconeStatusUrl from "./Ícone=Status.svg";
+import iconeVendaPropriedadeUrl from "./Ícone=Venda de Propriedade.svg";
+import iconePapéisUrl from "./Ícone=Papéis.svg";
+
 
 
 export {
@@ -86,5 +90,8 @@ export {
   iconeHabilitacaoUrl,
   iconePontuacaoUrl,
   iconeInsumoUrl,
-  iconeIndiceUrl
+  iconeIndiceUrl,
+  iconeStatusUrl,
+  iconeVendaPropriedadeUrl,
+  iconePapéisUrl
 };

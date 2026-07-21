@@ -86,13 +86,10 @@ export function AdicionarUsuariosPage({
 
   const handleAdicionar = () => {
     const numerosCpf = cpf.replace(/\D/g, "");
-    
-    // Validação direta ao clicar no botão
-    if (numerosCpf.length === 11 && nome.trim() !== "") {
-      setIsSucesso(true);
-    } else {
-      alert("Por favor, preencha o CPF completo e certifique-se de que o nome foi carregado.");
-    }
+
+
+    setIsSucesso(true);
+
   };
 
   return (
@@ -157,7 +154,7 @@ export function AdicionarUsuariosPage({
                 }
                 required
                 value={nome}
-                onChange={setNome} 
+                onChange={setNome}
                 maxLength={255}
                 disabled={isLoadingCpf}
               />
@@ -179,7 +176,7 @@ export function AdicionarUsuariosPage({
       {isSucesso && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4 animate-fade-in">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
-           
+
             <h3 className="text-lg font-bold text-gray-900">
               Usuário cadastrado com sucesso!
             </h3>

@@ -10,6 +10,7 @@ import {
   FlaskConical,
   Globe,
   Landmark,
+  Layers3,
   ListTree,
   Map,
   MapPinned,
@@ -77,6 +78,17 @@ export const cadastrosCategories: MenuCategory[] = [
           <img
             src={Icons.iconeEstabelecimentoUrl}
             alt="Estabelecimento Agropecuário"
+            className="w-4 h-4"
+          />
+        ),
+      },
+      {
+        label: "Venda de Propriedade",
+        route: "venda-propriedade",
+        icon: (
+          <img
+            src={Icons.iconeVendaPropriedadeUrl}
+            alt="Venda Propriedade"
             className="w-4 h-4"
           />
         ),
@@ -261,6 +273,18 @@ export const cadastrosCategories: MenuCategory[] = [
         route: "revendedora-animais",
         icon: <Store size={16} />,
       },
+      {
+        label: "Status Animal",
+        route: "status-animal",
+        icon: (
+          <img
+            src={Icons.iconeStatusUrl}
+            alt="Status"
+            className="w-4 h-4"
+          />
+        ),
+      },
+
     ],
   },
   {
@@ -477,9 +501,19 @@ export const secondaryCategories: MenuCategory[] = [
         ),
       },
       {
+        label: "Taxa de Emissão de GTA",
+        route: "taxa-emissao-gta",
+        icon: <ReceiptText size={16} />,
+      },
+      {
         label: "Isenção de Taxa de GTA",
         route: "isencao-taxa-gta",
         icon: <BadgePercent size={16} />,
+      },
+      {
+        label: "Recolhimento Mensal de GTAs",
+        route: "recolhimento-mensal-gta",
+        icon: <ReceiptText size={16} />,
       },
     ],
   },
@@ -520,6 +554,9 @@ export const thirdCategories: MenuCategory[] = [
         label: "DAE",
         route: "dae",
         icon: <ScrollText size={16} />,
+        label: "Lote de Pagamento",
+        route: "lote-pagamento",
+        icon: <Layers3 size={16} />,
       },
     ],
   },
