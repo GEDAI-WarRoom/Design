@@ -1576,10 +1576,7 @@ export default function App() {
           instituicao={screenData}
         />
       );
-    
-      case "atestado-exame":
-      return (
-        <AtestadoExamePage
+
     case "venda-entrada-insumos-exames":
       return (
         <VendaComEntradaInsumosExamesPage
@@ -1587,26 +1584,38 @@ export default function App() {
           onNavigate={handleNavigate}
         />
       );
-      case "adicionar-atestado-exame":
+    case "adicionar-venda-entrada-insumos-exames":
+      return (
+        <AdicionarVendaComEntradaInsumosExamesPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+
+    case "atestado-exame":
+      return (
+        <AtestadoExamePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "adicionar-atestado-exame":
       return (
         <AdicionarAtestadoExamePage
           onLogout={handleLogout}
           onNavigate={handleNavigate}
         />
       );
-      case "visualizar-atestado-exame":
+    case "visualizar-atestado-exame":
       return (
         <VisualizarAtestadoExamePage
           onLogout={handleLogout}
           onNavigate={handleNavigate}
         />
       );
-      case "editar-atestado-exame":
+    case "editar-atestado-exame":
       return (
         <EditarAtestadoExamePage
-    case "adicionar-venda-entrada-insumos-exames":
-      return (
-        <AdicionarVendaComEntradaInsumosExamesPage
           onLogout={handleLogout}
           onNavigate={handleNavigate}
         />
