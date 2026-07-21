@@ -383,6 +383,17 @@ export const secondaryCategories: MenuCategory[] = [
         ),
       },
       {
+        label: "Ajuste de Doses de Insumo",
+        route: "ajuste-doses-insumo",
+        icon: (
+          <img
+            src={Icons.iconeInsumoUrl}
+            alt="Dose de Insumo"
+            className="w-4 h-4"
+          />
+        ),
+      },
+      {
         label: "Etapa de Vacinação",
         route: "etapa-vacinacao",
         icon: (

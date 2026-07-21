@@ -126,6 +126,10 @@ import { TipoInsumoExamePage } from "./pages/Vacinacao/TipoInsumoExame/TipoInsum
 import { AdicionarTipoInsumoExamePage } from "./pages/Vacinacao/TipoInsumoExame/AdicionarTipoInsumoExame";
 import { VisualizarTipoInsumoExamePage } from "./pages/Vacinacao/TipoInsumoExame/VisualizarTipoInsumoExame";
 import { EditarTipoInsumoExamePage } from "./pages/Vacinacao/TipoInsumoExame/EditarTipoInsumoExame";
+import { AjusteDosesInsumoPage } from "./pages/Vacinacao/AjusteDosesInsumo/AjusteDosesInsumo";
+import { AdicionarAjusteDosesInsumoPage } from "./pages/Vacinacao/AjusteDosesInsumo/AdicionarAjusteDosesInsumo";
+import { VisualizarAjusteDosesInsumoPage } from "./pages/Vacinacao/AjusteDosesInsumo/VisualizarAjusteDosesInsumo";
+import { EditarAjusteDosesInsumoPage } from "./pages/Vacinacao/AjusteDosesInsumo/EditarAjusteDosesInsumo";
 
 //ARRECADACAO
 import { ValorIndicePage } from "./pages/Arrecadacao/ValorIndice/ValorIndice";
@@ -241,6 +245,10 @@ export type Screen =
   | "adicionar-tipo-insumo-exame"
   | "visualizar-tipo-insumo-exame"
   | "editar-tipo-insumo-exame"
+  | "ajuste-doses-insumo"
+  | "adicionar-ajuste-doses-insumo"
+  | "visualizar-ajuste-doses-insumo"
+  | "editar-ajuste-doses-insumo"
   | "registro-venda-gta-digital"
   | "adicionar-registro-venda-gta-digital"
   | "visualizar-registro-venda-gta-digital"
@@ -743,6 +751,36 @@ export default function App() {
     case "editar-tipo-insumo-exame":
       return (
         <EditarTipoInsumoExamePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
+        />
+      );
+    case "ajuste-doses-insumo":
+      return (
+        <AjusteDosesInsumoPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "adicionar-ajuste-doses-insumo":
+      return (
+        <AdicionarAjusteDosesInsumoPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "visualizar-ajuste-doses-insumo":
+      return (
+        <VisualizarAjusteDosesInsumoPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
+        />
+      );
+    case "editar-ajuste-doses-insumo":
+      return (
+        <EditarAjusteDosesInsumoPage
           onLogout={handleLogout}
           onNavigate={handleNavigate}
           dados={screenData}
