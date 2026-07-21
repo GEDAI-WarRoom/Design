@@ -8,6 +8,7 @@ import {
   FlaskConical,
   Globe,
   Landmark,
+  Layers3,
   ListTree,
   Map,
   MapPinned,
@@ -379,6 +380,17 @@ export const secondaryCategories: MenuCategory[] = [
         ),
       },
       {
+        label: "Ajuste de Doses de Insumo",
+        route: "ajuste-doses-insumo",
+        icon: (
+          <img
+            src={Icons.iconeDoseVacinaUrl}
+            alt="Dose de Vacina"
+            className="w-4 h-4"
+          />
+        ),
+      },
+      {
         label: "Etapa de Vacinação",
         route: "etapa-vacinacao",
         icon: (
@@ -544,6 +556,11 @@ export const thirdCategories: MenuCategory[] = [
         label: "Item da Receita",
         route: "item-receita",
         icon: <ListTree size={16} />,
+      },
+      {
+        label: "Lote de Pagamento",
+        route: "lote-pagamento",
+        icon: <Layers3 size={16} />,
       },
     ],
   },

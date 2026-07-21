@@ -125,6 +125,10 @@ import { AdicionarVendaComEntradaVacinaPage } from "./pages/Vacinacao/VendaComEn
 import { VendaComEntradaVacinaPage } from "./pages/Vacinacao/VendaComEntradaVacina/VendaComEntradaVacina";
 import { AdicionarVendaComSaidaVacinaPage } from "./pages/Vacinacao/VendaComSaidaVacina/AdicionarVendaComSaidaVacina";
 import { VendaComSaidaVacinaPage } from "./pages/Vacinacao/VendaComSaidaVacina/VendaComSaidaVacina";
+import { AjusteDosesInsumoPage } from "./pages/Vacinacao/AjusteDosesInsumo/AjusteDosesInsumo";
+import { AdicionarAjusteDosesInsumoPage } from "./pages/Vacinacao/AjusteDosesInsumo/AdicionarAjusteDosesInsumo";
+import { VisualizarAjusteDosesInsumoPage } from "./pages/Vacinacao/AjusteDosesInsumo/VisualizarAjusteDosesInsumo";
+import { EditarAjusteDosesInsumoPage } from "./pages/Vacinacao/AjusteDosesInsumo/EditarAjusteDosesInsumo";
 
 //ARRECADACAO
 import { FundoArrecadacaoPage } from "./pages/Arrecadacao/FundoArrecadacao/FundoArrecadacao";
@@ -137,6 +141,11 @@ import { AdicionarItemReceitaPage } from "./pages/Arrecadacao/ItemReceita/Adicio
 import { ItemReceitaPage } from "./pages/Arrecadacao/ItemReceita/ItemReceita";
 import { AdicionarValorIndicePage } from "./pages/Arrecadacao/ValorIndice/AdicionarValorIndice";
 import { ValorIndicePage } from "./pages/Arrecadacao/ValorIndice/ValorIndice";
+import { LotePagamentoPage } from "./pages/Arrecadacao/LotePagamento/LotePagamento";
+import { AdicionarLotePagamentoPage } from "./pages/Arrecadacao/LotePagamento/AdicionarLotePagamento";
+import { VisualizarLotePagamentoPage } from "./pages/Arrecadacao/LotePagamento/VisualizarLotePagamento";
+import { VisualizarDocumentoLotePagamentoPage } from "./pages/Arrecadacao/LotePagamento/VisualizarDocumentoLotePagamento";
+import { VisualizarDaeLotePagamentoPage } from "./pages/Arrecadacao/LotePagamento/VisualizarDaeLotePagamento";
 
 // GTA
 import { AdicionarDistribuicaoFormulariosGta } from "./pages/GTA/DistribuicaoFormulariosGta/AdicionarDistribuicaoFormulariosGta";
@@ -233,6 +242,10 @@ export type Screen =
   | "adicionar-tipo-insumo-exame"
   | "visualizar-tipo-insumo-exame"
   | "editar-tipo-insumo-exame"
+  | "ajuste-doses-insumo"
+  | "adicionar-ajuste-doses-insumo"
+  | "visualizar-ajuste-doses-insumo"
+  | "editar-ajuste-doses-insumo"
   | "registro-venda-gta-digital"
   | "adicionar-registro-venda-gta-digital"
   | "visualizar-registro-venda-gta-digital"
@@ -326,6 +339,11 @@ export type Screen =
   | "editar-fundo-arrecadacao"
   | "item-receita"
   | "adicionar-item-receita"
+  | "lote-pagamento"
+  | "adicionar-lote-pagamento"
+  | "visualizar-lote-pagamento"
+  | "visualizar-documento-lote-pagamento"
+  | "visualizar-dae-lote-pagamento"
   | "tipo-veiculo"
   | "adicionar-tipo-veiculo"
   | "venda-entrada-insumos-exames"
@@ -732,6 +750,36 @@ export default function App() {
     case "editar-tipo-insumo-exame":
       return (
         <EditarTipoInsumoExamePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
+        />
+      );
+    case "ajuste-doses-insumo":
+      return (
+        <AjusteDosesInsumoPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "adicionar-ajuste-doses-insumo":
+      return (
+        <AdicionarAjusteDosesInsumoPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "visualizar-ajuste-doses-insumo":
+      return (
+        <VisualizarAjusteDosesInsumoPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
+        />
+      );
+    case "editar-ajuste-doses-insumo":
+      return (
+        <EditarAjusteDosesInsumoPage
           onLogout={handleLogout}
           onNavigate={handleNavigate}
           dados={screenData}
@@ -1412,6 +1460,44 @@ export default function App() {
     case "adicionar-item-receita":
       return (
         <AdicionarItemReceitaPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "lote-pagamento":
+      return (
+        <LotePagamentoPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "adicionar-lote-pagamento":
+      return (
+        <AdicionarLotePagamentoPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "visualizar-lote-pagamento":
+      return (
+        <VisualizarLotePagamentoPage
+          dados={screenData}
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "visualizar-documento-lote-pagamento":
+      return (
+        <VisualizarDocumentoLotePagamentoPage
+          dados={screenData}
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "visualizar-dae-lote-pagamento":
+      return (
+        <VisualizarDaeLotePagamentoPage
+          dados={screenData}
           onLogout={handleLogout}
           onNavigate={handleNavigate}
         />
