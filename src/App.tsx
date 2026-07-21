@@ -1340,19 +1340,7 @@ export default function App() {
           onNavigate={handleNavigate}
         />
       );
-    case "recolhimento-mensal-gta":
-      return (
-        <RecolhimentoMensalGTAPage
-    case "taxa-emissao-gta":
-      return (
-        <TaxaEmissaoGtaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
-    case "adicionar-recolhimento-mensal-gta":
-      return (
-        <AdicionarRecolhimentoMensalGTAPage
+
     case "adicionar-taxa-emissao-gta":
       return (
         <AdicionarTaxaEmissaoGtaPage
@@ -1360,12 +1348,33 @@ export default function App() {
           onNavigate={handleNavigate}
         />
       );
+    case "taxa-emissao-gta":
+      return (
+        <TaxaEmissaoGtaPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+
+    case "recolhimento-mensal-gta":
+      return (
+        <RecolhimentoMensalGTAPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "adicionar-recolhimento-mensal-gta":
+      return (
+        <AdicionarRecolhimentoMensalGTAPage
+
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
     case "visualizar-recolhimento-mensal-gta":
       return (
         <VisualizarRecolhimentoMensalGTAPage
-    case "visualizar-taxa-emissao-gta":
-      return (
-        <VisualizarTaxaEmissaoGtaPage
+
           onLogout={handleLogout}
           onNavigate={handleNavigate}
           dados={screenData}
@@ -1390,9 +1399,6 @@ export default function App() {
     case "visualizar-dae-recolhimento-gta":
       return (
         <VisualizarDAERecolhimentoGTAPage
-    case "editar-taxa-emissao-gta":
-      return (
-        <EditarTaxaEmissaoGtaPage
           onLogout={handleLogout}
           onNavigate={handleNavigate}
           dados={screenData}
