@@ -532,7 +532,7 @@ export function SearchModal<T extends { id: string | number }>({
         </button>
 
         <div className="flex flex-col items-center gap-2 text-center mt-2">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 text-[#1A7A3C]">
             {icon}
             <h2 className="text-2xl font-bold text-gray-800 tracking-tight">{title}</h2>
           </div>
