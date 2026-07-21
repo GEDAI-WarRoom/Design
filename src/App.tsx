@@ -42,6 +42,9 @@ import { AdicionarUnidadeAdministrativaPage } from "./pages/Geral/UnidadeAdminis
 import { UnidadeAdministrativaPage } from "./pages/Geral/UnidadeAdministrativa/UnidadeAdministrativa";
 import { AdicionarUnidadeMedidaPage } from "./pages/Geral/UnidadeMedida/AdicionarUnidadeMedida";
 import { UnidadeMedidaPage } from "./pages/Geral/UnidadeMedida/UnidadeMedida";
+import { AdicionarVendaPropriedadePage } from "./pages/Geral/VendaPropriedade/AdicionarVendaPropriedade";
+import { VendaPropriedadePage } from "./pages/Geral/VendaPropriedade/VendaPropriedade";
+import { VisualizarVendaPropriedadePage } from "./pages/Geral/VendaPropriedade/VisualizarVendaPropriedade";
 
 // ANIMAL
 import { AdicionarCertificadoraSISBOVPage } from "./pages/Animal/CertificadoraSISBOV/AdicionarCertificadoraSISBOV";
@@ -151,6 +154,8 @@ import { VisualizarDaeLotePagamentoPage } from "./pages/Arrecadacao/LotePagament
 // GTA
 import { AdicionarDistribuicaoFormulariosGta } from "./pages/GTA/DistribuicaoFormulariosGta/AdicionarDistribuicaoFormulariosGta";
 import { DistribuicaoFormulariosGta } from "./pages/GTA/DistribuicaoFormulariosGta/DistribuicaoFormulariosGta";
+import { AdicionarFinalidadeGTAPage } from "./pages/GTA/FinalidadeGTA/AdicionarFinalidadeGTA";
+import { FinalidadeGTAPage } from "./pages/GTA/FinalidadeGTA/FinalidadeGTA";
 import { AdicionarFinalidadeTransitoPage } from "./pages/GTA/FinalidadeTransito/AdicionarFinalidadeTransito";
 import { FinalidadeTransitoPage } from "./pages/GTA/FinalidadeTransito/FinalidadeTransito";
 import { AdicionarIsencaoTaxaGtaPage } from "./pages/GTA/IsencaoTaxaGTA/AdicionarIsencaoTaxaGTA";
@@ -309,8 +314,8 @@ export type Screen =
   | "adicionar-praga"
   | "profissional-vegetal"
   | "adicionar-profissional-vegetal"
-  | "finalidade-transito"
-  | "adicionar-finalidade-transito"
+  | "finalidade-gta"
+  | "adicionar-finalidade-gta"
   | "usuarios"
   | "adicionar-usuario"
   | "visualizar-usuario"
@@ -1325,17 +1330,17 @@ export default function App() {
         />
       );
 
-    case "finalidade-transito":
+    case "finalidade-gta":
       return (
-        <FinalidadeTransitoPage
+        <FinalidadeGTAPage
           onLogout={handleLogout}
           onNavigate={handleNavigate}
         />
       );
 
-    case "adicionar-finalidade-transito":
+    case "adicionar-finalidade-gta":
       return (
-        <AdicionarFinalidadeTransitoPage
+        <AdicionarFinalidadeGTAPage
           onLogout={handleLogout}
           onNavigate={handleNavigate}
         />

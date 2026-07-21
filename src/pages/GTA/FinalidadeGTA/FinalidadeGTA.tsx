@@ -1,21 +1,18 @@
-import { useState } from "react";
 import {
   ArrowLeft,
-  Search,
-  SlidersHorizontal,
   ChevronLeft,
   ChevronRight,
-  Eye as ViewIcon,
-  Pencil,
-  X,
   Dna,
+  Pencil,
+  Search,
+  SlidersHorizontal,
+  Eye as ViewIcon,
+  X,
 } from "lucide-react";
+import { useState } from "react";
 import { Navbar } from "../../../components/Navbar";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
-import {
-  FloatSelect,
-  FloatInput,
-} from "../../../components/ui/FormKit";
+import { FloatSelect } from "../../../components/ui/FormKit";
 
 const GREEN = "#1A7A3C";
 
@@ -135,13 +132,7 @@ const FINALIDADES_MOCK: FinalidadeTransito[] = [
   },
 ];
 
-function Chip({
-  label,
-  onRemove,
-}: {
-  label: string;
-  onRemove: () => void;
-}) {
+function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
     <div className="flex items-center gap-2 bg-[#1A7A3C] text-white text-xs font-medium px-3 py-1.5 rounded-md shadow-sm max-w-full">
       <span className="truncate">{label}</span>
@@ -160,10 +151,7 @@ interface PageProps {
   onNavigate: (screen: any, data?: any) => void;
 }
 
-export function FinalidadeTransitoPage({
-  onLogout,
-  onNavigate,
-}: PageProps) {
+export function FinalidadeGTAPage({ onLogout, onNavigate }: PageProps) {
   const [finalidade, setFinalidade] = useState("");
   const [tipoDestino, setTipoDestino] = useState("");
   const [situacao, setSituacao] = useState("");
@@ -176,9 +164,7 @@ export function FinalidadeTransitoPage({
   const perPage = 10;
 
   const temFiltroAtivo =
-    finalidade.trim() !== "" ||
-    tipoDestino !== "" ||
-    situacao !== "";
+    finalidade.trim() !== "" || tipoDestino !== "" || situacao !== "";
 
   const handlePesquisar = () => {
     if (!temFiltroAtivo) {
@@ -192,21 +178,17 @@ export function FinalidadeTransitoPage({
   const filtrados = FINALIDADES_MOCK.filter((f) => {
     const matchFinalidade =
       finalidade.trim() === "" ||
-      f.finalidade
-        .toLowerCase()
-        .includes(finalidade.trim().toLowerCase());
+      f.finalidade.toLowerCase().includes(finalidade.trim().toLowerCase());
     const matchTipoDestino =
       tipoDestino === "" || f.tipoDestino === tipoDestino;
-    const matchSituacao =
-      situacao === "" || f.situacao === situacao;
+    const matchSituacao = situacao === "" || f.situacao === situacao;
     return matchFinalidade && matchTipoDestino && matchSituacao;
   });
 
   const total = filtrados.length;
   const totalPages = Math.max(1, Math.ceil(total / perPage));
   const pageAtual = Math.min(page, totalPages);
-  const inicio =
-    total === 0 ? 0 : (pageAtual - 1) * perPage + 1;
+  const inicio = total === 0 ? 0 : (pageAtual - 1) * perPage + 1;
   const fim = Math.min(pageAtual * perPage, total);
   const pagina = filtrados.slice(
     (pageAtual - 1) * perPage,
@@ -218,7 +200,7 @@ export function FinalidadeTransitoPage({
       <Navbar
         onLogout={onLogout}
         onNavigate={onNavigate}
-        currentScreen="finalidade-transito"
+        currentScreen="finalidade-gta"
         hideSearch
       />
 
@@ -235,12 +217,10 @@ export function FinalidadeTransitoPage({
           </button>
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-semibold text-gray-900">
-              Finalidade de Trânsito
+              Finalidade de GTA
             </h1>
             <button
-              onClick={() =>
-                onNavigate("adicionar-finalidade-transito")
-              }
+              onClick={() => onNavigate("adicionar-finalidade-gta")}
               className="px-5 py-3 rounded-md text-white text-sm font-semibold transition hover:opacity-90 active:scale-[0.98]"
               style={{ backgroundColor: GREEN }}
             >
@@ -257,7 +237,7 @@ export function FinalidadeTransitoPage({
               <label
                 className={`absolute left-3 transition-all duration-200 pointer-events-none ${focusFinalidade || finalidade ? "top-1 text-[10px] text-gray-400 font-medium" : "top-1/2 -translate-y-1/2 text-sm text-gray-400"}`}
               >
-                Finalidade de Trânsito
+                Finalidade de GTA
               </label>
               <div className="flex items-center w-full">
                 <input
@@ -266,12 +246,8 @@ export function FinalidadeTransitoPage({
                   value={finalidade}
                   onFocus={() => setFocusFinalidade(true)}
                   onBlur={() => setFocusFinalidade(false)}
-                  onChange={(e) =>
-                    setFinalidade(e.target.value)
-                  }
-                  onKeyDown={(e) =>
-                    e.key === "Enter" && handlePesquisar()
-                  }
+                  onChange={(e) => setFinalidade(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handlePesquisar()}
                   className="w-full bg-transparent text-sm text-gray-800 outline-none h-6"
                 />
                 <Search
@@ -285,9 +261,7 @@ export function FinalidadeTransitoPage({
               onClick={() => setShowFilters(!showFilters)}
               className="px-4 border rounded-md flex items-center justify-center transition flex-shrink-0 font-medium text-sm"
               style={{
-                backgroundColor: showFilters
-                  ? "transparent"
-                  : GREEN,
+                backgroundColor: showFilters ? "transparent" : GREEN,
                 borderColor: GREEN,
                 color: showFilters ? GREEN : "#ffffff",
               }}
@@ -300,8 +274,6 @@ export function FinalidadeTransitoPage({
           {showFilters && (
             <div className="animate-fadeIn flex flex-col gap-3 w-full">
               <div className="flex flex-col lg:flex-row items-end gap-3 w-full">
-                
-
                 <div className="w-full lg:flex-1">
                   <FloatSelect
                     label="Tipo de Procedência"
@@ -387,15 +359,14 @@ export function FinalidadeTransitoPage({
           )}
 
           {/* --- linha divisoria entre filtros e resultados (aparece apos primeira busca) --- */}
-          {hasSearched && (
-            <div className="border-t border-gray-100 my-1" />
-          )}
+          {hasSearched && <div className="border-t border-gray-100 my-1" />}
 
           {/* --- area de resultados (dentro do mesmo card branco) --- */}
           {!hasSearched ? (
             <div className="py-5 text-center">
               <p className="text-sm text-gray-500">
-                Busque por finalidade de trânsito utilizando o campo de busca e os filtros acima.
+                Busque por finalidade de GTA utilizando o campo de busca e
+                os filtros acima.
               </p>
             </div>
           ) : total === 0 ? (
@@ -411,7 +382,7 @@ export function FinalidadeTransitoPage({
                   <thead>
                     <tr className="border-b border-gray-100">
                       <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-normal uppercase">
-                        Finalidade de Trânsito
+                        Finalidade de GTA
                       </th>
                       <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-normal uppercase">
                         Tipo de Procedência
@@ -482,9 +453,7 @@ export function FinalidadeTransitoPage({
                   </span>
                   <div className="flex items-center gap-1">
                     <button
-                      onClick={() =>
-                        setPage((p) => Math.max(1, p - 1))
-                      }
+                      onClick={() => setPage((p) => Math.max(1, p - 1))}
                       disabled={pageAtual === 1}
                       className="p-1.5 rounded-md hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition"
                     >
@@ -492,9 +461,7 @@ export function FinalidadeTransitoPage({
                     </button>
                     <button
                       onClick={() =>
-                        setPage((p) =>
-                          Math.min(totalPages, p + 1),
-                        )
+                        setPage((p) => Math.min(totalPages, p + 1))
                       }
                       disabled={pageAtual === totalPages}
                       className="p-1.5 rounded-md hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition"

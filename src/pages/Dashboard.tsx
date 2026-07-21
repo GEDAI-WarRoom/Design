@@ -478,8 +478,8 @@ export const secondaryCategories: MenuCategory[] = [
     ),
     items: [
       {
-        label: "Finalidade de Trânsito",
-        route: "finalidade-transito",
+        label: "Finalidade de GTA",
+        route: "finalidade-gta",
         icon: <Route size={18} />,
       },
       {
