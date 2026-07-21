@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { ArrowLeft, Building2, Calendar, ChevronLeft, ChevronRight, Eye, Search, SlidersHorizontal, UserRound, X } from "lucide-react";
+import { ArrowLeft, Calendar, ChevronLeft, ChevronRight, Eye, Pencil, Search, UserRound, X } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
-import { FloatInput } from "../../../components/ui/FormKit";
+import { FloatInput, FloatSelect } from "../../../components/ui/FormKit";
 import {
   ESTABELECIMENTOS_VENDA_PROPRIEDADE,
   formatarData,
@@ -14,6 +14,7 @@ import {
   type PessoaVendaPropriedade,
   type VendaPropriedade,
 } from "./vendaPropriedadeData";
+import * as Icons from "../../../imports/icons";
 
 interface PageProps {
   onLogout: () => void;
@@ -37,16 +38,34 @@ function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
 }
 
 export function VendaPropriedadePage({ onLogout, onNavigate }: PageProps) {
+  // Estados dos Filtros
   const [vendedor, setVendedor] = useState<PessoaVendaPropriedade | null>(null);
+  const [tipoPessoaVendedor, setTipoPessoaVendedor] = useState("Pessoa física");
+
   const [estabelecimento, setEstabelecimento] = useState<EstabelecimentoVendaPropriedade | null>(null);
+
   const [comprador, setComprador] = useState<PessoaVendaPropriedade | null>(null);
+  const [tipoPessoaComprador, setTipoPessoaComprador] = useState("Pessoa física");
+
   const [dataInicial, setDataInicial] = useState("");
   const [dataFinal, setDataFinal] = useState("");
   const [resultados, setResultados] = useState<VendaPropriedade[] | null>(null);
   const [erro, setErro] = useState("");
-  const [maisBuscasAberto, setMaisBuscasAberto] = useState(false);
   const [pagina, setPagina] = useState(1);
   const itensPorPagina = 10;
+
+  // Filtragem dos Mocks do Modal baseada no Tipo de Pessoa selecionado ("Pessoa física" / "Pessoa jurídica")
+  const vendedoresFiltrados = PROPRIETARIOS_VENDA_PROPRIEDADE.filter((p) => {
+    if (tipoPessoaVendedor === "Pessoa física") return p.documento.length <= 14;
+    if (tipoPessoaVendedor === "Pessoa jurídica") return p.documento.length > 14;
+    return true;
+  });
+
+  const compradoresFiltrados = PESSOAS_VENDA_PROPRIEDADE.filter((p) => {
+    if (tipoPessoaComprador === "Pessoa física") return p.documento.length <= 14;
+    if (tipoPessoaComprador === "Pessoa jurídica") return p.documento.length > 14;
+    return true;
+  });
 
   const pesquisar = () => {
     if (dataInicial && dataFinal && dataInicial >= dataFinal) {
@@ -101,43 +120,39 @@ export function VendaPropriedadePage({ onLogout, onNavigate }: PageProps) {
         </div>
 
         <section className="bg-white rounded-xl shadow-sm p-5 md:p-6 flex flex-col gap-5">
-          <div className="flex flex-col md:flex-row gap-3 items-stretch">
-            <div className="flex-1">
+          {/* Todos os campos em linha */}
+          <div className="flex flex-col lg:flex-row gap-3 items-end w-full">
+
+            {/* Vendedor */}
+            <div className="flex-1 w-full">
               <EntitySearchInput
-                label="Nome do Vendedor"
+                label="Vendedor"
                 placeholder="Buscar por nome ou razão social"
                 value={vendedor?.nome ?? ""}
-                data={PROPRIETARIOS_VENDA_PROPRIEDADE}
+                data={vendedoresFiltrados}
                 searchKeys={["nome", "documento"]}
                 columns={pessoaColumns}
                 icon={<UserRound size={18} />}
                 title="Buscar Vendedor"
                 subtitle="Busque por um proprietário cadastrado no sistema:"
                 onChange={setVendedor}
+                headerActions={
+                  <FloatSelect
+                    label="Tipo de Pessoa"
+                    required
+                    value={tipoPessoaVendedor}
+                    onChange={(v) => setTipoPessoaVendedor(v)}
+                    options={[
+                      { value: "Pessoa física", label: "Pessoa Física" },
+                      { value: "Pessoa jurídica", label: "Pessoa Jurídica" },
+                    ]}
+                  />
+                }
               />
             </div>
-            <button
-              type="button"
-              onClick={() => setMaisBuscasAberto((aberto) => !aberto)}
-              className={`h-12 w-12 border rounded-md flex items-center justify-center flex-shrink-0 transition ${maisBuscasAberto ? "bg-white text-[#1A7A3C]" : "bg-[#1A7A3C] text-white"}`}
-              style={{ borderColor: "#1A7A3C" }}
-              aria-expanded={maisBuscasAberto}
-              aria-label={maisBuscasAberto ? "Ocultar buscas adicionais" : "Exibir buscas adicionais"}
-              title={maisBuscasAberto ? "Ocultar buscas adicionais" : "Exibir buscas adicionais"}
-            >
-              <SlidersHorizontal size={16} />
-            </button>
-            <button
-              type="button"
-              onClick={pesquisar}
-              className="h-12 px-5 rounded-md text-white text-sm font-semibold bg-[#1A7A3C] hover:bg-[#15612F] flex items-center justify-center gap-2 transition"
-            >
-              <Search size={16} /> Pesquisar
-            </button>
-          </div>
 
-          {maisBuscasAberto && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end animate-fadeIn">
+            {/* Estabelecimento Agropecuário */}
+            <div className="flex-1 w-full">
               <EntitySearchInput
                 label="Estabelecimento Agropecuário"
                 placeholder="Buscar por código ou nome"
@@ -149,30 +164,61 @@ export function VendaPropriedadePage({ onLogout, onNavigate }: PageProps) {
                   { label: "Estabelecimento", key: "nome" },
                   { label: "Município", key: "municipio" },
                 ]}
-                icon={<Building2 size={18} />}
+                icon={<img src={Icons.iconeEstabelecimentoUrl} alt="Estabelecimento" className="w-5 h-5 object-contain" />}
                 title="Buscar Estabelecimento Agropecuário"
                 subtitle="Busque por um estabelecimento agropecuário cadastrado no sistema:"
                 onChange={setEstabelecimento}
               />
+            </div>
 
+            {/* Comprador */}
+            <div className="flex-1 w-full">
               <EntitySearchInput
                 label="Comprador"
                 placeholder="Buscar por nome ou razão social"
                 value={comprador?.nome ?? ""}
-                data={PESSOAS_VENDA_PROPRIEDADE}
+                data={compradoresFiltrados}
                 searchKeys={["nome", "documento"]}
                 columns={pessoaColumns}
                 icon={<UserRound size={18} />}
                 title="Buscar Comprador"
                 subtitle="Busque por uma pessoa cadastrada no sistema:"
                 onChange={setComprador}
+                headerActions={
+                  <FloatSelect
+                    label="Tipo de Pessoa"
+                    required
+                    value={tipoPessoaComprador}
+                    onChange={(v) => setTipoPessoaComprador(v)}
+                    options={[
+                      { value: "Pessoa física", label: "Pessoa Física" },
+                      { value: "Pessoa jurídica", label: "Pessoa Jurídica" },
+                    ]}
+                  />
+                }
               />
+            </div>
 
+            {/* Datas */}
+            <div className="w-full lg:w-40 shrink-0">
               <FloatInput label="Data Inicial" value={dataInicial} onChange={setDataInicial} type="date" icon={<Calendar size={18} />} />
+            </div>
+
+            <div className="w-full lg:w-40 shrink-0">
               <FloatInput label="Data Final" value={dataFinal} onChange={setDataFinal} type="date" icon={<Calendar size={18} />} />
             </div>
-          )}
 
+            {/* Pesquisar */}
+            <button
+              type="button"
+              onClick={pesquisar}
+              className="h-12 w-full lg:w-auto px-5 rounded-md text-white text-sm font-semibold bg-[#1A7A3C] hover:bg-[#15612F] flex items-center justify-center gap-2 transition shrink-0"
+            >
+              <Search size={16} /> Pesquisar
+            </button>
+          </div>
+
+          {/* Chips */}
           {(vendedor || estabelecimento || comprador || dataInicial || dataFinal) && (
             <div className="flex flex-wrap gap-2">
               {vendedor && <Chip label={`Vendedor: ${vendedor.nome}`} onRemove={() => setVendedor(null)} />}
@@ -185,6 +231,7 @@ export function VendaPropriedadePage({ onLogout, onNavigate }: PageProps) {
 
           {erro && <p className="text-sm text-red-500 font-medium">{erro}</p>}
 
+          {/* Resultados */}
           {resultados === null ? (
             <div className="py-12 text-center text-sm text-gray-500">
               Busque por uma venda de propriedade utilizando os filtros acima.
@@ -197,27 +244,60 @@ export function VendaPropriedadePage({ onLogout, onNavigate }: PageProps) {
                 <thead>
                   <tr className="border-b border-gray-100">
                     {["Vendedor", "Estabelecimento Agropecuário", "Comprador", "Data da Venda"].map((titulo) => (
-                      <th key={titulo} className="text-left px-4 py-3 font-semibold text-gray-600 uppercase">{titulo}</th>
+                      <th key={titulo} className="text-left px-4 py-3 font-semibold text-gray-600 uppercase">
+                        {titulo}
+                      </th>
                     ))}
-                    <th className="px-4 py-3 w-16" aria-label="Ações" />
+                    <th className="px-4 py-3 w-24 text-right" aria-label="Ações">
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {linhas.map((venda) => (
                     <tr key={venda.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/60 transition">
-                      <td className="px-4 py-3 text-gray-700">{venda.vendedor.nome}</td>
+
+                      {/* Vendedor */}
+                      <td className="px-4 py-3 text-gray-700">
+                        <div className="flex flex-col">
+                          <span className="text-xs text-gray-500 font-medium">{venda.vendedor.documento}</span>
+                          <span>{venda.vendedor.nome}</span>
+                        </div>
+                      </td>
+
+                      {/* Estabelecimento Agropecuário */}
                       <td className="px-4 py-3 text-gray-700">{formatarEstabelecimento(venda.estabelecimento)}</td>
-                      <td className="px-4 py-3 text-gray-700">{venda.comprador.nome}</td>
+
+                      {/* Comprador */}
+                      <td className="px-4 py-3 text-gray-700">
+                        <div className="flex flex-col">
+                          <span className="text-xs text-gray-500 font-medium">{venda.comprador.documento}</span>
+                          <span>{venda.comprador.nome}</span>
+                        </div>
+                      </td>
+
+                      {/* Data da Venda */}
                       <td className="px-4 py-3 text-gray-700 whitespace-nowrap">{formatarData(venda.dataVenda)}</td>
-                      <td className="px-4 py-3 text-right">
-                        <button
-                          type="button"
-                          onClick={() => onNavigate("visualizar-venda-propriedade", venda)}
-                          className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"
-                          title="Visualizar"
-                        >
-                          <Eye size={18} />
-                        </button>
+
+                      {/* 🌟 Ações: Botões de Visualizar e Editar lado a lado */}
+                      <td className="px-4 py-3 text-right whitespace-nowrap">
+                        <div className="flex items-center justify-end gap-1">
+                          <button
+                            type="button"
+                            onClick={() => onNavigate("visualizar-venda-propriedade", venda)}
+                            className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"
+                            title="Visualizar"
+                          >
+                            <Eye size={18} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => onNavigate("editar-venda-propriedade", venda)}
+                            className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"
+                            title="Editar"
+                          >
+                            <Pencil size={18} />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}

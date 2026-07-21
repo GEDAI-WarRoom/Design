@@ -83,7 +83,13 @@ export const cadastrosCategories: MenuCategory[] = [
       {
         label: "Venda de Propriedade",
         route: "venda-propriedade",
-        icon: <FileText size={16} />,
+        icon: (
+          <img
+            src={Icons.iconeVendaPropriedadeUrl}
+            alt="Venda Propriedade"
+            className="w-4 h-4"
+          />
+        ),
       },
       {
         label: "Pessoa Física",
