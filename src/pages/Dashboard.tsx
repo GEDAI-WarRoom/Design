@@ -563,6 +563,8 @@ export const thirdCategories: MenuCategory[] = [
         label: "Notificações dos Estabelecimentos",
         route: "notificacoes-estabelecimentos",
         icon: <Scale size={16} />,
+      },
+      {
         label: "Lote de Pagamento",
         route: "lote-pagamento",
         icon: <Layers3 size={16} />,
