@@ -477,6 +477,11 @@ export const secondaryCategories: MenuCategory[] = [
         ),
       },
       {
+        label: "Taxa de Emissão de GTA",
+        route: "taxa-emissao-gta",
+        icon: <ReceiptText size={16} />,
+      },
+      {
         label: "Isenção de Taxa de GTA",
         route: "isencao-taxa-gta",
         icon: <BadgePercent size={16} />,

@@ -146,6 +146,10 @@ import { FinalidadeTransitoPage } from "./pages/GTA/FinalidadeTransito/Finalidad
 import { AdicionarFinalidadeTransitoPage } from "./pages/GTA/FinalidadeTransito/AdicionarFinalidadeTransito";
 import { IsencaoTaxaGtaPage } from "./pages/GTA/IsencaoTaxaGTA/IsencaoTaxaGTA";
 import { AdicionarIsencaoTaxaGtaPage } from "./pages/GTA/IsencaoTaxaGTA/AdicionarIsencaoTaxaGTA";
+import { TaxaEmissaoGtaPage } from "./pages/GTA/TaxaEmissaoGta/TaxaEmissaoGta";
+import { AdicionarTaxaEmissaoGtaPage } from "./pages/GTA/TaxaEmissaoGta/AdicionarTaxaEmissaoGta";
+import { VisualizarTaxaEmissaoGtaPage } from "./pages/GTA/TaxaEmissaoGta/VisualizarTaxaEmissaoGta";
+import { EditarTaxaEmissaoGtaPage } from "./pages/GTA/TaxaEmissaoGta/EditarTaxaEmissaoGta";
 
 // CONTROLE
 import { UsuariosPage } from "./pages/Controle/Usuarios/Usuarios";
@@ -289,6 +293,10 @@ export type Screen =
   | "editar-instituicao-ensino-pesquisa"
   | "isencao-taxa-gta"
   | "adicionar-isencao-taxa-gta"
+  | "taxa-emissao-gta"
+  | "adicionar-taxa-emissao-gta"
+  | "visualizar-taxa-emissao-gta"
+  | "editar-taxa-emissao-gta"
   | "fundo-arrecadacao"
   | "adicionar-fundo-arrecadacao"
   | "visualizar-fundo-arrecadacao"
@@ -1278,6 +1286,36 @@ export default function App() {
         <AdicionarIsencaoTaxaGtaPage
           onLogout={handleLogout}
           onNavigate={handleNavigate}
+        />
+      );
+    case "taxa-emissao-gta":
+      return (
+        <TaxaEmissaoGtaPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "adicionar-taxa-emissao-gta":
+      return (
+        <AdicionarTaxaEmissaoGtaPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "visualizar-taxa-emissao-gta":
+      return (
+        <VisualizarTaxaEmissaoGtaPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
+        />
+      );
+    case "editar-taxa-emissao-gta":
+      return (
+        <EditarTaxaEmissaoGtaPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
         />
       );
     case "item-receita":
