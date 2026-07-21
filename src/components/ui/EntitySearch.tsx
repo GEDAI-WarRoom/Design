@@ -270,6 +270,7 @@ interface DynamicListWrapperProps {
   renderHeaderBadge?: (item: any) => React.ReactNode;
   variant?: "default" | "plain";
   smallCounter?: boolean; // 💡 Controla o tamanho reduzido do contador exclusivamente para o lote card
+  disabled?: boolean;
   children: (item: any, index: number) => React.ReactNode;
 }
 
@@ -284,6 +285,7 @@ export function DynamicListWrapper({
   renderHeaderBadge,
   variant = "default",
   smallCounter = false, // Por padrão, mantém o contador normal
+  disabled = false,
   children,
 }: DynamicListWrapperProps) {
   // Estado para controlar quais índices estão minimizados (usado no layout padrão "default")
@@ -323,7 +325,7 @@ export function DynamicListWrapper({
               </div>
 
               {/* Botão de excluir inline à direita dos campos */}
-              {!(behavior === "at-least-one" && items.length === 1) && (
+              {!disabled && !(behavior === "at-least-one" && items.length === 1) && (
                 <button
                   type="button"
                   onClick={() => onRemoveItem(index)}
@@ -339,7 +341,7 @@ export function DynamicListWrapper({
         </div>
 
         {/* Botão de Adicionar à esquerda menor */}
-        <div className="w-full flex justify-start">
+        {!disabled && <div className="w-full flex justify-start">
           <button
             type="button"
             onClick={onAddItem}
@@ -348,7 +350,7 @@ export function DynamicListWrapper({
             <PlusCircle size={18} />
             {addButtonLabel}
           </button>
-        </div>
+        </div>}
       </div>
     );
   }
@@ -393,7 +395,7 @@ export function DynamicListWrapper({
                     {isMinimizado ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
                   </button>
 
-                  {!(behavior === "at-least-one" && items.length === 1) && (
+                  {!disabled && !(behavior === "at-least-one" && items.length === 1) && (
                     <button
                       type="button"
                       onClick={() => onRemoveItem(index)}
@@ -418,7 +420,7 @@ export function DynamicListWrapper({
       </div>
 
       {/* Botão de Adicionar padrão à esquerda */}
-      <div className="w-full flex justify-start">
+      {!disabled && <div className="w-full flex justify-start">
         <button
           type="button"
           onClick={onAddItem}
@@ -427,7 +429,7 @@ export function DynamicListWrapper({
           <PlusCircle size={16} />
           {addButtonLabel}
         </button>
-      </div>
+      </div>}
     </div>
   );
 }

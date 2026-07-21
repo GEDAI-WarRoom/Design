@@ -1,27 +1,20 @@
-import React, { useState } from "react";
 import {
   ArrowLeft,
-  ChevronUp,
-  ChevronDown,
   Check,
-  Info,
+  ChevronDown,
+  ChevronUp,
   Dna,
+  Info,
   PlusCircle,
   X,
 } from "lucide-react";
+import React, { useState } from "react";
 import { Navbar } from "../../../components/Navbar";
 import {
   CheckboxGroup,
   FloatInput,
-  FloatMultiSelect,
-  FloatSelect,
   MultiSearchModal,
-  SimNao,
 } from "../../../components/ui/FormKit";
-import {
-  EntitySearchInput,
-  DynamicListWrapper,
-} from "../../../components/ui/EntitySearch";
 
 const GREEN = "#1A7A3C";
 
@@ -42,10 +35,7 @@ const EMITE_GTA_ACESSO_EXTERNO = [
   "Emite para dentro do Estado",
   "Emite para fora do Estado",
 ];
-const TAXAS_COBRAR = [
-  "GTA para dentro do Estado",
-  "GTA para fora do Estado",
-];
+const TAXAS_COBRAR = ["GTA para dentro do Estado", "GTA para fora do Estado"];
 
 // --- mock da entidade ---
 const ESPECIES_MOCK = [
@@ -74,9 +64,7 @@ function Section({
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between px-6 py-4 text-left rounded-xl hover:bg-gray-50 transition"
       >
-        <span className="text-base font-semibold text-gray-800">
-          {title}
-        </span>
+        <span className="text-base font-semibold text-gray-800">{title}</span>
         {open ? (
           <ChevronUp size={18} className="text-gray-400" />
         ) : (
@@ -84,9 +72,7 @@ function Section({
         )}
       </button>
       {open && (
-        <div className="px-6 pb-6 border-t border-gray-100">
-          {children}
-        </div>
+        <div className="px-6 pb-6 border-t border-gray-100">{children}</div>
       )}
     </div>
   );
@@ -118,8 +104,7 @@ function SubGrupo({
   );
 }
 
-const toOptions = (arr: string[]) =>
-  arr.map((v) => ({ value: v, label: v }));
+const toOptions = (arr: string[]) => arr.map((v) => ({ value: v, label: v }));
 const uid = (p: string) =>
   `${p}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 
@@ -129,28 +114,19 @@ interface PageProps {
   onNavigate: (screen: any, data?: any) => void;
 }
 
-export function AdicionarFinalidadeTransitoPage({
+export function AdicionarFinalidadeGTAPage({
   onLogout,
   onNavigate,
 }: PageProps) {
   // --- informações basicas ---
   const [finalidadeGta, setFinalidadeGta] = useState("");
-  const [tiposProcedencia, setTiposProcedencia] = useState<
-    string[]
-  >([]);
+  const [tiposProcedencia, setTiposProcedencia] = useState<string[]>([]);
   const [codigoMapa, setCodigoMapa] = useState("");
-  const [emiteAcessoExterno, setEmiteAcessoExterno] = useState<
-    string[]
-  >([]);
-  const [tiposDestino, setTiposDestino] = useState<string[]>(
-    [],
-  );
+  const [emiteAcessoExterno, setEmiteAcessoExterno] = useState<string[]>([]);
+  const [tiposDestino, setTiposDestino] = useState<string[]>([]);
   const [taxasCobrar, setTaxasCobrar] = useState<string[]>([]);
-  const [especies, setEspecies] = useState<
-    typeof ESPECIES_MOCK
-  >([]);
-  const [modalEspecieAberto, setModalEspecieAberto] =
-    useState(false);
+  const [especies, setEspecies] = useState<typeof ESPECIES_MOCK>([]);
+  const [modalEspecieAberto, setModalEspecieAberto] = useState(false);
 
   // --- procedencia/especie (RNE001 para zero ou mais instâncias) ---
   const [procedencias, setProcedencias] = useState<any[]>([]);
@@ -159,20 +135,13 @@ export function AdicionarFinalidadeTransitoPage({
 
   const handleCodigoMapaChange = (v: string) => {
     let apenasNumeros = v.replace(/\D/g, "").slice(0, 2);
-    if (apenasNumeros && parseInt(apenasNumeros, 10) > 99)
-      apenasNumeros = "99";
+    if (apenasNumeros && parseInt(apenasNumeros, 10) > 99) apenasNumeros = "99";
     setCodigoMapa(apenasNumeros);
   };
 
-  const atualizarProcedencia = (
-    index: number,
-    campo: string,
-    valor: any,
-  ) => {
+  const atualizarProcedencia = (index: number, campo: string, valor: any) => {
     setProcedencias((prev) =>
-      prev.map((item, i) =>
-        i === index ? { ...item, [campo]: valor } : item,
-      ),
+      prev.map((item, i) => (i === index ? { ...item, [campo]: valor } : item)),
     );
   };
 
@@ -181,7 +150,7 @@ export function AdicionarFinalidadeTransitoPage({
       <Navbar
         onLogout={onLogout}
         onNavigate={onNavigate}
-        currentScreen="finalidade-transito"
+        currentScreen="finalidade-gta"
         hideSearch
       />
 
@@ -190,16 +159,16 @@ export function AdicionarFinalidadeTransitoPage({
         <div>
           <button
             type="button"
-            onClick={() => onNavigate("finalidade-transito")}
+            onClick={() => onNavigate("finalidade-gta")}
             className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70"
             style={{ color: GREEN }}
           >
             <ArrowLeft size={15} />
-            Todas as Finalidades de Trânsito
+            Todas as Finalidades de GTA
           </button>
           <div className="flex justify-between items-center w-full">
             <h1 className="text-2xl font-semibold text-gray-900">
-              Adicionar Finalidade de Trânsito
+              Adicionar Finalidade de GTA
             </h1>
             <button
               type="button"
@@ -218,8 +187,8 @@ export function AdicionarFinalidadeTransitoPage({
           </div>
           <p className="text-sm text-gray-600 font-medium leading-relaxed">
             Campos indicados com{" "}
-            <span className="text-red-500 font-bold">*</span>{" "}
-            são obrigatórios e deverão ser preenchidos.
+            <span className="text-red-500 font-bold">*</span> são obrigatórios e
+            deverão ser preenchidos.
           </p>
         </div>
 
@@ -253,18 +222,14 @@ export function AdicionarFinalidadeTransitoPage({
                 defaultValue={tiposProcedencia}
                 onChange={setTiposProcedencia}
               />
-              {tiposProcedencia.includes(
-                "Estabelecimento Agropecuário",
-              ) && (
+              {tiposProcedencia.includes("Estabelecimento Agropecuário") && (
                 <div className="w-full">
                   <CheckboxGroup
                     title="Emite GTA por Acesso Externo"
-                    options={EMITE_GTA_ACESSO_EXTERNO.map(
-                      (item) => ({
-                        value: item,
-                        label: item,
-                      }),
-                    )}
+                    options={EMITE_GTA_ACESSO_EXTERNO.map((item) => ({
+                      value: item,
+                      label: item,
+                    }))}
                     defaultValue={emiteAcessoExterno}
                     onChange={setEmiteAcessoExterno}
                   />
@@ -274,22 +239,22 @@ export function AdicionarFinalidadeTransitoPage({
           </div>
         </Section>
 
-       {/* --- [2] especies aplicaveis --- */}
+        {/* --- [2] especies aplicaveis --- */}
         <Section title="Espécies aplicáveis">
           <div className="pt-5 flex flex-col gap-4">
-            
             {/* Estrutura unificada: Título e Botão lado a lado na mesma linha */}
             <div className="w-full border border-gray-200 rounded-xl bg-[#f9fafb]/50 overflow-hidden mt-2">
-              
               {/* Cabeçalho do Bloco Integrado */}
               <div className="flex items-center justify-between px-5 py-3 border-b border-gray-200 bg-white gap-4">
                 <div className="flex items-center gap-3">
                   <span className="text-sm font-semibold text-gray-500">
-                    Espécies Selecionadas <span className="text-red-500 ml-0.5">*</span>
+                    Espécies Selecionadas{" "}
+                    <span className="text-red-500 ml-0.5">*</span>
                   </span>
                   {especies.length > 0 && (
                     <span className="text-xs font-bold bg-[#E6F4EA] text-[#1A7A3C] px-2.5 py-1 rounded-full">
-                      {especies.length} {especies.length === 1 ? "Selecionada" : "Selecionadas"}
+                      {especies.length}{" "}
+                      {especies.length === 1 ? "Selecionada" : "Selecionadas"}
                     </span>
                   )}
                 </div>
@@ -317,15 +282,18 @@ export function AdicionarFinalidadeTransitoPage({
                       className="flex flex-col bg-white border border-gray-200 rounded-xl p-2.5 min-w-[180px] shadow-sm transition hover:border-gray-300 relative group"
                     >
                       <div className="flex items-center justify-between gap-4 w-full">
-                        <span className="text-sm font-bold" style={{ color: GREEN }}>
+                        <span
+                          className="text-sm font-bold"
+                          style={{ color: GREEN }}
+                        >
                           {especie.nome}
                         </span>
-                        
+
                         <button
                           type="button"
                           onClick={() =>
                             setEspecies((prev) =>
-                              prev.filter((item) => item.id !== especie.id)
+                              prev.filter((item) => item.id !== especie.id),
                             )
                           }
                           className="text-gray-400 hover:text-red-500 transition-colors p-0.5 rounded-md hover:bg-gray-50 cursor-pointer"
@@ -398,14 +366,10 @@ export function AdicionarFinalidadeTransitoPage({
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
             <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4">
-              <Check
-                size={28}
-                className="text-[#1A7A3C]"
-                strokeWidth={3}
-              />
+              <Check size={28} className="text-[#1A7A3C]" strokeWidth={3} />
             </div>
             <h3 className="text-lg font-bold text-gray-900">
-              Finalidade de Trânsito cadastrada com sucesso!
+              Finalidade de GTA cadastrada com sucesso!
             </h3>
             <p className="text-sm text-gray-500 mt-1">
               {finalidadeGta
@@ -417,7 +381,7 @@ export function AdicionarFinalidadeTransitoPage({
               <button
                 onClick={() => {
                   setIsSucesso(false);
-                  onNavigate("finalidade-transito");
+                  onNavigate("finalidade-gta");
                 }}
                 className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition"
               >

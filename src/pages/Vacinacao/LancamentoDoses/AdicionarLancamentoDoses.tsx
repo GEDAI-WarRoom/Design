@@ -1,21 +1,15 @@
 import React, { useState } from "react";
-import { ArrowLeft, ChevronUp, ChevronDown, Check, Info, PlusCircle, FileText, Trash2, Package } from "lucide-react";
+import { ArrowLeft, ChevronUp, ChevronDown, Check, Info, PlusCircle, Trash2, Package, PillBottle } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
-import { FloatInput, LargeTextArea, MultiSearchModal } from "../../../components/ui/FormKit";
-// Inputs de DOMÍNIO. RevendedoraInput: DomainInputProps (encapsula o SearchModal da revendedora).
-import { RevendedoraInput, SelectedChipsContainer } from "../../../components/ui/EntitySearch";
+import { FloatInput, MultiSearchModal } from "../../../components/ui/FormKit";
+import { RevendedoraInput } from "../../../components/ui/EntitySearch";
 import { PieChart, Pie, Cell, Sector } from "recharts";
-
-import * as Icons from "../../../imports/icons";
-
 
 const GREEN = "#1A7A3C";
 
 // ==========================================================
 // MOCKS
 // ==========================================================
-// Notas fiscais por revendedora (codigo). Cada nota possui um ou mais lotes/partidas,
-// e cada partida traz dados somente-leitura herdados do cadastro de entrada.
 const NOTAS_FISCAIS_MOCK = [
   {
     id: "nf-1", numero: "28568", revendedoraCodigo: "3120938028", uf: "Minas Gerais",
@@ -38,10 +32,6 @@ const NOTAS_FISCAIS_MOCK = [
   },
 ];
 
-const uid = (p: string) => `${p}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-
-
-
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(true);
   return (
@@ -59,124 +49,6 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-
-function SimNao({
-  label,
-  name,
-  value,
-  onChange,
-  required,
-}: {
-  label: string;
-  name: string;
-  value: string;
-  onChange: (v: string) => void;
-  required?: boolean;
-}) {
-  return (
-    <div className="flex flex-col gap-2">
-      <span className="text-sm font-medium text-gray-700">
-        {label}
-        {required && <span className="text-red-500 ml-0.5">*</span>}
-      </span>
-      <div className="flex gap-6 h-8 items-center">
-        <CustomRadio label="Sim" name={name} value="Sim" checked={value === "Sim"} onChange={() => onChange("Sim")} />
-        <CustomRadio label="Não" name={name} value="Não" checked={value === "Não"} onChange={() => onChange("Não")} />
-      </div>
-    </div>
-  );
-}
-
-function SubGrupo({ titulo, children, comDivisor = false }) {
-  return (
-    <div className={comDivisor ? "border-t border-gray-100 pt-6 mt-6" : ""}>
-      <h3 className="text-sm font-semibold text-gray-800 mb-3">{titulo}</h3>
-      {children}
-    </div>
-  );
-}
-
-
-interface AdicionarVendaVacinaProps {
-  onLogout: () => void;
-  onNavigate: (screen: any, data?: any) => void;
-}
-
-
-interface DoseCategory {
-  name: string;
-  value: number;
-  color: string;
-}
-
-interface BatchPanelData {
-  batchNumber: string;
-  expirationDate: string;
-  totalDoses: number;
-  totalFrascos: number;
-  availableDoses: number;
-  availableFrascos: number;
-  categories: DoseCategory[];
-}
-
-const LEGEND_ITEMS = [
-  { name: "Vencidas", color: "#ef4444" },
-  { name: "Descartadas", color: "#9ca3af" },
-  { name: "Partilhadas", color: "#3b82f6" },
-  { name: "Utilizadas", color: "#f59e0b" },
-  { name: "Disponíveis", color: "#22c55e" },
-];
-
-const EXPLORACOES_MOCK = [
-  {
-    id: 1,
-    codigo: "420010400050001",
-    estabelecimentoFormatado: "54001040005001 -\n Fazenda Vertentes",
-    grupoEspecieFormatado: "Bovinos -\n Bovino",
-    produtoresFormatado: "555.009.956-40 -\n  José Aarão Neto"
-  },
-  {
-    id: 2,
-    codigo: "420010400050002",
-    estabelecimentoFormatado: "42001040005001 - \n Sitio Recanto",
-    grupoEspecieFormatado: "Abelhas -\n Abelha com Ferrão",
-    produtoresFormatado: "111.222.333-44 -\n Maria Carmo Souza "
-  }
-];
-
-const BATCHES_MOCK: BatchPanelData[] = [
-  {
-    batchNumber: "006/19",
-    expirationDate: "12/06/2026",
-    totalDoses: 200,
-    totalFrascos: 5,
-    availableDoses: 100,
-    availableFrascos: 5,
-    categories: [
-      { name: "Vencidas", value: 15, color: "#ef4444" },
-      { name: "Descartadas", value: 10, color: "#9ca3af" },
-      { name: "Partilhadas", value: 25, color: "#3b82f6" },
-      { name: "Utilizadas", value: 50, color: "#f59e0b" },
-      { name: "Disponíveis", value: 100, color: "#22c55e" },
-    ],
-  },
-  {
-    batchNumber: "007/19",
-    expirationDate: "20/08/2026",
-    totalDoses: 350,
-    totalFrascos: 10,
-    availableDoses: 280,
-    availableFrascos: 8,
-    categories: [
-      { name: "Vencidas", value: 0, color: "#ef4444" },
-      { name: "Descartadas", value: 5, color: "#9ca3af" },
-      { name: "Partilhadas", value: 15, color: "#3b82f6" },
-      { name: "Utilizadas", value: 50, color: "#f59e0b" },
-      { name: "Disponíveis", value: 280, color: "#22c55e" },
-    ],
-  },
-];
-
 const renderActiveShape = (props: any) => {
   const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } = props;
   return (
@@ -187,22 +59,6 @@ const renderActiveShape = (props: any) => {
   );
 };
 
-
-
-
-
-
-// ==========================================================
-// HELPERS DE UI
-// ==========================================================
-
-const Campo = ({ label, value, className = "" }: { label: string; value?: string; className?: string }) => (
-  <FloatInput label={label} value={value ?? "—"} onChange={() => { }} disabled className={className} />
-);
-
-// ==========================================================
-// PÁGINA: ADICIONAR LANÇAMENTO DE DOSES DE VACINA (US0V7 - AC3)
-// ==========================================================
 interface PageProps {
   onLogout: () => void;
   onNavigate: (screen: any, data?: any) => void;
@@ -210,32 +66,14 @@ interface PageProps {
 
 export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate }: PageProps) {
   const [revendedora, setRevendedora] = useState<any | null>(null);
-  const [notasSelecionadas, setNotasSelecionadas] = useState<any[]>([]); // notas inteiras selecionadas
-  const [modalNota, setModalNota] = useState(false);
-  // valores editáveis por partida: { [partidaId]: { dosesLancadas, justificativa } }
   const [lancamentos, setLancamentos] = useState<Record<string, { dosesLancadas: string; justificativa: string }>>({});
   const [isSucesso, setIsSucesso] = useState(false);
-  // Estados da Seção 1: Informações Básicas
-  const [notaFiscal, setNotaFiscal] = useState("");
 
   const [modalNotaOrigemOpen, setModalNotaOrigemOpen] = useState(false);
   const [notasFiscaisOrigem, setNotasFiscaisOrigem] = useState<any[]>([]);
   const [graficoAtivo, setGraficoAtivo] = useState<{ loteId: string; index: number } | null>(null);
   const [notasListasMinimizadas, setNotasListasMinimizadas] = useState<Record<string, boolean>>({});
   const [lotesMinimizados, setLotesMinimizados] = useState<Record<string, boolean>>({});
-
-
-
-
-
-
-  // Notas pré-filtradas pela revendedora selecionada
-  const notasDisponiveis = revendedora
-    ? NOTAS_FISCAIS_MOCK.filter((n) => n.revendedoraCodigo === revendedora.codigo)
-    : [];
-
-  const setLancamento = (partidaId: string, patch: Partial<{ dosesLancadas: string; justificativa: string }>) =>
-    setLancamentos((prev) => ({ ...prev, [partidaId]: { dosesLancadas: "", justificativa: "", ...prev[partidaId], ...patch } }));
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
@@ -252,17 +90,13 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate }: Pag
             <h1 className="text-2xl font-semibold text-gray-900">Adicionar Ajuste de Doses de Vacina</h1>
             <button type="button" onClick={() => setIsSucesso(true)} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm">Adicionar</button>
           </div>
-
         </div>
 
-
-        {/* 🔥 ALERTA CORRIGIDO: Adicionado mb-6 para dar respiro até a próxima seção */}
+        {/* ALERTA */}
         <div className="w-full bg-white border border-gray-100 rounded-lg p-5 shadow-sm flex items-center gap-3 mt-4 mb-6">
-          {/* Ícone de Informação Azul/Cinza Discreto */}
           <div className="text-gray-500 flex-shrink-0">
             <Info size={20} className="stroke-[2.5]" />
           </div>
-
           <p className="text-sm text-gray-600 font-medium leading-relaxed">
             Campos indicados com <span className="text-red-500 font-bold">*</span> são obrigatórios e deverão ser preenchidos.
           </p>
@@ -286,7 +120,6 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate }: Pag
         {/* Seção 2: Nota Fiscal de Origem */}
         <Section title="Nota Fiscal">
           <div className="flex flex-col gap-4">
-
             <div className="flex items-center justify-between border-b border-gray-100 pb-3">
               <div className="flex items-center gap-3">
                 <div className="flex flex-col">
@@ -321,14 +154,14 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate }: Pag
               </button>
             </div>
 
-            {/* CONDICIONAL 1: Sem fornecedor selecionado ainda */}
+            {/* CONDICIONAL 1: Sem revendedora selecionada */}
             {!revendedora && (
               <div className="text-left py-4">
                 <p className="text-xs text-gray-400 italic">É necessário selecionar uma Revendedora para pesquisar notas fiscais.</p>
               </div>
             )}
 
-            {/* CONDICIONAL 2: Fornecedor selecionado, mas nenhuma nota fiscal adicionada ainda */}
+            {/* CONDICIONAL 2: Revendedora selecionada, mas nenhum lote adicionado */}
             {revendedora && notasFiscaisOrigem.length === 0 && (
               <div className="w-full border border-dashed border-gray-200 rounded-xl py-8 px-4 text-center bg-gray-50/20">
                 <p className="text-sm text-gray-400 italic">Nenhum lote vinculado a este lançamento até o momento.</p>
@@ -347,32 +180,55 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate }: Pag
                   }, {})
                 ).map((grupo: any) => {
                   const isNotaMinimizada = notasListasMinimizadas[grupo.nome] || false;
+                  const lotePrincipal = grupo.partidas[0];
+                  const numeroLote = String(grupo.nome).replace(/^Lote:\s*/i, "");
+                  const dosesTotaisLote = grupo.partidas.reduce(
+                    (total: number, partida: any) => total + Number(partida.dosesDisponiveisTotais || 0),
+                    0
+                  );
 
                   return (
                     <div key={`grupo-${grupo.nome}`} className="border border-gray-200 rounded-xl p-4 bg-gray-50/30 relative">
-
+                      {/* Cabeçalho do Lote */}
                       <div className="flex items-center justify-between mb-4 px-1">
-                        <div
-                          className="flex items-center gap-2 cursor-pointer select-none group/title"
-                          onClick={() => setNotasListasMinimizadas(prev => ({ ...prev, [grupo.nome]: !isNotaMinimizada }))}
-                        >
+                        <div className="flex items-center gap-2 select-none">
                           <Package size={24} color={GREEN} />
 
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-sm font-bold text-gray-800 group-hover/title:text-gray-600 transition-colors">
-                              {grupo.nome}
-                            </span>
+                          <span className="text-sm font-bold text-gray-800">Lote: {numeroLote}</span>
 
-                            <span className="px-1.5 py-0.5 bg-gray-100/60 border border-gray-200 text-gray-700 text-[10px] font-medium rounded uppercase tracking-wider">
-                              UF: {grupo.partidas[0]?.uf || "MG"}
-                            </span>
+                          {/* Tooltip com os detalhes do lote */}
+                          <div className="relative group/lote-info flex-shrink-0 z-20">
+                            <Info size={14} className="text-gray-400 cursor-help" />
+                            <div className="fixed inset-0 bg-black/15 hidden group-hover/lote-info:block pointer-events-none z-[998] animate-fadeIn" />
+                            <div className="absolute left-0 top-full mt-2 w-60 bg-white border border-gray-100 rounded-2xl shadow-xl hidden group-hover/lote-info:block animate-fadeIn z-[999] text-left overflow-hidden">
+                              <div className="flex items-center gap-1.5 border-b border-gray-100 p-3">
+                                <Package size={13} className="text-gray-500" />
+                                <span className="text-[11px] font-extrabold text-gray-800">Nº de Partida: {numeroLote}</span>
+                              </div>
+                              <div className="p-3 flex flex-col gap-2.5 text-[11px] text-gray-500 bg-white">
+                                <div className="flex justify-between items-center gap-3">
+                                  <span>Doença:</span>
+                                  <span className="font-bold text-gray-700 text-right">{lotePrincipal?.doenca || "—"}</span>
+                                </div>
+                                <div className="flex justify-between items-center gap-3">
+                                  <span>Tipo de Vacina:</span>
+                                  <span className="font-bold text-gray-700">{lotePrincipal?.tipoVacina || "B19"}</span>
+                                </div>
+                                <div className="flex justify-between items-center gap-3">
+                                  <span>Laboratório:</span>
+                                  <span className="font-bold text-gray-700">{lotePrincipal?.laboratorio || "Biovet"}</span>
+                                </div>
+                                <div className="flex justify-between items-center gap-3">
+                                  <span>Validade:</span>
+                                  <span className="font-bold text-gray-700">{lotePrincipal?.validade || "15/08/2027"}</span>
+                                </div>
+                              </div>
+                              <div className="bg-gray-50 border-t border-gray-100 p-3 flex justify-between items-center text-[11px] font-bold text-green-700">
+                                <span>Doses Totais Lote:</span>
+                                <span>{dosesTotaisLote}</span>
+                              </div>
+                            </div>
                           </div>
-
-                          {isNotaMinimizada ? (
-                            <ChevronDown size={16} className="text-gray-400 group-hover/title:text-gray-600 mt-0.5" />
-                          ) : (
-                            <ChevronUp size={16} className="text-gray-400 group-hover/title:text-gray-600 mt-0.5" />
-                          )}
 
                           {isNotaMinimizada && (
                             <span className="text-[11px] text-gray-400 font-medium normal-case">
@@ -381,16 +237,28 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate }: Pag
                           )}
                         </div>
 
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setNotasFiscaisOrigem(notasFiscaisOrigem.filter(item => item.nome !== grupo.nome));
-                          }}
-                          className="text-gray-400 hover:text-red-500 p-1 rounded transition hover:bg-red-50"
-                          title="Remover Nota"
-                        >
-                          <Trash2 size={16} />
-                        </button>
+                        {/* Ações do Lote */}
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => setNotasListasMinimizadas(prev => ({ ...prev, [grupo.nome]: !isNotaMinimizada }))}
+                            className="text-gray-400 hover:text-gray-600 p-1 rounded transition hover:bg-gray-100"
+                            title={isNotaMinimizada ? "Expandir lote" : "Minimizar lote"}
+                          >
+                            {isNotaMinimizada ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setNotasFiscaisOrigem(notasFiscaisOrigem.filter(item => item.nome !== grupo.nome));
+                            }}
+                            className="text-gray-400 hover:text-red-500 p-1 rounded transition hover:bg-red-50"
+                            title="Remover lote"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
                       </div>
 
                       {!isNotaMinimizada && (
@@ -429,7 +297,6 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate }: Pag
                             const totalDosesGrafico = dadosGrafico.reduce((s, d) => s + d.value, 0);
                             const porcentagem = fatiaAtiva ? ((fatiaAtiva.value / totalDosesGrafico) * 100).toFixed(1) : null;
 
-                            // Doses efetivamente disponíveis (o número que decide o lançamento)
                             const DOSES_DISPONIVEIS = dadosGrafico.find(d => d.name === "Disponíveis")?.value ?? 0;
                             const FRASCOS_DISPONIVEIS = Math.floor(DOSES_DISPONIVEIS / DOSES_POR_FRASCO);
 
@@ -441,7 +308,6 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate }: Pag
                                 className={`border border-gray-200 rounded-xl bg-white shadow-sm flex flex-col overflow-visible relative group transition-all duration-200 h-auto ${isLoteMinimizado ? "p-2.5 pb-2 justify-start" : "p-4 justify-between"
                                   }`}
                               >
-
                                 <div className="absolute top-2.5 right-2.5 flex items-center gap-1 z-10">
                                   <button
                                     type="button"
@@ -464,39 +330,14 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate }: Pag
 
                                 <div className={`flex items-center justify-between border-gray-100 overflow-visible pr-14 ${isLoteMinimizado ? "border-none pb-0 mb-0" : "border-b pb-2 mb-3"
                                   }`}>
-                                  <div className="flex items-center gap-1.5 relative group/info overflow-visible">
-                                    <div className="relative cursor-help text-gray-400 hover:text-gray-600 transition pt-0.5 z-20">
-                                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></svg>
-                                      <div className="fixed inset-0 bg-black/15 hidden group-hover/info:block pointer-events-none z-[998] animate-fadeIn" />
-
-                                      <div className="absolute left-0 top-full mt-2 w-56 bg-white border border-gray-100 rounded-xl shadow-xl hidden group-hover/info:block animate-fadeIn z-[999] text-left overflow-hidden">
-                                        <div className="flex items-center gap-1.5 bg-gray-50 border-b border-gray-100 p-3">
-                                          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-gray-500"><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></svg>
-                                          <span className="text-[11px] font-extrabold text-gray-800">Apresentação</span>
-                                        </div>
-                                        <div className="p-3 flex flex-col gap-2 text-[11px] text-gray-500 bg-white">
-                                          <div className="flex justify-between items-center">
-                                            <span>Laboratório:</span>
-                                            <span className="font-bold text-gray-700">BioMed/MG</span>
-                                          </div>
-                                          <div className="flex justify-between items-center">
-                                            <span>Doença:</span>
-                                            <span className="font-bold text-gray-700">{nfItem.doenca || "—"}</span>
-                                          </div>
-                                          <div className="flex justify-between items-center">
-                                            <span>Tipo de Vacina:</span>
-                                            <span className="font-bold text-gray-700">B19</span>
-                                          </div>
-                                        </div>
-                                        <div className="bg-gray-50 border-t border-gray-100 p-3 flex justify-between items-center text-[11px] font-bold text-green-700">
-                                          <span>Doses Totais Lote:</span>
-                                          <span>{TOTAL_DISPONIVEL}</span>
-                                        </div>
-                                      </div>
-                                    </div>
-
+                                  <div className="flex items-center gap-2 overflow-visible">
                                     <span className="text-xs font-semibold text-gray-800 select-none">
                                       Apresentação
+                                    </span>
+
+                                    <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-600 text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">
+                                      <PillBottle size={10} className="text-gray-400" />
+                                      {DOSES_POR_FRASCO} doses/frasco
                                     </span>
 
                                     {isLoteMinimizado && (
@@ -504,11 +345,6 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate }: Pag
                                         ({DOSES_DISPONIVEIS} disp. · {nfItem.quantidadeDoses || 0} lançadas)
                                       </span>
                                     )}
-                                  </div>
-
-                                  <div className={`px-2 py-0.5 rounded border font-semibold text-[10px] ${isVencido ? "bg-red-50 border-red-200 text-red-700" : "bg-green-50 border-green-200 text-green-700"
-                                    }`}>
-                                    Validade: {validadeLote} {isVencido && "(Vencida)"}
                                   </div>
                                 </div>
 
@@ -558,10 +394,10 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate }: Pag
                                           ) : (
                                             <div className="flex flex-col items-center justify-center">
                                               <span className="text-base font-black text-gray-800 leading-none">
-                                                {DOSES_DISPONIVEIS}
+                                                {totalDosesGrafico}
                                               </span>
                                               <span className="text-[7px] font-bold text-gray-400 mt-0.5 uppercase tracking-wider">
-                                                Disponíveis
+                                                Total
                                               </span>
                                             </div>
                                           )}
@@ -587,14 +423,10 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate }: Pag
                                               <span className="text-[9px] text-gray-400 font-medium mt-0.5">Doses</span>
                                             </div>
                                           </div>
-
-                                          <p className="text-[8px] text-gray-400 text-center leading-none mt-0.5">
-                                            {DOSES_POR_FRASCO} doses por frasco
-                                          </p>
                                         </div>
 
                                         <div className="flex flex-col border border-gray-200 rounded-xl px-2.5 py-2 w-full max-w-[130px] gap-1 bg-white justify-between">
-                                          <span className="text-[11px] text-gray-500 font-medium text-center">Lançadas</span>
+                                          <span className="text-[11px] text-gray-500 font-medium text-center">Lançadas <span className="text-red-500">*</span></span>
 
                                           <div className="flex gap-1.5 items-end justify-center">
                                             <div className="flex flex-col flex-1 min-w-[40px]">
@@ -633,24 +465,18 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate }: Pag
                                               <span className="text-[9px] text-gray-400 font-semibold text-center mt-0.5">Doses</span>
                                             </div>
                                           </div>
-                                          <p className="text-[8px] text-gray-400 text-center leading-none mt-0.5"></p>
                                         </div>
                                       </div>
                                     </div>
 
-                                    {/* NOVO: Campo de Justificativa por lote/partida */}
-                                    {/* NOVO: Campo de Justificativa com Título Fixo Interno (Dentro do Quadrado) */}
+                                    {/* Campo de Justificativa */}
                                     <div className="w-full mt-4 bg-white border border-gray-200 rounded-lg px-3 py-1.5 flex flex-col justify-center text-left focus-within:border-[#1A7A3C] shadow-sm transition-colors">
-
-                                      {/* Título fixo no topo interno do quadrado */}
                                       <span className="text-[10px] font-regular text-gray-500 select-none tracking-wide mb-0.5">
                                         Justificativa
                                       </span>
 
-                                      {/* Input sem bordas e transparente preenchendo o restante do espaço */}
                                       <input
                                         type="text"
-                                        placeholder="Digite aqui o motivo deste lançamento (ex: quebra de frasco, partilha, etc.)"
                                         value={lancamentos[nfItem.id]?.justificativa || ""}
                                         onChange={(e) => {
                                           setLancamentos(prev => ({
@@ -664,40 +490,37 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate }: Pag
                                         className="w-full bg-transparent border-none text-xs p-0 focus:outline-none focus:ring-0 text-gray-800 placeholder:text-gray-300 h-5"
                                       />
                                     </div>
-                                    <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 mt-3 pt-2 border-t border-gray-100 text-[9px] z-10">
-                                      {dadosGrafico
-                                        .filter((item) => item.name !== "Disponíveis")
-                                        .map((item) => (
-                                          <div key={item.name} className="flex items-center gap-1 bg-gray-50 px-1 py-0.5 rounded border border-gray-100">
-                                            <span className="w-1 h-1 rounded-full" style={{ backgroundColor: item.color }} />
-                                            <span className="text-gray-400 font-medium">{item.name}:</span>
-                                            <span className="font-bold text-gray-600">{item.value}</span>
-                                          </div>
-                                        ))}
 
-                                      <div className="flex items-center gap-1 px-1 py-0.5 ml-auto">
-                                        <span className="text-gray-400 font-medium">Total do lote:</span>
-                                        <span className="font-bold text-gray-600">{totalDosesGrafico}</span>
+                                    <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 mt-3 pt-2 border-t border-gray-100 text-[9px] z-10">
+                                      {dadosGrafico.map((item) => (
+                                        <div key={item.name} className="flex items-center gap-1 bg-gray-50 px-1 py-0.5 rounded border border-gray-100">
+                                          <span className="w-1 h-1 rounded-full" style={{ backgroundColor: item.color }} />
+                                          <span className="text-gray-400 font-medium">{item.name}:</span>
+                                          <span className="font-bold text-gray-600">{item.value}</span>
+                                        </div>
+                                      ))}
+
+                                      <div className="flex flex-col items-end gap-0.5 px-1 py-0.5 ml-auto">
+                                        <div className="flex items-center gap-1">
+                                          <span className="text-gray-400 font-medium">Total de doses:</span>
+                                          <span className="font-bold text-gray-600">{totalDosesGrafico}</span>
+                                        </div>
                                       </div>
                                     </div>
                                   </div>
                                 )}
-
                               </div>
                             );
                           })}
                         </div>
                       )}
-
                     </div>
                   );
                 })}
               </div>
             )}
-
           </div>
         </Section>
-
       </main>
 
       <MultiSearchModal
@@ -706,37 +529,32 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate }: Pag
         title="Buscar Lotes de Vacinas"
         subtitle="Selecione os lotes de vacina desejados para vincular a este ajuste:"
         icon={<Package size={24} color={GREEN} />}
-        /* Dados continuam os mesmos */
         data={[
-          { id: 1, nome: "Lote: 0013225/24", partida: "1", uf: "MG", dosesDisponiveisTotais: 120, fornecedor: "Distribuidora de Vacinas Alfa LTDA", doenca: "Brucelose", exigeReceituario: true },
-          { id: 2, nome: "Lote: 0013225/24", partida: "2", uf: "MG", dosesDisponiveisTotais: 80, fornecedor: "Distribuidora de Vacinas Alfa LTDA", doenca: "Febre Aftosa", exigeReceituario: true },
-          { id: 3, nome: "Lote: 0014589/24", partida: "1", uf: "SP", dosesDisponiveisTotais: 250, fornecedor: "Comercial Agropecuária Beta S/A", doenca: "Raiva dos Herbívoros", exigeReceituario: false },
-          { id: 4, nome: "Lote: 0014589/24", partida: "1", uf: "GO", dosesDisponiveisTotais: 50, fornecedor: "Laboratório Biovet Saúde Animal", doenca: "Brucelose", exigeReceituario: true }
+          { id: 1, nome: "0013225/24", partida: "1", uf: "MG", dosesDisponiveisTotais: 120, fornecedor: "Distribuidora de Vacinas Alfa LTDA", doenca: "Brucelose", exigeReceituario: true, tipoVacina: "B19", laboratorio: "BioMed/MG", validade: "20/12/2026" },
+          { id: 2, nome: "0013225/24", partida: "2", uf: "MG", dosesDisponiveisTotais: 80, fornecedor: "Distribuidora de Vacinas Alfa LTDA", doenca: "Brucelose", exigeReceituario: true, tipoVacina: "Oleosa", laboratorio: "BioMed/MG", validade: "20/12/2026" },
+          { id: 3, nome: "0014589/24", partida: "1", uf: "SP", dosesDisponiveisTotais: 250, fornecedor: "Comercial Agropecuária Beta S/A", doenca: "Raiva dos Herbívoros", exigeReceituario: false, tipoVacina: "Inativada", laboratorio: "Zoetis", validade: "15/08/2027" },
+          { id: 4, nome: "0014589/24", partida: "1", uf: "GO", dosesDisponiveisTotais: 50, fornecedor: "Laboratório Biovet Saúde Animal", doenca: "Raiva dos Herbívoros", exigeReceituario: true, tipoVacina: "B19", laboratorio: "Biovet", validade: "15/08/2027" }
         ]}
-
         searchKeys={["nome", "partida", "fornecedor", "uf"]}
         searchPlaceholder="Busque por lote."
-
-        /* ALTERADO: Substituída a coluna de Partida pela de Saldo da Apresentação */
         columns={[
           { label: "Lote/ Nº de Partida", key: "nome" },
-          { label: "Saldo da Apresentação", key: "dosesDisponiveisTotais" }, // <-- Mudança aqui
+          { label: "Saldo da Apresentação", key: "dosesDisponiveisTotais" },
           { label: "UF", key: "uf" }
         ]}
-
         selectedItems={notasFiscaisOrigem}
         onConfirm={(selectedValues) => {
           setNotasFiscaisOrigem(selectedValues);
         }}
       />
 
-
-
       {/* Modal de Sucesso */}
       {isSucesso && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
-            <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4"><Check size={28} className="text-[#1A7A3C]" strokeWidth={3} /></div>
+            <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4">
+              <Check size={28} className="text-[#1A7A3C]" strokeWidth={3} />
+            </div>
             <h3 className="text-lg font-bold text-gray-900">Lançamento de doses adicionado com sucesso!</h3>
             <p className="text-sm text-gray-500 mt-1">O registro foi gravado.</p>
             <div className="flex gap-3 justify-center mt-6">
