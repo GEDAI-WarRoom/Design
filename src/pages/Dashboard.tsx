@@ -1,5 +1,6 @@
 import {
   BadgePercent,
+  Bell,
   BriefcaseBusiness,
   Calendar,
   ClipboardList,
@@ -27,6 +28,7 @@ import {
   Truck,
   User,
   Wallet,
+  Scale
 } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import * as Icons from "../imports/icons";
@@ -357,6 +359,11 @@ export const secondaryCategories: MenuCategory[] = [
         icon: <PackagePlus size={16} />,
       },
       {
+        label: "Venda com Entrada de Insumos para Exames",
+        route: "venda-entrada-insumos-exames",
+        icon: <PackagePlus size={16} />,
+      },
+      {
         label: "Doação/Partilha de Vacina",
         route: "partilha-vacina",
         icon: (
@@ -366,6 +373,17 @@ export const secondaryCategories: MenuCategory[] = [
       {
         label: "Ajuste de Doses de Vacina",
         route: "lancamento-doses-vacina",
+        icon: (
+          <img
+            src={Icons.iconeDoseVacinaUrl}
+            alt="Dose de Vacina"
+            className="w-4 h-4"
+          />
+        ),
+      },
+      {
+        label: "Ajuste de Doses de Insumo",
+        route: "ajuste-doses-insumo",
         icon: (
           <img
             src={Icons.iconeDoseVacinaUrl}
@@ -540,6 +558,11 @@ export const thirdCategories: MenuCategory[] = [
         label: "Item da Receita",
         route: "item-receita",
         icon: <ListTree size={16} />,
+      },
+      {
+        label: "Notificações dos Estabelecimentos",
+        route: "notificacoes-estabelecimentos",
+        icon: <Scale size={16} />,
       },
       {
         label: "Lote de Pagamento",

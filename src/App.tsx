@@ -122,10 +122,16 @@ import { TipoInsumoExamePage } from "./pages/Vacinacao/TipoInsumoExame/TipoInsum
 import { VisualizarTipoInsumoExamePage } from "./pages/Vacinacao/TipoInsumoExame/VisualizarTipoInsumoExame";
 import { AdicionarVacinadorPage } from "./pages/Vacinacao/Vacinador/AdicionarVacinador";
 import { VacinadorPage } from "./pages/Vacinacao/Vacinador/Vacinador";
+import { AdicionarVendaComEntradaInsumosExamesPage } from "./pages/Vacinacao/VendaComEntradaInsumosExames/AdicionarVendaComEntradaInsumosExames";
+import { VendaComEntradaInsumosExamesPage } from "./pages/Vacinacao/VendaComEntradaInsumosExames/VendaComEntradaInsumosExames";
 import { AdicionarVendaComEntradaVacinaPage } from "./pages/Vacinacao/VendaComEntradaVacina/AdicionarVendaComEntradaVacina";
 import { VendaComEntradaVacinaPage } from "./pages/Vacinacao/VendaComEntradaVacina/VendaComEntradaVacina";
 import { AdicionarVendaComSaidaVacinaPage } from "./pages/Vacinacao/VendaComSaidaVacina/AdicionarVendaComSaidaVacina";
 import { VendaComSaidaVacinaPage } from "./pages/Vacinacao/VendaComSaidaVacina/VendaComSaidaVacina";
+import { AjusteDosesInsumoPage } from "./pages/Vacinacao/AjusteDosesInsumo/AjusteDosesInsumo";
+import { AdicionarAjusteDosesInsumoPage } from "./pages/Vacinacao/AjusteDosesInsumo/AdicionarAjusteDosesInsumo";
+import { VisualizarAjusteDosesInsumoPage } from "./pages/Vacinacao/AjusteDosesInsumo/VisualizarAjusteDosesInsumo";
+import { EditarAjusteDosesInsumoPage } from "./pages/Vacinacao/AjusteDosesInsumo/EditarAjusteDosesInsumo";
 
 //ARRECADACAO
 import { FundoArrecadacaoPage } from "./pages/Arrecadacao/FundoArrecadacao/FundoArrecadacao";
@@ -135,6 +141,7 @@ import {
   VisualizarFundoArrecadacaoPage,
 } from "./pages/Arrecadacao/FundoArrecadacao/FundoArrecadacaoDetalhe";
 import { AdicionarItemReceitaPage } from "./pages/Arrecadacao/ItemReceita/AdicionarItemReceita";
+import { NotificacoesEstabelecimentosPage } from "./pages/Arrecadacao/NotificacoesEstabelecimentos/NotificacoesEstabelecimentos";
 import { ItemReceitaPage } from "./pages/Arrecadacao/ItemReceita/ItemReceita";
 import { AdicionarValorIndicePage } from "./pages/Arrecadacao/ValorIndice/AdicionarValorIndice";
 import { ValorIndicePage } from "./pages/Arrecadacao/ValorIndice/ValorIndice";
@@ -149,6 +156,8 @@ import { AdicionarDistribuicaoFormulariosGta } from "./pages/GTA/DistribuicaoFor
 import { DistribuicaoFormulariosGta } from "./pages/GTA/DistribuicaoFormulariosGta/DistribuicaoFormulariosGta";
 import { AdicionarFinalidadeGTAPage } from "./pages/GTA/FinalidadeGTA/AdicionarFinalidadeGTA";
 import { FinalidadeGTAPage } from "./pages/GTA/FinalidadeGTA/FinalidadeGTA";
+import { AdicionarFinalidadeTransitoPage } from "./pages/GTA/FinalidadeTransito/AdicionarFinalidadeTransito";
+import { FinalidadeTransitoPage } from "./pages/GTA/FinalidadeTransito/FinalidadeTransito";
 import { AdicionarIsencaoTaxaGtaPage } from "./pages/GTA/IsencaoTaxaGTA/AdicionarIsencaoTaxaGTA";
 import { IsencaoTaxaGtaPage } from "./pages/GTA/IsencaoTaxaGTA/IsencaoTaxaGTA";
 import { AdicionarRecolhimentoMensalGTAPage } from "./pages/GTA/RecolhimentoMensalGTA/AdicionarRecolhimentoMensalGTA";
@@ -239,6 +248,10 @@ export type Screen =
   | "adicionar-tipo-insumo-exame"
   | "visualizar-tipo-insumo-exame"
   | "editar-tipo-insumo-exame"
+  | "ajuste-doses-insumo"
+  | "adicionar-ajuste-doses-insumo"
+  | "visualizar-ajuste-doses-insumo"
+  | "editar-ajuste-doses-insumo"
   | "registro-venda-gta-digital"
   | "adicionar-registro-venda-gta-digital"
   | "visualizar-registro-venda-gta-digital"
@@ -332,6 +345,7 @@ export type Screen =
   | "editar-fundo-arrecadacao"
   | "item-receita"
   | "adicionar-item-receita"
+  | "notificacoes-estabelecimentos"
   | "lote-pagamento"
   | "adicionar-lote-pagamento"
   | "visualizar-lote-pagamento"
@@ -339,6 +353,8 @@ export type Screen =
   | "visualizar-dae-lote-pagamento"
   | "tipo-veiculo"
   | "adicionar-tipo-veiculo"
+  | "venda-entrada-insumos-exames"
+  | "adicionar-venda-entrada-insumos-exames"
   | "status-animal"
   | "adicionar-status-animal"
   | "visualizar-status-animal"
@@ -741,6 +757,36 @@ export default function App() {
     case "editar-tipo-insumo-exame":
       return (
         <EditarTipoInsumoExamePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
+        />
+      );
+    case "ajuste-doses-insumo":
+      return (
+        <AjusteDosesInsumoPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "adicionar-ajuste-doses-insumo":
+      return (
+        <AdicionarAjusteDosesInsumoPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "visualizar-ajuste-doses-insumo":
+      return (
+        <VisualizarAjusteDosesInsumoPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
+        />
+      );
+    case "editar-ajuste-doses-insumo":
+      return (
+        <EditarAjusteDosesInsumoPage
           onLogout={handleLogout}
           onNavigate={handleNavigate}
           dados={screenData}
@@ -1414,6 +1460,13 @@ export default function App() {
       return (
         <ItemReceitaPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
+    case "notificacoes-estabelecimentos":
+      return (
+        <NotificacoesEstabelecimentosPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
     case "tipo-veiculo":
       return (
         <TipoVeiculoPage onLogout={handleLogout} onNavigate={handleNavigate} />
@@ -1512,6 +1565,20 @@ export default function App() {
           onLogout={handleLogout}
           onNavigate={handleNavigate}
           instituicao={screenData}
+        />
+      );
+    case "venda-entrada-insumos-exames":
+      return (
+        <VendaComEntradaInsumosExamesPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "adicionar-venda-entrada-insumos-exames":
+      return (
+        <AdicionarVendaComEntradaInsumosExamesPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
         />
       );
 
