@@ -78,6 +78,17 @@ export const cadastrosCategories: MenuCategory[] = [
         ),
       },
       {
+        label: "Venda de Propriedade",
+        route: "venda-propriedade",
+        icon: (
+          <img
+            src={Icons.iconeVendaPropriedadeUrl}
+            alt="Venda Propriedade"
+            className="w-4 h-4"
+          />
+        ),
+      },
+      {
         label: "Pessoa Física",
         route: "pessoa-fisica",
         icon: <User size={16} />,
@@ -256,6 +267,13 @@ export const cadastrosCategories: MenuCategory[] = [
         label: "Revendedora de Animais Vivos",
         route: "revendedora-animais",
         icon: <Store size={16} />,
+      },
+      {
+        label: "Status Animal",
+        route: "status-animal",
+        icon: (
+          <img src={Icons.iconeStatusUrl} alt="Status" className="w-4 h-4" />
+        ),
       },
     ],
   },
@@ -478,9 +496,19 @@ export const secondaryCategories: MenuCategory[] = [
         ),
       },
       {
+        label: "Taxa de Emissão de GTA",
+        route: "taxa-emissao-gta",
+        icon: <ReceiptText size={16} />,
+      },
+      {
         label: "Isenção de Taxa de GTA",
         route: "isencao-taxa-gta",
         icon: <BadgePercent size={16} />,
+      },
+      {
+        label: "Recolhimento Mensal de GTAs",
+        route: "recolhimento-mensal-gta",
+        icon: <ReceiptText size={16} />,
       },
     ],
   },

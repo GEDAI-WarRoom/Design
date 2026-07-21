@@ -532,7 +532,7 @@ export function SearchModal<T extends { id: string | number }>({
         </button>
 
         <div className="flex flex-col items-center gap-2 text-center mt-2">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 text-[#1A7A3C]">
             {icon}
             <h2 className="text-2xl font-bold text-gray-800 tracking-tight">{title}</h2>
           </div>
@@ -929,6 +929,7 @@ interface CheckboxGroupProps {
   onChange?: (selectedIds: string[]) => void;
   orientation?: "horizontal" | "vertical" | "grid";
   required?: boolean;
+  disabled?: boolean;
 }
 
 export function CheckboxGroup({
@@ -939,10 +940,12 @@ export function CheckboxGroup({
   onChange,
   orientation = "vertical",
   required,
+  disabled = false,
 }: CheckboxGroupProps) {
   const [selected, setSelected] = useState<string[]>(defaultValue);
 
   const handleToggle = (id: string) => {
+    if (disabled) return;
     const updated = selected.includes(id)
       ? selected.filter((item) => item !== id)
       : [...selected, id];
@@ -983,16 +986,17 @@ export function CheckboxGroup({
           return (
             <div
               key={currentId}
-              className={`flex items-start gap-1.5 ${orientation === "grid" ? "w-full" : "w-fit"
+              className={`flex items-start gap-1.5 ${disabled ? "opacity-60" : ""} ${orientation === "grid" ? "w-full" : "w-fit"
                 }`}
             >
               {/* O label mantém a estrutura flex original do grupo */}
-              <label className="inline-flex items-center gap-3 cursor-pointer group w-full">
+              <label className={`inline-flex items-center gap-3 group w-full ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`}>
                 <div className="relative flex items-center justify-center flex-shrink-0">
                   <input
                     type="checkbox"
                     checked={isChecked}
                     onChange={() => handleToggle(currentId)}
+                    disabled={disabled}
                     className="peer appearance-none w-5 h-5 border border-gray-300 rounded bg-white 
                                checked:bg-[#1A7A3C] checked:border-[#1A7A3C] 
                                focus:outline-none

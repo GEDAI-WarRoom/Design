@@ -255,7 +255,7 @@ interface PageProps {
 }
 
 export function AdicionarPapeisPage({
-  onLogout = () => {},
+  onLogout = () => { },
   onNavigate = (screen: any) => console.log("navigate:", screen),
 }: PageProps = {}) {
   // Informações básicas: Inicia fixo e desativado como "Complementar"
@@ -282,10 +282,7 @@ export function AdicionarPapeisPage({
   };
 
   const handleAdicionar = () => {
-    if (!tipo || !nomePapel.trim()) {
-      alert("Preencha o tipo e o nome do papel.");
-      return;
-    }
+
     setIsSucesso(true);
   };
 
@@ -340,7 +337,7 @@ export function AdicionarPapeisPage({
               value={tipo}
               onChange={setTipo}
               options={toOptions(TIPOS_PAPEL)}
-              disabled={true} 
+              disabled={true}
             />
             <FloatInput label="Nome do Papel" required value={nomePapel} onChange={setNomePapel} maxLength={255} />
           </div>
@@ -357,19 +354,19 @@ export function AdicionarPapeisPage({
             </div>
 
             {/* Copiar de papel existente */}
-            <div className="flex flex-col md:flex-row gap-3 md:items-end bg-gray-50/60 border border-gray-100 rounded-lg p-4">
+            <div className="flex flex-col md:flex-row gap-3 md:items-end">
               <div className="flex-1">
                 <FloatInput
-                  label="Copiar permissões de"
+                  label="Herdar permissões de"
                   value={papelSelecionadoNome}
-                 icon={<Copy size={16} />} 
+                  icon={<Copy size={16} />}
                   placeholder="Clique para selecionar um papel..."
                   onClick={() => setIsModalCopiarOpen(true)}
                   readOnly
                   className="cursor-pointer font-medium"
                 />
               </div>
-              
+
             </div>
 
             <hr className="border-gray-100" />
@@ -378,15 +375,6 @@ export function AdicionarPapeisPage({
           </div>
         </Section>
 
-        {/* Rodapé de ações */}
-        <div className="flex justify-end gap-3 pb-4">
-          <CustomButton variant="outlined" onClick={() => onNavigate("papeis")}>
-            Cancelar
-          </CustomButton>
-          <CustomButton variant="filled" onClick={handleAdicionar}>
-            Adicionar
-          </CustomButton>
-        </div>
       </main>
 
       {/* Modal de Sucesso */}
@@ -426,34 +414,37 @@ export function AdicionarPapeisPage({
           </div>
         </div>
       )}
-{/* Modal de Cópia Simples usando seu SearchModal correto */}
-<SearchModal<SystemRole>
-  open={isModalCopiarOpen}
-  onClose={() => {
-    setIsModalCopiarOpen(false);
-    setFiltroPapel(""); 
-  }}
-  title="Copiar Permissões de um Papel"
-  subtitle="Selecione abaixo um dos papéis de sistema cadastrados para copiar suas configurações de acesso."
-  data={papeisFiltrados || []}
-  columns={[
-    {
-      key: "nome",
-      header: "Nome do Papel",
-    }
-  ]}
-  searchKeys={["nome"]}
-  // O seu componente já usa essa prop para renderizar o input de busca único correto:
-  searchPlaceholder="Buscar papel..." 
-  confirmLabel="Confirmar"
-  onConfirm={(p) => {
-    copiarPermissoes(p);
-    setIsModalCopiarOpen(false);
-    setFiltroPapel("");
-  }}
-  // Removemos o input duplicado daqui de dentro:
-  headerActions={undefined} 
-/>
+      {/* Modal de Cópia Simples usando seu SearchModal correto */}
+      <SearchModal<SystemRole>
+        open={isModalCopiarOpen}
+        onClose={() => {
+          setIsModalCopiarOpen(false);
+          setFiltroPapel("");
+        }}
+        title={
+          <span className="flex items-center gap-2">
+            <Copy className="w-5 h-5 text-emerald-600" />
+            Herdar Permissões de Papel
+          </span>
+        }
+        subtitle="Selecione um papel para herdar suas permissões."
+        data={papeisFiltrados || []}
+        columns={[
+          {
+            key: "nome",
+            label: "Nome do Papel",
+          }
+        ]}
+        searchKeys={["nome"]}
+        searchPlaceholder="Buscar papel."
+        confirmLabel="Confirmar"
+        onConfirm={(p) => {
+          copiarPermissoes(p);
+          setIsModalCopiarOpen(false);
+          setFiltroPapel("");
+        }}
+        headerActions={undefined}
+      />
     </div>
   );
 }
