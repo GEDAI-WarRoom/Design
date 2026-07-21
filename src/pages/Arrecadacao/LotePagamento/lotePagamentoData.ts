@@ -1,5 +1,5 @@
 export type TipoDocumentoLote = "GTA" | "PTV";
-export type DocumentoBuscaLote = TipoDocumentoLote | "INSPEÇÃO SANITÁRIA INDUSTRIAL";
+export type DocumentoBuscaLote = TipoDocumentoLote;
 export type SituacaoLote = "Ativo" | "Cancelado";
 export type StatusPagamentoLote = "Pago" | "Pendente de pagamento";
 
@@ -69,14 +69,14 @@ export const UNIDADES_ADMINISTRATIVAS_LOTE: UnidadeAdministrativaLote[] = [
 ];
 
 export const DOCUMENTOS_DISPONIVEIS_LOTE: DocumentoLotePagamento[] = [
-  { id: "GTA-MG-AB-00018452", tipo: "GTA", serie: "AB", numero: "00018452", titularId: 1, titularNome: PESSOAS_LOTE[0].nome, status: "Gravada", valor: 18.75 },
-  { id: "GTA-MG-AB-00018453", tipo: "GTA", serie: "AB", numero: "00018453", titularId: 1, titularNome: PESSOAS_LOTE[0].nome, status: "Gravada", valor: 22.4 },
-  { id: "GTA-MG-CD-00027811", tipo: "GTA", serie: "CD", numero: "00027811", titularId: 2, titularNome: PESSOAS_LOTE[1].nome, status: "Gravada", valor: 31.9 },
-  { id: "GTA-MG-EF-00034102", tipo: "GTA", serie: "EF", numero: "00034102", titularId: 4, titularNome: PESSOAS_LOTE[3].nome, status: "Gravada", valor: 27.65 },
-  { id: "PTV-MG-2026-000091", tipo: "PTV", numero: "000091", titularId: 2, titularNome: PESSOAS_LOTE[1].nome, status: "Gravado", valor: 42.3 },
-  { id: "PTV-MG-2026-000092", tipo: "PTV", numero: "000092", titularId: 2, titularNome: PESSOAS_LOTE[1].nome, status: "Gravado", valor: 38.75 },
-  { id: "PTV-MG-2026-000145", tipo: "PTV", numero: "000145", titularId: 3, titularNome: PESSOAS_LOTE[2].nome, status: "Gravado", valor: 51.2 },
-  { id: "PTV-MG-2026-000203", tipo: "PTV", numero: "000203", titularId: 4, titularNome: PESSOAS_LOTE[3].nome, status: "Gravado", valor: 46.1 },
+  { id: "AB-00018452", tipo: "GTA", serie: "AB", numero: "00018452", titularId: 1, titularNome: PESSOAS_LOTE[0].nome, status: "Gravada", valor: 18.75 },
+  { id: "AB-00018453", tipo: "GTA", serie: "AB", numero: "00018453", titularId: 1, titularNome: PESSOAS_LOTE[0].nome, status: "Gravada", valor: 22.4 },
+  { id: "CD-00027811", tipo: "GTA", serie: "CD", numero: "00027811", titularId: 2, titularNome: PESSOAS_LOTE[1].nome, status: "Gravada", valor: 31.9 },
+  { id: "EF-00034102", tipo: "GTA", serie: "EF", numero: "00034102", titularId: 4, titularNome: PESSOAS_LOTE[3].nome, status: "Gravada", valor: 27.65 },
+  { id: "000091", tipo: "PTV", numero: "000091", titularId: 2, titularNome: PESSOAS_LOTE[1].nome, status: "Gravado", valor: 42.3 },
+  { id: "000092", tipo: "PTV", numero: "000092", titularId: 2, titularNome: PESSOAS_LOTE[1].nome, status: "Gravado", valor: 38.75 },
+  { id: "000145", tipo: "PTV", numero: "000145", titularId: 3, titularNome: PESSOAS_LOTE[2].nome, status: "Gravado", valor: 51.2 },
+  { id: "000203", tipo: "PTV", numero: "000203", titularId: 4, titularNome: PESSOAS_LOTE[3].nome, status: "Gravado", valor: 46.1 },
 ];
 
 const criarDae = (numeroLote: number, valor: number, pago: boolean): DaeLotePagamento => ({
@@ -128,7 +128,6 @@ let proximoNumero = 20260003;
 export const DOCUMENTOS_BUSCA_OPTIONS = [
   { value: "GTA", label: "GTA" },
   { value: "PTV", label: "PTV" },
-  { value: "INSPEÇÃO SANITÁRIA INDUSTRIAL", label: "INSPEÇÃO SANITÁRIA INDUSTRIAL" },
 ];
 export const DOCUMENTOS_CADASTRO_OPTIONS = DOCUMENTOS_BUSCA_OPTIONS.slice(0, 2);
 export const SITUACOES_LOTE_OPTIONS = [

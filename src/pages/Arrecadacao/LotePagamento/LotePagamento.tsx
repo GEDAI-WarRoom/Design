@@ -8,7 +8,7 @@ import {
   Eye,
   Search,
   SlidersHorizontal,
-  X,
+  X, Calendar
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, FloatSelect } from "../../../components/ui/FormKit";
@@ -166,8 +166,9 @@ export function LotePagamentoPage({ onLogout, onNavigate }: PageProps) {
               {documento === "GTA" && <FloatInput label="Série" value={serie} onChange={(value) => setSerie(value.replace(/[^a-zA-Z0-9]/g, "").toUpperCase().slice(0, 2))} maxLength={2} />}
               {documento === "GTA" && <FloatInput label="Número da GTA" value={numeroGta} onChange={(value) => setNumeroGta(value.replace(/\D/g, ""))} maxLength={12} />}
               {documento === "PTV" && <FloatInput label="Número da PTV" value={numeroPtv} onChange={(value) => setNumeroPtv(value.replace(/\D/g, ""))} maxLength={12} />}
-              <FloatInput label="Data de Pagamento (Usuário)" type="date" value={dataUsuario} onChange={setDataUsuario} />
-              <FloatInput label="Data de Pagamento (PRODEMGE)" type="date" value={dataProdemge} onChange={setDataProdemge} />
+              <FloatInput label="Data de Pagamento (Usuário)" type="date" value={dataUsuario} icon={<Calendar size={18} className="text-[#1A7A3C]" />}
+                onChange={setDataUsuario} />
+              <FloatInput label="Data de Pagamento (PRODEMGE)" type="date" value={dataProdemge} icon={<Calendar size={18} className="text-[#1A7A3C]" />} onChange={setDataProdemge} />
               <FloatSelect label="Situação" value={situacao} onChange={setSituacao} options={SITUACOES_LOTE_OPTIONS} />
               <FloatSelect label="Status do Pagamento" value={statusPagamento} onChange={setStatusPagamento} options={STATUS_PAGAMENTO_OPTIONS} />
               <button type="button" onClick={pesquisar} className="h-12 rounded-md bg-[#1A7A3C] text-sm font-semibold text-white hover:bg-[#15612F]">Pesquisar</button>
@@ -190,7 +191,7 @@ export function LotePagamentoPage({ onLogout, onNavigate }: PageProps) {
           )}
 
           {!searched ? (
-            <div className="py-12 text-center text-sm text-gray-500">Busque lotes de pagamento utilizando o número do lote ou os filtros acima.</div>
+            <div className="py-12 text-center text-sm text-gray-500">Busque lotes de pagamento utilizando o campo de busca e os filtros acima.</div>
           ) : results.length === 0 ? (
             <div className="py-12 text-center text-sm text-gray-500">Nenhum resultado foi encontrado.</div>
           ) : (
