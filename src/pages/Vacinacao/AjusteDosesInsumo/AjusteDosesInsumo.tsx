@@ -170,50 +170,50 @@ export function AjusteDosesInsumoPage({ onLogout, onNavigate }: PageProps) {
                 className="h-12 px-6 rounded-md text-white text-sm font-semibold flex items-center justify-center gap-2 transition hover:opacity-90"
                 style={{ backgroundColor: GREEN }}
               >
-                <Search size={17} /> Pesquisar
+                Pesquisar
               </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 items-end">
-                <FloatInput
-                  label="Número da Nota Fiscal"
-                  value={numeroNotaFiscal}
-                  type="number"
-                  onChange={(value) => setNumeroNotaFiscal(value.replace(/\D/g, ""))}
-                />
-                <FloatInput
-                  label="Número da Partida"
-                  value={numeroPartida}
-                  maxLength={10}
-                  placeholder="0001245/26"
-                  onChange={(value) => setNumeroPartida(value.toUpperCase().slice(0, 10))}
-                />
-                <EntitySearchInput
-                  label="Doença"
-                  placeholder="Buscar pelo nome da doença."
-                  value={doenca?.nome ?? ""}
-                  data={DOENCAS_COM_INSUMO_MOCK}
-                  searchKeys={["nome"]}
-                  columns={[{ label: "Doença", key: "nome" }]}
-                  icon={<img src={Icons.iconeDoencaUrl} alt="Doença" className="w-5 h-5 object-contain" />}
-                  title="Buscar Doença"
-                  subtitle="Busque por doenças que possuem insumos de exame vinculados:"
-                  onChange={(item) => { setDoenca(item); setTipoInsumo(""); }}
-                />
-                {doenca && tiposInsumo.length > 0 && (
-                  <FloatSelect
-                    label="Tipo de Insumo de Exame"
-                    value={tipoInsumo}
-                    options={tiposInsumo}
-                    onChange={setTipoInsumo}
-                  />
-                )}
+              <FloatInput
+                label="Número da Nota Fiscal"
+                value={numeroNotaFiscal}
+                type="number"
+                onChange={(value) => setNumeroNotaFiscal(value.replace(/\D/g, ""))}
+              />
+              <FloatInput
+                label="Número da Partida"
+                value={numeroPartida}
+                maxLength={10}
+                placeholder="0001245/26"
+                onChange={(value) => setNumeroPartida(value.toUpperCase().slice(0, 10))}
+              />
+              <EntitySearchInput
+                label="Doença"
+                placeholder="Buscar pelo nome da doença."
+                value={doenca?.nome ?? ""}
+                data={DOENCAS_COM_INSUMO_MOCK}
+                searchKeys={["nome"]}
+                columns={[{ label: "Doença", key: "nome" }]}
+                icon={<img src={Icons.iconeDoencaUrl} alt="Doença" className="w-5 h-5 object-contain" />}
+                title="Buscar Doença"
+                subtitle="Busque por doenças que possuem insumos de exame vinculados:"
+                onChange={(item) => { setDoenca(item); setTipoInsumo(""); }}
+              />
+              {doenca && tiposInsumo.length > 0 && (
                 <FloatSelect
-                  label="Situação"
-                  value={situacao}
-                  options={SITUACOES_AJUSTE_DOSES_INSUMO}
-                  onChange={setSituacao}
+                  label="Tipo de Insumo de Exame"
+                  value={tipoInsumo}
+                  options={tiposInsumo}
+                  onChange={setTipoInsumo}
                 />
+              )}
+              <FloatSelect
+                label="Situação"
+                value={situacao}
+                options={SITUACOES_AJUSTE_DOSES_INSUMO}
+                onChange={setSituacao}
+              />
             </div>
 
             {partidaInvalida && (
