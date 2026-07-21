@@ -123,9 +123,8 @@ export function AdicionarAtestadoExamePage({ onLogout, onNavigate }: PageProps) 
                 placeholder="Selecione uma doença..."
                 value={doenca ? doenca.nome : ""}
                 data={DOENCAS_CORRIGIDAS_MOCK}
-                searchKeys={["nome", "codigo"]}
+                searchKeys={["nome"]}
                 columns={[
-                  { label: "Código", key: "codigo" },
                   { label: "Nome da Doença", key: "nome" },
                 ]}
                 title="Buscar Doença"
