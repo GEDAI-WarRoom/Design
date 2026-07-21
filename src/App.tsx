@@ -138,6 +138,9 @@ import {
 } from "./pages/Arrecadacao/FundoArrecadacao/FundoArrecadacaoDetalhe";
 import { ItemReceitaPage } from "./pages/Arrecadacao/ItemReceita/ItemReceita";
 import { AdicionarItemReceitaPage } from "./pages/Arrecadacao/ItemReceita/AdicionarItemReceita";
+import { DAEBuscaPage } from "./pages/Arrecadacao/DAE/DAE";
+import { AdicionarDAEPage } from "./pages/Arrecadacao/DAE/AdicionarDAE";
+import { VisualizarDAEPage } from "./pages/Arrecadacao/DAE/VisualizarDAE";
 import { LotePagamentoPage } from "./pages/Arrecadacao/LotePagamento/LotePagamento";
 import { AdicionarLotePagamentoPage } from "./pages/Arrecadacao/LotePagamento/AdicionarLotePagamento";
 import { VisualizarLotePagamentoPage } from "./pages/Arrecadacao/LotePagamento/VisualizarLotePagamento";
@@ -334,6 +337,9 @@ export type Screen =
   | "editar-fundo-arrecadacao"
   | "item-receita"
   | "adicionar-item-receita"
+  | "dae"
+  | "adicionar-dae"
+  | "visualizar-dae"
   | "lote-pagamento"
   | "adicionar-lote-pagamento"
   | "visualizar-lote-pagamento"
@@ -1429,6 +1435,20 @@ export default function App() {
           onNavigate={handleNavigate}
         />
       );
+    case "dae":
+      return (
+        <DAEBuscaPage onLogout={handleLogout} onNavigate={handleNavigate} />
+      );
+    case "adicionar-dae":
+      return (
+        <AdicionarDAEPage onLogout={handleLogout} onNavigate={handleNavigate} />
+      );
+    case "visualizar-dae":
+      return (
+        <VisualizarDAEPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dae={screenData}
     case "lote-pagamento":
       return (
         <LotePagamentoPage

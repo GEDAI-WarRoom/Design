@@ -30,6 +30,7 @@ import {
   User,
   Users,
   Wallet,
+  ScrollText,
 } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import * as Icons from "../imports/icons";
@@ -550,6 +551,9 @@ export const thirdCategories: MenuCategory[] = [
         icon: <ListTree size={16} />,
       },
       {
+        label: "DAE",
+        route: "dae",
+        icon: <ScrollText size={16} />,
         label: "Lote de Pagamento",
         route: "lote-pagamento",
         icon: <Layers3 size={16} />,
@@ -648,9 +652,7 @@ export function DashboardPage({ onLogout, onNavigate }: any) {
 
         {/* Bloco de Cadastros (Exatamente como estava) */}
         <div className="flex flex-col bg-white rounded-xl shadow-sm p-6 mb-6 gap-6">
-          <h2 className="text-xl font-semibold text-gray-800">
-            Cadastros
-          </h2>
+          <h2 className="text-xl font-semibold text-gray-800">Cadastros</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {cadastrosCategories.map((cat) => (
               <CategoryCard key={cat.title} cat={cat} onNavigate={onNavigate} />
@@ -668,7 +670,6 @@ export function DashboardPage({ onLogout, onNavigate }: any) {
             ))}
           </div>
         </div>
-
 
         <div className="bg-white rounded-xl shadow-sm p-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
