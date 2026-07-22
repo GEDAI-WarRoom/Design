@@ -1,12 +1,12 @@
 import {
   BadgePercent,
+  Bell,
   BriefcaseBusiness,
   Calendar,
-  ChartColumn,
   ClipboardList,
+  ClipboardPlus,
   Dna,
   DollarSign,
-  FileText,
   FlaskConical,
   Globe,
   Landmark,
@@ -28,8 +28,8 @@ import {
   TowerControl,
   Truck,
   User,
-  Users,
   Wallet,
+  Scale
 } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import * as Icons from "../imports/icons";
@@ -276,14 +276,9 @@ export const cadastrosCategories: MenuCategory[] = [
         label: "Status Animal",
         route: "status-animal",
         icon: (
-          <img
-            src={Icons.iconeStatusUrl}
-            alt="Status"
-            className="w-4 h-4"
-          />
+          <img src={Icons.iconeStatusUrl} alt="Status" className="w-4 h-4" />
         ),
       },
-
     ],
   },
   {
@@ -365,6 +360,11 @@ export const secondaryCategories: MenuCategory[] = [
         icon: <PackagePlus size={16} />,
       },
       {
+        label: "Venda com Entrada de Insumos para Exames",
+        route: "venda-entrada-insumos-exames",
+        icon: <PackagePlus size={16} />,
+      },
+      {
         label: "Doação/Partilha de Vacina",
         route: "partilha-vacina",
         icon: (
@@ -387,8 +387,8 @@ export const secondaryCategories: MenuCategory[] = [
         route: "ajuste-doses-insumo",
         icon: (
           <img
-            src={Icons.iconeInsumoUrl}
-            alt="Dose de Insumo"
+            src={Icons.iconeDoseVacinaUrl}
+            alt="Dose de Vacina"
             className="w-4 h-4"
           />
         ),
@@ -455,6 +455,11 @@ export const secondaryCategories: MenuCategory[] = [
         route: "local-realizacao-exame",
         icon: <MapPinned size={16} />,
       },
+      {
+        label: "Atestado De Exame",
+        route: "atestado-exame",
+        icon: <ClipboardPlus size={16} />,
+      },
     ],
   },
   {
@@ -479,8 +484,8 @@ export const secondaryCategories: MenuCategory[] = [
     ),
     items: [
       {
-        label: "Finalidade de Trânsito",
-        route: "finalidade-transito",
+        label: "Finalidade de GTA",
+        route: "finalidade-gta",
         icon: <Route size={18} />,
       },
       {
@@ -559,6 +564,11 @@ export const thirdCategories: MenuCategory[] = [
         label: "Item da Receita",
         route: "item-receita",
         icon: <ListTree size={16} />,
+      },
+      {
+        label: "Notificações dos Estabelecimentos",
+        route: "notificacoes-estabelecimentos",
+        icon: <Scale size={16} />,
       },
       {
         label: "Lote de Pagamento",
@@ -659,9 +669,7 @@ export function DashboardPage({ onLogout, onNavigate }: any) {
 
         {/* Bloco de Cadastros (Exatamente como estava) */}
         <div className="flex flex-col bg-white rounded-xl shadow-sm p-6 mb-6 gap-6">
-          <h2 className="text-xl font-semibold text-gray-800">
-            Cadastros
-          </h2>
+          <h2 className="text-xl font-semibold text-gray-800">Cadastros</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {cadastrosCategories.map((cat) => (
               <CategoryCard key={cat.title} cat={cat} onNavigate={onNavigate} />
@@ -679,7 +687,6 @@ export function DashboardPage({ onLogout, onNavigate }: any) {
             ))}
           </div>
         </div>
-
 
         <div className="bg-white rounded-xl shadow-sm p-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">

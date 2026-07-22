@@ -171,7 +171,7 @@ export function AjusteDosesInsumoPage({ onLogout, onNavigate }: PageProps) {
                   { label: "Nome", key: "nome" },
                   { label: "UF", key: "uf" },
                 ]}
-                icon={<img src={Icons.iconeInsumoUrl} alt="Revendedora de Insumos" className="w-5 h-5 object-contain" />}
+                icon={<Store size={18} color={GREEN} />}
                 title="Buscar Revendedora de Insumos"
                 subtitle="Busque por revendedoras habilitadas para insumos de exames de brucelose e tuberculose:"
                 onChange={(item) => { setRevendedora(item); setErro(""); }}

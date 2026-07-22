@@ -6,6 +6,7 @@ import {
   Package,
   PlusCircle,
   Trash2,
+  Store
 } from "lucide-react";
 import { Cell, Pie, PieChart, Sector } from "recharts";
 import {
@@ -14,6 +15,8 @@ import {
 } from "../../../components/ui/FormKit";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
 import * as Icons from "../../../imports/icons";
+const GREEN = "#1A7A3C";
+
 import {
   criarNotaFiscalAjustada,
   notasDaRevendedora,
@@ -185,160 +188,160 @@ function DetalhesNotaFiscal({
             {open ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
           </button>
           {!disabled && onRemove && (
-          <button
-            type="button"
-            onClick={onRemove}
-            className="p-2 text-red-500 hover:bg-red-50 rounded-md transition flex-shrink-0"
-            title="Remover lote"
-          >
-            <Trash2 size={17} />
-          </button>
+            <button
+              type="button"
+              onClick={onRemove}
+              className="p-2 text-red-500 hover:bg-red-50 rounded-md transition flex-shrink-0"
+              title="Remover lote"
+            >
+              <Trash2 size={17} />
+            </button>
           )}
         </div>
       </div>
 
       {open && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start animate-fadeIn">
-              {nota.itens.map((item) => (
-                (() => {
-                  const minimizado = itensMinimizados[item.id] ?? false;
-                  const saldo = [
-                    { name: "Vencidas", value: item.dosesVencidas, color: CORES_SALDO.vencidas },
-                    { name: "Descartadas", value: item.dosesDescartadas, color: CORES_SALDO.descartadas },
-                    { name: "Partilhadas", value: item.dosesPartilhadas, color: CORES_SALDO.partilhadas },
-                    { name: "Utilizadas", value: item.dosesUtilizadas, color: CORES_SALDO.utilizadas },
-                    { name: "Disponíveis", value: item.dosesDisponiveis, color: CORES_SALDO.disponiveis },
-                  ];
-                  const ativoNesteItem = graficoAtivo?.itemId === item.id;
-                  const fatiaAtiva = ativoNesteItem ? saldo[graficoAtivo.index] : null;
-                  const total = saldo.reduce((soma, categoria) => soma + categoria.value, 0);
-                  const porcentagem = fatiaAtiva && total > 0
-                    ? `${((fatiaAtiva.value / total) * 100).toFixed(1)}%`
-                    : "";
+          {nota.itens.map((item) => (
+            (() => {
+              const minimizado = itensMinimizados[item.id] ?? false;
+              const saldo = [
+                { name: "Vencidas", value: item.dosesVencidas, color: CORES_SALDO.vencidas },
+                { name: "Descartadas", value: item.dosesDescartadas, color: CORES_SALDO.descartadas },
+                { name: "Partilhadas", value: item.dosesPartilhadas, color: CORES_SALDO.partilhadas },
+                { name: "Utilizadas", value: item.dosesUtilizadas, color: CORES_SALDO.utilizadas },
+                { name: "Disponíveis", value: item.dosesDisponiveis, color: CORES_SALDO.disponiveis },
+              ];
+              const ativoNesteItem = graficoAtivo?.itemId === item.id;
+              const fatiaAtiva = ativoNesteItem ? saldo[graficoAtivo.index] : null;
+              const total = saldo.reduce((soma, categoria) => soma + categoria.value, 0);
+              const porcentagem = fatiaAtiva && total > 0
+                ? `${((fatiaAtiva.value / total) * 100).toFixed(1)}%`
+                : "";
 
-                  return (
-                  <div key={item.id} className={`border border-gray-200 rounded-xl bg-white shadow-sm relative transition-all ${minimizado ? "p-2.5" : "p-4"}`}>
-                    <div className={`flex items-center justify-between ${minimizado ? "" : "border-b border-gray-100 pb-2 mb-3"}`}>
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className="text-xs font-semibold text-gray-800">Apresentação</span>
-                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-gray-50 border border-gray-200 rounded text-[10px] font-semibold text-gray-600 whitespace-nowrap">
-                          <Package size={10} /> {item.dosesPorFrasco} doses/frasco
+              return (
+                <div key={item.id} className={`border border-gray-200 rounded-xl bg-white shadow-sm relative transition-all ${minimizado ? "p-2.5" : "p-4"}`}>
+                  <div className={`flex items-center justify-between ${minimizado ? "" : "border-b border-gray-100 pb-2 mb-3"}`}>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="text-xs font-semibold text-gray-800">Apresentação</span>
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-gray-50 border border-gray-200 rounded text-[10px] font-semibold text-gray-600 whitespace-nowrap">
+                        <Package size={10} /> {item.dosesPorFrasco} doses/frasco
+                      </span>
+                      {minimizado && (
+                        <span className="text-[11px] text-gray-400 whitespace-nowrap">
+                          ({item.dosesDisponiveis} disp. · {item.dosesLancadas || 0} lançadas)
                         </span>
-                        {minimizado && (
-                          <span className="text-[11px] text-gray-400 whitespace-nowrap">
-                            ({item.dosesDisponiveis} disp. · {item.dosesLancadas || 0} lançadas)
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-1 flex-shrink-0">
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1 flex-shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => setItensMinimizados((atual) => ({ ...atual, [item.id]: !minimizado }))}
+                        className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 transition"
+                        title={minimizado ? "Expandir apresentação" : "Minimizar apresentação"}
+                      >
+                        {minimizado ? <ChevronDown size={15} /> : <ChevronUp size={15} />}
+                      </button>
+                      {!disabled && (
                         <button
                           type="button"
-                          onClick={() => setItensMinimizados((atual) => ({ ...atual, [item.id]: !minimizado }))}
-                          className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 transition"
-                          title={minimizado ? "Expandir apresentação" : "Minimizar apresentação"}
+                          onClick={() => removerItem(item.id)}
+                          className="text-gray-400 hover:text-red-500 p-1 rounded-lg hover:bg-red-50 transition"
+                          title="Remover apresentação"
                         >
-                          {minimizado ? <ChevronDown size={15} /> : <ChevronUp size={15} />}
+                          <Trash2 size={15} />
                         </button>
-                        {!disabled && (
-                          <button
-                            type="button"
-                            onClick={() => removerItem(item.id)}
-                            className="text-gray-400 hover:text-red-500 p-1 rounded-lg hover:bg-red-50 transition"
-                            title="Remover apresentação"
-                          >
-                            <Trash2 size={15} />
-                          </button>
-                        )}
-                      </div>
+                      )}
                     </div>
+                  </div>
 
-                    {!minimizado && (
-                      <div className="animate-fadeIn">
-                        <div className="flex flex-col sm:flex-row gap-4 items-center">
-                          <div className="w-24 h-24 flex items-center justify-center relative select-none flex-shrink-0">
-                            <PieChart width={96} height={96}>
-                              <Pie
-                                data={saldo}
-                                cx="50%"
-                                cy="50%"
-                                innerRadius={26}
-                                outerRadius={35}
-                                paddingAngle={2}
-                                dataKey="value"
-                                stroke="none"
-                                activeIndex={ativoNesteItem ? graficoAtivo.index : undefined}
-                                activeShape={renderActiveShape}
-                                onMouseEnter={(_, itemIndex) => setGraficoAtivo({ itemId: item.id, index: itemIndex })}
-                                onMouseLeave={() => setGraficoAtivo(null)}
-                              >
-                                {saldo.map((categoria) => <Cell key={categoria.name} fill={categoria.color} />)}
-                              </Pie>
-                            </PieChart>
-                            <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
-                              <span className="text-sm font-black leading-none" style={{ color: fatiaAtiva?.color ?? "#1f2937" }}>
-                                {fatiaAtiva?.value ?? total}
-                              </span>
-                              <span className="text-[7px] text-gray-500 font-semibold uppercase max-w-[52px] truncate mt-0.5">
-                                {fatiaAtiva?.name ?? "Total"}
-                              </span>
-                              {fatiaAtiva && <span className="text-[8px] font-bold" style={{ color: fatiaAtiva.color }}>{porcentagem}</span>}
+                  {!minimizado && (
+                    <div className="animate-fadeIn">
+                      <div className="flex flex-col sm:flex-row gap-4 items-center">
+                        <div className="w-24 h-24 flex items-center justify-center relative select-none flex-shrink-0">
+                          <PieChart width={96} height={96}>
+                            <Pie
+                              data={saldo}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={26}
+                              outerRadius={35}
+                              paddingAngle={2}
+                              dataKey="value"
+                              stroke="none"
+                              activeIndex={ativoNesteItem ? graficoAtivo.index : undefined}
+                              activeShape={renderActiveShape}
+                              onMouseEnter={(_, itemIndex) => setGraficoAtivo({ itemId: item.id, index: itemIndex })}
+                              onMouseLeave={() => setGraficoAtivo(null)}
+                            >
+                              {saldo.map((categoria) => <Cell key={categoria.name} fill={categoria.color} />)}
+                            </Pie>
+                          </PieChart>
+                          <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
+                            <span className="text-sm font-black leading-none" style={{ color: fatiaAtiva?.color ?? "#1f2937" }}>
+                              {fatiaAtiva?.value ?? total}
+                            </span>
+                            <span className="text-[7px] text-gray-500 font-semibold uppercase max-w-[52px] truncate mt-0.5">
+                              {fatiaAtiva?.name ?? "Total"}
+                            </span>
+                            {fatiaAtiva && <span className="text-[8px] font-bold" style={{ color: fatiaAtiva.color }}>{porcentagem}</span>}
+                          </div>
+                        </div>
+
+                        <div className="flex gap-2 flex-1 w-full justify-center">
+                          <div className="flex flex-col border border-gray-200 rounded-xl px-2.5 py-2 w-full max-w-[150px] gap-1 bg-gray-50/80 justify-between">
+                            <span className="text-[11px] text-gray-600 font-medium text-center">Disponíveis</span>
+                            <div className="flex gap-2 items-end justify-center py-0.5">
+                              <div className="flex flex-col items-center flex-1"><span className="text-sm font-bold text-gray-700">{item.frascosDisponiveis}</span><span className="text-[9px] text-gray-400">Frascos</span></div>
+                              <div className="flex flex-col items-center flex-1"><span className="text-sm font-bold text-gray-700">{item.dosesDisponiveis}</span><span className="text-[9px] text-gray-400">Doses</span></div>
                             </div>
                           </div>
 
-                          <div className="flex gap-2 flex-1 w-full justify-center">
-                            <div className="flex flex-col border border-gray-200 rounded-xl px-2.5 py-2 w-full max-w-[150px] gap-1 bg-gray-50/80 justify-between">
-                              <span className="text-[11px] text-gray-600 font-medium text-center">Disponíveis</span>
-                              <div className="flex gap-2 items-end justify-center py-0.5">
-                                <div className="flex flex-col items-center flex-1"><span className="text-sm font-bold text-gray-700">{item.frascosDisponiveis}</span><span className="text-[9px] text-gray-400">Frascos</span></div>
-                                <div className="flex flex-col items-center flex-1"><span className="text-sm font-bold text-gray-700">{item.dosesDisponiveis}</span><span className="text-[9px] text-gray-400">Doses</span></div>
-                              </div>
-                            </div>
-
-                            <div className="flex flex-col border border-gray-200 rounded-xl px-2.5 py-2 w-full max-w-[150px] gap-1 bg-white justify-between">
-                              <span className="text-[11px] text-gray-500 font-medium text-center">Lançadas <span className="text-red-500">*</span></span>
-                              <div className="flex gap-1.5 items-end justify-center">
-                                <label className="flex flex-col flex-1 min-w-0">
-                                  <input
-                                    aria-label={`Frascos lançados da partida ${item.numeroPartida}`}
-                                    type="number"
-                                    min="0"
-                                    value={item.frascosLancados}
-                                    disabled={disabled}
-                                    placeholder="0"
-                                    onChange={(event) => {
-                                      const frascos = event.target.value.replace(/\D/g, "");
-                                      alterarItem(item.id, {
-                                        frascosLancados: frascos,
-                                        dosesLancadas: frascos === "" ? "" : String(Number(frascos) * item.dosesPorFrasco),
-                                      });
-                                    }}
-                                    className="w-full text-center bg-white border border-gray-200 rounded-lg text-xs font-black p-1 focus:outline-none focus:border-[#1A7A3C] disabled:bg-gray-50 disabled:text-gray-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                  />
-                                  <span className="text-[9px] text-gray-400 font-semibold text-center mt-0.5">Frascos</span>
-                                </label>
-                                <label className="flex flex-col flex-1 min-w-0">
-                                  <input
-                                    aria-label={`Doses lançadas da partida ${item.numeroPartida}`}
-                                    type="number"
-                                    min="0"
-                                    value={item.dosesLancadas}
-                                    disabled={disabled}
-                                    placeholder="0"
-                                    onChange={(event) => {
-                                      const doses = event.target.value.replace(/\D/g, "");
-                                      alterarItem(item.id, {
-                                        dosesLancadas: doses,
-                                        frascosLancados: doses === "" ? "" : String(Math.ceil(Number(doses) / item.dosesPorFrasco)),
-                                      });
-                                    }}
-                                    className="w-full text-center bg-white border border-gray-200 rounded-lg text-xs font-black p-1 focus:outline-none focus:border-[#1A7A3C] disabled:bg-gray-50 disabled:text-gray-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                  />
-                                  <span className="text-[9px] text-gray-400 font-semibold text-center mt-0.5">Doses</span>
-                                </label>
-                              </div>
+                          <div className="flex flex-col border border-gray-200 rounded-xl px-2.5 py-2 w-full max-w-[150px] gap-1 bg-white justify-between">
+                            <span className="text-[11px] text-gray-500 font-medium text-center">Lançadas <span className="text-red-500">*</span></span>
+                            <div className="flex gap-1.5 items-end justify-center">
+                              <label className="flex flex-col flex-1 min-w-0">
+                                <input
+                                  aria-label={`Frascos lançados da partida ${item.numeroPartida}`}
+                                  type="number"
+                                  min="0"
+                                  value={item.frascosLancados}
+                                  disabled={disabled}
+                                  placeholder="0"
+                                  onChange={(event) => {
+                                    const frascos = event.target.value.replace(/\D/g, "");
+                                    alterarItem(item.id, {
+                                      frascosLancados: frascos,
+                                      dosesLancadas: frascos === "" ? "" : String(Number(frascos) * item.dosesPorFrasco),
+                                    });
+                                  }}
+                                  className="w-full text-center bg-white border border-gray-200 rounded-lg text-xs font-black p-1 focus:outline-none focus:border-[#1A7A3C] disabled:bg-gray-50 disabled:text-gray-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                />
+                                <span className="text-[9px] text-gray-400 font-semibold text-center mt-0.5">Frascos</span>
+                              </label>
+                              <label className="flex flex-col flex-1 min-w-0">
+                                <input
+                                  aria-label={`Doses lançadas da partida ${item.numeroPartida}`}
+                                  type="number"
+                                  min="0"
+                                  value={item.dosesLancadas}
+                                  disabled={disabled}
+                                  placeholder="0"
+                                  onChange={(event) => {
+                                    const doses = event.target.value.replace(/\D/g, "");
+                                    alterarItem(item.id, {
+                                      dosesLancadas: doses,
+                                      frascosLancados: doses === "" ? "" : String(Math.ceil(Number(doses) / item.dosesPorFrasco)),
+                                    });
+                                  }}
+                                  className="w-full text-center bg-white border border-gray-200 rounded-lg text-xs font-black p-1 focus:outline-none focus:border-[#1A7A3C] disabled:bg-gray-50 disabled:text-gray-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                />
+                                <span className="text-[9px] text-gray-400 font-semibold text-center mt-0.5">Doses</span>
+                              </label>
                             </div>
                           </div>
                         </div>
+                      </div>
 
                     <div className="w-full h-[52px] mt-4 bg-white border border-gray-200 rounded-lg px-3 py-1.5 flex flex-col justify-center text-left focus-within:border-[#1A7A3C] shadow-sm transition-colors">
                         <span className="text-[10px] text-gray-500 select-none mb-0.5">Justificativa <span className="text-red-500">*</span></span>
@@ -353,21 +356,21 @@ function DetalhesNotaFiscal({
                       />
                     </div>
 
-                        <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 mt-3 pt-2 border-t border-gray-100 text-[9px]">
-                          {saldo.map((categoria) => (
-                            <div key={categoria.name} className="flex items-center gap-1 bg-gray-50 px-1 py-0.5 rounded border border-gray-100">
-                              <span className="w-1 h-1 rounded-full" style={{ backgroundColor: categoria.color }} />
-                              <span className="text-gray-400 font-medium">{categoria.name}:</span>
-                              <span className="font-bold text-gray-600">{categoria.value}</span>
-                            </div>
-                          ))}
-                        </div>
+                      <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 mt-3 pt-2 border-t border-gray-100 text-[9px]">
+                        {saldo.map((categoria) => (
+                          <div key={categoria.name} className="flex items-center gap-1 bg-gray-50 px-1 py-0.5 rounded border border-gray-100">
+                            <span className="w-1 h-1 rounded-full" style={{ backgroundColor: categoria.color }} />
+                            <span className="text-gray-400 font-medium">{categoria.name}:</span>
+                            <span className="font-bold text-gray-600">{categoria.value}</span>
+                          </div>
+                        ))}
                       </div>
-                    )}
-                  </div>
-                  );
-                })()
-              ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })()
+          ))}
         </div>
       )}
     </article>
@@ -411,7 +414,7 @@ export function AjusteDosesInsumoForm({
               { label: "Nome", key: "nome" },
               { label: "UF", key: "uf" },
             ]}
-            icon={<img src={Icons.iconeInsumoUrl} alt="Revendedora de Insumos" className="w-5 h-5 object-contain" />}
+            icon={<Store size={18} color={GREEN} />}
             title="Buscar Revendedora de Insumos"
             subtitle="Busque por revendedoras habilitadas para insumos de exames de brucelose e tuberculose:"
             confirmLabel="Selecionar"
