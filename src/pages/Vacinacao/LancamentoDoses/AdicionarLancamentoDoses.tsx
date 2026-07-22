@@ -49,6 +49,123 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
+function SimNao({
+  label,
+  name,
+  value,
+  onChange,
+  required,
+}: {
+  label: string;
+  name: string;
+  value: string;
+  onChange: (v: string) => void;
+  required?: boolean;
+}) {
+  return (
+    <div className="flex flex-col gap-2">
+      <span className="text-sm font-medium text-gray-700">
+        {label}
+        {required && <span className="text-red-500 ml-0.5">*</span>}
+      </span>
+      <div className="flex gap-6 h-8 items-center">
+        <CustomRadio label="Sim" name={name} value="Sim" checked={value === "Sim"} onChange={() => onChange("Sim")} />
+        <CustomRadio label="Não" name={name} value="Não" checked={value === "Não"} onChange={() => onChange("Não")} />
+      </div>
+    </div>
+  );
+}
+
+function SubGrupo({ titulo, children, comDivisor = false }) {
+  return (
+    <div className={comDivisor ? "border-t border-gray-100 pt-6 mt-6" : ""}>
+      <h3 className="text-sm font-semibold text-gray-800 mb-3">{titulo}</h3>
+      {children}
+    </div>
+  );
+}
+
+
+interface AdicionarVendaVacinaProps {
+  onLogout: () => void;
+  onNavigate: (screen: any, data?: any) => void;
+}
+
+
+interface DoseCategory {
+  name: string;
+  value: number;
+  color: string;
+}
+
+interface BatchPanelData {
+  batchNumber: string;
+  expirationDate: string;
+  totalDoses: number;
+  totalFrascos: number;
+  availableDoses: number;
+  availableFrascos: number;
+  categories: DoseCategory[];
+}
+
+const LEGEND_ITEMS = [
+  { name: "Vencidas", color: "#ef4444" },
+  { name: "Descartadas", color: "#9ca3af" },
+  { name: "Partilhadas", color: "#3b82f6" },
+  { name: "Utilizadas", color: "#f59e0b" },
+  { name: "Disponíveis", color: "#22c55e" },
+];
+
+const EXPLORACOES_MOCK = [
+  {
+    id: 1,
+    codigo: "420010400050001",
+    estabelecimentoFormatado: "54001040005001 -\n Fazenda Vertentes",
+    grupoEspecieFormatado: "Bovinos -\n Bovino",
+    produtoresFormatado: "555.009.956-40 -\n  José Aarão Neto"
+  },
+  {
+    id: 2,
+    codigo: "420010400050002",
+    estabelecimentoFormatado: "42001040005001 - \n Sitio Recanto",
+    grupoEspecieFormatado: "Abelhas -\n Abelha com Ferrão",
+    produtoresFormatado: "111.222.333-44 -\n Maria Carmo Souza "
+  }
+];
+
+const BATCHES_MOCK: BatchPanelData[] = [
+  {
+    batchNumber: "006/19",
+    expirationDate: "12/06/2026",
+    totalDoses: 200,
+    totalFrascos: 5,
+    availableDoses: 100,
+    availableFrascos: 5,
+    categories: [
+      { name: "Vencidas", value: 15, color: "#ef4444" },
+      { name: "Descartadas", value: 10, color: "#9ca3af" },
+      { name: "Partilhadas", value: 25, color: "#3b82f6" },
+      { name: "Utilizadas", value: 50, color: "#f59e0b" },
+      { name: "Disponíveis", value: 100, color: "#22c55e" },
+    ],
+  },
+  {
+    batchNumber: "007/19",
+    expirationDate: "20/08/2026",
+    totalDoses: 350,
+    totalFrascos: 10,
+    availableDoses: 280,
+    availableFrascos: 8,
+    categories: [
+      { name: "Vencidas", value: 0, color: "#ef4444" },
+      { name: "Descartadas", value: 5, color: "#9ca3af" },
+      { name: "Partilhadas", value: 15, color: "#3b82f6" },
+      { name: "Utilizadas", value: 50, color: "#f59e0b" },
+      { name: "Disponíveis", value: 280, color: "#22c55e" },
+    ],
+  },
+];
+
 const renderActiveShape = (props: any) => {
   const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } = props;
   return (
@@ -188,72 +305,30 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate }: Pag
                   );
 
                   return (
-                    <div key={`grupo-${grupo.nome}`} className="border border-gray-200 rounded-xl p-4 bg-gray-50/30 relative">
-                      {/* Cabeçalho do Lote */}
-                      <div className="flex items-center justify-between mb-4 px-1">
-                        <div className="flex items-center gap-2 select-none">
+                    <div key={`grupo-${grupo.nome}`} className="border border-gray-200 rounded-xl p-4 bg-gray-50/30">
+                      <div className="flex items-center justify-between gap-4 mb-4">
+                        <div className="flex items-center gap-2">
                           <Package size={24} color={GREEN} />
-
                           <span className="text-sm font-bold text-gray-800">Lote: {numeroLote}</span>
-
-                          {/* Tooltip com os detalhes do lote */}
-                          <div className="relative group/lote-info flex-shrink-0 z-20">
-                            <Info size={14} className="text-gray-400 cursor-help" />
-                            <div className="fixed inset-0 bg-black/15 hidden group-hover/lote-info:block pointer-events-none z-[998] animate-fadeIn" />
-                            <div className="absolute left-0 top-full mt-2 w-60 bg-white border border-gray-100 rounded-2xl shadow-xl hidden group-hover/lote-info:block animate-fadeIn z-[999] text-left overflow-hidden">
-                              <div className="flex items-center gap-1.5 border-b border-gray-100 p-3">
-                                <Package size={13} className="text-gray-500" />
-                                <span className="text-[11px] font-extrabold text-gray-800">Nº de Partida: {numeroLote}</span>
-                              </div>
-                              <div className="p-3 flex flex-col gap-2.5 text-[11px] text-gray-500 bg-white">
-                                <div className="flex justify-between items-center gap-3">
-                                  <span>Doença:</span>
-                                  <span className="font-bold text-gray-700 text-right">{lotePrincipal?.doenca || "—"}</span>
-                                </div>
-                                <div className="flex justify-between items-center gap-3">
-                                  <span>Tipo de Vacina:</span>
-                                  <span className="font-bold text-gray-700">{lotePrincipal?.tipoVacina || "B19"}</span>
-                                </div>
-                                <div className="flex justify-between items-center gap-3">
-                                  <span>Laboratório:</span>
-                                  <span className="font-bold text-gray-700">{lotePrincipal?.laboratorio || "Biovet"}</span>
-                                </div>
-                                <div className="flex justify-between items-center gap-3">
-                                  <span>Validade:</span>
-                                  <span className="font-bold text-gray-700">{lotePrincipal?.validade || "15/08/2027"}</span>
-                                </div>
-                              </div>
-                              <div className="bg-gray-50 border-t border-gray-100 p-3 flex justify-between items-center text-[11px] font-bold text-green-700">
-                                <span>Doses Totais Lote:</span>
-                                <span>{dosesTotaisLote}</span>
-                              </div>
-                            </div>
-                          </div>
-
                           {isNotaMinimizada && (
-                            <span className="text-[11px] text-gray-400 font-medium normal-case">
-                              ({grupo.partidas.length} {grupo.partidas.length === 1 ? 'partida oculta' : 'partidas ocultas'})
+                            <span className="text-[11px] text-gray-400">
+                              ({grupo.partidas.length} {grupo.partidas.length === 1 ? "partida oculta" : "partidas ocultas"})
                             </span>
                           )}
                         </div>
-
-                        {/* Ações do Lote */}
                         <div className="flex items-center gap-1">
                           <button
                             type="button"
-                            onClick={() => setNotasListasMinimizadas(prev => ({ ...prev, [grupo.nome]: !isNotaMinimizada }))}
-                            className="text-gray-400 hover:text-gray-600 p-1 rounded transition hover:bg-gray-100"
+                            onClick={() => setNotasListasMinimizadas((prev) => ({ ...prev, [grupo.nome]: !isNotaMinimizada }))}
+                            className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded"
                             title={isNotaMinimizada ? "Expandir lote" : "Minimizar lote"}
                           >
                             {isNotaMinimizada ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
                           </button>
-
                           <button
                             type="button"
-                            onClick={() => {
-                              setNotasFiscaisOrigem(notasFiscaisOrigem.filter(item => item.nome !== grupo.nome));
-                            }}
-                            className="text-gray-400 hover:text-red-500 p-1 rounded transition hover:bg-red-50"
+                            onClick={() => setNotasFiscaisOrigem(notasFiscaisOrigem.filter((item) => item.nome !== grupo.nome))}
+                            className="p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded"
                             title="Remover lote"
                           >
                             <Trash2 size={16} />
@@ -262,253 +337,63 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate }: Pag
                       </div>
 
                       {!isNotaMinimizada && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start animate-slideDown">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {grupo.partidas.map((nfItem: any) => {
-                            const DOSES_POR_FRASCO = nfItem.dosesPerFrasco || 20;
-                            const TOTAL_DISPONIVEL = nfItem.dosesDisponiveisTotais || 100;
-                            const validadeLote = nfItem.validade || "20/12/2026";
-
-                            const verificarVencimento = (dataStr: string) => {
-                              if (!dataStr) return false;
-                              const [dia, mes, ano] = dataStr.split("/").map(Number);
-                              const dataValidade = new Date(ano, mes - 1, dia);
-                              return dataValidade < new Date();
-                            };
-                            const isVencido = verificarVencimento(validadeLote);
-
-                            const dadosGrafico = isVencido
-                              ? [
-                                { name: "Vencidas", value: TOTAL_DISPONIVEL, color: "#ef4444" },
-                                { name: "Descartadas", value: 0, color: "#9ca3af" },
-                                { name: "Partilhadas", value: 0, color: "#3b82f6" },
-                                { name: "Utilizadas", value: 0, color: "#f59e0b" },
-                                { name: "Disponíveis", value: 0, color: "#22c55e" },
-                              ]
-                              : [
-                                { name: "Vencidas", value: 0, color: "#ef4444" },
-                                { name: "Descartadas", value: 10, color: "#9ca3af" },
-                                { name: "Partilhadas", value: 20, color: "#3b82f6" },
-                                { name: "Utilizadas", value: 30, color: "#f59e0b" },
-                                { name: "Disponíveis", value: TOTAL_DISPONIVEL >= 60 ? TOTAL_DISPONIVEL - 60 : 40, color: "#22c55e" },
-                              ];
-
-                            const estaAtivoNesteLote = graficoAtivo?.loteId === nfItem.id;
-                            const fatiaAtiva = estaAtivoNesteLote ? dadosGrafico[graficoAtivo.index] : null;
-                            const totalDosesGrafico = dadosGrafico.reduce((s, d) => s + d.value, 0);
-                            const porcentagem = fatiaAtiva ? ((fatiaAtiva.value / totalDosesGrafico) * 100).toFixed(1) : null;
-
-                            const DOSES_DISPONIVEIS = dadosGrafico.find(d => d.name === "Disponíveis")?.value ?? 0;
-                            const FRASCOS_DISPONIVEIS = Math.floor(DOSES_DISPONIVEIS / DOSES_POR_FRASCO);
-
-                            const isLoteMinimizado = lotesMinimizados[nfItem.id] || false;
-
+                            const dosesPorFrasco = nfItem.dosesPerFrasco || 20;
+                            const dosesDisponiveis = nfItem.dosesDisponiveisTotais || 0;
                             return (
-                              <div
-                                key={`lote-${nfItem.id}`}
-                                className={`border border-gray-200 rounded-xl bg-white shadow-sm flex flex-col overflow-visible relative group transition-all duration-200 h-auto ${isLoteMinimizado ? "p-2.5 pb-2 justify-start" : "p-4 justify-between"
-                                  }`}
-                              >
-                                <div className="absolute top-2.5 right-2.5 flex items-center gap-1 z-10">
-                                  <button
-                                    type="button"
-                                    onClick={() => setLotesMinimizados(prev => ({ ...prev, [nfItem.id]: !isLoteMinimizado }))}
-                                    className="text-gray-400 hover:text-gray-600 p-1 rounded-lg transition hover:bg-gray-100"
-                                    title={isLoteMinimizado ? "Expandir Lote" : "Minimizar Lote"}
-                                  >
-                                    {isLoteMinimizado ? <ChevronDown size={15} /> : <ChevronUp size={15} />}
-                                  </button>
-
-                                  <button
-                                    type="button"
-                                    onClick={() => setNotasFiscaisOrigem(notasFiscaisOrigem.filter(item => item.id !== nfItem.id))}
-                                    className="text-gray-400 hover:text-red-500 p-1 rounded-lg transition hover:bg-red-50"
-                                    title="Remover Lote"
-                                  >
-                                    <Trash2 size={15} />
-                                  </button>
+                              <div key={nfItem.id} className="border border-gray-200 rounded-xl bg-white p-4">
+                                <div className="flex items-center justify-between border-b border-gray-100 pb-2 mb-3">
+                                  <span className="text-xs font-semibold text-gray-800">Apresentação</span>
+                                  <span className="text-[10px] font-semibold text-gray-600">{dosesPorFrasco} doses/frasco</span>
                                 </div>
-
-                                <div className={`flex items-center justify-between border-gray-100 overflow-visible pr-14 ${isLoteMinimizado ? "border-none pb-0 mb-0" : "border-b pb-2 mb-3"
-                                  }`}>
-                                  <div className="flex items-center gap-2 overflow-visible">
-                                    <span className="text-xs font-semibold text-gray-800 select-none">
-                                      Apresentação
-                                    </span>
-
-                                    <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-600 text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">
-                                      <PillBottle size={10} className="text-gray-400" />
-                                      {DOSES_POR_FRASCO} doses/frasco
-                                    </span>
-
-                                    {isLoteMinimizado && (
-                                      <span className="text-[11px] text-gray-400 font-medium ml-2 animate-fadeIn">
-                                        ({DOSES_DISPONIVEIS} disp. · {nfItem.quantidadeDoses || 0} lançadas)
-                                      </span>
-                                    )}
+                                <div className="grid grid-cols-2 gap-3">
+                                  <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 text-center">
+                                    <span className="block text-[11px] text-gray-500">Disponíveis</span>
+                                    <strong className="block text-sm text-gray-700">{dosesDisponiveis}</strong>
+                                    <span className="text-[9px] text-gray-400">Doses</span>
                                   </div>
-                                </div>
-
-                                {!isLoteMinimizado && (
-                                  <div className="animate-slideDown">
-                                    <div className="flex items-center gap-4 z-10 mt-3">
-
-                                      <div className="w-24 h-24 flex items-center justify-center relative select-none">
-                                        <PieChart width={96} height={96} margin={{ top: 2, right: 2, bottom: 2, left: 2 }}>
-                                          <Pie
-                                            data={dadosGrafico}
-                                            cx="50%"
-                                            cy="50%"
-                                            innerRadius={26}
-                                            outerRadius={35}
-                                            paddingAngle={2}
-                                            dataKey="value"
-                                            stroke="none"
-                                            activeIndex={estaAtivoNesteLote ? graficoAtivo.index : undefined}
-                                            activeShape={renderActiveShape}
-                                            onMouseEnter={(_, index) => setGraficoAtivo({ loteId: nfItem.id, index })}
-                                            onMouseLeave={() => setGraficoAtivo(null)}
-                                          >
-                                            {dadosGrafico.map((entry, idx) => (
-                                              <Cell
-                                                key={`cell-${idx}`}
-                                                fill={entry.color}
-                                                className="cursor-pointer transition-all duration-200 outline-none"
-                                              />
-                                            ))}
-                                          </Pie>
-                                        </PieChart>
-
-                                        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
-                                          {fatiaAtiva ? (
-                                            <div className="flex flex-col items-center justify-center">
-                                              <span className="text-xs font-bold leading-none animate-fadeIn" style={{ color: fatiaAtiva.color }}>
-                                                {fatiaAtiva.value}
-                                              </span>
-                                              <span className="text-[7px] text-gray-500 font-semibold leading-tight uppercase truncate max-w-[50px] mt-0.5 animate-fadeIn">
-                                                {fatiaAtiva.name}
-                                              </span>
-                                              <span className="text-[8px] font-bold mt-0.5 animate-fadeIn" style={{ color: fatiaAtiva.color }}>
-                                                {porcentagem}%
-                                              </span>
-                                            </div>
-                                          ) : (
-                                            <div className="flex flex-col items-center justify-center">
-                                              <span className="text-base font-black text-gray-800 leading-none">
-                                                {totalDosesGrafico}
-                                              </span>
-                                              <span className="text-[7px] font-bold text-gray-400 mt-0.5 uppercase tracking-wider">
-                                                Total
-                                              </span>
-                                            </div>
-                                          )}
-                                        </div>
-                                      </div>
-
-                                      <div className="flex gap-2 flex-1 justify-start items-stretch">
-
-                                        <div className="flex flex-col border border-gray-200 rounded-xl px-2.5 py-2 w-full max-w-[130px] gap-1 bg-gray-50/80 justify-between">
-                                          <span className="text-[11px] text-gray-600 font-medium text-center">Disponíveis</span>
-
-                                          <div className="flex gap-2 items-end justify-center py-0.5">
-                                            <div className="flex flex-col items-center flex-1">
-                                              <span className="text-sm font-bold text-gray-700 leading-none">
-                                                {FRASCOS_DISPONIVEIS}
-                                              </span>
-                                              <span className="text-[9px] text-gray-400 font-medium mt-0.5">Frascos</span>
-                                            </div>
-                                            <div className="flex flex-col items-center flex-1">
-                                              <span className="text-sm font-bold text-gray-700 leading-none">
-                                                {DOSES_DISPONIVEIS}
-                                              </span>
-                                              <span className="text-[9px] text-gray-400 font-medium mt-0.5">Doses</span>
-                                            </div>
-                                          </div>
-                                        </div>
-
-                                        <div className="flex flex-col border border-gray-200 rounded-xl px-2.5 py-2 w-full max-w-[130px] gap-1 bg-white justify-between">
-                                          <span className="text-[11px] text-gray-500 font-medium text-center">Lançadas <span className="text-red-500">*</span></span>
-
-                                          <div className="flex gap-1.5 items-end justify-center">
-                                            <div className="flex flex-col flex-1 min-w-[40px]">
-                                              <input
-                                                type="number"
-                                                min="0"
-                                                value={nfItem.quantidadeFrascos || ""}
-                                                placeholder="0"
-                                                onChange={(e) => {
-                                                  const f = Number(e.target.value);
-                                                  const d = f * DOSES_POR_FRASCO;
-                                                  setNotasFiscaisOrigem(notasFiscaisOrigem.map(item =>
-                                                    item.id === nfItem.id ? { ...item, quantidadeDoses: d, quantidadeFrascos: f } : item
-                                                  ));
-                                                }}
-                                                className="w-full text-center bg-white border border-gray-200 rounded-lg text-xs font-black p-1 focus:outline-none focus:border-[#1A7A3C] text-gray-800 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                              />
-                                              <span className="text-[9px] text-gray-400 font-semibold text-center mt-0.5">Frascos</span>
-                                            </div>
-
-                                            <div className="flex flex-col flex-1 min-w-[40px]">
-                                              <input
-                                                type="number"
-                                                min="0"
-                                                value={nfItem.quantidadeDoses || ""}
-                                                placeholder="0"
-                                                onChange={(e) => {
-                                                  const d = Number(e.target.value);
-                                                  const f = Math.ceil(d / DOSES_POR_FRASCO);
-                                                  setNotasFiscaisOrigem(notasFiscaisOrigem.map(item =>
-                                                    item.id === nfItem.id ? { ...item, quantidadeDoses: d, quantidadeFrascos: f } : item
-                                                  ));
-                                                }}
-                                                className="w-full text-center bg-white border border-gray-200 rounded-lg text-xs font-black p-1 focus:outline-none focus:border-[#1A7A3C] text-gray-800 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                              />
-                                              <span className="text-[9px] text-gray-400 font-semibold text-center mt-0.5">Doses</span>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-
-                                    {/* Campo de Justificativa */}
-                                    <div className="w-full mt-4 bg-white border border-gray-200 rounded-lg px-3 py-1.5 flex flex-col justify-center text-left focus-within:border-[#1A7A3C] shadow-sm transition-colors">
-                                      <span className="text-[10px] font-regular text-gray-500 select-none tracking-wide mb-0.5">
-                                        Justificativa
-                                      </span>
-
+                                  <div className="rounded-lg border border-gray-200 p-3">
+                                    <span className="block text-[11px] text-gray-500 text-center">Lançadas <span className="text-red-500">*</span></span>
+                                    <div className="mt-1 flex gap-2">
                                       <input
-                                        type="text"
-                                        value={lancamentos[nfItem.id]?.justificativa || ""}
-                                        onChange={(e) => {
-                                          setLancamentos(prev => ({
-                                            ...prev,
-                                            [nfItem.id]: {
-                                              dosesLancadas: String(nfItem.quantidadeDoses || 0),
-                                              justificativa: e.target.value
-                                            }
-                                          }));
+                                        type="number"
+                                        min="0"
+                                        value={nfItem.quantidadeFrascos || ""}
+                                        onChange={(event) => {
+                                          const frascos = Number(event.target.value);
+                                          setNotasFiscaisOrigem(notasFiscaisOrigem.map((item) => item.id === nfItem.id ? { ...item, quantidadeFrascos: frascos, quantidadeDoses: frascos * dosesPorFrasco } : item));
                                         }}
-                                        className="w-full bg-transparent border-none text-xs p-0 focus:outline-none focus:ring-0 text-gray-800 placeholder:text-gray-300 h-5"
+                                        className="w-full border border-gray-200 rounded p-1 text-center text-xs"
+                                        aria-label="Frascos lançados"
+                                      />
+                                      <input
+                                        type="number"
+                                        min="0"
+                                        value={nfItem.quantidadeDoses || ""}
+                                        onChange={(event) => {
+                                          const doses = Number(event.target.value);
+                                          setNotasFiscaisOrigem(notasFiscaisOrigem.map((item) => item.id === nfItem.id ? { ...item, quantidadeDoses: doses, quantidadeFrascos: Math.ceil(doses / dosesPorFrasco) } : item));
+                                        }}
+                                        className="w-full border border-gray-200 rounded p-1 text-center text-xs"
+                                        aria-label="Doses lançadas"
                                       />
                                     </div>
-
-                                    <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 mt-3 pt-2 border-t border-gray-100 text-[9px] z-10">
-                                      {dadosGrafico.map((item) => (
-                                        <div key={item.name} className="flex items-center gap-1 bg-gray-50 px-1 py-0.5 rounded border border-gray-100">
-                                          <span className="w-1 h-1 rounded-full" style={{ backgroundColor: item.color }} />
-                                          <span className="text-gray-400 font-medium">{item.name}:</span>
-                                          <span className="font-bold text-gray-600">{item.value}</span>
-                                        </div>
-                                      ))}
-
-                                      <div className="flex flex-col items-end gap-0.5 px-1 py-0.5 ml-auto">
-                                        <div className="flex items-center gap-1">
-                                          <span className="text-gray-400 font-medium">Total de doses:</span>
-                                          <span className="font-bold text-gray-600">{totalDosesGrafico}</span>
-                                        </div>
-                                      </div>
-                                    </div>
+                                    <div className="mt-1 flex justify-between text-[9px] text-gray-400"><span>Frascos</span><span>Doses</span></div>
                                   </div>
-                                )}
+                                </div>
+                                <label className="mt-4 block text-[10px] text-gray-500">
+                                  Justificativa <span className="text-red-500">*</span>
+                                  <input
+                                    type="text"
+                                    value={lancamentos[nfItem.id]?.justificativa || ""}
+                                    onChange={(event) => setLancamentos((prev) => ({
+                                      ...prev,
+                                      [nfItem.id]: { dosesLancadas: String(nfItem.quantidadeDoses || 0), justificativa: event.target.value },
+                                    }))}
+                                    className="mt-1 w-full border border-gray-200 rounded p-2 text-xs text-gray-800"
+                                  />
+                                </label>
                               </div>
                             );
                           })}
