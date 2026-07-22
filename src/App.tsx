@@ -42,6 +42,9 @@ import { AdicionarUnidadeAdministrativaPage } from "./pages/Geral/UnidadeAdminis
 import { UnidadeAdministrativaPage } from "./pages/Geral/UnidadeAdministrativa/UnidadeAdministrativa";
 import { AdicionarUnidadeMedidaPage } from "./pages/Geral/UnidadeMedida/AdicionarUnidadeMedida";
 import { UnidadeMedidaPage } from "./pages/Geral/UnidadeMedida/UnidadeMedida";
+import { AdicionarVendaPropriedadePage } from "./pages/Geral/VendaPropriedade/AdicionarVendaPropriedade";
+import { VendaPropriedadePage } from "./pages/Geral/VendaPropriedade/VendaPropriedade";
+import { VisualizarVendaPropriedadePage } from "./pages/Geral/VendaPropriedade/VisualizarVendaPropriedade";
 
 // ANIMAL
 import { AdicionarCertificadoraSISBOVPage } from "./pages/Animal/CertificadoraSISBOV/AdicionarCertificadoraSISBOV";
@@ -130,6 +133,11 @@ import { AdicionarAjusteDosesInsumoPage } from "./pages/Vacinacao/AjusteDosesIns
 import { VisualizarAjusteDosesInsumoPage } from "./pages/Vacinacao/AjusteDosesInsumo/VisualizarAjusteDosesInsumo";
 import { EditarAjusteDosesInsumoPage } from "./pages/Vacinacao/AjusteDosesInsumo/EditarAjusteDosesInsumo";
 
+import { AtestadoExamePage } from "./pages/Vacinacao/AtestadoExame/AtestadoExame";
+import { AdicionarAtestadoExamePage } from "./pages/Vacinacao/AtestadoExame/AdicionarAtestadoExame";
+import { VisualizarAtestadoExamePage } from "./pages/Vacinacao/AtestadoExame/VisualizarAtestadoExame";
+import { EditarAtestadoExamePage } from "./pages/Vacinacao/AtestadoExame/EditarAtestadoExame";
+
 //ARRECADACAO
 import { FundoArrecadacaoPage } from "./pages/Arrecadacao/FundoArrecadacao/FundoArrecadacao";
 import {
@@ -138,6 +146,7 @@ import {
   VisualizarFundoArrecadacaoPage,
 } from "./pages/Arrecadacao/FundoArrecadacao/FundoArrecadacaoDetalhe";
 import { AdicionarItemReceitaPage } from "./pages/Arrecadacao/ItemReceita/AdicionarItemReceita";
+import { NotificacoesEstabelecimentosPage } from "./pages/Arrecadacao/NotificacoesEstabelecimentos/NotificacoesEstabelecimentos";
 import { ItemReceitaPage } from "./pages/Arrecadacao/ItemReceita/ItemReceita";
 import { AdicionarValorIndicePage } from "./pages/Arrecadacao/ValorIndice/AdicionarValorIndice";
 import { ValorIndicePage } from "./pages/Arrecadacao/ValorIndice/ValorIndice";
@@ -150,6 +159,8 @@ import { VisualizarDaeLotePagamentoPage } from "./pages/Arrecadacao/LotePagament
 // GTA
 import { AdicionarDistribuicaoFormulariosGta } from "./pages/GTA/DistribuicaoFormulariosGta/AdicionarDistribuicaoFormulariosGta";
 import { DistribuicaoFormulariosGta } from "./pages/GTA/DistribuicaoFormulariosGta/DistribuicaoFormulariosGta";
+import { AdicionarFinalidadeGTAPage } from "./pages/GTA/FinalidadeGTA/AdicionarFinalidadeGTA";
+import { FinalidadeGTAPage } from "./pages/GTA/FinalidadeGTA/FinalidadeGTA";
 import { AdicionarFinalidadeTransitoPage } from "./pages/GTA/FinalidadeTransito/AdicionarFinalidadeTransito";
 import { FinalidadeTransitoPage } from "./pages/GTA/FinalidadeTransito/FinalidadeTransito";
 import { AdicionarIsencaoTaxaGtaPage } from "./pages/GTA/IsencaoTaxaGTA/AdicionarIsencaoTaxaGTA";
@@ -308,8 +319,8 @@ export type Screen =
   | "adicionar-praga"
   | "profissional-vegetal"
   | "adicionar-profissional-vegetal"
-  | "finalidade-transito"
-  | "adicionar-finalidade-transito"
+  | "finalidade-gta"
+  | "adicionar-finalidade-gta"
   | "usuarios"
   | "adicionar-usuario"
   | "visualizar-usuario"
@@ -339,6 +350,7 @@ export type Screen =
   | "editar-fundo-arrecadacao"
   | "item-receita"
   | "adicionar-item-receita"
+  | "notificacoes-estabelecimentos"
   | "lote-pagamento"
   | "adicionar-lote-pagamento"
   | "visualizar-lote-pagamento"
@@ -346,6 +358,10 @@ export type Screen =
   | "visualizar-dae-lote-pagamento"
   | "tipo-veiculo"
   | "adicionar-tipo-veiculo"
+  | "atestado-exame"
+  | "adicionar-atestado-exame"
+  | "visualizar-atestado-exame"
+  | "editar-atestado-exame"
   | "venda-entrada-insumos-exames"
   | "adicionar-venda-entrada-insumos-exames"
   | "status-animal"
@@ -1323,17 +1339,17 @@ export default function App() {
         />
       );
 
-    case "finalidade-transito":
+    case "finalidade-gta":
       return (
-        <FinalidadeTransitoPage
+        <FinalidadeGTAPage
           onLogout={handleLogout}
           onNavigate={handleNavigate}
         />
       );
 
-    case "adicionar-finalidade-transito":
+    case "adicionar-finalidade-gta":
       return (
-        <AdicionarFinalidadeTransitoPage
+        <AdicionarFinalidadeGTAPage
           onLogout={handleLogout}
           onNavigate={handleNavigate}
         />
@@ -1453,6 +1469,13 @@ export default function App() {
       return (
         <ItemReceitaPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
+    case "notificacoes-estabelecimentos":
+      return (
+        <NotificacoesEstabelecimentosPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
     case "tipo-veiculo":
       return (
         <TipoVeiculoPage onLogout={handleLogout} onNavigate={handleNavigate} />
@@ -1553,6 +1576,7 @@ export default function App() {
           instituicao={screenData}
         />
       );
+
     case "venda-entrada-insumos-exames":
       return (
         <VendaComEntradaInsumosExamesPage
@@ -1563,6 +1587,35 @@ export default function App() {
     case "adicionar-venda-entrada-insumos-exames":
       return (
         <AdicionarVendaComEntradaInsumosExamesPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+
+    case "atestado-exame":
+      return (
+        <AtestadoExamePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "adicionar-atestado-exame":
+      return (
+        <AdicionarAtestadoExamePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "visualizar-atestado-exame":
+      return (
+        <VisualizarAtestadoExamePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "editar-atestado-exame":
+      return (
+        <EditarAtestadoExamePage
           onLogout={handleLogout}
           onNavigate={handleNavigate}
         />

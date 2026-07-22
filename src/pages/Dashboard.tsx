@@ -1,8 +1,10 @@
 import {
   BadgePercent,
+  Bell,
   BriefcaseBusiness,
   Calendar,
   ClipboardList,
+  ClipboardPlus,
   Dna,
   DollarSign,
   FlaskConical,
@@ -27,6 +29,7 @@ import {
   Truck,
   User,
   Wallet,
+  Scale
 } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import * as Icons from "../imports/icons";
@@ -452,6 +455,11 @@ export const secondaryCategories: MenuCategory[] = [
         route: "local-realizacao-exame",
         icon: <MapPinned size={16} />,
       },
+      {
+        label: "Atestado De Exame",
+        route: "atestado-exame",
+        icon: <ClipboardPlus size={16} />,
+      },
     ],
   },
   {
@@ -476,8 +484,8 @@ export const secondaryCategories: MenuCategory[] = [
     ),
     items: [
       {
-        label: "Finalidade de Trânsito",
-        route: "finalidade-transito",
+        label: "Finalidade de GTA",
+        route: "finalidade-gta",
         icon: <Route size={18} />,
       },
       {
@@ -556,6 +564,11 @@ export const thirdCategories: MenuCategory[] = [
         label: "Item da Receita",
         route: "item-receita",
         icon: <ListTree size={16} />,
+      },
+      {
+        label: "Notificações dos Estabelecimentos",
+        route: "notificacoes-estabelecimentos",
+        icon: <Scale size={16} />,
       },
       {
         label: "Lote de Pagamento",
