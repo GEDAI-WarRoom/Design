@@ -44,12 +44,12 @@ export function VisualizarAjusteDosesInsumoPage({ onLogout, onNavigate, dados }:
           </button>
           <div className="flex items-center justify-between gap-4">
             <h1 className="text-2xl font-semibold text-gray-900">Visualizar Ajuste de Doses de Insumo</h1>
-            <CustomButton
+            {registro.situacao === "Gravada" && <CustomButton
               icon={<Pencil size={17} />}
               onClick={() => onNavigate("editar-ajuste-doses-insumo", registro)}
             >
-              Editar
-            </CustomButton>
+              Cancelar
+            </CustomButton>}
           </div>
         </div>
 

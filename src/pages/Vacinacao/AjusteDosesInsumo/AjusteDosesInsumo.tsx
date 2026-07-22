@@ -7,6 +7,8 @@ import {
   Eye,
   Pencil,
   Search,
+  Store,
+  ArrowUpDown,
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
@@ -45,13 +47,18 @@ export function AjusteDosesInsumoPage({ onLogout, onNavigate }: PageProps) {
   const [hasSearched, setHasSearched] = useState(false);
   const [erro, setErro] = useState("");
   const [page, setPage] = useState(1);
+  const [ordenacao, setOrdenacao] = useState<{
+    campo: "nota" | "partida" | "doenca" | "situacao";
+    direcao: "asc" | "desc";
+  }>({ campo: "nota", direcao: "asc" });
   const perPage = 10;
 
   const partidaInvalida = numeroPartida !== "" && !PARTIDA_PATTERN.test(numeroPartida);
   const periodoInvalido = periodoDe !== "" && periodoAte !== "" && periodoDe > periodoAte;
   const tiposInsumo = (doenca?.tiposInsumo ?? []).map((tipo) => ({ value: tipo, label: tipo }));
 
-  const resultados = useMemo(() => listarAjustesDosesInsumo().filter((item) => {
+  const resultados = useMemo(() => {
+    const filtrados = listarAjustesDosesInsumo().filter((item) => {
     const notas = item.notasFiscais;
     const matchRevendedora = !revendedora || item.revendedora.codigo === revendedora.codigo;
     const matchNota = numeroNotaFiscal === "" || notas.some((nota) => nota.numero.includes(numeroNotaFiscal));
@@ -63,8 +70,21 @@ export function AjusteDosesInsumoPage({ onLogout, onNavigate }: PageProps) {
     const matchPeriodo = (!periodoDe || item.dataCadastro >= periodoDe)
       && (!periodoAte || item.dataCadastro <= periodoAte);
     const matchSituacao = situacao === "" || item.situacao === situacao;
-    return matchRevendedora && matchNota && matchPartida && matchDoenca && matchTipo && matchPeriodo && matchSituacao;
-  }), [
+      return matchRevendedora && matchNota && matchPartida && matchDoenca && matchTipo && matchPeriodo && matchSituacao;
+    });
+
+    const valorOrdenacao = (item: AjusteDosesInsumo) => {
+      if (ordenacao.campo === "nota") return formatarNotas(item.notasFiscais);
+      if (ordenacao.campo === "partida") return formatarPartidas(item.notasFiscais);
+      if (ordenacao.campo === "doenca") return formatarDoencas(item.notasFiscais);
+      return item.situacao;
+    };
+
+    return [...filtrados].sort((a, b) => {
+      const resultado = valorOrdenacao(a).localeCompare(valorOrdenacao(b), "pt-BR", { numeric: true });
+      return ordenacao.direcao === "asc" ? resultado : -resultado;
+    });
+  }, [
     doenca,
     numeroNotaFiscal,
     numeroPartida,
@@ -73,11 +93,12 @@ export function AjusteDosesInsumoPage({ onLogout, onNavigate }: PageProps) {
     revendedora,
     situacao,
     tipoInsumo,
+    ordenacao,
   ]);
 
   const pesquisar = () => {
-    if (!revendedora || !periodoDe || !periodoAte) {
-      setErro("Selecione a revendedora e informe as datas inicial e final do período para pesquisar.");
+    if (!revendedora) {
+      setErro("Selecione a revendedora para pesquisar.");
       setHasSearched(false);
       return;
     }
@@ -93,6 +114,14 @@ export function AjusteDosesInsumoPage({ onLogout, onNavigate }: PageProps) {
     }
     setErro("");
     setHasSearched(true);
+    setPage(1);
+  };
+
+  const alternarOrdenacao = (campo: typeof ordenacao.campo) => {
+    setOrdenacao((atual) => ({
+      campo,
+      direcao: atual.campo === campo && atual.direcao === "asc" ? "desc" : "asc",
+    }));
     setPage(1);
   };
 
@@ -150,7 +179,6 @@ export function AjusteDosesInsumoPage({ onLogout, onNavigate }: PageProps) {
 
               <FloatInput
                 label="Período - De"
-                required
                 type="date"
                 value={periodoDe}
                 icon={<Calendar size={17} />}
@@ -158,7 +186,6 @@ export function AjusteDosesInsumoPage({ onLogout, onNavigate }: PageProps) {
               />
               <FloatInput
                 label="Período - Até"
-                required
                 type="date"
                 value={periodoAte}
                 icon={<Calendar size={17} />}
@@ -200,14 +227,13 @@ export function AjusteDosesInsumoPage({ onLogout, onNavigate }: PageProps) {
                 subtitle="Busque por doenças que possuem insumos de exame vinculados:"
                 onChange={(item) => { setDoenca(item); setTipoInsumo(""); }}
               />
-              {doenca && tiposInsumo.length > 0 && (
-                <FloatSelect
-                  label="Tipo de Insumo de Exame"
-                  value={tipoInsumo}
-                  options={tiposInsumo}
-                  onChange={setTipoInsumo}
-                />
-              )}
+              <FloatSelect
+                label="Tipo de Insumo"
+                value={tipoInsumo}
+                options={tiposInsumo}
+                disabled={!doenca}
+                onChange={setTipoInsumo}
+              />
               <FloatSelect
                 label="Situação"
                 value={situacao}
@@ -238,10 +264,18 @@ export function AjusteDosesInsumoPage({ onLogout, onNavigate }: PageProps) {
                   <thead>
                     <tr className="border-b border-gray-100">
                       <th className="text-left px-4 py-3 uppercase font-semibold text-gray-600 min-w-[260px]">Revendedora de Insumos</th>
-                      <th className="text-left px-4 py-3 uppercase font-semibold text-gray-600 whitespace-nowrap">Número da Nota Fiscal</th>
-                      <th className="text-left px-4 py-3 uppercase font-semibold text-gray-600 whitespace-nowrap">Número da Partida</th>
-                      <th className="text-left px-4 py-3 uppercase font-semibold text-gray-600 min-w-[260px]">Doença</th>
-                      <th className="text-left px-4 py-3 uppercase font-semibold text-gray-600 whitespace-nowrap">Situação</th>
+                      {([
+                        ["nota", "Número da Nota Fiscal", "whitespace-nowrap"],
+                        ["partida", "Número da Partida", "whitespace-nowrap"],
+                        ["doenca", "Doença", "min-w-[260px]"],
+                        ["situacao", "Situação", "whitespace-nowrap"],
+                      ] as const).map(([campo, titulo, tamanho]) => (
+                        <th key={campo} className={`text-left px-4 py-3 uppercase font-semibold text-gray-600 ${tamanho}`}>
+                          <button type="button" onClick={() => alternarOrdenacao(campo)} className="flex items-center gap-1 hover:text-[#1A7A3C]">
+                            {titulo} <ArrowUpDown size={13} aria-label={`Ordenar por ${titulo}`} />
+                          </button>
+                        </th>
+                      ))}
                       <th className="px-4 py-3 w-[100px]" />
                     </tr>
                   </thead>
@@ -264,7 +298,7 @@ export function AjusteDosesInsumoPage({ onLogout, onNavigate }: PageProps) {
                             >
                               <Eye size={18} />
                             </button>
-                            <button
+                            {item.situacao === "Gravada" && <button
                               type="button"
                               onClick={() => onNavigate("editar-ajuste-doses-insumo", item)}
                               className="p-2 rounded-md hover:bg-green-50 transition"
@@ -272,7 +306,7 @@ export function AjusteDosesInsumoPage({ onLogout, onNavigate }: PageProps) {
                               title="Editar"
                             >
                               <Pencil size={17} />
-                            </button>
+                            </button>}
                           </div>
                         </td>
                       </tr>

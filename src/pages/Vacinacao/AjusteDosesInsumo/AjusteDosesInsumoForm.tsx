@@ -10,7 +10,6 @@ import {
 import { Cell, Pie, PieChart, Sector } from "recharts";
 import {
   FloatInput,
-  FloatSelect,
   MultiSearchModal,
 } from "../../../components/ui/FormKit";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
@@ -19,7 +18,6 @@ import {
   criarNotaFiscalAjustada,
   notasDaRevendedora,
   REVENDEDORAS_INSUMO_MOCK,
-  SITUACOES_AJUSTE_DOSES_INSUMO,
   type NotaFiscalAjustada,
   type NotaFiscalInsumo,
   type RevendedoraInsumo,
@@ -343,7 +341,7 @@ function DetalhesNotaFiscal({
                         </div>
 
                     <div className="w-full h-[52px] mt-4 bg-white border border-gray-200 rounded-lg px-3 py-1.5 flex flex-col justify-center text-left focus-within:border-[#1A7A3C] shadow-sm transition-colors">
-                      <span className="text-[10px] text-gray-500 select-none mb-0.5">Justificativa</span>
+                        <span className="text-[10px] text-gray-500 select-none mb-0.5">Justificativa <span className="text-red-500">*</span></span>
                       <input
                         type="text"
                         value={item.justificativa}
@@ -383,7 +381,6 @@ export function AjusteDosesInsumoForm({
 }: FormProps) {
   const [modalNotasAberto, setModalNotasAberto] = useState(false);
   const cadastro = mode === "create";
-  const visualizacao = mode === "view";
   const notasDisponiveis = notasDaRevendedora(value.revendedora?.codigo);
 
   const selecionarRevendedora = (revendedora: RevendedoraInsumo) => {
@@ -449,7 +446,7 @@ export function AjusteDosesInsumoForm({
                 onClick={() => setModalNotasAberto(true)}
                 className="flex items-center justify-center gap-2 px-4 h-10 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50 transition disabled:border-gray-200 disabled:text-gray-300 disabled:bg-gray-50 disabled:cursor-not-allowed"
               >
-                <PlusCircle size={16} /> Adicionar Saldo
+                <PlusCircle size={16} /> Adicionar Nota Fiscal
               </button>
             </div>
           )}
@@ -464,6 +461,7 @@ export function AjusteDosesInsumoForm({
             </div>
           ) : (
             <div className="flex flex-col gap-4">
+              {cadastro && <h3 className="text-sm font-semibold text-gray-700">Lançadas</h3>}
               {value.notasFiscais.map((nota) => (
                 <DetalhesNotaFiscal
                   key={nota.id}
@@ -488,16 +486,10 @@ export function AjusteDosesInsumoForm({
 
       {!cadastro && (
         <Section title="Situação">
-          <FloatSelect
+          <FloatInput
             label="Situação"
-            required
             value={value.situacao}
-            disabled={visualizacao}
-            options={SITUACOES_AJUSTE_DOSES_INSUMO}
-            onChange={(situacao) => onChange({
-              ...value,
-              situacao: situacao as SituacaoAjusteDosesInsumo,
-            })}
+            disabled
           />
         </Section>
       )}
@@ -505,19 +497,19 @@ export function AjusteDosesInsumoForm({
       <MultiSearchModal<NotaFiscalInsumo>
         open={modalNotasAberto}
         onClose={() => setModalNotasAberto(false)}
-        title="Buscar Lotes de Insumos"
-        subtitle="Selecione os lotes de insumo vinculados à revendedora informada:"
+        title="Buscar Notas Fiscais"
+        subtitle="Selecione as notas fiscais vinculadas à revendedora informada:"
         icon={<Package size={21} className="text-[#1A7A3C]" />}
         data={notasDisponiveis}
         columns={[
-          { label: "Lote/Nº de Partida", key: "lote" },
-          { label: "Saldo da Apresentação", key: "saldoApresentacao" },
           { label: "Nota Fiscal", key: "numero" },
+          { label: "Número da Partida", key: "lote" },
+          { label: "Saldo da Apresentação", key: "saldoApresentacao" },
         ]}
         searchKeys={["lote", "numero", "itensFormatados"]}
-        searchPlaceholder="Buscar por lote, nota fiscal ou insumo."
+        searchPlaceholder="Buscar por nota fiscal, partida ou insumo."
         selectedItems={value.notasFiscais}
-        confirmLabel="Adicionar Lotes"
+        confirmLabel="Adicionar Notas Fiscais"
         onConfirm={selecionarNotas}
       />
     </>
