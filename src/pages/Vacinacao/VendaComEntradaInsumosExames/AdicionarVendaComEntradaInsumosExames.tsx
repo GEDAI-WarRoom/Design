@@ -7,6 +7,7 @@ import {
 	FlaskConical,
 	Info,
 	Stethoscope,
+	Eye
 } from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
 import { Navbar } from "../../../components/Navbar";
@@ -15,6 +16,7 @@ import {
 	EntitySearchInput,
 	FornecedorVacinaInput,
 	RevendedoraInput,
+	MedicoVeterinarioInput
 } from "../../../components/ui/EntitySearch";
 import {
 	FloatCombobox,
@@ -381,7 +383,7 @@ export function LoteCardItem({
 						disabled
 						icon={<FlaskConical size={18} color={GREEN} />}
 						value={fornecedor?.nome || ""}
-						onChange={() => {}}
+						onChange={() => { }}
 					/>
 				) : (
 					<EntitySearchInput
@@ -402,9 +404,8 @@ export function LoteCardItem({
 
 			{/* Grid contendo Doença, Tipo de Vacina (se houver) e Validade alinhados */}
 			<div
-				className={`grid grid-cols-1 ${
-					examSupplyTypes.length > 0 ? "md:grid-cols-3" : "md:grid-cols-2"
-				} gap-4 items-end`}>
+				className={`grid grid-cols-1 ${examSupplyTypes.length > 0 ? "md:grid-cols-3" : "md:grid-cols-2"
+					} gap-4 items-end`}>
 				<EntitySearchInput
 					label="Doença"
 					placeholder="Buscar doença..."
@@ -490,7 +491,7 @@ export function LoteCardItem({
 								value={String(
 									totalDosesApresentacao(ap.frascos, ap.dosesPorFrasco) || "",
 								)}
-								onChange={() => {}}
+								onChange={() => { }}
 							/>
 						</div>
 					)}
@@ -503,7 +504,7 @@ export function LoteCardItem({
 					required
 					disabled
 					value={String(totalDosesLote || "")}
-					onChange={() => {}}
+					onChange={() => { }}
 					className="md:w-1/2"
 				/>
 			</SubGrupo>
@@ -570,11 +571,11 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
 			ls.map((l) =>
 				l.uid === loteUid
 					? {
-							...l,
-							apresentacoes: l.apresentacoes.filter(
-								(_: any, i: number) => i !== index,
-							),
-						}
+						...l,
+						apresentacoes: l.apresentacoes.filter(
+							(_: any, i: number) => i !== index,
+						),
+					}
 					: l,
 			),
 		);
@@ -583,11 +584,11 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
 			ls.map((l) =>
 				l.uid === loteUid
 					? {
-							...l,
-							apresentacoes: l.apresentacoes.map((a: any) =>
-								a.uid === apUid ? { ...a, ...patch } : a,
-							),
-						}
+						...l,
+						apresentacoes: l.apresentacoes.map((a: any) =>
+							a.uid === apUid ? { ...a, ...patch } : a,
+						),
+					}
 					: l,
 			),
 		);
@@ -677,59 +678,59 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
 							/>
 						</div>
 					</Section>
-
 					<Section title="Destinatário">
-						<div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
-							<FloatSelect
-								label="Tipo de Destinatário"
-								value={destinatario}
-								onChange={(val) => {
-									setDestinatario(val);
-								}}
-								options={TIPOS_DESTINATARIOS}
-								required
-							/>
-							{isRevendedora && (
-								<RevendedoraInput
-									value={revendedora ? revendedora.codigo : ""}
-									onChange={(entidadeSelecionada) =>
-										setRevendedora(entidadeSelecionada)
-									}
-									onEyeClick={() => {
-										if (revendedora?.codigo)
-											alert(`Visualizar detalhes: ${revendedora.codigo}`);
-										else
-											alert(
-												"Por favor, digite ou selecione uma revendedora primeiro.",
-											);
+						<div className="flex flex-col gap-4">
+							{/* 1. Seleção do Tipo de Destinatário */}
+							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+								<FloatSelect
+									label="Tipo de Destinatário"
+									value={destinatario || ""}
+									onChange={(val) => {
+										setDestinatario(val);
+										// Limpa seleções anteriores ao alterar o tipo
+										setRevendedora(null);
+										setMedicoVeterinario(null);
 									}}
-									required
-								/>
-							)}
-							<div
-								className={isMedicoVeterinario ? "col-span-1" : "col-span-2"}>
-								<EntitySearchInput
-									label="Médico Veterinário"
-									placeholder="Buscar por código ou nome."
-									value={medicoVeterinario ? ` ${medicoVeterinario.nome}` : ""}
-									data={MEDICOS_VETERINARIOS_MOCK}
-									searchKeys={["codigo", "nome"]}
-									columns={[
-										{ label: "Código", key: "codigo" },
-										{ label: "Nome", key: "nome" },
-									]}
-									icon={<Stethoscope size={20} color={GREEN} />}
-									title="Buscar Médico Veterinário"
-									subtitle="Busque por um médico veterinário cadastrado:"
-									onChange={(ent) => {
-										setMedicoVeterinario(ent);
-									}}
+									options={TIPOS_DESTINATARIOS}
 									required
 								/>
 							</div>
+
+							{/* 2. Campo da Revendedora (Aparece apenas quando selecionado "Revendedora de Produtos Agropecuários") */}
+							{destinatario === "Revendedora de Produtos Agropecuários" && (
+								<div className="flex flex-col gap-3">
+									<RevendedoraInput
+										value={revendedora ? revendedora.codigo : ""}
+										required
+										onChange={(entidadeSelecionada) => setRevendedora(entidadeSelecionada)}
+										onEyeClick={() => {
+											if (revendedora?.codigo)
+												alert(`Visualizar detalhes: ${revendedora.codigo}`);
+											else
+												alert("Por favor, digite ou selecione uma revendedora primeiro.");
+										}}
+									/>
+								</div>
+							)}
+
+							{/* 3. Campo do Médico Veterinário (Aparece apenas quando selecionado "Médico Veterinário") */}
+							{destinatario === "Médico Veterinário" && (
+								<div className="flex flex-col gap-3">
+									<MedicoVeterinarioInput
+										value={medicoVeterinario ? medicoVeterinario.codigo : ""}
+										required
+										onChange={(entidadeSelecionada) => setMedicoVeterinario(entidadeSelecionada)}
+										onEyeClick={() => {
+											if (medicoVeterinario?.codigo)
+												alert(`Visualizar detalhes: ${medicoVeterinario.codigo}`);
+											else
+												alert("Por favor, digite ou selecione um médico veterinário primeiro.");
+										}}
+									/>
+								</div>
+							)}
 						</div>
 					</Section>
-
 					<Section title="Nota Fiscal">
 						<div className="flex flex-col gap-6">
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
@@ -789,13 +790,13 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
 													label="Doença"
 													disabled
 													value={t.doenca}
-													onChange={() => {}}
+													onChange={() => { }}
 												/>
 												<FloatInput
 													label="Total de Doses Adquiridas"
 													disabled
 													value={String(t.total)}
-													onChange={() => {}}
+													onChange={() => { }}
 												/>
 											</div>
 										))}

@@ -249,7 +249,7 @@ export function EntitySearchInput({
 						label={label}
 						required={required}
 						value={value}
-						onChange={() => {}}
+						onChange={() => { }}
 						hasTooltip={hasTooltip}
 						tooltipText={tooltipText}
 						icon={icon}
@@ -557,7 +557,7 @@ export function ExploracaoPecuariaInput({
 								label="Espécie Explorada"
 								required={required}
 								value={entidadeSelecionada.especie}
-								onChange={() => {}}
+								onChange={() => { }}
 								disabled
 								className="w-full"
 							/>
@@ -632,7 +632,7 @@ export function EstabelecimentoAgropecuarioInput({
 								label="Código do Estabelecimento Agropecuário"
 								required={required}
 								value={entidadeSelecionada.codigo}
-								onChange={() => {}}
+								onChange={() => { }}
 								disabled
 								className="w-full"
 							/>
@@ -744,7 +744,7 @@ export function ProdutorInput({
 								label={entidadeSelecionada.tipo === "PJ" ? "CNPJ" : "CPF"}
 								required={required}
 								value={entidadeSelecionada.documento}
-								onChange={() => {}}
+								onChange={() => { }}
 								disabled
 								className="w-full"
 							/>
@@ -811,7 +811,7 @@ export function RevendedoraInput({
 								label="Código"
 								required={required}
 								value={entidadeSelecionada.codigo}
-								onChange={() => {}}
+								onChange={() => { }}
 								disabled
 								className="w-full"
 							/>
@@ -892,7 +892,7 @@ export function FornecedorVacinaInput({
 								label="Código do Fornecedor"
 								required={required}
 								value={entidadeSelecionada.codigo}
-								onChange={() => {}}
+								onChange={() => { }}
 								disabled
 								className="w-full"
 							/>
@@ -1074,7 +1074,7 @@ export function ProprietarioInput({
 								label={entidadeSelecionada.tipo === "PJ" ? "CNPJ" : "CPF"}
 								required={required}
 								value={entidadeSelecionada.documento}
-								onChange={() => {}}
+								onChange={() => { }}
 								disabled
 								className="w-full"
 							/>
@@ -1192,7 +1192,7 @@ export function FornecedorInput({
 								label={entidadeSelecionada.tipo === "PJ" ? "CNPJ" : "CPF"}
 								required={required}
 								value={entidadeSelecionada.documento}
-								onChange={() => {}}
+								onChange={() => { }}
 								disabled
 								className="w-full"
 							/>
@@ -1301,7 +1301,7 @@ export function DestinatarioInput({
 								label={entidadeSelecionada.tipo === "PJ" ? "CNPJ" : "CPF"}
 								required={required}
 								value={entidadeSelecionada.documento}
-								onChange={() => {}}
+								onChange={() => { }}
 								disabled
 								className="w-full"
 							/>
@@ -1975,7 +1975,7 @@ export function BlocoContatoFields({
 
 					{/* LISTAGEM DOS CARDS EXATAMENTE IGUAL AO CONTACTCARD (EMAIL, TELEFONE E OBSERVAÇÕES) */}
 					{!data.proprietariosSelecionados ||
-					data.proprietariosSelecionados.length === 0 ? (
+						data.proprietariosSelecionados.length === 0 ? (
 						<p className="text-xs text-gray-400 italic">
 							Nenhum proprietário selecionado para contato.
 						</p>
@@ -1984,32 +1984,32 @@ export function BlocoContatoFields({
 							{(proprietariosDisponiveis && proprietariosDisponiveis.length > 0
 								? proprietariosDisponiveis
 								: [
-										{
-											id: "prop-1",
-											nome: "Carlos Henrique Silva",
-											email: "carlos.silva@email.com",
-											telefone: "(11) 98888-7777",
-											observacoes: "Contato principal da fazenda",
-										},
-										{
-											id: "prop-2",
-											nome: "Maria Fernanda Oliveira",
-											email: "maria.fernanda@email.com",
-											telefone: "(21) 99999-8888",
-										},
-										{
-											id: "prop-3",
-											nome: "Antônio Marcos de Souza",
-											email: "antonio.marcos@email.com",
-											telefone: "(31) 97777-6666",
-										},
-										{
-											id: "prop-4",
-											nome: "Juliana Costa Rezende",
-											email: "juliana.costa@email.com",
-											telefone: "(61) 96666-5555",
-										},
-									]
+									{
+										id: "prop-1",
+										nome: "Carlos Henrique Silva",
+										email: "carlos.silva@email.com",
+										telefone: "(11) 98888-7777",
+										observacoes: "Contato principal da fazenda",
+									},
+									{
+										id: "prop-2",
+										nome: "Maria Fernanda Oliveira",
+										email: "maria.fernanda@email.com",
+										telefone: "(21) 99999-8888",
+									},
+									{
+										id: "prop-3",
+										nome: "Antônio Marcos de Souza",
+										email: "antonio.marcos@email.com",
+										telefone: "(31) 97777-6666",
+									},
+									{
+										id: "prop-4",
+										nome: "Juliana Costa Rezende",
+										email: "juliana.costa@email.com",
+										telefone: "(61) 96666-5555",
+									},
+								]
 							)
 								.filter((p) =>
 									data.proprietariosSelecionados
@@ -2076,13 +2076,13 @@ export function BlocoContatoFields({
 											{((p as any).observacoes ||
 												(p as any).observacao ||
 												(p as any).obs) && (
-												<span className="text-xs text-gray-600">
-													<span className="text-gray-400">Observações: </span>
-													{(p as any).observacoes ||
-														(p as any).observacao ||
-														(p as any).obs}
-												</span>
-											)}
+													<span className="text-xs text-gray-600">
+														<span className="text-gray-400">Observações: </span>
+														{(p as any).observacoes ||
+															(p as any).observacao ||
+															(p as any).obs}
+													</span>
+												)}
 										</div>
 									</div>
 								))}
@@ -2105,15 +2105,15 @@ export function BlocoContatoFields({
 						data={
 							proprietariosDisponiveis && proprietariosDisponiveis.length > 0
 								? proprietariosDisponiveis.map((p: any) => ({
-										id: p.id,
-										nome: p.nome,
-									}))
+									id: p.id,
+									nome: p.nome,
+								}))
 								: [
-										{ id: "prop-1", nome: "Carlos Henrique Silva" },
-										{ id: "prop-2", nome: "Maria Fernanda Oliveira" },
-										{ id: "prop-3", nome: "Antônio Marcos de Souza" },
-										{ id: "prop-4", nome: "Juliana Costa Rezende" },
-									]
+									{ id: "prop-1", nome: "Carlos Henrique Silva" },
+									{ id: "prop-2", nome: "Maria Fernanda Oliveira" },
+									{ id: "prop-3", nome: "Antônio Marcos de Souza" },
+									{ id: "prop-4", nome: "Juliana Costa Rezende" },
+								]
 						}
 						searchKeys={["nome"]}
 						searchPlaceholder="Busque pelo nome do proprietário."
@@ -2121,11 +2121,11 @@ export function BlocoContatoFields({
 						selectedItems={(proprietariosDisponiveis.length > 0
 							? proprietariosDisponiveis
 							: [
-									{ id: "prop-1", nome: "Carlos Henrique Silva" },
-									{ id: "prop-2", nome: "Maria Fernanda Oliveira" },
-									{ id: "prop-3", nome: "Antônio Marcos de Souza" },
-									{ id: "prop-4", nome: "Juliana Costa Rezende" },
-								]
+								{ id: "prop-1", nome: "Carlos Henrique Silva" },
+								{ id: "prop-2", nome: "Maria Fernanda Oliveira" },
+								{ id: "prop-3", nome: "Antônio Marcos de Souza" },
+								{ id: "prop-4", nome: "Juliana Costa Rezende" },
+							]
 						).filter((p: any) =>
 							data.proprietariosSelecionados
 								?.map(String)
@@ -2276,11 +2276,11 @@ export function BlocoContatoFields({
 										const list = data.contatosAdicionais.map((c, i) =>
 											i === index
 												? {
-														...c,
-														tipo: v as "E-mail" | "Telefone",
-														email: "",
-														telefone: "",
-													}
+													...c,
+													tipo: v as "E-mail" | "Telefone",
+													email: "",
+													telefone: "",
+												}
 												: c,
 										);
 										handleFieldChange("contatosAdicionais", list);
@@ -2498,7 +2498,7 @@ export function NucleoInput({
 								label="Código do Núcleo"
 								required={required}
 								value={entidadeSelecionada.codigo}
-								onChange={() => {}}
+								onChange={() => { }}
 								disabled
 								className="w-full"
 							/>
@@ -2514,6 +2514,11 @@ export function NucleoInput({
 // ==========================================================
 // MOCK DE MÉDICOS VETERINÁRIOS (Global)
 // ==========================================================
+
+
+// ==========================================================
+// MOCK DE MÉDICOS VETERINÁRIOS (Global)
+// ==========================================================
 export const VETERINARIOS_MOCK = [
 	{ id: 1, nome: "Dr. Carlos Eduardo Silva", cpf: "123.456.789-00" },
 	{ id: 2, nome: "Dra. Mariana Costa Alencar", cpf: "987.654.321-11" },
@@ -2521,7 +2526,7 @@ export const VETERINARIOS_MOCK = [
 ];
 
 interface MedicoVeterinarioInputProps {
-	value: string;
+	value: any; // Aceita string ou objeto
 	onChange: (entidade: any) => void;
 	onEyeClick?: () => void;
 	error?: boolean;
@@ -2539,13 +2544,22 @@ export const MedicoVeterinarioInput: React.FC<MedicoVeterinarioInputProps> = ({
 	required = false,
 	data = VETERINARIOS_MOCK,
 }) => {
-	// Encontra a entidade selecionada no array para capturar o CPF
-	const entidadeSelecionada = data.find((item) => item.nome === value);
+	// Busca flexível: encontra por cpf, por codigo, por nome ou caso o value já seja o objeto
+	const entidadeSelecionada = typeof value === "object" && value !== null
+		? value
+		: data.find((item) =>
+			item.cpf === value ||
+			item.codigo === value ||
+			item.nome === value
+		);
+
+	// Texto que será exibido no input principal de busca
+	const displayValue = entidadeSelecionada ? entidadeSelecionada.nome : (typeof value === "string" ? value : "");
 
 	return (
-		/* 💡 Grid Inteligente: Se houver valor selecionado, vira 2 colunas horizontais, senão fica 1 coluna full */
+		/* Grid Inteligente: Se houver entidade selecionada, divide em 2 colunas */
 		<div
-			className={`grid grid-cols-1 ${value && entidadeSelecionada ? "md:grid-cols-2" : "w-full"} gap-4 items-end w-full`}>
+			className={`grid grid-cols-1 ${entidadeSelecionada ? "md:grid-cols-2" : "w-full"} gap-4 items-end w-full`}>
 			{/* Coluna 1: Barra de Busca Principal */}
 			<div className="w-full">
 				<EntitySearchInput
@@ -2553,9 +2567,9 @@ export const MedicoVeterinarioInput: React.FC<MedicoVeterinarioInputProps> = ({
 					placeholder="Buscar por nome ou CPF"
 					required={required}
 					disabled={disabled}
-					value={value}
+					value={displayValue}
 					data={data}
-					searchKeys={["nome", "cpf"]}
+					searchKeys={["nome", "cpf", "codigo"]}
 					columns={[
 						{ label: "Nome", key: "nome" },
 						{ label: "CPF", key: "cpf" },
@@ -2574,15 +2588,15 @@ export const MedicoVeterinarioInput: React.FC<MedicoVeterinarioInputProps> = ({
 				/>
 			</div>
 
-			{/* Coluna 2: Campos do Reboque e Olho alinhados lado a lado horizontalmente */}
-			{value && entidadeSelecionada && (
+			{/* Coluna 2: CPF do Reboque e Olho lado a lado */}
+			{entidadeSelecionada && (
 				<div className="flex items-center gap-2 animate-fadeIn w-full">
 					<div className="flex-1">
 						<FloatInput
 							label="CPF do Veterinário"
 							required={required}
-							value={entidadeSelecionada.cpf}
-							onChange={() => {}}
+							value={entidadeSelecionada.cpf || entidadeSelecionada.codigo || ""}
+							onChange={() => { }}
 							disabled
 							className="w-full"
 						/>
@@ -2593,7 +2607,6 @@ export const MedicoVeterinarioInput: React.FC<MedicoVeterinarioInputProps> = ({
 		</div>
 	);
 };
-
 // ==========================================================
 // MOCK DE VACINADORES CONTRA BRUCELOSE (Global)
 // ==========================================================
@@ -2624,60 +2637,60 @@ export const VacinadorBruceloseInput: React.FC<
 	required = false,
 	data = VACINADORES_BRUCELOSE_MOCK,
 }) => {
-	// Encontra a entidade selecionada no array para capturar o CPF/Documento
-	const entidadeSelecionada = data.find((item) => item.nome === value);
+		// Encontra a entidade selecionada no array para capturar o CPF/Documento
+		const entidadeSelecionada = data.find((item) => item.nome === value);
 
-	return (
-		/* 💡 Grid Inteligente: Se houver valor selecionado, vira 2 colunas horizontais, senão fica 1 coluna full */
-		<div
-			className={`grid grid-cols-1 ${value && entidadeSelecionada ? "md:grid-cols-2" : "w-full"} gap-4 items-end w-full`}>
-			{/* Coluna 1: Barra de Busca Principal */}
-			<div className="w-full">
-				<EntitySearchInput
-					label="Vacinador Contra Brucelose"
-					placeholder="Buscar por nome ou CPF"
-					required={required}
-					disabled={disabled}
-					value={value}
-					data={data}
-					searchKeys={["nome", "documento"]}
-					columns={[
-						{ label: "Nome", key: "nome" },
-						{ label: "CPF", key: "documento" },
-					]}
-					icon={
-						<img
-							src={Icons.iconeProdutorUrl || Icons.iconeProdutorUrl}
-							alt="Vacinador Brucelose"
-							className="w-5 h-5 object-contain"
-						/>
-					}
-					title="Buscar Vacinador Contra Brucelose"
-					subtitle="Busque por um vacinador associado ao médico veterinário responsável:"
-					onChange={onChange}
-					error={error}
-				/>
-			</div>
-
-			{/* Coluna 2: Campos do Reboque e Olho alinhados lado a lado horizontalmente */}
-			{value && entidadeSelecionada && (
-				<div className="flex items-center gap-2 animate-fadeIn w-full">
-					<div className="flex-1">
-						<FloatInput
-							label="CPF do Vacinador"
-							required={required}
-							value={entidadeSelecionada.documento}
-							onChange={() => {}}
-							disabled
-							className="w-full"
-						/>
-					</div>
-					<EyeAction onClick={onEyeClick} />
+		return (
+			/* 💡 Grid Inteligente: Se houver valor selecionado, vira 2 colunas horizontais, senão fica 1 coluna full */
+			<div
+				className={`grid grid-cols-1 ${value && entidadeSelecionada ? "md:grid-cols-2" : "w-full"} gap-4 items-end w-full`}>
+				{/* Coluna 1: Barra de Busca Principal */}
+				<div className="w-full">
+					<EntitySearchInput
+						label="Vacinador Contra Brucelose"
+						placeholder="Buscar por nome ou CPF"
+						required={required}
+						disabled={disabled}
+						value={value}
+						data={data}
+						searchKeys={["nome", "documento"]}
+						columns={[
+							{ label: "Nome", key: "nome" },
+							{ label: "CPF", key: "documento" },
+						]}
+						icon={
+							<img
+								src={Icons.iconeProdutorUrl || Icons.iconeProdutorUrl}
+								alt="Vacinador Brucelose"
+								className="w-5 h-5 object-contain"
+							/>
+						}
+						title="Buscar Vacinador Contra Brucelose"
+						subtitle="Busque por um vacinador associado ao médico veterinário responsável:"
+						onChange={onChange}
+						error={error}
+					/>
 				</div>
-			)}
-		</div>
-	);
-};
+
+				{/* Coluna 2: Campos do Reboque e Olho alinhados lado a lado horizontalmente */}
+				{value && entidadeSelecionada && (
+					<div className="flex items-center gap-2 animate-fadeIn w-full">
+						<div className="flex-1">
+							<FloatInput
+								label="CPF do Vacinador"
+								required={required}
+								value={entidadeSelecionada.documento}
+								onChange={() => { }}
+								disabled
+								className="w-full"
+							/>
+						</div>
+						<EyeAction onClick={onEyeClick} />
+					</div>
+				)}
+			</div>
+		);
+	};
 
 // ==========================================================
 // MOCK DE PROFISSIONAIS DA ÁREA ANIMAL (Baseado no seu VacinadorPage)
@@ -2730,60 +2743,60 @@ export const ProfissionalAnimalInput: React.FC<
 	required = false,
 	data = PROFISSIONAIS_AREA_ANIMAL_MOCK,
 }) => {
-	// Encontra a entidade selecionada no array para capturar o CPF (chave 'documento')
-	const entidadeSelecionada = data.find((item) => item.nome === value);
+		// Encontra a entidade selecionada no array para capturar o CPF (chave 'documento')
+		const entidadeSelecionada = data.find((item) => item.nome === value);
 
-	return (
-		/* 💡 Grid Inteligente: Se houver valor selecionado, vira 2 colunas horizontais, senão fica 1 coluna full */
-		<div
-			className={`grid grid-cols-1 ${value && entidadeSelecionada ? "md:grid-cols-2" : "w-full"} gap-4 items-end w-full`}>
-			{/* Coluna 1: Barra de Busca Principal */}
-			<div className="w-full">
-				<EntitySearchInput
-					label="Profissional Responsável"
-					placeholder="Buscar por nome ou CPF"
-					required={required}
-					disabled={disabled}
-					value={value}
-					data={data}
-					searchKeys={["nome", "documento"]}
-					columns={[
-						{ label: "Nome", key: "nome" },
-						{ label: "CPF", key: "documento" },
-					]}
-					icon={
-						<img
-							src={Icons.iconeProfissionalAnimalUrl}
-							alt="Profissional da Área Animal"
-							className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0"
-						/>
-					}
-					title="Buscar Profissional Responsável"
-					subtitle="Busque por um profissional da área animal cadastrado:"
-					onChange={onChange}
-					error={error}
-				/>
-			</div>
-
-			{/* Coluna 2: Campos do Reboque e Olho alinhados lado a lado horizontalmente */}
-			{value && entidadeSelecionada && (
-				<div className="flex items-center gap-2 animate-fadeIn w-full">
-					<div className="flex-1">
-						<FloatInput
-							label="CPF do Profissional"
-							required={required}
-							value={entidadeSelecionada.documento} // Mapeado para utilizar a chave 'documento' do mock
-							onChange={() => {}}
-							disabled
-							className="w-full"
-						/>
-					</div>
-					<EyeAction onClick={onEyeClick} />
+		return (
+			/* 💡 Grid Inteligente: Se houver valor selecionado, vira 2 colunas horizontais, senão fica 1 coluna full */
+			<div
+				className={`grid grid-cols-1 ${value && entidadeSelecionada ? "md:grid-cols-2" : "w-full"} gap-4 items-end w-full`}>
+				{/* Coluna 1: Barra de Busca Principal */}
+				<div className="w-full">
+					<EntitySearchInput
+						label="Profissional Responsável"
+						placeholder="Buscar por nome ou CPF"
+						required={required}
+						disabled={disabled}
+						value={value}
+						data={data}
+						searchKeys={["nome", "documento"]}
+						columns={[
+							{ label: "Nome", key: "nome" },
+							{ label: "CPF", key: "documento" },
+						]}
+						icon={
+							<img
+								src={Icons.iconeProfissionalAnimalUrl}
+								alt="Profissional da Área Animal"
+								className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0"
+							/>
+						}
+						title="Buscar Profissional Responsável"
+						subtitle="Busque por um profissional da área animal cadastrado:"
+						onChange={onChange}
+						error={error}
+					/>
 				</div>
-			)}
-		</div>
-	);
-};
+
+				{/* Coluna 2: Campos do Reboque e Olho alinhados lado a lado horizontalmente */}
+				{value && entidadeSelecionada && (
+					<div className="flex items-center gap-2 animate-fadeIn w-full">
+						<div className="flex-1">
+							<FloatInput
+								label="CPF do Profissional"
+								required={required}
+								value={entidadeSelecionada.documento} // Mapeado para utilizar a chave 'documento' do mock
+								onChange={() => { }}
+								disabled
+								className="w-full"
+							/>
+						</div>
+						<EyeAction onClick={onEyeClick} />
+					</div>
+				)}
+			</div>
+		);
+	};
 
 // ==========================================================
 // MOCK DE EXEMPLO (Substituir pela sua lista global se necessário)
@@ -2863,7 +2876,7 @@ export function PessoaFisicaInput({
 								label="CPF"
 								required={required}
 								value={entidadeSelecionada.documento}
-								onChange={() => {}}
+								onChange={() => { }}
 								disabled
 								className="w-full"
 							/>
@@ -2972,7 +2985,7 @@ export function PessoaJuridicaInput({
 								label="CNPJ"
 								required={required}
 								value={entidadeSelecionada.documento}
-								onChange={() => {}}
+								onChange={() => { }}
 								disabled
 								className="w-full"
 							/>
@@ -3103,60 +3116,60 @@ export const ResponsavelTecnicoInput: React.FC<
 	required = false,
 	data = RESPONSAVEIS_TECNICOS_MOCK,
 }) => {
-	// Encontra a entidade selecionada no array para capturar o Documento (CPF)
-	const entidadeSelecionada = data.find((item) => item.nome === value);
+		// Encontra a entidade selecionada no array para capturar o Documento (CPF)
+		const entidadeSelecionada = data.find((item) => item.nome === value);
 
-	return (
-		/* 💡 Grid Inteligente: Se houver valor selecionado, vira 2 colunas horizontais, senão fica 1 coluna full */
-		<div
-			className={`grid grid-cols-1 ${value && entidadeSelecionada ? "md:grid-cols-2" : "w-full"} gap-4 items-end w-full`}>
-			{/* Coluna 1: Barra de Busca Principal */}
-			<div className="w-full">
-				<EntitySearchInput
-					label="Responsável Técnico"
-					placeholder="Buscar por nome ou CPF"
-					required={required}
-					disabled={disabled}
-					value={value}
-					data={data}
-					searchKeys={["nome", "documento"]}
-					columns={[
-						{ label: "Nome", key: "nome" },
-						{ label: "CPF", key: "documento" },
-					]}
-					icon={
-						<UserRoundCheck
-							size={18}
-							color={GREEN}
-							className="mr-2 -ml-1 flex-shrink-0"
-						/>
-					}
-					title="Buscar Responsável Técnico"
-					subtitle="Busque por um profissional responsável técnico cadastrado:"
-					onChange={onChange}
-					error={error}
-				/>
-			</div>
-
-			{/* Coluna 2: CPF do Responsável Técnico e Botão Olho alinhados lado a lado horizontalmente */}
-			{value && entidadeSelecionada && (
-				<div className="flex items-center gap-2 animate-fadeIn w-full">
-					<div className="flex-1">
-						<FloatInput
-							label="CPF do Responsável"
-							required={required}
-							value={entidadeSelecionada.documento} // 💡 Mapeado para .documento conforme seu mock
-							onChange={() => {}}
-							disabled
-							className="w-full"
-						/>
-					</div>
-					<EyeAction onClick={onEyeClick} />
+		return (
+			/* 💡 Grid Inteligente: Se houver valor selecionado, vira 2 colunas horizontais, senão fica 1 coluna full */
+			<div
+				className={`grid grid-cols-1 ${value && entidadeSelecionada ? "md:grid-cols-2" : "w-full"} gap-4 items-end w-full`}>
+				{/* Coluna 1: Barra de Busca Principal */}
+				<div className="w-full">
+					<EntitySearchInput
+						label="Responsável Técnico"
+						placeholder="Buscar por nome ou CPF"
+						required={required}
+						disabled={disabled}
+						value={value}
+						data={data}
+						searchKeys={["nome", "documento"]}
+						columns={[
+							{ label: "Nome", key: "nome" },
+							{ label: "CPF", key: "documento" },
+						]}
+						icon={
+							<UserRoundCheck
+								size={18}
+								color={GREEN}
+								className="mr-2 -ml-1 flex-shrink-0"
+							/>
+						}
+						title="Buscar Responsável Técnico"
+						subtitle="Busque por um profissional responsável técnico cadastrado:"
+						onChange={onChange}
+						error={error}
+					/>
 				</div>
-			)}
-		</div>
-	);
-};
+
+				{/* Coluna 2: CPF do Responsável Técnico e Botão Olho alinhados lado a lado horizontalmente */}
+				{value && entidadeSelecionada && (
+					<div className="flex items-center gap-2 animate-fadeIn w-full">
+						<div className="flex-1">
+							<FloatInput
+								label="CPF do Responsável"
+								required={required}
+								value={entidadeSelecionada.documento} // 💡 Mapeado para .documento conforme seu mock
+								onChange={() => { }}
+								disabled
+								className="w-full"
+							/>
+						</div>
+						<EyeAction onClick={onEyeClick} />
+					</div>
+				)}
+			</div>
+		);
+	};
 
 // ==========================================================
 // MOCK DE CERTIFICADORAS SISBOV (Baseado no seu CERTIFICADORAS_MOCK)
