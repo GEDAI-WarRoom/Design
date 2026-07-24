@@ -307,11 +307,12 @@ export function criarAjusteDosesInsumo(
 
 export function atualizarAjusteDosesInsumo(
   id: number,
-  situacao: SituacaoAjusteDosesInsumo,
 ) {
   const index = AJUSTES_DOSES_INSUMO_MOCK.findIndex((item) => item.id === id);
   if (index === -1) return null;
-  const atualizado = { ...AJUSTES_DOSES_INSUMO_MOCK[index], situacao };
+  const registro = AJUSTES_DOSES_INSUMO_MOCK[index];
+  if (registro.situacao === "Cancelada") return null;
+  const atualizado = { ...registro, situacao: "Cancelada" as const };
   AJUSTES_DOSES_INSUMO_MOCK[index] = atualizado;
   return atualizado;
 }
@@ -341,7 +342,7 @@ export function formatarDoencas(notas: NotaFiscalAjustada[]) {
   return Array.from(
     new Set(
       notas.flatMap((nota) =>
-        nota.itens.map((item) => `${item.doenca} - ${item.tipoInsumo}`),
+        nota.itens.map((item) => `${item.doenca} (${item.tipoInsumo})`),
       ),
     ),
   ).join(", ");
