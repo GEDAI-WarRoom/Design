@@ -651,10 +651,10 @@ export function AdicionarPartilhaVacinaPage({ onLogout, onNavigate }: AdicionarV
                                           ) : (
                                             <div className="flex flex-col items-center justify-center">
                                               <span className="text-base font-black text-gray-800 leading-none">
-                                                {DOSES_DISPONIVEIS}
+                                                {totalDosesGrafico}
                                               </span>
                                               <span className="text-[7px] font-bold text-gray-400 mt-0.5 uppercase tracking-wider">
-                                                Disponíveis
+                                                Total
                                               </span>
                                             </div>
                                           )}
@@ -732,7 +732,6 @@ export function AdicionarPartilhaVacinaPage({ onLogout, onNavigate }: AdicionarV
 
                                     <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 mt-3 pt-2 border-t border-gray-100 text-[9px] z-10">
                                       {dadosGrafico
-                                        .filter((item) => item.name !== "Disponíveis")
                                         .map((item) => (
                                           <div key={item.name} className="flex items-center gap-1 bg-gray-50 px-1 py-0.5 rounded border border-gray-100">
                                             <span className="w-1 h-1 rounded-full" style={{ backgroundColor: item.color }} />
@@ -741,13 +740,7 @@ export function AdicionarPartilhaVacinaPage({ onLogout, onNavigate }: AdicionarV
                                           </div>
                                         ))}
 
-                                      <div className="flex flex-col items-end gap-0.5 px-1 py-0.5 ml-auto">
-                                        <div className="flex items-center gap-1">
-                                          <span className="text-gray-400 font-medium">Total de doses:</span>
-                                          <span className="font-bold text-gray-600">{totalDosesGrafico}</span>
-                                        </div>
 
-                                      </div>
                                     </div>
                                   </div>
 

@@ -500,12 +500,7 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate }: Pag
                                         </div>
                                       ))}
 
-                                      <div className="flex flex-col items-end gap-0.5 px-1 py-0.5 ml-auto">
-                                        <div className="flex items-center gap-1">
-                                          <span className="text-gray-400 font-medium">Total de doses:</span>
-                                          <span className="font-bold text-gray-600">{totalDosesGrafico}</span>
-                                        </div>
-                                      </div>
+
                                     </div>
                                   </div>
                                 )}
