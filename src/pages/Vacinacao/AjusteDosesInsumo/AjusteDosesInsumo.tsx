@@ -6,9 +6,9 @@ import {
   ChevronRight,
   Eye,
   Pencil,
-  Search,
   Store,
   ArrowUpDown,
+  X,
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
@@ -35,6 +35,17 @@ interface PageProps {
   onNavigate: (screen: any, data?: any) => void;
 }
 
+function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
+  return (
+    <div className="flex items-center gap-2 bg-[#1A7A3C] text-white text-xs font-medium px-3 py-1.5 rounded-md shadow-sm max-w-full">
+      <span className="truncate">{label}</span>
+      <button type="button" onClick={onRemove} className="hover:opacity-80 transition flex-shrink-0">
+        <X size={14} className="stroke-[2.5]" />
+      </button>
+    </div>
+  );
+}
+
 export function AjusteDosesInsumoPage({ onLogout, onNavigate }: PageProps) {
   const [revendedora, setRevendedora] = useState<RevendedoraInsumo | null>(null);
   const [numeroNotaFiscal, setNumeroNotaFiscal] = useState("");
@@ -55,21 +66,45 @@ export function AjusteDosesInsumoPage({ onLogout, onNavigate }: PageProps) {
 
   const partidaInvalida = numeroPartida !== "" && !PARTIDA_PATTERN.test(numeroPartida);
   const periodoInvalido = periodoDe !== "" && periodoAte !== "" && periodoDe > periodoAte;
-  const tiposInsumo = (doenca?.tiposInsumo ?? []).map((tipo) => ({ value: tipo, label: tipo }));
+
+  // Verifica se há algum filtro preenchido
+  const temFiltroAtivo = Boolean(
+    revendedora ||
+    numeroNotaFiscal ||
+    numeroPartida ||
+    doenca ||
+    tipoInsumo ||
+    periodoDe ||
+    periodoAte ||
+    situacao
+  );
+
+  // Lista completa de opções de insumos para quando não houver doença selecionada
+  const todosTiposInsumoOpcoes = useMemo(() => {
+    const conjuntoTipos = new Set<string>();
+    DOENCAS_COM_INSUMO_MOCK.forEach((d) => {
+      d.tiposInsumo?.forEach((t) => conjuntoTipos.add(t));
+    });
+    return Array.from(conjuntoTipos).map((tipo) => ({ value: tipo, label: tipo }));
+  }, []);
+
+  const tiposInsumo = doenca
+    ? (doenca.tiposInsumo ?? []).map((tipo) => ({ value: tipo, label: tipo }))
+    : todosTiposInsumoOpcoes;
 
   const resultados = useMemo(() => {
     const filtrados = listarAjustesDosesInsumo().filter((item) => {
-    const notas = item.notasFiscais;
-    const matchRevendedora = !revendedora || item.revendedora.codigo === revendedora.codigo;
-    const matchNota = numeroNotaFiscal === "" || notas.some((nota) => nota.numero.includes(numeroNotaFiscal));
-    const matchPartida = numeroPartida === "" || notas.some((nota) => (
-      nota.itens.some((insumo) => insumo.numeroPartida.toLowerCase().includes(numeroPartida.toLowerCase()))
-    ));
-    const matchDoenca = !doenca || notas.some((nota) => nota.itens.some((insumo) => insumo.doenca === doenca.nome));
-    const matchTipo = tipoInsumo === "" || notas.some((nota) => nota.itens.some((insumo) => insumo.tipoInsumo === tipoInsumo));
-    const matchPeriodo = (!periodoDe || item.dataCadastro >= periodoDe)
-      && (!periodoAte || item.dataCadastro <= periodoAte);
-    const matchSituacao = situacao === "" || item.situacao === situacao;
+      const notas = item.notasFiscais;
+      const matchRevendedora = !revendedora || item.revendedora.codigo === revendedora.codigo;
+      const matchNota = numeroNotaFiscal === "" || notas.some((nota) => nota.numero.includes(numeroNotaFiscal));
+      const matchPartida = numeroPartida === "" || notas.some((nota) => (
+        nota.itens.some((insumo) => insumo.numeroPartida.toLowerCase().includes(numeroPartida.toLowerCase()))
+      ));
+      const matchDoenca = !doenca || notas.some((nota) => nota.itens.some((insumo) => insumo.doenca === doenca.nome));
+      const matchTipo = tipoInsumo === "" || notas.some((nota) => nota.itens.some((insumo) => insumo.tipoInsumo === tipoInsumo));
+      const matchPeriodo = (!periodoDe || item.dataCadastro >= periodoDe)
+        && (!periodoAte || item.dataCadastro <= periodoAte);
+      const matchSituacao = situacao === "" || item.situacao === situacao;
       return matchRevendedora && matchNota && matchPartida && matchDoenca && matchTipo && matchPeriodo && matchSituacao;
     });
 
@@ -178,18 +213,17 @@ export function AjusteDosesInsumoPage({ onLogout, onNavigate }: PageProps) {
               />
 
               <FloatInput
-                label="Período - De"
-                type="date"
-                value={periodoDe}
-                icon={<Calendar size={17} />}
-                onChange={setPeriodoDe}
+                label="Número da Nota Fiscal"
+                value={numeroNotaFiscal}
+                type="number"
+                onChange={(value) => setNumeroNotaFiscal(value.replace(/\D/g, ""))}
               />
               <FloatInput
-                label="Período - Até"
-                type="date"
-                value={periodoAte}
-                icon={<Calendar size={17} />}
-                onChange={setPeriodoAte}
+                label="Número da Partida"
+                value={numeroPartida}
+                maxLength={10}
+                placeholder="0001245/26"
+                onChange={(value) => setNumeroPartida(value.toUpperCase().slice(0, 10))}
               />
               <button
                 type="button"
@@ -203,17 +237,18 @@ export function AjusteDosesInsumoPage({ onLogout, onNavigate }: PageProps) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 items-end">
               <FloatInput
-                label="Número da Nota Fiscal"
-                value={numeroNotaFiscal}
-                type="number"
-                onChange={(value) => setNumeroNotaFiscal(value.replace(/\D/g, ""))}
+                label="Período - De"
+                type="date"
+                value={periodoDe}
+                icon={<Calendar size={17} />}
+                onChange={setPeriodoDe}
               />
               <FloatInput
-                label="Número da Partida"
-                value={numeroPartida}
-                maxLength={10}
-                placeholder="0001245/26"
-                onChange={(value) => setNumeroPartida(value.toUpperCase().slice(0, 10))}
+                label="Período - Até"
+                type="date"
+                value={periodoAte}
+                icon={<Calendar size={17} />}
+                onChange={setPeriodoAte}
               />
               <EntitySearchInput
                 label="Doença"
@@ -227,13 +262,13 @@ export function AjusteDosesInsumoPage({ onLogout, onNavigate }: PageProps) {
                 subtitle="Busque por doenças que possuem insumos de exame vinculados:"
                 onChange={(item) => { setDoenca(item); setTipoInsumo(""); }}
               />
-              <FloatSelect
-                label="Tipo de Insumo"
-                value={tipoInsumo}
-                options={tiposInsumo}
-                disabled={!doenca}
-                onChange={setTipoInsumo}
-              />
+              {doenca && (
+                <FloatSelect
+                  label="Tipo de Insumo"
+                  value={tipoInsumo}
+                  options={tiposInsumo}
+                  onChange={setTipoInsumo}
+                />)}
               <FloatSelect
                 label="Situação"
                 value={situacao}
@@ -241,6 +276,20 @@ export function AjusteDosesInsumoPage({ onLogout, onNavigate }: PageProps) {
                 onChange={setSituacao}
               />
             </div>
+
+            {/* Renderização dos Chips dos Filtros Ativos */}
+            {temFiltroAtivo && (
+              <div className="flex flex-wrap gap-2 mt-2 animate-fadeIn">
+                {revendedora && <Chip label={`Revendedora: ${revendedora.nome}`} onRemove={() => setRevendedora(null)} />}
+                {numeroNotaFiscal && <Chip label={`NF: ${numeroNotaFiscal}`} onRemove={() => setNumeroNotaFiscal("")} />}
+                {numeroPartida && <Chip label={`Partida: ${numeroPartida}`} onRemove={() => setNumeroPartida("")} />}
+                {doenca && <Chip label={`Doença: ${doenca.nome}`} onRemove={() => { setDoenca(null); setTipoInsumo(""); }} />}
+                {tipoInsumo && <Chip label={`Tipo de Insumo: ${tipoInsumo}`} onRemove={() => setTipoInsumo("")} />}
+                {periodoDe && <Chip label={`De: ${periodoDe.split("-").reverse().join("/")}`} onRemove={() => setPeriodoDe("")} />}
+                {periodoAte && <Chip label={`Até: ${periodoAte.split("-").reverse().join("/")}`} onRemove={() => setPeriodoAte("")} />}
+                {situacao && <Chip label={`Situação: ${situacao}`} onRemove={() => setSituacao("")} />}
+              </div>
+            )}
 
             {partidaInvalida && (
               <p className="text-xs text-red-500">O número da partida deve possuir 7 caracteres, barra e ano com 2 dígitos.</p>
@@ -265,14 +314,14 @@ export function AjusteDosesInsumoPage({ onLogout, onNavigate }: PageProps) {
                     <tr className="border-b border-gray-100">
                       <th className="text-left px-4 py-3 uppercase font-semibold text-gray-600 min-w-[260px]">Revendedora de Insumos</th>
                       {([
-                        ["nota", "Número da Nota Fiscal", "whitespace-nowrap"],
-                        ["partida", "Número da Partida", "whitespace-nowrap"],
-                        ["doenca", "Doença", "min-w-[260px]"],
-                        ["situacao", "Situação", "whitespace-nowrap"],
-                      ] as const).map(([campo, titulo, tamanho]) => (
-                        <th key={campo} className={`text-left px-4 py-3 uppercase font-semibold text-gray-600 ${tamanho}`}>
+                        ["nota", "NÚMERO DA NOTA FISCAL"],
+                        ["partida", "NÚMERO DE PARTIDA"],
+                        ["doenca", "DOENÇA"],
+                        ["situacao", "SITUAÇÃO",],
+                      ] as const).map(([campo, titulo]) => (
+                        <th key={campo} className={`text-left px-4 py-3 font-semibold text-xs text-gray-600`}>
                           <button type="button" onClick={() => alternarOrdenacao(campo)} className="flex items-center gap-1 hover:text-[#1A7A3C]">
-                            {titulo} <ArrowUpDown size={13} aria-label={`Ordenar por ${titulo}`} />
+                            {titulo}
                           </button>
                         </th>
                       ))}
@@ -298,15 +347,17 @@ export function AjusteDosesInsumoPage({ onLogout, onNavigate }: PageProps) {
                             >
                               <Eye size={18} />
                             </button>
-                            {item.situacao === "Gravada" && <button
-                              type="button"
-                              onClick={() => onNavigate("editar-ajuste-doses-insumo", item)}
-                              className="p-2 rounded-md hover:bg-green-50 transition"
-                              style={{ color: GREEN }}
-                              title="Editar"
-                            >
-                              <Pencil size={17} />
-                            </button>}
+                            {item.situacao === "Gravada" && (
+                              <button
+                                type="button"
+                                onClick={() => onNavigate("editar-ajuste-doses-insumo", item)}
+                                className="p-2 rounded-md hover:bg-green-50 transition"
+                                style={{ color: GREEN }}
+                                title="Editar"
+                              >
+                                <Pencil size={17} />
+                              </button>
+                            )}
                           </div>
                         </td>
                       </tr>
