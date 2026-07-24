@@ -27,17 +27,16 @@ const toFormValue = (registro: AjusteDosesInsumo): AjusteDosesInsumoFormValue =>
 
 export function EditarAjusteDosesInsumoPage({ onLogout, onNavigate, dados }: PageProps) {
   const registro = dados ?? obterAjusteDosesInsumo();
-  const [form, setForm] = useState<AjusteDosesInsumoFormValue | null>(() => (
-    registro ? toFormValue(registro) : null
-  ));
+  const [confirmandoCancelamento, setConfirmandoCancelamento] = useState(false);
   const [erro, setErro] = useState("");
 
-  if (!registro || !form) return null;
+  if (!registro) return null;
 
-  const salvar = () => {
-    const atualizado = atualizarAjusteDosesInsumo(registro.id, form.situacao);
+  const cancelar = () => {
+    const atualizado = atualizarAjusteDosesInsumo(registro.id);
     if (!atualizado) {
-      setErro("Não foi possível localizar o ajuste para edição.");
+      setErro("Este ajuste já está cancelado e não pode voltar para a situação Gravada.");
+      setConfirmandoCancelamento(false);
       return;
     }
     onNavigate("visualizar-ajuste-doses-insumo", atualizado);
@@ -58,24 +57,37 @@ export function EditarAjusteDosesInsumoPage({ onLogout, onNavigate, dados }: Pag
             <ArrowLeft size={15} /> Visualizar Ajuste de Doses de Insumo
           </button>
           <div className="flex items-center justify-between gap-4">
-            <h1 className="text-2xl font-semibold text-gray-900">Editar Ajuste de Doses de Insumo</h1>
-            <button
+            <h1 className="text-2xl font-semibold text-gray-900">Cancelar Ajuste de Doses de Insumo</h1>
+            {registro.situacao === "Gravada" && <button
               type="button"
-              onClick={salvar}
-              className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold rounded-md transition shadow-sm"
+              onClick={() => setConfirmandoCancelamento(true)}
+              className="px-5 h-10 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-md transition shadow-sm"
             >
-              Salvar
-            </button>
+              Cancelar
+            </button>}
           </div>
         </div>
 
         <AjusteDosesInsumoForm
-          value={form}
-          onChange={(value) => { setForm(value); setErro(""); }}
+          value={toFormValue(registro)}
+          onChange={() => {}}
           mode="edit"
         />
         {erro && <p className="text-sm text-red-500 font-medium">{erro}</p>}
       </main>
+
+      {confirmandoCancelamento && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
+            <h2 className="text-lg font-bold text-gray-900">Cancelar ajuste de doses?</h2>
+            <p className="mt-2 text-sm text-gray-600">Após o cancelamento, o ajuste ficará com situação Cancelada e não poderá voltar para Gravada.</p>
+            <div className="mt-6 flex justify-end gap-3">
+              <button type="button" onClick={() => setConfirmandoCancelamento(false)} className="h-10 rounded-md border border-gray-300 px-4 text-sm font-semibold text-gray-700">Voltar</button>
+              <button type="button" onClick={cancelar} className="h-10 rounded-md bg-red-600 px-4 text-sm font-semibold text-white hover:bg-red-700">Confirmar cancelamento</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

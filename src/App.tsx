@@ -133,6 +133,11 @@ import { AdicionarAjusteDosesInsumoPage } from "./pages/Vacinacao/AjusteDosesIns
 import { VisualizarAjusteDosesInsumoPage } from "./pages/Vacinacao/AjusteDosesInsumo/VisualizarAjusteDosesInsumo";
 import { EditarAjusteDosesInsumoPage } from "./pages/Vacinacao/AjusteDosesInsumo/EditarAjusteDosesInsumo";
 
+import { AtestadoExamePage } from "./pages/Vacinacao/AtestadoExame/AtestadoExame";
+import { AdicionarAtestadoExamePage } from "./pages/Vacinacao/AtestadoExame/AdicionarAtestadoExame";
+import { VisualizarAtestadoExamePage } from "./pages/Vacinacao/AtestadoExame/VisualizarAtestadoExame";
+import { EditarAtestadoExamePage } from "./pages/Vacinacao/AtestadoExame/EditarAtestadoExame";
+
 //ARRECADACAO
 import { FundoArrecadacaoPage } from "./pages/Arrecadacao/FundoArrecadacao/FundoArrecadacao";
 import {
@@ -351,6 +356,10 @@ export type Screen =
 	| "visualizar-dae-lote-pagamento"
 	| "tipo-veiculo"
 	| "adicionar-tipo-veiculo"
+	| "atestado-exame"
+	| "adicionar-atestado-exame"
+	| "visualizar-atestado-exame"
+	| "editar-atestado-exame"
 	| "venda-entrada-insumos-exames"
 	| "adicionar-venda-entrada-insumos-exames"
 	| "status-animal"
@@ -1565,6 +1574,7 @@ export default function App() {
 					instituicao={screenData}
 				/>
 			);
+
 		case "venda-entrada-insumos-exames":
 			return (
 				<VendaComEntradaInsumosExamesPage
@@ -1575,6 +1585,35 @@ export default function App() {
 		case "adicionar-venda-entrada-insumos-exames":
 			return (
 				<AdicionarVendaComEntradaInsumosExamesPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+
+		case "atestado-exame":
+			return (
+				<AtestadoExamePage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-atestado-exame":
+			return (
+				<AdicionarAtestadoExamePage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-atestado-exame":
+			return (
+				<VisualizarAtestadoExamePage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "editar-atestado-exame":
+			return (
+				<EditarAtestadoExamePage
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
 				/>
