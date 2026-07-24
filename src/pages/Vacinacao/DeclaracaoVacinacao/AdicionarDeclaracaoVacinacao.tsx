@@ -1802,26 +1802,26 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageP
         open={modalNotaOrigemOpen}
         onClose={() => setModalNotaOrigemOpen(false)}
         title="Buscar Lotes de Vacinas"
-        subtitle="Selecione os lotes de vacina desejados para vincular a esta declaração:"
+        subtitle="Selecione os lotes de vacina desejados para vincular a este ajuste:"
         icon={<Package size={24} color={GREEN} />}
-        /* Dados continuam os mesmos */
         data={[
-          { id: 1, nome: "0013225/24", partida: "1", uf: "MG", dosesDisponiveisTotais: 120, fornecedor: "Distribuidora de Vacinas Alfa LTDA", doenca: "Brucelose", exigeReceituario: true, tipoVacina: "B19", laboratorio: "BioMed/MG", validade: "20/12/2026" },
-          { id: 2, nome: "0013225/24", partida: "2", uf: "MG", dosesDisponiveisTotais: 80, fornecedor: "Distribuidora de Vacinas Alfa LTDA", doenca: "Brucelose", exigeReceituario: true, tipoVacina: "Oleosa", laboratorio: "BioMed/MG", validade: "20/12/2026" },
-          { id: 3, nome: "0014589/24", partida: "1", uf: "SP", dosesDisponiveisTotais: 250, fornecedor: "Comercial Agropecuária Beta S/A", doenca: "Raiva dos Herbívoros", exigeReceituario: false, tipoVacina: "Inativada", laboratorio: "Zoetis", validade: "15/08/2027" },
-          { id: 4, nome: "0014589/24", partida: "1", uf: "GO", dosesDisponiveisTotais: 50, fornecedor: "Laboratório Biovet Saúde Animal", doenca: "Raiva dos Herbívoros", exigeReceituario: true, tipoVacina: "B19", laboratorio: "Biovet", validade: "15/08/2027" }
-        ]}
-
-        searchKeys={["nome", "partida", "fornecedor", "uf"]}
-        searchPlaceholder="Busque por lote."
-
-        /* ALTERADO: Substituída a coluna de Partida pela de Saldo da Apresentação */
+          { id: 1, nome: "0013225/24", partida: "1", uf: "MG", dosesDisponiveisTotais: 120, fornecedor: "Distribuidora de Vacinas Alfa LTDA", doenca: "Brucelose", tipoVacina: "B19", laboratorio: "BioMed/MG", validade: "20/12/2026" },
+          { id: 2, nome: "0013225/24", partida: "2", uf: "MG", dosesDisponiveisTotais: 80, fornecedor: "Distribuidora de Vacinas Alfa LTDA", doenca: "Brucelose", tipoVacina: "Oleosa", laboratorio: "BioMed/MG", validade: "20/12/2026" },
+          { id: 3, nome: "0014589/24", partida: "1", uf: "SP", dosesDisponiveisTotais: 250, fornecedor: "Comercial Agropecuária Beta S/A", doenca: "Raiva dos Herbívoros", tipoVacina: "", laboratorio: "Zoetis", validade: "15/08/2027" },
+          { id: 4, nome: "0014589/24", partida: "1", uf: "GO", dosesDisponiveisTotais: 50, fornecedor: "Laboratório Biovet Saúde Animal", doenca: "Raiva dos Herbívoros", tipoVacina: "", laboratorio: "Biovet", validade: "15/08/2027" }
+        ].map((item) => ({
+          ...item,
+          // Cria um campo combinado para a coluna exibir
+          doencaComTipo: `${item.doenca} - ${item.tipoVacina}`,
+        }))}
+        searchKeys={["nome", "partida", "doenca", "tipoVacina", "fornecedor", "uf"]}
+        searchPlaceholder="Busque por lote ou doença."
         columns={[
           { label: "Lote/ Nº de Partida", key: "nome" },
-          { label: "Saldo da Apresentação", key: "dosesDisponiveisTotais" }, // <-- Mudança aqui
+          { label: "Vacina", key: "doencaComTipo" }, // <-- Usando a chave combinada aqui
+          { label: "Saldo da Apresentação", key: "dosesDisponiveisTotais" },
           { label: "UF", key: "uf" }
         ]}
-
         selectedItems={notasFiscaisOrigem}
         onConfirm={(selectedValues) => {
           setNotasFiscaisOrigem(selectedValues);
