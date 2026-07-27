@@ -383,7 +383,7 @@ export function VendaComEntradaInsumosExamesPage({
 							<button
 								type="button"
 								onClick={handlePesquisar}
-								className="h-12 px-5 rounded-md text-white text-sm font-semibold transition hover:opacity-90 flex items-center justify-center flex-shrink-0"
+								className={`${tipoDestinatario ? "md:col-span-2" : "md:col-span-3"} w-full h-12 px-5 rounded-md text-white text-sm font-semibold transition hover:opacity-90 flex items-center justify-center flex-shrink-0`}
 								style={{ backgroundColor: GREEN }}>
 								Pesquisar
 							</button>

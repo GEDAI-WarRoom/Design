@@ -505,7 +505,6 @@ export function LoteCardItem({
 					disabled
 					value={String(totalDosesLote || "")}
 					onChange={() => { }}
-					className="md:w-1/2"
 				/>
 			</SubGrupo>
 		</div>
@@ -608,12 +607,6 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
 		return Array.from(map, ([doenca, total]) => ({ doenca, total }));
 	}, [lotes]);
 
-	const isRevendedora =
-		destinatario === "Revendedora de Produtos Agropecuários";
-
-	const isMedicoVeterinario =
-		destinatario == null || destinatario === "Médico Veterinário";
-
 	return (
 		<div className="min-h-screen bg-[#f2f3f5]">
 			<Navbar
@@ -679,22 +672,20 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
 						</div>
 					</Section>
 					<Section title="Destinatário">
-						<div className="flex flex-col gap-4">
+						<div
+							className={`grid grid-cols-1 gap-4`}>
 							{/* 1. Seleção do Tipo de Destinatário */}
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-								<FloatSelect
-									label="Tipo de Destinatário"
-									value={destinatario || ""}
-									onChange={(val) => {
-										setDestinatario(val);
-										// Limpa seleções anteriores ao alterar o tipo
-										setRevendedora(null);
-										setMedicoVeterinario(null);
-									}}
-									options={TIPOS_DESTINATARIOS}
-									required
-								/>
-							</div>
+							<FloatSelect
+								label="Tipo de Destinatário"
+								value={destinatario || ""}
+								onChange={(val) => {
+									setDestinatario(val);
+									setRevendedora(null);
+									setMedicoVeterinario(null);
+								}}
+								options={TIPOS_DESTINATARIOS}
+								required
+							/>
 
 							{/* 2. Campo da Revendedora (Aparece apenas quando selecionado "Revendedora de Produtos Agropecuários") */}
 							{destinatario === "Revendedora de Produtos Agropecuários" && (
