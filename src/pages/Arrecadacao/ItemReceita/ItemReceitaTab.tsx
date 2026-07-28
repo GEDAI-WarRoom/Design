@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Eye, Pencil, Ruler, Hash, X } from "lucide-react";
+import { Eye, Pencil, Ruler, Hash, Layers, ChevronUp, ChevronDown } from "lucide-react";
 import { FloatInput, SimNao } from "../../../components/ui/FormKit";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "../../../components/ui-1/dialog";
 
 // Mocks utilizados para os inputs do tipo Entidade
 const UNIDADES_MEDIDA_ENTIDADE = [
@@ -18,6 +19,28 @@ interface ItemReceitaTabProps {
   receitaId: number;
   isModalOpen: boolean;
   setIsModalOpen: (open: boolean) => void;
+}
+
+// Subcomponente local para criar o "Card" colapsável dentro do modal (Informações Básicas)
+function ModalSection({ title, children }: { title: string; children: React.ReactNode }) {
+  const [isOpen, setIsOpen] = useState(true);
+  return (
+    <div className="w-full border border-gray-200 rounded-xl bg-white shadow-sm overflow-hidden mt-2">
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between p-5 bg-white hover:bg-gray-50 transition-colors"
+      >
+        <span className="text-sm font-bold text-gray-800">{title}</span>
+        {isOpen ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
+      </button>
+      {isOpen && (
+        <div className="p-5 pt-2 border-t border-gray-100 flex flex-col gap-5">
+          {children}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export function ItemReceitaTab({ receitaId, isModalOpen, setIsModalOpen }: ItemReceitaTabProps) {
@@ -40,7 +63,6 @@ export function ItemReceitaTab({ receitaId, isModalOpen, setIsModalOpen }: ItemR
       indice: "UFEMG",
       quantidadeIndice: "1,50",
       contribuicaoFundo: "Sim",
-      situacao: "Ativo"
     }
   ]);
 
@@ -69,7 +91,7 @@ export function ItemReceitaTab({ receitaId, isModalOpen, setIsModalOpen }: ItemR
 
   const handleSalvar = () => {
     if (!formularioValido) return;
-    // Aqui vai a lógica de salvamento na API (Adição ou Edição)
+    // Lógica de salvamento na API (Adição ou Edição)
     setIsModalOpen(false);
   };
 
@@ -77,6 +99,10 @@ export function ItemReceitaTab({ receitaId, isModalOpen, setIsModalOpen }: ItemR
     modalMode === "view" ? "Visualizar Item de Receita" : 
     modalMode === "edit" ? "Editar Item de Receita" : 
     "Adicionar Item de Receita";
+
+  const modalSubtitle = 
+    modalMode === "view" ? "Detalhes do item de receita vinculado." :
+    "Preencha os campos para adicionar um item.";
 
   return (
     <section className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -86,7 +112,7 @@ export function ItemReceitaTab({ receitaId, isModalOpen, setIsModalOpen }: ItemR
         <h2 className="text-base font-semibold text-gray-800">Itens de Receita Vinculados</h2>
       </div>
 
-      {/* Tabela de Listagem */}
+      {/* Tabela de Listagem - Colunas Índice e Qtde. Índice removidas */}
       <div className="p-6">
         <div className="overflow-x-auto">
           <table className="w-full text-sm border-collapse">
@@ -94,27 +120,21 @@ export function ItemReceitaTab({ receitaId, isModalOpen, setIsModalOpen }: ItemR
               <tr className="border-b border-gray-100 bg-gray-50/50">
                 <th className="text-left px-4 py-3 font-semibold text-gray-600 uppercase">Item de Receita</th>
                 <th className="text-left px-4 py-3 font-semibold text-gray-600 uppercase">Unidade de Medida</th>
-                <th className="text-left px-4 py-3 font-semibold text-gray-600 uppercase">Índice</th>
-                <th className="text-left px-4 py-3 font-semibold text-gray-600 uppercase">Qtde. do Índice</th>
                 <th className="text-left px-4 py-3 font-semibold text-gray-600 uppercase">Permite contribuição ao fundo privado?</th>
-                <th className="text-left px-4 py-3 font-semibold text-gray-600 uppercase">Situação</th>
                 <th className="text-right px-4 py-3 w-24">Ações</th>
               </tr>
             </thead>
             <tbody>
               {itens.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-8 text-center text-gray-500">Nenhum item de receita cadastrado.</td>
+                  <td colSpan={4} className="py-8 text-center text-gray-500">Nenhum item de receita cadastrado.</td>
                 </tr>
               ) : (
                 itens.map((t) => (
                   <tr key={t.id} className="border-b border-gray-50 hover:bg-gray-50/60 transition">
                     <td className="px-4 py-3 text-gray-700 font-medium">{t.itemReceita}</td>
                     <td className="px-4 py-3 text-gray-700">{t.unidadeMedida}</td>
-                    <td className="px-4 py-3 text-gray-700">{t.indice}</td>
-                    <td className="px-4 py-3 text-gray-700">{t.quantidadeIndice}</td>
                     <td className="px-4 py-3 text-gray-700">{t.contribuicaoFundo}</td>
-                    <td className="px-4 py-3 text-gray-700">{t.situacao}</td>
                     <td className="px-4 py-3 text-right whitespace-nowrap">
                       <div className="flex justify-end gap-1">
                         <button 
@@ -149,35 +169,38 @@ export function ItemReceitaTab({ receitaId, isModalOpen, setIsModalOpen }: ItemR
         </div>
       </div>
 
-      {/* MODAL INLINE */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4 animate-fadeIn">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl p-8 flex flex-col relative">
-            
-            {/* Cabeçalho do Modal */}
-            <div className="flex justify-between items-center border-b border-gray-100 pb-4 mb-6">
-              <h2 className="text-xl font-bold text-gray-900">
-                {modalTitle}
-              </h2>
-              <button 
-                type="button" 
-                onClick={() => setIsModalOpen(false)} 
-                className="text-gray-400 hover:text-gray-600 transition"
-              >
-                <X size={24} />
-              </button>
+      {/* MODAL PADRONIZADO (Largura 1000px, padding idêntico ao Adicionar Profissional) */}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="max-w-[1000px] px-[45px] py-[40px] bg-white rounded-[15px] border border-[#d6d6d6] shadow-xl overflow-y-auto max-h-[90vh]">
+          
+          <DialogHeader className="flex flex-col items-center justify-center text-center space-y-2 mb-2">
+            <div className="flex items-center justify-center gap-2 text-[#1A7A3C]">
+              <Layers size={24} />
+              <DialogTitle className="text-2xl font-bold text-gray-900 tracking-tight">{modalTitle}</DialogTitle>
             </div>
+            <DialogDescription className="text-sm text-gray-600 font-medium">
+              {modalSubtitle}
+            </DialogDescription>
+          </DialogHeader>
 
-            {/* Corpo do Formulário */}
+          {/* Divisor Padrão */}
+          <div className="flex flex-col items-center justify-center py-[12px] w-full">
+            <div className="h-[1px] w-full bg-[#D2D2D7]/60" />
+          </div>
+
+          {/* Agrupamento em estilo de Card interno conforme design solicitado */}
+          <ModalSection title="Informações Básicas">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 w-full">
-              <FloatInput
-                label="Item de Receita"
-                required={!isViewOnly}
-                value={itemReceita}
-                onChange={setItemReceita}
-                maxLength={255}
-                disabled={isViewOnly}
-              />
+              <div className="md:col-span-2">
+                <FloatInput
+                  label="Item de Receita"
+                  required={!isViewOnly}
+                  value={itemReceita}
+                  onChange={setItemReceita}
+                  maxLength={255}
+                  disabled={isViewOnly}
+                />
+              </div>
 
               {isViewOnly ? (
                 <FloatInput
@@ -251,41 +274,42 @@ export function ItemReceitaTab({ receitaId, isModalOpen, setIsModalOpen }: ItemR
                 />
               </div>
             </div>
+          </ModalSection>
 
-            {/* Rodapé do Modal */}
-            <div className="flex justify-end gap-3 mt-8 pt-4 border-t border-gray-100">
-              {isViewOnly ? (
+          {/* Rodapé do Modal centralizado */}
+          <div className="flex justify-center items-center gap-[12px] pb-[10px] pt-[30px] w-full">
+            {isViewOnly ? (
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(false)}
+                className="flex h-[43px] items-center justify-center px-[24px] py-[8px] rounded-[4px] cursor-pointer transition hover:bg-gray-50 bg-white"
+                style={{ border: "1px solid #008446" }}
+              >
+                <span className="text-[15px] font-bold text-[#008446]">Voltar</span>
+              </button>
+            ) : (
+              <>
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-6 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50 transition"
+                  className="flex h-[43px] items-center justify-center px-[24px] py-[8px] rounded-[4px] cursor-pointer transition hover:bg-gray-50 bg-white"
+                  style={{ border: "1px solid #008446" }}
                 >
-                  Voltar
+                  <span className="text-[15px] font-bold text-[#008446]">Cancelar</span>
                 </button>
-              ) : (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => setIsModalOpen(false)}
-                    className="px-6 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50 transition"
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleSalvar}
-                    disabled={!formularioValido}
-                    className="px-6 h-11 rounded-md bg-[#1A7A3C] text-white text-sm font-semibold hover:bg-[#15612F] disabled:opacity-50 transition shadow-sm"
-                  >
-                    Salvar
-                  </button>
-                </>
-              )}
-            </div>
-            
+                <button
+                  type="button"
+                  onClick={handleSalvar}
+                  disabled={!formularioValido}
+                  className="bg-[#008446] hover:bg-[#006b38] disabled:opacity-50 disabled:cursor-not-allowed flex h-[43px] items-center justify-center px-[24px] py-[8px] rounded-[4px] cursor-pointer transition shadow-sm"
+                >
+                  <span className="text-[15px] font-bold text-white">Salvar</span>
+                </button>
+              </>
+            )}
           </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }
