@@ -78,6 +78,7 @@ export const UNIDADES_MEDIDA_ENTIDADE = [
     descricao: "Quantidade por frasco",
   },
 ];
+
 export const RECEITAS_ENTIDADE = [
   {
     id: 1,
@@ -129,12 +130,10 @@ export const RECEITAS_ENTIDADE = [
     ativo: false,
   },
 ];
+
 const INDICES = ["UFEMG"];
-const CONTRIBUICAO_FUNDO = ["Sim", "Não"];
 const SITUACOES = ["Ativo", "Inativo"];
 
-// const MEIOS_TRANSPORTE = ["Aéreo", "A Pé", "Ferroviário", "Marítimo/Fluvial", "Rodoviário"];
-// const SITUACOES = ["Ativo", "Inativo"];
 const toOptions = (arr: string[]) =>
   arr.map((v) => ({ value: v, label: v }));
 
@@ -191,7 +190,6 @@ interface ItemReceitaData {
 interface PageProps {
   onLogout: () => void;
   onNavigate: (screen: any, data?: any) => void;
-  // Quando presente, a tela entra em modo de edição e a Situação passa a ficar disponível
   data?: ItemReceitaData;
 }
 
@@ -210,7 +208,7 @@ export function AdicionarItemReceitaPage({
   const [indice, setIndice] = useState(data?.indice ?? "");
   const [quantidadeIndice, setQuantidadeIndice] = useState("");
   const [contribuicaoFundo, setContribuicaoFundo] = useState(
-    data?.contribuicaoFundo ?? "Sim",
+    data?.contribuicaoFundo ? "Sim" : "Sim",
   );
   const [situacao, setSituacao] = useState<string>(
     data?.situacao ?? "Ativo",
@@ -241,7 +239,7 @@ export function AdicionarItemReceitaPage({
           <button
             type="button"
             onClick={() => onNavigate("item-receita")}
-            className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70"
+            className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70 font-semibold"
             style={{ color: GREEN }}
           >
             <ArrowLeft size={15} />
@@ -257,7 +255,7 @@ export function AdicionarItemReceitaPage({
               type="button"
               disabled={!formularioValido}
               onClick={() => setIsSucesso(true)}
-              className="px-5 py-3 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-bold rounded-md transition shadow-sm"
+              className="px-6 py-3 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-bold rounded-md transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isEdicao ? "Salvar" : "Adicionar"}
             </button>
@@ -277,7 +275,8 @@ export function AdicionarItemReceitaPage({
 
         <Section title="Informações Básicas">
           <div
-            className={`grid grid-cols-1 ${isEdicao ? "md:grid-cols-3" : "md:grid-cols-2"} gap-4 items-center`}
+            className={`grid grid-cols-1 ${isEdicao ? "md:grid-cols-3" : "md:grid-cols-2"
+              } gap-4 items-center`}
           >
             <FloatInput
               label="Item da Receita"
@@ -289,7 +288,7 @@ export function AdicionarItemReceitaPage({
             <EntitySearchInput
               label="Unidade de Medida"
               placeholder="Buscar por unidade de medida"
-              value={unidadeMedida ? unidadeMedida : ""}
+              value={unidadeMedida}
               data={UNIDADES_MEDIDA_ENTIDADE}
               searchKeys={["nome", "sigla", "descricao"]}
               columns={[
@@ -307,7 +306,7 @@ export function AdicionarItemReceitaPage({
             <EntitySearchInput
               label="Receitas"
               placeholder="Buscar por receita"
-              value={receita ? receita : ""}
+              value={receita}
               data={RECEITAS_ENTIDADE}
               searchKeys={["nome", "sigla", "descricao"]}
               columns={[
@@ -327,14 +326,14 @@ export function AdicionarItemReceitaPage({
               required
             />
             <FloatSelect
-              label="Indice"
+              label="Índice"
               required
               value={indice}
               onChange={setIndice}
               options={toOptions(INDICES)}
             />
             <FloatInput
-              label="Quantidade do Indice"
+              label="Quantidade do Índice"
               required
               value={quantidadeIndice}
               onChange={setQuantidadeIndice}
@@ -360,38 +359,47 @@ export function AdicionarItemReceitaPage({
         </Section>
       </main>
 
+      {/* Modal de Sucesso com largura expandida */}
       {isSucesso && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
-            <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl p-8 text-center animate-fadeIn">
+            <div className="w-16 h-16 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4">
               <Check
-                size={28}
+                size={32}
                 className="text-[#1A7A3C]"
                 strokeWidth={3}
               />
             </div>
-            <h3 className="text-lg font-bold text-gray-900">
+            <h3 className="text-xl font-bold text-gray-900">
               {isEdicao
                 ? "Item de receita atualizado com sucesso!"
                 : "Item de receita cadastrado com sucesso!"}
             </h3>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-600 mt-2 leading-relaxed max-w-md mx-auto">
               {itemReceita
                 ? `O Item de receita "${itemReceita}"`
                 : "O Item de receita"}{" "}
-              foi {isEdicao ? "atualizado" : "cadastrado"}.
+              foi {isEdicao ? "atualizado" : "cadastrado"} com sucesso no sistema.
             </p>
-            <div className="flex gap-3 justify-center mt-6">
+            <div className="flex gap-3 justify-center mt-8">
               <button
+                type="button"
                 onClick={() => {
                   setIsSucesso(false);
                   onNavigate("item-receita");
                 }}
-                className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition"
+                className="px-8 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/50 transition"
               >
                 Voltar
               </button>
-              <button className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsSucesso(false);
+                  onNavigate("item-receita");
+                }}
+                className="px-8 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition shadow-sm"
+              >
                 Visualizar
               </button>
             </div>
