@@ -1,45 +1,256 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import {
   ArrowLeft,
+  ArrowRight,
+  CalendarDays,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
   ChevronUp,
+  ClipboardCopy,
+  ContactRound,
+  Dna,
+  DollarSign,
   Eye,
-  Pencil,
+  Factory,
+  FileCheck2,
+  FileDown,
+  Landmark,
+  Plane,
+  Search,
   SlidersHorizontal,
+  Store,
+  Truck,
+  Warehouse,
   X,
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
+import { EntitySearchInput } from "../../../components/ui/EntitySearch";
 import { FloatInput, FloatSelect } from "../../../components/ui/FormKit";
 import {
+  AEROPORTOS_GTA,
   EMISSOES_GTA_MOCK,
+  ESPECIES_GTA,
+  ESTABELECIMENTOS_GTA,
+  EVENTOS_GTA,
+  EXPLORACOES_GTA,
+  FINALIDADES_GTA,
+  FRIGORIFICOS_GTA,
+  NUCLEOS_GTA,
+  PESSOAS_GTA,
+  REVENDEDORAS_ANIMAIS_GTA,
+  SITUACOES_GTA,
   TIPOS_FORMULARIO_GTA,
-  TIPOS_PROCEDENCIA_GTA,
+  TIPOS_LOCAL_OPTIONS,
+  copiarEmissaoGta,
+  criarLocalVazio,
   formatarDataGta,
   type EmissaoGta,
+  type EntidadeGta,
+  type LocalGta,
+  type TipoLocalGta,
 } from "./emissaoGtaData";
 
 type SortKey =
-  | "numeroGta"
+  | "serieNumero"
   | "tipoFormulario"
+  | "especie"
+  | "finalidade"
+  | "procedencia"
+  | "destino"
   | "dataEmissao"
-  | "produtor";
+  | "situacao";
 
-function FilterChip({
+function SearchEntityField({
   label,
-  onRemove,
+  value,
+  data,
+  onChange,
+  codeKey = "codigo",
+  icon,
 }: {
   label: string;
-  onRemove: () => void;
+  value: EntidadeGta | null;
+  data: EntidadeGta[];
+  onChange: (entidade: any) => void;
+  codeKey?: "codigo" | "documento";
+  icon: ReactNode;
 }) {
   return (
-    <div className="flex items-center gap-2 bg-[#1A7A3C] text-white text-xs font-medium px-3 py-1.5 rounded-md shadow-sm">
-      <span>{label}</span>
-      <button type="button" onClick={onRemove} aria-label={`Remover ${label}`}>
-        <X size={14} />
-      </button>
+    <EntitySearchInput
+      label={label}
+      placeholder={`Buscar ${label.toLowerCase()}`}
+      value={value?.nome ?? ""}
+      data={data}
+      searchKeys={["nome", codeKey]}
+      columns={[
+        { label, key: "nome" },
+        {
+          label: codeKey === "documento" ? "CPF/CNPJ" : "Código",
+          key: codeKey,
+        },
+      ]}
+      icon={icon}
+      title={`Buscar ${label}`}
+      subtitle={`Busque por ${label.toLowerCase()} cadastrado no sistema:`}
+      confirmLabel="Selecionar"
+      onChange={onChange}
+    />
+  );
+}
+
+function LocalFilters({
+  titulo,
+  local,
+  onChange,
+}: {
+  titulo: "Origem" | "Destino";
+  local: LocalGta;
+  onChange: (local: LocalGta) => void;
+}) {
+  const update = (patch: Partial<LocalGta>) => onChange({ ...local, ...patch });
+  return (
+    <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+      <span className="w-14 flex-shrink-0 text-xs font-medium text-gray-600">
+        {titulo}:
+      </span>
+      <div className="grid flex-1 grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+        <SearchEntityField
+          label={
+            titulo === "Origem"
+              ? "Responsável de Procedência"
+              : "Responsável de Destino"
+          }
+          value={local.responsavel}
+          data={PESSOAS_GTA}
+          codeKey="documento"
+          icon={<ContactRound size={20} />}
+          onChange={(responsavel) => update({ responsavel })}
+        />
+
+        {local.tipo === "Estabelecimento Agropecuário" && (
+          <>
+            <SearchEntityField
+              label="Estabelecimento Agropecuário"
+              value={local.estabelecimento}
+              data={ESTABELECIMENTOS_GTA}
+              icon={<Warehouse size={20} />}
+              onChange={(estabelecimento) => update({ estabelecimento })}
+            />
+            <SearchEntityField
+              label="Exploração Pecuária"
+              value={local.exploracao}
+              data={EXPLORACOES_GTA}
+              icon={<Landmark size={20} />}
+              onChange={(exploracao) => update({ exploracao })}
+            />
+            <SearchEntityField
+              label="Núcleo de Produção"
+              value={local.nucleo}
+              data={NUCLEOS_GTA}
+              icon={<Factory size={20} />}
+              onChange={(nucleo) => update({ nucleo })}
+            />
+          </>
+        )}
+
+        {local.tipo === "Frigorífico" && (
+          <SearchEntityField
+            label="Frigorífico"
+            value={local.frigorifico}
+            data={FRIGORIFICOS_GTA}
+            icon={<Factory size={20} />}
+            onChange={(frigorifico) => update({ frigorifico })}
+          />
+        )}
+
+        {local.tipo === "Evento Pecuário" && (
+          <SearchEntityField
+            label="Evento Pecuário"
+            value={local.evento}
+            data={EVENTOS_GTA}
+            icon={<Landmark size={20} />}
+            onChange={(evento) => update({ evento })}
+          />
+        )}
+
+        {local.tipo === "Revendedora de Animais Vivos" && (
+          <SearchEntityField
+            label="Revendedora de Animais Vivos"
+            value={local.revendedora}
+            data={REVENDEDORAS_ANIMAIS_GTA}
+            icon={<Store size={20} />}
+            onChange={(revendedora) => update({ revendedora })}
+          />
+        )}
+
+        {local.tipo === "Aeroporto" && (
+          <SearchEntityField
+            label="Aeroporto"
+            value={local.aeroporto}
+            data={AEROPORTOS_GTA}
+            icon={<Plane size={20} />}
+            onChange={(aeroporto) => update({ aeroporto })}
+          />
+        )}
+      </div>
     </div>
+  );
+}
+
+function entidadeLocal(local: LocalGta) {
+  return (
+    local.nucleo ??
+    local.exploracao ??
+    local.estabelecimento ??
+    local.frigorifico ??
+    local.evento ??
+    local.revendedora ??
+    local.aeroporto
+  );
+}
+
+function descricaoLocal(local: LocalGta) {
+  const entidade = entidadeLocal(local);
+  if (!entidade) return local.tipo || "-";
+  return `${entidade.codigo ? `${entidade.codigo} - ` : ""}${entidade.nome}`;
+}
+
+function localCompativel(registro: LocalGta, filtro: LocalGta) {
+  if (filtro.tipo && registro.tipo !== filtro.tipo) return false;
+  if (filtro.responsavel && registro.responsavel?.id !== filtro.responsavel.id)
+    return false;
+  const entidadeFiltro = entidadeLocal(filtro);
+  return !entidadeFiltro || entidadeLocal(registro)?.id === entidadeFiltro.id;
+}
+
+function sortableValue(item: EmissaoGta, key: SortKey) {
+  if (key === "especie") return item.especie?.nome ?? "";
+  if (key === "finalidade") return item.finalidade?.nome ?? "";
+  if (key === "procedencia") return descricaoLocal(item.procedencia);
+  if (key === "destino") return descricaoLocal(item.destino);
+  return item[key] ?? "";
+}
+
+function ActionButton({
+  title,
+  onClick,
+  children,
+}: {
+  title: string;
+  onClick: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      title={title}
+      aria-label={title}
+      onClick={onClick}
+      className="p-1 text-[#00884A] hover:bg-green-50 rounded transition"
+    >
+      {children}
+    </button>
   );
 }
 
@@ -50,37 +261,71 @@ export function EmissaoGtaPage({
   onLogout: () => void;
   onNavigate: (screen: any, data?: any) => void;
 }) {
-  const [numeroGta, setNumeroGta] = useState("");
+  const [serieNumero, setSerieNumero] = useState("");
   const [tipoFormulario, setTipoFormulario] = useState("");
-  const [tipoProcedencia, setTipoProcedencia] = useState("");
-  const [filtrosAbertos, setFiltrosAbertos] = useState(false);
+  const [especie, setEspecie] = useState<EntidadeGta | null>(null);
+  const [finalidade, setFinalidade] = useState<EntidadeGta | null>(null);
+  const [dataEmissao, setDataEmissao] = useState("");
+  const [procedencia, setProcedencia] = useState(criarLocalVazio);
+  const [destino, setDestino] = useState(criarLocalVazio);
+  const [situacao, setSituacao] = useState("");
+  const [filtrosAbertos, setFiltrosAbertos] = useState(true);
   const [pesquisou, setPesquisou] = useState(false);
+  const [erro, setErro] = useState(false);
   const [sortKey, setSortKey] = useState<SortKey | null>(null);
   const [sortAsc, setSortAsc] = useState(true);
   const [pagina, setPagina] = useState(1);
   const itensPorPagina = 10;
 
+  const possuiFiltros = Boolean(
+    serieNumero ||
+      tipoFormulario ||
+      especie ||
+      finalidade ||
+      dataEmissao ||
+      procedencia.tipo ||
+      procedencia.responsavel ||
+      entidadeLocal(procedencia) ||
+      destino.tipo ||
+      destino.responsavel ||
+      entidadeLocal(destino) ||
+      situacao,
+  );
+
   const resultados = useMemo(() => {
-    const numeroNormalizado = numeroGta.replace(/\D/g, "");
+    const busca = serieNumero.replace(/\s/g, "").toLowerCase();
     const filtrados = EMISSOES_GTA_MOCK.filter(
       (item) =>
-        (!numeroNormalizado || item.numeroGta.includes(numeroNormalizado)) &&
+        (!busca ||
+          item.serieNumero.replace(/\s/g, "").toLowerCase().includes(busca)) &&
         (!tipoFormulario || item.tipoFormulario === tipoFormulario) &&
-        (!tipoProcedencia || item.tipoProcedencia === tipoProcedencia),
+        (!especie || item.especie?.id === especie.id) &&
+        (!finalidade || item.finalidade?.id === finalidade.id) &&
+        (!dataEmissao || item.dataEmissao === dataEmissao) &&
+        localCompativel(item.procedencia, procedencia) &&
+        localCompativel(item.destino, destino) &&
+        (!situacao || item.situacao === situacao),
     );
-
     if (!sortKey) return filtrados;
-
     return [...filtrados].sort((a, b) => {
-      const primeiro =
-        sortKey === "produtor" ? a.produtor.nome : a[sortKey] || "";
-      const segundo =
-        sortKey === "produtor" ? b.produtor.nome : b[sortKey] || "";
+      const primeiro = String(sortableValue(a, sortKey));
+      const segundo = String(sortableValue(b, sortKey));
       return sortAsc
         ? primeiro.localeCompare(segundo)
         : segundo.localeCompare(primeiro);
     });
-  }, [numeroGta, tipoFormulario, tipoProcedencia, sortKey, sortAsc]);
+  }, [
+    serieNumero,
+    tipoFormulario,
+    especie,
+    finalidade,
+    dataEmissao,
+    procedencia,
+    destino,
+    situacao,
+    sortKey,
+    sortAsc,
+  ]);
 
   const totalPaginas = Math.max(
     1,
@@ -95,12 +340,10 @@ export function EmissaoGtaPage({
     (paginaAtual - 1) * itensPorPagina,
     paginaAtual * itensPorPagina,
   );
-  const possuiFiltros = Boolean(
-    numeroGta || tipoFormulario || tipoProcedencia,
-  );
 
   const pesquisar = () => {
-    setPesquisou(true);
+    setErro(!possuiFiltros);
+    setPesquisou(possuiFiltros);
     setPagina(1);
   };
 
@@ -109,192 +352,312 @@ export function EmissaoGtaPage({
     setSortKey(key);
   };
 
-  const cabecalho = (key: SortKey, texto: string) => (
+  const cabecalho = (key: SortKey, texto: string): ReactNode => (
     <th
       onClick={() => ordenar(key)}
-      className="text-left px-4 py-3 font-semibold text-gray-600 uppercase cursor-pointer"
+      className="px-3 py-3 text-left text-[11px] font-semibold uppercase leading-tight text-gray-700 cursor-pointer"
     >
-      <span className="inline-flex items-center gap-1">
+      <span className="inline-flex items-center gap-1.5">
         {texto}
-        {sortKey === key &&
-          (sortAsc ? <ChevronUp size={14} /> : <ChevronDown size={14} />)}
+        {sortKey === key ? (
+          sortAsc ? (
+            <ChevronUp size={14} />
+          ) : (
+            <ChevronDown size={14} />
+          )
+        ) : (
+          <ChevronDown size={14} />
+        )}
       </span>
     </th>
   );
 
+  const downloadMock = (documento: string, item: EmissaoGta) =>
+    window.alert(
+      `${documento} de ${item.serieNumero} preparado para download no protótipo.`,
+    );
+
   return (
-    <div className="min-h-screen bg-[#f2f3f5]">
+    <div className="min-h-screen bg-white">
       <Navbar
         onLogout={onLogout}
         onNavigate={onNavigate}
         currentScreen="emissao-gta"
         hideSearch
       />
+      <main className="max-w-[1320px] mx-auto px-4 md:px-6 py-5">
+        <button
+          type="button"
+          onClick={() => onNavigate("dashboard")}
+          className="flex items-center gap-1 text-sm mb-6 font-medium text-[#00884A]"
+        >
+          <ArrowLeft size={15} />
+          Inicial
+        </button>
 
-      <main className="max-w-[1300px] mx-auto px-4 md:px-6 py-6">
-        <div className="mb-4">
+        <div className="flex items-center justify-between gap-4">
+          <h1 className="text-2xl font-semibold text-gray-900">
+            Emissão de GTA
+          </h1>
           <button
             type="button"
-            onClick={() => onNavigate("dashboard")}
-            className="flex items-center gap-1 text-sm mb-3 font-semibold text-[#1A7A3C]"
+            onClick={() => onNavigate("adicionar-emissao-gta", null)}
+            className="px-5 py-3 rounded-md text-white text-sm font-semibold bg-[#00884A] hover:bg-[#00743F]"
           >
-            <ArrowLeft size={15} />
-            Inicial
+            Adicionar Nova
           </button>
-          <div className="flex items-center justify-between gap-4">
-            <h1 className="text-2xl font-semibold text-gray-900">
-              Emissão de GTA
-            </h1>
-            <button
-              type="button"
-              onClick={() => onNavigate("adicionar-emissao-gta")}
-              className="px-5 py-3 rounded-md text-white text-sm font-semibold bg-[#1A7A3C] hover:bg-[#15612F]"
-            >
-              Adicionar Nova
-            </button>
-          </div>
         </div>
 
-        <section className="bg-white rounded-xl shadow-sm p-6 flex flex-col gap-5">
-          <div className="flex flex-col sm:flex-row items-end gap-4 w-full">
-            <div className="flex-1 w-full">
-              <FloatInput
-                label="Número da GTA"
-                value={numeroGta}
-                maxLength={6}
-                onChange={(valor) =>
-                  setNumeroGta(valor.replace(/\D/g, "").slice(0, 6))
-                }
+        <section className="mt-16 flex flex-col gap-3">
+          <div className="flex items-stretch gap-3">
+            <div className="relative flex-1">
+              <input
+                type="text"
+                value={serieNumero}
+                maxLength={11}
+                placeholder="Buscar pela série e número da GTA"
+                onChange={(event) => {
+                  setSerieNumero(event.target.value.toUpperCase().slice(0, 11));
+                  setErro(false);
+                }}
+                className="h-12 w-full rounded-md border border-gray-300 bg-white px-4 pr-11 text-sm text-gray-800 outline-none focus:border-[#00884A] focus:ring-1 focus:ring-[#00884A]"
+              />
+              <Search
+                size={19}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-[#00884A]"
               />
             </div>
             <button
               type="button"
+              title="Exibir ou ocultar filtros"
+              aria-label="Exibir ou ocultar filtros"
               onClick={() => setFiltrosAbertos((aberto) => !aberto)}
-              className="h-12 w-full sm:w-auto px-4 rounded-md border border-gray-300 text-gray-600 text-sm font-semibold hover:bg-gray-50 flex items-center justify-center gap-2"
+              className="h-12 w-16 flex-shrink-0 rounded-md bg-[#00884A] text-white flex items-center justify-center hover:bg-[#00743F]"
             >
-              <SlidersHorizontal size={17} />
-              Mais filtros
-              {filtrosAbertos ? (
-                <ChevronUp size={16} />
-              ) : (
-                <ChevronDown size={16} />
-              )}
-            </button>
-            <button
-              type="button"
-              onClick={pesquisar}
-              className="h-12 w-full sm:w-auto px-5 rounded-md text-white text-sm font-semibold bg-[#1A7A3C] hover:bg-[#15612F]"
-            >
-              Pesquisar
+              <SlidersHorizontal size={22} />
             </button>
           </div>
 
           {filtrosAbertos && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1 animate-fadeIn">
-              <FloatSelect
-                label="Tipo de Formulário"
-                value={tipoFormulario}
-                onChange={setTipoFormulario}
-                options={TIPOS_FORMULARIO_GTA}
+            <div className="flex flex-col gap-3 animate-fadeIn">
+              <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_1fr_1fr_auto]">
+                <FloatSelect
+                  label="Tipo de Formulário"
+                  value={tipoFormulario}
+                  onChange={setTipoFormulario}
+                  options={TIPOS_FORMULARIO_GTA}
+                />
+                <FloatSelect
+                  label="Tipo de Procedência"
+                  value={procedencia.tipo}
+                  onChange={(tipo) =>
+                    setProcedencia({
+                      ...criarLocalVazio(),
+                      tipo: tipo as TipoLocalGta,
+                    })
+                  }
+                  options={TIPOS_LOCAL_OPTIONS}
+                />
+                <FloatSelect
+                  label="Tipo de Destino"
+                  value={destino.tipo}
+                  onChange={(tipo) =>
+                    setDestino({
+                      ...criarLocalVazio(),
+                      tipo: tipo as TipoLocalGta,
+                    })
+                  }
+                  options={TIPOS_LOCAL_OPTIONS}
+                />
+                <button
+                  type="button"
+                  onClick={pesquisar}
+                  className="h-12 px-5 rounded-md text-white text-sm font-semibold bg-[#00884A] hover:bg-[#00743F]"
+                >
+                  Pesquisar
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+                <SearchEntityField
+                  label="Espécie"
+                  value={especie}
+                  data={ESPECIES_GTA}
+                  icon={<Dna size={20} />}
+                  onChange={setEspecie}
+                />
+                <SearchEntityField
+                  label="Finalidade de GTA"
+                  value={finalidade}
+                  data={FINALIDADES_GTA}
+                  icon={<Truck size={20} />}
+                  onChange={setFinalidade}
+                />
+                <FloatInput
+                  label="Data da Emissão"
+                  type="date"
+                  value={dataEmissao}
+                  icon={<CalendarDays size={20} />}
+                  onChange={setDataEmissao}
+                />
+                <FloatSelect
+                  label="Situação"
+                  value={situacao}
+                  onChange={setSituacao}
+                  options={SITUACOES_GTA.map((valor) => ({
+                    value: valor,
+                    label: valor,
+                  }))}
+                />
+              </div>
+
+              <LocalFilters
+                titulo="Origem"
+                local={procedencia}
+                onChange={setProcedencia}
               />
-              <FloatSelect
-                label="Tipo de Procedência"
-                value={tipoProcedencia}
-                onChange={setTipoProcedencia}
-                options={TIPOS_PROCEDENCIA_GTA}
+              <LocalFilters
+                titulo="Destino"
+                local={destino}
+                onChange={setDestino}
               />
             </div>
           )}
 
-          {possuiFiltros && (
-            <div className="flex flex-wrap gap-2">
-              {numeroGta && (
-                <FilterChip
-                  label={`Número da GTA: ${numeroGta}`}
-                  onRemove={() => setNumeroGta("")}
-                />
-              )}
-              {tipoFormulario && (
-                <FilterChip
-                  label={`Tipo de Formulário: ${tipoFormulario}`}
-                  onRemove={() => setTipoFormulario("")}
-                />
-              )}
-              {tipoProcedencia && (
-                <FilterChip
-                  label={`Tipo de Procedência: ${tipoProcedencia}`}
-                  onRemove={() => setTipoProcedencia("")}
-                />
-              )}
-            </div>
+          {erro && (
+            <p className="text-sm text-red-500 font-medium">
+              Informe a série e número da GTA ou ao menos um filtro para
+              pesquisar.
+            </p>
           )}
+        </section>
 
+        <div className="mt-7 border-t border-gray-200 pt-5">
           {!pesquisou ? (
-            <div className="py-12 text-center text-sm text-gray-500">
-              Utilize os filtros acima para buscar emissões de GTA.
+            <div className="py-10 text-center text-sm text-gray-600">
+              Busque por emissão de GTA utilizando o campo de busca e os filtros
+              acima
             </div>
           ) : resultados.length === 0 ? (
-            <div className="py-12 text-center text-sm text-gray-500">
+            <div className="py-10 text-center text-sm text-gray-600">
               Nenhum resultado foi encontrado.
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-sm border-collapse">
+              <table className="w-full min-w-[1120px] border-collapse text-xs">
                 <thead>
-                  <tr className="border-b border-gray-100">
-                    {cabecalho("numeroGta", "Número da GTA")}
+                  <tr className="border-y border-gray-200">
+                    {cabecalho("serieNumero", "Série - Nº GTA")}
                     {cabecalho("tipoFormulario", "Tipo de Formulário")}
+                    {cabecalho("especie", "Espécie")}
+                    {cabecalho("finalidade", "Finalidade de GTA")}
+                    {cabecalho("procedencia", "Procedência")}
+                    {cabecalho("destino", "Destinatário")}
                     {cabecalho("dataEmissao", "Data de Emissão")}
-                    {cabecalho("produtor", "Produtor")}
-                    <th className="text-left px-4 py-3 font-semibold text-gray-600 uppercase">
-                      Propriedade
-                    </th>
-                    <th />
+                    {cabecalho("situacao", "Situação")}
+                    <th className="w-40" />
                   </tr>
                 </thead>
                 <tbody>
-                  {linhas.map((item: EmissaoGta) => (
+                  {linhas.map((item) => (
                     <tr
                       key={item.id}
-                      className="border-b border-gray-50 hover:bg-gray-50"
+                      className="border-b border-gray-100 hover:bg-gray-50"
                     >
-                      <td className="px-4 py-3 text-gray-700">
-                        {item.numeroGta || "-"}
+                      <td className="px-3 py-3 text-gray-600 whitespace-nowrap">
+                        {item.serieNumero}
                       </td>
-                      <td className="px-4 py-3 text-gray-700">
+                      <td className="px-3 py-3 text-gray-600">
                         {item.tipoFormulario}
                       </td>
-                      <td className="px-4 py-3 text-gray-700">
+                      <td className="px-3 py-3 text-gray-600">
+                        {item.especie?.nome}
+                      </td>
+                      <td className="px-3 py-3 text-gray-600">
+                        {item.finalidade?.nome}
+                      </td>
+                      <td className="px-3 py-3 text-gray-600 max-w-40">
+                        {descricaoLocal(item.procedencia)}
+                      </td>
+                      <td className="px-3 py-3 text-gray-600 max-w-40">
+                        {descricaoLocal(item.destino)}
+                      </td>
+                      <td className="px-3 py-3 text-gray-600 whitespace-nowrap">
                         {formatarDataGta(item.dataEmissao)}
                       </td>
-                      <td className="px-4 py-3 text-gray-700">
-                        {item.produtor.nome}
+                      <td className="px-3 py-3 text-gray-600">
+                        {item.situacao}
                       </td>
-                      <td className="px-4 py-3 text-gray-700">
-                        {item.propriedade.nome}
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex justify-end gap-1">
-                          <button
-                            type="button"
+                      <td className="px-2 py-3">
+                        <div className="flex items-center justify-end gap-0.5">
+                          <ActionButton
+                            title="Visualizar"
                             onClick={() =>
                               onNavigate("visualizar-emissao-gta", item)
                             }
-                            className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md"
-                            title="Visualizar"
                           >
-                            <Eye size={18} />
-                          </button>
-                          <button
-                            type="button"
+                            <Eye size={16} />
+                          </ActionButton>
+                          <ActionButton
+                            title="Copiar GTA"
                             onClick={() =>
-                              onNavigate("editar-emissao-gta", item)
+                              onNavigate(
+                                "adicionar-emissao-gta",
+                                copiarEmissaoGta(item),
+                              )
                             }
-                            className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md"
-                            title="Editar"
                           >
-                            <Pencil size={17} />
-                          </button>
+                            <ClipboardCopy size={15} />
+                          </ActionButton>
+                          {item.situacao === "Gravada" &&
+                            item.necessitaPagamento && (
+                              <ActionButton
+                                title="Pagar"
+                                onClick={() =>
+                                  onNavigate("pagar-emissao-gta", item)
+                                }
+                              >
+                                <DollarSign size={16} />
+                              </ActionButton>
+                            )}
+                          {["Gravada", "Paga"].includes(item.situacao) && (
+                            <ActionButton
+                              title="Baixar Boleto/DAE"
+                              onClick={() => downloadMock("Boleto/DAE", item)}
+                            >
+                              <FileDown size={16} />
+                            </ActionButton>
+                          )}
+                          {(item.situacao === "Paga" ||
+                            (item.situacao === "Gravada" &&
+                              !item.necessitaPagamento)) && (
+                            <ActionButton
+                              title="Emitir"
+                              onClick={() =>
+                                onNavigate("emitir-emissao-gta", item)
+                              }
+                            >
+                              <ArrowRight size={17} />
+                            </ActionButton>
+                          )}
+                          {item.situacao === "Emitida" && (
+                            <ActionButton
+                              title="Baixar GTA"
+                              onClick={() => downloadMock("GTA", item)}
+                            >
+                              <FileCheck2 size={16} />
+                            </ActionButton>
+                          )}
+                          {item.situacao !== "Cancelada" && (
+                            <ActionButton
+                              title="Cancelar"
+                              onClick={() =>
+                                onNavigate("cancelar-emissao-gta", item)
+                              }
+                            >
+                              <X size={17} />
+                            </ActionButton>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -302,11 +665,12 @@ export function EmissaoGtaPage({
                 </tbody>
               </table>
 
-              <div className="flex items-center justify-between pt-4 text-sm text-gray-500">
+              <div className="flex items-center justify-between px-3 pt-7 text-xs text-gray-600">
                 <span>Itens por página: {itensPorPagina}</span>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
                   <span>
-                    {inicio} - {fim} de {resultados.length}
+                    Mostrando de {inicio} a {fim} de {resultados.length}{" "}
+                    resultados
                   </span>
                   <button
                     type="button"
@@ -314,9 +678,9 @@ export function EmissaoGtaPage({
                       setPagina((valor) => Math.max(1, valor - 1))
                     }
                     disabled={paginaAtual === 1}
-                    className="p-1 disabled:opacity-30"
+                    className="p-1 text-[#00884A] disabled:opacity-30"
                   >
-                    <ChevronLeft size={18} />
+                    <ChevronLeft size={16} />
                   </button>
                   <button
                     type="button"
@@ -324,15 +688,15 @@ export function EmissaoGtaPage({
                       setPagina((valor) => Math.min(totalPaginas, valor + 1))
                     }
                     disabled={paginaAtual === totalPaginas}
-                    className="p-1 disabled:opacity-30"
+                    className="p-1 text-[#00884A] disabled:opacity-30"
                   >
-                    <ChevronRight size={18} />
+                    <ChevronRight size={16} />
                   </button>
                 </div>
               </div>
             </div>
           )}
-        </section>
+        </div>
       </main>
     </div>
   );

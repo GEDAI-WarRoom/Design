@@ -10,16 +10,21 @@ import {
   adicionarEmissaoGta,
   criarEmissaoGtaVazia,
   type EmissaoGta,
+  type EmissaoGtaFormValue,
 } from "./emissaoGtaData";
 
 export function AdicionarEmissaoGtaPage({
+  dados,
   onLogout,
   onNavigate,
 }: {
+  dados?: EmissaoGtaFormValue | null;
   onLogout: () => void;
   onNavigate: (screen: any, data?: any) => void;
 }) {
-  const [emissao, setEmissao] = useState(criarEmissaoGtaVazia);
+  const [emissao, setEmissao] = useState<EmissaoGtaFormValue>(
+    () => dados ?? criarEmissaoGtaVazia(),
+  );
   const [tentouSalvar, setTentouSalvar] = useState(false);
   const [emissaoSalva, setEmissaoSalva] = useState<EmissaoGta | null>(null);
 
@@ -49,7 +54,7 @@ export function AdicionarEmissaoGtaPage({
           </button>
           <div className="flex items-center justify-between gap-4">
             <h1 className="text-2xl font-semibold text-gray-900">
-              Adicionar Emissão de GTA
+              Adicionar GTA
             </h1>
             <button
               type="button"
@@ -64,8 +69,8 @@ export function AdicionarEmissaoGtaPage({
         <RequiredFieldsNotice />
         {tentouSalvar && !emissaoGtaValida(emissao) && (
           <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm font-medium text-red-700">
-            Preencha todos os campos obrigatórios. Para formulário manual, a
-            série deve ter 2 caracteres e o número da GTA deve ter 6 dígitos.
+            Preencha os campos obrigatórios e complete todos os itens
+            adicionados antes de continuar.
           </div>
         )}
         <EmissaoGtaForm
@@ -91,7 +96,8 @@ export function AdicionarEmissaoGtaPage({
               GTA cadastrada com sucesso!
             </h2>
             <p className="text-sm text-gray-500 mt-1">
-              A emissão para {emissaoSalva.produtor.nome} foi cadastrada.
+              A GTA {emissaoSalva.serieNumero} foi cadastrada para{" "}
+              {emissaoSalva.procedencia.responsavel?.nome}.
             </p>
             <div className="flex gap-3 justify-center mt-6">
               <button
