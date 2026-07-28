@@ -7,6 +7,7 @@ import {
 	ClipboardPlus,
 	Dna,
 	DollarSign,
+	FileInput,
 	FlaskConical,
 	Globe,
 	Landmark,
@@ -483,6 +484,11 @@ export const secondaryCategories: MenuCategory[] = [
 			/>
 		),
 		items: [
+			{
+				label: "Emissão de GTA",
+				route: "emissao-gta",
+				icon: <FileInput size={16} />,
+			},
 			{
 				label: "Finalidade de Trânsito",
 				route: "finalidade-transito",

@@ -157,6 +157,10 @@ import { VisualizarDocumentoLotePagamentoPage } from "./pages/Arrecadacao/LotePa
 import { VisualizarDaeLotePagamentoPage } from "./pages/Arrecadacao/LotePagamento/VisualizarDaeLotePagamento";
 
 // GTA
+import { AdicionarEmissaoGtaPage } from "./pages/GTA/EmissaoGta/AdicionarEmissaoGta";
+import { EditarEmissaoGtaPage } from "./pages/GTA/EmissaoGta/EditarEmissaoGta";
+import { EmissaoGtaPage } from "./pages/GTA/EmissaoGta/EmissaoGta";
+import { VisualizarEmissaoGtaPage } from "./pages/GTA/EmissaoGta/VisualizarEmissaoGta";
 import { AdicionarDistribuicaoFormulariosGta } from "./pages/GTA/DistribuicaoFormulariosGta/AdicionarDistribuicaoFormulariosGta";
 import { DistribuicaoFormulariosGta } from "./pages/GTA/DistribuicaoFormulariosGta/DistribuicaoFormulariosGta";
 import { AdicionarFinalidadeTransitoPage } from "./pages/GTA/FinalidadeTransito/AdicionarFinalidadeTransito";
@@ -260,6 +264,10 @@ export type Screen =
 	| "visualizar-registro-venda-gta-digital"
 	| "editar-registro-venda-gta-digital"
 	| "visualizar-dae-registro-venda-gta"
+	| "emissao-gta"
+	| "adicionar-emissao-gta"
+	| "visualizar-emissao-gta"
+	| "editar-emissao-gta"
 	| "vacinador"
 	| "adicionar-vacinador"
 	| "produto"
@@ -1115,6 +1123,36 @@ export default function App() {
 		//  case "adicionar-passaporte-equestre":
 		//  return <AdicionarPassaporteEquestrePage onLogout={handleLogout} onNavigate={handleNavigate} />;
 
+		case "emissao-gta":
+			return (
+				<EmissaoGtaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-emissao-gta":
+			return (
+				<AdicionarEmissaoGtaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-emissao-gta":
+			return (
+				<VisualizarEmissaoGtaPage
+					dados={screenData}
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "editar-emissao-gta":
+			return (
+				<EditarEmissaoGtaPage
+					dados={screenData}
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
 		case "distribuicao-formularios-gta":
 			return (
 				<DistribuicaoFormulariosGta
