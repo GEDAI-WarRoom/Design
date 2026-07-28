@@ -95,24 +95,24 @@ export function ItemReceitaTab({ receitaId, isModalOpen, setIsModalOpen }: ItemR
     setIsModalOpen(false);
   };
 
-  const modalTitle = 
-    modalMode === "view" ? "Visualizar Item de Receita" : 
-    modalMode === "edit" ? "Editar Item de Receita" : 
-    "Adicionar Item de Receita";
+  const modalTitle =
+    modalMode === "view" ? "Visualizar Item de Receita" :
+      modalMode === "edit" ? "Editar Item de Receita" :
+        "Adicionar Item de Receita";
 
-  const modalSubtitle = 
+  const modalSubtitle =
     modalMode === "view" ? "Detalhes do item de receita vinculado." :
-    "Preencha os campos para adicionar um item.";
+      "Preencha os campos para adicionar um item.";
 
   return (
     <section className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-      
+
       {/* Cabeçalho da Listagem */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-white">
         <h2 className="text-base font-semibold text-gray-800">Itens de Receita Vinculados</h2>
       </div>
 
-      {/* Tabela de Listagem - Colunas Índice e Qtde. Índice removidas */}
+      {/* Tabela de Listagem */}
       <div className="p-6">
         <div className="overflow-x-auto">
           <table className="w-full text-sm border-collapse">
@@ -137,24 +137,24 @@ export function ItemReceitaTab({ receitaId, isModalOpen, setIsModalOpen }: ItemR
                     <td className="px-4 py-3 text-gray-700">{t.contribuicaoFundo}</td>
                     <td className="px-4 py-3 text-right whitespace-nowrap">
                       <div className="flex justify-end gap-1">
-                        <button 
+                        <button
                           onClick={() => {
                             setSelectedItem(t);
                             setModalMode("edit");
                             setIsModalOpen(true);
-                          }} 
-                          className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md transition" 
+                          }}
+                          className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"
                           title="Editar Detalhes"
                         >
                           <Pencil size={20} />
                         </button>
-                        <button 
+                        <button
                           onClick={() => {
                             setSelectedItem(t);
                             setModalMode("view");
                             setIsModalOpen(true);
-                          }} 
-                          className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md transition" 
+                          }}
+                          className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"
                           title="Visualizar Detalhes"
                         >
                           <Eye size={20} />
@@ -169,10 +169,11 @@ export function ItemReceitaTab({ receitaId, isModalOpen, setIsModalOpen }: ItemR
         </div>
       </div>
 
-      {/* MODAL PADRONIZADO (Largura 1000px, padding idêntico ao Adicionar Profissional) */}
+      {/* MODAL PADRONIZADO LADO A LADO - COM LARGURA FORÇADA EM 1000px */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-[1000px] px-[45px] py-[40px] bg-white rounded-[15px] border border-[#d6d6d6] shadow-xl overflow-y-auto max-h-[90vh]">
-          
+        <DialogContent
+          className="w-full sm:max-w-[1000px] max-w-[95vw] px-[45px] py-[40px] bg-white rounded-[15px] border border-[#d6d6d6] shadow-xl overflow-y-auto max-h-[90vh]"
+        >
           <DialogHeader className="flex flex-col items-center justify-center text-center space-y-2 mb-2">
             <div className="flex items-center justify-center gap-2 text-[#1A7A3C]">
               <Layers size={24} />
@@ -188,7 +189,7 @@ export function ItemReceitaTab({ receitaId, isModalOpen, setIsModalOpen }: ItemR
             <div className="h-[1px] w-full bg-[#D2D2D7]/60" />
           </div>
 
-          {/* Agrupamento em estilo de Card interno conforme design solicitado */}
+          {/* Informações Básicas */}
           <ModalSection title="Informações Básicas">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 w-full">
               <div className="md:col-span-2">
@@ -207,7 +208,7 @@ export function ItemReceitaTab({ receitaId, isModalOpen, setIsModalOpen }: ItemR
                   label="Unidade de Medida"
                   value={unidadeMedida?.nome || ""}
                   disabled={true}
-                  onChange={() => {}}
+                  onChange={() => { }}
                 />
               ) : (
                 <EntitySearchInput
@@ -233,7 +234,7 @@ export function ItemReceitaTab({ receitaId, isModalOpen, setIsModalOpen }: ItemR
                   label="Índice"
                   value={indice?.nome || ""}
                   disabled={true}
-                  onChange={() => {}}
+                  onChange={() => { }}
                 />
               ) : (
                 <EntitySearchInput
@@ -276,7 +277,7 @@ export function ItemReceitaTab({ receitaId, isModalOpen, setIsModalOpen }: ItemR
             </div>
           </ModalSection>
 
-          {/* Rodapé do Modal centralizado */}
+          {/* Rodapé do Modal */}
           <div className="flex justify-center items-center gap-[12px] pb-[10px] pt-[30px] w-full">
             {isViewOnly ? (
               <button
