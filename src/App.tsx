@@ -90,6 +90,12 @@ import { VisualizarStatusAnimalPage } from "./pages/Animal/StatusAnimal/Visualiz
 import { AdicionarTipoVeiculoPage } from "./pages/Animal/TipoVeiculo/AdicionarTipoVeiculo";
 import { TipoVeiculoPage } from "./pages/Animal/TipoVeiculo/TipoVeiculo";
 
+// REBANHO
+import { AdicionarAjusteRebanhoPage } from "./pages/Rebanho/AjusteRebanho/AdicionarAjusteRebanho";
+import { AjusteRebanhoPage } from "./pages/Rebanho/AjusteRebanho/AjusteRebanho";
+import { EditarAjusteRebanhoPage } from "./pages/Rebanho/AjusteRebanho/EditarAjusteRebanho";
+import { VisualizarAjusteRebanhoPage } from "./pages/Rebanho/AjusteRebanho/VisualizarAjusteRebanho";
+
 // VEGETAL
 import { AdicionarCulturaPage } from "./pages/Vegetal/Cultura/AdicionarCultura";
 import { CulturaPage } from "./pages/Vegetal/Cultura/Cultura";
@@ -235,6 +241,10 @@ export type Screen =
 	| "exploracao-pecuaria" // 🚀 Adicionado
 	| "adicionar-exploracao-pecuaria" // 🚀 Adicionado
 	| "visualizar-exploracao-pecuaria" // 🚀 Adicionado
+	| "ajuste-rebanho"
+	| "adicionar-ajuste-rebanho"
+	| "visualizar-ajuste-rebanho"
+	| "editar-ajuste-rebanho"
 	| "passaporte-equestre"
 	| "adicionar-passaporte-equestre"
 	| "visualizar-passaporte-equestre"
@@ -1012,6 +1022,36 @@ export default function App() {
 				<VisualizarExploracaoPecuariaPage
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
+				/>
+			);
+		case "ajuste-rebanho":
+			return (
+				<AjusteRebanhoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-ajuste-rebanho":
+			return (
+				<AdicionarAjusteRebanhoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-ajuste-rebanho":
+			return (
+				<VisualizarAjusteRebanhoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "editar-ajuste-rebanho":
+			return (
+				<EditarAjusteRebanhoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
 				/>
 			);
 		case "agroindustrial-sie":
