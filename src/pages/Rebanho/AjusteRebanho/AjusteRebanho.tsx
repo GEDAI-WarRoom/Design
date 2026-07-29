@@ -3,7 +3,7 @@ import {
   ArrowDown,
   ArrowLeft,
   ArrowUp,
-  CalendarDays,
+  Calendar,
   ChevronLeft,
   ChevronRight,
   Dna,
@@ -443,14 +443,14 @@ export function AjusteRebanhoPage({ onLogout, onNavigate }: PageProps) {
                 type="date"
                 value={periodoDe}
                 onChange={setPeriodoDe}
-                icon={<CalendarDays size={17} />}
+                icon={<Calendar size={17} />}
               />
               <FloatInput
                 label="Período - Até"
                 type="date"
                 value={periodoAte}
                 onChange={setPeriodoAte}
-                icon={<CalendarDays size={17} />}
+                icon={<Calendar size={17} />}
               />
               <FloatSelect
                 label="Situação"
@@ -483,48 +483,29 @@ export function AjusteRebanhoPage({ onLogout, onNavigate }: PageProps) {
                       <th className="min-w-[210px] px-3 py-3 text-left text-xs font-semibold uppercase text-gray-700">
                         Produtor
                       </th>
-                      <SortHeader
-                        label="Estabelecimento Agropecuário"
-                        field="estabelecimento"
-                        onSort={changeSort}
-                        currentSort={sort}
-                      />
-                      <SortHeader
-                        label="Exploração Pecuária"
-                        field="exploracao"
-                        onSort={changeSort}
-                        currentSort={sort}
-                      />
-                      <SortHeader
-                        label="Núcleo de Produção"
-                        field="nucleo"
-                        onSort={changeSort}
-                        currentSort={sort}
-                      />
-                      <SortHeader
-                        label="Espécie"
-                        field="especie"
-                        onSort={changeSort}
-                        currentSort={sort}
-                      />
-                      <SortHeader
-                        label="Machos Lançados"
-                        field="machos"
-                        onSort={changeSort}
-                        currentSort={sort}
-                      />
-                      <SortHeader
-                        label="Fêmeas Lançadas"
-                        field="femeas"
-                        onSort={changeSort}
-                        currentSort={sort}
-                      />
-                      <SortHeader
-                        label="Data de Lançamento"
-                        field="data"
-                        onSort={changeSort}
-                        currentSort={sort}
-                      />
+                      <th className="min-w-[210px] px-3 py-3 text-left text-xs font-semibold uppercase text-gray-700">
+Estabelecimento Agropecuário
+                      </th>
+                       <th className="min-w-[210px] px-3 py-3 text-left text-xs font-semibold uppercase text-gray-700">
+Exploração Pecuária
+                      </th>
+                       <th className="min-w-[210px] px-3 py-3 text-left text-xs font-semibold uppercase text-gray-700">
+Núcleo de Produção
+                      </th>
+                       <th className="min-w-[210px] px-3 py-3 text-left text-xs font-semibold uppercase text-gray-700">
+Espécie
+                      </th>
+                       <th className="min-w-[210px] px-3 py-3 text-left text-xs font-semibold uppercase text-gray-700">
+Machos Lançados
+                      </th>
+                       <th className="min-w-[210px] px-3 py-3 text-left text-xs font-semibold uppercase text-gray-700">
+Fêmeas Lançadas
+                      </th>
+                       <th className="min-w-[210px] px-3 py-3 text-left text-xs font-semibold uppercase text-gray-700">
+Data de Lançamento
+                      </th>
+
+       
                       <th className="w-[100px] px-3 py-3" />
                     </tr>
                   </thead>
