@@ -91,6 +91,10 @@ import { AdicionarTipoVeiculoPage } from "./pages/Animal/TipoVeiculo/AdicionarTi
 import { TipoVeiculoPage } from "./pages/Animal/TipoVeiculo/TipoVeiculo";
 
 // REBANHO
+import { AdicionarAjusteRebanhoPage } from "./pages/Rebanho/AjusteRebanho/AdicionarAjusteRebanho";
+import { AjusteRebanhoPage } from "./pages/Rebanho/AjusteRebanho/AjusteRebanho";
+import { EditarAjusteRebanhoPage } from "./pages/Rebanho/AjusteRebanho/EditarAjusteRebanho";
+import { VisualizarAjusteRebanhoPage } from "./pages/Rebanho/AjusteRebanho/VisualizarAjusteRebanho";
 import { AdicionarLancamentoRebanhoPage } from "./pages/Rebanho/LancamentoRebanho/AdicionarLancamentoRebanho";
 import { EditarLancamentoRebanhoPage } from "./pages/Rebanho/LancamentoRebanho/EditarLancamentoRebanho";
 import { LancamentoRebanhoPage } from "./pages/Rebanho/LancamentoRebanho/LancamentoRebanho";
@@ -241,6 +245,10 @@ export type Screen =
 	| "exploracao-pecuaria" // 🚀 Adicionado
 	| "adicionar-exploracao-pecuaria" // 🚀 Adicionado
 	| "visualizar-exploracao-pecuaria" // 🚀 Adicionado
+	| "ajuste-rebanho"
+	| "adicionar-ajuste-rebanho"
+	| "visualizar-ajuste-rebanho"
+	| "editar-ajuste-rebanho"
 	| "lancamento-rebanho"
 	| "adicionar-lancamento-rebanho"
 	| "visualizar-lancamento-rebanho"
@@ -1024,10 +1032,24 @@ export default function App() {
 					onNavigate={handleNavigate}
 				/>
 			);
+		case "ajuste-rebanho":
+			return (
+				<AjusteRebanhoPage
+          onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
 		case "lancamento-rebanho":
 			return (
 				<LancamentoRebanhoPage
 					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-ajuste-rebanho":
+			return (
+				<AdicionarAjusteRebanhoPage
+          onLogout={handleLogout}
 					onNavigate={handleNavigate}
 				/>
 			);
@@ -1038,12 +1060,26 @@ export default function App() {
 					onNavigate={handleNavigate}
 				/>
 			);
+		case "visualizar-ajuste-rebanho":
+			return (
+				<VisualizarAjusteRebanhoPage
+          onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
 		case "visualizar-lancamento-rebanho":
 			return (
 				<VisualizarLancamentoRebanhoPage
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
 					dados={screenData}
+				/>
+			);
+		case "editar-ajuste-rebanho":
+			return (
+				<EditarAjusteRebanhoPage
+          onLogout={handleLogout}
+					onNavigate={handleNavigate}
 				/>
 			);
 		case "editar-lancamento-rebanho":

@@ -477,6 +477,16 @@ export const secondaryCategories: MenuCategory[] = [
 		),
 		items: [
 			{
+				label: "Ajuste de Rebanho",
+				route: "ajuste-rebanho",
+				icon: (
+					<img
+						src={Icons.iconeRebanhoUrl}
+						alt="Ajuste de Rebanho"
+            className="w-4 h-4 object-contain"
+					/>
+				),
+            },
 				label: "Lançamento de Rebanho",
 				route: "lancamento-rebanho",
 				icon: (
