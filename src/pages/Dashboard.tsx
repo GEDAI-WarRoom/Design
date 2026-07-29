@@ -33,7 +33,8 @@ import {
 	ScrollText,
 	LineChart,
 	CalendarDays,
-	ScanBarcode
+	ScanBarcode,
+	MoveUpRight
 } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import * as Icons from "../imports/icons";
@@ -481,21 +482,17 @@ export const secondaryCategories: MenuCategory[] = [
 				route: "ajuste-rebanho",
 				icon: (
 					<img
-						src={Icons.iconeRebanhoUrl}
-						alt="Ajuste de Rebanho"
-            className="w-4 h-4 object-contain"
-					/>
-				),
-            },
-				label: "Lançamento de Rebanho",
-				route: "lancamento-rebanho",
-				icon: (
-					<img
-						src={Icons.iconeRebanhoUrl}
+						src={Icons.iconeAjusteRebanhoUrl}
 						alt="Lançamento de Rebanho"
 						className="w-4 h-4 object-contain"
 					/>
 				),
+            },
+			{
+				label: "Lançamento de Rebanho",
+				route: "lancamento-rebanho",
+				
+				icon: <MoveUpRight size={16} />,
 			},
 		],
 	},
