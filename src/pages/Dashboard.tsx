@@ -31,7 +31,9 @@ import {
 	Wallet,
 	Scale,
 	ScrollText,
-	LineChart
+	LineChart,
+	CalendarDays,
+	ScanBarcode
 } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import * as Icons from "../imports/icons";
@@ -520,7 +522,7 @@ export const secondaryCategories: MenuCategory[] = [
 			{
 				label: "Taxa de Emissão de GTA",
 				route: "taxa-emissao-gta",
-				icon: <ReceiptText size={16} />,
+				icon: <BadgePercent size={16} />,
 			},
 			{
 				label: "Isenção de Taxa de GTA",
@@ -536,7 +538,7 @@ export const secondaryCategories: MenuCategory[] = [
 			{
 				label: "Recolhimento Mensal de GTAs",
 				route: "recolhimento-mensal-gta",
-				icon: <ReceiptText size={16} />,
+				icon: <CalendarDays size={16} />,
 			},
 		],
 	},
@@ -571,7 +573,7 @@ export const thirdCategories: MenuCategory[] = [
 			{
 				label: "DAE",
 				route: "dae",
-				icon: <ScrollText size={16} />,
+				icon: <ScanBarcode size={16} />,
 
 			},
 			{
