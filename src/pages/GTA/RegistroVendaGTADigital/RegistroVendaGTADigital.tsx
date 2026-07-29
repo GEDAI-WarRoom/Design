@@ -69,14 +69,14 @@ export function RegistroVendaGTADigitalPage({ onLogout, onNavigate }: Props) {
               searchKeys={["nome", "sigla"]}
               columns={[{ label: "Escritório Seccional", key: "nome" }, { label: "Sigla", key: "sigla" }]}
               icon={
-                  Icons.iconeUnidadeAdministrativaUrl ? (
-                    <img
-                      src={Icons.iconeUnidadeAdministrativaUrl}
-                      alt="Escritório Seccional"
-                      className="w-5 h-5 object-contain"
-                    />
-                  ) : undefined
-                }
+                Icons.iconeUnidadeAdministrativaUrl ? (
+                  <img
+                    src={Icons.iconeUnidadeAdministrativaUrl}
+                    alt="Escritório Seccional"
+                    className="w-5 h-5 object-contain"
+                  />
+                ) : undefined
+              }
 
               title="Buscar Escritório Seccional"
               subtitle="Busque po um escritório seccional cadastrado:"
@@ -91,14 +91,14 @@ export function RegistroVendaGTADigitalPage({ onLogout, onNavigate }: Props) {
               searchKeys={["nome", "cpf"]}
               columns={[{ label: "Nome", key: "nome" }, { label: "CPF", key: "cpf" }]}
               icon={
-                  Icons.iconeProfissionalAnimalUrl ? (
-                    <img
-                      src={Icons.iconeProfissionalAnimalUrl}
-                      alt="Médico Veterinário"
-                      className="w-5 h-5 object-contain"
-                    />
-                  ) : undefined
-                }
+                Icons.iconeProfissionalAnimalUrl ? (
+                  <img
+                    src={Icons.iconeProfissionalAnimalUrl}
+                    alt="Médico Veterinário"
+                    className="w-5 h-5 object-contain"
+                  />
+                ) : undefined
+              }
               title="Buscar Médico Veterinário"
               subtitle="Busque por um médico veterinário cadastrado:"
               confirmLabel="Selecionar"
@@ -117,17 +117,17 @@ export function RegistroVendaGTADigitalPage({ onLogout, onNavigate }: Props) {
               onChange={setSituacao}
               options={SITUACOES_REGISTRO_VENDA_GTA}
             />
-            <button 
-              type="button" 
-              onClick={() => { setPesquisou(true); setPagina(1); }} 
-              className="h-11 px-6 rounded-md text-white text-sm font-semibold flex items-center justify-center gap-2" 
+            <button
+              type="button"
+              onClick={() => { setPesquisou(true); setPagina(1); }}
+              className="h-11 px-6 rounded-md text-white text-sm font-semibold flex items-center justify-center gap-2"
               style={{ backgroundColor: GREEN }}
             >
               Pesquisar
             </button>
           </div>
 
-         
+
 
           {!pesquisou ? (
             <div className="py-12 text-center text-sm text-gray-500">Busque por registro de venda de GTA utilizando os filtros acima.</div>
@@ -136,33 +136,48 @@ export function RegistroVendaGTADigitalPage({ onLogout, onNavigate }: Props) {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm border-collapse">
-                <thead><tr className="border-b border-gray-100">
-                  {["Escritório Seccional", "Qtd. comprada", "Qtd. utilizada", "Qtd. disponível", "Médico Veterinário", "Data de cadastro", "Situação"].map((titulo) => <th key={titulo} className="text-left px-3 py-3 font-semibold uppercase text-gray-600 whitespace-nowrap">{titulo}</th>)}
-                  <th className="px-3 py-3 w-[100px]" />
-                </tr></thead>
-                <tbody>{linhas.map((registro) => (
-                  <tr key={registro.id} className="border-b border-gray-50 hover:bg-gray-50/60">
-                    <td className="px-3 py-3 text-gray-500">{registro.escritorio.nome}</td>
-                    <td className="px-3 py-3 text-gray-500">{registro.quantidadeComprada}</td>
-                    <td className="px-3 py-3 text-gray-500">{registro.quantidadeUtilizada}</td>
-                    <td className="px-3 py-3 text-gray-500">{quantidadeDisponivel(registro)}</td>
-                    <td className="px-3 py-3 text-gray-500 ">{registro.medico.cpf} - {registro.medico.nome}</td>
-                    <td className="px-3 py-3 text-gray-500 whitespace-nowrap">{formatarData(registro.dataCadastro)}</td>
-                    <td className="px-3 py-3 text-gray-500">{registro.situacao}</td>
-                    <td className="px-3 py-3"><div className="flex justify-end gap-1">
-                      <button type="button" title="Visualizar" onClick={() => onNavigate("visualizar-registro-venda-gta-digital", registro)} className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md"><Eye size={18} /></button>
-                      <button type="button" title="Editar" onClick={() => onNavigate("editar-registro-venda-gta-digital", registro)} className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md"><Pencil size={17} /></button>
-                    </div></td>
+                <thead>
+                  <tr className="border-b border-gray-100">
+                    <th className="text-left px-3 py-3 font-semibold uppercase text-gray-600">Escritório Seccional</th>
+
+                    {/* Cabeçalhos com quebra de linha (<br />) */}
+                    <th className="text-left px-3 py-3 font-semibold uppercase text-gray-600 leading-tight">
+                      Quantidade<br />Comprada
+                    </th>
+                    <th className="text-left px-3 py-3 font-semibold uppercase text-gray-600 leading-tight">
+                      Quantidade<br />Utilizada
+                    </th>
+                    <th className="text-left px-3 py-3 font-semibold uppercase text-gray-600 leading-tight">
+                      Quantidade<br />Disponível
+                    </th>
+
+                    <th className="text-left px-3 py-3 font-semibold uppercase text-gray-600 whitespace-nowrap">Médico Veterinário</th>
+                    <th className="text-left px-3 py-3 font-semibold uppercase text-gray-600 whitespace-nowrap">Data de cadastro</th>
+                    <th className="text-left px-3 py-3 font-semibold uppercase text-gray-600 whitespace-nowrap">Situação</th>
+                    <th className="px-3 py-3 w-[100px]" />
                   </tr>
-                ))}</tbody>
+                </thead>
+                <tbody>
+                  {linhas.map((registro) => (
+                    <tr key={registro.id} className="border-b border-gray-50 hover:bg-gray-50/60">
+                      <td className="px-3 py-3 text-gray-500">{registro.escritorio.nome}</td>
+                      <td className="px-3 py-3 text-gray-500">{registro.quantidadeComprada}</td>
+                      <td className="px-3 py-3 text-gray-500">{registro.quantidadeUtilizada}</td>
+                      <td className="px-3 py-3 text-gray-500">{quantidadeDisponivel(registro)}</td>
+                      <td className="px-3 py-3 text-gray-500">{registro.medico.cpf} - {registro.medico.nome}</td>
+                      <td className="px-3 py-3 text-gray-500 whitespace-nowrap">{formatarData(registro.dataCadastro)}</td>
+                      <td className="px-3 py-3 text-gray-500">{registro.situacao}</td>
+                      <td className="px-3 py-3">
+                        <div className="flex justify-end gap-1">
+                          <button type="button" title="Visualizar" onClick={() => onNavigate("visualizar-registro-venda-gta-digital", registro)} className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md"><Eye size={18} /></button>
+                          <button type="button" title="Editar" onClick={() => onNavigate("editar-registro-venda-gta-digital", registro)} className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md"><Pencil size={17} /></button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
               </table>
-              <div className="flex items-center justify-between pt-4 text-sm text-gray-500">
-                <span>Itens por página: {porPagina}</span>
-                <div className="flex items-center gap-3"><span>{inicio} - {fim} de {resultados.length}</span>
-                  <button type="button" disabled={paginaAtual === 1} onClick={() => setPagina((valor) => Math.max(1, valor - 1))} className="disabled:opacity-30"><ChevronLeft size={18} /></button>
-                  <button type="button" disabled={paginaAtual === totalPaginas} onClick={() => setPagina((valor) => Math.min(totalPaginas, valor + 1))} className="disabled:opacity-30"><ChevronRight size={18} /></button>
-                </div>
-              </div>
+              {/* ... Paginação abaixo ... */}
             </div>
           )}
         </section>

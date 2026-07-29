@@ -1,12 +1,12 @@
 import {
 	BadgePercent,
+	Bell,
 	BriefcaseBusiness,
 	Calendar,
-	ChartColumn,
 	ClipboardList,
+	ClipboardPlus,
 	Dna,
 	DollarSign,
-	FileText,
 	FlaskConical,
 	Globe,
 	Landmark,
@@ -28,9 +28,8 @@ import {
 	TowerControl,
 	Truck,
 	User,
-	Users,
 	Wallet,
-	ScrollText,
+	Scale,
 } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import * as Icons from "../imports/icons";
@@ -277,14 +276,9 @@ export const cadastrosCategories: MenuCategory[] = [
 				label: "Status Animal",
 				route: "status-animal",
 				icon: (
-					<img
-						src={Icons.iconeStatusUrl}
-						alt="Status"
-						className="w-4 h-4"
-					/>
+					<img src={Icons.iconeStatusUrl} alt="Status" className="w-4 h-4" />
 				),
 			},
-
 		],
 	},
 	{
@@ -366,6 +360,11 @@ export const secondaryCategories: MenuCategory[] = [
 				icon: <PackagePlus size={16} />,
 			},
 			{
+				label: "Venda com Entrada de Insumos para Exames",
+				route: "venda-entrada-insumos-exames",
+				icon: <PackagePlus size={16} />,
+			},
+			{
 				label: "Doação/Partilha de Vacina",
 				route: "partilha-vacina",
 				icon: (
@@ -375,6 +374,17 @@ export const secondaryCategories: MenuCategory[] = [
 			{
 				label: "Ajuste de Doses de Vacina",
 				route: "lancamento-doses-vacina",
+				icon: (
+					<img
+						src={Icons.iconeDoseVacinaUrl}
+						alt="Dose de Vacina"
+						className="w-4 h-4"
+					/>
+				),
+			},
+			{
+				label: "Ajuste de Doses de Insumo",
+				route: "ajuste-doses-insumo",
 				icon: (
 					<img
 						src={Icons.iconeDoseVacinaUrl}
@@ -445,6 +455,11 @@ export const secondaryCategories: MenuCategory[] = [
 				route: "local-realizacao-exame",
 				icon: <MapPinned size={16} />,
 			},
+			{
+				label: "Atestado De Exame",
+				route: "atestado-exame",
+				icon: <ClipboardPlus size={16} />,
+			},
 		],
 	},
 	{
@@ -508,7 +523,13 @@ export const secondaryCategories: MenuCategory[] = [
 			{
 				label: "Isenção de Taxa de GTA",
 				route: "isencao-taxa-gta",
-				icon: <BadgePercent size={16} />,
+				icon: (
+					<img
+						src={Icons.iconeIsencaoTaxaUrl}
+						alt="Isenção de Taxa"
+						className="w-4 h-4 object-contain"
+					/>
+				),
 			},
 			{
 				label: "Recolhimento Mensal de GTAs",
@@ -551,9 +572,9 @@ export const thirdCategories: MenuCategory[] = [
 				icon: <ListTree size={16} />,
 			},
 			{
-				label: "DAE",
-				route: "dae",
-				icon: <ScrollText size={16} />,
+				label: "Notificações dos Estabelecimentos",
+				route: "notificacoes-estabelecimentos",
+				icon: <Scale size={16} />,
 			},
 			{
 				label: "Lote de Pagamento",
@@ -607,8 +628,7 @@ function CategoryCard({
 							onClick={(e) => {
 								e.preventDefault();
 								if (item.route) onNavigate(item.route);
-							}}
-						>
+							}}>
 							{/* MODIFICADO AQUI: Se houver ícone, renderiza o ícone personalizado, senão mantém a bolinha clássica */}
 							{item.icon ? (
 								<span className="flex-shrink-0 text-[#1A7A3C]">
