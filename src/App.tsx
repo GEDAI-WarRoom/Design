@@ -95,6 +95,14 @@ import { AdicionarEtapaAtualizacaoCadastralPage } from "./pages/Rebanho/EtapaAtu
 import { EditarEtapaAtualizacaoCadastralPage } from "./pages/Rebanho/EtapaAtualizacaoCadastral/EditarEtapaAtualizacaoCadastral";
 import { EtapaAtualizacaoCadastralPage } from "./pages/Rebanho/EtapaAtualizacaoCadastral/EtapaAtualizacaoCadastral";
 import { VisualizarEtapaAtualizacaoCadastralPage } from "./pages/Rebanho/EtapaAtualizacaoCadastral/VisualizarEtapaAtualizacaoCadastral";
+import { AdicionarAjusteRebanhoPage } from "./pages/Rebanho/AjusteRebanho/AdicionarAjusteRebanho";
+import { AjusteRebanhoPage } from "./pages/Rebanho/AjusteRebanho/AjusteRebanho";
+import { EditarAjusteRebanhoPage } from "./pages/Rebanho/AjusteRebanho/EditarAjusteRebanho";
+import { VisualizarAjusteRebanhoPage } from "./pages/Rebanho/AjusteRebanho/VisualizarAjusteRebanho";
+import { AdicionarLancamentoRebanhoPage } from "./pages/Rebanho/LancamentoRebanho/AdicionarLancamentoRebanho";
+import { EditarLancamentoRebanhoPage } from "./pages/Rebanho/LancamentoRebanho/EditarLancamentoRebanho";
+import { LancamentoRebanhoPage } from "./pages/Rebanho/LancamentoRebanho/LancamentoRebanho";
+import { VisualizarLancamentoRebanhoPage } from "./pages/Rebanho/LancamentoRebanho/VisualizarLancamentoRebanho";
 
 // VEGETAL
 import { AdicionarCulturaPage } from "./pages/Vegetal/Cultura/AdicionarCultura";
@@ -164,6 +172,8 @@ import { VisualizarDaeLotePagamentoPage } from "./pages/Arrecadacao/LotePagament
 import { DAEBuscaPage } from "./pages/Arrecadacao/DAE/DAE";
 import { AdicionarDAEPage } from "./pages/Arrecadacao/DAE/AdicionarDAE";
 import { VisualizarDAEPage } from "./pages/Arrecadacao/DAE/VisualizarDAE";
+import { Indice } from "./pages/Arrecadacao/Indice/Indice";
+import { AdicionarIndice } from "./pages/Arrecadacao/Indice/AdicionarIndice";
 
 // GTA
 import { AdicionarDistribuicaoFormulariosGta } from "./pages/GTA/DistribuicaoFormulariosGta/AdicionarDistribuicaoFormulariosGta";
@@ -239,6 +249,14 @@ export type Screen =
 	| "exploracao-pecuaria" // 🚀 Adicionado
 	| "adicionar-exploracao-pecuaria" // 🚀 Adicionado
 	| "visualizar-exploracao-pecuaria" // 🚀 Adicionado
+	| "ajuste-rebanho"
+	| "adicionar-ajuste-rebanho"
+	| "visualizar-ajuste-rebanho"
+	| "editar-ajuste-rebanho"
+	| "lancamento-rebanho"
+	| "adicionar-lancamento-rebanho"
+	| "visualizar-lancamento-rebanho"
+	| "editar-lancamento-rebanho"
 	| "passaporte-equestre"
 	| "adicionar-passaporte-equestre"
 	| "visualizar-passaporte-equestre"
@@ -383,7 +401,9 @@ export type Screen =
 	| "editar-etapa-atualizacao-cadastral"
 	| "dae"
 	| "adicionar-dae"
-	| "visualizar-dae";
+	| "visualizar-dae"
+	| "indice"
+	| "adicionar-indice";
 
 export default function App() {
 	const [screen, setScreen] = useState<Screen>("login");
@@ -1020,6 +1040,64 @@ export default function App() {
 					onNavigate={handleNavigate}
 				/>
 			);
+		case "ajuste-rebanho":
+			return (
+				<AjusteRebanhoPage
+          onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "lancamento-rebanho":
+			return (
+				<LancamentoRebanhoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-ajuste-rebanho":
+			return (
+				<AdicionarAjusteRebanhoPage
+          onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-lancamento-rebanho":
+			return (
+				<AdicionarLancamentoRebanhoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-ajuste-rebanho":
+			return (
+				<VisualizarAjusteRebanhoPage
+          onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-lancamento-rebanho":
+			return (
+				<VisualizarLancamentoRebanhoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "editar-ajuste-rebanho":
+			return (
+				<EditarAjusteRebanhoPage
+          onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "editar-lancamento-rebanho":
+			return (
+				<EditarLancamentoRebanhoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
 		case "agroindustrial-sie":
 			return (
 				<EstabelecimentoAgroindustrialSIEMGPage
@@ -1529,6 +1607,21 @@ export default function App() {
 			return (
 				<VisualizarLotePagamentoPage
 					dados={screenData}
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "indice":
+			return (
+				<Indice
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+
+		case "adicionar-indice":
+			return (
+				<AdicionarIndice
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
 				/>

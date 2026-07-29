@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ArrowLeft, Info, Pencil, Check, Eye, FileText, CreditCard, Clock, RotateCcw, Calendar } from "lucide-react";
+import { ArrowLeft, Info, Pencil, Check, Eye, FileText, CreditCard, Clock, RotateCcw, Calendar, ScrollText, ScanBarcode } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput } from "../../../components/ui/FormKit";
 import * as Icons from "../../../imports/icons";
@@ -136,7 +136,7 @@ export function VisualizarRegistroVendaGtaFisicaPage({
 
           <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3 w-full">
             <div className="flex flex-wrap items-center gap-3">
-              <h1 className="text-2xl font-semibold text-gray-900">Registro de Venda de GTA Física</h1>
+              <h1 className="text-2xl font-semibold text-gray-900">Visualizar Registro de Venda de GTA Física</h1>
             </div>
 
             <div className="flex items-center gap-2 flex-wrap">
@@ -147,20 +147,10 @@ export function VisualizarRegistroVendaGtaFisicaPage({
                   onClick={() => onNavigate("visualizar-dae", r.dae)}
                   className="px-5 h-10 border border-[#1A7A3C] text-[#1A7A3C] hover:bg-green-50/50 text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2"
                 >
-                  <FileText size={15} /> DAE Relacionado
+                  <ScanBarcode size={15} /> DAE Relacionado
                 </button>
               )}
 
-              {/* Gravar — sem a animação de piscar */}
-              {podeGravar && (
-                <button
-                  type="button"
-                  onClick={handleGravarEntrega}
-                  className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2"
-                >
-                  Gravar
-                </button>
-              )}
 
               <button
                 type="button"
@@ -194,8 +184,8 @@ export function VisualizarRegistroVendaGtaFisicaPage({
               onClick={handlePagarTaxa}
               className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#F57C00] hover:bg-[#E65100] text-white rounded-lg text-xs font-bold transition self-start sm:self-center shrink-0 shadow-sm"
             >
-              <CreditCard size={15} />
-              Pagamento da Taxa
+              <ScrollText size={15} />
+              Associar DAE
             </button>
           </div>
         )}
