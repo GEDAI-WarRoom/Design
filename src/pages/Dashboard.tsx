@@ -475,7 +475,19 @@ export const secondaryCategories: MenuCategory[] = [
 				className="w-9 h-9 object-contain"
 			/>
 		),
-		items: [],
+		items: [
+			{
+				label: "Lançamento de Rebanho",
+				route: "lancamento-rebanho",
+				icon: (
+					<img
+						src={Icons.iconeRebanhoUrl}
+						alt="Lançamento de Rebanho"
+						className="w-4 h-4 object-contain"
+					/>
+				),
+			},
+		],
 	},
 	{
 		title: "GTA",

@@ -90,6 +90,12 @@ import { VisualizarStatusAnimalPage } from "./pages/Animal/StatusAnimal/Visualiz
 import { AdicionarTipoVeiculoPage } from "./pages/Animal/TipoVeiculo/AdicionarTipoVeiculo";
 import { TipoVeiculoPage } from "./pages/Animal/TipoVeiculo/TipoVeiculo";
 
+// REBANHO
+import { AdicionarLancamentoRebanhoPage } from "./pages/Rebanho/LancamentoRebanho/AdicionarLancamentoRebanho";
+import { EditarLancamentoRebanhoPage } from "./pages/Rebanho/LancamentoRebanho/EditarLancamentoRebanho";
+import { LancamentoRebanhoPage } from "./pages/Rebanho/LancamentoRebanho/LancamentoRebanho";
+import { VisualizarLancamentoRebanhoPage } from "./pages/Rebanho/LancamentoRebanho/VisualizarLancamentoRebanho";
+
 // VEGETAL
 import { AdicionarCulturaPage } from "./pages/Vegetal/Cultura/AdicionarCultura";
 import { CulturaPage } from "./pages/Vegetal/Cultura/Cultura";
@@ -235,6 +241,10 @@ export type Screen =
 	| "exploracao-pecuaria" // 🚀 Adicionado
 	| "adicionar-exploracao-pecuaria" // 🚀 Adicionado
 	| "visualizar-exploracao-pecuaria" // 🚀 Adicionado
+	| "lancamento-rebanho"
+	| "adicionar-lancamento-rebanho"
+	| "visualizar-lancamento-rebanho"
+	| "editar-lancamento-rebanho"
 	| "passaporte-equestre"
 	| "adicionar-passaporte-equestre"
 	| "visualizar-passaporte-equestre"
@@ -1012,6 +1022,36 @@ export default function App() {
 				<VisualizarExploracaoPecuariaPage
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
+				/>
+			);
+		case "lancamento-rebanho":
+			return (
+				<LancamentoRebanhoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-lancamento-rebanho":
+			return (
+				<AdicionarLancamentoRebanhoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-lancamento-rebanho":
+			return (
+				<VisualizarLancamentoRebanhoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "editar-lancamento-rebanho":
+			return (
+				<EditarLancamentoRebanhoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
 				/>
 			);
 		case "agroindustrial-sie":
