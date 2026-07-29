@@ -158,6 +158,8 @@ import { VisualizarDaeLotePagamentoPage } from "./pages/Arrecadacao/LotePagament
 import { DAEBuscaPage } from "./pages/Arrecadacao/DAE/DAE";
 import { AdicionarDAEPage } from "./pages/Arrecadacao/DAE/AdicionarDAE";
 import { VisualizarDAEPage } from "./pages/Arrecadacao/DAE/VisualizarDAE";
+import { Indice } from "./pages/Indice/Indice";
+import { AdicionarIndice } from "./pages/Indice/AdicionarIndice";
 
 // GTA
 import { AdicionarDistribuicaoFormulariosGta } from "./pages/GTA/DistribuicaoFormulariosGta/AdicionarDistribuicaoFormulariosGta";
@@ -373,7 +375,9 @@ export type Screen =
 	| "editar-status-animal"
 	| "dae"
 	| "adicionar-dae"
-	| "visualizar-dae";
+	| "visualizar-dae"
+	| "indice"
+	| "adicionar-indice";
 
 export default function App() {
 	const [screen, setScreen] = useState<Screen>("login");
@@ -1522,6 +1526,21 @@ export default function App() {
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
 				/>
+			);
+		case "indice":
+			return (
+				<Indice
+					onLogout={handleLogout}
+        			onNavigate={handleNavigate}
+        		/>
+      		);
+
+    	case "adicionar-indice":
+      		return (
+        		<AdicionarIndice
+        			onLogout={handleLogout}
+        			onNavigate={handleNavigate}
+        		/>
 			);
 		case "dae":
 			return (
