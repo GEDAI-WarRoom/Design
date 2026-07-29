@@ -100,6 +100,13 @@ export function VisualizarRegistroVendaGTADigitalPage({
     setModalDaeAberto(true);
   };
 
+  const handlePagarTaxa = () => {
+    // Transiciona para Confirmado e preenche a Data de Pagamento
+    setStatusPagamento("confirmado");
+    const hoje = new Date().toLocaleDateString("pt-BR");
+    setDataPagamento(hoje);
+  };
+
   // 2. Confirmar Pagamento do DAE
   const handleConfirmarPagamentoDAE = () => {
     setStatusPagamento("confirmado");
@@ -154,7 +161,7 @@ export function VisualizarRegistroVendaGTADigitalPage({
                   onClick={handleGravarLiberacao}
                   className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2"
                 >
-                  <Check size={15} /> Gravar
+                  Gravar
                 </button>
               )}
 
@@ -169,7 +176,7 @@ export function VisualizarRegistroVendaGTADigitalPage({
           </div>
         </div>
 
-        {/* Alerta: Pagamento Pendente com ação para o DAE */}
+        {/* ✅ Pagamento direto ao clicar no botão: */}
         {isPendente && registro.situacao !== "Cancelado" && (
           <div className="w-full bg-[#FFF9E6] border border-[#FFE0B2] rounded-xl p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-2">
             <div className="flex items-start gap-3">
@@ -185,11 +192,11 @@ export function VisualizarRegistroVendaGTADigitalPage({
             </div>
             <button
               type="button"
-              onClick={handleAbrirPagamento}
+              onClick={handlePagarTaxa}
               className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#F57C00] hover:bg-[#E65100] text-white rounded-lg text-xs font-bold transition self-start sm:self-center shrink-0 shadow-sm"
             >
               <CreditCard size={15} />
-              Pagamento do DAE
+              Pagamento da Taxa
             </button>
           </div>
         )}

@@ -155,6 +155,9 @@ import { AdicionarLotePagamentoPage } from "./pages/Arrecadacao/LotePagamento/Ad
 import { VisualizarLotePagamentoPage } from "./pages/Arrecadacao/LotePagamento/VisualizarLotePagamento";
 import { VisualizarDocumentoLotePagamentoPage } from "./pages/Arrecadacao/LotePagamento/VisualizarDocumentoLotePagamento";
 import { VisualizarDaeLotePagamentoPage } from "./pages/Arrecadacao/LotePagamento/VisualizarDaeLotePagamento";
+import { DAEBuscaPage } from "./pages/Arrecadacao/DAE/DAE";
+import { AdicionarDAEPage } from "./pages/Arrecadacao/DAE/AdicionarDAE";
+import { VisualizarDAEPage } from "./pages/Arrecadacao/DAE/VisualizarDAE";
 
 // GTA
 import { AdicionarDistribuicaoFormulariosGta } from "./pages/GTA/DistribuicaoFormulariosGta/AdicionarDistribuicaoFormulariosGta";
@@ -367,7 +370,10 @@ export type Screen =
 	| "status-animal"
 	| "adicionar-status-animal"
 	| "visualizar-status-animal"
-	| "editar-status-animal";
+	| "editar-status-animal"
+	| "dae"
+	| "adicionar-dae"
+	| "visualizar-dae";
 
 export default function App() {
 	const [screen, setScreen] = useState<Screen>("login");
@@ -1512,6 +1518,28 @@ export default function App() {
 		case "visualizar-lote-pagamento":
 			return (
 				<VisualizarLotePagamentoPage
+					dados={screenData}
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "dae":
+			return (
+				<DAEBuscaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-dae":
+			return (
+				<AdicionarDAEPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-dae":
+			return (
+				<VisualizarDAEPage
 					dados={screenData}
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}

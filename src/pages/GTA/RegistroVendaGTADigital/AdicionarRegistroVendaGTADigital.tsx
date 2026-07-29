@@ -76,15 +76,13 @@ export function AdicionarRegistroVendaGTADigitalPage({ onLogout, onNavigate }: a
       {registroSalvo && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8 text-center">
-            <div className="w-16 h-16 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-5">
-              <Check size={32} className="text-[#1A7A3C]" strokeWidth={3} />
-            </div>
+
 
             <h2 className="text-xl font-bold text-gray-900 leading-tight">
-              Registro de venda de GTA digital cadastrado com sucesso!
+              Registro de venda de GTA digital cadastrado com sucesso
             </h2>
             <p className="text-sm text-gray-500 mt-2">
-              A venda para <span className="font-semibold text-gray-700">{registroSalvo.medico.nome}</span> foi realizada e os créditos já estão disponíveis.
+              O registro de venda para <span className="font-semibold text-gray-700">{registroSalvo.medico.nome}</span> foi cadastrado com sucesso.
             </p>
 
             <div className="flex gap-3 justify-center mt-8">
