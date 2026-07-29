@@ -10,8 +10,8 @@ import {
   X,
   Plus,
 } from "lucide-react";
-import { Navbar } from "../../components/Navbar";
-import { FloatSelect } from "../../components/ui/FormKit";
+import { Navbar } from "../../../components/Navbar";
+import { FloatSelect } from "../../../components/ui/FormKit";
 
 const GREEN = "#1A7A3C";
 
@@ -142,11 +142,10 @@ export function Indice({ onLogout, onNavigate }: IndiceProps) {
           <div className="flex gap-3 items-stretch w-full">
             <div className="flex-1 bg-white border border-gray-300 rounded-md px-3 h-12 transition-all relative flex items-end pb-1.5 focus-within:border-[#1A7A3C] focus-within:ring-1 focus-within:ring-[#1A7A3C]">
               <label
-                className={`absolute left-3 transition-all duration-200 pointer-events-none ${
-                  focusNome || nomeIndice
-                    ? "top-1 text-[10px] text-gray-400 font-medium"
-                    : "top-1/2 -translate-y-1/2 text-sm text-gray-400"
-                }`}
+                className={`absolute left-3 transition-all duration-200 pointer-events-none ${focusNome || nomeIndice
+                  ? "top-1 text-[10px] text-gray-400 font-medium"
+                  : "top-1/2 -translate-y-1/2 text-sm text-gray-400"
+                  }`}
               >
                 Nome do Índice
               </label>
@@ -181,14 +180,7 @@ export function Indice({ onLogout, onNavigate }: IndiceProps) {
           {/* Filtros Expandidos */}
           {showFilters && (
             <div className="animate-fadeIn flex flex-col lg:flex-row items-end gap-3 w-full">
-              <div className="w-full lg:flex-1">
-                <FloatSelect
-                  label="Índice"
-                  value={nomeIndice}
-                  onChange={setNomeIndice}
-                  options={INDICES_OPCOES}
-                />
-              </div>
+
               <div className="w-full lg:flex-1">
                 <FloatSelect
                   label="Situação"
@@ -265,15 +257,7 @@ export function Indice({ onLogout, onNavigate }: IndiceProps) {
                           {item.nome}
                         </td>
                         <td className="px-4 py-3 text-gray-500">
-                          <span
-                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                              item.situacao === "Ativo"
-                                ? "bg-green-50 text-[#1A7A3C] border border-green-200"
-                                : "bg-gray-100 text-gray-600 border border-gray-200"
-                            }`}
-                          >
-                            {item.situacao}
-                          </span>
+                          {item.situacao}
                         </td>
                         <td className="px-4 py-3 text-right">
                           <div className="flex items-center justify-end gap-1">
@@ -329,7 +313,7 @@ export function Indice({ onLogout, onNavigate }: IndiceProps) {
             </div>
           )}
         </div>
-      </main>
-    </div>
+      </main >
+    </div >
   );
 }

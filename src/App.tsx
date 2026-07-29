@@ -158,8 +158,8 @@ import { VisualizarDaeLotePagamentoPage } from "./pages/Arrecadacao/LotePagament
 import { DAEBuscaPage } from "./pages/Arrecadacao/DAE/DAE";
 import { AdicionarDAEPage } from "./pages/Arrecadacao/DAE/AdicionarDAE";
 import { VisualizarDAEPage } from "./pages/Arrecadacao/DAE/VisualizarDAE";
-import { Indice } from "./pages/Indice/Indice";
-import { AdicionarIndice } from "./pages/Indice/AdicionarIndice";
+import { Indice } from "./pages/Arrecadacao/Indice/Indice";
+import { AdicionarIndice } from "./pages/Arrecadacao/Indice/AdicionarIndice";
 
 // GTA
 import { AdicionarDistribuicaoFormulariosGta } from "./pages/GTA/DistribuicaoFormulariosGta/AdicionarDistribuicaoFormulariosGta";
@@ -1531,16 +1531,16 @@ export default function App() {
 			return (
 				<Indice
 					onLogout={handleLogout}
-        			onNavigate={handleNavigate}
-        		/>
-      		);
+					onNavigate={handleNavigate}
+				/>
+			);
 
-    	case "adicionar-indice":
-      		return (
-        		<AdicionarIndice
-        			onLogout={handleLogout}
-        			onNavigate={handleNavigate}
-        		/>
+		case "adicionar-indice":
+			return (
+				<AdicionarIndice
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
 			);
 		case "dae":
 			return (

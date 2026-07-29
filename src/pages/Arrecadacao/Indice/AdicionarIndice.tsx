@@ -6,8 +6,8 @@ import {
   Check,
   Info,
 } from "lucide-react";
-import { Navbar } from "../../components/Navbar";
-import { FloatInput, FloatSelect } from "../../components/ui/FormKit";
+import { Navbar } from "../../../components/Navbar";
+import { FloatInput, FloatSelect } from "../../../components/ui/FormKit";
 
 const GREEN = "#1A7A3C";
 
@@ -119,39 +119,19 @@ export function AdicionarIndice({ onLogout, onNavigate, data }: AdicionarIndiceP
         </div>
 
         {/* Formulário em Seção */}
-        <Section title="Informações do Índice">
+        <Section title="Informações Básicas">
           <div
-            className={`grid grid-cols-1 ${
-              isEdicao ? "md:grid-cols-3" : "md:grid-cols-2"
-            } gap-4 items-center`}
+            className={`grid grid-cols-1 ${isEdicao ? "md:grid-cols-3" : "md:grid-cols-2"
+              } gap-4 items-center`}
           >
             <FloatInput
-              label="Nome do Índice"
+              label="Índice"
               required
               value={nome}
               onChange={setNome}
               maxLength={255}
             />
-            <FloatInput
-              label="Ano Vigente"
-              value={ano}
-              onChange={setAno}
-              maxLength={4}
-            />
-            <FloatInput
-              label="Valor Inicial"
-              value={valor}
-              onChange={setValor}
-            />
-            {isEdicao && (
-              <FloatSelect
-                label="Situação"
-                required
-                value={situacao}
-                onChange={setSituacao}
-                options={SITUACOES_OPCOES}
-              />
-            )}
+
           </div>
         </Section>
       </main>
