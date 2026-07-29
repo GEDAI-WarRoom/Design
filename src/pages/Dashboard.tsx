@@ -30,6 +30,7 @@ import {
 	User,
 	Wallet,
 	Scale,
+	ScrollText
 } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import * as Icons from "../imports/icons";
@@ -560,6 +561,12 @@ export const thirdCategories: MenuCategory[] = [
 						className="w-4 h-4 object-contain"
 					/>
 				),
+			},
+			{
+				label: "DAE",
+				route: "dae",
+				icon: <ScrollText size={16} />,
+
 			},
 			{
 				label: "Fundo de Arrecadação",
