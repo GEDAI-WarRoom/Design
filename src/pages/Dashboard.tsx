@@ -30,7 +30,8 @@ import {
 	User,
 	Wallet,
 	Scale,
-	ScrollText
+	ScrollText,
+	LineChart
 } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import * as Icons from "../imports/icons";
@@ -550,6 +551,11 @@ export const thirdCategories: MenuCategory[] = [
 				label: "Receita",
 				route: "receita",
 				icon: <ReceiptText size={16} />,
+			},
+			{
+				label: "Índice",
+				route: "indice",
+				icon: <LineChart size={16} />,
 			},
 			{
 				label: "Valor Por Índice",
