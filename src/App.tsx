@@ -95,6 +95,10 @@ import { AdicionarAjusteRebanhoPage } from "./pages/Rebanho/AjusteRebanho/Adicio
 import { AjusteRebanhoPage } from "./pages/Rebanho/AjusteRebanho/AjusteRebanho";
 import { EditarAjusteRebanhoPage } from "./pages/Rebanho/AjusteRebanho/EditarAjusteRebanho";
 import { VisualizarAjusteRebanhoPage } from "./pages/Rebanho/AjusteRebanho/VisualizarAjusteRebanho";
+import { AdicionarLancamentoRebanhoPage } from "./pages/Rebanho/LancamentoRebanho/AdicionarLancamentoRebanho";
+import { EditarLancamentoRebanhoPage } from "./pages/Rebanho/LancamentoRebanho/EditarLancamentoRebanho";
+import { LancamentoRebanhoPage } from "./pages/Rebanho/LancamentoRebanho/LancamentoRebanho";
+import { VisualizarLancamentoRebanhoPage } from "./pages/Rebanho/LancamentoRebanho/VisualizarLancamentoRebanho";
 
 // VEGETAL
 import { AdicionarCulturaPage } from "./pages/Vegetal/Cultura/AdicionarCultura";
@@ -245,6 +249,10 @@ export type Screen =
 	| "adicionar-ajuste-rebanho"
 	| "visualizar-ajuste-rebanho"
 	| "editar-ajuste-rebanho"
+	| "lancamento-rebanho"
+	| "adicionar-lancamento-rebanho"
+	| "visualizar-lancamento-rebanho"
+	| "editar-lancamento-rebanho"
 	| "passaporte-equestre"
 	| "adicionar-passaporte-equestre"
 	| "visualizar-passaporte-equestre"
@@ -1027,6 +1035,13 @@ export default function App() {
 		case "ajuste-rebanho":
 			return (
 				<AjusteRebanhoPage
+          onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "lancamento-rebanho":
+			return (
+				<LancamentoRebanhoPage
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
 				/>
@@ -1034,6 +1049,13 @@ export default function App() {
 		case "adicionar-ajuste-rebanho":
 			return (
 				<AdicionarAjusteRebanhoPage
+          onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-lancamento-rebanho":
+			return (
+				<AdicionarLancamentoRebanhoPage
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
 				/>
@@ -1041,6 +1063,13 @@ export default function App() {
 		case "visualizar-ajuste-rebanho":
 			return (
 				<VisualizarAjusteRebanhoPage
+          onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-lancamento-rebanho":
+			return (
+				<VisualizarLancamentoRebanhoPage
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
 					dados={screenData}
@@ -1049,6 +1078,13 @@ export default function App() {
 		case "editar-ajuste-rebanho":
 			return (
 				<EditarAjusteRebanhoPage
+          onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "editar-lancamento-rebanho":
+			return (
+				<EditarLancamentoRebanhoPage
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
 					dados={screenData}

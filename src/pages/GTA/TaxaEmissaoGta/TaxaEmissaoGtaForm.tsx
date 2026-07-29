@@ -1,16 +1,23 @@
 import { useState, type ReactNode } from "react";
-import { ChevronDown, ChevronUp, Dna, Info, Calendar } from "lucide-react";
+import { ChevronDown, ChevronUp, Dna, Info, Calendar, Receipt, ListTree } from "lucide-react";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
 import { FloatInput, FloatSelect } from "../../../components/ui/FormKit";
 import {
   ESPECIES_TAXA_MOCK,
   FAIXAS_POR_CABECA,
-  ITENS_RECEITA,
   TIPOS_COBRANCA,
   type FaixaPorCabeca,
   type TaxaEmissaoGtaDraft,
   type TipoCobranca,
 } from "./taxaEmissaoGtaData";
+
+// Mock de exemplo para os Itens de Receita
+const ITENS_RECEITA_MOCK = [
+  { id: "1", codigo: "001", nome: "Taxa de Emissão GTA - Bovinos", quantidadeUfmg: "2" },
+  { id: "2", codigo: "002", nome: "Taxa de Emissão GTA - Aves", quantidadeUfmg: "1" },
+  { id: "3", codigo: "003", nome: "Taxa de Emissão GTA - Suínos", quantidadeUfmg: "1" },
+  { id: "4", codigo: "004", nome: "Taxa de Emissão GTA - Equídeos", quantidadeUfmg: "3" },
+];
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   const [open, setOpen] = useState(true);
@@ -76,11 +83,12 @@ export function TaxaEmissaoGtaForm({ value, onChange, mode = "create" }: TaxaEmi
               { label: "Espécie", key: "nome" },
               { label: "Grupo", key: "grupo" },
             ]}
-            icon={<Dna size={18} />}
+            icon={<Dna size={18} color="#1A7A3C" />}
             onChange={(especie) => update("especie", especie)}
             required
+            disabled={disabled}
             title="Buscar Espécie"
-            subtitle="Selecione uma espécie cadastrada no sistema:"
+            subtitle="Busque por uma espécie cadastrada no sistema:"
           />
         ) : (
           <FloatInput
@@ -92,12 +100,12 @@ export function TaxaEmissaoGtaForm({ value, onChange, mode = "create" }: TaxaEmi
           />
         )}
 
-        {/* 2. Data Início de Vigência (Colocada na frente de Tipo de Cobrança) */}
+        {/* 2. Data Início de Vigência */}
         <FloatInput
           label="Data Início de Vigência"
           type="date"
           value={value.dataInicioVigencia}
-          icon={<Calendar size={18} />}
+          icon={<Calendar size={18} color="#1A7A3C" />}
           onChange={(next) => update("dataInicioVigencia", next)}
           disabled={disabled}
         />
@@ -112,17 +120,27 @@ export function TaxaEmissaoGtaForm({ value, onChange, mode = "create" }: TaxaEmi
           disabled={disabled}
         />
 
-        {/* Item de Receita para 'Por Cabeça' e 'Por Documento' */}
+        {/* Item de Receita para 'Por Cabeça' e 'Por Documento' (Seleção de Entidade) */}
         {(value.tipoCobranca === "Por Cabeça" || value.tipoCobranca === "Por Documento") && (
-          <FloatSelect
-            label="Item de Receita"
-            required
-            value={value.itemReceita}
-            onChange={(next) => update("itemReceita", next)}
-            options={ITENS_RECEITA}
-            disabled={disabled}
-            className="md:col-span-2"
-          />
+          <div className="md:col-span-2">
+            <EntitySearchInput
+              label="Item de Receita"
+              placeholder="Buscar item de receita"
+              value={value.itemReceita}
+              data={ITENS_RECEITA_MOCK}
+              searchKeys={["nome", "quantidadeUfmg"]}
+              columns={[
+                { label: "Nome", key: "nome" },
+                { label: "Quantidade de UFMG", key: "quantidadeUfmg" },
+              ]}
+              icon={<ListTree size={18} color="#1A7A3C" />}
+              onChange={(item) => update("itemReceita", item ? item.nome : "")}
+              required
+              disabled={disabled}
+              title="Buscar Item de Receita"
+              subtitle="Busque por item de receita cadastrado:"
+            />
+          </div>
         )}
       </div>
 
@@ -131,15 +149,27 @@ export function TaxaEmissaoGtaForm({ value, onChange, mode = "create" }: TaxaEmi
         <div className="mt-6 pt-6 border-t border-gray-100">
           <h3 className="text-sm font-semibold text-gray-700 mb-5">Cobrança por Quantidade</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <FloatSelect
-              label="Item de Receita por Cabeça"
-              required
-              value={value.itemReceitaPorCabeca}
-              onChange={(next) => update("itemReceitaPorCabeca", next)}
-              options={ITENS_RECEITA}
-              disabled={disabled}
-              className="md:col-span-2"
-            />
+
+            {/* Item de Receita por Cabeça (Seleção de Entidade) */}
+            <div className="md:col-span-2">
+              <EntitySearchInput
+                label="Item de Receita por Cabeça"
+                placeholder="Buscar item de receita por cabeça"
+                value={value.itemReceitaPorCabeca}
+                data={ITENS_RECEITA_MOCK}
+                searchKeys={["nome", "quantidadeUfmg"]}
+                columns={[
+                  { label: "Nome", key: "nome" },
+                  { label: "Quantidade de UFMG", key: "quantidadeUfmg" },
+                ]}
+                icon={<ListTree size={18} color="#1A7A3C" />}
+                onChange={(item) => update("itemReceitaPorCabeca", item ? item.nome : "")}
+                required
+                disabled={disabled}
+                title="Buscar Item de Receita por Cabeça"
+                subtitle="Busque por item de receita cadastrado:"
+              />
+            </div>
 
             <FloatSelect
               label="Por cabeça"
@@ -169,13 +199,23 @@ export function TaxaEmissaoGtaForm({ value, onChange, mode = "create" }: TaxaEmi
                   onChange={() => { }}
                 />
 
-                <FloatSelect
+                {/* Item de Receita por Documento (Seleção de Entidade) */}
+                <EntitySearchInput
                   label="Item de Receita por Documento"
-                  required
+                  placeholder="Buscar item de receita por documento"
                   value={value.itemReceitaPorDocumento}
-                  onChange={(next) => update("itemReceitaPorDocumento", next)}
-                  options={ITENS_RECEITA}
+                  data={ITENS_RECEITA_MOCK}
+                  searchKeys={["nome", "quantidadeUfmg"]}
+                  columns={[
+                    { label: "Nome", key: "nome" },
+                    { label: "Quantidade de UFMG", key: "quantidadeUfmg" },
+                  ]}
+                  icon={<ListTree size={18} color="#1A7A3C" />}
+                  onChange={(item) => update("itemReceitaPorDocumento", item ? item.nome : "")}
+                  required
                   disabled={disabled}
+                  title="Buscar Item de Receita por Documento"
+                  subtitle="Busque por item de receita cadastrado:"
                 />
               </>
             )}
@@ -201,7 +241,6 @@ export function taxaValida(taxa: TaxaEmissaoGtaDraft) {
   if (!taxa.especie.id || !taxa.tipoCobranca) return false;
   if (taxa.tipoCobranca !== "Por Quantidade") return Boolean(taxa.itemReceita);
 
-  // Validação: Quantidade de Animais deve ser um número maior que zero
   const qtdValida = Boolean(taxa.quantidadeAnimais) && Number(taxa.quantidadeAnimais) > 0;
   if (!taxa.porCabeca || !taxa.itemReceitaPorCabeca || !qtdValida) return false;
 
