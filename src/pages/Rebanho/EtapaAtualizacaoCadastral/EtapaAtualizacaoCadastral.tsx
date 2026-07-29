@@ -102,6 +102,10 @@ export function EtapaAtualizacaoCadastralPage({
   const [sortKey, setSortKey] = useState<SortKey | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [pagina, setPagina] = useState(1);
+  
+  // 🟢 Novo estado para controlar se uma pesquisa foi realizada
+  const [foiPesquisado, setFoiPesquisado] = useState(false);
+
   const itensPorPagina = 10;
 
   const temFiltroPreenchido = Boolean(
@@ -114,6 +118,8 @@ export function EtapaAtualizacaoCadastralPage({
   );
 
   const resultados = useMemo(() => {
+    if (!foiPesquisado) return []; // Se não foi pesquisado, não traz resultados
+
     const filtrados = listarEtapasAtualizacaoCadastral().filter(
       (item) =>
         (!filtrosAplicados.codigo ||
@@ -132,7 +138,7 @@ export function EtapaAtualizacaoCadastralPage({
         ? primeiro.localeCompare(segundo, "pt-BR")
         : segundo.localeCompare(primeiro, "pt-BR");
     });
-  }, [filtrosAplicados, sortDirection, sortKey]);
+  }, [filtrosAplicados, sortDirection, sortKey, foiPesquisado]);
 
   const pesquisar = () => {
     if (!temFiltroPreenchido) {
@@ -151,6 +157,7 @@ export function EtapaAtualizacaoCadastralPage({
     }
     setErroFiltro("");
     setFiltrosAplicados(filtros);
+    setFoiPesquisado(true); // 🟢 Marca que a pesquisa foi executada
     setPagina(1);
   };
 
@@ -159,6 +166,11 @@ export function EtapaAtualizacaoCadastralPage({
     const novosAplicados = { ...filtrosAplicados, [campo]: "" };
     setFiltros(novosFiltros);
     setFiltrosAplicados(novosAplicados);
+
+    // Se todos os filtros forem removidos, oculta a tabela novamente
+    if (!novosAplicados.codigo && !novosAplicados.ano && !novosAplicados.situacao) {
+      setFoiPesquisado(false);
+    }
     setPagina(1);
   };
 
@@ -331,142 +343,149 @@ export function EtapaAtualizacaoCadastralPage({
             </div>
           )}
 
-          <div className="mt-5 overflow-x-auto border-t border-gray-100">
-            {linhas.length === 0 ? (
-              <div className="py-12 text-center text-sm text-gray-500">
-                Nenhum resultado foi encontrado.
+          {/* 🟢 Renderização condicional da tabela e mensagens */}
+          {foiPesquisado && (
+            <>
+              <div className="mt-5 overflow-x-auto border-t border-gray-100">
+                {linhas.length === 0 ? (
+                  <div className="py-12 text-center text-sm text-gray-500">
+                    Nenhum resultado foi encontrado.
+                  </div>
+                ) : (
+                  <table className="w-full border-collapse text-sm">
+                    <thead>
+                      <tr className="border-b border-gray-100">
+                        <SortableHeader
+                          label="Código"
+                          sortKey="codigo"
+                          activeKey={sortKey}
+                          direction={sortDirection}
+                          onSort={ordenar}
+                        />
+                        <SortableHeader
+                          label="Ano"
+                          sortKey="ano"
+                          activeKey={sortKey}
+                          direction={sortDirection}
+                          onSort={ordenar}
+                        />
+                        <SortableHeader
+                          label="Data do Início"
+                          sortKey="dataInicio"
+                          activeKey={sortKey}
+                          direction={sortDirection}
+                          onSort={ordenar}
+                        />
+                        <SortableHeader
+                          label="Data do Fim"
+                          sortKey="dataFim"
+                          activeKey={sortKey}
+                          direction={sortDirection}
+                          onSort={ordenar}
+                        />
+                        <SortableHeader
+                          label="Situação"
+                          sortKey="situacao"
+                          activeKey={sortKey}
+                          direction={sortDirection}
+                          onSort={ordenar}
+                        />
+                        <th className="w-[92px] px-3 py-3" aria-label="Ações" />
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {linhas.map((item: EtapaAtualizacaoCadastral) => (
+                        <tr
+                          key={item.id}
+                          className="border-b border-gray-100 last:border-0 hover:bg-gray-50/60"
+                        >
+                          <td className="whitespace-nowrap px-3 py-3 text-gray-600">
+                            {item.codigo}
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-3 text-gray-600">
+                            {item.ano}
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-3 text-gray-600">
+                            {formatarDataEtapaAtualizacao(item.dataInicio)}
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-3 text-gray-600">
+                            {formatarDataEtapaAtualizacao(item.dataFim)}
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-3 text-gray-600">
+                            {item.situacao}
+                          </td>
+                          <td className="px-3 py-3">
+                            <div className="flex justify-end gap-1">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  onNavigate(
+                                    "visualizar-etapa-atualizacao-cadastral",
+                                    item,
+                                  )
+                                }
+                                className="rounded-md p-2 text-[#1A7A3C] hover:bg-green-50"
+                                title="Visualizar"
+                                aria-label={`Visualizar etapa ${item.codigo}`}
+                              >
+                                <Eye size={18} />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  onNavigate(
+                                    "editar-etapa-atualizacao-cadastral",
+                                    item,
+                                  )
+                                }
+                                className="rounded-md p-2 text-[#1A7A3C] hover:bg-green-50"
+                                title="Editar"
+                                aria-label={`Editar etapa ${item.codigo}`}
+                              >
+                                <Pencil size={17} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
               </div>
-            ) : (
-              <table className="w-full border-collapse text-sm">
-                <thead>
-                  <tr className="border-b border-gray-100">
-                    <SortableHeader
-                      label="Código"
-                      sortKey="codigo"
-                      activeKey={sortKey}
-                      direction={sortDirection}
-                      onSort={ordenar}
-                    />
-                    <SortableHeader
-                      label="Ano"
-                      sortKey="ano"
-                      activeKey={sortKey}
-                      direction={sortDirection}
-                      onSort={ordenar}
-                    />
-                    <SortableHeader
-                      label="Data do Início"
-                      sortKey="dataInicio"
-                      activeKey={sortKey}
-                      direction={sortDirection}
-                      onSort={ordenar}
-                    />
-                    <SortableHeader
-                      label="Data do Fim"
-                      sortKey="dataFim"
-                      activeKey={sortKey}
-                      direction={sortDirection}
-                      onSort={ordenar}
-                    />
-                    <SortableHeader
-                      label="Situação"
-                      sortKey="situacao"
-                      activeKey={sortKey}
-                      direction={sortDirection}
-                      onSort={ordenar}
-                    />
-                    <th className="w-[92px] px-3 py-3" aria-label="Ações" />
-                  </tr>
-                </thead>
-                <tbody>
-                  {linhas.map((item: EtapaAtualizacaoCadastral) => (
-                    <tr
-                      key={item.id}
-                      className="border-b border-gray-100 last:border-0 hover:bg-gray-50/60"
-                    >
-                      <td className="whitespace-nowrap px-3 py-3 text-gray-600">
-                        {item.codigo}
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-3 text-gray-600">
-                        {item.ano}
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-3 text-gray-600">
-                        {formatarDataEtapaAtualizacao(item.dataInicio)}
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-3 text-gray-600">
-                        {formatarDataEtapaAtualizacao(item.dataFim)}
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-3 text-gray-600">
-                        {item.situacao}
-                      </td>
-                      <td className="px-3 py-3">
-                        <div className="flex justify-end gap-1">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              onNavigate(
-                                "visualizar-etapa-atualizacao-cadastral",
-                                item,
-                              )
-                            }
-                            className="rounded-md p-2 text-[#1A7A3C] hover:bg-green-50"
-                            title="Visualizar"
-                            aria-label={`Visualizar etapa ${item.codigo}`}
-                          >
-                            <Eye size={18} />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              onNavigate(
-                                "editar-etapa-atualizacao-cadastral",
-                                item,
-                              )
-                            }
-                            className="rounded-md p-2 text-[#1A7A3C] hover:bg-green-50"
-                            title="Editar"
-                            aria-label={`Editar etapa ${item.codigo}`}
-                          >
-                            <Pencil size={17} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
 
-          <div className="flex items-center justify-between border-t border-gray-100 pt-4 text-sm text-gray-500">
-            <span>Itens por página: {itensPorPagina}</span>
-            <div className="flex items-center gap-3">
-              <span>
-                Mostrando de {inicio} a {fim} de {resultados.length} resultado
-                {resultados.length !== 1 ? "s" : ""}
-              </span>
-              <button
-                type="button"
-                onClick={() => setPagina((value) => Math.max(1, value - 1))}
-                disabled={paginaAtual === 1}
-                className="p-1 text-[#1A7A3C] disabled:opacity-30"
-                aria-label="Página anterior"
-              >
-                <ChevronLeft size={18} />
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  setPagina((value) => Math.min(totalPaginas, value + 1))
-                }
-                disabled={paginaAtual === totalPaginas}
-                className="p-1 text-[#1A7A3C] disabled:opacity-30"
-                aria-label="Próxima página"
-              >
-                <ChevronRight size={18} />
-              </button>
-            </div>
-          </div>
+              {resultados.length > 0 && (
+                <div className="flex items-center justify-between border-t border-gray-100 pt-4 text-sm text-gray-500">
+                  <span>Itens por página: {itensPorPagina}</span>
+                  <div className="flex items-center gap-3">
+                    <span>
+                      Mostrando de {inicio} a {fim} de {resultados.length} resultado
+                      {resultados.length !== 1 ? "s" : ""}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setPagina((value) => Math.max(1, value - 1))}
+                      disabled={paginaAtual === 1}
+                      className="p-1 text-[#1A7A3C] disabled:opacity-30"
+                      aria-label="Página anterior"
+                    >
+                      <ChevronLeft size={18} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setPagina((value) => Math.min(totalPaginas, value + 1))
+                      }
+                      disabled={paginaAtual === totalPaginas}
+                      className="p-1 text-[#1A7A3C] disabled:opacity-30"
+                      aria-label="Próxima página"
+                    >
+                      <ChevronRight size={18} />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
         </section>
       </main>
     </div>
