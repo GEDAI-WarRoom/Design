@@ -90,6 +90,12 @@ import { VisualizarStatusAnimalPage } from "./pages/Animal/StatusAnimal/Visualiz
 import { AdicionarTipoVeiculoPage } from "./pages/Animal/TipoVeiculo/AdicionarTipoVeiculo";
 import { TipoVeiculoPage } from "./pages/Animal/TipoVeiculo/TipoVeiculo";
 
+// REBANHO
+import { AdicionarEtapaAtualizacaoCadastralPage } from "./pages/Rebanho/EtapaAtualizacaoCadastral/AdicionarEtapaAtualizacaoCadastral";
+import { EditarEtapaAtualizacaoCadastralPage } from "./pages/Rebanho/EtapaAtualizacaoCadastral/EditarEtapaAtualizacaoCadastral";
+import { EtapaAtualizacaoCadastralPage } from "./pages/Rebanho/EtapaAtualizacaoCadastral/EtapaAtualizacaoCadastral";
+import { VisualizarEtapaAtualizacaoCadastralPage } from "./pages/Rebanho/EtapaAtualizacaoCadastral/VisualizarEtapaAtualizacaoCadastral";
+
 // VEGETAL
 import { AdicionarCulturaPage } from "./pages/Vegetal/Cultura/AdicionarCultura";
 import { CulturaPage } from "./pages/Vegetal/Cultura/Cultura";
@@ -371,6 +377,10 @@ export type Screen =
 	| "adicionar-status-animal"
 	| "visualizar-status-animal"
 	| "editar-status-animal"
+	| "etapa-atualizacao-cadastral"
+	| "adicionar-etapa-atualizacao-cadastral"
+	| "visualizar-etapa-atualizacao-cadastral"
+	| "editar-etapa-atualizacao-cadastral"
 	| "dae"
 	| "adicionar-dae"
 	| "visualizar-dae";
@@ -1590,6 +1600,36 @@ export default function App() {
 		case "editar-status-animal":
 			return (
 				<EditarStatusAnimalPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "etapa-atualizacao-cadastral":
+			return (
+				<EtapaAtualizacaoCadastralPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-etapa-atualizacao-cadastral":
+			return (
+				<AdicionarEtapaAtualizacaoCadastralPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-etapa-atualizacao-cadastral":
+			return (
+				<VisualizarEtapaAtualizacaoCadastralPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "editar-etapa-atualizacao-cadastral":
+			return (
+				<EditarEtapaAtualizacaoCadastralPage
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
 					dados={screenData}

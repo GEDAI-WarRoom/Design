@@ -472,7 +472,13 @@ export const secondaryCategories: MenuCategory[] = [
 				className="w-9 h-9 object-contain"
 			/>
 		),
-		items: [],
+		items: [
+			{
+				label: "Etapa de Atualização Cadastral",
+				route: "etapa-atualizacao-cadastral",
+				icon: <Calendar size={16} />,
+			},
+		],
 	},
 	{
 		title: "GTA",
