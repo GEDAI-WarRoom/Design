@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Pencil, FileText, Layers, PlusCircle } from "lucide-react";
+import { ArrowLeft, Pencil, FileText, Layers, PlusCircle, ListTree } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, Tabs } from "../../../components/ui/FormKit";
 import { classificacaoLabel, Receita } from "./receitaData";
@@ -11,7 +11,7 @@ export function VisualizarReceitaPage({ dados, onLogout, onNavigate }: { dados: 
 
   const tabs = [
     { id: "cadastro", label: "Cadastro", icon: (active: boolean) => <FileText size={18} className={active ? "text-[#1A7A3C]" : "text-gray-400"} /> },
-    { id: "itens-receita", label: "Item de Receita", icon: (active: boolean) => <Layers size={18} className={active ? "text-[#1A7A3C]" : "text-gray-400"} /> },
+    { id: "itens-receita", label: "Item de Receita", icon: (active: boolean) => <ListTree size={18} className={active ? "text-[#1A7A3C]" : "text-gray-400"} /> },
   ];
 
   return (
@@ -34,7 +34,7 @@ export function VisualizarReceitaPage({ dados, onLogout, onNavigate }: { dados: 
                 onClick={() => onNavigate("editar-receita", dados)}
                 className="px-5 h-10 bg-[#1A7A3C] text-white text-xs font-bold rounded-md flex items-center gap-2 hover:bg-[#15612F] transition shadow-sm"
               >
-                <Pencil size={15} /> Editar
+                Editar
               </button>
             )}
 

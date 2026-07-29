@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ArrowLeft, Info, Pencil, Check, Eye, FileText, CreditCard, Clock, Calendar, DollarSign } from "lucide-react";
+import { ArrowLeft, Info, Pencil, Eye, FileText, CreditCard, Clock, Calendar, DollarSign, Check } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput } from "../../../components/ui/FormKit";
 import * as Icons from "../../../imports/icons";
@@ -58,12 +58,12 @@ export function VisualizarRegistroVendaGTADigitalPage({
 }: PageProps) {
   const registro = dados ?? obterRegistroVendaGTA(null);
 
-  // ── ESTADOS DINÂMICOS DE PAGAMENTO E DAE ───────────────────────
+  // ── ESTADOS DINÂMICOS DE PAGAMENTO, SITUAÇÃO E DAE ─────────────
+  const [situacao, setSituacao] = useState<string>(registro?.situacao || "Gravada");
   const [statusPagamento, setStatusPagamento] = useState<"pendente" | "realizado" | "confirmado">("pendente");
   const [dataPagamento, setDataPagamento] = useState<string>("");
   const [dataLiberacao, setDataLiberacao] = useState<string>("");
   const [dae, setDae] = useState<{ codigo: string; valor: number; dataVencimento: string } | null>(null);
-  const [modalDaeAberto, setModalDaeAberto] = useState(false);
 
   if (!registro) return null;
 
@@ -82,40 +82,29 @@ export function VisualizarRegistroVendaGTADigitalPage({
   const mostrarDataLiberacao = pagamentoRealizado;
   const liberacaoRealizada = Boolean(dataLiberacao);
 
-  const podeGravar = mostrarDataLiberacao && !liberacaoRealizada && registro.situacao !== "Cancelado";
+  const podeGravar = mostrarDataLiberacao && !liberacaoRealizada && situacao !== "Cancelado";
   const temDaeRelacionado = Boolean(dae || registro.dae?.codigo);
 
-  // ── LÓGICA DO DAE E PAGAMENTO ──────────────────────────────────
-  // 1. Abrir Modal para Gerar/Simular o DAE
-  const handleAbrirPagamento = () => {
-    if (!dae) {
-      // Gera o DAE dinamicamente se ainda não existir
-      const novoDae = {
-        codigo: `DAE-2026-${Math.floor(100000 + Math.random() * 900000)}`,
-        valor: valorTotal,
-        dataVencimento: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toLocaleDateString("pt-BR"),
-      };
-      setDae(novoDae);
-    }
-    setModalDaeAberto(true);
-  };
-
+  // ── LÓGICA DE PAGAMENTO DIRETO ─────────────────────────────────
   const handlePagarTaxa = () => {
-    // Transiciona para Confirmado e preenche a Data de Pagamento
+    // 1. Muda a situação para Gravada
+    setSituacao("Gravada");
+
+    // 2. Gera/vincula o DAE
+    const novoDae = dae || (registro.dae?.codigo ? registro.dae : {
+      codigo: `DAE-2026-${Math.floor(100000 + Math.random() * 900000)}`,
+      valor: valorTotal,
+      dataVencimento: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toLocaleDateString("pt-BR"),
+    });
+    setDae(novoDae as any);
+
+    // 3. Atualiza o pagamento para confirmado e preenche a data
     setStatusPagamento("confirmado");
     const hoje = new Date().toLocaleDateString("pt-BR");
     setDataPagamento(hoje);
   };
 
-  // 2. Confirmar Pagamento do DAE
-  const handleConfirmarPagamentoDAE = () => {
-    setStatusPagamento("confirmado");
-    const hoje = new Date().toLocaleDateString("pt-BR");
-    setDataPagamento(hoje);
-    setModalDaeAberto(false);
-  };
-
-  // 3. Gravar Liberação dos Créditos
+  // Gravar Liberação dos Créditos
   const handleGravarLiberacao = () => {
     const hoje = new Date().toLocaleDateString("pt-BR");
     setDataLiberacao(hoje);
@@ -143,27 +132,18 @@ export function VisualizarRegistroVendaGTADigitalPage({
             <h1 className="text-2xl font-semibold text-gray-900">Visualizar Registro de Venda de GTA Digital</h1>
 
             <div className="flex items-center gap-2 flex-wrap">
-              {/* DAE Relacionado — Botão habilitado quando o DAE existe */}
+              {/* DAE Relacionado — Posicionado ao lado do botão Gravar */}
               {temDaeRelacionado && (
                 <button
                   type="button"
                   onClick={() => onNavigate("visualizar-dae", dae || registro.dae)}
                   className="px-5 h-10 border border-[#1A7A3C] text-[#1A7A3C] hover:bg-green-50/50 text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2"
                 >
-                  <FileText size={15} /> DAE Relacionado
+                  <ScrollText size={15} /> DAE Relacionado
                 </button>
               )}
 
-              {/* Botão Gravar Liberação */}
-              {podeGravar && (
-                <button
-                  type="button"
-                  onClick={handleGravarLiberacao}
-                  className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2"
-                >
-                  Gravar
-                </button>
-              )}
+
 
               <button
                 type="button"
@@ -176,8 +156,8 @@ export function VisualizarRegistroVendaGTADigitalPage({
           </div>
         </div>
 
-        {/* ✅ Pagamento direto ao clicar no botão: */}
-        {isPendente && registro.situacao !== "Cancelado" && (
+        {/* Alerta de Pagamento Pendente */}
+        {isPendente && situacao !== "Cancelado" && (
           <div className="w-full bg-[#FFF9E6] border border-[#FFE0B2] rounded-xl p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-2">
             <div className="flex items-start gap-3">
               <div className="text-[#F57C00] flex-shrink-0 mt-0.5">
@@ -286,7 +266,7 @@ export function VisualizarRegistroVendaGTADigitalPage({
 
             {/* Situação e Datas Condicionais */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <FloatInput label="Situação" value={registro.situacao || "Gravada"} disabled onChange={() => { }} />
+              <FloatInput label="Situação" value={situacao} disabled onChange={() => { }} />
 
               {mostrarDataPagamento && (
                 <FloatInput
@@ -312,55 +292,6 @@ export function VisualizarRegistroVendaGTADigitalPage({
           </div>
         </Section>
       </main>
-
-      {/* ── MODAL DE PAGAMENTO DO DAE ─────────────────────────────── */}
-      {modalDaeAberto && dae && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
-            <div className="flex items-center gap-3 border-b border-gray-100 pb-4 mb-4">
-              <div className="p-2.5 bg-green-50 text-[#1A7A3C] rounded-lg">
-                <DollarSign size={22} />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-gray-900">Pagamento de DAE</h3>
-                <p className="text-xs text-gray-500">Documento de Arrecadação Estadual</p>
-              </div>
-            </div>
-
-            <div className="space-y-3 bg-gray-50 p-4 rounded-xl border border-gray-100 mb-6">
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Número do DAE:</span>
-                <span className="font-semibold text-gray-800">{dae.codigo}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Vencimento:</span>
-                <span className="font-semibold text-gray-800">{dae.dataVencimento}</span>
-              </div>
-              <div className="flex justify-between text-sm pt-2 border-t border-gray-200">
-                <span className="text-gray-700 font-medium">Valor Total:</span>
-                <span className="font-bold text-[#1A7A3C] text-base">{formatCurrency(dae.valor)}</span>
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => setModalDaeAberto(false)}
-                className="flex-1 h-11 rounded-lg border border-gray-300 text-gray-700 text-sm font-semibold hover:bg-gray-50 transition"
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirmarPagamentoDAE}
-                className="flex-1 h-11 rounded-lg bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition flex items-center justify-center gap-2"
-              >
-                <Check size={16} /> Confirmar Pagamento
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Eye, Pencil, Ruler, Hash, Layers, ChevronUp, ChevronDown } from "lucide-react";
+import { Eye, Pencil, Ruler, Hash, Layers, ChevronUp, ChevronDown, ListTree } from "lucide-react";
 import { FloatInput, SimNao } from "../../../components/ui/FormKit";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "../../../components/ui-1/dialog";
@@ -176,7 +176,7 @@ export function ItemReceitaTab({ receitaId, isModalOpen, setIsModalOpen }: ItemR
         >
           <DialogHeader className="flex flex-col items-center justify-center text-center space-y-2 mb-2">
             <div className="flex items-center justify-center gap-2 text-[#1A7A3C]">
-              <Layers size={24} />
+              <ListTree size={24} />
               <DialogTitle className="text-2xl font-bold text-gray-900 tracking-tight">{modalTitle}</DialogTitle>
             </div>
             <DialogDescription className="text-sm text-gray-600 font-medium">

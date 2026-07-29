@@ -573,11 +573,7 @@ export const thirdCategories: MenuCategory[] = [
 				route: "fundo-arrecadacao",
 				icon: <Wallet size={16} />,
 			},
-			{
-				label: "Item da Receita",
-				route: "item-receita",
-				icon: <ListTree size={16} />,
-			},
+
 			{
 				label: "Notificações dos Estabelecimentos",
 				route: "notificacoes-estabelecimentos",
