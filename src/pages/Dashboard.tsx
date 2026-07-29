@@ -473,7 +473,19 @@ export const secondaryCategories: MenuCategory[] = [
 				className="w-9 h-9 object-contain"
 			/>
 		),
-		items: [],
+		items: [
+			{
+				label: "Atualização Cadastral de Rebanho",
+				route: "atualizacao-cadastral-rebanho",
+				icon: (
+					<img
+						src={Icons.iconeRebanhoUrl}
+						alt="Atualização Cadastral de Rebanho"
+						className="w-4 h-4 object-contain"
+					/>
+				),
+			},
+		],
 	},
 	{
 		title: "GTA",
