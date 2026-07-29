@@ -3,6 +3,8 @@ import { DashboardPage } from "./pages/Dashboard";
 import { LoginPage } from "./pages/Login";
 
 // GERAL
+import { AcouguePage } from "./pages/Geral/Acougue/Acougue";
+import { AdicionarAcouguePage } from "./pages/Geral/Acougue/AdicionarAcougue";
 import { AdicionarReceitaPage } from "./pages/Arrecadacao/Receita/AdicionarReceita";
 import { EditarReceitaPage } from "./pages/Arrecadacao/Receita/EditarReceita";
 import { ReceitaPage } from "./pages/Arrecadacao/Receita/Receita";
@@ -377,6 +379,9 @@ export type Screen =
 	| "adicionar-dae"
 	| "visualizar-dae"
 	| "indice"
+	| "acougue"
+  | "adicionar-acougue"
+  | "visualizar-acougue"
 	| "adicionar-indice";
 
 export default function App() {
@@ -1675,6 +1680,19 @@ export default function App() {
 					onNavigate={handleNavigate}
 				/>
 			);
+			case "acougue":
+      return (
+        <AcouguePage onLogout={handleLogout} onNavigate={handleNavigate} />
+      );
+    case "adicionar-acougue":
+    case "editar-acougue":
+    case "visualizar-acougue":
+      return (
+        <AdicionarAcouguePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
 
 		default:
 			return (

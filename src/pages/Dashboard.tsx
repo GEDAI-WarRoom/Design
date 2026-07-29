@@ -62,6 +62,7 @@ export const cadastrosCategories: MenuCategory[] = [
 				route: "aeroporto-porto",
 				icon: <TowerControl size={16} />,
 			},
+			{ label: "Açougue", route: "acougue", icon: <Store size={16} /> },
 			{
 				label: "Divisão Municipal",
 				route: "divisao-municipal",
@@ -83,6 +84,7 @@ export const cadastrosCategories: MenuCategory[] = [
 					/>
 				),
 			},
+			
 			{
 				label: "Venda de Propriedade",
 				route: "venda-propriedade",
