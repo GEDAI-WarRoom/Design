@@ -23,8 +23,9 @@ const TIPOS_DESTINO = [
 	"Evento Pecuário",
 	"Frigorífico",
 	"Estabelecimento Agropecuário",
-	"Pesagem",
 	"Revendedora de Animais Vivos",
+	"Estabelecimento Genérico",
+	"Instituição de Ensino e Pesquisa"
 ];
 const TIPOS_PROCEDENCIA = [
 	"Evento Pecuário",
@@ -208,31 +209,7 @@ export function AdicionarFinalidadeTransitoPage({
 								maxLength={2}
 							/>
 						</div>
-						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-							<CheckboxGroup
-								title="Tipo de Procedência"
-								required
-								options={TIPOS_DESTINO.map((item) => ({
-									value: item,
-									label: item,
-								}))}
-								defaultValue={tiposProcedencia}
-								onChange={setTiposProcedencia}
-							/>
-							{tiposProcedencia.includes("Estabelecimento Agropecuário") && (
-								<div className="w-full">
-									<CheckboxGroup
-										title="Emite GTA por Acesso Externo"
-										options={EMITE_GTA_ACESSO_EXTERNO.map((item) => ({
-											value: item,
-											label: item,
-										}))}
-										defaultValue={emiteAcessoExterno}
-										onChange={setEmiteAcessoExterno}
-									/>
-								</div>
-							)}
-						</div>
+
 					</div>
 				</Section>
 
@@ -326,6 +303,41 @@ export function AdicionarFinalidadeTransitoPage({
 					</div>
 				</Section>
 
+				{/* --- OPÇÃO 1: Alterando a proporção ou estrutura da Grid --- */}
+				<Section title="Informações de Procedência">
+					<div className="pt-5 flex flex-col gap-5 w-full">
+						{/* Removido o grid duplicado que estava afunilando as colunas */}
+						<div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start w-full">
+
+							<CheckboxGroup
+								title="Tipo de Procedência"
+								required
+								options={TIPOS_DESTINO.map((item) => ({
+									value: item,
+									label: item,
+								}))}
+								defaultValue={tiposProcedencia}
+								onChange={setTiposProcedencia}
+							/>
+
+							{tiposProcedencia.includes("Estabelecimento Agropecuário") && (
+								<div className="w-full">
+									<CheckboxGroup
+										title="Emite GTA por Acesso Externo"
+										options={EMITE_GTA_ACESSO_EXTERNO.map((item) => ({
+											value: item,
+											label: item,
+										}))}
+										defaultValue={emiteAcessoExterno}
+										onChange={setEmiteAcessoExterno}
+									/>
+								</div>
+							)}
+
+						</div>
+					</div>
+				</Section>
+
 				{/* --- [3] informacoes de destino --- */}
 				<Section title="Informações de Destino">
 					<div className="pt-5 flex flex-col gap-4">
@@ -355,37 +367,39 @@ export function AdicionarFinalidadeTransitoPage({
 			</main>
 
 			{/* --- modal de sucesso --- */}
-			{isSucesso && (
-				<div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
-					<div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
-						<div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4">
-							<Check size={28} className="text-[#1A7A3C]" strokeWidth={3} />
-						</div>
-						<h3 className="text-lg font-bold text-gray-900">
-							Finalidade de Trânsito cadastrada com sucesso!
-						</h3>
-						<p className="text-sm text-gray-500 mt-1">
-							{finalidadeTransito
-								? `A finalidade "${finalidadeTransito}"`
-								: "A finalidade"}{" "}
-							foi cadastrada.
-						</p>
-						<div className="flex gap-3 justify-center mt-6">
-							<button
-								onClick={() => {
-									setIsSucesso(false);
-									onNavigate("finalidade-transito");
-								}}
-								className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition">
-								Voltar
-							</button>
-							<button className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">
-								Visualizar
-							</button>
+			{
+				isSucesso && (
+					<div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
+						<div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
+							<div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4">
+								<Check size={28} className="text-[#1A7A3C]" strokeWidth={3} />
+							</div>
+							<h3 className="text-lg font-bold text-gray-900">
+								Finalidade de Trânsito cadastrada com sucesso!
+							</h3>
+							<p className="text-sm text-gray-500 mt-1">
+								{finalidadeTransito
+									? `A finalidade "${finalidadeTransito}"`
+									: "A finalidade"}{" "}
+								foi cadastrada.
+							</p>
+							<div className="flex gap-3 justify-center mt-6">
+								<button
+									onClick={() => {
+										setIsSucesso(false);
+										onNavigate("finalidade-transito");
+									}}
+									className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition">
+									Voltar
+								</button>
+								<button className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">
+									Visualizar
+								</button>
+							</div>
 						</div>
 					</div>
-				</div>
-			)}
-		</div>
+				)
+			}
+		</div >
 	);
 }
