@@ -43,7 +43,7 @@ export function AdicionarRegistroVendaGtaFisicaPage({ onLogout, onNavigate }: Pa
   const [serie, setSerie] = useState("");
   const [numInicial, setNumInicial] = useState("");
   const [numFinal, setNumFinal] = useState("");
-  
+
   const [quantidade, setQuantidade] = useState(0);
   const [valor, setValor] = useState(0);
 
@@ -87,7 +87,7 @@ export function AdicionarRegistroVendaGtaFisicaPage({ onLogout, onNavigate }: Pa
   };
 
   const handleSalvar = () => {
-    if (!medico || !escritorio || !serie || numInicial.length !== 6 || numFinal.length !== 6 || erroFaixa) return;
+
     setIsSucesso(true);
   };
 
@@ -129,13 +129,13 @@ export function AdicionarRegistroVendaGtaFisicaPage({ onLogout, onNavigate }: Pa
 
         <Section title="Informações Básicas">
           <div className="flex flex-col gap-6">
-            
+
             <div className="grid grid-cols-1 gap-4">
               <MedicoVeterinarioInput
                 value={medico ? medico.nome : ""}
                 required
                 onChange={(ent) => setMedico(ent)}
-                onEyeClick={() => {}}
+                onEyeClick={() => { }}
               />
             </div>
 
@@ -170,7 +170,7 @@ export function AdicionarRegistroVendaGtaFisicaPage({ onLogout, onNavigate }: Pa
                   <button
                     type="button"
                     onClick={() => alert(`Visualizar detalhes de: ${escritorio.nome}`)}
-                    className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-lg transition bg-white h-[44px] w-[44px] flex items-center justify-center flex-shrink-0 mb-[1px] border border-gray-200"
+                    className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-lg transition bg-white h-[44px] w-[44px] flex items-center justify-center flex-shrink-0 mb-[1px]"
                     title="Visualizar Escritório"
                   >
                     <Eye size={20} />
@@ -217,14 +217,14 @@ export function AdicionarRegistroVendaGtaFisicaPage({ onLogout, onNavigate }: Pa
                 value={String(quantidade)}
                 required
                 disabled
-                onChange={() => {}}
+                onChange={() => { }}
               />
               <FloatInput
                 label="Valor"
                 value={formatCurrency(valor)}
                 required
                 disabled
-                onChange={() => {}}
+                onChange={() => { }}
               />
             </div>
 
@@ -235,11 +235,9 @@ export function AdicionarRegistroVendaGtaFisicaPage({ onLogout, onNavigate }: Pa
       {isSucesso && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
-            <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4">
-              <Check size={28} className="text-[#1A7A3C]" strokeWidth={3} />
-            </div>
-            <h3 className="text-lg font-bold text-gray-900">Registro de Venda gravado com sucesso!</h3>
-            <p className="text-sm text-gray-500 mt-1">Os formulários foram atribuídos ao médico veterinário.</p>
+
+            <h3 className="text-lg font-bold text-gray-900">Registro de Venda cadastrado com sucesso!</h3>
+            <p className="text-sm text-gray-500 mt-1">Registro de venda de GTA física cadatrado.</p>
             <div className="flex gap-3 justify-center mt-6">
               <button
                 onClick={() => { setIsSucesso(false); onNavigate("busca-venda-gta"); }}
@@ -248,7 +246,7 @@ export function AdicionarRegistroVendaGtaFisicaPage({ onLogout, onNavigate }: Pa
                 Voltar
               </button>
               <button
-                onClick={() => { setIsSucesso(false); onNavigate("visualizar-venda-gta"); }}
+                onClick={() => { setIsSucesso(false); onNavigate("visualizar-registro-venda-gta-fisica"); }}
                 className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition"
               >
                 Visualizar

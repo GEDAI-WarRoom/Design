@@ -178,6 +178,7 @@ import { EditarRegistroVendaGTADigitalPage } from "./pages/GTA/RegistroVendaGTAD
 import { RegistroVendaGTADigitalPage } from "./pages/GTA/RegistroVendaGTADigital/RegistroVendaGTADigital";
 import { VisualizarDAERegistroVendaGTAPage } from "./pages/GTA/RegistroVendaGTADigital/VisualizarDAERegistroVendaGTA";
 import { VisualizarRegistroVendaGTADigitalPage } from "./pages/GTA/RegistroVendaGTADigital/VisualizarRegistroVendaGTADigital";
+import { VisualizarRegistroVendaGtaFisicaPage } from "./pages/GTA/RegistroVendaGTAFisica/VisualizarRegistroVendaGTAFisica";
 import { AdicionarRegistroVendaGtaFisicaPage } from "./pages/GTA/RegistroVendaGTAFisica/AdicionarRegistroVendaGTAFisica";
 import { RegistroVendaGtaFisicaPage } from "./pages/GTA/RegistroVendaGTAFisica/RegistroVendaGTAFisica";
 import { AdicionarTaxaEmissaoGtaPage } from "./pages/GTA/TaxaEmissaoGta/AdicionarTaxaEmissaoGta";
@@ -292,6 +293,7 @@ export type Screen =
 	| "adicionar-aeroporto-porto"
 	| "registro-venda-gta-fisica"
 	| "adicionar-registro-venda-gta-fisica"
+	| "visualizar-registro-venda-gta-fisica"
 	| "estabelecimento-evento-pecuario"
 	| "adicionar-estabelecimento-evento-pecuario"
 	| "local-realizacao-exame"
@@ -1150,6 +1152,14 @@ export default function App() {
 		case "adicionar-registro-venda-gta-fisica":
 			return (
 				<AdicionarRegistroVendaGtaFisicaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+
+		case "visualizar-registro-venda-gta-fisica":
+			return (
+				<VisualizarRegistroVendaGtaFisicaPage
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
 				/>

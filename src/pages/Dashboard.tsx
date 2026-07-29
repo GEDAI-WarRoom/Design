@@ -523,7 +523,13 @@ export const secondaryCategories: MenuCategory[] = [
 			{
 				label: "Isenção de Taxa de GTA",
 				route: "isencao-taxa-gta",
-				icon: <BadgePercent size={16} />,
+				icon: (
+					<img
+						src={Icons.iconeIsencaoTaxaUrl}
+						alt="Isenção de Taxa"
+						className="w-4 h-4 object-contain"
+					/>
+				),
 			},
 			{
 				label: "Recolhimento Mensal de GTAs",
