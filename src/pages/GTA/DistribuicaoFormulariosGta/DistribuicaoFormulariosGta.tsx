@@ -321,15 +321,15 @@ export function DistribuicaoFormulariosGta({
               />
 
               <button
-              onClick={handlePesquisar}
-              className="h-11 px-6 rounded-md text-white text-sm font-semibold transition hover:opacity-90 flex items-center justify-center gap-2 whitespace-nowrap"
-              style={{ backgroundColor: GREEN }}
-            >
-              Pesquisar
-            </button>
+                onClick={handlePesquisar}
+                className="h-11 px-6 rounded-md text-white text-sm font-semibold transition hover:opacity-90 flex items-center justify-center gap-2 whitespace-nowrap"
+                style={{ backgroundColor: GREEN }}
+              >
+                Pesquisar
+              </button>
             </div>
 
-            
+
           </div>
 
           {/* Feedback de Validação */}
@@ -350,9 +350,7 @@ export function DistribuicaoFormulariosGta({
           {!hasSearched ? (
             <div className="py-12 text-center">
               <p className="text-sm text-gray-500">
-                Preencha todos os filtros acima e clique em
-                "Pesquisar" para buscar distribuições de
-                formulários de GTA.
+                Busque por distribuicao de formulário utilizando o campo de busca e os filtros acima.
               </p>
             </div>
           ) : total === 0 ? (
@@ -399,7 +397,7 @@ export function DistribuicaoFormulariosGta({
                           {pad(f.numeroFinal, 6)}
                         </td>
                         <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">
-                            {f.situacao}
+                          {f.situacao}
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-1 justify-end">

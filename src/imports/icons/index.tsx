@@ -44,6 +44,7 @@ import iconeIndiceUrl from "./Ícone=Valor por Indice.svg";
 import iconeStatusUrl from "./Ícone=Status.svg";
 import iconeVendaPropriedadeUrl from "./Ícone=Venda de Propriedade.svg";
 import iconePapéisUrl from "./Ícone=Papéis.svg";
+import iconeIsencaoTaxaUrl from "./Ícone=Isenção de Taxa.svg";
 
 
 
@@ -93,5 +94,6 @@ export {
   iconeIndiceUrl,
   iconeStatusUrl,
   iconeVendaPropriedadeUrl,
-  iconePapéisUrl
+  iconePapéisUrl,
+  iconeIsencaoTaxaUrl
 };

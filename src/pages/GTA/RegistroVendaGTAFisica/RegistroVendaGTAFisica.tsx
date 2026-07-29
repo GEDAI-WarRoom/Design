@@ -209,7 +209,7 @@ export function RegistroVendaGtaFisicaPage({
   const [escritorio, setEscritorio] = useState<any | null>(
     null,
   );
-    const [medico, setMedico] = useState<MedicoVendaGTA | null>(null);
+  const [medico, setMedico] = useState<MedicoVendaGTA | null>(null);
 
   const [veterinario, setVeterinario] = useState<any | null>(
     null,
@@ -306,18 +306,18 @@ export function RegistroVendaGtaFisicaPage({
 
         {/* CONTAINER BRANCO ÚNICO */}
         <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col gap-5">
-         
 
-            <div className="animate-fadeIn flex flex-col gap-4 w-full">
-              <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_1.4fr_180px] gap-4 items-end w-full">
-               <EntitySearchInput
-              label="Escritório Seccional"
-              placeholder="Buscar por nome ou sigla"
-              value={escritorio?.nome ?? ""}
-              data={ESCRITORIOS_SECCIONAIS}
-              searchKeys={["nome", "sigla"]}
-              columns={[{ label: "Escritório Seccional", key: "nome" }, { label: "Sigla", key: "sigla" }]}
-              icon={
+
+          <div className="animate-fadeIn flex flex-col gap-4 w-full">
+            <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_1.4fr_180px] gap-4 items-end w-full">
+              <EntitySearchInput
+                label="Escritório Seccional"
+                placeholder="Buscar por nome ou sigla"
+                value={escritorio?.nome ?? ""}
+                data={ESCRITORIOS_SECCIONAIS}
+                searchKeys={["nome", "sigla"]}
+                columns={[{ label: "Escritório Seccional", key: "nome" }, { label: "Sigla", key: "sigla" }]}
+                icon={
                   Icons.iconeUnidadeAdministrativaUrl ? (
                     <img
                       src={Icons.iconeUnidadeAdministrativaUrl}
@@ -327,20 +327,20 @@ export function RegistroVendaGtaFisicaPage({
                   ) : undefined
                 }
 
-              title="Buscar Escritório Seccional"
-              subtitle="Busque po um escritório seccional cadastrado:"
-              confirmLabel="Selecionar"
-              onChange={setEscritorio}
-            />
+                title="Buscar Escritório Seccional"
+                subtitle="Busque po um escritório seccional cadastrado:"
+                confirmLabel="Selecionar"
+                onChange={setEscritorio}
+              />
 
-                <EntitySearchInput
-              label="Médico Veterinário"
-              placeholder="Buscar por nome ou CPF"
-              value={medico?.nome ?? ""}
-              data={MEDICOS_VETERINARIOS_GTA}
-              searchKeys={["nome", "cpf"]}
-              columns={[{ label: "Nome", key: "nome" }, { label: "CPF", key: "cpf" }]}
-              icon={
+              <EntitySearchInput
+                label="Médico Veterinário"
+                placeholder="Buscar por nome ou CPF"
+                value={medico?.nome ?? ""}
+                data={MEDICOS_VETERINARIOS_GTA}
+                searchKeys={["nome", "cpf"]}
+                columns={[{ label: "Nome", key: "nome" }, { label: "CPF", key: "cpf" }]}
+                icon={
                   Icons.iconeProfissionalAnimalUrl ? (
                     <img
                       src={Icons.iconeProfissionalAnimalUrl}
@@ -349,56 +349,56 @@ export function RegistroVendaGtaFisicaPage({
                     />
                   ) : undefined
                 }
-              title="Buscar Médico Veterinário"
-              subtitle="Busque por um médico veterinário cadastrado:"
-              confirmLabel="Selecionar"
-              onChange={setMedico}
-            />
+                title="Buscar Médico Veterinário"
+                subtitle="Busque por um médico veterinário cadastrado:"
+                confirmLabel="Selecionar"
+                onChange={setMedico}
+              />
 
-                <button
-                  onClick={handlePesquisar}
-                  className="h-12 w-full rounded-md text-white text-sm font-semibold transition hover:opacity-90 flex items-center justify-center"
-                  style={{ backgroundColor: GREEN }}
-                >
-                  Pesquisar
-                </button>
+              <button
+                onClick={handlePesquisar}
+                className="h-12 w-full rounded-md text-white text-sm font-semibold transition hover:opacity-90 flex items-center justify-center"
+                style={{ backgroundColor: GREEN }}
+              >
+                Pesquisar
+              </button>
+            </div>
+
+            {/* Ajustado para md:grid-cols-12 para usar o padrão nativo do Tailwind */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end w-full">
+
+              {/* Ocupa 3 colunas de 12 */}
+              <div className="md:col-span-3">
+                <FloatInput
+                  label="Série do Formulário"
+                  value={serie}
+                  onChange={setSerie}
+                  maxLength={2}
+                />
               </div>
 
-             {/* Ajustado para md:grid-cols-12 para usar o padrão nativo do Tailwind */}
-<div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end w-full">
+              {/* CORRIGIDO: Ocupa 5 colunas de 12 e alterado para usar as variáveis corretas do Número */}
+              <div className="md:col-span-5">
+                <FloatInput
+                  label="Número do Formulário"
+                  value={numero} // Alterado de 'serie' para 'numero'
+                  onChange={setNumero} // Alterado de 'setSerie' para 'setNumero'
+                />
+              </div>
 
-  {/* Ocupa 3 colunas de 12 */}
-  <div className="md:col-span-3">
-    <FloatInput
-      label="Série do Formulário"
-      value={serie}
-      onChange={setSerie}
-      maxLength={2}
-    />
-  </div>
+              {/* Ocupa 4 colunas de 12 (3 + 5 + 4 = 12 colunas perfeitas na mesma linha) */}
+              <div className="md:col-span-4">
+                <FloatSelect
+                  label="Situação"
+                  value={situacao}
+                  onChange={setSituacao}
+                  options={SITUACOES}
+                />
+              </div>
 
-  {/* CORRIGIDO: Ocupa 5 colunas de 12 e alterado para usar as variáveis corretas do Número */}
-  <div className="md:col-span-5">
-    <FloatInput
-      label="Número do Formulário"
-      value={numero} // Alterado de 'serie' para 'numero'
-      onChange={setNumero} // Alterado de 'setSerie' para 'setNumero'
-    />
-  </div>
-
-  {/* Ocupa 4 colunas de 12 (3 + 5 + 4 = 12 colunas perfeitas na mesma linha) */}
-  <div className="md:col-span-4">
-    <FloatSelect
-      label="Situação"
-      value={situacao}
-      onChange={setSituacao}
-      options={SITUACOES}
-    />
-  </div>
-
-</div>
             </div>
-         
+          </div>
+
 
           {/* Chips de Filtros Ativos */}
           {temFiltroAtivo && (
