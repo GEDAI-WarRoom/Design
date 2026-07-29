@@ -478,6 +478,11 @@ export const secondaryCategories: MenuCategory[] = [
 		),
 		items: [
 			{
+				label: "Etapa de Atualização Cadastral",
+				route: "etapa-atualizacao-cadastral",
+				icon: <Calendar size={16} />,
+      },
+      {
 				label: "Ajuste de Rebanho",
 				route: "ajuste-rebanho",
 				icon: (
