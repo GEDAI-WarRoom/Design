@@ -1,4 +1,4 @@
-import { useRef, useState, type ReactNode } from "react";
+import React, { useRef, useState, type ReactNode } from "react";
 import {
   AlertTriangle,
   ChevronDown,
@@ -32,8 +32,6 @@ import {
   type SituacaoLancamentoRebanho,
   type TipoLancamentoRebanho,
 } from "./lancamentoRebanhoData";
-
-const GREEN = "#1A7A3C";
 
 export interface LancamentoRebanhoFormValue {
   produtor: ProdutorRebanho | null;
@@ -307,33 +305,113 @@ function NumberStepper({
   ariaLabel: string;
   color: "blue" | "pink";
 }) {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawVal = e.target.value.replace(/[^0-9]/g, "");
+    const parsedVal = rawVal === "" ? 0 : parseInt(rawVal, 10);
+    onChange(parsedVal);
+  };
+
   return (
-    <div className="mx-auto flex h-9 w-[92px] items-center overflow-hidden rounded-xl border border-gray-200 bg-gray-50 shadow-sm">
+    <div className="mx-auto flex h-9 w-[100px] items-center overflow-hidden rounded-xl border border-gray-200 bg-gray-50 shadow-sm focus-within:border-[#1A7A3C] focus-within:ring-1 focus-within:ring-[#1A7A3C]">
       <button
         type="button"
         disabled={disabled || value === 0}
         aria-label={`Diminuir ${ariaLabel}`}
         onClick={() => onChange(Math.max(0, value - 1))}
-        className="flex h-full w-8 items-center justify-center text-lg text-gray-400 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+        className="flex h-full w-7 flex-shrink-0 items-center justify-center text-lg text-gray-500 transition hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-30"
       >
         −
       </button>
-      <span
-        className={`flex-1 text-center text-sm font-bold ${
+
+      <input
+        type="text"
+        inputMode="numeric"
+        disabled={disabled}
+        aria-label={ariaLabel}
+        value={value === 0 ? "" : value}
+        placeholder="0"
+        onChange={handleInputChange}
+        className={`w-full bg-transparent text-center text-sm font-bold focus:outline-none disabled:cursor-not-allowed ${
           color === "blue" ? "text-blue-600" : "text-pink-600"
         }`}
-      >
-        {value}
-      </span>
+      />
+
       <button
         type="button"
         disabled={disabled}
         aria-label={`Aumentar ${ariaLabel}`}
         onClick={() => onChange(value + 1)}
-        className="flex h-full w-8 items-center justify-center text-lg text-gray-500 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+        className="flex h-full w-7 flex-shrink-0 items-center justify-center text-lg text-gray-500 transition hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-30"
       >
         +
       </button>
+    </div>
+  );
+}
+
+function ResultadoTooltipCell({
+  tipo,
+  existente,
+  informado,
+  resultado,
+}: {
+  tipo: TipoLancamentoRebanho;
+  existente: number;
+  informado: number;
+  resultado: number;
+}) {
+  // Se não houve alteração informada, exibe apenas o valor simples do resultado
+  if (!informado || informado === 0) {
+    return (
+      <span className="font-semibold text-slate-700">
+        {resultado}
+      </span>
+    );
+  }
+
+  const operacoesSubtracao: TipoLancamentoRebanho[] = [
+    "Mortalidade",
+    "Roubo/Extravio",
+    "Descarte",
+  ];
+  const ehSubtracao = operacoesSubtracao.includes(tipo);
+  const sinal = ehSubtracao ? "-" : "+";
+
+  return (
+    <div className="group relative inline-flex items-center justify-center gap-1.5 cursor-help">
+      {/* Valor do resultado */}
+      <span className="font-semibold text-slate-700">
+        {resultado}
+      </span>
+
+      {/* Ícone informativo exibido apenas quando há alteração */}
+      <Info
+        size={14}
+        className="text-gray-400 transition-colors group-hover:text-[#1A7A3C]"
+      />
+
+      {/* Popover/Tooltip do resumo das alterações */}
+      <div className="pointer-events-none absolute bottom-full mb-2 hidden w-48 flex-col items-center rounded-xl border border-gray-200 bg-white p-3 shadow-xl group-hover:flex z-50">
+        <div className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-gray-500">
+          <Info size={14} className="text-gray-400" />
+          <span>Resumo Alterações</span>
+        </div>
+
+        {/* Expressão Matemática Ex: 18 - 18 = 0 */}
+        <div className="mb-2 text-base font-bold text-gray-800">
+          {existente} <span className="text-gray-400">{sinal}</span> {informado}{" "}
+          <span className="text-gray-400">=</span> {resultado}
+        </div>
+
+        {/* Legenda inferior */}
+        <div className="flex w-full justify-between text-[10px] font-semibold tracking-wider text-gray-400 uppercase border-t border-gray-100 pt-1.5">
+          <span>INICIAL</span>
+          <span>SALDO</span>
+        </div>
+
+        {/* Seta do tooltip */}
+        <div className="absolute top-full -mt-[1px] border-4 border-transparent border-t-white" />
+      </div>
     </div>
   );
 }
@@ -386,7 +464,7 @@ function FaixasTable({
   );
 
   return (
-    <div className="overflow-x-auto border-t border-gray-200">
+    <div className="overflow-x-auto overflow-y-visible border-t border-gray-200">
       <table className="w-full min-w-[850px] border-collapse text-sm">
         <thead className="bg-slate-50 text-left text-[11px] uppercase tracking-wide text-slate-500">
           <tr>
@@ -411,9 +489,13 @@ function FaixasTable({
         <tbody>
           {lancamento.faixas.map((faixa, index) => {
             const bloquearPrimeiraEvolucao = lancamento.tipo === "Evolução de Rebanho" && index === 0;
+            const machosResultado = calcularResultado(lancamento.tipo, lancamento.faixas, index, "machos");
+            const femeasResultado = calcularResultado(lancamento.tipo, lancamento.faixas, index, "femeas");
+
             return (
               <tr key={faixa.faixa} className="border-b border-gray-100 bg-white last:border-b-0">
                 <td className="border-r border-gray-100 px-4 py-4 text-center font-semibold text-slate-700">{faixa.faixa}</td>
+
                 <td className="border-r border-gray-100 px-3 py-4 text-center text-slate-600">{faixa.machosExistentes}</td>
                 <td className="border-r border-gray-100 px-3 py-4 text-center">
                   <NumberStepper
@@ -424,9 +506,15 @@ function FaixasTable({
                     color="blue"
                   />
                 </td>
-                <td className="border-r border-gray-100 px-3 py-4 text-center font-semibold text-slate-600">
-                  {calcularResultado(lancamento.tipo, lancamento.faixas, index, "machos")}
+                <td className="border-r border-gray-100 px-3 py-4 text-center">
+                  <ResultadoTooltipCell
+                    tipo={lancamento.tipo}
+                    existente={faixa.machosExistentes}
+                    informado={faixa.machosInformados}
+                    resultado={machosResultado}
+                  />
                 </td>
+
                 <td className="border-r border-gray-100 px-3 py-4 text-center text-slate-600">{faixa.femeasExistentes}</td>
                 <td className="border-r border-gray-100 px-3 py-4 text-center">
                   <NumberStepper
@@ -437,8 +525,13 @@ function FaixasTable({
                     color="pink"
                   />
                 </td>
-                <td className="px-3 py-4 text-center font-semibold text-slate-600">
-                  {calcularResultado(lancamento.tipo, lancamento.faixas, index, "femeas")}
+                <td className="px-3 py-4 text-center">
+                  <ResultadoTooltipCell
+                    tipo={lancamento.tipo}
+                    existente={faixa.femeasExistentes}
+                    informado={faixa.femeasInformadas}
+                    resultado={femeasResultado}
+                  />
                 </td>
               </tr>
             );
@@ -556,8 +649,8 @@ export function LancamentoRebanhoForm({ value, onChange, mode = "create" }: Form
             </div>
 
             {value.lancamentos[0] && (
-              <div className="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm">
-                <div className="flex flex-col gap-3 px-7 py-5 sm:flex-row sm:items-center sm:justify-between">
+              <div className="overflow-visible rounded-3xl border border-gray-200 bg-white shadow-sm">
+                <div className="flex flex-col gap-3 px-7 py-5 sm:flex-row sm:items-center sm:justify-between border-b border-gray-100">
                   <div className="flex flex-wrap items-center gap-3">
                     <h3 className="font-semibold text-slate-700">{value.lancamentos[0].tipo}</h3>
                     <span className="text-xs text-slate-400">●</span>

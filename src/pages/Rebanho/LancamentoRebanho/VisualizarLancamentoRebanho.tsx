@@ -62,11 +62,7 @@ export function VisualizarLancamentoRebanhoPage({ onLogout, onNavigate, dados }:
               </CustomButton>
             )}
           </div>
-          {!podeEditar && registro.situacao === "Ativo" && (
-            <p className="mt-3 text-sm text-gray-500">
-              Este lançamento não pode ser editado ou inativado porque existe uma atualização posterior do rebanho.
-            </p>
-          )}
+        
         </div>
 
         <LancamentoRebanhoForm value={toFormValue(registro)} onChange={() => {}} mode="view" />

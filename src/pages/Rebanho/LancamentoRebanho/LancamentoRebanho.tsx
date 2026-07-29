@@ -6,6 +6,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Eye,
+  Dna
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
@@ -310,14 +311,14 @@ export function LancamentoRebanhoPage({ onLogout, onNavigate }: PageProps) {
                     { label: "Espécie", key: "nome" },
                     { label: "Grupo", key: "grupo" },
                   ]}
-                  icon={<img src={Icons.iconeRebanhoUrl} alt="" className="h-5 w-5 object-contain" />}
+                   icon={<Dna size={17} />}
                   onChange={setEspecie}
                 />
                 <FloatSelect
                   label="Tipo de Lançamento"
                   value={tipo}
                   onChange={setTipo}
-                  options={tiposPermitidos(null).concat(["Adição"]).map((item) => ({ value: item, label: item }))}
+                  options={tiposPermitidos(null).map((item) => ({ value: item, label: item }))}
                 />
                 <FloatInput
                   label="Período - De"
@@ -348,7 +349,7 @@ export function LancamentoRebanhoPage({ onLogout, onNavigate }: PageProps) {
 
           {!hasSearched ? (
             <div className="p-12 text-center text-sm text-gray-500">
-              Selecione o produtor e utilize os filtros acima para pesquisar lançamentos de rebanho.
+              Busque por um lançamento de rebanho utilizando o campo de busca e os filtros acima.
             </div>
           ) : rows.length === 0 ? (
             <div className="p-12 text-center text-sm text-gray-500">Nenhum resultado foi encontrado.</div>
@@ -362,11 +363,11 @@ export function LancamentoRebanhoPage({ onLogout, onNavigate }: PageProps) {
                       <th className="px-4 py-3 font-semibold">Estabelecimento Agropecuário</th>
                       <th className="px-4 py-3 font-semibold">Exploração Pecuária</th>
                       <th className="px-4 py-3 font-semibold">Núcleo de Produção</th>
-                      <th className="px-4 py-3 font-semibold"><SortButton label="Espécie" field="especie" onSort={handleSort} /></th>
-                      <th className="px-4 py-3 font-semibold"><SortButton label="Tipo de Lançamento" field="tipo" onSort={handleSort} /></th>
-                      <th className="px-4 py-3 font-semibold"><SortButton label="Machos Lançados" field="machos" onSort={handleSort} /></th>
-                      <th className="px-4 py-3 font-semibold"><SortButton label="Fêmeas Lançadas" field="femeas" onSort={handleSort} /></th>
-                      <th className="px-4 py-3 font-semibold"><SortButton label="Data de Lançamento" field="data" onSort={handleSort} /></th>
+                      <th className="px-4 py-3 font-semibold">Espécies</th>
+                      <th className="px-4 py-3 font-semibold">Tipo de Lançamento </th>
+                      <th className="px-4 py-3 font-semibold"> Machos Lançados</th>
+                      <th className="px-4 py-3 font-semibold">Fêmeas Lançadas</th>
+                      <th className="px-4 py-3 font-semibold">Data de Lançamento </th>
                       <th className="px-4 py-3 font-semibold">Situação</th>
                       <th className="px-4 py-3 font-semibold">Ações</th>
                     </tr>

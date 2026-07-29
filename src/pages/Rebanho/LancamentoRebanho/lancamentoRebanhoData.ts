@@ -3,8 +3,7 @@ export type TipoLancamentoRebanho =
   | "Nascimento"
   | "Evolução de Rebanho"
   | "Roubo/Extravio"
-  | "Descarte"
-  | "Adição";
+  | "Descarte";
 
 export type SituacaoLancamentoRebanho = "Ativo" | "Inativo";
 
@@ -315,7 +314,7 @@ export function tiposPermitidos(exploracao: ExploracaoRebanho | null) {
     "Roubo/Extravio",
     "Descarte",
   ];
-  return exploracao?.grupo === "Aves" ? [...basicos, "Adição"] : basicos;
+  return exploracao?.grupo === "Aves" ? [...basicos,] : basicos;
 }
 
 export function calcularResultado(
@@ -327,7 +326,7 @@ export function calcularResultado(
   const existente = sexo === "machos" ? faixas[index].machosExistentes : faixas[index].femeasExistentes;
   const informado = sexo === "machos" ? faixas[index].machosInformados : faixas[index].femeasInformadas;
 
-  if (tipo === "Nascimento" || tipo === "Adição") return existente + informado;
+  if (tipo === "Nascimento" ) return existente + informado;
   if (tipo === "Mortalidade" || tipo === "Roubo/Extravio" || tipo === "Descarte") {
     return existente - informado;
   }
@@ -361,7 +360,7 @@ export function resumirAnimais(
         .map((faixa) => {
           const quantidade = sexo === "machos" ? faixa.machosInformados : faixa.femeasInformadas;
           const sinal =
-            lancamento.tipo === "Nascimento" || lancamento.tipo === "Adição" || lancamento.tipo === "Evolução de Rebanho"
+            lancamento.tipo === "Nascimento" || lancamento.tipo === "Evolução de Rebanho"
               ? "+"
               : "-";
           return `${faixa.faixa} (${sinal}${quantidade})`;
