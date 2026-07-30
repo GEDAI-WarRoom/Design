@@ -211,6 +211,7 @@ import { AdicionarRegistroVendaGtaFisicaPage } from "./pages/GTA/RegistroVendaGT
 import { RegistroVendaGtaFisicaPage } from "./pages/GTA/RegistroVendaGTAFisica/RegistroVendaGTAFisica";
 import { AdicionarTaxaEmissaoGtaPage } from "./pages/GTA/TaxaEmissaoGta/AdicionarTaxaEmissaoGta";
 import { TaxaEmissaoGtaPage } from "./pages/GTA/TaxaEmissaoGta/TaxaEmissaoGta";
+import { VisualizarTaxaEmissaoGtaPage } from "./pages/GTA/TaxaEmissaoGta/VisualizarTaxaEmissaoGta";
 
 // CONTROLE
 import { AdicionarPapeisPage } from "./pages/Controle/Papeis/AdicionarPapeis";
@@ -1588,6 +1589,14 @@ export default function App() {
 				<AdicionarTaxaEmissaoGtaPage
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-taxa-emissao-gta":
+			return (
+				<VisualizarTaxaEmissaoGtaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
 				/>
 			);
 		case "taxa-emissao-gta":

@@ -69,7 +69,7 @@ export function TaxaEmissaoGtaForm({ value, onChange, mode = "create" }: TaxaEmi
     });
 
   return (
-    <Section title="Informações da Taxa">
+    <Section title="Informações Básicas">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {/* 1. Espécie */}
         {mode === "create" ? (
@@ -231,7 +231,7 @@ export function RequiredFieldsNotice() {
     <div className="w-full bg-white border border-gray-100 rounded-xl p-5 shadow-sm flex items-center gap-3">
       <Info size={20} className="text-gray-500 flex-shrink-0 stroke-[2.5]" />
       <p className="text-sm text-gray-600 font-medium leading-relaxed">
-        Campos indicados com <span className="text-red-500 font-bold">*</span> são obrigatórios e deverão ser preenchidos.
+        Campos indicados * com <span className="text-red-500 font-bold">*</span> são obrigatórios e deverão ser preenchidos.
       </p>
     </div>
   );
