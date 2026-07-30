@@ -3,6 +3,9 @@ import { DashboardPage } from "./pages/Dashboard";
 import { LoginPage } from "./pages/Login";
 
 // GERAL
+import { EmissaoATAPage } from "./pages/GTA/EmissaoATA/EmissaoATA";
+import { AdicionarEmissaoATAPage } from "./pages/GTA/EmissaoATA/AdicionarEmissaoATA";
+import { VisualizarEmissaoATAPage } from "./pages/GTA/EmissaoATA/VisualizarEmissaoATA";
 import { AcouguePage } from "./pages/Geral/Acougue/Acougue";
 import { AdicionarAcouguePage } from "./pages/Geral/Acougue/AdicionarAcougue";
 import { AdicionarReceitaPage } from "./pages/Arrecadacao/Receita/AdicionarReceita";
@@ -221,6 +224,10 @@ import { VisualizarUsuariosPage } from "./pages/Controle/Usuarios/VisualizarUsua
 
 // 1. Adicionamos as novas rotas de Pessoa Jurídica no tipo Screen
 export type Screen =
+| "emissao-ata"
+  | "adicionar-emissao-ata"
+  | "editar-emissao-ata"
+  | "visualizar-emissao-ata"
 	| "login"
 	| "dashboard"
 	| "classificacao-sanitaria-estado"
@@ -437,6 +444,13 @@ export default function App() {
 	};
 
 	switch (screen) {
+		case "emissao-ata":
+      return <EmissaoATAPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-emissao-ata":
+    case "editar-emissao-ata":
+      return <AdicionarEmissaoATAPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-emissao-ata":
+      return <VisualizarEmissaoATAPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
 		case "login":
 			return <LoginPage onLogin={() => setScreen("dashboard")} />;
 		case "dashboard":
