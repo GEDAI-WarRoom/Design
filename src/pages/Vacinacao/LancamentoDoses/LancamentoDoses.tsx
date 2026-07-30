@@ -16,6 +16,7 @@ import {
 import { Navbar } from "../../../components/Navbar";
 import { FloatSelect, FloatInput } from "../../../components/ui/FormKit";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
+import * as Icons from "../../../imports/icons";
 
 const GREEN = "#1A7A3C";
 
@@ -163,7 +164,7 @@ export function LancamentoDosesVacinaPage({ onLogout, onNavigate }: PageProps) {
 
         {/* ÚNICO CARD BRANCO PARA FILTROS E TABELA */}
         <div className="bg-white rounded-xl shadow-sm mt-5 overflow-hidden">
-          
+
           {/* Sessão interna de Filtros */}
           <div className="p-6 border-b border-gray-100">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -202,21 +203,22 @@ export function LancamentoDosesVacinaPage({ onLogout, onNavigate }: PageProps) {
                 data={DOENCAS_MOCK}
                 searchKeys={["nome"]}
                 columns={[{ label: "Doença", key: "nome" }]}
-                icon={<FlaskConical size={18} color={GREEN} />}
+                icon={<img src={Icons.iconeDoencaUrl || (Icons as any).iconedoencaurl} alt="Doença" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}
+
                 title="Buscar Doença"
                 subtitle="Busque por uma doença cadastrada:"
                 onChange={(ent) => { setDoenca(ent); setTipoVacina(""); }}
               />
 
               {/* Tipo de Vacina — disponível apenas se a doença possuir tipos */}
-{doencaTemTipoVacina && (
-  <FloatSelect label="Tipo de Vacina" value={tipoVacina} onChange={setTipoVacina} options={tiposVacinaDisponiveis} />
-)}
+              {doencaTemTipoVacina && (
+                <FloatSelect label="Tipo de Vacina" value={tipoVacina} onChange={setTipoVacina} options={tiposVacinaDisponiveis} />
+              )}
 
 
               <FloatInput label="Período - De" type="date" value={periodoDe} icon={<Calendar size={18} color={GREEN} />} onChange={setPeriodoDe} />
               <FloatInput label="Período - Até" type="date" value={periodoAte} icon={<Calendar size={18} color={GREEN} />} onChange={setPeriodoAte} />
-              
+
               <FloatSelect label="Situação" value={situacao} onChange={setSituacao} options={SITUACOES} />
             </div>
 
@@ -257,43 +259,43 @@ export function LancamentoDosesVacinaPage({ onLogout, onNavigate }: PageProps) {
               <>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm border-collapse">
-<thead>
-  <tr className=" border-b border-gray-100">
-    {/* Coluna Longa: Definida com largura fixa para não quebrar linha de forma feia */}
-    <th className="text-left px-4 py-3 uppercase font-semibold text-gray-600 w-80">
-      Revendedora de Produtos Agropecuários
-    </th>
+                    <thead>
+                      <tr className=" border-b border-gray-100">
+                        {/* Coluna Longa: Definida com largura fixa para não quebrar linha de forma feia */}
+                        <th className="text-left px-4 py-3 uppercase font-semibold text-gray-600 w-80">
+                          Revendedora de Produtos Agropecuários
+                        </th>
 
-    {/* Nota Fiscal: Espaço fixo ideal para números */}
-    <th className="text-left px-4 py-3 uppercase font-semibold text-gray-600 whitespace-nowrap w-48">
-      Número da Nota Fiscal
-    </th>
+                        {/* Nota Fiscal: Espaço fixo ideal para números */}
+                        <th className="text-left px-4 py-3 uppercase font-semibold text-gray-600 whitespace-nowrap w-48">
+                          Número da Nota Fiscal
+                        </th>
 
-    {/* Número da Partida: Espaço fixo ideal */}
-    <th className="text-left px-4 py-3 uppercase font-semibold text-gray-600 whitespace-nowrap w-44">
-      Número da Partida
-    </th>
+                        {/* Número da Partida: Espaço fixo ideal */}
+                        <th className="text-left px-4 py-3 uppercase font-semibold text-gray-600 whitespace-nowrap w-44">
+                          Número da Partida
+                        </th>
 
-    {/* Coluna "Doença": Agora ela vai ocupar de forma fluida todo o resto do espaço disponível da tabela */}
-    <th className="text-left px-4 py-3 uppercase font-semibold text-gray-600">
-      Doença
-    </th>
+                        {/* Coluna "Doença": Agora ela vai ocupar de forma fluida todo o resto do espaço disponível da tabela */}
+                        <th className="text-left px-4 py-3 uppercase font-semibold text-gray-600">
+                          Doença
+                        </th>
 
-    {/* Coluna "Situação": Tamanho fixo controlado */}
-    <th className="text-left px-4 py-3 uppercase font-semibold text-gray-600 whitespace-nowrap w-40">
-      Situação
-    </th>
+                        {/* Coluna "Situação": Tamanho fixo controlado */}
+                        <th className="text-left px-4 py-3 uppercase font-semibold text-gray-600 whitespace-nowrap w-40">
+                          Situação
+                        </th>
 
-    {/* Coluna de Ações (Botão excluir/editar se houver) */}
-    <th className="px-4 py-3 w-16" />
-  </tr>
-</thead>
+                        {/* Coluna de Ações (Botão excluir/editar se houver) */}
+                        <th className="px-4 py-3 w-16" />
+                      </tr>
+                    </thead>
                     <tbody>
                       {pagina.map((l) => (
                         <tr key={l.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/60 transition text-sm text-gray-700">
                           {/* Coluna com quebra de linha correta usando quebra textual real */}
                           <td className="px-4 py-3 whitespace-pre-line max-w-[220px] leading-relaxed font-normal">
-                            {l.revendedoraCodigo} - <br/> {l.revendedoraNome}
+                            {l.revendedoraCodigo} - <br /> {l.revendedoraNome}
                           </td>
                           <td className="px-4 py-3 font-normal text-gray-700 whitespace-nowrap">{l.numeroNotaFiscal}</td>
                           <td className="px-4 py-3 font-normal text-gray-700 whitespace-nowrap">{l.numeroPartida}</td>

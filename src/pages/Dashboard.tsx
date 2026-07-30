@@ -557,17 +557,7 @@ export const thirdCategories: MenuCategory[] = [
 				route: "indice",
 				icon: <LineChart size={16} />,
 			},
-			{
-				label: "Valor Por Índice",
-				route: "valor-indice",
-				icon: (
-					<img
-						src={Icons.iconeIndiceUrl}
-						alt="Valor por Índice"
-						className="w-4 h-4 object-contain"
-					/>
-				),
-			},
+
 			{
 				label: "DAE",
 				route: "dae",
