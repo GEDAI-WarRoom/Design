@@ -89,6 +89,11 @@ import { StatusAnimalPage } from "./pages/Animal/StatusAnimal/StatusAnimal";
 import { VisualizarStatusAnimalPage } from "./pages/Animal/StatusAnimal/VisualizarStatusAnimal";
 import { AdicionarTipoVeiculoPage } from "./pages/Animal/TipoVeiculo/AdicionarTipoVeiculo";
 import { TipoVeiculoPage } from "./pages/Animal/TipoVeiculo/TipoVeiculo";
+import { AtualizacaoCadastralRebanhoPage } from "./pages/Rebanho/AtualizacaoCadastralRebanho/AtualizacaoCadastralRebanho";
+import { AtualizarCadastroRebanhoPage } from "./pages/Rebanho/AtualizacaoCadastralRebanho/AtualizarCadastroRebanho";
+import { ConfirmarDadosProdutorRebanhoPage } from "./pages/Rebanho/AtualizacaoCadastralRebanho/ConfirmarDadosProdutorRebanho";
+import { VisualizarAtualizacaoCadastralRebanhoPage } from "./pages/Rebanho/AtualizacaoCadastralRebanho/VisualizarAtualizacaoCadastralRebanho";
+import { VisualizarRebanhoAtualizadoPage } from "./pages/Rebanho/AtualizacaoCadastralRebanho/VisualizarRebanhoAtualizado";
 
 // REBANHO
 import { AdicionarEtapaAtualizacaoCadastralPage } from "./pages/Rebanho/EtapaAtualizacaoCadastral/AdicionarEtapaAtualizacaoCadastral";
@@ -249,6 +254,11 @@ export type Screen =
 	| "exploracao-pecuaria" // 🚀 Adicionado
 	| "adicionar-exploracao-pecuaria" // 🚀 Adicionado
 	| "visualizar-exploracao-pecuaria" // 🚀 Adicionado
+	| "atualizacao-cadastral-rebanho"
+	| "confirmar-dados-produtor-rebanho"
+	| "visualizar-atualizacao-cadastral-rebanho"
+	| "atualizar-cadastro-rebanho"
+	| "visualizar-rebanho-atualizado"
 	| "ajuste-rebanho"
 	| "adicionar-ajuste-rebanho"
 	| "visualizar-ajuste-rebanho"
@@ -1040,6 +1050,36 @@ export default function App() {
 					onNavigate={handleNavigate}
 				/>
 			);
+		case "atualizacao-cadastral-rebanho":
+			return (
+				<AtualizacaoCadastralRebanhoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "confirmar-dados-produtor-rebanho":
+			return (
+				<ConfirmarDadosProdutorRebanhoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "visualizar-atualizacao-cadastral-rebanho":
+			return (
+				<VisualizarAtualizacaoCadastralRebanhoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "atualizar-cadastro-rebanho":
+			return (
+				<AtualizarCadastroRebanhoPage
+            onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
 		case "ajuste-rebanho":
 			return (
 				<AjusteRebanhoPage
@@ -1081,6 +1121,13 @@ export default function App() {
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
 					dados={screenData}
+				/>
+			);
+		case "visualizar-rebanho-atualizado":
+			return (
+				<VisualizarRebanhoAtualizadoPage
+            onLogout={handleLogout}
+					onNavigate={handleNavigate}
 				/>
 			);
 		case "editar-ajuste-rebanho":

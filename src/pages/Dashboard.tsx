@@ -32,6 +32,7 @@ import {
 	Scale,
 	ScrollText,
 	LineChart,
+	RefreshCw,
 	CalendarDays,
 	ScanBarcode,
 	MoveUpRight
@@ -478,6 +479,11 @@ export const secondaryCategories: MenuCategory[] = [
 		),
 		items: [
 			{
+				label: "Atualização Cadastral de Rebanho",
+				route: "atualizacao-cadastral-rebanho",
+				icon: <RefreshCw size={16} />,
+      },
+      {
 				label: "Etapa de Atualização Cadastral",
 				route: "etapa-atualizacao-cadastral",
 					icon: (
