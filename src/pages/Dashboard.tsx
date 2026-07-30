@@ -31,7 +31,12 @@ import {
 	Wallet,
 	Scale,
 	ScrollText,
-	LineChart
+	LineChart,
+	Ham,
+	RefreshCw,
+	CalendarDays,
+	ScanBarcode,
+	MoveUpRight
 } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import * as Icons from "../imports/icons";
@@ -62,6 +67,7 @@ export const cadastrosCategories: MenuCategory[] = [
 				route: "aeroporto-porto",
 				icon: <TowerControl size={16} />,
 			},
+			{ label: "Açougue", route: "acougue", icon: <Ham size={16} /> },
 			{
 				label: "Divisão Municipal",
 				route: "divisao-municipal",
@@ -83,6 +89,7 @@ export const cadastrosCategories: MenuCategory[] = [
 					/>
 				),
 			},
+			
 			{
 				label: "Venda de Propriedade",
 				route: "venda-propriedade",
@@ -473,7 +480,41 @@ export const secondaryCategories: MenuCategory[] = [
 				className="w-9 h-9 object-contain"
 			/>
 		),
-		items: [],
+		items: [
+			{
+				label: "Atualização Cadastral de Rebanho",
+				route: "atualizacao-cadastral-rebanho",
+				icon: <RefreshCw size={16} />,
+      },
+      {
+				label: "Etapa de Atualização Cadastral",
+				route: "etapa-atualizacao-cadastral",
+					icon: (
+			<img
+				src={Icons.iconeEtapaUrl}
+				alt="Etapa"
+				className="w-4 h-4 object-contain"
+			/>
+		),
+      },
+      {
+				label: "Ajuste de Rebanho",
+				route: "ajuste-rebanho",
+				icon: (
+					<img
+						src={Icons.iconeAjusteRebanhoUrl}
+						alt="Lançamento de Rebanho"
+						className="w-4 h-4 object-contain"
+					/>
+				),
+            },
+			{
+				label: "Lançamento de Rebanho",
+				route: "lancamento-rebanho",
+				
+				icon: <MoveUpRight size={16} />,
+			},
+		],
 	},
 	{
 		title: "GTA",
@@ -520,7 +561,7 @@ export const secondaryCategories: MenuCategory[] = [
 			{
 				label: "Taxa de Emissão de GTA",
 				route: "taxa-emissao-gta",
-				icon: <ReceiptText size={16} />,
+				icon: <BadgePercent size={16} />,
 			},
 			{
 				label: "Isenção de Taxa de GTA",
@@ -536,7 +577,7 @@ export const secondaryCategories: MenuCategory[] = [
 			{
 				label: "Recolhimento Mensal de GTAs",
 				route: "recolhimento-mensal-gta",
-				icon: <ReceiptText size={16} />,
+				icon: <CalendarDays size={16} />,
 			},
 		],
 	},
@@ -561,7 +602,7 @@ export const thirdCategories: MenuCategory[] = [
 			{
 				label: "DAE",
 				route: "dae",
-				icon: <ScrollText size={16} />,
+				icon: <ScanBarcode size={16} />,
 
 			},
 			{

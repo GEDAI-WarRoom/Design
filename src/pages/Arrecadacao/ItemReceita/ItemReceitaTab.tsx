@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Eye, Pencil, Ruler, Hash, Layers, ChevronUp, ChevronDown, ListTree } from "lucide-react";
+import { Eye, Pencil, Ruler, LineChart, Layers, ChevronUp, ChevronDown, ListTree } from "lucide-react";
 import { FloatInput, SimNao } from "../../../components/ui/FormKit";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "../../../components/ui-1/dialog";
@@ -248,7 +248,7 @@ export function ItemReceitaTab({ receitaId, isModalOpen, setIsModalOpen }: ItemR
                     { label: "Código", key: "codigo" },
                     { label: "Índice", key: "nome" },
                   ]}
-                  icon={<Hash size={18} className="text-[#1A7A3C]" />}
+                  icon={<LineChart size={18} className="text-[#1A7A3C]" />}
                   title="Buscar Índice"
                   subtitle="Busque por um índice cadastrado:"
                   onChange={setIndice}
