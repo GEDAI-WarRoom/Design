@@ -47,7 +47,6 @@ interface Acougue {
   proprietarios: string[];
   municipio: string;
   uf: string;
-  tipo: "Açougue" | "Casa de Carnes";
   situacao: "Ativo" | "Inativo";
 }
 
@@ -59,7 +58,6 @@ const DADOS_MOCK: Acougue[] = [
     proprietarios: ["12.345.678/0001-99 - Agro Carnes IMA"],
     municipio: "Belo Horizonte",
     uf: "MG",
-    tipo: "Açougue",
     situacao: "Ativo",
   },
   {
@@ -69,7 +67,6 @@ const DADOS_MOCK: Acougue[] = [
     proprietarios: ["555.009.956-40 - José Aarão Neto"],
     municipio: "Uberlândia",
     uf: "MG",
-    tipo: "Casa de Carnes",
     situacao: "Ativo",
   },
 ];
@@ -154,7 +151,6 @@ export function AcouguePage({ onLogout, onNavigate }: { onLogout: () => void; on
                 Pesquisar
               </button>
               {estado && <FloatCombobox label="Município" value={municipio} onChange={setMunicipio} options={MUNICIPIOS_MG} />}
-              <FloatSelect label="Tipo de Açougue" value={tipoLocal} onChange={setTipoLocal} options={TIPO_LOCAL} />
               <FloatSelect label="Situação" value={situacao} onChange={setSituacao} options={SITUACOES} />
             </div>
           )}
@@ -168,7 +164,6 @@ export function AcouguePage({ onLogout, onNavigate }: { onLogout: () => void; on
                     <th className="px-4 py-3">Nome</th>
                     <th className="px-4 py-3">Proprietários</th>
                     <th className="px-4 py-3">Município - UF</th>
-                    <th className="px-4 py-3">Tipo</th>
                     <th className="px-4 py-3">Situação</th>
                     <th className="px-4 py-3">Ações</th>
                   </tr>
@@ -180,7 +175,6 @@ export function AcouguePage({ onLogout, onNavigate }: { onLogout: () => void; on
                       <td className="px-4 py-3 text-gray-600">{r.nome}</td>
                       <td className="px-4 py-3 text-gray-600">{r.proprietarios.join(", ")}</td>
                       <td className="px-4 py-3 text-gray-600">{r.municipio} - {r.uf}</td>
-                      <td className="px-4 py-3 text-gray-600">{r.tipo}</td>
                       <td className="px-4 py-3 text-gray-600">{r.situacao}</td>
                       <td className="px-4 py-3 text-right">
                         <button onClick={() => onNavigate("visualizar-acougue", r)} className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md">

@@ -64,7 +64,7 @@ export function AdicionarAcouguePage({ onLogout, onNavigate }: { onLogout: () =>
         </div>
 
         <Section title="Informações Básicas">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-1 gap-5">
             <FloatInput
               label="Nome Comercial do Açougue"
               required
@@ -72,13 +72,7 @@ export function AdicionarAcouguePage({ onLogout, onNavigate }: { onLogout: () =>
               onChange={setNomeComercial}
               maxLength={255}
             />
-            <FloatSelect
-              label="Tipo de Açougue"
-              required
-              value={tipoLocal}
-              onChange={setTipoLocal}
-              options={[ { value: "Açougue", label: "Açougue" }, { value: "Casa de Carnes", label: "Casa de Carnes" } ]}
-            />
+            
           </div>
         </Section>
 
