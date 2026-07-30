@@ -31,7 +31,8 @@ import {
 	Wallet,
 	Scale,
 	ScrollText,
-	LineChart
+	LineChart,
+	RefreshCw
 } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import * as Icons from "../imports/icons";
@@ -477,13 +478,7 @@ export const secondaryCategories: MenuCategory[] = [
 			{
 				label: "Atualização Cadastral de Rebanho",
 				route: "atualizacao-cadastral-rebanho",
-				icon: (
-					<img
-						src={Icons.iconeRebanhoUrl}
-						alt="Atualização Cadastral de Rebanho"
-						className="w-4 h-4 object-contain"
-					/>
-				),
+				icon: <RefreshCw size={16} />,
 			},
 		],
 	},

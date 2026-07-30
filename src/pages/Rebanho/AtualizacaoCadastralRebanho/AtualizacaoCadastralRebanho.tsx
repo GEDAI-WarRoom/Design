@@ -4,8 +4,8 @@ import {
   ArrowLeft,
   ChevronLeft,
   ChevronRight,
-  Eye,
-  Search,
+  Pencil,
+  Eye
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
@@ -31,6 +31,44 @@ interface PageProps {
 }
 
 type Ordenacao = "etapa" | "estabelecimento" | "situacao";
+
+function renderSituacaoBadge(situacao: string) {
+  const sitLower = situacao.toLowerCase();
+
+  // 1. Pendente (Amarelo / Laranja)
+  if (sitLower.includes("pendente") || sitLower.includes("preenchimento") || sitLower.includes("andamento")) {
+    return (
+      <span className="inline-flex items-center rounded-full bg-[#FEF3D6] px-3 py-1 text-xs font-semibold text-[#B45309]">
+        {situacao}
+      </span>
+    );
+  }
+
+  // 2. Inadimplente / Irregular (Rosa / Vermelho)
+  if (sitLower.includes("inadimplente") || sitLower.includes("cancelad") || sitLower.includes("atraso")) {
+    return (
+      <span className="inline-flex items-center rounded-full bg-[#FCE8E6] px-3 py-1 text-xs font-semibold text-[#D93025]">
+        {situacao}
+      </span>
+    );
+  }
+
+  // 3. Atualizado Regular / Concluído (Verde)
+  if (sitLower.includes("atualizado") || sitLower.includes("regular") || sitLower.includes("conclu")) {
+    return (
+      <span className="inline-flex items-center rounded-full bg-[#E6F4EA] px-3 py-1 text-xs font-semibold text-[#137333]">
+        {situacao}
+      </span>
+    );
+  }
+
+  // Padrão (Cinza)
+  return (
+    <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-600">
+      {situacao}
+    </span>
+  );
+}
 
 export function AtualizacaoCadastralRebanhoPage({
   onLogout,
@@ -150,12 +188,12 @@ export function AtualizacaoCadastralRebanhoPage({
     <button
       type="button"
       onClick={() => alterarOrdenacao(campo)}
-      className="flex items-center justify-between gap-2 w-full text-left uppercase"
+      className="flex items-center justify-between gap-2 w-full text-left uppercase text-xs font-semibold text-gray-500 tracking-wider"
     >
       <span>{children}</span>
       <ArrowDown
-        size={15}
-        className={`text-gray-500 transition ${
+        size={13}
+        className={`text-gray-400 transition ${
           ordenacao === campo && ordemAscendente ? "rotate-180" : ""
         }`}
       />
@@ -187,7 +225,11 @@ export function AtualizacaoCadastralRebanhoPage({
         </div>
 
         <section className="bg-white rounded-xl shadow-sm p-6 flex flex-col gap-5">
-          <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_1fr_auto] gap-3 items-end">
+          <div
+            className={`grid grid-cols-1 ${
+              produtor ? "lg:grid-cols-[1.15fr_1fr_auto]" : "lg:grid-cols-[1fr_auto]"
+            } gap-3 items-end`}
+          >
             {usuarioEhProdutor ? (
               <FloatInput
                 label="Produtor Titular"
@@ -233,14 +275,11 @@ export function AtualizacaoCadastralRebanhoPage({
               />
             )}
 
-            <div className={!produtor ? "pointer-events-none opacity-60" : ""}>
+            {/* O campo só aparece se houver produtor selecionado */}
+            {produtor && (
               <EntitySearchInput
                 label="Estabelecimento Agropecuário"
-                placeholder={
-                  produtor
-                    ? "Buscar por nome ou código."
-                    : "Informe primeiro o produtor titular."
-                }
+                placeholder="Buscar por nome ou código."
                 value={estabelecimento?.nome ?? ""}
                 data={estabelecimentosDisponiveis}
                 searchKeys={["nome", "codigo", "municipio"]}
@@ -264,7 +303,7 @@ export function AtualizacaoCadastralRebanhoPage({
                   setPesquisado(false);
                 }}
               />
-            </div>
+            )}
 
             <button
               type="button"
@@ -338,22 +377,22 @@ export function AtualizacaoCadastralRebanhoPage({
               <div className="overflow-x-auto">
                 <table className="w-full text-sm border-collapse">
                   <thead>
-                    <tr className="border-y border-gray-200">
-                      <th className="text-left px-3 py-3 font-semibold text-gray-700 min-w-[190px]">
+                    <tr className=" border-gray-200 ">
+                      <th className="text-left px-3 py-2.5 min-w-[190px]">
                         <SortHeader campo="etapa">
                           Etapa de Atualização Cadastral
                         </SortHeader>
                       </th>
-                      <th className="text-left px-3 py-3 font-semibold text-gray-700 min-w-[280px]">
+                      <th className="text-left px-3 py-2.5 min-w-[280px]">
                         <SortHeader campo="estabelecimento">
                           Estabelecimento Agropecuário
                         </SortHeader>
                       </th>
-                      <th className="text-left px-3 py-3 font-semibold text-gray-700 min-w-[230px]">
+                      <th className="text-left px-3 py-2.5 min-w-[200px]">
                         <SortHeader campo="situacao">Situação</SortHeader>
                       </th>
-                      <th className="text-center px-3 py-3 font-semibold text-gray-700 w-20">
-                        Ação
+                      <th className="text-center px-3 py-2.5 w-20 uppercase text-xs font-semibold text-gray-500 tracking-wider">
+                        Ações
                       </th>
                     </tr>
                   </thead>
@@ -363,18 +402,20 @@ export function AtualizacaoCadastralRebanhoPage({
                         key={item.id}
                         className="border-b border-gray-100 hover:bg-gray-50/60"
                       >
-                        <td className="px-3 py-4 text-gray-500">{item.etapa}</td>
-                        <td className="px-3 py-4 text-gray-500">
+                        <td className="px-3 py-3.5 text-gray-600 font-medium">{item.etapa}</td>
+                        <td className="px-3 py-3.5 text-gray-600">
                           {item.estabelecimento.nome} - {item.estabelecimento.codigo}
                         </td>
-                        <td className="px-3 py-4 text-gray-500">{item.situacao}</td>
-                        <td className="px-3 py-4 text-center">
+                        <td className="px-3 py-3.5">
+                          {renderSituacaoBadge(item.situacao)}
+                        </td>
+                        <td className="px-3 py-3.5 text-center">
                           <button
                             type="button"
                             onClick={() => abrirAtualizacao(item)}
-                            className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md"
-                            title="Visualizar item"
-                            aria-label={`Visualizar atualização ${item.etapa}`}
+                            className="p-1.5 text-[#1A7A3C] hover:bg-green-50 rounded-md transition inline-flex items-center justify-center"
+                            title="Editar atualização"
+                            aria-label={`Editar atualização ${item.etapa}`}
                           >
                             <Eye size={18} />
                           </button>

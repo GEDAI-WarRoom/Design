@@ -4,10 +4,12 @@ import {
   ArrowLeft,
   ArrowRight,
   Check,
+  ChevronUp,
   Info,
   Minus,
   Plus,
   RotateCcw,
+  TrendingUp,
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { DynamicListWrapper } from "../../../components/ui/EntitySearch";
@@ -164,21 +166,54 @@ function CardIndicador({
   valor,
   detalhe,
   progress,
+  tendencia,
+  subtitulo,
+  centralizado = false,
 }: {
   titulo: string;
   valor: string | number;
   detalhe?: string;
   progress?: number;
+  tendencia?: string;
+  subtitulo?: string;
+  centralizado?: boolean;
 }) {
   return (
-    <div className="border border-gray-200 rounded-xl p-6 bg-white min-h-[140px]">
+    <div className={`border border-gray-200 rounded-xl p-6 bg-white min-h-[130px] flex flex-col ${centralizado ? "items-center justify-center text-center" : ""}`}>
       <p className="text-xs uppercase tracking-[0.12em] font-bold text-slate-500">
         {titulo}
       </p>
-      <div className="flex items-end gap-2 mt-4">
-        <strong className="text-4xl font-bold text-gray-950">{valor}</strong>
-        {detalhe && <span className="text-sm text-slate-500 mb-1">{detalhe}</span>}
-      </div>
+
+      {centralizado ? (
+        <strong className="text-3xl font-bold text-gray-900 mt-3">{valor}</strong>
+      ) : (
+        <>
+          <div className="flex items-end gap-2 mt-3">
+            <strong className="text-4xl font-bold text-gray-900 leading-none">{valor}</strong>
+
+            {tendencia && (
+              <span className="inline-flex items-center gap-0.5 text-sm font-bold text-[#008d4d] mb-0.5">
+                <TrendingUp size={15} strokeWidth={2.5} />
+                {tendencia}
+              </span>
+            )}
+
+            {detalhe && !tendencia && (
+              <span className="inline-flex items-center gap-0.5 text-sm text-slate-500 mb-1">
+                <ChevronUp size={14} className="text-slate-400" />
+                {detalhe}
+              </span>
+            )}
+          </div>
+
+          {subtitulo && (
+            <p className="text-[11px] uppercase tracking-[0.12em] font-semibold text-slate-400 mt-2">
+              {subtitulo}
+            </p>
+          )}
+        </>
+      )}
+
       {progress !== undefined && (
         <div className="h-2 rounded-full bg-[#e6f1eb] mt-5 overflow-hidden">
           <div
@@ -218,6 +253,7 @@ export function AtualizarCadastroRebanhoPage({
   const [erroNatalidade, setErroNatalidade] = useState("");
   const [modalSalvar, setModalSalvar] = useState(false);
   const [modalSucesso, setModalSucesso] = useState(false);
+  const [relatorioAberto, setRelatorioAberto] = useState(true);
 
   const calculos = useMemo(() => {
     if (!item) {
@@ -569,9 +605,8 @@ export function AtualizarCadastroRebanhoPage({
   };
 
   const renderRevisao = () => (
-    <div className="flex flex-col gap-6">
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm border-collapse min-w-[720px]">
+    <div className="overflow-x-auto">
+      <table className="w-full text-sm border-collapse min-w-[720px]">
           <thead>
             <tr className="bg-slate-50 border-y border-gray-200">
               <th
@@ -639,101 +674,121 @@ export function AtualizarCadastroRebanhoPage({
             </tr>
           </tfoot>
         </table>
-      </div>
-
-      <div className="border border-gray-200 rounded-2xl p-5 md:p-7">
-        <h3 className="text-lg font-semibold text-slate-800 mb-5">
-          Relatório Detalhado
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <CardIndicador
-            titulo="Saldo Geral"
-            valor={totalFinal}
-            detalhe={`${totalFinal - totalBase >= 0 ? "+" : ""}${totalFinal - totalBase} cabeças`}
-          />
-          <CardIndicador
-            titulo="Machos"
-            valor={totalFinalMachos}
-            detalhe={`${totalFinal > 0 ? Math.round((totalFinalMachos / totalFinal) * 100) : 0}% do total`}
-            progress={totalFinal > 0 ? (totalFinalMachos / totalFinal) * 100 : 0}
-          />
-          <CardIndicador
-            titulo="Fêmeas"
-            valor={totalFinalFemeas}
-            detalhe={`${totalFinal > 0 ? Math.round((totalFinalFemeas / totalFinal) * 100) : 0}% do total`}
-            progress={totalFinal > 0 ? (totalFinalFemeas / totalFinal) * 100 : 0}
-          />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-          <div className="grid grid-cols-1 gap-4">
-            <CardIndicador
-              titulo="Natalidade"
-              valor={`${taxaNatalidade.toFixed(1)}%`}
-            />
-            <CardIndicador
-              titulo="Mortalidade"
-              valor={`${taxaMortalidade.toFixed(1)}%`}
-            />
-          </div>
-          <div className="border border-gray-200 rounded-xl p-6 bg-white">
-            <h4 className="text-xs uppercase tracking-wider font-bold text-gray-800">
-              Saldo Machos
-            </h4>
-            <dl className="mt-5 text-sm space-y-3 text-slate-600">
-              <div className="flex justify-between">
-                <dt>Nascimentos</dt>
-                <dd>{somar(lancamentos.nascimentoMachos)}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt>Mortes</dt>
-                <dd>{somar(lancamentos.mortalidadeMachos)}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt>Evolução</dt>
-                <dd>{somar(lancamentos.evolucaoMachos)}</dd>
-              </div>
-              <div className="flex justify-between border-t pt-3 font-bold">
-                <dt>Saldo</dt>
-                <dd>{saldoMachos}</dd>
-              </div>
-            </dl>
-          </div>
-          <div className="border border-gray-200 rounded-xl p-6 bg-white">
-            <h4 className="text-xs uppercase tracking-wider font-bold text-gray-800">
-              Saldo Fêmeas
-            </h4>
-            <dl className="mt-5 text-sm space-y-3 text-slate-600">
-              <div className="flex justify-between">
-                <dt>Nascimentos</dt>
-                <dd>{somar(lancamentos.nascimentoFemeas)}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt>Mortes</dt>
-                <dd>{somar(lancamentos.mortalidadeFemeas)}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt>Evolução</dt>
-                <dd>{somar(lancamentos.evolucaoFemeas)}</dd>
-              </div>
-              <div className="flex justify-between border-t pt-3 font-bold">
-                <dt>Saldo</dt>
-                <dd>{saldoFemeas}</dd>
-              </div>
-            </dl>
-          </div>
-        </div>
-      </div>
     </div>
   );
 
-  const formula =
-    etapaAtual === 0
-      ? "Resultado = existente − mortalidade informada."
-      : etapaAtual === 1
-        ? "O valor informado entra na faixa atual e é debitado automaticamente da faixa imediatamente anterior."
-        : etapaAtual === 2
-          ? `Resultado = existente + nascimento. Limite parametrizado: ${limiteNascimentos} animais.`
-          : "O relatório consolida mortalidade, evolução e nascimento por sexo e faixa etária.";
+  const renderRelatorioDetalhado = () => (
+      <div className="bg-[#f7f8fa] border border-gray-200 rounded-2xl overflow-hidden">
+        <button
+          type="button"
+          onClick={() => setRelatorioAberto((prev) => !prev)}
+          className="w-full flex items-center gap-2 p-5 md:px-7 text-left"
+        >
+          {relatorioAberto ? (
+            <Minus size={18} className="text-[#1A7A3C]" />
+          ) : (
+            <Plus size={18} className="text-[#1A7A3C]" />
+          )}
+          <span className="text-sm font-semibold text-[#1A7A3C]">
+            {relatorioAberto ? "Ocultar Relatório" : "Mostrar Relatório"}
+          </span>
+        </button>
+
+        {relatorioAberto && (
+          <div className="px-5 pb-5 md:px-7 md:pb-7">
+            <h3 className="text-lg font-bold text-slate-800 mb-5">
+              Relatório Detalhado
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <CardIndicador
+                titulo="Saldo Geral"
+                valor={totalFinal}
+                tendencia={`${totalFinal - totalBase >= 0 ? "+" : ""}${totalBase > 0 ? (((totalFinal - totalBase) / totalBase) * 100).toFixed(1) : "0.0"}%`}
+                subtitulo="Cabeças Totais"
+              />
+              <CardIndicador
+                titulo="Machos"
+                valor={totalFinalMachos}
+                detalhe={`${totalFinal > 0 ? Math.round((totalFinalMachos / totalFinal) * 100) : 0}% do total`}
+                progress={totalFinal > 0 ? (totalFinalMachos / totalFinal) * 100 : 0}
+              />
+              <CardIndicador
+                titulo="Fêmeas"
+                valor={totalFinalFemeas}
+                detalhe={`${totalFinal > 0 ? Math.round((totalFinalFemeas / totalFinal) * 100) : 0}% do total`}
+                progress={totalFinal > 0 ? (totalFinalFemeas / totalFinal) * 100 : 0}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+              <div className="grid grid-cols-1 gap-4">
+                <CardIndicador
+                  titulo="Natalidade"
+                  valor={`${taxaNatalidade.toFixed(1)}%`}
+                  centralizado
+                />
+                <CardIndicador
+                  titulo="Mortalidade"
+                  valor={`${taxaMortalidade.toFixed(1)}%`}
+                  centralizado
+                />
+              </div>
+
+              <div className="border border-gray-200 rounded-xl p-6 bg-white">
+                <h4 className="text-xs uppercase tracking-wider font-bold text-gray-800">
+                  Saldo Machos
+                </h4>
+                <dl className="mt-5 text-sm space-y-3 text-slate-600">
+                  <div className="flex justify-between">
+                    <dt>Nascimentos</dt>
+                    <dd>{somar(lancamentos.nascimentoMachos)}</dd>
+                  </div>
+                  <div className="flex justify-between">
+                    <dt>Mortes</dt>
+                    <dd>{somar(lancamentos.mortalidadeMachos)}</dd>
+                  </div>
+                  <div className="flex justify-between">
+                    <dt>Evolução</dt>
+                    <dd>{somar(lancamentos.evolucaoMachos)}</dd>
+                  </div>
+                  <div className="flex justify-between border-t border-gray-100 pt-3 font-bold text-gray-900">
+                    <dt>Saldo</dt>
+                    <dd>{saldoMachos}</dd>
+                  </div>
+                </dl>
+              </div>
+
+              <div className="border border-gray-200 rounded-xl p-6 bg-white">
+                <h4 className="text-xs uppercase tracking-wider font-bold text-gray-800">
+                  Saldo Fêmeas
+                </h4>
+                <dl className="mt-5 text-sm space-y-3 text-slate-600">
+                  <div className="flex justify-between">
+                    <dt>Nascimentos</dt>
+                    <dd>{somar(lancamentos.nascimentoFemeas)}</dd>
+                  </div>
+                  <div className="flex justify-between">
+                    <dt>Mortes</dt>
+                    <dd>{somar(lancamentos.mortalidadeFemeas)}</dd>
+                  </div>
+                  <div className="flex justify-between">
+                    <dt>Evolução</dt>
+                    <dd>{somar(lancamentos.evolucaoFemeas)}</dd>
+                  </div>
+                  <div className="flex justify-between border-t border-gray-100 pt-3 font-bold text-gray-900">
+                    <dt>Saldo</dt>
+                    <dd>{saldoFemeas}</dd>
+                  </div>
+                </dl>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+  );
+
+
 
   return (
     <div className="min-h-screen bg-[#f2f3f5] pb-16">
@@ -793,10 +848,7 @@ export function AtualizarCadastroRebanhoPage({
 
           {etapaAtual < 3 ? renderTabelaEdicao() : renderRevisao()}
 
-          <div className="mx-5 md:mx-7 my-5 flex items-start gap-3 rounded-lg bg-slate-50 border border-slate-200 px-4 py-3 text-xs text-slate-600">
-            <Info size={16} className="flex-shrink-0 text-[#1A7A3C]" />
-            <span>{formula}</span>
-          </div>
+         
 
           {etapaAtual === 0 && mortalidadeIrregular && (
             <div className="mx-5 md:mx-7 mb-6 flex flex-col gap-5">
@@ -893,6 +945,9 @@ export function AtualizarCadastroRebanhoPage({
             </p>
           )}
         </section>
+
+        {/* Relatório Detalhado — card separado (fora da seção da tabela) */}
+        {etapaAtual === 3 && renderRelatorioDetalhado()}
 
         <div className="flex justify-end gap-3">
           {etapaAtual > 0 && (

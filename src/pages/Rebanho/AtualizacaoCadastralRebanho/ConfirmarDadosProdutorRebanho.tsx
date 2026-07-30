@@ -29,7 +29,7 @@ interface PageProps {
 
 function ContatoSomenteLeitura({ contato }: { contato: ContatoProdutor }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-start">
+    <div className="grid grid-cols-1 md:grid-cols-12 gap-2.5 items-start">
       <FloatSelect
         label="Tipo de Contato"
         required={contato.obrigatorio}
@@ -56,7 +56,7 @@ function ContatoSomenteLeitura({ contato }: { contato: ContatoProdutor }) {
           value={contato.observacao}
           onChange={() => {}}
           disabled
-          rows={3}
+          rows={2}
         />
       </div>
     </div>
@@ -83,14 +83,18 @@ export function ConfirmarDadosProdutorRebanhoPage({
 
   const salvar = () => {
     if (!confirmado) return;
+    
+    // 1. Marca os dados do produtor como confirmados
     confirmarDadosProdutor(atualizacao);
+
+    // 2. Navega para a tela de visualização/gerenciamento dos itens da atualização
     onNavigate("visualizar-atualizacao-cadastral-rebanho", {
       atualizacaoId: atualizacao.id,
     });
   };
 
   return (
-    <div className="min-h-screen bg-[#eef0f1] pb-12">
+    <div className="min-h-screen bg-[#eef0f1] pb-6">
       <Navbar
         onLogout={onLogout}
         onNavigate={onNavigate}
@@ -98,57 +102,57 @@ export function ConfirmarDadosProdutorRebanhoPage({
         hideSearch
       />
 
-      <main className="max-w-[1088px] mx-auto px-4 md:px-6 py-6">
-        <section className="bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div className="px-5 md:px-8 py-6 border-b border-gray-200 text-center relative">
+      <main className="max-w-[1000px] mx-auto px-3 sm:px-4 py-4">
+        <section className="bg-white rounded-2xl shadow-lg overflow-hidden">
+          <div className="px-4 sm:px-6 py-4 border-b border-gray-200 text-center relative">
             <button
               type="button"
               onClick={() => onNavigate("atualizacao-cadastral-rebanho")}
-              className="absolute left-5 top-6 p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md"
+              className="absolute left-4 top-4 p-1.5 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"
               aria-label="Voltar para a listagem"
             >
-              <ArrowLeft size={20} />
+              <ArrowLeft size={18} />
             </button>
-            <div className="flex items-center justify-center gap-3">
+            <div className="flex items-center justify-center gap-2">
               <img
                 src={Icons.iconeProdutorUrl}
                 alt=""
-                className="w-6 h-6 object-contain"
+                className="w-5 h-5 object-contain"
               />
-              <h1 className="text-2xl font-semibold text-gray-900">
+              <h1 className="text-xl font-semibold text-gray-900">
                 Confirmação de Dados do Produtor
               </h1>
             </div>
-            <p className="text-sm text-gray-600 mt-4">
+            <p className="text-xs sm:text-sm text-gray-600 mt-1">
               Confirme os dados de contato do produtor para realizar a atualização
               cadastral de rebanho:
             </p>
           </div>
 
-          <div className="p-5 md:p-8 flex flex-col gap-7">
-            <section className="border border-gray-200 rounded-2xl overflow-visible">
+          <div className="p-4 sm:p-5 flex flex-col gap-4">
+            <section className="border border-gray-200 rounded-xl overflow-hidden">
               <button
                 type="button"
                 onClick={() => setSecaoAberta((valor) => !valor)}
-                className="w-full flex items-center justify-between px-5 py-5 bg-gray-50 rounded-t-2xl text-left"
+                className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 text-left hover:bg-gray-100/70 transition"
               >
-                <span className="font-semibold text-gray-800">
+                <span className="font-semibold text-sm text-gray-800">
                   Informações de Contato
                 </span>
                 {secaoAberta ? (
-                  <ChevronUp size={18} className="text-gray-500" />
+                  <ChevronUp size={16} className="text-gray-500" />
                 ) : (
-                  <ChevronDown size={18} className="text-gray-500" />
+                  <ChevronDown size={16} className="text-gray-500" />
                 )}
               </button>
 
               {secaoAberta && (
-                <div className="p-5 flex flex-col gap-7">
+                <div className="p-4 flex flex-col gap-4">
                   <div>
-                    <h2 className="text-sm font-semibold text-gray-800 mb-5">
+                    <h2 className="text-xs font-semibold text-gray-500 tracking-wider mb-3">
                       Contatos Obrigatórios
                     </h2>
-                    <div className="flex flex-col gap-6">
+                    <div className="flex flex-col gap-3">
                       {contatosObrigatorios.map((contato) => (
                         <ContatoSomenteLeitura key={contato.id} contato={contato} />
                       ))}
@@ -156,11 +160,11 @@ export function ConfirmarDadosProdutorRebanhoPage({
                   </div>
 
                   {contatosAdicionais.length > 0 && (
-                    <div className="pt-5 border-t border-gray-100">
-                      <h2 className="text-sm font-semibold text-gray-800 mb-5">
-                        Contatos Adicionais
+                    <div className="pt-3 border-t border-gray-100">
+                      <h2 className="text-xs font-semibold text-gray-500 tracking-wider mb-3">
+                        Contatos Opcionais
                       </h2>
-                      <div className="flex flex-col gap-6">
+                      <div className="flex flex-col gap-3">
                         {contatosAdicionais.map((contato) => (
                           <ContatoSomenteLeitura key={contato.id} contato={contato} />
                         ))}
@@ -171,22 +175,21 @@ export function ConfirmarDadosProdutorRebanhoPage({
               )}
             </section>
 
-            <div className="h-px bg-gray-200" />
-
-            <label className="flex items-start gap-4 bg-[#eafaf2] rounded-2xl p-5 md:p-6 cursor-pointer">
-              <span className="w-9 h-9 rounded-md bg-[#dcf5e9] border border-[#c7ead9] text-[#1A7A3C] flex items-center justify-center flex-shrink-0">
-                <Info size={18} />
+            {/* Declaração com checkbox */}
+            <label className="flex items-start gap-3 bg-[#eafaf2] rounded-xl p-3.5 sm:p-4 cursor-pointer">
+              <span className="w-7 h-7 rounded-md bg-[#dcf5e9] border border-[#c7ead9] text-[#1A7A3C] flex items-center justify-center flex-shrink-0 mt-0.5">
+                <Info size={16} />
               </span>
-              <span className="flex flex-col gap-2">
-                <span className="text-sm font-semibold text-gray-900">
+              <span className="flex flex-col gap-1">
+                <span className="text-xs sm:text-sm font-semibold text-gray-900">
                   Confirmação de Dados
                 </span>
-                <span className="flex items-start gap-2 text-sm text-gray-700">
+                <span className="flex items-start gap-2 text-xs sm:text-sm text-gray-700">
                   <input
                     type="checkbox"
                     checked={confirmado}
                     onChange={(event) => setConfirmado(event.target.checked)}
-                    className="mt-0.5 h-4 w-4 accent-[#1A7A3C]"
+                    className="mt-0.5 h-4 w-4 rounded accent-[#1A7A3C] shrink-0"
                   />
                   Declaro que todas as informações prestadas são verdadeiras e refletem
                   a situação atual do cadastro.
@@ -194,19 +197,20 @@ export function ConfirmarDadosProdutorRebanhoPage({
               </span>
             </label>
 
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            {/* Rodapé: Dados Incorretos acima (centralizado) + Botões centralizados */}
+            <div className="flex flex-col items-center justify-center gap-3 pt-2">
               <button
                 type="button"
                 onClick={() => onNavigate("editar-pessoa-fisica", null)}
-                className="inline-flex items-center gap-2 text-sm text-[#1A7A3C] hover:underline"
+                className="inline-flex items-center gap-1.5 text-xs sm:text-sm text-[#1A7A3C] hover:underline"
               >
-                <Info size={15} className="text-gray-500" />
+                <Info size={14} className="text-gray-500" />
                 <span className="text-gray-500">Dados incorretos?</span>
                 Acessar Cadastro para Editar
-                <ExternalLink size={14} />
+                <ExternalLink size={13} />
               </button>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center gap-3 w-full">
                 <CustomButton
                   variant="outlined"
                   onClick={() => onNavigate("atualizacao-cadastral-rebanho")}
@@ -216,7 +220,6 @@ export function ConfirmarDadosProdutorRebanhoPage({
                 <CustomButton
                   onClick={salvar}
                   disabled={!confirmado}
-                  icon={<Check size={18} />}
                 >
                   Salvar
                 </CustomButton>
@@ -228,4 +231,3 @@ export function ConfirmarDadosProdutorRebanhoPage({
     </div>
   );
 }
-

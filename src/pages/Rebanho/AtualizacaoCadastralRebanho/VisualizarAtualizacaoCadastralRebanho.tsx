@@ -166,27 +166,25 @@ export function VisualizarAtualizacaoCadastralRebanhoPage({
         <section className="bg-white rounded-xl shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm border-collapse">
-              <thead>
-                <tr className="border-y border-gray-200">
-                  <th className="text-left px-4 py-3 font-semibold text-gray-700 min-w-[220px] uppercase">
-                    Exploração/Núcleo
-                  </th>
-                  <th className="text-left px-4 py-3 font-semibold text-gray-700 min-w-[160px]">
-                    <SortHeader campo="especie">Espécie</SortHeader>
-                  </th>
-                  <th className="text-left px-4 py-3 font-semibold text-gray-700 min-w-[220px]">
-                    <SortHeader campo="data">
-                      Data da Última Atualização
-                    </SortHeader>
-                  </th>
-                  <th className="text-left px-4 py-3 font-semibold text-gray-700 min-w-[150px]">
-                    <SortHeader campo="situacao">Situação</SortHeader>
-                  </th>
-                  <th className="text-center px-4 py-3 font-semibold text-gray-700 w-32 uppercase">
-                    Ação
-                  </th>
-                </tr>
-              </thead>
+             <thead>
+    <tr className="border-y border-gray-200">
+      <th className="text-left px-4 py-3 text-xs font-semibold text-gray-700 min-w-[220px] uppercase tracking-wider">
+        Exploração/Núcleo
+      </th>
+      <th className="text-left px-4 py-3 text-xs font-semibold text-gray-700 min-w-[220px] uppercase tracking-wider">
+        Espécie
+      </th>
+      <th className="text-left px-4 py-3 text-xs font-semibold text-gray-700 min-w-[220px] uppercase tracking-wider">
+      
+          Data da Última Atualização
+    
+      </th>
+      <th className="text-left px-4 py-3 text-xs font-semibold text-gray-700 min-w-[220px] uppercase tracking-wider">
+        Situação
+      </th>
+      
+    </tr>
+  </thead>
               <tbody>
                 {itensOrdenados.map((item) => (
                   <tr

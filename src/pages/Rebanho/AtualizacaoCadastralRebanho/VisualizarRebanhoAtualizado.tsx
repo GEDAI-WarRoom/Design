@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ArrowLeft, ChevronDown, ChevronUp, FileText } from "lucide-react";
+import { ArrowLeft, ChevronUp, Minus, Plus, TrendingUp } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { LargeTextArea } from "../../../components/ui/FormKit";
 import {
@@ -37,21 +37,54 @@ function Indicador({
   valor,
   detalhe,
   progress,
+  tendencia,
+  subtitulo,
+  centralizado = false,
 }: {
   titulo: string;
   valor: string | number;
   detalhe?: string;
   progress?: number;
+  tendencia?: string;
+  subtitulo?: string;
+  centralizado?: boolean;
 }) {
   return (
-    <div className="border border-gray-200 rounded-xl p-6 bg-white min-h-[140px]">
+    <div className={`border border-gray-200 rounded-xl p-6 bg-white min-h-[130px] flex flex-col ${centralizado ? "items-center justify-center text-center" : ""}`}>
       <p className="text-xs uppercase tracking-[0.12em] font-bold text-slate-500">
         {titulo}
       </p>
-      <div className="flex items-end gap-2 mt-4">
-        <strong className="text-4xl font-bold text-gray-950">{valor}</strong>
-        {detalhe && <span className="text-sm text-slate-500 mb-1">{detalhe}</span>}
-      </div>
+
+      {centralizado ? (
+        <strong className="text-3xl font-bold text-gray-900 mt-3">{valor}</strong>
+      ) : (
+        <>
+          <div className="flex items-end gap-2 mt-3">
+            <strong className="text-4xl font-bold text-gray-900 leading-none">{valor}</strong>
+
+            {tendencia && (
+              <span className="inline-flex items-center gap-0.5 text-sm font-bold text-[#008d4d] mb-0.5">
+                <TrendingUp size={15} strokeWidth={2.5} />
+                {tendencia}
+              </span>
+            )}
+
+            {detalhe && !tendencia && (
+              <span className="inline-flex items-center gap-0.5 text-sm text-slate-500 mb-1">
+                <ChevronUp size={14} className="text-slate-400" />
+                {detalhe}
+              </span>
+            )}
+          </div>
+
+          {subtitulo && (
+            <p className="text-[11px] uppercase tracking-[0.12em] font-semibold text-slate-400 mt-2">
+              {subtitulo}
+            </p>
+          )}
+        </>
+      )}
+
       {progress !== undefined && (
         <div className="h-2 rounded-full bg-[#e6f1eb] mt-5 overflow-hidden">
           <div
@@ -254,32 +287,34 @@ export function VisualizarRebanhoAtualizadoPage({
           </div>
         </section>
 
-        <section className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <section className="bg-[#f7f8fa] border border-gray-200 rounded-2xl overflow-hidden">
           <button
             type="button"
             onClick={() => setRelatorioAberto((valor) => !valor)}
-            className="w-full px-6 py-5 flex items-center justify-between text-left"
+            className="w-full flex items-center gap-2 p-5 md:px-7 text-left"
           >
-            <span className="flex items-center gap-3">
-              <FileText size={19} className="text-[#1A7A3C]" />
-              <span className="font-semibold text-slate-800">
-                Relatório Detalhado
-              </span>
-            </span>
             {relatorioAberto ? (
-              <ChevronUp size={19} className="text-gray-500" />
+              <Minus size={18} className="text-[#1A7A3C]" />
             ) : (
-              <ChevronDown size={19} className="text-gray-500" />
+              <Plus size={18} className="text-[#1A7A3C]" />
             )}
+            <span className="text-sm font-semibold text-[#1A7A3C]">
+              {relatorioAberto ? "Ocultar Relatório" : "Mostrar Relatório"}
+            </span>
           </button>
 
           {relatorioAberto && (
-            <div className="border-t border-gray-200 p-5 md:p-7">
+            <div className="px-5 pb-5 md:px-7 md:pb-7">
+              <h3 className="text-lg font-bold text-slate-800 mb-5">
+                Relatório Detalhado
+              </h3>
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Indicador
                   titulo="Saldo Geral"
                   valor={totalFinal}
-                  detalhe={`${totalFinal - totalBase >= 0 ? "+" : ""}${totalFinal - totalBase} cabeças`}
+                  tendencia={`${totalFinal - totalBase >= 0 ? "+" : ""}${totalBase > 0 ? (((totalFinal - totalBase) / totalBase) * 100).toFixed(1) : "0.0"}%`}
+                  subtitulo="Cabeças Totais"
                 />
                 <Indicador
                   titulo="Machos"
@@ -300,10 +335,12 @@ export function VisualizarRebanhoAtualizadoPage({
                   <Indicador
                     titulo="Natalidade"
                     valor={`${natalidade.toFixed(1)}%`}
+                    centralizado
                   />
                   <Indicador
                     titulo="Mortalidade"
                     valor={`${mortalidade.toFixed(1)}%`}
+                    centralizado
                   />
                 </div>
                 {[
@@ -342,7 +379,7 @@ export function VisualizarRebanhoAtualizadoPage({
                         <dt>Evolução</dt>
                         <dd>{saldo.evolucao}</dd>
                       </div>
-                      <div className="flex justify-between border-t pt-3 font-bold">
+                      <div className="flex justify-between border-t border-gray-100 pt-3 font-bold text-gray-900">
                         <dt>Saldo</dt>
                         <dd>{saldo.saldo}</dd>
                       </div>
@@ -390,4 +427,3 @@ export function VisualizarRebanhoAtualizadoPage({
     </div>
   );
 }
-
