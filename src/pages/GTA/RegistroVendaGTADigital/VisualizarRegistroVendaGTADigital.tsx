@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ArrowLeft, Info, Pencil, Eye, FileText, CreditCard, Clock, Calendar, DollarSign, Check } from "lucide-react";
+import { ArrowLeft, Info, Pencil, Eye, FileText, CreditCard, Clock, Calendar, DollarSign, Check, ScanBarcode } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput } from "../../../components/ui/FormKit";
 import * as Icons from "../../../imports/icons";
@@ -139,7 +139,7 @@ export function VisualizarRegistroVendaGTADigitalPage({
                   onClick={() => onNavigate("visualizar-dae", dae || registro.dae)}
                   className="px-5 h-10 border border-[#1A7A3C] text-[#1A7A3C] hover:bg-green-50/50 text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2"
                 >
-                  <ScrollText size={15} /> DAE Relacionado
+                  <ScanBarcode size={15} /> DAE Relacionado
                 </button>
               )}
 
