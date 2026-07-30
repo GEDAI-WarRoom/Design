@@ -69,7 +69,7 @@ export function TaxaEmissaoGtaForm({ value, onChange, mode = "create" }: TaxaEmi
     });
 
   return (
-    <Section title="Informações da Taxa">
+    <Section title="Informações Básicas">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {/* 1. Espécie */}
         {mode === "create" ? (
