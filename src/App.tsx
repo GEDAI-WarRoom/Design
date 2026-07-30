@@ -91,6 +91,25 @@ import { StatusAnimalPage } from "./pages/Animal/StatusAnimal/StatusAnimal";
 import { VisualizarStatusAnimalPage } from "./pages/Animal/StatusAnimal/VisualizarStatusAnimal";
 import { AdicionarTipoVeiculoPage } from "./pages/Animal/TipoVeiculo/AdicionarTipoVeiculo";
 import { TipoVeiculoPage } from "./pages/Animal/TipoVeiculo/TipoVeiculo";
+import { AtualizacaoCadastralRebanhoPage } from "./pages/Rebanho/AtualizacaoCadastralRebanho/AtualizacaoCadastralRebanho";
+import { AtualizarCadastroRebanhoPage } from "./pages/Rebanho/AtualizacaoCadastralRebanho/AtualizarCadastroRebanho";
+import { ConfirmarDadosProdutorRebanhoPage } from "./pages/Rebanho/AtualizacaoCadastralRebanho/ConfirmarDadosProdutorRebanho";
+import { VisualizarAtualizacaoCadastralRebanhoPage } from "./pages/Rebanho/AtualizacaoCadastralRebanho/VisualizarAtualizacaoCadastralRebanho";
+import { VisualizarRebanhoAtualizadoPage } from "./pages/Rebanho/AtualizacaoCadastralRebanho/VisualizarRebanhoAtualizado";
+
+// REBANHO
+import { AdicionarEtapaAtualizacaoCadastralPage } from "./pages/Rebanho/EtapaAtualizacaoCadastral/AdicionarEtapaAtualizacaoCadastral";
+import { EditarEtapaAtualizacaoCadastralPage } from "./pages/Rebanho/EtapaAtualizacaoCadastral/EditarEtapaAtualizacaoCadastral";
+import { EtapaAtualizacaoCadastralPage } from "./pages/Rebanho/EtapaAtualizacaoCadastral/EtapaAtualizacaoCadastral";
+import { VisualizarEtapaAtualizacaoCadastralPage } from "./pages/Rebanho/EtapaAtualizacaoCadastral/VisualizarEtapaAtualizacaoCadastral";
+import { AdicionarAjusteRebanhoPage } from "./pages/Rebanho/AjusteRebanho/AdicionarAjusteRebanho";
+import { AjusteRebanhoPage } from "./pages/Rebanho/AjusteRebanho/AjusteRebanho";
+import { EditarAjusteRebanhoPage } from "./pages/Rebanho/AjusteRebanho/EditarAjusteRebanho";
+import { VisualizarAjusteRebanhoPage } from "./pages/Rebanho/AjusteRebanho/VisualizarAjusteRebanho";
+import { AdicionarLancamentoRebanhoPage } from "./pages/Rebanho/LancamentoRebanho/AdicionarLancamentoRebanho";
+import { EditarLancamentoRebanhoPage } from "./pages/Rebanho/LancamentoRebanho/EditarLancamentoRebanho";
+import { LancamentoRebanhoPage } from "./pages/Rebanho/LancamentoRebanho/LancamentoRebanho";
+import { VisualizarLancamentoRebanhoPage } from "./pages/Rebanho/LancamentoRebanho/VisualizarLancamentoRebanho";
 
 // VEGETAL
 import { AdicionarCulturaPage } from "./pages/Vegetal/Cultura/AdicionarCultura";
@@ -237,6 +256,19 @@ export type Screen =
 	| "exploracao-pecuaria" // 🚀 Adicionado
 	| "adicionar-exploracao-pecuaria" // 🚀 Adicionado
 	| "visualizar-exploracao-pecuaria" // 🚀 Adicionado
+	| "atualizacao-cadastral-rebanho"
+	| "confirmar-dados-produtor-rebanho"
+	| "visualizar-atualizacao-cadastral-rebanho"
+	| "atualizar-cadastro-rebanho"
+	| "visualizar-rebanho-atualizado"
+	| "ajuste-rebanho"
+	| "adicionar-ajuste-rebanho"
+	| "visualizar-ajuste-rebanho"
+	| "editar-ajuste-rebanho"
+	| "lancamento-rebanho"
+	| "adicionar-lancamento-rebanho"
+	| "visualizar-lancamento-rebanho"
+	| "editar-lancamento-rebanho"
 	| "passaporte-equestre"
 	| "adicionar-passaporte-equestre"
 	| "visualizar-passaporte-equestre"
@@ -375,6 +407,10 @@ export type Screen =
 	| "adicionar-status-animal"
 	| "visualizar-status-animal"
 	| "editar-status-animal"
+	| "etapa-atualizacao-cadastral"
+	| "adicionar-etapa-atualizacao-cadastral"
+	| "visualizar-etapa-atualizacao-cadastral"
+	| "editar-etapa-atualizacao-cadastral"
 	| "dae"
 	| "adicionar-dae"
 	| "visualizar-dae"
@@ -1019,6 +1055,101 @@ export default function App() {
 					onNavigate={handleNavigate}
 				/>
 			);
+		case "atualizacao-cadastral-rebanho":
+			return (
+				<AtualizacaoCadastralRebanhoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "confirmar-dados-produtor-rebanho":
+			return (
+				<ConfirmarDadosProdutorRebanhoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "visualizar-atualizacao-cadastral-rebanho":
+			return (
+				<VisualizarAtualizacaoCadastralRebanhoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "atualizar-cadastro-rebanho":
+			return (
+				<AtualizarCadastroRebanhoPage
+            onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "ajuste-rebanho":
+			return (
+				<AjusteRebanhoPage
+          onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "lancamento-rebanho":
+			return (
+				<LancamentoRebanhoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-ajuste-rebanho":
+			return (
+				<AdicionarAjusteRebanhoPage
+          onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-lancamento-rebanho":
+			return (
+				<AdicionarLancamentoRebanhoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-ajuste-rebanho":
+			return (
+				<VisualizarAjusteRebanhoPage
+          onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-lancamento-rebanho":
+			return (
+				<VisualizarLancamentoRebanhoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "visualizar-rebanho-atualizado":
+			return (
+				<VisualizarRebanhoAtualizadoPage
+            onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "editar-ajuste-rebanho":
+			return (
+				<EditarAjusteRebanhoPage
+          onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "editar-lancamento-rebanho":
+			return (
+				<EditarLancamentoRebanhoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
 		case "agroindustrial-sie":
 			return (
 				<EstabelecimentoAgroindustrialSIEMGPage
@@ -1614,6 +1745,36 @@ export default function App() {
 		case "editar-status-animal":
 			return (
 				<EditarStatusAnimalPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "etapa-atualizacao-cadastral":
+			return (
+				<EtapaAtualizacaoCadastralPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-etapa-atualizacao-cadastral":
+			return (
+				<AdicionarEtapaAtualizacaoCadastralPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-etapa-atualizacao-cadastral":
+			return (
+				<VisualizarEtapaAtualizacaoCadastralPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "editar-etapa-atualizacao-cadastral":
+			return (
+				<EditarEtapaAtualizacaoCadastralPage
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
 					dados={screenData}
