@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useMemo, useState, useEffect, type ReactNode } from "react";
 import {
   ArrowLeft,
   Check,
@@ -234,7 +234,7 @@ function BasicData({ mode, fundo, setFundo, onNavigate }: { mode: Mode; fundo: F
               />
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center w-full">
-                <FloatInput label="Razão Social / Nome" value={selectedPessoa?.razaoSocial || ""} disabled />
+                <FloatInput label="Razão Social" value={selectedPessoa?.razaoSocial || ""} disabled />
                 <div className="flex items-center gap-2 w-full">
                   <div className="flex-1">
                     <FloatInput label="CNPJ" required value={selectedPessoa?.cnpj || ""} disabled />
@@ -405,13 +405,41 @@ function ConvenioModal({ mode, initial, onClose, onSave }: { mode: ConvenioMode;
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 p-4">
       <div className="max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-2xl bg-white shadow-xl">
-        <div className="sticky top-0 z-20 flex items-center justify-between border-b border-gray-100 bg-white px-6 py-5">
-          <div><h2 className="text-xl font-semibold text-gray-900">{mode === "add" ? "Adicionar Convênio" : mode === "edit" ? "Editar Convênio" : "Detalhes do Convênio"}</h2><p className="mt-1 text-sm text-gray-500">Informe os dados de arrecadação vinculados ao fundo.</p></div>
-          <button type="button" onClick={onClose} className="rounded-md p-2 text-gray-400 hover:bg-gray-100" title="Fechar"><X size={20} /></button>
+        <div className="sticky top-0 z-20 flex flex-col items-center justify-center border-b border-gray-100 bg-white px-6 py-5 text-center relative">
+          {/* Título e Subtítulo Centralizados */}
+          <div className="sticky top-0 z-20 flex flex-col items-center justify-center border-b border-gray-100 bg-white px-6 py-5 text-center relative">
+            <div>
+              {/* Título com Ícone Alinhado na Frente */}
+              <h2 className="flex items-center justify-center gap-2 text-xl font-semibold text-gray-900">
+                <Handshake size={22} className="text-[#1A7A3C]" />
+                <span>
+                  {mode === "add"
+                    ? "Adicionar Convênio"
+                    : mode === "edit"
+                      ? "Editar Convênio"
+                      : "Detalhes do Convênio"}
+                </span>
+              </h2>
+              <p className="mt-1 text-sm text-gray-500">
+                Preencha os campos abaixo para adicionar um novo convênio:
+              </p>
+            </div>
+
+
+          </div>
+
+          {/* Botão Fechar Posicionado no Canto Direito */}
+          <button
+            type="button"
+            onClick={onClose}
+            className="absolute right-4 top-4 rounded-md p-2 text-gray-400 hover:bg-gray-100 transition"
+            title="Fechar"
+          >
+            <X size={20} />
+          </button>
         </div>
         <div className="flex flex-col gap-5 p-6">
-          {!disabled && <RequiredFieldsNotice />}
-          <Section title="Convênio">
+          <Section title="Informações Básicas">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <FloatInput label="Nome do Convênio" required value={value.nome} onChange={(next) => update("nome", next)} maxLength={255} disabled={disabled} />
               <FloatInput label="Número do Convênio" required value={value.numero} onChange={(next) => digits("numero", next, 7)} maxLength={7} disabled={disabled} />
@@ -425,9 +453,30 @@ function ConvenioModal({ mode, initial, onClose, onSave }: { mode: ConvenioMode;
               {mode !== "add" && <FloatSelect label="Situação" required value={value.situacao} onChange={(next) => update("situacao", next)} options={SITUACOES} disabled={disabled} />}
             </div>
           </Section>
-          <div className="flex justify-end gap-3">
-            <button type="button" onClick={onClose} className="h-11 rounded-md border border-[#1A7A3C] px-5 text-sm font-semibold text-[#1A7A3C]">{disabled ? "Voltar" : "Cancelar"}</button>
-            {!disabled && <button type="button" onClick={() => onSave(value)} disabled={!valid} className="h-11 rounded-md bg-[#1A7A3C] px-5 text-sm font-semibold text-white hover:bg-[#15612F] disabled:cursor-not-allowed disabled:opacity-50">{mode === "add" ? "Adicionar" : "Salvar"}</button>}
+          <div className="flex justify-center items-center gap-3">
+            {/* Botão de Cancelar / Voltar */}
+            <button
+              type="button"
+              onClick={onClose}
+              className="h-11 min-w-[130px] rounded-md border border-[#1A7A3C] px-5 text-sm font-semibold text-[#1A7A3C] hover:bg-green-50 transition"
+            >
+              {disabled ? "Voltar" : "Cancelar"}
+            </button>
+
+            {/* Botão Principal sem as travas de disabled e valid */}
+            <button
+              type="button"
+              onClick={() => onSave(value)}
+              className="h-11 min-w-[160px] flex items-center justify-center gap-2 rounded-md bg-[#1A7A3C] px-5 text-sm font-semibold text-white hover:bg-[#15612F] transition shadow-sm"
+            >
+              {mode === "add" ? (
+                <>
+                  <span>Salvar</span>
+                </>
+              ) : (
+                <span>Salvar</span>
+              )}
+            </button>
           </div>
         </div>
       </div>
@@ -496,7 +545,6 @@ function ConvenioCards({ convenios, menuAberto, onMenuChange, onVisualizar, onEd
               {menuAberto === convenio.id && (
                 <div className="absolute bottom-10 right-0 z-30 w-36 overflow-hidden rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
                   <button type="button" onClick={() => { onEditar(convenio); onMenuChange(null); }} className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50">Editar</button>
-                  <button type="button" onClick={() => { onToggleSituacao(convenio); onMenuChange(null); }} className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50">{convenio.situacao === "Ativo" ? "Inativar" : "Ativar"}</button>
                 </div>
               )}
             </div>
@@ -538,11 +586,10 @@ function ConvenioCardGroup({ ativos, inativos, onAdicionar, onVisualizar, onEdit
     <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
       <div className="flex items-center justify-between gap-4 p-5">
         <button type="button" onClick={() => setOpen((value) => !value)} className="flex flex-1 items-center gap-3 text-left">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#20A866] text-white"><CalendarClock size={21} /></div>
-          <div><h2 className="font-semibold text-gray-800">Convênio</h2><p className="text-xs text-gray-500">Convênios ativos: {ativos.length}</p></div>
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#20A866] text-white"><Handshake size={21} /></div>
+          <div><h2 className="font-semibold text-gray-800">Convênio</h2><p className="text-xs text-gray-500">Cadastros ativos: {ativos.length}</p></div>
         </button>
         <div className="flex items-center gap-3">
-          <button type="button" onClick={onAdicionar} className="flex h-10 items-center gap-2 rounded-md bg-[#1A7A3C] px-4 text-xs font-bold text-white hover:bg-[#15612F]"><PlusCircle size={16} />Adicionar Convênio</button>
           <button type="button" onClick={() => setOpen((value) => !value)} className="rounded-md p-1 text-gray-500 hover:bg-gray-100" aria-label={open ? "Recolher convênios" : "Expandir convênios"}><ChevronDown size={19} className={`transition ${open ? "rotate-180" : ""}`} /></button>
         </div>
       </div>
@@ -559,7 +606,6 @@ function ConvenioCardGroup({ ativos, inativos, onAdicionar, onVisualizar, onEdit
           <div className="mt-6 border-t border-gray-100 pt-5">
             <button type="button" onClick={() => setHistoricoOpen((value) => !value)} className="flex w-full items-center justify-between text-left text-sm font-medium text-[#1A7A3C] transition hover:text-[#15612F]">
               <span className="flex items-center gap-2"><ChevronDown size={17} className={`transition ${historicoOpen ? "rotate-180" : ""}`} />Histórico de Convênios Inativos</span>
-              <span className="text-xs font-normal text-gray-500">Convênios inativos: {inativos.length}</span>
             </button>
 
             {historicoOpen && (
@@ -580,9 +626,14 @@ function ConvenioCardGroup({ ativos, inativos, onAdicionar, onVisualizar, onEdit
   );
 }
 
-function ConveniosPanel({ fundo, setFundo }: { fundo: FundoArrecadacao; setFundo: (value: FundoArrecadacao) => void }) {
+function ConveniosPanel({ fundo, setFundo, addSignal }: { fundo: FundoArrecadacao; setFundo: (value: FundoArrecadacao) => void; addSignal?: number }) {
   const [modal, setModal] = useState<{ mode: ConvenioMode; convenio?: Convenio } | null>(null);
   const [savedConvenio, setSavedConvenio] = useState<Convenio | null>(null);
+
+  // Abre o modal "Adicionar" quando o botão do cabeçalho é acionado (sinal do componente pai)
+  useEffect(() => {
+    if (addSignal && addSignal > 0) setModal({ mode: "add" });
+  }, [addSignal]);
   const ativos = fundo.convenios.filter((item) => item.situacao === "Ativo").sort((a, b) => b.cadastradoEm.localeCompare(a.cadastradoEm));
   const inativos = fundo.convenios.filter((item) => item.situacao === "Inativo").sort((a, b) => b.cadastradoEm.localeCompare(a.cadastradoEm));
 
@@ -615,6 +666,7 @@ function ConveniosPanel({ fundo, setFundo }: { fundo: FundoArrecadacao; setFundo
 function FundoArrecadacaoDetailPage({ mode, dados, onLogout, onNavigate }: PageProps & { mode: Mode }) {
   const [fundo, setFundo] = useState<FundoDraft | FundoArrecadacao>(() => dados ? cloneFundo(dados) : newDraft());
   const [activeTab, setActiveTab] = useState("dados");
+  const [addConvenioSignal, setAddConvenioSignal] = useState(0);
   const [savedFundo, setSavedFundo] = useState<FundoArrecadacao | null>(null);
 
   const valid = useMemo(() => {
@@ -641,7 +693,7 @@ function FundoArrecadacaoDetailPage({ mode, dados, onLogout, onNavigate }: PageP
   const backLabel = mode === "edit" ? "Visualizar Fundo de Arrecadação" : "Todos os Fundos de Arrecadação";
   const back = () => mode === "edit" ? onNavigate("visualizar-fundo-arrecadacao", fundo) : onNavigate("fundo-arrecadacao");
   const tabs = [
-    { id: "dados", label: "Dados do Fundo", icon: (active: boolean) => <FileText size={18} className={active ? "text-[#1A7A3C]" : "text-gray-400"} /> },
+    { id: "dados", label: "Cadastro", icon: (active: boolean) => <FileText size={18} className={active ? "text-[#1A7A3C]" : "text-gray-400"} /> },
     { id: "convenios", label: "Convênio", icon: (active: boolean) => <Handshake size={18} className={active ? "text-[#1A7A3C]" : "text-gray-400"} /> },
   ];
 
@@ -654,7 +706,11 @@ function FundoArrecadacaoDetailPage({ mode, dados, onLogout, onNavigate }: PageP
           <div className="flex items-center justify-between gap-3">
             <h1 className="text-2xl font-semibold text-gray-900">{title}</h1>
             {mode === "view" ? (
-              <button type="button" onClick={() => onNavigate("editar-fundo-arrecadacao", fundo)} className="flex h-10 items-center gap-2 rounded-md bg-[#1A7A3C] px-5 text-xs font-bold text-white hover:bg-[#15612F]"><Pencil size={15} />Editar</button>
+              activeTab === "convenios" ? (
+                <button type="button" onClick={() => setAddConvenioSignal((n) => n + 1)} className="flex h-10 items-center gap-2 rounded-md bg-[#1A7A3C] px-5 text-xs font-bold text-white hover:bg-[#15612F]"><PlusCircle size={15} />Adicionar Convênio</button>
+              ) : (
+                <button type="button" onClick={() => onNavigate("editar-fundo-arrecadacao", fundo)} className="flex h-10 items-center gap-2 rounded-md bg-[#1A7A3C] px-5 text-xs font-bold text-white hover:bg-[#15612F]"><Pencil size={15} />Editar</button>
+              )
             ) : (
               <button type="button" onClick={saveFundo} disabled={!valid} className="h-10 rounded-md bg-[#1A7A3C] px-5 text-xs font-bold text-white hover:bg-[#15612F] disabled:cursor-not-allowed disabled:opacity-50">{mode === "add" ? "Adicionar" : "Salvar"}</button>
             )}
@@ -664,7 +720,7 @@ function FundoArrecadacaoDetailPage({ mode, dados, onLogout, onNavigate }: PageP
         {mode !== "view" && <RequiredFieldsNotice />}
         {mode !== "add" && <Tabs activeTab={activeTab} setActiveTab={setActiveTab} tabs={tabs} />}
         {(mode === "add" || activeTab === "dados") && <BasicData mode={mode} fundo={fundo} setFundo={setFundo} onNavigate={onNavigate} />}
-        {mode !== "add" && activeTab === "convenios" && <ConveniosPanel fundo={fundo as FundoArrecadacao} setFundo={setFundo} />}
+        {mode !== "add" && activeTab === "convenios" && <ConveniosPanel fundo={fundo as FundoArrecadacao} setFundo={setFundo} addSignal={addConvenioSignal} />}
       </main>
 
       {savedFundo && (

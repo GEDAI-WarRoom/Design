@@ -150,7 +150,13 @@ export function AdicionarLotePagamentoPage({ onLogout, onNavigate, onViewPessoa,
                       { label: labelModalNome, key: "nome" },
                       { label: labelModalDoc, key: "documento" },
                     ]}
-                    icon={<User size={18} className="text-[#1A7A3C]" />}
+                    icon={
+                      <img
+                        src={Icons.iconeProdutorUrl}
+                        alt="Proprietário"
+                        className="w-5 h-5 object-contain"
+                      />
+                    }
                     title={`Buscar ${tituloEntidade}`}
                     subtitle={`Busque por um ${tituloEntidade.toLowerCase()} cadastrado no sistema:`}
                     onChange={(item) => {

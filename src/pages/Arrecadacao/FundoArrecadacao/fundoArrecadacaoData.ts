@@ -124,7 +124,7 @@ export const PESSOAS_JURIDICAS_FUNDO: PessoaJuridicaFundo[] = [
 export const emptyEndereco = (): EnderecoFundo => ({
   zona: "",
   cep: "",
-  estado: "Minas Gerais",
+  estado: "",
   municipio: "",
   bairro: "",
   endereco: "",
