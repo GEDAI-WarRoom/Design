@@ -1,11 +1,18 @@
 import React, { useState } from "react";
-import { ArrowLeft, Info, Check, PlusCircle, Trash2, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowLeft, Info, Check, PlusCircle, Trash2, ChevronDown, ChevronUp, FileText } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, FloatSelect, LargeTextArea, UploadField } from "../../../components/ui/FormKit";
-import { DynamicListWrapper } from "../../../components/ui/EntitySearch";
+import { DynamicListWrapper, EntitySearchInput, ProdutorInput, EstabelecimentoAgropecuarioInput, ExploracaoPecuariaInput, NucleoInput, DestinatarioInput } from "../../../components/ui/EntitySearch";
 
 const GREEN = "#1A7A3C";
 const uid = () => `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+
+const ESPECIES_MOCK = [
+  { id: 1, nome: "Bovino" }, { id: 2, nome: "Suíno" }, { id: 3, nome: "Equino" }, { id: 4, nome: "Avícola" }
+];
+const FINALIDADES_MOCK = [
+  { id: 1, nome: "Abate" }, { id: 2, nome: "Cria" }, { id: 3, nome: "Engorda" }, { id: 4, nome: "Reprodução" }
+];
 
 function Section({ title, children, defaultOpen = true }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
@@ -31,6 +38,15 @@ export function AdicionarEmissaoATAPage({ dados, onLogout, onNavigate }: { dados
   const [placa, setPlaca] = useState("");
   const [observacoes, setObservacoes] = useState("");
   const [atestados, setAtestados] = useState([{ id: uid(), tipo: "", arquivo: "" }]);
+
+  // Lógica de Cascata - Procedência
+  const [respProc, setRespProc] = useState("");
+  const [estabProc, setEstabProc] = useState("");
+  const [exploracaoProc, setExploracaoProc] = useState("");
+  const [nucleoProc, setNucleoProc] = useState("");
+
+  // Lógica - Destino
+  const [respDest, setRespDest] = useState("");
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
@@ -58,39 +74,95 @@ export function AdicionarEmissaoATAPage({ dados, onLogout, onNavigate }: { dados
 
         <Section title="Informações Básicas">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <FloatSelect label="Espécie" required value={especie} onChange={setEspecie} options={[{value:"Bovino", label:"Bovino"}, {value:"Suíno", label:"Suíno"}]} />
-            <FloatSelect label="Finalidade de Transferência" required value={finalidade} onChange={setFinalidade} options={[{value:"Abate", label:"Abate"}, {value:"Cria", label:"Cria"}]} />
+            <EntitySearchInput
+              label="Espécie" placeholder="Buscar Espécie..." required value={especie}
+              data={ESPECIES_MOCK} columns={[{ label: "Espécie", key: "nome" }]} searchKeys={["nome"]}
+              onChange={(e) => setEspecie(e.nome)} icon={<FileText size={18} className="text-[#1A7A3C]" />}
+            />
+            <EntitySearchInput
+              label="Finalidade de Transferência" placeholder="Buscar Finalidade..." required value={finalidade}
+              data={FINALIDADES_MOCK} columns={[{ label: "Finalidade", key: "nome" }]} searchKeys={["nome"]}
+              onChange={(e) => setFinalidade(e.nome)} icon={<FileText size={18} className="text-[#1A7A3C]" />}
+            />
           </div>
         </Section>
 
         <Section title="Informações da Procedência">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-4">
-            <FloatInput label="Tipo de Procedência" value="Estabelecimento Agropecuário" disabled />
-            <FloatInput label="Responsável de Procedência" required value="José Teixeira Guimarães" disabled />
-            <FloatSelect label="Estabelecimento Agropecuário" required value="" onChange={()=>{}} options={[{value:"1", label:"Fazenda Recanto dos Pássaros"}]} />
-            <FloatSelect label="Exploração Pecuária" required value="" onChange={()=>{}} options={[{value:"1", label:"3100203003910001"}]} />
-            <FloatSelect label="Núcleo de Produção" required value="" onChange={()=>{}} options={[{value:"1", label:"Núcleo A"}]} />
-          </div>
-          {/* Readonly Grids de Situação */}
-          <div className="bg-gray-50 p-4 rounded-md border border-gray-200">
-            <h4 className="text-sm font-semibold mb-3 text-gray-700">Situação do Estabelecimento</h4>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-               <FloatInput label="Estado" value="Suspenso" disabled />
-               <FloatInput label="Data de Início" value="01/01/2026" disabled />
-               <FloatInput label="Data de Validade" value="01/08/2027" disabled />
-               <FloatInput label="Status" value="1. Código_S13" disabled />
-               <FloatInput label="Observação" value="Irregularidade em 2025" disabled />
+          <div className="flex flex-col gap-5 mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+               <FloatInput label="Tipo de Procedência" value="Estabelecimento Agropecuário" disabled />
             </div>
+
+            {/* Início da cascata com os componentes especialistas */}
+            <ProdutorInput 
+              value={respProc} 
+              required
+              onChange={(e) => { setRespProc(e.nome); setEstabProc(""); setExploracaoProc(""); setNucleoProc(""); }} 
+            />
+            
+            {respProc && (
+              <div className="pt-2 border-t border-gray-100 animate-fadeIn">
+                <EstabelecimentoAgropecuarioInput 
+                  value={estabProc} 
+                  required
+                  onChange={(e) => { setEstabProc(e.nome); setExploracaoProc(""); setNucleoProc(""); }} 
+                />
+              </div>
+            )}
+
+            {estabProc && (
+              <div className="pt-2 border-t border-gray-100 animate-fadeIn flex flex-col gap-4">
+                <ExploracaoPecuariaInput 
+                  value={exploracaoProc} 
+                  required
+                  onChange={(e) => { setExploracaoProc(e.codigo); setNucleoProc(""); }} 
+                />
+                
+                {/* Tabela Readonly que aparece após estabelecimento */}
+                <div className="bg-gray-50 p-4 rounded-md border border-gray-200 mt-2">
+                  <h4 className="text-sm font-semibold mb-3 text-gray-700">Situação do Estabelecimento</h4>
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                    <FloatInput label="Estado" value="Suspenso" disabled />
+                    <FloatInput label="Data de Início" value="01/01/2026" disabled />
+                    <FloatInput label="Data de Validade" value="01/08/2027" disabled />
+                    <FloatInput label="Status" value="1. Código_S13" disabled />
+                    <FloatInput label="Observação" value="Irregularidade em 2025" disabled />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {exploracaoProc && (
+              <div className="pt-2 border-t border-gray-100 animate-fadeIn">
+                <NucleoInput 
+                  value={nucleoProc} 
+                  required
+                  onChange={(e) => setNucleoProc(e.nome)} 
+                />
+              </div>
+            )}
           </div>
         </Section>
 
         <Section title="Informações de Destino">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <FloatSelect label="Tipo de Destino" required value="Estabelecimento Agropecuário" onChange={()=>{}} options={[{value:"Estabelecimento Agropecuário", label:"Estabelecimento Agropecuário"}]} />
-            <FloatSelect label="Responsável de Destino" required value="" onChange={()=>{}} options={[{value:"1", label:"João Bosco"}]} />
-            <FloatInput label="Estabelecimento Agropecuário" value="Fazenda Esperança" disabled />
-            <FloatInput label="Exploração Pecuária" value="3100203003910002" disabled />
-            <FloatInput label="Núcleo de Produção" value="Núcleo B" disabled />
+          <div className="flex flex-col gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <FloatSelect label="Tipo de Destino" required value="Frigorífico" onChange={()=>{}} options={[{value:"Frigorífico", label:"Frigorífico"}]} disabled />
+            </div>
+
+            <DestinatarioInput 
+              value={respDest} 
+              required
+              onChange={(e) => setRespDest(e.nome)} 
+            />
+
+            {respDest && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 pt-4 border-t border-gray-100 animate-fadeIn">
+                <FloatInput label="Estabelecimento Agropecuário" value="Frigorífico Sul - Matriz" disabled />
+                <FloatInput label="Exploração Pecuária" value="3100203003910002" disabled />
+                <FloatInput label="Núcleo de Produção" value="Núcleo Principal" disabled />
+              </div>
+            )}
           </div>
         </Section>
 
@@ -165,7 +237,7 @@ export function AdicionarEmissaoATAPage({ dados, onLogout, onNavigate }: { dados
       </main>
 
       {isSucesso && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4 animate-fadeIn">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
             <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4"><Check size={28} className="text-[#1A7A3C]" strokeWidth={3} /></div>
             <h3 className="text-lg font-bold text-gray-900">ATA Gravada com Sucesso!</h3>

@@ -16,7 +16,6 @@ export function VisualizarEmissaoATAPage({ dados, onLogout, onNavigate }: { dado
   const [motivoCancelamento, setMotivoCancelamento] = useState("");
 
   const handleAction = (acao: string) => {
-    // Fecha os modais e volta pra lista simulando o processamento
     setModalEmitir(false);
     setModalCancelar(false);
     onNavigate("emissao-ata");
@@ -35,7 +34,7 @@ export function VisualizarEmissaoATAPage({ dados, onLogout, onNavigate }: { dado
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 w-full">
             <h1 className="text-2xl font-semibold text-gray-900">Visualizar ATA</h1>
             
-            {/* Ações (Copiar, Pagar, Emitir, Cancelar, Baixar) */}
+            {/* Ações Integradas (C.A. 4 e 5) */}
             <div className="flex flex-wrap items-center gap-2">
               <button className="px-4 h-9 bg-white border border-gray-300 text-gray-700 text-xs font-bold rounded-md hover:bg-gray-50 transition shadow-sm">
                 Copiar ATA
@@ -65,14 +64,55 @@ export function VisualizarEmissaoATAPage({ dados, onLogout, onNavigate }: { dado
         <section className="bg-white rounded-xl shadow-sm p-6 border border-gray-200 mt-2">
           <h2 className="text-base font-semibold text-gray-800 mb-5 border-b border-gray-100 pb-3">Informações Básicas e Situação</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <FloatInput label="Série - Número da ATA" value={ata.serie} disabled />
-            <FloatInput label="Situação" value={ata.situacao} disabled />
-            <FloatInput label="Espécie" value={ata.especie || "Bovino"} disabled />
-            <FloatInput label="Finalidade" value={ata.finalidade || "Abate"} disabled />
+            <FloatInput label="Série - Número da ATA" value={ata.serie || "AR-123456"} disabled onChange={()=>{}} />
+            <FloatInput label="Situação" value={ata.situacao} disabled onChange={()=>{}} />
+            <FloatInput label="Espécie" value={ata.especie || "Bovino"} disabled onChange={()=>{}} />
+            <FloatInput label="Finalidade" value={ata.finalidade || "Abate"} disabled onChange={()=>{}} />
           </div>
         </section>
-        
-        {/* Aqui viriam as outras sections como ReadOnly. Omitido para economizar tokens mantendo a lógica central */}
+
+        <section className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+          <h2 className="text-base font-semibold text-gray-800 mb-5 border-b border-gray-100 pb-3">Informações da Procedência</h2>
+          <div className="flex flex-col gap-5">
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <FloatInput label="Tipo de Procedência" value="Estabelecimento Agropecuário" disabled onChange={()=>{}} />
+             </div>
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <FloatInput label="Responsável de Procedência" value="José Teixeira Guimarães" disabled onChange={()=>{}} />
+                <FloatInput label="CPF" value="550.134.236-88" disabled onChange={()=>{}} />
+             </div>
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2 border-t border-gray-100">
+                <FloatInput label="Estabelecimento Agropecuário" value="31002030039 - Fazenda Rio das Ostras" disabled onChange={()=>{}} />
+                <FloatInput label="Código do Estabelecimento" value="31002030039" disabled onChange={()=>{}} />
+             </div>
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2 border-t border-gray-100">
+                <FloatInput label="Exploração Pecuária" value="3100203003910001" disabled onChange={()=>{}} />
+                <FloatInput label="Espécie Explorada" value="Bovino" disabled onChange={()=>{}} />
+             </div>
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2 border-t border-gray-100">
+                <FloatInput label="Núcleo de Produção" value="Núcleo A" disabled onChange={()=>{}} />
+                <FloatInput label="Código do Núcleo" value="3100203003910001-A" disabled onChange={()=>{}} />
+             </div>
+          </div>
+        </section>
+
+        <section className="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+          <h2 className="text-base font-semibold text-gray-800 mb-5 border-b border-gray-100 pb-3">Informações de Destino</h2>
+          <div className="flex flex-col gap-5">
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <FloatInput label="Tipo de Destino" value="Frigorífico" disabled onChange={()=>{}} />
+             </div>
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <FloatInput label="Responsável de Destino" value="João Bosco" disabled onChange={()=>{}} />
+                <FloatInput label="CPF" value="999.888.777-66" disabled onChange={()=>{}} />
+             </div>
+             <div className="grid grid-cols-1 md:grid-cols-3 gap-5 pt-4 border-t border-gray-100">
+                <FloatInput label="Estabelecimento Agropecuário" value="Frigorífico Sul" disabled onChange={()=>{}} />
+                <FloatInput label="Exploração Pecuária" value="3100203003910002" disabled onChange={()=>{}} />
+                <FloatInput label="Núcleo de Produção" value="Núcleo Principal" disabled onChange={()=>{}} />
+             </div>
+          </div>
+        </section>
       </main>
 
       {/* MODAL DE EMITIR ATA */}
@@ -81,7 +121,7 @@ export function VisualizarEmissaoATAPage({ dados, onLogout, onNavigate }: { dado
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-gray-900">Emitir ATA</DialogTitle>
             <DialogDescription className="text-gray-500 mt-2">
-              Confirme os dados de validade para emissão da Guia de Trânsito.
+              Confirme os dados de validade para emissão da Guia de Trânsito Animal.
             </DialogDescription>
           </DialogHeader>
           
@@ -91,8 +131,8 @@ export function VisualizarEmissaoATAPage({ dados, onLogout, onNavigate }: { dado
           </div>
 
           <div className="flex justify-end gap-3 mt-8">
-             <button onClick={() => setModalEmitir(false)} className="px-5 h-11 border border-gray-300 rounded-md text-gray-700 font-semibold hover:bg-gray-50">Cancelar</button>
-             <button onClick={() => handleAction("emitir")} disabled={!validade} className="px-5 h-11 bg-[#1A7A3C] text-white rounded-md font-semibold hover:opacity-90 disabled:opacity-50">Emitir Documento</button>
+             <button onClick={() => setModalEmitir(false)} className="px-5 h-11 border border-gray-300 rounded-md text-gray-700 font-semibold hover:bg-gray-50 transition">Cancelar</button>
+             <button onClick={() => handleAction("emitir")} disabled={!validade} className="px-5 h-11 bg-[#1A7A3C] text-white rounded-md font-semibold hover:opacity-90 disabled:opacity-50 transition shadow-sm">Emitir Documento</button>
           </div>
         </DialogContent>
       </Dialog>
@@ -113,8 +153,8 @@ export function VisualizarEmissaoATAPage({ dados, onLogout, onNavigate }: { dado
           </div>
 
           <div className="flex justify-end gap-3 mt-8">
-             <button onClick={() => setModalCancelar(false)} className="px-5 h-11 border border-gray-300 rounded-md text-gray-700 font-semibold hover:bg-gray-50">Voltar</button>
-             <button onClick={() => handleAction("cancelar")} disabled={!motivoCancelamento} className="px-5 h-11 bg-red-600 text-white rounded-md font-semibold hover:bg-red-700 disabled:opacity-50">Confirmar Cancelamento</button>
+             <button onClick={() => setModalCancelar(false)} className="px-5 h-11 border border-gray-300 rounded-md text-gray-700 font-semibold hover:bg-gray-50 transition">Voltar</button>
+             <button onClick={() => handleAction("cancelar")} disabled={!motivoCancelamento} className="px-5 h-11 bg-red-600 text-white rounded-md font-semibold hover:bg-red-700 disabled:opacity-50 transition shadow-sm">Confirmar Cancelamento</button>
           </div>
         </DialogContent>
       </Dialog>

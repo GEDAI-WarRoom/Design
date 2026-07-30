@@ -1,9 +1,27 @@
 import { useState } from "react";
-import { ArrowLeft, PlusCircle, Search, SlidersHorizontal, Eye as ViewIcon, Pencil } from "lucide-react";
+import { ArrowLeft, PlusCircle, Search, SlidersHorizontal, Eye as ViewIcon, Pencil, FileText } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatSelect, FloatInput } from "../../../components/ui/FormKit";
+import { EntitySearchInput } from "../../../components/ui/EntitySearch";
+import { ProdutorInput, DestinatarioInput, NucleoInput } from "../../../components/ui/EntitySearch";
 
 const GREEN = "#1A7A3C";
+
+// MOCKS
+const ESPECIES_MOCK = [
+  { id: 1, nome: "Bovino" },
+  { id: 2, nome: "Suíno" },
+  { id: 3, nome: "Equino" },
+  { id: 4, nome: "Avícola" },
+];
+
+const FINALIDADES_MOCK = [
+  { id: 1, nome: "Abate" },
+  { id: 2, nome: "Cria" },
+  { id: 3, nome: "Engorda" },
+  { id: 4, nome: "Reprodução" },
+  { id: 5, nome: "Exposição" },
+];
 
 const MOCK_ATAS = [
   {
@@ -34,7 +52,12 @@ export function EmissaoATAPage({ onLogout, onNavigate }: { onLogout: () => void;
   const [busca, setBusca] = useState("");
   const [especie, setEspecie] = useState("");
   const [finalidade, setFinalidade] = useState("");
+  const [dataEmissao, setDataEmissao] = useState("");
+  const [responsavelProc, setResponsavelProc] = useState("");
+  const [responsavelDest, setResponsavelDest] = useState("");
+  const [nucleo, setNucleo] = useState("");
   const [situacao, setSituacao] = useState("");
+  
   const [showFilters, setShowFilters] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
 
@@ -82,13 +105,51 @@ export function EmissaoATAPage({ onLogout, onNavigate }: { onLogout: () => void;
           </div>
 
           {showFilters && (
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 animate-fadeIn">
-              <FloatSelect label="Espécie" value={especie} onChange={setEspecie} options={[{ value: "Bovino", label: "Bovino" }, { value: "Suíno", label: "Suíno" }]} />
-              <FloatSelect label="Finalidade" value={finalidade} onChange={setFinalidade} options={[{ value: "Abate", label: "Abate" }, { value: "Cria", label: "Cria" }]} />
-              <FloatInput type="date" label="Data da Emissão" value="" onChange={() => {}} />
-              <FloatSelect label="Situação" value={situacao} onChange={setSituacao} options={[{ value: "Gravada", label: "Gravada" }, { value: "Paga", label: "Paga" }, { value: "Emitida", label: "Emitida" }, { value: "Cancelada", label: "Cancelada" }]} />
-              <div className="md:col-span-4 flex justify-end">
-                <button onClick={() => setHasSearched(true)} className="px-6 h-12 bg-[#1A7A3C] text-white rounded-md font-semibold text-sm hover:opacity-90">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6 animate-fadeIn p-4 border border-gray-100 rounded-lg bg-gray-50/50">
+              
+              <EntitySearchInput
+                label="Espécie"
+                placeholder="Buscar Espécie..."
+                value={especie}
+                data={ESPECIES_MOCK}
+                columns={[{ label: "Espécie", key: "nome" }]}
+                searchKeys={["nome"]}
+                onChange={(e) => setEspecie(e.nome)}
+                icon={<FileText size={18} className="text-[#1A7A3C]" />}
+              />
+              
+              <EntitySearchInput
+                label="Finalidade de Transferência"
+                placeholder="Buscar Finalidade..."
+                value={finalidade}
+                data={FINALIDADES_MOCK}
+                columns={[{ label: "Finalidade", key: "nome" }]}
+                searchKeys={["nome"]}
+                onChange={(e) => setFinalidade(e.nome)}
+                icon={<FileText size={18} className="text-[#1A7A3C]" />}
+              />
+
+              <ProdutorInput value={responsavelProc} onChange={(e) => setResponsavelProc(e.nome)} />
+              <DestinatarioInput value={responsavelDest} onChange={(e) => setResponsavelDest(e.nome)} />
+              <NucleoInput value={nucleo} onChange={(e) => setNucleo(e.nome)} />
+
+              <div className="grid grid-cols-2 gap-4">
+                <FloatInput type="date" label="Data da Emissão" value={dataEmissao} onChange={setDataEmissao} />
+                <FloatSelect 
+                  label="Situação" 
+                  value={situacao} 
+                  onChange={setSituacao} 
+                  options={[
+                    { value: "Gravada", label: "Gravada" }, 
+                    { value: "Paga", label: "Paga" }, 
+                    { value: "Emitida", label: "Emitida" }, 
+                    { value: "Cancelada", label: "Cancelada" }
+                  ]} 
+                />
+              </div>
+
+              <div className="md:col-span-2 flex justify-end mt-2 border-t border-gray-200 pt-4">
+                <button onClick={() => setHasSearched(true)} className="px-8 h-12 bg-[#1A7A3C] text-white rounded-md font-semibold text-sm hover:opacity-90 shadow-sm">
                   Pesquisar
                 </button>
               </div>
