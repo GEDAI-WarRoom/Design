@@ -32,6 +32,7 @@ import {
 	Scale,
 	ScrollText,
 	LineChart,
+	Ham,
 	RefreshCw,
 	CalendarDays,
 	ScanBarcode,
@@ -66,6 +67,7 @@ export const cadastrosCategories: MenuCategory[] = [
 				route: "aeroporto-porto",
 				icon: <TowerControl size={16} />,
 			},
+			{ label: "Açougue", route: "acougue", icon: <Ham size={16} /> },
 			{
 				label: "Divisão Municipal",
 				route: "divisao-municipal",
@@ -87,6 +89,7 @@ export const cadastrosCategories: MenuCategory[] = [
 					/>
 				),
 			},
+			
 			{
 				label: "Venda de Propriedade",
 				route: "venda-propriedade",
