@@ -1,26 +1,32 @@
 import { useState } from "react";
-import { ArrowLeft, PlusCircle, Search, SlidersHorizontal, Eye as ViewIcon, Pencil, FileText } from "lucide-react";
+import { ArrowLeft, PlusCircle, Search, SlidersHorizontal, Eye as ViewIcon, Pencil, Dna, Route, Calendar } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatSelect, FloatInput } from "../../../components/ui/FormKit";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
-import { ProdutorInput, DestinatarioInput, NucleoInput } from "../../../components/ui/EntitySearch";
+import { NucleoInput } from "../../../components/ui/EntitySearch";
 
-const GREEN = "#1A7A3C";
+// IMPORTAÇÃO UNIFICADA DOS ÍCONES
+import * as Icons from "../../../imports/icons";
 
 // MOCKS
 const ESPECIES_MOCK = [
-  { id: 1, nome: "Bovino" },
-  { id: 2, nome: "Suíno" },
-  { id: 3, nome: "Equino" },
-  { id: 4, nome: "Avícola" },
+  { id: 1, nome: "Bovino", grupoEspecie: "Bovídeos" },
+  { id: 2, nome: "Bubalino", grupoEspecie: "Bovídeos" },
+  { id: 3, nome: "Suíno", grupoEspecie: "Suídeos" },
+  { id: 4, nome: "Galinha", grupoEspecie: "Aves" },
+  { id: 5, nome: "Equino", grupoEspecie: "Equídeos" },
 ];
 
 const FINALIDADES_MOCK = [
-  { id: 1, nome: "Abate" },
+  { id: 1, nome: "Atendimento veterinário" },
   { id: 2, nome: "Cria" },
   { id: 3, nome: "Engorda" },
-  { id: 4, nome: "Reprodução" },
-  { id: 5, nome: "Exposição" },
+  { id: 4, nome: "Exportação" },
+  { id: 5, nome: "Pesquisa" },
+  { id: 6, nome: "Quarentena" },
+  { id: 7, nome: "Recria" },
+  { id: 8, nome: "Reprodução" },
+  { id: 9, nome: "Tratamento veterinário" },
 ];
 
 const MOCK_ATAS = [
@@ -28,7 +34,7 @@ const MOCK_ATAS = [
     id: "1",
     serie: "AR-123456",
     especie: "Bovino",
-    finalidade: "Abate",
+    finalidade: "Atendimento veterinário",
     estabelecimento: "31002030039 - Fazenda Rio das Ostras",
     procedencia: "550.134.236-88 - José Teixeira Guimarães",
     destinatario: "550.134.236-88 - João Bosco",
@@ -53,13 +59,34 @@ export function EmissaoATAPage({ onLogout, onNavigate }: { onLogout: () => void;
   const [especie, setEspecie] = useState("");
   const [finalidade, setFinalidade] = useState("");
   const [dataEmissao, setDataEmissao] = useState("");
-  const [responsavelProc, setResponsavelProc] = useState("");
-  const [responsavelDest, setResponsavelDest] = useState("");
+
+  // Responsáveis
+  const [responsavelProcedencia, setResponsavelProcedencia] = useState("");
+  const [responsavelDestino, setResponsavelDestino] = useState("");
+
+  // Filtros Agropecuários
+  const [estabelecimento, setEstabelecimento] = useState("");
+  const [exploracao, setExploracao] = useState("");
   const [nucleo, setNucleo] = useState("");
   const [situacao, setSituacao] = useState("");
-  
+
   const [showFilters, setShowFilters] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+
+  // Auxiliar para formatar campos que contêm "CPF/CNPJ - Nome" com quebra de linha
+  const formatNomeCpf = (texto: string) => {
+    if (!texto) return "-";
+    const partes = texto.split(" - ");
+    if (partes.length > 1) {
+      return (
+        <div className="flex flex-col">
+          <span className="text-xs text-gray-500 font-normal">{partes[0]}</span>
+          <span className="font-normal text-gray-500 truncate max-w-[180px]">{partes.slice(1).join(" - ")}</span>
+        </div>
+      );
+    }
+    return <span className="text-gray-700">{texto}</span>;
+  };
 
   const filtrados = MOCK_ATAS.filter((r) => {
     const b = busca.toLowerCase();
@@ -82,7 +109,7 @@ export function EmissaoATAPage({ onLogout, onNavigate }: { onLogout: () => void;
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-semibold text-gray-900">Emissão de ATA</h1>
             <button onClick={() => onNavigate("adicionar-emissao-ata")} className="px-5 py-3 rounded-md bg-[#1A7A3C] text-white text-sm font-semibold hover:opacity-90 shadow-sm flex items-center gap-2">
-              <PlusCircle size={18} /> Nova ATA
+              Adicionar ATA
             </button>
           </div>
         </div>
@@ -105,95 +132,149 @@ export function EmissaoATAPage({ onLogout, onNavigate }: { onLogout: () => void;
           </div>
 
           {showFilters && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6 animate-fadeIn p-4 border border-gray-100 rounded-lg bg-gray-50/50">
-              
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-x-4 gap-y-6 animate-fadeIn items-end">
+
+              {/* Linha 1 */}
               <EntitySearchInput
                 label="Espécie"
                 placeholder="Buscar Espécie..."
                 value={especie}
                 data={ESPECIES_MOCK}
-                columns={[{ label: "Espécie", key: "nome" }]}
-                searchKeys={["nome"]}
+                columns={[
+                  { label: "Espécie", key: "nome" },
+                  { label: "Grupo de Espécie", key: "grupoEspecie" }
+                ]}
+                searchKeys={["nome", "grupoEspecie"]}
                 onChange={(e) => setEspecie(e.nome)}
-                icon={<FileText size={18} className="text-[#1A7A3C]" />}
+                icon={<Dna size={18} className="text-[#1A7A3C]" />}
               />
-              
+
               <EntitySearchInput
-                label="Finalidade de Transferência"
+                label="Finalidade de Trânsito"
                 placeholder="Buscar Finalidade..."
                 value={finalidade}
                 data={FINALIDADES_MOCK}
                 columns={[{ label: "Finalidade", key: "nome" }]}
                 searchKeys={["nome"]}
                 onChange={(e) => setFinalidade(e.nome)}
-                icon={<FileText size={18} className="text-[#1A7A3C]" />}
+                icon={<Route size={18} className="text-[#1A7A3C]" />}
               />
 
-              <ProdutorInput value={responsavelProc} onChange={(e) => setResponsavelProc(e.nome)} />
-              <DestinatarioInput value={responsavelDest} onChange={(e) => setResponsavelDest(e.nome)} />
-              <NucleoInput value={nucleo} onChange={(e) => setNucleo(e.nome)} />
+              <EntitySearchInput
+                label="Responsável de Procedência"
+                placeholder="Buscar Responsável..."
+                value={responsavelProcedencia}
+                data={[]}
+                columns={[{ label: "Nome/CPF/CNPJ", key: "nome" }]}
+                searchKeys={["nome"]}
+                onChange={(e) => setResponsavelProcedencia(e.nome)}
+                icon={<img src={Icons.iconeFornecedorUrl} alt="Responsável Procedência" className="w-5 h-5 object-contain" />}
+              />
 
-              <div className="grid grid-cols-2 gap-4">
-                <FloatInput type="date" label="Data da Emissão" value={dataEmissao} onChange={setDataEmissao} />
-                <FloatSelect 
-                  label="Situação" 
-                  value={situacao} 
-                  onChange={setSituacao} 
-                  options={[
-                    { value: "Gravada", label: "Gravada" }, 
-                    { value: "Paga", label: "Paga" }, 
-                    { value: "Emitida", label: "Emitida" }, 
-                    { value: "Cancelada", label: "Cancelada" }
-                  ]} 
-                />
-              </div>
+              <EntitySearchInput
+                label="Responsável de Destino"
+                placeholder="Buscar Responsável..."
+                value={responsavelDestino}
+                data={[]}
+                columns={[{ label: "Nome/CPF/CNPJ", key: "nome" }]}
+                searchKeys={["nome"]}
+                onChange={(e) => setResponsavelDestino(e.nome)}
+                icon={<img src={Icons.iconeDestinatarioUrl} alt="Responsável Destino" className="w-5 h-5 object-contain" />}
+              />
 
-              <div className="md:col-span-2 flex justify-end mt-2 border-t border-gray-200 pt-4">
-                <button onClick={() => setHasSearched(true)} className="px-8 h-12 bg-[#1A7A3C] text-white rounded-md font-semibold text-sm hover:opacity-90 shadow-sm">
+              {/* Linha 2 */}
+              <EntitySearchInput
+                label="Estabelecimento Agropecuário"
+                placeholder="Buscar Estabelecimento..."
+                value={estabelecimento}
+                data={[]}
+                columns={[{ label: "Estabelecimento", key: "nome" }]}
+                searchKeys={["nome"]}
+                onChange={(e) => setEstabelecimento(e.nome)}
+                icon={<img src={Icons.iconeEstabelecimentoUrl} alt="Estabelecimento" className="w-5 h-5 object-contain" />}
+              />
+
+              <EntitySearchInput
+                label="Exploração Pecuária"
+                placeholder="Buscar Exploração..."
+                value={exploracao}
+                data={[]}
+                columns={[{ label: "Exploração", key: "nome" }]}
+                searchKeys={["nome"]}
+                onChange={(e) => setExploracao(e.nome)}
+                icon={<img src={Icons.iconeExploracaoUrl} alt="Exploração Pecuária" className="w-5 h-5 object-contain" />}
+              />
+
+              <NucleoInput
+                value={nucleo}
+                onChange={(e) => setNucleo(e.nome)}
+                icon={<img src={Icons.iconeNucleoProducaoUrl} alt="Núcleo" className="w-5 h-5 object-contain" />}
+              />
+
+              <FloatInput type="date" label="Data da Emissão" value={dataEmissao} icon={<Calendar size={18} className="text-[#1A7A3C]" />}
+                onChange={setDataEmissao} />
+
+              {/* Linha 3 */}
+              <FloatSelect
+                label="Situação"
+                value={situacao}
+                onChange={setSituacao}
+                options={[
+                  { value: "Gravada", label: "Gravada" },
+                  { value: "Paga", label: "Paga" },
+                  { value: "Emitida", label: "Emitida" },
+                  { value: "Cancelada", label: "Cancelada" }
+                ]}
+              />
+
+              <div className="md:col-span-3 flex justify-end">
+                <button
+                  onClick={() => setHasSearched(true)}
+                  className="px-8 h-12 bg-[#1A7A3C] text-white rounded-md font-semibold text-sm hover:opacity-90 shadow-sm w-full md:w-auto"
+                >
                   Pesquisar
                 </button>
               </div>
+
             </div>
           )}
 
           {hasSearched && (
             <div className="overflow-x-auto mt-2">
-              <table className="w-full text-sm text-left">
-                <thead className="text-gray-600 uppercase border-b border-gray-100">
+              <table className="w-full text-sm text-left border-collapse">
+                <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
-                    <th className="px-4 py-3">Série - Número</th>
-                    <th className="px-4 py-3">Espécie</th>
-                    <th className="px-4 py-3">Finalidade</th>
-                    <th className="px-4 py-3">Estabelecimento</th>
-                    <th className="px-4 py-3">Procedência</th>
-                    <th className="px-4 py-3">Destinatário</th>
-                    <th className="px-4 py-3">Data</th>
-                    <th className="px-4 py-3">Situação</th>
-                    <th className="px-4 py-3 text-right">Ações</th>
+                    <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Série - Número da ATA</th>
+                    <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Espécie</th>
+                    <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Finalidade de Transferência</th>
+                    <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Estabelecimento Agropecuário</th>
+                    <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Procedência</th>
+                    <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Destinatário</th>
+                    <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Data de Emissão</th>
+                    <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Situação</th>
+                    <th className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Ações</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-gray-100">
                   {filtrados.map((r) => (
-                    <tr key={r.id} className="border-b border-gray-50 hover:bg-gray-50 transition">
-                      <td className="px-4 py-3 font-medium text-gray-800">{r.serie}</td>
+                    <tr key={r.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-3 text-gray-600">{r.serie}</td>
                       <td className="px-4 py-3 text-gray-600">{r.especie}</td>
                       <td className="px-4 py-3 text-gray-600">{r.finalidade}</td>
-                      <td className="px-4 py-3 text-gray-600">{r.estabelecimento}</td>
-                      <td className="px-4 py-3 text-gray-600 truncate max-w-[150px]">{r.procedencia}</td>
-                      <td className="px-4 py-3 text-gray-600 truncate max-w-[150px]">{r.destinatario}</td>
-                      <td className="px-4 py-3 text-gray-600">{r.dataEmissao}</td>
-                      <td className="px-4 py-3">
-                        <span className={`px-2 py-1 rounded-full text-xs font-bold ${r.situacao === "Emitida" ? "bg-green-100 text-green-700" : r.situacao === "Gravada" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-700"}`}>
-                          {r.situacao}
-                        </span>
+                      <td className="px-4 py-3 text-gray-600">{formatNomeCpf(r.estabelecimento)}</td>
+                      <td className="px-4 py-3 text-gray-600">{formatNomeCpf(r.procedencia)}</td>
+                      <td className="px-4 py-3 text-gray-600">{formatNomeCpf(r.destinatario)}</td>
+                      <td className="px-4 py-3 text-gray-600 whitespace-nowrap">{r.dataEmissao}</td>
+                      <td className="px-4 py-3 text-gray-600">
+                        {r.situacao}
                       </td>
                       <td className="px-4 py-3 text-right whitespace-nowrap">
                         <div className="flex items-center justify-end gap-1">
-                          <button onClick={() => onNavigate("visualizar-emissao-ata", r)} className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md">
+                          <button onClick={() => onNavigate("visualizar-emissao-ata", r)} className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md transition-colors">
                             <ViewIcon size={18} />
                           </button>
                           {r.situacao === "Gravada" && (
-                            <button onClick={() => onNavigate("editar-emissao-ata", r)} className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md">
+                            <button onClick={() => onNavigate("editar-emissao-ata", r)} className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md transition-colors">
                               <Pencil size={18} />
                             </button>
                           )}
