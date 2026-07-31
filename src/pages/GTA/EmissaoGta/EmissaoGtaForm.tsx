@@ -5,12 +5,31 @@ import {
   Eye,
   Info,
   Search,
+  CheckCircle2,
+  Dna,
+  Truck,
+  AlertTriangle,
+  Calendar,
+  Building2,
+  Store,
+  Minus,
+  Plus,
+  Ham,
+  Map,
+  Syringe,
+  RotateCcw,
 } from "lucide-react";
-import { EntitySearchInput, DynamicListWrapper } from "../../../components/ui/EntitySearch";
+import * as Icons from "../../../imports/icons";
+import {
+  EntitySearchInput,
+  DynamicListWrapper,
+  BlocoEnderecoFields,
+
+} from "../../../components/ui/EntitySearch";
 import {
   FloatInput,
-  FloatMultiSelect,
   FloatSelect,
+  SimNao,
   LargeTextArea,
   UploadField,
 } from "../../../components/ui/FormKit";
@@ -25,8 +44,8 @@ import {
   EXPLORACOES_GTA,
   FINALIDADES_GTA,
   FRIGORIFICOS_GTA,
+  getInterdicaoGta,
   ISENCOES_TAXA_GTA,
-  ISENCOES_VACINACAO_GTA,
   MEIOS_TRANSPORTE,
   MUNICIPIOS_POR_ESTADO,
   NUCLEOS_GTA,
@@ -100,6 +119,254 @@ export function RequiredFieldsNotice() {
   );
 }
 
+function QuantityStepper({
+  value,
+  onChange,
+  disabled,
+  colorClass,
+  label,
+  max,
+}: {
+  value: number;
+  onChange: (value: number) => void;
+  disabled: boolean;
+  colorClass: string;
+  label: string;
+  max?: number;
+}) {
+  if (disabled) {
+    return <span className={`font-semibold ${colorClass}`}>{value}</span>;
+  }
+  const limite = max ?? 999999;
+  const update = (next: number) => onChange(Math.max(0, Math.min(limite, next)));
+  return (
+    <div className="mx-auto flex h-9 w-[120px] items-center overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
+      <button
+        type="button"
+        onClick={() => update(value - 1)}
+        className="flex h-full w-8 items-center justify-center text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
+        aria-label={`Diminuir ${label}`}
+      >
+        <Minus size={14} />
+      </button>
+      <input
+        type="text"
+        inputMode="numeric"
+        value={value}
+        onChange={(e) => {
+          const n = e.target.value.replace(/\D/g, "").slice(0, 6);
+          update(n ? Number(n) : 0);
+        }}
+        aria-label={label}
+        className={`h-full min-w-0 flex-1 bg-white text-center text-sm font-semibold outline-none ${colorClass}`}
+      />
+      <button
+        type="button"
+        onClick={() => update(value + 1)}
+        className="flex h-full w-8 items-center justify-center text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
+        aria-label={`Aumentar ${label}`}
+      >
+        <Plus size={14} />
+      </button>
+    </div>
+  );
+}
+
+function normalizarOpcaoMultiSelect(opcao: string | { value: string; label: string }) {
+  return typeof opcao === "string" ? { value: opcao, label: opcao } : opcao;
+}
+
+function GeolocalizacaoParada({
+  latitude,
+  longitude,
+  onChange,
+  disabled,
+}: {
+  latitude: string;
+  longitude: string;
+  onChange: (lat: string, lng: string) => void;
+  disabled?: boolean;
+}) {
+  const [modalAberto, setModalAberto] = useState(false);
+  const possuiCoordenadas = Boolean(latitude && longitude);
+
+  if (disabled) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <FloatInput label="Latitude" value={latitude} disabled />
+        <FloatInput label="Longitude" value={longitude} disabled />
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full">
+      {!possuiCoordenadas ? (
+        <button
+          type="button"
+          onClick={() => setModalAberto(true)}
+          className="w-full flex items-center justify-center gap-2 border border-[#1A7A3C] rounded-md h-11 text-sm font-semibold text-[#1A7A3C] hover:bg-green-50 transition shadow-sm cursor-pointer"
+        >
+          <Map size={16} /> Adicionar Coordenadas
+        </button>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end animate-fade-in">
+          <div className="md:col-span-2">
+            <button
+              type="button"
+              onClick={() => setModalAberto(true)}
+              className="w-full flex items-center justify-center border border-[#1A7A3C] rounded-md h-11 bg-white hover:bg-green-50/30 text-[#1A7A3C] transition cursor-pointer"
+            >
+              <Map size={18} />
+            </button>
+          </div>
+          <div className="md:col-span-5">
+            <FloatInput label="Latitude" value={latitude} disabled />
+          </div>
+          <div className="md:col-span-5">
+            <FloatInput label="Longitude" value={longitude} disabled />
+          </div>
+        </div>
+      )}
+
+      {modalAberto && (
+        <MapModal
+          onClose={() => setModalAberto(false)}
+          onConfirm={(lat, lng) => {
+            onChange(lat, lng);
+            setModalAberto(false);
+          }}
+          initialLat={latitude}
+          initialLng={longitude}
+        />
+      )}
+    </div>
+  );
+}
+
+function LocalParadaGeolocalizacao({
+  especieGrandesAnimais,
+  possuiParadaDescanso,
+  onChangePossuiParada,
+  endereco,
+  onChangeEndereco,
+  onSetMultipleFieldsEndereco,
+  latitude,
+  longitude,
+  onChangeGeolocalizacao,
+  disabled,
+}: {
+  especieGrandesAnimais: boolean;
+  possuiParadaDescanso: "Sim" | "Não" | "";
+  onChangePossuiParada: (valor: "Sim" | "Não") => void;
+  endereco: EnderecoState;
+  onChangeEndereco: (key: keyof EnderecoState, value: string) => void;
+  onSetMultipleFieldsEndereco: (fields: Partial<EnderecoState>) => void;
+  latitude: string;
+  longitude: string;
+  onChangeGeolocalizacao: (lat: string, lng: string) => void;
+  disabled?: boolean;
+}) {
+  if (especieGrandesAnimais) {
+    return (
+      <BlocoEnderecoFields
+        title="Informações de Localização do Local de Parada"
+        data={endereco}
+        tipoEstado="normal"
+        onChange={onChangeEndereco}
+        onSetMultipleFields={onSetMultipleFieldsEndereco}
+      />
+    );
+  }
+
+  return (
+    <>
+      <SimNao
+        label="Possui Parada para Descanso?"
+        name="possuiParadaDescanso"
+        required
+        value={possuiParadaDescanso}
+        onChange={(v) => onChangePossuiParada((v ? "Sim" : "Não") as "Sim" | "Não")}
+        disabled={disabled}
+      />
+      {possuiParadaDescanso === "Sim" && (
+        <div className="rounded-lg border border-gray-100 bg-gray-50/50 p-4">
+          <GeolocalizacaoParada
+            latitude={latitude}
+            longitude={longitude}
+            onChange={onChangeGeolocalizacao}
+            disabled={disabled}
+          />
+        </div>
+      )}
+    </>
+  );
+}
+
+function MeioTransporteSelector({
+  label,
+  value,
+  options,
+  onChange,
+  required,
+  disabled,
+}: {
+  label: string;
+  value: string[];
+  options: (string | { value: string; label: string })[];
+  onChange: (value: string[]) => void;
+  required?: boolean;
+  disabled?: boolean;
+}) {
+  const opcoes = options.map(normalizarOpcaoMultiSelect);
+
+  const alternar = (opcaoValue: string) => {
+    if (disabled) return;
+    if (value.includes(opcaoValue)) {
+      onChange(value.filter((item) => item !== opcaoValue));
+    } else {
+      onChange([...value, opcaoValue]);
+    }
+  };
+
+  return (
+    <div>
+      <span className="block text-sm font-medium text-gray-700 mb-2">
+        {label}
+        {required && <span className="text-red-500 ml-0.5">*</span>}
+      </span>
+      <div className="flex flex-wrap gap-2">
+        {opcoes.map((opcao) => {
+          const selecionado = value.includes(opcao.value);
+          return (
+            <button
+              key={opcao.value}
+              type="button"
+              disabled={disabled}
+              onClick={() => alternar(opcao.value)}
+              aria-pressed={selecionado}
+              className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition ${selecionado
+                ? "bg-green-50 text-[#1A7A3C]"
+                : "bg-gray-50 text-gray-600 hover:bg-gray-100"
+                } ${disabled ? "opacity-60 cursor-not-allowed" : ""}`}
+            >
+              <span
+                className={`flex h-4 w-4 items-center justify-center rounded border ${selecionado
+                  ? "border-[#1A7A3C] bg-[#1A7A3C] text-white"
+                  : "border-gray-300 bg-white"
+                  }`}
+              >
+                {selecionado && <CheckCircle2 size={12} strokeWidth={3} />}
+              </span>
+              {opcao.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function EntityPicker({
   label,
   value,
@@ -110,6 +377,10 @@ function EntityPicker({
   codeLabel = "Código",
   codeKey = "codigo",
   placeholder,
+  columns,
+  searchKeys,
+  icon,
+  semComplemento,
 }: {
   label: string;
   value: EntidadeGta | null;
@@ -120,10 +391,21 @@ function EntityPicker({
   codeLabel?: string;
   codeKey?: "codigo" | "documento";
   placeholder?: string;
+  columns?: { label: string; key: string }[];
+  searchKeys?: string[];
+  icon?: ReactNode;
+  semComplemento?: boolean;
 }) {
   const codigo = value?.[codeKey] ?? "";
+  const colunasModal = columns ?? [
+    { label, key: "nome" },
+    { label: codeLabel, key: codeKey },
+  ];
+  const chavesBusca = searchKeys ?? ["nome", codeKey];
   if (disabled) {
-    return (
+    return semComplemento ? (
+      <FloatInput label={label} value={value?.nome ?? ""} required={required} disabled />
+    ) : (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FloatInput label={label} value={value?.nome ?? ""} required={required} disabled />
         <FloatInput label={codeLabel} value={codigo} required={required} disabled />
@@ -134,7 +416,7 @@ function EntityPicker({
   return (
     <div
       className={
-        value
+        value && !semComplemento
           ? "grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-4 items-end"
           : "w-full"
       }
@@ -145,18 +427,15 @@ function EntityPicker({
         required={required}
         value={value?.nome ?? ""}
         data={data}
-        searchKeys={["nome", codeKey]}
-        columns={[
-          { label, key: "nome" },
-          { label: codeLabel, key: codeKey },
-        ]}
-        icon={<Search size={18} />}
+        searchKeys={chavesBusca}
+        columns={colunasModal}
+        icon={icon ?? <Search size={18} />}
         title={`Buscar ${label}`}
         subtitle={`Busque por ${label.toLowerCase()} cadastrado no sistema:`}
         confirmLabel="Selecionar"
         onChange={onChange}
       />
-      {value && (
+      {value && !semComplemento && (
         <>
           <FloatInput label={codeLabel} value={codigo} required={required} disabled />
           <button
@@ -190,16 +469,23 @@ function LocalDentroEstado({
 }) {
   const update = (patch: Partial<LocalGta | DestinoGta>) =>
     onChange({ ...local, ...patch });
+  const [interdicao, setInterdicao] = useState<ReturnType<typeof getInterdicaoGta>>(
+    () => getInterdicaoGta(local.estabelecimento),
+  );
+  const [modalInterdicao, setModalInterdicao] = useState(false);
   const exploracoes = EXPLORACOES_GTA.filter(
     (item) =>
-      (!especieId || item.especieId === especieId) &&
-      (!local.responsavel || item.responsavelId === local.responsavel.id) &&
-      (!local.estabelecimento ||
-        item.estabelecimentoId === local.estabelecimento.id),
+      !local.estabelecimento ||
+      item.estabelecimentoId === local.estabelecimento.id,
   );
   const nucleos = NUCLEOS_GTA.filter(
     (item) => !local.exploracao || item.exploracaoId === local.exploracao.id,
   );
+
+  const temNucleosDisponiveis =
+    local.exploracao &&
+    !interdicao &&
+    NUCLEOS_GTA.some((nucleo) => nucleo.exploracaoId === local.exploracao?.id);
 
   return (
     <div className="flex flex-col gap-5">
@@ -209,6 +495,7 @@ function LocalDentroEstado({
         data={PESSOAS_GTA}
         codeLabel="CPF/CNPJ"
         codeKey="documento"
+        icon={<img src={Icons.iconeFornecedorUrl} alt="" className="w-5 h-5 object-contain" />}
         required
         disabled={disabled}
         onChange={(responsavel) =>
@@ -223,38 +510,92 @@ function LocalDentroEstado({
 
       {local.tipo === "Estabelecimento Agropecuário" && (
         <>
-          <EntityPicker
-            label="Estabelecimento Agropecuário"
-            value={local.estabelecimento}
-            data={ESTABELECIMENTOS_GTA}
-            codeLabel="Código do Estabelecimento"
-            required
-            disabled={disabled || !local.responsavel}
-            onChange={(estabelecimento) =>
-              update({ estabelecimento, exploracao: null, nucleo: null })
-            }
-          />
-          <EntityPicker
-            label="Exploração Pecuária"
-            value={local.exploracao}
-            data={exploracoes}
-            codeLabel="Código da Exploração"
-            required
-            disabled={disabled || !local.estabelecimento}
-            onChange={(exploracao) => update({ exploracao, nucleo: null })}
-          />
-          {NUCLEOS_GTA.some(
-            (nucleo) => nucleo.exploracaoId === local.exploracao?.id,
-          ) && (
-            <EntityPicker
-              label="Núcleo de Produção"
-              value={local.nucleo}
-              data={nucleos}
-              codeLabel="Código do Núcleo"
-              required
-              disabled={disabled || !local.exploracao}
-              onChange={(nucleo) => update({ nucleo })}
-            />
+          {/* Estabelecimento — só após escolher o Responsável */}
+          {local.responsavel && (
+            <div className="animate-fadeIn">
+              {interdicao && (
+                <button
+                  type="button"
+                  onClick={() => setModalInterdicao(true)}
+                  className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-[#F0C27B] bg-[#FDF6E7] px-3 py-1 text-xs font-semibold text-[#9A6B00] hover:bg-[#fbefd3] transition"
+                  title="Ver detalhes da interdição"
+                >
+                  <AlertTriangle size={13} />
+                  Estabelecimento Interditado
+                </button>
+              )}
+              <EntityPicker
+                label="Estabelecimento Agropecuário"
+                value={local.estabelecimento}
+                data={ESTABELECIMENTOS_GTA}
+                codeLabel="Código do Estabelecimento"
+                icon={<img src={Icons.iconeEstabelecimentoUrl} alt="" className="w-5 h-5 object-contain" />}
+
+                searchKeys={["nome", "codigo", "municipio", "proprietarios"]}
+                columns={[
+                  { label: "Estabelecimento", key: "nome" },
+                  { label: "Código", key: "codigo" },
+                  { label: "Município", key: "municipio" },
+                  { label: "Proprietários", key: "proprietarios" },
+                ]}
+                required
+                disabled={disabled}
+                onChange={(estabelecimento) => {
+                  const interd = getInterdicaoGta(estabelecimento);
+                  setInterdicao(interd);
+                  if (interd) setModalInterdicao(true);
+                  update({ estabelecimento, exploracao: null, nucleo: null });
+                }}
+              />
+            </div>
+          )}
+
+          {/* Exploração e Núcleo — só após escolher o Estabelecimento e se não estiver interditado */}
+          {local.estabelecimento && !interdicao && (
+            <div className="pt-2 animate-fadeIn flex flex-col gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+                {/* Campo da Exploração Pecuária (Ocupa a linha toda) */}
+                <div className="md:col-span-12">
+                  <EntityPicker
+                    label="Exploração Pecuária"
+                    value={local.exploracao}
+                    data={exploracoes}
+                    codeLabel="Espécie"
+                    icon={<img src={Icons.iconeExploracaoUrl} alt="" className="w-5 h-5 object-contain" />}
+                    searchKeys={["codigo", "especie", "produtores"]}
+                    columns={[
+                      { label: "Código", key: "codigo" },
+                      { label: "Espécie", key: "especie" },
+                      { label: "Produtores", key: "produtores" },
+                    ]}
+                    required
+                    disabled={disabled}
+                    onChange={(exploracao) => update({ exploracao, nucleo: null })}
+                  />
+                </div>
+
+                {/* Campo do Núcleo de Produção (Fica na linha de baixo) */}
+                {temNucleosDisponiveis && (
+                  <div className="md:col-span-12 animate-fadeIn">
+                    <EntityPicker
+                      label="Núcleo de Produção"
+                      value={local.nucleo}
+                      data={nucleos}
+                      codeLabel="Código do Núcleo"
+                      icon={<img src={Icons.iconeNucleoProducaoUrl} alt="" className="w-5 h-5 object-contain" />}
+                      searchKeys={["nome", "produtores"]}
+                      columns={[
+                        { label: "Núcleo", key: "nome" },
+                        { label: "Produtores", key: "produtores" },
+                      ]}
+                      required
+                      disabled={disabled}
+                      onChange={(nucleo) => update({ nucleo })}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
           )}
         </>
       )}
@@ -266,31 +607,26 @@ function LocalDentroEstado({
             value={local.frigorifico}
             data={FRIGORIFICOS_GTA}
             codeLabel="Código do Frigorífico"
+            icon={<img src={Icons.iconeEstabelecimentoAgroindustrialUrl} alt="" className="w-5 h-5 object-contain" />}
             required
             disabled={disabled}
             onChange={(frigorifico) => update({ frigorifico })}
           />
           {isDestino && finalidade === "Abate" && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <FloatSelect
+              <SimNao
                 label="Abate Terceirizado?"
+                name="abateTerceirizado"
                 required
                 value={(local as DestinoGta).abateTerceirizado}
-                onChange={(abateTerceirizado) =>
+                onChange={(v) => {
+                  const abateTerceirizado = v ? "Sim" : "Não";
                   update({
-                    abateTerceirizado:
-                      abateTerceirizado as DestinoGta["abateTerceirizado"],
-                    empresaAbate:
-                      abateTerceirizado === "Sim"
-                        ? (local as DestinoGta).empresaAbate
-                        : null,
-                  })
-                }
+                    abateTerceirizado: abateTerceirizado as DestinoGta["abateTerceirizado"],
+                    empresaAbate: v ? (local as DestinoGta).empresaAbate : null,
+                  });
+                }}
                 disabled={disabled}
-                options={[
-                  { value: "Sim", label: "Sim" },
-                  { value: "Não", label: "Não" },
-                ]}
               />
               {(local as DestinoGta).abateTerceirizado === "Sim" && (
                 <EntityPicker
@@ -299,6 +635,8 @@ function LocalDentroEstado({
                   data={ACOUGUES_GTA}
                   required
                   disabled={disabled}
+                  icon={<Ham size={18} className="text-[#1A7A3C]" />}
+
                   onChange={(empresaAbate) => update({ empresaAbate })}
                 />
               )}
@@ -312,70 +650,106 @@ function LocalDentroEstado({
           label="Evento Pecuário"
           value={local.evento}
           data={EVENTOS_GTA}
+          icon={<Calendar size={18} className="text-[#1A7A3C]" />}
           required
           disabled={disabled}
           onChange={(evento) => update({ evento })}
         />
       )}
+
       {local.tipo === "Revendedora de Animais Vivos" && (
         <EntityPicker
           label="Revendedora de Animais Vivos"
           value={local.revendedora}
           data={REVENDEDORAS_ANIMAIS_GTA}
+          icon={<Store size={18} className="text-[#1A7A3C]" />}
           required
           disabled={disabled}
           onChange={(revendedora) => update({ revendedora })}
         />
       )}
-      {local.tipo === "Aeroporto" && (
+
+      {local.tipo === "Estabelecimento Genérico" && (
         <EntityPicker
-          label="Aeroporto"
+          label="Estabelecimento Genérico"
           value={local.aeroporto}
           data={AEROPORTOS_GTA}
           required
           disabled={disabled}
+          icon={<Building2 size={18} className="text-[#1A7A3C]" />}
           onChange={(aeroporto) => update({ aeroporto })}
         />
       )}
-    </div>
-  );
-}
 
-function StatusEntidade({ local }: { local: LocalGta }) {
-  const entidade =
-    local.nucleo ??
-    local.exploracao ??
-    local.estabelecimento ??
-    local.frigorifico ??
-    local.evento ??
-    local.revendedora ??
-    local.aeroporto;
-  if (!entidade) return null;
-  return (
-    <div className="mt-6 pt-6 border-t border-gray-100">
-      <h3 className="text-sm font-semibold text-gray-700 mb-4">
-        Situação da Entidade
-      </h3>
-      <div className="rounded-lg border border-gray-100 bg-gray-50/50 p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FloatInput label="Estado" value="Regular" disabled required />
-        <FloatInput label="Data de Início" value="01/01/2026" disabled required />
-        <FloatInput label="Data de Validade" value="01/08/2027" disabled required />
-        <FloatInput
-          label="Status"
-          value="S13 - Entidade habilitada para trânsito"
-          disabled
-          required
-        />
-        <div className="md:col-span-2">
-          <LargeTextArea
-            label="Observação"
-            value="Situação sanitária verificada no cadastro da entidade."
-            onChange={() => {}}
-            disabled
-            required
-          />
+      {/* MODAL DE ESTABELECIMENTO INTERDITADO */}
+      {modalInterdicao && interdicao && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden">
+            <div className="bg-[#FBF0D9] px-6 py-5 flex items-start gap-3">
+              <div className="text-[#C8912B] flex-shrink-0 mt-0.5">
+                <AlertTriangle size={22} className="stroke-[2.5]" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-gray-800">Cadastro Interditado</p>
+                <p className="text-sm text-gray-600 mt-0.5">Cadastro impossibilitado de emitir GTA.</p>
+                <p className="text-sm text-gray-600">O registro encontra-se interditado com suas atividades impedidas.</p>
+              </div>
+            </div>
+
+            <div className="p-6">
+              <div className="border border-gray-200 rounded-xl p-5">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h4 className="text-sm font-bold text-gray-800">Estado do Cadastro</h4>
+                      <span className="text-gray-300">•</span>
+                      <span className="inline-flex items-center gap-1 text-xs text-gray-500">
+                        <Calendar size={13} /> Início: {interdicao.inicio}
+                      </span>
+                      <span className="inline-flex items-center gap-1 text-xs text-gray-500">
+                        <Calendar size={13} /> Validade: {interdicao.validade}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Indica a condição específica do cadastro conforme regras ou determinações aplicáveis.
+                    </p>
+                  </div>
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-[#F0C27B] bg-[#FBF0D9] px-3 py-1 text-xs font-semibold text-[#9A6B00] self-start whitespace-nowrap">
+                    <Info size={13} /> Interditado
+                  </span>
+                </div>
+
+                <div className="border border-gray-200 rounded-lg p-4 mt-4">
+                  <p className="text-sm font-semibold text-gray-700 mb-2">Status de Cadastro:</p>
+                  <ol className="list-decimal list-inside space-y-1 text-sm text-gray-600">
+                    {interdicao.status.map((s, i) => (
+                      <li key={i}>{s}</li>
+                    ))}
+                  </ol>
+                </div>
+
+                <div className="border border-gray-200 rounded-lg p-4 mt-4">
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <p className="text-sm font-semibold text-gray-700">Observação</p>
+                    <Info size={13} className="text-gray-400" />
+                  </div>
+                  <p className="text-sm text-gray-600">{interdicao.observacao}</p>
+                </div>
+              </div>
+
+              <div className="flex justify-center mt-6">
+                <button
+                  type="button"
+                  onClick={() => setModalInterdicao(false)}
+                  className="px-8 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50 transition"
+                >
+                  Fechar
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
@@ -527,7 +901,7 @@ function DestinoForaEstado({
             disabled={disabled}
           />
           <FloatInput
-            label="Código da Exploração Pecuária"
+            label="Espécie"
             required
             value={destino.codigoExploracaoExterna}
             maxLength={15}
@@ -622,9 +996,9 @@ function DestinoForaEstado({
           />
         </div>
       )}
-      {destino.tipo === "Aeroporto" && (
+      {destino.tipo === "Estabelecimento Genérico" && (
         <FloatInput
-          label="Aeroporto"
+          label="Estabelecimento Genérico"
           required
           value={destino.aeroportoExterno}
           maxLength={255}
@@ -720,24 +1094,30 @@ export function EmissaoGtaForm({
   const especieGrandesAnimais = ["Bovídeos", "Equídeos"].includes(
     value.especie?.grupo ?? "",
   );
+  const [endereco, setEndereco] = useState<EnderecoState>({
+    zona: "Urbana",
+    cep: "",
+    estado: "Minas Gerais",
+    municipio: "",
+    bairro: "",
+    endereco: "",
+    numero: "",
+    complemento: "",
+    localidade: "",
+    distrito: "",
+    latitude: "",
+    longitude: "",
+  });
+  const [latitudeParada, setLatitudeParada] = useState("");
+  const [longitudeParada, setLongitudeParada] = useState("");
   const origemPreenchida = Boolean(
     value.procedencia.exploracao ||
-      value.procedencia.nucleo ||
-      value.procedencia.frigorifico ||
-      value.procedencia.evento ||
-      value.procedencia.revendedora ||
-      value.procedencia.aeroporto,
+    value.procedencia.nucleo ||
+    value.procedencia.frigorifico ||
+    value.procedencia.evento ||
+    value.procedencia.revendedora ||
+    value.procedencia.aeroporto,
   );
-
-  const gruposAnimais = useMemo(() => {
-    return value.faixasAnimais.reduce<Record<string, typeof value.faixasAnimais>>(
-      (grupos, item) => {
-        grupos[item.sexo] = [...(grupos[item.sexo] ?? []), item];
-        return grupos;
-      },
-      {},
-    );
-  }, [value.faixasAnimais]);
 
   const alterarFaixa = (id: string, animaisGta: number) =>
     update(
@@ -749,11 +1129,27 @@ export function EmissaoGtaForm({
       ),
     );
 
+  const sexoMacho = value.faixasAnimais.some((f) => f.sexo === "Machos") ? "Machos" : null;
+  const sexoFemea = value.faixasAnimais.some((f) => f.sexo === "Fêmeas") ? "Fêmeas" : null;
+  const linhasPorFaixa = useMemo(() => {
+    const ordem: string[] = [];
+    const mapa: Record<string, { faixaEtaria: string; macho?: any; femea?: any }> = {};
+    value.faixasAnimais.forEach((f) => {
+      if (!mapa[f.faixaEtaria]) {
+        mapa[f.faixaEtaria] = { faixaEtaria: f.faixaEtaria };
+        ordem.push(f.faixaEtaria);
+      }
+      if (f.sexo === "Fêmeas") mapa[f.faixaEtaria].femea = f;
+      else mapa[f.faixaEtaria].macho = f;
+    });
+    return ordem.map((k) => mapa[k]);
+  }, [value.faixasAnimais]);
+
   return (
     <div className="flex flex-col gap-4">
       {showBasicSection && (
         <Section title="Informações Básicas">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             <FloatSelect
               label="Tipo de Formulário"
               required
@@ -768,6 +1164,13 @@ export function EmissaoGtaForm({
               label="Espécie"
               value={value.especie}
               data={ESPECIES_GTA}
+              icon={<Dna size={18} className="text-[#1A7A3C]" />}
+              columns={[
+                { label: "Espécie", key: "nome" },
+                { label: "Grupo de Espécie", key: "grupo" },
+              ]}
+              searchKeys={["nome", "grupo"]}
+              semComplemento
               required
               disabled={disabled}
               onChange={(especie) =>
@@ -779,34 +1182,36 @@ export function EmissaoGtaForm({
                   destino: criarDestinoVazio(),
                   gtasRastreio:
                     especie.grupo === "Aves" &&
-                    value.finalidade?.nome === "Abate"
+                      value.finalidade?.nome === "Abate"
                       ? value.gtasRastreio
                       : [],
                 })
               }
             />
-            <div className="md:col-span-2">
-              <EntityPicker
-                label="Finalidade de GTA"
-                value={value.finalidade}
-                data={FINALIDADES_GTA}
-                required
-                disabled={disabled}
-                onChange={(finalidade) =>
-                  onChange?.({
-                    ...value,
-                    finalidade,
-                    destino: {
-                      ...value.destino,
-                      abateTerceirizado: "",
-                      empresaAbate: null,
-                    },
-                    gtasRastreio:
-                      finalidade.nome === "Abate" ? value.gtasRastreio : [],
-                  })
-                }
-              />
-            </div>
+            <EntityPicker
+              label="Finalidade de Trânsito"
+              value={value.finalidade}
+              data={FINALIDADES_GTA}
+              icon={<Truck size={18} className="text-[#1A7A3C]" />}
+              columns={[{ label: "Finalidade de Trânsito", key: "nome" }]}
+              searchKeys={["nome"]}
+              semComplemento
+              required
+              disabled={disabled}
+              onChange={(finalidade) =>
+                onChange?.({
+                  ...value,
+                  finalidade,
+                  destino: {
+                    ...value.destino,
+                    abateTerceirizado: "",
+                    empresaAbate: null,
+                  },
+                  gtasRastreio:
+                    finalidade.nome === "Abate" ? value.gtasRastreio : [],
+                })
+              }
+            />
           </div>
         </Section>
       )}
@@ -834,7 +1239,6 @@ export function EmissaoGtaForm({
               disabled={disabled}
             />
           )}
-          <StatusEntidade local={value.procedencia} />
         </div>
       </Section>
 
@@ -857,21 +1261,18 @@ export function EmissaoGtaForm({
               options={TIPOS_LOCAL_OPTIONS}
               disabled={disabled}
             />
-            <FloatSelect
+            <SimNao
               label="Destino dentro do Estado?"
+              name="dentroEstado"
               required
               value={value.destino.dentroEstado}
-              onChange={(dentroEstado) =>
+              onChange={(v) =>
                 updateDestino({
                   ...criarDestinoVazio(),
                   tipo: value.destino.tipo,
-                  dentroEstado: dentroEstado as "Sim" | "Não",
+                  dentroEstado: (v ? "Sim" : "Não") as "Sim" | "Não",
                 })
               }
-              options={[
-                { value: "Sim", label: "Sim" },
-                { value: "Não", label: "Não" },
-              ]}
               disabled={disabled}
             />
           </div>
@@ -897,85 +1298,40 @@ export function EmissaoGtaForm({
 
       <Section title="Informações do Trânsito">
         <div className="flex flex-col gap-5">
-          {disabled ? (
-            <FloatInput
-              label="Meio de Transporte"
-              value={value.meiosTransporte.join(", ")}
-              disabled
-              required
-            />
-          ) : (
-            <FloatMultiSelect
-              label="Meio de Transporte *"
-              value={value.meiosTransporte}
-              onChange={(meios) => {
-                onChange?.({
-                  ...value,
-                  meiosTransporte: meios,
-                  placaVeiculo: meios.includes("Rodoviário")
-                    ? value.placaVeiculo
-                    : "",
-                });
-              }}
-              options={MEIOS_TRANSPORTE}
-            />
-          )}
-          {value.meiosTransporte.includes("Rodoviário") && (
-            <FloatInput
-              label="Placa do Veículo"
-              value={value.placaVeiculo}
-              maxLength={7}
-              onChange={(placaVeiculo) =>
-                update(
-                  "placaVeiculo",
-                  placaVeiculo
-                    .replace(/[^a-zA-Z0-9]/g, "")
-                    .toUpperCase()
-                    .slice(0, 7),
-                )
-              }
-              disabled={disabled}
-            />
-          )}
-          {especieGrandesAnimais ? (
-            <FloatInput
-              label="Informações de Localização do Local de Parada"
-              value="Não"
-              disabled
-            />
-          ) : (
-            <FloatSelect
-              label="Possui Parada para Descanso?"
-              required
-              value={value.possuiParadaDescanso}
-              onChange={(possuiParadaDescanso) =>
-                update(
-                  "possuiParadaDescanso",
-                  possuiParadaDescanso as "Sim" | "Não",
-                )
-              }
-              disabled={disabled}
-              options={[
-                { value: "Sim", label: "Sim" },
-                { value: "Não", label: "Não" },
-              ]}
-            />
-          )}
-          {!especieGrandesAnimais &&
-            value.possuiParadaDescanso === "Sim" && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 rounded-lg border border-gray-100 bg-gray-50/50 p-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
+            <div className="md:col-span-3">
+              <MeioTransporteSelector
+                label="Meio de Transporte"
+                value={value.meiosTransporte}
+                onChange={(novosMeios) => update("meiosTransporte", novosMeios)}
+                options={MEIOS_TRANSPORTE}
+                required
+                disabled={disabled}
+              />
+            </div>
+
+            {value.meiosTransporte.includes("Rodoviário") && (
+              <div className="md:col-span-1">
                 <FloatInput
-                  label="Local da Parada"
-                  value="Ponto de descanso informado"
-                  disabled
-                />
-                <FloatInput
-                  label="Geolocalização"
-                  value="-21.2457, -45.0012"
-                  disabled
+                  label="Placa do Veículo"
+                  value={value.placaVeiculo}
+                  maxLength={7}
+                  onChange={(placaVeiculo) =>
+                    update(
+                      "placaVeiculo",
+                      placaVeiculo
+                        .replace(/[^a-zA-Z0-9]/g, "")
+                        .toUpperCase()
+                        .slice(0, 7),
+                    )
+                  }
+                  disabled={disabled}
                 />
               </div>
             )}
+          </div>
+
+
         </div>
       </Section>
 
@@ -988,55 +1344,107 @@ export function EmissaoGtaForm({
           <AnimalsReadOnlyTable value={value} />
         ) : (
           <div className="flex flex-col gap-6">
-            {Object.entries(gruposAnimais).map(([sexo, faixas]) => (
-              <div key={sexo}>
-                <h3 className="text-sm font-semibold text-gray-700 mb-3">
-                  {sexo}
-                </h3>
-                <div className="overflow-x-auto">
-                  <table className="w-full min-w-[620px] text-sm">
-                    <thead>
-                      <tr className="border-b border-gray-200">
-                        <th className="text-left px-3 py-2 font-semibold text-gray-600 uppercase">
-                          Faixa Etária
-                        </th>
-                        <th className="text-left px-3 py-2 font-semibold text-gray-600 uppercase">
-                          Existente
-                        </th>
-                        <th className="text-left px-3 py-2 font-semibold text-gray-600 uppercase">
-                          Animais na GTA
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {faixas.map((faixa) => (
-                        <tr key={faixa.id} className="border-b border-gray-100">
-                          <td className="px-3 py-3 text-gray-700">
-                            {faixa.faixaEtaria}
-                          </td>
-                          <td className="px-3 py-3 text-gray-700">
-                            {faixa.existente}
-                          </td>
-                          <td className="px-3 py-3 w-56">
-                            <FloatInput
-                              label="Animais na GTA"
-                              value={String(faixa.animaisGta)}
-                              onChange={(valor) =>
-                                alterarFaixa(
-                                  faixa.id,
-                                  Number(valor.replace(/\D/g, "")) || 0,
-                                )
-                              }
-                              disabled={disabled}
-                            />
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+            <div className="overflow-hidden rounded-2xl border border-gray-200">
+              <div className="flex flex-col gap-3 border-b border-gray-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="font-semibold text-gray-700">Registro</span>
+                  <span className="text-gray-300">•</span>
+                  <span className="text-xs text-gray-500">
+                    Registre quantos animais serão transportados.
+                  </span>
                 </div>
+                <button
+                  type="button"
+                  onClick={() =>
+                    update(
+                      "faixasAnimais",
+                      value.faixasAnimais.map((item) => ({ ...item, animaisGta: 0 })),
+                    )
+                  }
+                  className="flex items-center gap-1.5 self-start text-sm font-medium text-[#1A7A3C] transition hover:opacity-75 sm:self-auto"
+                >
+                  <RotateCcw size={15} /> Reiniciar
+                </button>
               </div>
-            ))}
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[720px] border-collapse text-sm">
+                  <thead>
+                    <tr className="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
+                      <th rowSpan={2} className="border-b border-r border-gray-200 px-4 py-3 text-left align-middle">
+                        Faixa Etária
+                      </th>
+                      {sexoMacho && (
+                        <th colSpan={2} className="border-b border-r border-gray-200 px-4 py-3 text-center font-bold text-blue-600">
+                          Machos
+                        </th>
+                      )}
+                      {sexoFemea && (
+                        <th colSpan={2} className="border-b border-gray-200 px-4 py-3 text-center font-bold text-pink-600">
+                          Fêmeas
+                        </th>
+                      )}
+                    </tr>
+                    <tr className="bg-gray-50 text-xs text-gray-500">
+                      {sexoMacho && (
+                        <>
+                          <th className="border-b border-r border-gray-200 px-4 py-2 text-center">Existente</th>
+                          <th className="border-b border-r border-gray-200 px-4 py-2 text-center">Animais na GTA</th>
+                        </>
+                      )}
+                      {sexoFemea && (
+                        <>
+                          <th className="border-b border-r border-gray-200 px-4 py-2 text-center">Existente</th>
+                          <th className="border-b border-gray-200 px-4 py-2 text-center">Animais na GTA</th>
+                        </>
+                      )}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {linhasPorFaixa.map((linha) => (
+                      <tr key={linha.faixaEtaria} className="border-b border-gray-100">
+                        <th className="border-r border-gray-100 px-4 py-3 text-left font-semibold text-gray-700">
+                          {linha.faixaEtaria}
+                        </th>
+                        {sexoMacho && (
+                          <>
+                            <td className="border-r border-gray-100 px-4 py-3 text-center text-gray-600">
+                              {linha.macho?.existente ?? 0}
+                            </td>
+                            <td className="border-r border-gray-100 px-4 py-3 text-center">
+                              <QuantityStepper
+                                value={linha.macho?.animaisGta ?? 0}
+                                max={linha.macho?.existente ?? 0}
+                                onChange={(q) => linha.macho && alterarFaixa(linha.macho.id, q)}
+                                disabled={disabled || !linha.macho}
+                                colorClass="text-blue-600"
+                                label={`machos na GTA de ${linha.faixaEtaria}`}
+                              />
+                            </td>
+                          </>
+                        )}
+                        {sexoFemea && (
+                          <>
+                            <td className="border-r border-gray-100 px-4 py-3 text-center text-gray-600">
+                              {linha.femea?.existente ?? 0}
+                            </td>
+                            <td className="px-4 py-3 text-center">
+                              <QuantityStepper
+                                value={linha.femea?.animaisGta ?? 0}
+                                max={linha.femea?.existente ?? 0}
+                                onChange={(q) => linha.femea && alterarFaixa(linha.femea.id, q)}
+                                disabled={disabled || !linha.femea}
+                                colorClass="text-pink-600"
+                                label={`fêmeas na GTA de ${linha.faixaEtaria}`}
+                              />
+                            </td>
+                          </>
+                        )}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 border-t border-gray-100 pt-5">
               <FloatInput
                 label="Total Existente"
@@ -1076,6 +1484,8 @@ export function EmissaoGtaForm({
             required
           />
         </div>
+
+
       </Section>
 
       {origemPreenchida && (
@@ -1091,12 +1501,14 @@ export function EmissaoGtaForm({
                   value={formatarDataGta(value.dataRaivaPrimeiraEtapa)}
                   disabled
                   required
+                  icon={<Calendar size={18} className="text-gray-400" />}
                 />
                 <FloatInput
                   label="Data da Vacinação da 2ª Etapa de Raiva de Herbívoros"
                   value={formatarDataGta(value.dataRaivaSegundaEtapa)}
                   disabled
                   required
+                  icon={<Calendar size={18} className="text-gray-400" />}
                 />
                 {value.especie?.grupo === "Bovídeos" && (
                   <FloatInput
@@ -1104,24 +1516,18 @@ export function EmissaoGtaForm({
                     value={formatarDataGta(value.dataBrucelose)}
                     disabled
                     required
+                    icon={<Calendar size={18} className="text-gray-400" />}
                   />
                 )}
-                <EntityPicker
-                  label="Motivo de Isenção de Vacinação"
-                  value={value.motivoIsencaoVacinacao}
-                  data={ISENCOES_VACINACAO_GTA}
-                  disabled={disabled}
-                  onChange={(motivo) =>
-                    update("motivoIsencaoVacinacao", motivo)
-                  }
-                />
               </div>
             </div>
 
-            <div className="border-t border-gray-100 pt-5">
-              <h3 className="text-sm font-semibold text-gray-700 mb-4">
+            <hr className="border-gray-100" />
+
+            <div>
+              <h4 className="text-sm font-semibold text-gray-700 mb-3">
                 Outras Vacinas
-              </h3>
+              </h4>
               <DynamicListWrapper
                 items={value.outrasVacinas}
                 behavior="zero-or-more"
@@ -1147,60 +1553,52 @@ export function EmissaoGtaForm({
                 }
               >
                 {(item, index) => (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <EntityPicker
-                      label="Vacina"
-                      value={item.vacina}
-                      data={DOENCAS_VACINA_GTA}
-                      required
-                      disabled={disabled}
-                      onChange={(vacina) =>
-                        update(
-                          "outrasVacinas",
-                          value.outrasVacinas.map((vacinaItem, itemIndex) =>
-                            itemIndex === index
-                              ? { ...vacinaItem, vacina }
-                              : vacinaItem,
-                          ),
-                        )
-                      }
-                    />
-                    <FloatInput
-                      label="Data da Vacinação"
-                      type="date"
-                      required
-                      value={item.dataVacinacao}
-                      onChange={(dataVacinacao) =>
-                        update(
-                          "outrasVacinas",
-                          value.outrasVacinas.map((vacinaItem, itemIndex) =>
-                            itemIndex === index
-                              ? { ...vacinaItem, dataVacinacao }
-                              : vacinaItem,
-                          ),
-                        )
-                      }
-                      disabled={disabled}
-                    />
-                    <UploadField
-                      label="Atestado de Vacinação"
-                      required
-                      fileName={item.atestado}
-                      disabled={disabled}
-                      onSelectFile={() =>
-                        update(
-                          "outrasVacinas",
-                          value.outrasVacinas.map((vacinaItem, itemIndex) =>
-                            itemIndex === index
-                              ? {
-                                  ...vacinaItem,
-                                  atestado: `atestado_vacinacao_${index + 1}.pdf`,
-                                }
-                              : vacinaItem,
-                          ),
-                        )
-                      }
-                    />
+                  <div className="flex items-start gap-4">
+                    <div className="flex-1">
+                      <EntitySearchInput
+                        label="Vacina"
+                        placeholder="Buscar doença"
+                        value={item.vacina?.nome ?? ""}
+                        data={DOENCAS_VACINA_GTA}
+                        searchKeys={["nome"]}
+                        columns={[{ label: "Doença", key: "nome" }]}
+                        title="Buscar Vacina"
+                        subtitle="Busque por uma doença que produz vacina:"
+                        required
+                        disabled={disabled}
+                        onChange={(vacina) =>
+                          update(
+                            "outrasVacinas",
+                            value.outrasVacinas.map((vacinaItem, itemIndex) =>
+                              itemIndex === index
+                                ? { ...vacinaItem, vacina }
+                                : vacinaItem,
+                            ),
+                          )
+                        }
+                        icon={<Syringe size={18} className="text-[#1A7A3C]" />}
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <FloatInput
+                        label="Data da Vacinação"
+                        type="date"
+                        required
+                        value={item.dataVacinacao}
+                        onChange={(dataVacinacao) =>
+                          update(
+                            "outrasVacinas",
+                            value.outrasVacinas.map((vacinaItem, itemIndex) =>
+                              itemIndex === index
+                                ? { ...vacinaItem, dataVacinacao }
+                                : vacinaItem,
+                            ),
+                          )
+                        }
+                        disabled={disabled}
+                        icon={<Calendar size={18} className="text-[#1A7A3C]" />}
+                      />
+                    </div>
                   </div>
                 )}
               </DynamicListWrapper>
@@ -1210,46 +1608,42 @@ export function EmissaoGtaForm({
       )}
 
       <Section title="Atestados">
-        <div className="flex flex-col gap-6">
-          <div>
-            <h3 className="text-sm font-semibold text-gray-700 mb-4">
-              Atestado Sanitário
-            </h3>
-            <UploadField
-              label="Atestado Sanitário"
-              required
-              fileName={value.atestadoSanitario}
-              disabled={disabled}
-              onSelectFile={() =>
-                update("atestadoSanitario", "atestado_sanitario.pdf")
-              }
-            />
-          </div>
-          <div className="border-t border-gray-100 pt-5">
-            <h3 className="text-sm font-semibold text-gray-700 mb-4">
-              Atestados de Exames
-            </h3>
-            <DynamicListWrapper
-              items={value.atestadosExame}
-              behavior="zero-or-more"
-              itemLabel="Atestado de Exame"
-              addButtonLabel="Adicionar Atestado"
-              disabled={disabled}
-              onAddItem={() =>
-                update("atestadosExame", [
-                  ...value.atestadosExame,
-                  { id: uid(), tipo: null, arquivo: "" },
-                ])
-              }
-              onRemoveItem={(index) =>
-                update(
-                  "atestadosExame",
-                  value.atestadosExame.filter((_, itemIndex) => itemIndex !== index),
-                )
-              }
-            >
-              {(item, index) => (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="flex flex-col gap-4">
+          <UploadField
+            label="Atestado Sanitário"
+            required
+            fileName={value.atestadoSanitario}
+            disabled={disabled}
+            onSelectFile={() =>
+              update("atestadoSanitario", "atestado_sanitario.pdf")
+            }
+          />
+          <hr className="border-gray-100 my-2" />
+          <h4 className="text-sm font-semibold text-gray-700">
+            Atestado de Exames
+          </h4>
+          <DynamicListWrapper
+            items={value.atestadosExame}
+            behavior="zero-or-more"
+            itemLabel="Atestado de Exame"
+            addButtonLabel="Adicionar Exame"
+            disabled={disabled}
+            onAddItem={() =>
+              update("atestadosExame", [
+                ...value.atestadosExame,
+                { id: uid(), tipo: null, arquivo: "" },
+              ])
+            }
+            onRemoveItem={(index) =>
+              update(
+                "atestadosExame",
+                value.atestadosExame.filter((_, itemIndex) => itemIndex !== index),
+              )
+            }
+          >
+            {(item, index) => (
+              <div className="flex items-center gap-4">
+                <div className="flex-1">
                   <EntityPicker
                     label="Tipo de Atestado de Exame"
                     value={item.tipo}
@@ -1265,6 +1659,8 @@ export function EmissaoGtaForm({
                       )
                     }
                   />
+                </div>
+                <div className="flex-1">
                   <UploadField
                     label="Atestado de Exame"
                     required
@@ -1276,18 +1672,18 @@ export function EmissaoGtaForm({
                         value.atestadosExame.map((atestado, itemIndex) =>
                           itemIndex === index
                             ? {
-                                ...atestado,
-                                arquivo: `atestado_exame_${index + 1}.pdf`,
-                              }
+                              ...atestado,
+                              arquivo: `atestado_exame_${index + 1}.pdf`,
+                            }
                             : atestado,
                         ),
                       )
                     }
                   />
                 </div>
-              )}
-            </DynamicListWrapper>
-          </div>
+              </div>
+            )}
+          </DynamicListWrapper>
         </div>
       </Section>
 
@@ -1322,7 +1718,7 @@ export function EmissaoGtaForm({
                 <UploadField
                   label="Arquivo"
                   fileName={value.procedencia.nucleo.arquivoRegistro ?? ""}
-                  onSelectFile={() => {}}
+                  onSelectFile={() => { }}
                   disabled
                   required
                 />
@@ -1332,73 +1728,73 @@ export function EmissaoGtaForm({
 
           {value.finalidade?.nome === "Abate" &&
             value.especie?.grupo === "Aves" && (
-            <div className="border-t border-gray-100 pt-5">
-              <h3 className="text-sm font-semibold text-gray-700 mb-4">
-                GTAs de Rastreio
-              </h3>
-              <DynamicListWrapper
-                items={value.gtasRastreio}
-                behavior="zero-or-more"
-                itemLabel="GTA de Rastreio"
-                addButtonLabel="Adicionar GTA de Rastreio"
-                disabled={disabled}
-                onAddItem={() =>
-                  update("gtasRastreio", [
-                    ...value.gtasRastreio,
-                    { id: uid(), uf: "", serieNumero: "" },
-                  ])
-                }
-                onRemoveItem={(index) =>
-                  update(
-                    "gtasRastreio",
-                    value.gtasRastreio.filter((_, itemIndex) => itemIndex !== index),
-                  )
-                }
-              >
-                {(item, index) => (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <FloatSelect
-                      label="UF da GTA"
-                      required
-                      value={item.uf}
-                      onChange={(uf) =>
-                        update(
-                          "gtasRastreio",
-                          value.gtasRastreio.map((gta, itemIndex) =>
-                            itemIndex === index ? { ...gta, uf } : gta,
-                          ),
-                        )
-                      }
-                      options={ESTADOS_BRASIL.map((estado) => ({
-                        value: estado,
-                        label: estado,
-                      }))}
-                      disabled={disabled}
-                    />
-                    <FloatInput
-                      label="Série - Número da GTA"
-                      value={item.serieNumero}
-                      maxLength={11}
-                      onChange={(serieNumero) =>
-                        update(
-                          "gtasRastreio",
-                          value.gtasRastreio.map((gta, itemIndex) =>
-                            itemIndex === index
-                              ? {
+              <div className="border-t border-gray-100 pt-5">
+                <h3 className="text-sm font-semibold text-gray-700 mb-4">
+                  GTAs de Rastreio
+                </h3>
+                <DynamicListWrapper
+                  items={value.gtasRastreio}
+                  behavior="zero-or-more"
+                  itemLabel="GTA de Rastreio"
+                  addButtonLabel="Adicionar GTA de Rastreio"
+                  disabled={disabled}
+                  onAddItem={() =>
+                    update("gtasRastreio", [
+                      ...value.gtasRastreio,
+                      { id: uid(), uf: "", serieNumero: "" },
+                    ])
+                  }
+                  onRemoveItem={(index) =>
+                    update(
+                      "gtasRastreio",
+                      value.gtasRastreio.filter((_, itemIndex) => itemIndex !== index),
+                    )
+                  }
+                >
+                  {(item, index) => (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <FloatSelect
+                        label="UF da GTA"
+                        required
+                        value={item.uf}
+                        onChange={(uf) =>
+                          update(
+                            "gtasRastreio",
+                            value.gtasRastreio.map((gta, itemIndex) =>
+                              itemIndex === index ? { ...gta, uf } : gta,
+                            ),
+                          )
+                        }
+                        options={ESTADOS_BRASIL.map((estado) => ({
+                          value: estado,
+                          label: estado,
+                        }))}
+                        disabled={disabled}
+                      />
+                      <FloatInput
+                        label="Série - Número da GTA"
+                        value={item.serieNumero}
+                        maxLength={11}
+                        onChange={(serieNumero) =>
+                          update(
+                            "gtasRastreio",
+                            value.gtasRastreio.map((gta, itemIndex) =>
+                              itemIndex === index
+                                ? {
                                   ...gta,
                                   serieNumero: serieNumero.toUpperCase().slice(0, 11),
                                 }
-                              : gta,
-                          ),
-                        )
-                      }
-                      disabled={disabled}
-                    />
-                  </div>
-                )}
-              </DynamicListWrapper>
-            </div>
-          )}
+                                : gta,
+                            ),
+                          )
+                        }
+                        disabled={disabled}
+                      />
+                    </div>
+                  )}
+                </DynamicListWrapper>
+              </div>
+            )}
 
           <LargeTextArea
             label="Observações"
@@ -1454,10 +1850,10 @@ function destinoPreenchido(destino: DestinoGta, finalidade?: string) {
   if (destino.tipo === "Estabelecimento Agropecuário")
     return Boolean(
       destino.estabelecimentoExterno &&
-        destino.codigoEstabelecimentoExterno &&
-        destino.codigoExploracaoExterna &&
-        destino.nucleoExterno &&
-        destino.codigoNucleoExterno,
+      destino.codigoEstabelecimentoExterno &&
+      destino.codigoExploracaoExterna &&
+      destino.nucleoExterno &&
+      destino.codigoNucleoExterno,
     );
   if (destino.tipo === "Frigorífico")
     return Boolean(destino.frigorificoExterno && destino.codigoFrigorificoExterno);
@@ -1492,8 +1888,7 @@ export function emissaoGtaValida(value: EmissaoGtaFormValue) {
       (item) =>
         !item.vacina ||
         !item.dataVacinacao ||
-        item.dataVacinacao > hoje ||
-        !item.atestado,
+        item.dataVacinacao > hoje,
     )
   )
     return false;

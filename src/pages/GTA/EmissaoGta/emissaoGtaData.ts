@@ -4,7 +4,7 @@ export type TipoLocalGta =
   | "Frigorífico"
   | "Evento Pecuário"
   | "Revendedora de Animais Vivos"
-  | "Aeroporto";
+  | "Estabelecimento Genérico";
 export type SituacaoGta = "Gravada" | "Paga" | "Emitida" | "Cancelada";
 
 export interface EntidadeGta {
@@ -13,6 +13,8 @@ export interface EntidadeGta {
   codigo?: string;
   documento?: string;
   uf?: string;
+  municipio?: string;
+  proprietarios?: string;
 }
 
 export interface EspecieGta extends EntidadeGta {
@@ -22,10 +24,15 @@ export interface EspecieGta extends EntidadeGta {
   faixasEtarias: string[];
 }
 
-export interface ExploracaoGta extends EntidadeGta {
+export interface ExploracaoGta {
+  id: number;
+  codigo: string;
+  nome: string;
   estabelecimentoId: number;
   responsavelId: number;
   especieId: number;
+  especie: string;
+  produtores: string;
 }
 
 export interface NucleoGta extends EntidadeGta {
@@ -124,6 +131,40 @@ export interface EmissaoGtaFormValue {
   observacoes: string;
 }
 
+// Adicione o tipo da estrutura do endereço
+export interface EnderecoParadaDescanso {
+  logradouro: string;
+  numero: string;
+  bairro: string;
+  municipio: string;
+  uf: string;
+  cep: string;
+}
+
+export interface EmissaoGtaFormValue {
+  tipoFormulario: TipoFormularioGta | "";
+  especie: EspecieGta | null;
+  finalidade: EntidadeGta | null;
+  procedencia: LocalGta;
+  destino: DestinoGta;
+  meiosTransporte: string[];
+  placaVeiculo: string;
+  possuiParadaDescanso: "Sim" | "Não";
+  enderecoParadaDescanso?: EnderecoParadaDescanso; // 👈 Adicione esta linha (com ? se opcional)
+  faixasAnimais: FaixaAnimalGta[];
+  motivoIsencaoTaxa: EntidadeGta | null;
+  valorGta: number;
+  dataRaivaPrimeiraEtapa: string;
+  dataRaivaSegundaEtapa: string;
+  dataBrucelose: string;
+  motivoIsencaoVacinacao: EntidadeGta | null;
+  outrasVacinas: VacinaAdicionalGta[];
+  atestadoSanitario: string;
+  atestadosExame: AtestadoExameGta[];
+  gtasRastreio: GtaRastreio[];
+  observacoes: string;
+}
+
 export interface EmissaoGta extends EmissaoGtaFormValue {
   id: number;
   serieNumero: string;
@@ -146,7 +187,7 @@ export const TIPOS_LOCAL_GTA: TipoLocalGta[] = [
   "Frigorífico",
   "Evento Pecuário",
   "Revendedora de Animais Vivos",
-  "Aeroporto",
+  "Estabelecimento Genérico",
 ];
 
 export const TIPOS_LOCAL_OPTIONS = TIPOS_LOCAL_GTA.map((valor) => ({
@@ -227,10 +268,38 @@ export const PESSOAS_GTA: EntidadeGta[] = [
 ];
 
 export const ESTABELECIMENTOS_GTA: EntidadeGta[] = [
-  { id: 1, codigo: "31002030039", nome: "Fazenda Recanto dos Pássaros" },
-  { id: 2, codigo: "31002030040", nome: "Granja Vale Verde" },
-  { id: 3, codigo: "31002030041", nome: "Fazenda Santa Rita" },
+  { id: 1, codigo: "31002030039", nome: "Fazenda Recanto dos Pássaros", municipio: "Lavras - MG", proprietarios: "Carlos Henrique Souza" },
+  { id: 2, codigo: "31002030040", nome: "Granja Vale Verde", municipio: "Nepomuceno - MG", proprietarios: "Marcos Silva, Ana Paula Nunes" },
+  { id: 3, codigo: "31002030041", nome: "Fazenda Santa Rita", municipio: "Ijaci - MG", proprietarios: "Maria Oliveira" },
 ];
+
+// Estabelecimentos com situação "Interditado" (impedidos de emitir GTA).
+// Chave = nome OU código do estabelecimento.
+export const ESTABELECIMENTOS_INTERDITADOS_GTA: Record<string, {
+  inicio: string;
+  validade: string;
+  status: string[];
+  observacao: string;
+}> = {
+  "Fazenda Recanto dos Pássaros": {
+    inicio: "20/02/2026",
+    validade: "20/05/2026",
+    status: [
+      "Irregularidades reportadas. Suspensão temporária aplicada aguardando nova avaliação do conselho.",
+      "Espólio.",
+    ],
+    observacao: "Cadastro com informações irregulares.",
+  },
+};
+
+export function getInterdicaoGta(estab: { nome?: string; codigo?: string } | null | undefined) {
+  if (!estab) return null;
+  return (
+    ESTABELECIMENTOS_INTERDITADOS_GTA[estab.nome ?? ""] ||
+    ESTABELECIMENTOS_INTERDITADOS_GTA[estab.codigo ?? ""] ||
+    null
+  );
+}
 
 export const EXPLORACOES_GTA: ExploracaoGta[] = [
   {
@@ -240,6 +309,8 @@ export const EXPLORACOES_GTA: ExploracaoGta[] = [
     estabelecimentoId: 1,
     responsavelId: 1,
     especieId: 1,
+    especie: "Bovinos",
+    produtores: "Carlos Henrique Souza",
   },
   {
     id: 2,
@@ -248,6 +319,8 @@ export const EXPLORACOES_GTA: ExploracaoGta[] = [
     estabelecimentoId: 2,
     responsavelId: 3,
     especieId: 3,
+    especie: "Aves",
+    produtores: "Marcos Silva, Ana Paula Nunes",
   },
   {
     id: 3,
@@ -256,6 +329,8 @@ export const EXPLORACOES_GTA: ExploracaoGta[] = [
     estabelecimentoId: 3,
     responsavelId: 2,
     especieId: 4,
+    especie: "Suínos",
+    produtores: "Maria Oliveira",
   },
 ];
 
@@ -265,6 +340,7 @@ export const NUCLEOS_GTA: NucleoGta[] = [
     codigo: "31002030040100201",
     nome: "Núcleo A",
     exploracaoId: 2,
+    produtores: "Marcos Silva, Ana Paula Nunes",
     caracteristica: "Corte",
     areaAtuacao: "Material de Multiplicação Animal",
     classificacao: "Corte",
@@ -278,6 +354,7 @@ export const NUCLEOS_GTA: NucleoGta[] = [
     codigo: "31002030041100301",
     nome: "Núcleo 09",
     exploracaoId: 3,
+    produtores: "Maria Oliveira",
     caracteristica: "Tecnificada",
     areaAtuacao: "Material de Multiplicação Animal",
     classificacao: "Ciclo Completo",

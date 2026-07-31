@@ -2,6 +2,8 @@ import { useMemo, useState, type ReactNode } from "react";
 import {
   ArrowLeft,
   ArrowRight,
+  Building2,
+  Calendar,
   CalendarDays,
   ChevronDown,
   ChevronLeft,
@@ -9,6 +11,7 @@ import {
   ChevronUp,
   ClipboardCopy,
   ContactRound,
+  Copy,
   Dna,
   DollarSign,
   Eye,
@@ -50,6 +53,7 @@ import {
   type LocalGta,
   type TipoLocalGta,
 } from "./emissaoGtaData";
+import * as Icons from "../../../imports/icons";
 
 type SortKey =
   | "serieNumero"
@@ -68,6 +72,8 @@ function SearchEntityField({
   onChange,
   codeKey = "codigo",
   icon,
+  columns,
+  searchKeys,
 }: {
   label: string;
   value: EntidadeGta | null;
@@ -75,6 +81,8 @@ function SearchEntityField({
   onChange: (entidade: any) => void;
   codeKey?: "codigo" | "documento";
   icon: ReactNode;
+  columns?: { label: string; key: string }[];
+  searchKeys?: string[];
 }) {
   return (
     <EntitySearchInput
@@ -82,8 +90,8 @@ function SearchEntityField({
       placeholder={`Buscar ${label.toLowerCase()}`}
       value={value?.nome ?? ""}
       data={data}
-      searchKeys={["nome", codeKey]}
-      columns={[
+      searchKeys={searchKeys ?? ["nome", codeKey]}
+      columns={columns ?? [
         { label, key: "nome" },
         {
           label: codeKey === "documento" ? "CPF/CNPJ" : "Código",
@@ -124,7 +132,7 @@ function LocalFilters({
           value={local.responsavel}
           data={PESSOAS_GTA}
           codeKey="documento"
-          icon={<ContactRound size={20} />}
+          icon={<img src={Icons.iconeFornecedorUrl} alt="" className="w-5 h-5 object-contain" />}
           onChange={(responsavel) => update({ responsavel })}
         />
 
@@ -134,21 +142,39 @@ function LocalFilters({
               label="Estabelecimento Agropecuário"
               value={local.estabelecimento}
               data={ESTABELECIMENTOS_GTA}
-              icon={<Warehouse size={20} />}
+              searchKeys={["nome", "codigo", "municipio", "proprietarios"]}
+              columns={[
+                { label: "Estabelecimento", key: "nome" },
+                { label: "Código", key: "codigo" },
+                { label: "Município", key: "municipio" },
+                { label: "Proprietários", key: "proprietarios" },
+              ]}
+              icon={<img src={Icons.iconeEstabelecimentoUrl} alt="" className="w-5 h-5 object-contain" />}
               onChange={(estabelecimento) => update({ estabelecimento })}
             />
             <SearchEntityField
               label="Exploração Pecuária"
               value={local.exploracao}
               data={EXPLORACOES_GTA}
-              icon={<Landmark size={20} />}
+              searchKeys={["codigo", "especie", "produtores"]}
+              columns={[
+                { label: "Código", key: "codigo" },
+                { label: "Espécie", key: "especie" },
+                { label: "Produtores", key: "produtores" },
+              ]}
+              icon={<img src={Icons.iconeExploracaoUrl} alt="" className="w-5 h-5 object-contain" />}
               onChange={(exploracao) => update({ exploracao })}
             />
             <SearchEntityField
               label="Núcleo de Produção"
               value={local.nucleo}
               data={NUCLEOS_GTA}
-              icon={<Factory size={20} />}
+              searchKeys={["nome", "produtores"]}
+              columns={[
+                { label: "Núcleo", key: "nome" },
+                { label: "Produtores", key: "produtores" },
+              ]}
+              icon={<img src={Icons.iconeNucleoProducaoUrl} alt="" className="w-5 h-5 object-contain" />}
               onChange={(nucleo) => update({ nucleo })}
             />
           </>
@@ -159,7 +185,7 @@ function LocalFilters({
             label="Frigorífico"
             value={local.frigorifico}
             data={FRIGORIFICOS_GTA}
-            icon={<Factory size={20} />}
+            icon={<img src={Icons.iconeEstabelecimentoAgroindustrialUrl} alt="" className="w-5 h-5 object-contain" />}
             onChange={(frigorifico) => update({ frigorifico })}
           />
         )}
@@ -169,7 +195,7 @@ function LocalFilters({
             label="Evento Pecuário"
             value={local.evento}
             data={EVENTOS_GTA}
-            icon={<Landmark size={20} />}
+            icon={<Calendar size={20} />}
             onChange={(evento) => update({ evento })}
           />
         )}
@@ -184,12 +210,12 @@ function LocalFilters({
           />
         )}
 
-        {local.tipo === "Aeroporto" && (
+        {local.tipo === "Estabelecimento Genérico" && (
           <SearchEntityField
-            label="Aeroporto"
+            label="Estabelecimento Genérico"
             value={local.aeroporto}
             data={AEROPORTOS_GTA}
-            icon={<Plane size={20} />}
+            icon={<Building2 size={20} />}
             onChange={(aeroporto) => update({ aeroporto })}
           />
         )}
@@ -279,17 +305,17 @@ export function EmissaoGtaPage({
 
   const possuiFiltros = Boolean(
     serieNumero ||
-      tipoFormulario ||
-      especie ||
-      finalidade ||
-      dataEmissao ||
-      procedencia.tipo ||
-      procedencia.responsavel ||
-      entidadeLocal(procedencia) ||
-      destino.tipo ||
-      destino.responsavel ||
-      entidadeLocal(destino) ||
-      situacao,
+    tipoFormulario ||
+    especie ||
+    finalidade ||
+    dataEmissao ||
+    procedencia.tipo ||
+    procedencia.responsavel ||
+    entidadeLocal(procedencia) ||
+    destino.tipo ||
+    destino.responsavel ||
+    entidadeLocal(destino) ||
+    situacao,
   );
 
   const resultados = useMemo(() => {
@@ -487,7 +513,7 @@ export function EmissaoGtaPage({
                   onChange={setEspecie}
                 />
                 <SearchEntityField
-                  label="Finalidade de GTA"
+                  label="Finalidade de Trânsito"
                   value={finalidade}
                   data={FINALIDADES_GTA}
                   icon={<Truck size={20} />}
@@ -497,7 +523,7 @@ export function EmissaoGtaPage({
                   label="Data da Emissão"
                   type="date"
                   value={dataEmissao}
-                  icon={<CalendarDays size={20} />}
+                  icon={<Calendar size={20} />}
                   onChange={setDataEmissao}
                 />
                 <FloatSelect
@@ -550,7 +576,7 @@ export function EmissaoGtaPage({
                     {cabecalho("serieNumero", "Série - Nº GTA")}
                     {cabecalho("tipoFormulario", "Tipo de Formulário")}
                     {cabecalho("especie", "Espécie")}
-                    {cabecalho("finalidade", "Finalidade de GTA")}
+                    {cabecalho("finalidade", "Finalidade de Trânsito")}
                     {cabecalho("procedencia", "Procedência")}
                     {cabecalho("destino", "Destinatário")}
                     {cabecalho("dataEmissao", "Data de Emissão")}
@@ -607,7 +633,7 @@ export function EmissaoGtaPage({
                               )
                             }
                           >
-                            <ClipboardCopy size={15} />
+                            <Copy size={15} />
                           </ActionButton>
                           {item.situacao === "Gravada" &&
                             item.necessitaPagamento && (
@@ -631,15 +657,15 @@ export function EmissaoGtaPage({
                           {(item.situacao === "Paga" ||
                             (item.situacao === "Gravada" &&
                               !item.necessitaPagamento)) && (
-                            <ActionButton
-                              title="Emitir"
-                              onClick={() =>
-                                onNavigate("emitir-emissao-gta", item)
-                              }
-                            >
-                              <ArrowRight size={17} />
-                            </ActionButton>
-                          )}
+                              <ActionButton
+                                title="Emitir"
+                                onClick={() =>
+                                  onNavigate("emitir-emissao-gta", item)
+                                }
+                              >
+                                <ArrowRight size={17} />
+                              </ActionButton>
+                            )}
                           {item.situacao === "Emitida" && (
                             <ActionButton
                               title="Baixar GTA"
