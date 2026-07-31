@@ -224,6 +224,7 @@ import { VisualizarPapelPage } from "./pages/Controle/Papeis/VisualizarPapel";
 import { AdicionarUsuariosPage } from "./pages/Controle/Usuarios/AdicionarUsuarios";
 import { UsuariosPage } from "./pages/Controle/Usuarios/Usuarios";
 import { VisualizarUsuariosPage } from "./pages/Controle/Usuarios/VisualizarUsuarios";
+import { ParametrosSistemaPage } from "./pages/Controle/ParametrosSistema/ParametrosSistema";
 
 // 1. Adicionamos as novas rotas de Pessoa Jurídica no tipo Screen
 export type Screen =
@@ -234,6 +235,7 @@ export type Screen =
 	| "visualizar-valor-indice"
 	| "login"
 	| "dashboard"
+	| "parametros-sistema"
 	| "classificacao-sanitaria-estado"
 	| "adicionar-classificacao-sanitaria-estado"
 	| "visualizar-classificacao-sanitaria-estado"
@@ -471,6 +473,10 @@ export default function App() {
 		case "dashboard":
 			return (
 				<DashboardPage onLogout={handleLogout} onNavigate={handleNavigate} />
+			);
+		case "parametros-sistema":
+			return (
+				<ParametrosSistemaPage onLogout={handleLogout} onNavigate={handleNavigate} />
 			);
 		case "classificacao-sanitaria-estado":
 			return (

@@ -20,6 +20,7 @@ import {
 	Route,
 	Ruler,
 	Settings,
+	Settings2,
 	ShieldCheck,
 	ShoppingCart,
 	Store,
@@ -652,6 +653,11 @@ export const fourthCategories: MenuCategory[] = [
 		title: "Controle", // Altere o título conforme o seu Figma
 		icon: <Settings size={28} color={GREEN} />, // Altere o ícone se precisar
 		items: [
+			{
+				label: "Parâmetros do sistema",
+				route: "parametros-sistema",
+				icon: <Settings2 size={16} />,
+			},
 			{
 				label: "Usuários",
 				route: "usuarios",
