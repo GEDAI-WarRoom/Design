@@ -85,11 +85,11 @@ function Section({
 }) {
   const [aberta, setAberta] = useState(defaultOpen);
   return (
-    <section className="bg-white rounded-xl shadow-sm overflow-visible">
+    <section className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
       <button
         type="button"
         onClick={() => setAberta((valor) => !valor)}
-        className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50 transition rounded-xl"
+        className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50 transition border-b border-gray-100"
       >
         <span className="text-base font-semibold text-gray-800">{title}</span>
         {aberta ? (
@@ -99,7 +99,7 @@ function Section({
         )}
       </button>
       {aberta && (
-        <div className="px-6 pb-6 border-t border-gray-100 pt-5">
+        <div className="p-6 flex flex-col gap-5 bg-white">
           {children}
         </div>
       )}
@@ -1330,8 +1330,19 @@ export function EmissaoGtaForm({
               </div>
             )}
           </div>
-
-
+          {value.especie?.nome === "Bovino" && (
+            <BlocoEnderecoFields
+              title="Informações de Localização do Local de Parada"
+              data={endereco}
+              tipoEstado="normal"
+              onChange={(campo, valor) =>
+                setEndereco((atual) => ({ ...atual, [campo]: valor }))
+              }
+              onSetMultipleFields={(campos) =>
+                setEndereco((atual) => ({ ...atual, ...campos }))
+              }
+            />
+          )}
         </div>
       </Section>
 
@@ -1468,14 +1479,20 @@ export function EmissaoGtaForm({
 
       <Section title="Informações da GTA">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <EntityPicker
+          <EntitySearchInput
             label="Motivo de Isenção de Taxa"
-            value={value.motivoIsencaoTaxa}
+            placeholder="Buscar motivo de isenção"
+            value={value.motivoIsencaoTaxa?.nome ?? ""}
             data={ISENCOES_TAXA_GTA}
+            searchKeys={["nome"]}
+            columns={[{ label: "Motivo", key: "nome" }]}
+            title="Buscar Motivo de Isenção de Taxa"
+            subtitle="Busque por um motivo de isenção cadastrado no sistema:"
             disabled={disabled}
             onChange={(motivoIsencaoTaxa) =>
               update("motivoIsencaoTaxa", motivoIsencaoTaxa)
             }
+            icon={<Search size={18} className="text-[#1A7A3C]" />}
           />
           <FloatInput
             label="Valor da GTA"
@@ -1531,8 +1548,10 @@ export function EmissaoGtaForm({
               <DynamicListWrapper
                 items={value.outrasVacinas}
                 behavior="zero-or-more"
-                itemLabel="Vacina"
+                variant="plain"
                 addButtonLabel="Adicionar Vacina"
+                addButtonVariant="outline"
+                addButtonClassName="border border-[#1A7A3C] text-[#1A7A3C] hover:bg-green-50 bg-transparent font-semibold"
                 disabled={disabled}
                 onAddItem={() =>
                   update("outrasVacinas", [
@@ -1625,8 +1644,10 @@ export function EmissaoGtaForm({
           <DynamicListWrapper
             items={value.atestadosExame}
             behavior="zero-or-more"
-            itemLabel="Atestado de Exame"
+            variant="plain"
             addButtonLabel="Adicionar Exame"
+            addButtonVariant="outline"
+            addButtonClassName="border border-[#1A7A3C] text-[#1A7A3C] hover:bg-green-50 bg-transparent font-semibold"
             disabled={disabled}
             onAddItem={() =>
               update("atestadosExame", [
@@ -1642,19 +1663,30 @@ export function EmissaoGtaForm({
             }
           >
             {(item, index) => (
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col md:flex-row items-start gap-4">
                 <div className="flex-1">
-                  <EntityPicker
-                    label="Tipo de Atestado de Exame"
-                    value={item.tipo}
-                    data={TIPOS_ATESTADO_EXAME_GTA}
+                  <FloatSelect
+                    label="Tipo de Atestado"
+                    value={item.tipo?.nome ?? ""}
+                    options={TIPOS_ATESTADO_EXAME_GTA.map((tipo) => ({
+                      value: tipo.nome,
+                      label: tipo.nome,
+                    }))}
                     required
                     disabled={disabled}
-                    onChange={(tipo) =>
+                    onChange={(nomeTipo) =>
                       update(
                         "atestadosExame",
                         value.atestadosExame.map((atestado, itemIndex) =>
-                          itemIndex === index ? { ...atestado, tipo } : atestado,
+                          itemIndex === index
+                            ? {
+                                ...atestado,
+                                tipo:
+                                  TIPOS_ATESTADO_EXAME_GTA.find(
+                                    (tipo) => tipo.nome === nomeTipo,
+                                  ) ?? null,
+                              }
+                            : atestado,
                         ),
                       )
                     }
