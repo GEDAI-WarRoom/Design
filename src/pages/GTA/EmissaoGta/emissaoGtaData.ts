@@ -37,6 +37,7 @@ export interface ExploracaoGta {
 
 export interface NucleoGta extends EntidadeGta {
   exploracaoId: number;
+  produtores?: string;
   caracteristica: string;
   areaAtuacao: string;
   classificacao: string;
@@ -106,29 +107,6 @@ export interface GtaRastreio {
   id: string;
   uf: string;
   serieNumero: string;
-}
-
-export interface EmissaoGtaFormValue {
-  tipoFormulario: TipoFormularioGta | "";
-  especie: EspecieGta | null;
-  finalidade: EntidadeGta | null;
-  procedencia: LocalGta;
-  destino: DestinoGta;
-  meiosTransporte: string[];
-  placaVeiculo: string;
-  possuiParadaDescanso: "Sim" | "Não";
-  faixasAnimais: FaixaAnimalGta[];
-  motivoIsencaoTaxa: EntidadeGta | null;
-  valorGta: number;
-  dataRaivaPrimeiraEtapa: string;
-  dataRaivaSegundaEtapa: string;
-  dataBrucelose: string;
-  motivoIsencaoVacinacao: EntidadeGta | null;
-  outrasVacinas: VacinaAdicionalGta[];
-  atestadoSanitario: string;
-  atestadosExame: AtestadoExameGta[];
-  gtasRastreio: GtaRastreio[];
-  observacoes: string;
 }
 
 // Adicione o tipo da estrutura do endereço

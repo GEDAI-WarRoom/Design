@@ -18,6 +18,7 @@ import {
   Map,
   Syringe,
   RotateCcw,
+  Check,
 } from "lucide-react";
 import * as Icons from "../../../imports/icons";
 import {
@@ -70,8 +71,77 @@ import {
 
 type FormMode = "create" | "view";
 
+type EnderecoState = {
+  zona: "Urbana" | "Rural" | string;
+  cep: string;
+  estado: string;
+  municipio: string;
+  bairro: string;
+  endereco: string;
+  numero: string;
+  complemento: string;
+  localidade: string;
+  distrito: string;
+  latitude: string;
+  longitude: string;
+};
+
+function MapModal({
+  onClose,
+  onConfirm,
+  initialLat,
+  initialLng,
+}: {
+  onClose: () => void;
+  onConfirm: (lat: string, lng: string) => void;
+  initialLat: string;
+  initialLng: string;
+}) {
+  const [lat, setLat] = useState(initialLat);
+  const [lng, setLng] = useState(initialLng);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-lg">
+        <h3 className="text-base font-semibold text-gray-800 mb-4">
+          Adicionar Coordenadas
+        </h3>
+        <div className="grid grid-cols-1 gap-4">
+          <FloatInput
+            label="Latitude"
+            value={lat}
+            onChange={(v) => setLat(v)}
+          />
+          <FloatInput
+            label="Longitude"
+            value={lng}
+            onChange={(v) => setLng(v)}
+          />
+        </div>
+        <div className="mt-6 flex justify-end gap-3">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-md border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            disabled={!lat || !lng}
+            onClick={() => onConfirm(lat, lng)}
+            className="rounded-md bg-[#1A7A3C] px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
+          >
+            Confirmar
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function uid() {
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  return crypto.randomUUID();
 }
 
 function Section({
@@ -85,7 +155,7 @@ function Section({
 }) {
   const [aberta, setAberta] = useState(defaultOpen);
   return (
-    <section className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    <section className="bg-white rounded-xl shadow-sm border border-gray-200 ">
       <button
         type="button"
         onClick={() => setAberta((valor) => !valor)}
@@ -118,6 +188,7 @@ export function RequiredFieldsNotice() {
     </div>
   );
 }
+
 
 function QuantityStepper({
   value,
@@ -175,6 +246,7 @@ function QuantityStepper({
 function normalizarOpcaoMultiSelect(opcao: string | { value: string; label: string }) {
   return typeof opcao === "string" ? { value: opcao, label: opcao } : opcao;
 }
+
 
 function GeolocalizacaoParada({
   latitude,
@@ -346,8 +418,8 @@ function MeioTransporteSelector({
               onClick={() => alternar(opcao.value)}
               aria-pressed={selecionado}
               className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition ${selecionado
-                ? "bg-green-50 text-[#1A7A3C]"
-                : "bg-gray-50 text-gray-600 hover:bg-gray-100"
+                ? " text-gray-600"
+                : "text-gray-600 "
                 } ${disabled ? "opacity-60 cursor-not-allowed" : ""}`}
             >
               <span
@@ -356,7 +428,7 @@ function MeioTransporteSelector({
                   : "border-gray-300 bg-white"
                   }`}
               >
-                {selecionado && <CheckCircle2 size={12} strokeWidth={3} />}
+                {selecionado && <Check size={12} strokeWidth={3} />}
               </span>
               {opcao.label}
             </button>
@@ -367,7 +439,7 @@ function MeioTransporteSelector({
   );
 }
 
-function EntityPicker({
+function EntityPicker<T extends EntidadeGta = EntidadeGta>({
   label,
   value,
   data,
@@ -383,9 +455,9 @@ function EntityPicker({
   semComplemento,
 }: {
   label: string;
-  value: EntidadeGta | null;
-  data: EntidadeGta[];
-  onChange: (entidade: any) => void;
+  value: T | null;
+  data: T[];
+  onChange: (entidade: T) => void;
   required?: boolean;
   disabled?: boolean;
   codeLabel?: string;
@@ -441,7 +513,6 @@ function EntityPicker({
           <button
             type="button"
             title={`Visualizar ${label}`}
-            onClick={() => window.alert(`${value.nome}\n${codigo}`)}
             className="h-12 w-12 flex items-center justify-center rounded-md text-[#1A7A3C] hover:bg-green-50"
           >
             <Eye size={20} />
@@ -463,14 +534,15 @@ function LocalDentroEstado({
   local: LocalGta | DestinoGta;
   especieId?: number;
   finalidade?: string;
-  onChange: (local: any) => void;
+  onChange: (local: LocalGta | DestinoGta) => void;
   disabled: boolean;
   isDestino?: boolean;
 }) {
   const update = (patch: Partial<LocalGta | DestinoGta>) =>
     onChange({ ...local, ...patch });
-  const [interdicao, setInterdicao] = useState<ReturnType<typeof getInterdicaoGta>>(
+  const interdicao = useMemo(
     () => getInterdicaoGta(local.estabelecimento),
+    [local.estabelecimento]
   );
   const [modalInterdicao, setModalInterdicao] = useState(false);
   const exploracoes = EXPLORACOES_GTA.filter(
@@ -542,7 +614,6 @@ function LocalDentroEstado({
                 disabled={disabled}
                 onChange={(estabelecimento) => {
                   const interd = getInterdicaoGta(estabelecimento);
-                  setInterdicao(interd);
                   if (interd) setModalInterdicao(true);
                   update({ estabelecimento, exploracao: null, nucleo: null });
                 }}
@@ -1090,7 +1161,8 @@ export function EmissaoGtaForm({
   ) => onChange?.({ ...value, [campo]: valor });
   const updateProcedencia = (procedencia: LocalGta) =>
     update("procedencia", procedencia);
-  const updateDestino = (destino: DestinoGta) => update("destino", destino);
+  const updateDestino = (destino: LocalGta | DestinoGta) =>
+    update("destino", destino as DestinoGta);
   const especieGrandesAnimais = ["Bovídeos", "Equídeos"].includes(
     value.especie?.grupo ?? "",
   );
@@ -1118,7 +1190,6 @@ export function EmissaoGtaForm({
     value.procedencia.revendedora ||
     value.procedencia.aeroporto,
   );
-
   const alterarFaixa = (id: string, animaisGta: number) =>
     update(
       "faixasAnimais",
@@ -1131,9 +1202,26 @@ export function EmissaoGtaForm({
 
   const sexoMacho = value.faixasAnimais.some((f) => f.sexo === "Machos") ? "Machos" : null;
   const sexoFemea = value.faixasAnimais.some((f) => f.sexo === "Fêmeas") ? "Fêmeas" : null;
+  type LinhaFaixa = {
+    faixaEtaria: string;
+    macho?: typeof value.faixasAnimais[number];
+    femea?: typeof value.faixasAnimais[number];
+  };
+
+  const motivoIsencao = Boolean(value.motivoIsencaoTaxa);
+  const faixasAnimais = value.faixasAnimais;
+  const totalMachos = (faixas: typeof value.faixasAnimais) =>
+    faixas
+      .filter((f) => f.sexo === "Machos")
+      .reduce((acc, f) => acc + (f.animaisGta ?? 0), 0);
+  const totalFemeas = (faixas: typeof value.faixasAnimais) =>
+    faixas
+      .filter((f) => f.sexo === "Fêmeas")
+      .reduce((acc, f) => acc + (f.animaisGta ?? 0), 0);
+
   const linhasPorFaixa = useMemo(() => {
     const ordem: string[] = [];
-    const mapa: Record<string, { faixaEtaria: string; macho?: any; femea?: any }> = {};
+    const mapa: Record<string, LinhaFaixa> = {};
     value.faixasAnimais.forEach((f) => {
       if (!mapa[f.faixaEtaria]) {
         mapa[f.faixaEtaria] = { faixaEtaria: f.faixaEtaria };
@@ -1298,7 +1386,8 @@ export function EmissaoGtaForm({
 
       <Section title="Informações do Trânsito">
         <div className="flex flex-col gap-5">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
+          {/* Adicionado items-end para alinhar todos os filhos pela parte de baixo */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-5 items-end">
             <div className="md:col-span-3">
               <MeioTransporteSelector
                 label="Meio de Transporte"
@@ -1330,7 +1419,20 @@ export function EmissaoGtaForm({
               </div>
             )}
           </div>
+          {value.especie?.nome !== "Bovino" && (
+            <SimNao
+              name="possuiParadaDescanso"
+              label="Possui Parada para Descanso?"
+              required
+              value={value.possuiParadaDescanso ?? "Não"}
+              onChange={(val) => update("possuiParadaDescanso", val)}
+              disabled={disabled}
+            />
+          )}
+
+
           {value.especie?.nome === "Bovino" && (
+
             <BlocoEnderecoFields
               title="Informações de Localização do Local de Parada"
               data={endereco}
@@ -1453,57 +1555,51 @@ export function EmissaoGtaForm({
                       </tr>
                     ))}
                   </tbody>
+                  {/* Linha de Totalização na tabela */}
+                  <tfoot className="bg-gray-50 border-t-2 border-gray-200 font-bold text-gray-800">
+                    <tr>
+                      <td className="border-r border-gray-200 px-4 py-3 text-left">
+                        Total
+                      </td>
+                      {sexoMacho && (
+                        <>
+                          <td className="border-r border-gray-200 px-4 py-3 text-center text-blue-900">
+                            {value.faixasAnimais
+                              .filter((f) => f.sexo === "Machos")
+                              .reduce((acc, f) => acc + (f.existente ?? 0), 0)}
+                          </td>
+                          <td className="border-r border-gray-200 px-4 py-3 text-center text-blue-900">
+                            {value.faixasAnimais
+                              .filter((f) => f.sexo === "Machos")
+                              .reduce((acc, f) => acc + (f.animaisGta ?? 0), 0)}
+                          </td>
+                        </>
+                      )}
+                      {sexoFemea && (
+                        <>
+                          <td className="border-r border-gray-200 px-4 py-3 text-center text-pink-900">
+                            {value.faixasAnimais
+                              .filter((f) => f.sexo === "Fêmeas")
+                              .reduce((acc, f) => acc + (f.existente ?? 0), 0)}
+                          </td>
+                          <td className="px-4 py-3 text-center text-pink-900">
+                            {value.faixasAnimais
+                              .filter((f) => f.sexo === "Fêmeas")
+                              .reduce((acc, f) => acc + (f.animaisGta ?? 0), 0)}
+                          </td>
+                        </>
+                      )}
+                    </tr>
+                  </tfoot>
                 </table>
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 border-t border-gray-100 pt-5">
-              <FloatInput
-                label="Total Existente"
-                value={String(
-                  value.faixasAnimais.reduce(
-                    (total, item) => total + item.existente,
-                    0,
-                  ),
-                )}
-                disabled
-              />
-              <FloatInput
-                label="Total de Animais na GTA"
-                value={String(totalAnimaisGta(value))}
-                disabled
-              />
-            </div>
+
           </div>
         )}
       </Section>
 
-      <Section title="Informações da GTA">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <EntitySearchInput
-            label="Motivo de Isenção de Taxa"
-            placeholder="Buscar motivo de isenção"
-            value={value.motivoIsencaoTaxa?.nome ?? ""}
-            data={ISENCOES_TAXA_GTA}
-            searchKeys={["nome"]}
-            columns={[{ label: "Motivo", key: "nome" }]}
-            title="Buscar Motivo de Isenção de Taxa"
-            subtitle="Busque por um motivo de isenção cadastrado no sistema:"
-            disabled={disabled}
-            onChange={(motivoIsencaoTaxa) =>
-              update("motivoIsencaoTaxa", motivoIsencaoTaxa)
-            }
-            icon={<Search size={18} className="text-[#1A7A3C]" />}
-          />
-          <FloatInput
-            label="Valor da GTA"
-            value={formatarMoedaGta(value.motivoIsencaoTaxa ? 0 : value.valorGta)}
-            disabled
-            required
-          />
-        </div>
 
-
-      </Section>
 
       {origemPreenchida && (
         <Section title="Vacinas">
@@ -1680,12 +1776,12 @@ export function EmissaoGtaForm({
                         value.atestadosExame.map((atestado, itemIndex) =>
                           itemIndex === index
                             ? {
-                                ...atestado,
-                                tipo:
-                                  TIPOS_ATESTADO_EXAME_GTA.find(
-                                    (tipo) => tipo.nome === nomeTipo,
-                                  ) ?? null,
-                              }
+                              ...atestado,
+                              tipo:
+                                TIPOS_ATESTADO_EXAME_GTA.find(
+                                  (tipo) => tipo.nome === nomeTipo,
+                                ) ?? null,
+                            }
                             : atestado,
                         ),
                       )
@@ -1838,6 +1934,89 @@ export function EmissaoGtaForm({
           />
         </div>
       </Section>
+      <Section title="Informações da GTA">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <EntitySearchInput
+            label="Motivo de Isenção de Taxa"
+            placeholder="Buscar motivo de isenção"
+            value={value.motivoIsencaoTaxa?.nome ?? ""}
+            data={ISENCOES_TAXA_GTA}
+            searchKeys={["nome"]}
+            columns={[{ label: "Motivo", key: "nome" }]}
+            title="Buscar Motivo de Isenção de Taxa"
+            subtitle="Busque por um motivo de isenção cadastrado no sistema:"
+            disabled={disabled}
+            onChange={(motivoIsencaoTaxa) =>
+              update("motivoIsencaoTaxa", motivoIsencaoTaxa)
+            }
+            icon={<img src={Icons.iconeIsencaoTaxaUrl} alt="Isenção" className="w-5 h-5 object-contain" />}
+          />
+          <FloatInput
+            label="Valor da GTA"
+            value={formatarMoedaGta(value.motivoIsencaoTaxa ? 0 : value.valorGta)}
+            disabled
+            required
+          />
+        </div>
+
+
+      </Section>
+
+      {/* Resumo final da ATA — valor e total de animais em destaque */}
+      <div className="relative overflow-hidden rounded-2xl bg-[#1B4332] px-6 py-6 flex flex-col sm:flex-row sm:items-center gap-6">
+        {/* Marca-d'água: nota emitida */}
+        <svg
+          className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[190%] w-auto text-white/[0.035] rotate-6"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+          <path d="M14 2v6h6" />
+          <path d="M8 13h5" />
+          <path d="M8 17h8" />
+          <path d="m15.5 10.5 1.5 1.5 3-3" />
+        </svg>
+
+        {/* Valor / Liquidação */}
+        <div className="relative z-10">
+          <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[#8FBF9F]">
+            Liquidação Final da ATA
+            <CheckCircle2 size={14} className="text-[#8FBF9F]" />
+          </p>
+          <p className="text-[11px] uppercase tracking-wider text-[#6E9A7D] mt-0.5">
+            {motivoIsencao ? "Isenção aplicada" : "Total devido ao tesouro estadual"}
+          </p>
+          <div className="flex items-baseline gap-1.5 mt-2">
+            <span className="text-lg font-semibold text-[#8FBF9F]">R$</span>
+            <span className="text-4xl font-bold text-white leading-none tracking-tight">
+              {formatarMoedaGta(motivoIsencao ? 0 : value.valorGta).replace("R$", "").trim()}
+            </span>
+          </div>
+        </div>
+
+        {/* Total de animais na ATA */}
+        <div className="relative z-10 sm:ml-auto sm:border-l sm:border-white/15 sm:pl-6">
+          <p className="text-xs font-semibold uppercase tracking-wider text-[#8FBF9F]">
+            Animais na ATA
+          </p>
+          <p className="text-[11px] uppercase tracking-wider text-[#6E9A7D] mt-0.5">
+            Total transportado nesta guia
+          </p>
+          <div className="flex items-baseline gap-2 mt-2">
+            <span className="text-4xl font-bold text-white leading-none tracking-tight">
+              {totalMachos(faixasAnimais) + totalFemeas(faixasAnimais)}
+            </span>
+            <span className="text-sm text-[#8FBF9F]">
+              ({totalMachos(faixasAnimais)} machos · {totalFemeas(faixasAnimais)} fêmeas)
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
