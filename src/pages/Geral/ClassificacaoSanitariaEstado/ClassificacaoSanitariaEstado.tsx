@@ -129,7 +129,7 @@ export function ClassificacaoSanitariaEstadoPage({
                 data={DOENCAS_MOCK}
                 searchKeys={["nome"]}
                 columns={[{ label: "Doença", key: "nome" }]}
-                icon={<Dna size={18} color={GREEN} />} // Se não tiver a variável GREEN declarada neste arquivo, use uma cor string ex: "#1A7A3C"
+                icon={<img src={Icons.iconeDoencaUrl} alt="Doença" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}
                 title="Buscar Doença"
                 subtitle="Busque por uma doença cadastrada:"
                 onChange={(ent) => setDoenca(ent)} // Garanta que seu estado 'doenca' armazene o objeto ou ajuste para setDoenca(ent ? ent.nome : "") se preferir salvar apenas a string

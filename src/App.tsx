@@ -3,6 +3,11 @@ import { DashboardPage } from "./pages/Dashboard";
 import { LoginPage } from "./pages/Login";
 
 // GERAL
+import { EmissaoATAPage } from "./pages/GTA/EmissaoATA/EmissaoATA";
+import { AdicionarEmissaoATAPage } from "./pages/GTA/EmissaoATA/AdicionarEmissaoATA";
+import { VisualizarEmissaoATAPage } from "./pages/GTA/EmissaoATA/VisualizarEmissaoATA";
+import { VisualizarValorIndicePage } from "./pages/Arrecadacao/ValorIndice/VisualizarValorIndice";
+import { VisualizarIndice } from "./pages/Arrecadacao/Indice/VisualizarIndice";
 import { AcouguePage } from "./pages/Geral/Acougue/Acougue";
 import { AdicionarAcouguePage } from "./pages/Geral/Acougue/AdicionarAcougue";
 import { AdicionarReceitaPage } from "./pages/Arrecadacao/Receita/AdicionarReceita";
@@ -209,6 +214,7 @@ import { AdicionarRegistroVendaGtaFisicaPage } from "./pages/GTA/RegistroVendaGT
 import { RegistroVendaGtaFisicaPage } from "./pages/GTA/RegistroVendaGTAFisica/RegistroVendaGTAFisica";
 import { AdicionarTaxaEmissaoGtaPage } from "./pages/GTA/TaxaEmissaoGta/AdicionarTaxaEmissaoGta";
 import { TaxaEmissaoGtaPage } from "./pages/GTA/TaxaEmissaoGta/TaxaEmissaoGta";
+import { VisualizarTaxaEmissaoGtaPage } from "./pages/GTA/TaxaEmissaoGta/VisualizarTaxaEmissaoGta";
 
 // CONTROLE
 import { AdicionarPapeisPage } from "./pages/Controle/Papeis/AdicionarPapeis";
@@ -221,6 +227,11 @@ import { VisualizarUsuariosPage } from "./pages/Controle/Usuarios/VisualizarUsua
 
 // 1. Adicionamos as novas rotas de Pessoa Jurídica no tipo Screen
 export type Screen =
+| "emissao-ata"
+  | "adicionar-emissao-ata"
+  | "editar-emissao-ata"
+  | "visualizar-emissao-ata"
+	| "visualizar-valor-indice"
 	| "login"
 	| "dashboard"
 	| "classificacao-sanitaria-estado"
@@ -415,6 +426,8 @@ export type Screen =
 	| "adicionar-dae"
 	| "visualizar-dae"
 	| "indice"
+	| "adicionar-indice"
+	|"visualizar-indice"
 	| "acougue"
   | "adicionar-acougue"
   | "visualizar-acougue"
@@ -437,6 +450,22 @@ export default function App() {
 	};
 
 	switch (screen) {
+		case "emissao-ata":
+      return <EmissaoATAPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-emissao-ata":
+    case "editar-emissao-ata":
+      return <AdicionarEmissaoATAPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-emissao-ata":
+      return <VisualizarEmissaoATAPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+	
+		case "visualizar-indice":
+  return (
+    <VisualizarIndice 
+      onLogout={handleLogout} 
+      onNavigate={handleNavigate} 
+      dados={screenData} 
+    />
+  );
 		case "login":
 			return <LoginPage onLogin={() => setScreen("dashboard")} />;
 		case "dashboard":
@@ -1219,17 +1248,28 @@ export default function App() {
 					modo="editar"
 				/>
 			);
-		case "valor-indice":
-			return (
-				<ValorIndicePage onLogout={handleLogout} onNavigate={handleNavigate} />
-			);
-		case "adicionar-valor-indice":
-			return (
-				<AdicionarValorIndicePage
-					onLogout={handleLogout}
-					onNavigate={handleNavigate}
-				/>
-			);
+	case "valor-indice":
+      return (
+        <ValorIndicePage onLogout={handleLogout} onNavigate={handleNavigate} />
+      );
+    case "adicionar-valor-indice":
+    case "editar-valor-indice": // <-- Mapeamos o editar aqui também
+      return (
+        <AdicionarValorIndicePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData} // <-- ISSO GARANTE O PREENCHIMENTO NO LÁPIS E NO BOTÃO
+        />
+      );
+    case "visualizar-valor-indice":
+      return (
+        <VisualizarValorIndicePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
+        />
+      );
+
 		case "fundo-arrecadacao":
 			return (
 				<FundoArrecadacaoPage
@@ -1565,6 +1605,14 @@ export default function App() {
 					onNavigate={handleNavigate}
 				/>
 			);
+		case "visualizar-taxa-emissao-gta":
+			return (
+				<VisualizarTaxaEmissaoGtaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
 		case "taxa-emissao-gta":
 			return (
 				<TaxaEmissaoGtaPage
@@ -1664,20 +1712,20 @@ export default function App() {
 				/>
 			);
 		case "indice":
-			return (
-				<Indice
-					onLogout={handleLogout}
-					onNavigate={handleNavigate}
-				/>
-			);
+      return (
+        <Indice onLogout={handleLogout} onNavigate={handleNavigate} />
+      );
+    case "adicionar-indice":
+    case "editar-indice": // <-- Mapeamos o editar aqui também
+      return (
+        <AdicionarIndice 
+          onLogout={handleLogout} 
+          onNavigate={handleNavigate} 
+          data={screenData} // <-- ISSO GARANTE O PREENCHIMENTO NO LÁPIS E NO BOTÃO
+        />
+      );
 
-		case "adicionar-indice":
-			return (
-				<AdicionarIndice
-					onLogout={handleLogout}
-					onNavigate={handleNavigate}
-				/>
-			);
+		
 		case "dae":
 			return (
 				<DAEBuscaPage

@@ -13,10 +13,10 @@ import {
 
 // Mock de exemplo para os Itens de Receita
 const ITENS_RECEITA_MOCK = [
-  { id: "1", codigo: "001", nome: "Taxa de Emissão GTA - Bovinos", quantidadeUfmg: "2" },
-  { id: "2", codigo: "002", nome: "Taxa de Emissão GTA - Aves", quantidadeUfmg: "1" },
-  { id: "3", codigo: "003", nome: "Taxa de Emissão GTA - Suínos", quantidadeUfmg: "1" },
-  { id: "4", codigo: "004", nome: "Taxa de Emissão GTA - Equídeos", quantidadeUfmg: "3" },
+  { id: "1", codigo: "001", nome: "Taxa de Emissão GTA - Bovinos", quantidadeUfmg: "2 UFMG" },
+  { id: "2", codigo: "002", nome: "Taxa de Emissão GTA - Aves", quantidadeUfmg: "1 UFMG" },
+  { id: "3", codigo: "003", nome: "Taxa de Emissão GTA - Suínos", quantidadeUfmg: "1 UFMG" },
+  { id: "4", codigo: "004", nome: "Taxa de Emissão GTA - Equídeos", quantidadeUfmg: "3 UFMG" },
 ];
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
@@ -69,7 +69,7 @@ export function TaxaEmissaoGtaForm({ value, onChange, mode = "create" }: TaxaEmi
     });
 
   return (
-    <Section title="Informações da Taxa">
+    <Section title="Informações Básicas">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {/* 1. Espécie */}
         {mode === "create" ? (
@@ -130,8 +130,8 @@ export function TaxaEmissaoGtaForm({ value, onChange, mode = "create" }: TaxaEmi
               data={ITENS_RECEITA_MOCK}
               searchKeys={["nome", "quantidadeUfmg"]}
               columns={[
-                { label: "Nome", key: "nome" },
-                { label: "Quantidade de UFMG", key: "quantidadeUfmg" },
+                { label: "Item de Receita", key: "nome" },
+                { label: "Quantidade do Índice", key: "quantidadeUfmg" },
               ]}
               icon={<ListTree size={18} color="#1A7A3C" />}
               onChange={(item) => update("itemReceita", item ? item.nome : "")}
@@ -159,8 +159,8 @@ export function TaxaEmissaoGtaForm({ value, onChange, mode = "create" }: TaxaEmi
                 data={ITENS_RECEITA_MOCK}
                 searchKeys={["nome", "quantidadeUfmg"]}
                 columns={[
-                  { label: "Nome", key: "nome" },
-                  { label: "Quantidade de UFMG", key: "quantidadeUfmg" },
+                  { label: "Item de Receita", key: "nome" },
+                  { label: "Quantidade do Índice", key: "quantidadeUfmg" },
                 ]}
                 icon={<ListTree size={18} color="#1A7A3C" />}
                 onChange={(item) => update("itemReceitaPorCabeca", item ? item.nome : "")}
@@ -207,8 +207,8 @@ export function TaxaEmissaoGtaForm({ value, onChange, mode = "create" }: TaxaEmi
                   data={ITENS_RECEITA_MOCK}
                   searchKeys={["nome", "quantidadeUfmg"]}
                   columns={[
-                    { label: "Nome", key: "nome" },
-                    { label: "Quantidade de UFMG", key: "quantidadeUfmg" },
+                    { label: "Item de Receita", key: "nome" },
+                    { label: "Quantidade do Índice", key: "quantidadeUfmg" },
                   ]}
                   icon={<ListTree size={18} color="#1A7A3C" />}
                   onChange={(item) => update("itemReceitaPorDocumento", item ? item.nome : "")}
@@ -231,7 +231,7 @@ export function RequiredFieldsNotice() {
     <div className="w-full bg-white border border-gray-100 rounded-xl p-5 shadow-sm flex items-center gap-3">
       <Info size={20} className="text-gray-500 flex-shrink-0 stroke-[2.5]" />
       <p className="text-sm text-gray-600 font-medium leading-relaxed">
-        Campos indicados com <span className="text-red-500 font-bold">*</span> são obrigatórios e deverão ser preenchidos.
+        Campos indicados * com <span className="text-red-500 font-bold">*</span> são obrigatórios e deverão ser preenchidos.
       </p>
     </div>
   );
