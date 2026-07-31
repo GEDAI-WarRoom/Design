@@ -384,13 +384,14 @@ export function DynamicListWrapper({
 					))}
 				</div>
 
-				{/* Botão de Adicionar à esquerda menor */}
+				{/* Botão de Adicionar à esquerda menor - Estilo Outline */}
 				{!disabled && (
 					<div className="w-full flex justify-start">
 						<button
 							type="button"
 							onClick={onAddItem}
-							className="mt-1 flex items-center gap-1.5 text-xs font-semibold px-3 py-3 rounded-md bg-[#1A7A3C] text-white hover:bg-[#15612F] transition cursor-pointer">
+							className="mt-1 flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-md border border-[#1A7A3C] text-[#1A7A3C] bg-transparent hover:bg-green-50 transition cursor-pointer"
+						>
 							<PlusCircle size={18} />
 							{addButtonLabel}
 						</button>
