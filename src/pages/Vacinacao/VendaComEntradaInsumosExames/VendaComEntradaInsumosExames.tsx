@@ -237,8 +237,9 @@ export function VendaComEntradaInsumosExamesPage({
 				{/* Card Unificado (Filtros + Tabela) */}
 				<div className="bg-white rounded-xl shadow-sm p-6 flex flex-col gap-5">
 					{/* Seção dos Filtros */}
+					{/* Seção dos Filtros */}
 					<div className="bg-white">
-						<div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
+						<div className="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
 							{/* 1. Fornecedor */}
 							<EntitySearchInput
 								label="Fornecedor"
@@ -379,11 +380,11 @@ export function VendaComEntradaInsumosExamesPage({
 								options={SITUACOES}
 							/>
 
-							{/* 8. Botão Pesquisar */}
+							{/* 8. Botão Pesquisar - Ajustado para ocupar o restante da 2ª linha */}
 							<button
 								type="button"
 								onClick={handlePesquisar}
-								className={`${tipoDestinatario ? "md:col-span-2" : "md:col-span-3"} w-full h-12 px-5 rounded-md text-white text-sm font-semibold transition hover:opacity-90 flex items-center justify-center flex-shrink-0`}
+								className={`${tipoDestinatario ? "md:col-span-1" : "md:col-span-2"} w-full h-12 px-5 rounded-md text-white text-sm font-semibold transition hover:opacity-90 flex items-center justify-center flex-shrink-0`}
 								style={{ backgroundColor: GREEN }}>
 								Pesquisar
 							</button>
@@ -413,8 +414,7 @@ export function VendaComEntradaInsumosExamesPage({
 									)}
 									{tipoDestinatario && (
 										<Chip
-											label={`Tipo: ${TIPOS_DESTINATARIOS.find((t) => t.value === tipoDestinatario)?.label
-												}`}
+											label={`Tipo: ${TIPOS_DESTINATARIOS.find((t) => t.value === tipoDestinatario)?.label}`}
 											onRemove={() => {
 												setTipoDestinatario("");
 												setDestinatario(null);

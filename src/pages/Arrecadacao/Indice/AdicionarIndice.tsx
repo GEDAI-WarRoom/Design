@@ -43,7 +43,7 @@ export function AdicionarIndice({ onLogout, onNavigate, data }: AdicionarIndiceP
           </button>
           <div className="flex justify-between items-center w-full">
             <h1 className="text-2xl font-semibold text-gray-900">
-              {isEdicao ? "Editar Índice" : "Adicionar Índice"}
+              {"Adicionar Índice"}
             </h1>
             <button type="button" disabled={!formularioValido} onClick={() => setIsSucesso(true)} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-bold rounded-md transition shadow-sm">
               {isEdicao ? "Salvar" : "Adicionar"}
@@ -61,7 +61,6 @@ export function AdicionarIndice({ onLogout, onNavigate, data }: AdicionarIndiceP
         <Section title="Informações Básicas">
           <div className={`grid grid-cols-1 ${isEdicao ? "md:grid-cols-2" : "md:grid-cols-1"} gap-5`}>
             <FloatInput label="Nome do Índice" required value={nome} onChange={setNome} maxLength={255} />
-            {isEdicao && <FloatSelect label="Situação" required value={situacao} onChange={setSituacao} options={SITUACOES_OPCOES} />}
           </div>
         </Section>
       </main>

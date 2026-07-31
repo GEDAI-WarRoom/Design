@@ -32,7 +32,11 @@ import {
 	Scale,
 	ScrollText,
 	LineChart,
-	FileText
+	FileText,
+	MoveUpRight, ScanBarcode, RefreshCw,
+	BriefcaseMedical,
+	PillBottle,
+	CalendarDays
 } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import * as Icons from "../imports/icons";
@@ -58,7 +62,7 @@ export const cadastrosCategories: MenuCategory[] = [
 		title: "Geral",
 		icon: <Globe size={32} color={GREEN} />,
 		items: [
-			
+
 			{
 				label: "Aeroporto/Porto",
 				route: "aeroporto-porto",
@@ -86,7 +90,7 @@ export const cadastrosCategories: MenuCategory[] = [
 					/>
 				),
 			},
-			
+
 			{
 				label: "Venda de Propriedade",
 				route: "venda-propriedade",
@@ -365,11 +369,7 @@ export const secondaryCategories: MenuCategory[] = [
 				route: "venda-entrada-vacina",
 				icon: <PackagePlus size={16} />,
 			},
-			{
-				label: "Venda com Entrada de Insumos para Exames",
-				route: "venda-entrada-insumos-exames",
-				icon: <PackagePlus size={16} />,
-			},
+
 			{
 				label: "Doação/Partilha de Vacina",
 				route: "partilha-vacina",
@@ -388,17 +388,7 @@ export const secondaryCategories: MenuCategory[] = [
 					/>
 				),
 			},
-			{
-				label: "Ajuste de Doses de Insumo",
-				route: "ajuste-doses-insumo",
-				icon: (
-					<img
-						src={Icons.iconeDoseVacinaUrl}
-						alt="Dose de Vacina"
-						className="w-4 h-4"
-					/>
-				),
-			},
+
 			{
 				label: "Etapa de Vacinação",
 				route: "etapa-vacinacao",
@@ -440,11 +430,7 @@ export const secondaryCategories: MenuCategory[] = [
 					<img src={Icons.iconeDoencaUrl} alt="Doença" className="w-4 h-4" />
 				),
 			},
-			{
-				label: "Tipo de Insumo de Exame",
-				route: "tipo-insumo-exame",
-				icon: <TestTube size={16} />,
-			},
+
 			{
 				label: "Vacinador Contra Brucelose",
 				route: "vacinador",
@@ -456,6 +442,39 @@ export const secondaryCategories: MenuCategory[] = [
 					/>
 				),
 			},
+
+		],
+	},
+	{
+		title: "Exame",
+		icon: <BriefcaseMedical size={28} color={GREEN} />,
+		items: [
+
+
+			{
+				label: "Venda com Entrada de Insumos para Exames",
+				route: "venda-entrada-insumos-exames",
+				icon: <PackagePlus size={16} />,
+			},
+
+			{
+				label: "Ajuste de Doses de Insumo",
+				route: "ajuste-doses-insumo",
+				icon: (
+					<img
+						src={Icons.iconeDoseVacinaUrl}
+						alt="Dose de Vacina"
+						className="w-4 h-4"
+					/>
+				),
+			},
+
+			{
+				label: "Tipo de Insumo de Exame",
+				route: "tipo-insumo-exame",
+				icon: <PillBottle size={16} />,
+			},
+
 			{
 				label: "Local de Realização de Exame",
 				route: "local-realizacao-exame",
@@ -477,7 +496,84 @@ export const secondaryCategories: MenuCategory[] = [
 				className="w-9 h-9 object-contain"
 			/>
 		),
-		items: [],
+		items: [
+			{
+				label: "Etapa de Atualização Cadastral",
+				route: "etapa-atualizacao-cadastral",
+				icon: (
+					<img
+						src={Icons.iconeEtapaUrl}
+						alt="Etapa"
+						className="w-4 h-4 object-contain"
+					/>
+				),
+			},
+			{
+				label: "Ajuste de Rebanho",
+				route: "ajuste-rebanho",
+				icon: (
+					<img
+						src={Icons.iconeAjusteRebanhoUrl}
+						alt="Lançamento de Rebanho"
+						className="w-4 h-4 object-contain"
+					/>
+				),
+			},
+			{
+				label: "Lançamento de Rebanho",
+				route: "lancamento-rebanho",
+
+				icon: <MoveUpRight size={16} />,
+			},
+			{
+				label: "Atualização Cadastral de Rebanho",
+				route: "atualizacao-cadastral-rebanho",
+				icon: <RefreshCw size={16} />,
+			},
+		],
+	},
+];
+
+export const thirdCategories: MenuCategory[] = [
+
+	{
+		title: "Arrecadação",
+		icon: <DollarSign size={28} color={GREEN} />,
+		items: [
+			{
+				label: "Receita",
+				route: "receita",
+				icon: <ReceiptText size={16} />,
+			},
+			{
+				label: "Índice",
+				route: "indice",
+				icon: <LineChart size={16} />,
+			},
+
+			{
+				label: "DAE",
+				route: "dae",
+				icon: <ScanBarcode size={16} />,
+
+			},
+			{
+				label: "Fundo de Arrecadação",
+				route: "fundo-arrecadacao",
+				icon: <Wallet size={16} />,
+			},
+
+			{
+				label: "Notificações dos Estabelecimentos",
+				route: "notificacoes-estabelecimentos",
+				icon: <Scale size={16} />,
+			},
+			{
+				label: "Lote de Pagamento",
+				route: "lote-pagamento",
+				icon: <Layers3 size={16} />,
+			},
+		],
 	},
 	{
 		title: "GTA",
@@ -524,7 +620,7 @@ export const secondaryCategories: MenuCategory[] = [
 			{
 				label: "Taxa de Emissão de GTA",
 				route: "taxa-emissao-gta",
-				icon: <ReceiptText size={16} />,
+				icon: <BadgePercent size={16} />,
 			},
 			{
 				label: "Isenção de Taxa de GTA",
@@ -540,54 +636,12 @@ export const secondaryCategories: MenuCategory[] = [
 			{
 				label: "Recolhimento Mensal de GTAs",
 				route: "recolhimento-mensal-gta",
-				icon: <ReceiptText size={16} />,
+				icon: <CalendarDays size={16} />,
 			},
 			{
 				label: "Emissão de ATA",
 				route: "emissao-ata",
 				icon: <FileText size={16} />,
-			},
-		],
-	},
-];
-
-export const thirdCategories: MenuCategory[] = [
-	{
-		title: "Arrecadação",
-		icon: <DollarSign size={28} color={GREEN} />,
-		items: [
-			{
-				label: "Receita",
-				route: "receita",
-				icon: <ReceiptText size={16} />,
-			},
-			{
-				label: "Índice",
-				route: "indice",
-				icon: <LineChart size={16} />,
-			},
-
-			{
-				label: "DAE",
-				route: "dae",
-				icon: <ScrollText size={16} />,
-
-			},
-			{
-				label: "Fundo de Arrecadação",
-				route: "fundo-arrecadacao",
-				icon: <Wallet size={16} />,
-			},
-
-			{
-				label: "Notificações dos Estabelecimentos",
-				route: "notificacoes-estabelecimentos",
-				icon: <Scale size={16} />,
-			},
-			{
-				label: "Lote de Pagamento",
-				route: "lote-pagamento",
-				icon: <Layers3 size={16} />,
 			},
 		],
 	},
@@ -669,16 +723,7 @@ export function DashboardPage({ onLogout, onNavigate }: any) {
 			/>
 
 			<main className="max-w-5xl mx-auto px-4 md:px-6 py-6">
-				{/* Status badges */}
-				<div className="bg-white rounded-xl px-5 py-3 mb-6 flex flex-wrap gap-4 items-center shadow-sm">
-					<div className="flex items-center gap-2">
-						<span
-							className="w-3 h-3 rounded-full"
-							style={{ backgroundColor: GREEN }}
-						/>
-						<span className="text-sm text-gray-700">Concluído</span>
-					</div>
-				</div>
+
 
 				{/* Bloco de Cadastros (Exatamente como estava) */}
 				<div className="flex flex-col bg-white rounded-xl shadow-sm p-6 mb-6 gap-6">
