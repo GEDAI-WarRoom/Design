@@ -188,6 +188,12 @@ import { Indice } from "./pages/Arrecadacao/Indice/Indice";
 import { AdicionarIndice } from "./pages/Arrecadacao/Indice/AdicionarIndice";
 
 // GTA
+import { AdicionarEmissaoGtaPage } from "./pages/GTA/EmissaoGta/AdicionarEmissaoGta";
+import { CancelarEmissaoGtaPage } from "./pages/GTA/EmissaoGta/CancelarEmissaoGta";
+import { EmitirEmissaoGtaPage } from "./pages/GTA/EmissaoGta/EmitirEmissaoGta";
+import { EmissaoGtaPage } from "./pages/GTA/EmissaoGta/EmissaoGta";
+import { PagarEmissaoGtaPage } from "./pages/GTA/EmissaoGta/PagarEmissaoGta";
+import { VisualizarEmissaoGtaPage } from "./pages/GTA/EmissaoGta/VisualizarEmissaoGta";
 import { AdicionarDistribuicaoFormulariosGta } from "./pages/GTA/DistribuicaoFormulariosGta/AdicionarDistribuicaoFormulariosGta";
 import { DistribuicaoFormulariosGta } from "./pages/GTA/DistribuicaoFormulariosGta/DistribuicaoFormulariosGta";
 import { AdicionarFinalidadeTransitoPage } from "./pages/GTA/FinalidadeTransito/AdicionarFinalidadeTransito";
@@ -224,6 +230,7 @@ import { VisualizarPapelPage } from "./pages/Controle/Papeis/VisualizarPapel";
 import { AdicionarUsuariosPage } from "./pages/Controle/Usuarios/AdicionarUsuarios";
 import { UsuariosPage } from "./pages/Controle/Usuarios/Usuarios";
 import { VisualizarUsuariosPage } from "./pages/Controle/Usuarios/VisualizarUsuarios";
+import { ParametrosSistemaPage } from "./pages/Controle/ParametrosSistema/ParametrosSistema";
 
 // 1. Adicionamos as novas rotas de Pessoa Jurídica no tipo Screen
 export type Screen =
@@ -234,6 +241,7 @@ export type Screen =
 	| "visualizar-valor-indice"
 	| "login"
 	| "dashboard"
+	| "parametros-sistema"
 	| "classificacao-sanitaria-estado"
 	| "adicionar-classificacao-sanitaria-estado"
 	| "visualizar-classificacao-sanitaria-estado"
@@ -311,6 +319,12 @@ export type Screen =
 	| "visualizar-registro-venda-gta-digital"
 	| "editar-registro-venda-gta-digital"
 	| "visualizar-dae-registro-venda-gta"
+	| "emissao-gta"
+	| "adicionar-emissao-gta"
+	| "visualizar-emissao-gta"
+	| "emitir-emissao-gta"
+	| "cancelar-emissao-gta"
+	| "pagar-emissao-gta"
 	| "vacinador"
 	| "adicionar-vacinador"
 	| "produto"
@@ -471,6 +485,10 @@ export default function App() {
 		case "dashboard":
 			return (
 				<DashboardPage onLogout={handleLogout} onNavigate={handleNavigate} />
+			);
+		case "parametros-sistema":
+			return (
+				<ParametrosSistemaPage onLogout={handleLogout} onNavigate={handleNavigate} />
 			);
 		case "classificacao-sanitaria-estado":
 			return (
@@ -1303,6 +1321,53 @@ export default function App() {
 		//  case "adicionar-passaporte-equestre":
 		//  return <AdicionarPassaporteEquestrePage onLogout={handleLogout} onNavigate={handleNavigate} />;
 
+		case "emissao-gta":
+			return (
+				<EmissaoGtaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-emissao-gta":
+			return (
+				<AdicionarEmissaoGtaPage
+					dados={screenData}
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-emissao-gta":
+			return (
+				<VisualizarEmissaoGtaPage
+					dados={screenData}
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "emitir-emissao-gta":
+			return (
+				<EmitirEmissaoGtaPage
+					dados={screenData}
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "cancelar-emissao-gta":
+			return (
+				<CancelarEmissaoGtaPage
+					dados={screenData}
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "pagar-emissao-gta":
+			return (
+				<PagarEmissaoGtaPage
+					dados={screenData}
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
 		case "distribuicao-formularios-gta":
 			return (
 				<DistribuicaoFormulariosGta

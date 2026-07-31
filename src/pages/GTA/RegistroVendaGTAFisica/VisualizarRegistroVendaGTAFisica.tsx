@@ -184,7 +184,7 @@ export function VisualizarRegistroVendaGtaFisicaPage({
               onClick={handlePagarTaxa}
               className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#F57C00] hover:bg-[#E65100] text-white rounded-lg text-xs font-bold transition self-start sm:self-center shrink-0 shadow-sm"
             >
-              <ScrollText size={15} />
+              <ScanBarcode size={15} />
               Associar DAE
             </button>
           </div>

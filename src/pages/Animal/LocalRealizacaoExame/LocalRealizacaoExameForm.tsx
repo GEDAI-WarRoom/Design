@@ -340,7 +340,7 @@ export function LocalRealizacaoExameForm({
 export const criarEnderecoVazio = (): EnderecoLocalExame => ({
   zona: "",
   cep: "",
-  estado: "Minas Gerais",
+  estado: "",
   municipio: "",
   bairro: "",
   endereco: "",
