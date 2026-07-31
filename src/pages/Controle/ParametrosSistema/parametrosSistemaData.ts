@@ -19,6 +19,8 @@ export interface ParametroSistema {
   tipo: TipoValorParametro;
   funcionalidade?: string;
   campo?: string;
+  modificadoPor: string;
+  modificadoEm: string;
 }
 
 export const CADASTROS_COM_PARAMETROS = [
@@ -34,6 +36,9 @@ type ParametroGeralRaw = [
 ];
 
 const PARAMETROS_GERAIS_RAW: ParametroGeralRaw[] = [
+  ["nrDiasValidadePassaporteEquestre", "Quantidade de dias que o Passaporte Equestre permanece válido após a emissão", "365"],
+  ["dtValidadePassaporteEquestreModeloAntigo", "Data limite de validade dos passaportes equestres emitidos no modelo antigo", "2027-06-30"],
+  ["vlPercentualMinimoAlertaEstoqueProdutor", "Limite percentual para disparar alertas de baixo estoque animal para as regionais", "15"],
   ["assuntoEmailCargaGtaOe", "Texto assunto e-mail rotina EnviarEmailCargaGtaOe", "Lista de GTAs da PGA com destino Minas Gerais"],
   ["assuntoEmailGtaOeBaixada", "Texto assunto e-mail rotina EmailGtaOeBaixada", "Lista de GTAs da PGA"],
   ["controleNoventenaIntegracaoPGA", "Parâmetro para habilitar o controle de noventena Integração PGA", "Sim"],
@@ -148,27 +153,103 @@ function inferirTipo(nome: string, valor: string): TipoValorParametro {
   return "texto";
 }
 
+/** Faixa usada para desenhar o slider. rotuloMin/rotuloMax são opcionais —
+ *  quando presentes, aparecem ao lado do valor extremo (ex.: "5% (CRÍTICO)"). */
+export interface FaixaNumero {
+  min: number;
+  max: number;
+  step: number;
+  unidade: string;
+  rotuloMin?: string;
+  rotuloMax?: string;
+}
+
+/**
+ * Faixas configuradas manualmente para parâmetros específicos. Tem prioridade
+ * sobre o cálculo automático — use quando o intervalo "genérico" não fizer
+ * sentido para o parâmetro (ex.: validade de documento, multiplicador de taxa)
+ * ou quando quiser rótulos descritivos nos extremos (ex.: "CRÍTICO"/"PADRÃO").
+ * Para adicionar uma faixa própria, inclua uma entrada com a chave sendo o
+ * "nome" exato do parâmetro (o primeiro valor do array bruto).
+ */
+const FAIXAS_PERSONALIZADAS: Record<string, FaixaNumero> = {
+  // Faz sentido como slider: janela de cancelamento tem um teto operacional real (até 48h).
+  qtHorasEmissaoGtaSaidaEvento: { min: 1, max: 48, step: 1, unidade: "h" },
+  // Faz sentido como slider: percentual com rótulos de referência nos extremos.
+  vlPercentualMinimoAlertaEstoqueProdutor: {
+    min: 5,
+    max: 50,
+    step: 5,
+    unidade: "%",
+    rotuloMin: "CRÍTICO",
+    rotuloMax: "PADRÃO",
+  },
+  // nrDiasValidadePassaporteEquestre, nrDiasValidadeGta e vlMultiplicaTaxaEmissaoEvento
+  // ficam de fora de propósito: são valores livres (ex.: validade de documento), então
+  // caem no campo numérico manual em vez de slider.
+};
+
+/**
+ * Retorna a faixa (min/max/step/unidade/rótulos) para exibir o slider do tipo
+ * "numero", OU null quando o parâmetro não tem uma faixa curada — nesse caso
+ * o card usa um campo numérico de digitação livre em vez de slider.
+ * Só existe slider para parâmetros explicitamente cadastrados em
+ * FAIXAS_PERSONALIZADAS: um valor "livre" (validade, quantidade, etc.) não
+ * tem um teto natural e obrigar o usuário a usar um slider arbitrário
+ * atrapalha mais do que ajuda.
+ */
+export function calcularFaixaNumero(nome: string, _valor: string): FaixaNumero | null {
+  return FAIXAS_PERSONALIZADAS[nome] ?? null;
+}
+
+const NOMES_RESPONSAVEIS = ["João Silva", "Maria Lima", "Carlos Andrade", "Sofia Santos", "Ana Costa", "Pedro Oliveira"];
+const DATAS_MODIFICACAO = ["Há 2 horas", "Ontem às 15:30", "Há 5 dias", "12 de Jan, 2024", "Há 30 minutos", "Há 1 semana", "Há 3 dias"];
+
+function hashTexto(texto: string): number {
+  let hash = 0;
+  for (let indice = 0; indice < texto.length; indice += 1) {
+    hash = (hash * 31 + texto.charCodeAt(indice)) % 100000;
+  }
+  return hash;
+}
+
+function gerarMetadadosAuditoria(id: string): { modificadoPor: string; modificadoEm: string } {
+  const hash = hashTexto(id);
+  return {
+    modificadoPor: NOMES_RESPONSAVEIS[hash % NOMES_RESPONSAVEIS.length],
+    modificadoEm: DATAS_MODIFICACAO[Math.floor(hash / 7) % DATAS_MODIFICACAO.length],
+  };
+}
+
 let parametrosSistemaMock: ParametroSistema[] = [
-  ...PARAMETROS_GERAIS_RAW.map(([nome, descricao, valor, situacao]) => ({
-    id: `gta-gerais-${nome}`,
-    cadastroId: "gta-gerais" as const,
-    nome,
-    descricao,
-    valor,
-    situacao: situacao ?? "Ativo",
-    tipo: inferirTipo(nome, valor),
-  })),
-  ...PARAMETROS_FUNCIONALIDADES_RAW.map(([nome, funcionalidade, campo, descricao, valor]) => ({
-    id: `gta-funcionalidades-${nome}`,
-    cadastroId: "gta-funcionalidades" as const,
-    nome,
-    descricao,
-    valor,
-    situacao: valor,
-    tipo: "situacao" as const,
-    funcionalidade,
-    campo,
-  })),
+  ...PARAMETROS_GERAIS_RAW.map(([nome, descricao, valor, situacao]) => {
+    const id = `gta-gerais-${nome}`;
+    return {
+      id,
+      cadastroId: "gta-gerais" as const,
+      nome,
+      descricao,
+      valor,
+      situacao: situacao ?? "Ativo",
+      tipo: inferirTipo(nome, valor),
+      ...gerarMetadadosAuditoria(id),
+    };
+  }),
+  ...PARAMETROS_FUNCIONALIDADES_RAW.map(([nome, funcionalidade, campo, descricao, valor]) => {
+    const id = `gta-funcionalidades-${nome}`;
+    return {
+      id,
+      cadastroId: "gta-funcionalidades" as const,
+      nome,
+      descricao,
+      valor,
+      situacao: valor,
+      tipo: "situacao" as const,
+      funcionalidade,
+      campo,
+      ...gerarMetadadosAuditoria(id),
+    };
+  }),
 ];
 
 export function listarParametrosSistema(): ParametroSistema[] {
@@ -178,6 +259,8 @@ export function listarParametrosSistema(): ParametroSistema[] {
 export function salvarParametrosSistema(parametros: ParametroSistema[]): void {
   const alterados = new Map(parametros.map((item) => [item.id, item]));
   parametrosSistemaMock = parametrosSistemaMock.map((item) =>
-    alterados.has(item.id) ? { ...alterados.get(item.id)! } : item,
+    alterados.has(item.id)
+      ? { ...alterados.get(item.id)!, modificadoEm: "Agora mesmo" }
+      : item,
   );
 }
