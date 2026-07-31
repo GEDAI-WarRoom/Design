@@ -364,6 +364,15 @@ export function AdicionarEmissaoATAPage({ dados, onLogout, onNavigate }: { dados
   // Lógica - Destino
   const [respDest, setRespDest] = useState<any>(null);
 
+  // Condição para exibir as seções inferiores somente após o fluxo de procedência estar completo
+  const procedenciaConcluida = Boolean(
+    respProc &&
+    estabProc &&
+    exploracaoProc &&
+    nucleoProc &&
+    !interdicaoInfo
+  );
+
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
       <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="emissao-ata" hideSearch />
@@ -377,7 +386,7 @@ export function AdicionarEmissaoATAPage({ dados, onLogout, onNavigate }: { dados
             <h1 className="text-2xl font-semibold text-gray-900">{isEdicao ? "Editar ATA" : "Emitir Nova ATA"}</h1>
             <button
               type="button"
-              disabled={Boolean(interdicaoInfo)}
+              disabled={Boolean(interdicaoInfo) || !procedenciaConcluida}
               onClick={() => {
                 if (interdicaoInfo) {
                   setModalInterdicao(true);
@@ -385,7 +394,7 @@ export function AdicionarEmissaoATAPage({ dados, onLogout, onNavigate }: { dados
                 }
                 setIsSucesso(true);
               }}
-              className={`px-5 h-10 text-xs font-bold rounded-md transition shadow-sm ${interdicaoInfo
+              className={`px-5 h-10 text-xs font-bold rounded-md transition shadow-sm ${interdicaoInfo || !procedenciaConcluida
                 ? "bg-gray-200 text-gray-400 cursor-not-allowed"
                 : "bg-[#1A7A3C] hover:bg-[#15612F] text-white"
                 }`}
@@ -581,7 +590,7 @@ export function AdicionarEmissaoATAPage({ dados, onLogout, onNavigate }: { dados
                   ]}
                   searchKeys={["nome", "cpfCnpj"]}
                   onChange={(e) => setRespDest(e)}
-                  icon={<img src={Icons.iconeDestinatarioUrl} alt="Responsável Destino" className="w-5 h-5 object-contain grayscale opacity-60" />}
+                  icon={<img src={Icons.iconeDestinatarioUrl} alt="Responsável Destino" className="w-5 h-5 object-contain " />}
                 />
               </div>
 
@@ -738,197 +747,202 @@ export function AdicionarEmissaoATAPage({ dados, onLogout, onNavigate }: { dados
           </div>
         </Section>
 
-        {/* INFORMAÇÕES DOS ANIMAIS COM A ADJUSTMENT TABLE */}
-        <Section title="Informações dos Animais">
-          <AdjustmentTable
-            faixas={faixasAnimais}
-            onChange={setFaixasAnimais}
-            onReset={() => setFaixasAnimais(FAIXAS_MOCK_INICIAL)}
-          />
-        </Section>
+        {/* SEÇÕES DEPENDENTES DA CONCLUSÃO DA PROCEDÊNCIA */}
+        {procedenciaConcluida && (
+          <>
+            {/* INFORMAÇÕES DOS ANIMAIS COM A ADJUSTMENT TABLE */}
+            <Section title="Informações dos Animais">
+              <AdjustmentTable
+                faixas={faixasAnimais}
+                onChange={setFaixasAnimais}
+                onReset={() => setFaixasAnimais(FAIXAS_MOCK_INICIAL)}
+              />
+            </Section>
 
+            <Section title="Vacinas">
+              <div className="flex flex-col gap-5">
+                {/* Vacinas do Serviço Oficial */}
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3">Vacinas do Serviço Oficial</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <FloatInput
+                      label="Data da Vacinação da 1ª Etapa de Raiva de Herbívoros"
+                      value="25/03/2025"
+                      disabled
+                      icon={<Calendar size={18} className="text-gray-400" />}
+                    />
+                    <FloatInput
+                      label="Data da Vacinação da 2ª Etapa de Raiva de Herbívoros"
+                      value="25/03/2025"
+                      disabled
+                      icon={<Calendar size={18} className="text-gray-400" />}
+                    />
+                    {/* Brucelose: só para Bovinos e Bubalinos */}
+                    {(especie === "Bovino" || especie === "Bubalino") && (
+                      <FloatInput
+                        label="Data da Vacinação de Brucelose"
+                        value="25/03/2025"
+                        disabled
+                        icon={<Calendar size={18} className="text-gray-400" />}
+                      />
+                    )}
+                  </div>
+                </div>
 
-        <Section title="Vacinas">
-          <div className="flex flex-col gap-5">
-            {/* Vacinas do Serviço Oficial */}
-            <div>
-              <h4 className="text-sm font-semibold text-gray-700 mb-3">Vacinas do Serviço Oficial</h4>
+                <hr className="border-gray-100" />
+
+                {/* Outras Vacinas (zero ou mais - inicia vazio []) */}
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3">Outras Vacinas</h4>
+                  <DynamicListWrapper
+                    items={outrasVacinas}
+                    behavior="zero-or-more"
+                    variant="plain"
+                    addButtonLabel="Adicionar Vacina"
+                    addButtonVariant="outline"
+                    addButtonClassName="border border-[#1A7A3C] text-[#1A7A3C] hover:bg-green-50 bg-transparent font-semibold"
+                    onAddItem={() => setOutrasVacinas(p => [...p, { id: uid(), vacina: "", data: "" }])}
+                    onRemoveItem={(i) => setOutrasVacinas(p => p.filter((_, idx) => idx !== i))}
+                  >
+                    {(item, index) => (
+                      <div className="flex items-start gap-4">
+                        <div className="flex-1">
+                          <EntitySearchInput
+                            label="Vacina"
+                            placeholder="Buscar doença"
+                            value={item.vacina}
+                            data={DOENCAS_VACINA_MOCK}
+                            searchKeys={["nome"]}
+                            columns={[{ label: "Doença", key: "nome" }]}
+                            title="Buscar Vacina"
+                            subtitle="Busque por uma doença que produz vacina:"
+                            required
+                            onChange={(ent: any) => setOutrasVacinas(p => p.map((v, idx) => idx === index ? { ...v, vacina: ent?.nome || "" } : v))}
+                            icon={<Syringe size={18} className="text-[#1A7A3C]" />}
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <FloatInput
+                            label="Data da Vacinação"
+                            type="date"
+                            value={item.data}
+                            onChange={(v) => setOutrasVacinas(p => p.map((vac, idx) => idx === index ? { ...vac, data: v } : vac))}
+                            required
+                            icon={<Calendar size={18} className="text-[#1A7A3C]" />}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </DynamicListWrapper>
+                </div>
+              </div>
+            </Section>
+
+            <Section title="Atestados">
+              <div className="flex flex-col gap-4">
+                <UploadField label="Atestado Sanitário" required fileName="" onSelectFile={() => { }} />
+                <hr className="border-gray-100 my-2" />
+                <h4 className="text-sm font-semibold text-gray-700">Atestado de Exames</h4>
+                {/* Atestados de Exames (zero ou mais - inicia vazio []) */}
+                <DynamicListWrapper
+                  items={atestados}
+                  behavior="zero-or-more"
+                  variant="plain"
+                  addButtonLabel="Adicionar Exame"
+                  addButtonVariant="outline"
+                  addButtonClassName="border border-[#1A7A3C] text-[#1A7A3C] hover:bg-green-50 bg-transparent font-semibold"
+                  onAddItem={() => setAtestados(p => [...p, { id: uid(), tipo: "", arquivo: "" }])}
+                  onRemoveItem={(i) => setAtestados(p => p.filter((_, idx) => idx !== i))}
+                >
+                  {(item, index) => (
+                    <div className="flex items-center gap-4">
+                      <div className="flex-1"><FloatSelect label="Tipo de Atestado" value={item.tipo} onChange={(v) => setAtestados(p => p.map((a, idx) => idx === index ? { ...a, tipo: v } : a))} options={[{ value: "Brucelose", label: "Brucelose" }]} required /></div>
+                      <div className="flex-1"><UploadField label="Arquivo do Exame" fileName={item.arquivo} onSelectFile={() => { }} required /></div>
+                    </div>
+                  )}
+                </DynamicListWrapper>
+              </div>
+            </Section>
+
+            <Section title="Observações">
+              <LargeTextArea label="Observações" value={observacoes} onChange={setObservacoes} required />
+            </Section>
+
+            <Section title="Informações da ATA">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <FloatInput
-                  label="Data da Vacinação da 1ª Etapa de Raiva de Herbívoros"
-                  value="25/03/2025"
-                  disabled
-                  icon={<Calendar size={18} className="text-gray-400" />}
+                <EntitySearchInput
+                  label="Motivo de Isenção de Taxa"
+                  placeholder="Buscar motivo de isenção"
+                  value={motivoIsencao ? motivoIsencao.nome : ""}
+                  data={ISENCOES_MOCK}
+                  searchKeys={["nome"]}
+                  columns={[{ label: "Motivo", key: "nome" }]}
+                  title="Buscar Motivo de Isenção de Taxa"
+                  subtitle="Busque por um motivo de isenção cadastrado no sistema:"
+                  onChange={(ent: any) => setMotivoIsencao(ent)}
+                  icon={<img src={Icons.iconeIsencaoTaxaUrl} alt="Isenção" className="w-5 h-5 object-contain" />}
                 />
-                <FloatInput
-                  label="Data da Vacinação da 2ª Etapa de Raiva de Herbívoros"
-                  value="25/03/2025"
-                  disabled
-                  icon={<Calendar size={18} className="text-gray-400" />}
-                />
-                {/* Brucelose: só para Bovinos e Bubalinos */}
-                {(especie === "Bovino" || especie === "Bubalino") && (
-                  <FloatInput
-                    label="Data da Vacinação de Brucelose"
-                    value="25/03/2025"
-                    disabled
-                    icon={<Calendar size={18} className="text-gray-400" />}
-                  />
-                )}
+                <FloatInput label="Valor da ATA" value={motivoIsencao ? "R$ 0,00" : "R$ 8,56"} disabled />
+              </div>
+            </Section>
+
+            {/* Resumo final da ATA — valor e total de animais em destaque */}
+            <div className="relative overflow-hidden rounded-2xl bg-[#1B4332] px-6 py-6 flex flex-col sm:flex-row sm:items-center gap-6">
+              {/* Marca-d'água: nota emitida */}
+              <svg
+                className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[190%] w-auto text-white/[0.035] rotate-6"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <path d="M14 2v6h6" />
+                <path d="M8 13h5" />
+                <path d="M8 17h8" />
+                <path d="m15.5 10.5 1.5 1.5 3-3" />
+              </svg>
+
+              {/* Valor / Liquidação */}
+              <div className="relative z-10">
+                <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[#8FBF9F]">
+                  Liquidação Final da ATA
+                  <CheckCircle2 size={14} className="text-[#8FBF9F]" />
+                </p>
+                <p className="text-[11px] uppercase tracking-wider text-[#6E9A7D] mt-0.5">
+                  {motivoIsencao ? "Isenção aplicada" : "Total devido ao tesouro estadual"}
+                </p>
+                <div className="flex items-baseline gap-1.5 mt-2">
+                  <span className="text-lg font-semibold text-[#8FBF9F]">R$</span>
+                  <span className="text-4xl font-bold text-white leading-none tracking-tight">
+                    {motivoIsencao ? "0,00" : "8,56"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Total de animais na ATA */}
+              <div className="relative z-10 sm:ml-auto sm:border-l sm:border-white/15 sm:pl-6">
+                <p className="text-xs font-semibold uppercase tracking-wider text-[#8FBF9F]">
+                  Animais na ATA
+                </p>
+                <p className="text-[11px] uppercase tracking-wider text-[#6E9A7D] mt-0.5">
+                  Total transportado nesta guia
+                </p>
+                <div className="flex items-baseline gap-2 mt-2">
+                  <span className="text-4xl font-bold text-white leading-none tracking-tight">
+                    {totalMachos(faixasAnimais) + totalFemeas(faixasAnimais)}
+                  </span>
+                  <span className="text-sm text-[#8FBF9F]">
+                    ({totalMachos(faixasAnimais)} machos · {totalFemeas(faixasAnimais)} fêmeas)
+                  </span>
+                </div>
               </div>
             </div>
-
-            <hr className="border-gray-100" />
-
-            {/* Outras Vacinas (zero ou mais - inicia vazio []) */}
-            <div>
-              <h4 className="text-sm font-semibold text-gray-700 mb-3">Outras Vacinas</h4>
-              <DynamicListWrapper
-                items={outrasVacinas}
-                behavior="zero-or-more"
-                variant="plain"
-                addButtonLabel="Adicionar Vacina"
-                addButtonVariant="outline"
-                addButtonClassName="border border-[#1A7A3C] text-[#1A7A3C] hover:bg-green-50 bg-transparent font-semibold"
-                onAddItem={() => setOutrasVacinas(p => [...p, { id: uid(), vacina: "", data: "" }])}
-                onRemoveItem={(i) => setOutrasVacinas(p => p.filter((_, idx) => idx !== i))}
-              >
-                {(item, index) => (
-                  <div className="flex items-start gap-4">
-                    <div className="flex-1">
-                      <EntitySearchInput
-                        label="Vacina"
-                        placeholder="Buscar doença"
-                        value={item.vacina}
-                        data={DOENCAS_VACINA_MOCK}
-                        searchKeys={["nome"]}
-                        columns={[{ label: "Doença", key: "nome" }]}
-                        title="Buscar Vacina"
-                        subtitle="Busque por uma doença que produz vacina:"
-                        required
-                        onChange={(ent: any) => setOutrasVacinas(p => p.map((v, idx) => idx === index ? { ...v, vacina: ent?.nome || "" } : v))}
-                        icon={<Syringe size={18} className="text-[#1A7A3C]" />}
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <FloatInput
-                        label="Data da Vacinação"
-                        type="date"
-                        value={item.data}
-                        onChange={(v) => setOutrasVacinas(p => p.map((vac, idx) => idx === index ? { ...vac, data: v } : vac))}
-                        required
-                        icon={<Calendar size={18} className="text-[#1A7A3C]" />}
-                      />
-                    </div>
-                  </div>
-                )}
-              </DynamicListWrapper>
-            </div>
-          </div>
-        </Section>
-
-        <Section title="Atestados">
-          <div className="flex flex-col gap-4">
-            <UploadField label="Atestado Sanitário" required fileName="" onSelectFile={() => { }} />
-            <hr className="border-gray-100 my-2" />
-            <h4 className="text-sm font-semibold text-gray-700">Atestado de Exames</h4>
-            {/* Atestados de Exames (zero ou mais - inicia vazio []) */}
-            <DynamicListWrapper
-              items={atestados}
-              behavior="zero-or-more"
-              variant="plain"
-              addButtonLabel="Adicionar Exame"
-              addButtonVariant="outline"
-              addButtonClassName="border border-[#1A7A3C] text-[#1A7A3C] hover:bg-green-50 bg-transparent font-semibold"
-              onAddItem={() => setAtestados(p => [...p, { id: uid(), tipo: "", arquivo: "" }])}
-              onRemoveItem={(i) => setAtestados(p => p.filter((_, idx) => idx !== i))}
-            >
-              {(item, index) => (
-                <div className="flex items-center gap-4">
-                  <div className="flex-1"><FloatSelect label="Tipo de Atestado" value={item.tipo} onChange={(v) => setAtestados(p => p.map((a, idx) => idx === index ? { ...a, tipo: v } : a))} options={[{ value: "Brucelose", label: "Brucelose" }]} required /></div>
-                  <div className="flex-1"><UploadField label="Arquivo do Exame" fileName={item.arquivo} onSelectFile={() => { }} required /></div>
-                </div>
-              )}
-            </DynamicListWrapper>
-          </div>
-        </Section>
-
-        <Section title="Observações">
-          <LargeTextArea label="Observações" value={observacoes} onChange={setObservacoes} required />
-        </Section>
-
-        <Section title="Informações da ATA">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <EntitySearchInput
-              label="Motivo de Isenção de Taxa"
-              placeholder="Buscar motivo de isenção"
-              value={motivoIsencao ? motivoIsencao.nome : ""}
-              data={ISENCOES_MOCK}
-              searchKeys={["nome"]}
-              columns={[{ label: "Motivo", key: "nome" }]}
-              title="Buscar Motivo de Isenção de Taxa"
-              subtitle="Busque por um motivo de isenção cadastrado no sistema:"
-              onChange={(ent: any) => setMotivoIsencao(ent)}
-              icon={<img src={Icons.iconeIsencaoTaxaUrl} alt="Isenção" className="w-5 h-5 object-contain" />}
-            />
-            <FloatInput label="Valor da ATA" value={motivoIsencao ? "R$ 0,00" : "R$ 8,56"} disabled />
-          </div>
-        </Section>
-        {/* Resumo final da ATA — valor e total de animais em destaque */}
-        <div className="relative overflow-hidden rounded-2xl bg-[#1B4332] px-6 py-6 flex flex-col sm:flex-row sm:items-center gap-6">
-          {/* Marca-d'água: nota emitida */}
-          <svg
-            className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[190%] w-auto text-white/[0.035] rotate-6"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-            <path d="M14 2v6h6" />
-            <path d="M8 13h5" />
-            <path d="M8 17h8" />
-            <path d="m15.5 10.5 1.5 1.5 3-3" />
-          </svg>
-
-          {/* Valor / Liquidação */}
-          <div className="relative z-10">
-            <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[#8FBF9F]">
-              Liquidação Final da ATA
-              <CheckCircle2 size={14} className="text-[#8FBF9F]" />
-            </p>
-            <p className="text-[11px] uppercase tracking-wider text-[#6E9A7D] mt-0.5">
-              {motivoIsencao ? "Isenção aplicada" : "Total devido ao tesouro estadual"}
-            </p>
-            <div className="flex items-baseline gap-1.5 mt-2">
-              <span className="text-lg font-semibold text-[#8FBF9F]">R$</span>
-              <span className="text-4xl font-bold text-white leading-none tracking-tight">
-                {motivoIsencao ? "0,00" : "8,56"}
-              </span>
-            </div>
-          </div>
-
-          {/* Total de animais na ATA */}
-          <div className="relative z-10 sm:ml-auto sm:border-l sm:border-white/15 sm:pl-6">
-            <p className="text-xs font-semibold uppercase tracking-wider text-[#8FBF9F]">
-              Animais na ATA
-            </p>
-            <p className="text-[11px] uppercase tracking-wider text-[#6E9A7D] mt-0.5">
-              Total transportado nesta guia
-            </p>
-            <div className="flex items-baseline gap-2 mt-2">
-              <span className="text-4xl font-bold text-white leading-none tracking-tight">
-                {totalMachos(faixasAnimais) + totalFemeas(faixasAnimais)}
-              </span>
-              <span className="text-sm text-[#8FBF9F]">
-                ({totalMachos(faixasAnimais)} machos · {totalFemeas(faixasAnimais)} fêmeas)
-              </span>
-            </div>
-          </div>
-        </div>
+          </>
+        )}
       </main>
 
       {/* MODAL DE CADASTRO INTERDITADO */}
