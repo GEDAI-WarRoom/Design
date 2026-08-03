@@ -1,4 +1,6 @@
+import { useEffect, useState } from "react";
 import {
+	ArrowRight,
 	BadgePercent,
 	Bell,
 	BriefcaseBusiness,
@@ -35,13 +37,25 @@ import {
 	ScrollText,
 	LineChart,
 	FileText,
-	MoveUpRight, ScanBarcode, RefreshCw,
+	MoveUpRight,
+	ScanBarcode,
+	RefreshCw,
 	BriefcaseMedical,
 	PillBottle,
-	CalendarDays
+	CalendarDays,
+	ChevronLeft,
+	ChevronRight,
+	Download,
 } from "lucide-react";
 import { Navbar } from "../components/Navbar";
+import { PendenciasConfirmacaoGta } from "../components/PendenciasConfirmacaoGta";
 import * as Icons from "../imports/icons";
+import campanhaVacinacao2026Url from "../imports/images/campanha-vacinacao-2026.png";
+import {
+	isEntryRouteAllowed,
+	useDemoUser,
+	type DemoUserRole,
+} from "../contexts/DemoUserContext";
 
 const GREEN = "#1A7A3C";
 
@@ -678,6 +692,20 @@ export const fourthCategories: MenuCategory[] = [
 	},
 ];
 
+function filterCategoriesByRole(
+	categories: MenuCategory[],
+	role: DemoUserRole | null,
+) {
+	return categories
+		.map((category) => ({
+			...category,
+			items: category.items.filter((item) =>
+				isEntryRouteAllowed(role, item.route),
+			),
+		}))
+		.filter((category) => category.items.length > 0);
+}
+
 // Componente auxiliar de Card interno ajustado para renderizar o ícone do item
 function CategoryCard({
 	cat,
@@ -723,8 +751,123 @@ function CategoryCard({
 	);
 }
 
+const avisosProdutor = [
+	{
+		categoria: "Campanha 2026",
+		titulo: "Período de Vacinação Iniciado em Todo o Estado",
+		descricao: "Mantenha seu rebanho protegido e sua documentação em dia. A campanha contra febre aftosa é obrigatória para todos os produtores.",
+		acao: "Saiba mais",
+		imagem: campanhaVacinacao2026Url,
+		alt: "Pecuária",
+	},
+	{
+		categoria: "Infraestrutura",
+		titulo: "Novas Normas para Armazenamento de Grãos",
+		descricao: "O IMA publica novas diretrizes técnicas para silos e armazéns visando a segurança fitossanitária da safra 2025/26.",
+		acao: "Ver Documentação",
+		imagem: "https://lh3.googleusercontent.com/aida-public/AB6AXuBExVO6qTYxSMVXWc4LvuGH_59KRGVh7EAT-BVdL-IHfAWkbjKJsKB0ZD0Hww7V1JMQPiyzeJiHBIaWQs71_LzDz96wjDhjUlF8pS4MkKNfi7BBbeDfus8suEXyJ8zPYBDqbmoR0cdVA4LA905_GmQ0IRv3dLowAum3M6zVAMMacfT1jxbrAlcc9CFrnNNsVYpBADjo6vj1tsXUg8iDPgqm6xOZ2IHupHccxxHAh7o4wdLqdltgu7kb",
+		alt: "Silos",
+	},
+	{
+		categoria: "Tecnologia",
+		titulo: "Inovação Digital no Campo",
+		descricao: "Lançamento do novo aplicativo de gestão de propriedades. Mais agilidade na emissão de guias e controle sanitário direto do celular.",
+		acao: "Baixar App",
+		imagem: "https://lh3.googleusercontent.com/aida-public/AB6AXuAZQyeCdCXZmHpA__EYRTMXvGDj8RA2pzlKUMaIT4LuQ2Be5V6LhRaofs0bDs4uYjQEiQ5Q1hgnRwfpa5xxrs77Us6yGXQgMGiiG6uA7Zzbs4OZn53jyQ3pZVF3q6sV9FQj6s7V9K0jUaAy8IPKi3ZrWmbCpdBJ8NM9T0aUpNAtNfO8znJJ8hBfRd_q7x_lVW0ENHhzNV_UFFxvI5XimQL7uZePyIur_z-eyrnNnDEGAMX0-T767NQT",
+		alt: "Tecnologia no campo",
+	},
+];
+
+function AvisosNoticias() {
+	const [slideAtivo, setSlideAtivo] = useState(0);
+
+	useEffect(() => {
+		const intervalo = window.setInterval(
+			() => setSlideAtivo((atual) => (atual + 1) % avisosProdutor.length),
+			7000,
+		);
+		return () => window.clearInterval(intervalo);
+	}, []);
+
+	const anterior = () =>
+		setSlideAtivo((atual) =>
+			atual === 0 ? avisosProdutor.length - 1 : atual - 1,
+		);
+	const proximo = () =>
+		setSlideAtivo((atual) => (atual + 1) % avisosProdutor.length);
+
+	return (
+		<section className="mb-6" aria-label="Avisos e Notícias">
+			<div className="mb-3 flex justify-end">
+				<div className="flex gap-2" aria-label={`Notícia ${slideAtivo + 1} de ${avisosProdutor.length}`}>
+					{avisosProdutor.map((aviso, index) => (
+						<button
+							key={aviso.titulo}
+							type="button"
+							onClick={() => setSlideAtivo(index)}
+							aria-label={`Exibir notícia ${index + 1}`}
+							aria-current={index === slideAtivo}
+							className="h-1 w-12 overflow-hidden rounded-full bg-gray-300"
+						>
+							<span className={`block h-full bg-[#1A7A3C] transition-all duration-500 ${index === slideAtivo ? "w-full" : "w-0"}`} />
+						</button>
+					))}
+				</div>
+			</div>
+
+			<div className="relative h-[420px] overflow-hidden rounded-2xl bg-gray-900 shadow-sm sm:h-[400px]">
+				{avisosProdutor.map((aviso, index) => (
+					<article
+						key={aviso.titulo}
+						aria-hidden={index !== slideAtivo}
+						className={`absolute inset-0 transition-opacity duration-700 ${index === slideAtivo ? "z-10 opacity-100" : "pointer-events-none opacity-0"}`}
+					>
+						<img src={aviso.imagem} alt={aviso.alt} className="absolute inset-0 h-full w-full object-cover" />
+						<div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/55 to-black/10" />
+						<div className="absolute inset-0 flex max-w-3xl flex-col justify-end p-6 sm:p-9 md:p-12">
+							<span className="mb-4 w-fit rounded-full bg-green-100 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-[#1A7A3C]">
+								{aviso.categoria}
+							</span>
+							<h3 className="max-w-2xl text-2xl font-bold leading-tight text-white drop-shadow-lg sm:text-3xl md:text-4xl">
+								{aviso.titulo}
+							</h3>
+							<p className="mt-4 max-w-xl text-sm font-medium leading-6 text-white/85 sm:text-base">
+								{aviso.descricao}
+							</p>
+							<button type="button" className="mt-6 flex w-fit items-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-bold text-gray-900 shadow-xl transition hover:bg-gray-100">
+								{aviso.acao}
+								{index === 2 ? <Download size={18} /> : index === 1 ? <FileText size={18} /> : <ArrowRight size={18} />}
+							</button>
+						</div>
+					</article>
+				))}
+
+				<div className="absolute bottom-5 right-5 z-20 flex gap-3 sm:bottom-8 sm:right-8">
+					<button type="button" onClick={anterior} aria-label="Notícia anterior" className="flex h-11 w-11 items-center justify-center rounded-full border border-white/30 bg-black/20 text-white backdrop-blur-md transition hover:bg-white/20">
+						<ChevronLeft size={22} />
+					</button>
+					<button type="button" onClick={proximo} aria-label="Próxima notícia" className="flex h-11 w-11 items-center justify-center rounded-full border border-white/30 bg-black/20 text-white backdrop-blur-md transition hover:bg-white/20">
+						<ChevronRight size={22} />
+					</button>
+				</div>
+			</div>
+		</section>
+	);
+}
+
 // Componente Principal do Dashboard
 export function DashboardPage({ onLogout, onNavigate }: any) {
+	const { role } = useDemoUser();
+	const visibleCadastros = filterCategoriesByRole(cadastrosCategories, role);
+	const visibleSecondary = filterCategoriesByRole(secondaryCategories, role);
+	const visibleThird = filterCategoriesByRole(thirdCategories, role);
+	const visibleFourth = filterCategoriesByRole(fourthCategories, role);
+	const mainCategoryGroups = role === "produtor"
+		? [[...visibleCadastros, ...visibleSecondary, ...visibleThird]]
+		: [visibleCadastros, visibleSecondary, visibleThird].filter(
+			(group) => group.length > 0,
+		);
+
 	return (
 		<div className="min-h-screen bg-[#f2f3f5]">
 			{/* Importação limpa da Navbar que está na pasta de componentes */}
@@ -736,35 +879,45 @@ export function DashboardPage({ onLogout, onNavigate }: any) {
 
 			<main className="max-w-5xl mx-auto px-4 md:px-6 py-6">
 
+				{role === "produtor" && (
+					<>
+						<div className="mb-6">
+							<h1 className="text-2xl font-semibold text-gray-900">
+								Bem-vindo, Fernando
+							</h1>
+							<p className="mt-1 text-sm text-gray-600">
+								Gerencie suas propriedades e movimentações agropecuárias.
+							</p>
+						</div>
+						<AvisosNoticias />
+						<PendenciasConfirmacaoGta onNavigate={onNavigate} />
+					</>
+				)}
 
 				{/* Bloco de Cadastros (Exatamente como estava) */}
 				<div className="flex flex-col bg-white rounded-xl shadow-sm p-6 mb-6 gap-6">
 					<h2 className="text-xl font-semibold text-gray-800">Cadastros</h2>
-					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-						{cadastrosCategories.map((cat) => (
-							<CategoryCard key={cat.title} cat={cat} onNavigate={onNavigate} />
-						))}
-					</div>
-					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-						{secondaryCategories.map((cat) => (
-							<CategoryCard key={cat.title} cat={cat} onNavigate={onNavigate} />
-						))}
-					</div>
-
-					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-						{thirdCategories.map((cat) => (
-							<CategoryCard key={cat.title} cat={cat} onNavigate={onNavigate} />
-						))}
-					</div>
+					{mainCategoryGroups.map((categories, index) => (
+						<div
+							key={index}
+							className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
+						>
+							{categories.map((cat) => (
+								<CategoryCard key={cat.title} cat={cat} onNavigate={onNavigate} />
+							))}
+						</div>
+					))}
 				</div>
 
-				<div className="bg-white rounded-xl shadow-sm p-6">
-					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-						{fourthCategories.map((cat) => (
-							<CategoryCard key={cat.title} cat={cat} onNavigate={onNavigate} />
-						))}
+				{visibleFourth.length > 0 && (
+					<div className="bg-white rounded-xl shadow-sm p-6">
+						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+							{visibleFourth.map((cat) => (
+								<CategoryCard key={cat.title} cat={cat} onNavigate={onNavigate} />
+							))}
+						</div>
 					</div>
-				</div>
+				)}
 			</main>
 		</div>
 	);

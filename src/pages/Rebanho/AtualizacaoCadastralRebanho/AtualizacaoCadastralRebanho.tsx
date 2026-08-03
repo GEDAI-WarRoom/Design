@@ -10,14 +10,15 @@ import {
 import { Navbar } from "../../../components/Navbar";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
 import { FloatInput, FloatSelect } from "../../../components/ui/FormKit";
+import { useDemoUser } from "../../../contexts/DemoUserContext";
 import * as Icons from "../../../imports/icons";
 import {
   dadosProdutorConfirmados,
   ESTABELECIMENTOS_ATUALIZACAO,
   listarAtualizacoesCadastrais,
+  PRODUTOR_REBANHO_DEMONSTRACAO_DOCUMENTO,
   PRODUTORES_ATUALIZACAO,
   SITUACOES_ATUALIZACAO,
-  USUARIO_REBANHO_MOCK,
   type AtualizacaoCadastralRebanho,
   type EstabelecimentoAtualizacao,
   type ProdutorTitular,
@@ -74,10 +75,12 @@ export function AtualizacaoCadastralRebanhoPage({
   onLogout,
   onNavigate,
 }: PageProps) {
-  const usuarioEhProdutor = USUARIO_REBANHO_MOCK.papel === "Produtor";
+  const { role } = useDemoUser();
+  const usuarioEhProdutor = role === "produtor";
   const produtorDoUsuario = usuarioEhProdutor
     ? PRODUTORES_ATUALIZACAO.find(
-        (item) => item.documento === USUARIO_REBANHO_MOCK.produtorDocumento,
+        (item) =>
+          item.documento === PRODUTOR_REBANHO_DEMONSTRACAO_DOCUMENTO,
       ) ?? PRODUTORES_ATUALIZACAO[0]
     : null;
   const [produtor, setProdutor] = useState<ProdutorTitular | null>(
@@ -87,7 +90,7 @@ export function AtualizacaoCadastralRebanhoPage({
     useState<EstabelecimentoAtualizacao | null>(null);
   const [etapa, setEtapa] = useState("");
   const [situacao, setSituacao] = useState("");
-  const [pesquisado, setPesquisado] = useState(false);
+  const [pesquisado, setPesquisado] = useState(usuarioEhProdutor);
   const [erroProdutor, setErroProdutor] = useState(false);
   const [pagina, setPagina] = useState(1);
   const [ordenacao, setOrdenacao] = useState<Ordenacao>("etapa");
