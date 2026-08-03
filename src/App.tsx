@@ -237,10 +237,10 @@ import { ParametrosSistemaPage } from "./pages/Controle/ParametrosSistema/Parame
 
 // 1. Adicionamos as novas rotas de Pessoa Jurídica no tipo Screen
 export type Screen =
-| "emissao-ata"
-  | "adicionar-emissao-ata"
-  | "editar-emissao-ata"
-  | "visualizar-emissao-ata"
+	| "emissao-ata"
+	| "adicionar-emissao-ata"
+	| "editar-emissao-ata"
+	| "visualizar-emissao-ata"
 	| "visualizar-valor-indice"
 	| "login"
 	| "selecionar-usuario"
@@ -446,10 +446,10 @@ export type Screen =
 	| "visualizar-dae"
 	| "indice"
 	| "adicionar-indice"
-	|"visualizar-indice"
+	| "visualizar-indice"
 	| "acougue"
-  | "adicionar-acougue"
-  | "visualizar-acougue"
+	| "adicionar-acougue"
+	| "visualizar-acougue"
 	| "adicionar-indice";
 
 export default function App() {
@@ -478,21 +478,21 @@ export default function App() {
 
 	switch (screen) {
 		case "emissao-ata":
-      return <EmissaoATAPage onLogout={handleLogout} onNavigate={handleNavigate} />;
-    case "adicionar-emissao-ata":
-    case "editar-emissao-ata":
-      return <AdicionarEmissaoATAPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
-    case "visualizar-emissao-ata":
-      return <VisualizarEmissaoATAPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
-	
+			return <EmissaoATAPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+		case "adicionar-emissao-ata":
+		case "editar-emissao-ata":
+			return <AdicionarEmissaoATAPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+		case "visualizar-emissao-ata":
+			return <VisualizarEmissaoATAPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+
 		case "visualizar-indice":
-  return (
-    <VisualizarIndice 
-      onLogout={handleLogout} 
-      onNavigate={handleNavigate} 
-      dados={screenData} 
-    />
-  );
+			return (
+				<VisualizarIndice
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
 		case "login":
 			return <LoginPage onLogin={() => setScreen("selecionar-usuario")} />;
 		case "selecionar-usuario":
@@ -1123,6 +1123,7 @@ export default function App() {
 				<VisualizarExploracaoPecuariaPage
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
+					dados={screenData}
 				/>
 			);
 		case "atualizacao-cadastral-rebanho":
@@ -1151,14 +1152,14 @@ export default function App() {
 		case "atualizar-cadastro-rebanho":
 			return (
 				<AtualizarCadastroRebanhoPage
-            onLogout={handleLogout}
+					onLogout={handleLogout}
 					onNavigate={handleNavigate}
 				/>
 			);
 		case "ajuste-rebanho":
 			return (
 				<AjusteRebanhoPage
-          onLogout={handleLogout}
+					onLogout={handleLogout}
 					onNavigate={handleNavigate}
 				/>
 			);
@@ -1172,7 +1173,7 @@ export default function App() {
 		case "adicionar-ajuste-rebanho":
 			return (
 				<AdicionarAjusteRebanhoPage
-          onLogout={handleLogout}
+					onLogout={handleLogout}
 					onNavigate={handleNavigate}
 				/>
 			);
@@ -1186,7 +1187,7 @@ export default function App() {
 		case "visualizar-ajuste-rebanho":
 			return (
 				<VisualizarAjusteRebanhoPage
-          onLogout={handleLogout}
+					onLogout={handleLogout}
 					onNavigate={handleNavigate}
 				/>
 			);
@@ -1201,14 +1202,14 @@ export default function App() {
 		case "visualizar-rebanho-atualizado":
 			return (
 				<VisualizarRebanhoAtualizadoPage
-            onLogout={handleLogout}
+					onLogout={handleLogout}
 					onNavigate={handleNavigate}
 				/>
 			);
 		case "editar-ajuste-rebanho":
 			return (
 				<EditarAjusteRebanhoPage
-          onLogout={handleLogout}
+					onLogout={handleLogout}
 					onNavigate={handleNavigate}
 				/>
 			);
@@ -1289,27 +1290,27 @@ export default function App() {
 					modo="editar"
 				/>
 			);
-	case "valor-indice":
-      return (
-        <ValorIndicePage onLogout={handleLogout} onNavigate={handleNavigate} />
-      );
-    case "adicionar-valor-indice":
-    case "editar-valor-indice": // <-- Mapeamos o editar aqui também
-      return (
-        <AdicionarValorIndicePage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-          dados={screenData} // <-- ISSO GARANTE O PREENCHIMENTO NO LÁPIS E NO BOTÃO
-        />
-      );
-    case "visualizar-valor-indice":
-      return (
-        <VisualizarValorIndicePage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-          dados={screenData}
-        />
-      );
+		case "valor-indice":
+			return (
+				<ValorIndicePage onLogout={handleLogout} onNavigate={handleNavigate} />
+			);
+		case "adicionar-valor-indice":
+		case "editar-valor-indice": // <-- Mapeamos o editar aqui também
+			return (
+				<AdicionarValorIndicePage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData} // <-- ISSO GARANTE O PREENCHIMENTO NO LÁPIS E NO BOTÃO
+				/>
+			);
+		case "visualizar-valor-indice":
+			return (
+				<VisualizarValorIndicePage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
 
 		case "fundo-arrecadacao":
 			return (
@@ -1808,20 +1809,20 @@ export default function App() {
 				/>
 			);
 		case "indice":
-      return (
-        <Indice onLogout={handleLogout} onNavigate={handleNavigate} />
-      );
-    case "adicionar-indice":
-    case "editar-indice": // <-- Mapeamos o editar aqui também
-      return (
-        <AdicionarIndice 
-          onLogout={handleLogout} 
-          onNavigate={handleNavigate} 
-          data={screenData} // <-- ISSO GARANTE O PREENCHIMENTO NO LÁPIS E NO BOTÃO
-        />
-      );
+			return (
+				<Indice onLogout={handleLogout} onNavigate={handleNavigate} />
+			);
+		case "adicionar-indice":
+		case "editar-indice": // <-- Mapeamos o editar aqui também
+			return (
+				<AdicionarIndice
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					data={screenData} // <-- ISSO GARANTE O PREENCHIMENTO NO LÁPIS E NO BOTÃO
+				/>
+			);
 
-		
+
 		case "dae":
 			return (
 				<DAEBuscaPage
@@ -1985,19 +1986,19 @@ export default function App() {
 					onNavigate={handleNavigate}
 				/>
 			);
-			case "acougue":
-      return (
-        <AcouguePage onLogout={handleLogout} onNavigate={handleNavigate} />
-      );
-    case "adicionar-acougue":
-    case "editar-acougue":
-    case "visualizar-acougue":
-      return (
-        <AdicionarAcouguePage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+		case "acougue":
+			return (
+				<AcouguePage onLogout={handleLogout} onNavigate={handleNavigate} />
+			);
+		case "adicionar-acougue":
+		case "editar-acougue":
+		case "visualizar-acougue":
+			return (
+				<AdicionarAcouguePage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
 
 		default:
 			return (
