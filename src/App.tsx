@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { DashboardPage } from "./pages/Dashboard";
 import { LoginPage } from "./pages/Login";
+import { SelecionarUsuarioPage } from "./pages/SelecionarUsuario";
+import { isRouteAllowed, useDemoUser } from "./contexts/DemoUserContext";
 
 // GERAL
 import { EmissaoATAPage } from "./pages/GTA/EmissaoATA/EmissaoATA";
@@ -194,6 +196,7 @@ import { EmitirEmissaoGtaPage } from "./pages/GTA/EmissaoGta/EmitirEmissaoGta";
 import { EmissaoGtaPage } from "./pages/GTA/EmissaoGta/EmissaoGta";
 import { PagarEmissaoGtaPage } from "./pages/GTA/EmissaoGta/PagarEmissaoGta";
 import { VisualizarEmissaoGtaPage } from "./pages/GTA/EmissaoGta/VisualizarEmissaoGta";
+import { PendenciasConfirmacaoPage } from "./pages/GTA/PendenciasConfirmacao/PendenciasConfirmacao";
 import { AdicionarDistribuicaoFormulariosGta } from "./pages/GTA/DistribuicaoFormulariosGta/AdicionarDistribuicaoFormulariosGta";
 import { DistribuicaoFormulariosGta } from "./pages/GTA/DistribuicaoFormulariosGta/DistribuicaoFormulariosGta";
 import { AdicionarFinalidadeTransitoPage } from "./pages/GTA/FinalidadeTransito/AdicionarFinalidadeTransito";
@@ -240,6 +243,7 @@ export type Screen =
   | "visualizar-emissao-ata"
 	| "visualizar-valor-indice"
 	| "login"
+	| "selecionar-usuario"
 	| "dashboard"
 	| "parametros-sistema"
 	| "classificacao-sanitaria-estado"
@@ -320,6 +324,7 @@ export type Screen =
 	| "editar-registro-venda-gta-digital"
 	| "visualizar-dae-registro-venda-gta"
 	| "emissao-gta"
+	| "pendencias-confirmacao-gta"
 	| "adicionar-emissao-gta"
 	| "visualizar-emissao-gta"
 	| "emitir-emissao-gta"
@@ -450,13 +455,21 @@ export type Screen =
 export default function App() {
 	const [screen, setScreen] = useState<Screen>("login");
 	const [screenData, setScreenData] = useState<any>(null);
+	const { role, selectRole, clearRole } = useDemoUser();
 
 	const handleLogout = () => {
+		clearRole();
 		setScreen("login");
 		setScreenData(null);
 	};
 
 	const handleNavigate = (targetScreen: Screen, data?: any) => {
+		if (!isRouteAllowed(role, targetScreen)) {
+			setScreenData(null);
+			setScreen("dashboard");
+			return;
+		}
+
 		if (data !== undefined) {
 			setScreenData(data);
 		}
@@ -481,7 +494,17 @@ export default function App() {
     />
   );
 		case "login":
-			return <LoginPage onLogin={() => setScreen("dashboard")} />;
+			return <LoginPage onLogin={() => setScreen("selecionar-usuario")} />;
+		case "selecionar-usuario":
+			return (
+				<SelecionarUsuarioPage
+					onBack={() => setScreen("login")}
+					onSelect={(selectedRole) => {
+						selectRole(selectedRole);
+						setScreen("dashboard");
+					}}
+				/>
+			);
 		case "dashboard":
 			return (
 				<DashboardPage onLogout={handleLogout} onNavigate={handleNavigate} />
@@ -1324,6 +1347,14 @@ export default function App() {
 		case "emissao-gta":
 			return (
 				<EmissaoGtaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "pendencias-confirmacao-gta":
+			return (
+				<PendenciasConfirmacaoPage
+					dados={screenData}
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
 				/>

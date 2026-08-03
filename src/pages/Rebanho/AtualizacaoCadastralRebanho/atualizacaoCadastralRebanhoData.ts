@@ -78,36 +78,31 @@ export const SITUACOES_ATUALIZACAO = [
   { value: "Inadimplente Não Concluído", label: "Inadimplente Não Concluído" },
 ];
 
-export const USUARIO_REBANHO_MOCK: {
-  papel: "Funcionário IMA" | "Produtor";
-  produtorDocumento?: string;
-} = {
-  papel: "Funcionário IMA",
-};
+export const PRODUTOR_REBANHO_DEMONSTRACAO_DOCUMENTO = "362.778.831-19";
 
 export const PRODUTORES_ATUALIZACAO: ProdutorTitular[] = [
   {
     id: 1,
-    nome: "Divino de Souza Sobrinho",
-    documento: "685.784.465-89",
+    nome: "Fernando",
+    documento: PRODUTOR_REBANHO_DEMONSTRACAO_DOCUMENTO,
     tipo: "PF",
     contatos: [
       {
-        id: "contato-email-divino",
+        id: "contato-email-fernando",
         tipo: "E-mail",
-        valor: "divino@email.com",
+        valor: "fernando@email.com",
         observacao: "",
         obrigatorio: true,
       },
       {
-        id: "contato-telefone-divino",
+        id: "contato-telefone-fernando",
         tipo: "Telefone",
         valor: "(35) 98855-4433",
         observacao: "",
         obrigatorio: true,
       },
       {
-        id: "contato-celular-divino",
+        id: "contato-celular-fernando",
         tipo: "Celular",
         valor: "(35) 99812-1002",
         observacao: "Contato alternativo",
@@ -167,14 +162,14 @@ export const ESTABELECIMENTOS_ATUALIZACAO: EstabelecimentoAtualizacao[] = [
     nome: "Fazenda Santa Clara",
     codigo: "31234567891",
     municipio: "Lavras - MG",
-    produtorDocumento: "685.784.465-89",
+    produtorDocumento: PRODUTOR_REBANHO_DEMONSTRACAO_DOCUMENTO,
   },
   {
     id: 2,
     nome: "Fazenda Rio Preto",
     codigo: "31234567890",
     municipio: "Varginha - MG",
-    produtorDocumento: "685.784.465-89",
+    produtorDocumento: PRODUTOR_REBANHO_DEMONSTRACAO_DOCUMENTO,
   },
   {
     id: 3,
