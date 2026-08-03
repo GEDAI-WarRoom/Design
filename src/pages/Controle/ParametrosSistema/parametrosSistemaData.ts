@@ -23,6 +23,72 @@ export interface ParametroSistema {
   modificadoEm: string;
 }
 
+export function parametrosSaoDiferentes(
+  atual: ParametroSistema,
+  salvo: ParametroSistema | undefined,
+): boolean {
+  return !salvo || atual.valor !== salvo.valor || atual.situacao !== salvo.situacao;
+}
+
+export function validarParametroSistema(parametro: ParametroSistema): string | null {
+  const valor = parametro.valor.trim();
+
+  if (!["Ativo", "Inativo"].includes(parametro.situacao)) {
+    return "Selecione uma situação válida.";
+  }
+  if (parametro.tipo === "numero" && (valor === "" || !Number.isFinite(Number(valor)))) {
+    return "Informe um valor numérico válido.";
+  }
+  if (parametro.tipo === "data") {
+    const formatoValido = /^\d{4}-\d{2}-\d{2}$/.test(valor);
+    const data = formatoValido ? new Date(`${valor}T00:00:00Z`) : null;
+    if (!data || Number.isNaN(data.getTime()) || data.toISOString().slice(0, 10) !== valor) {
+      return "Informe uma data válida.";
+    }
+  }
+  if (parametro.tipo === "sim-nao" && !["Sim", "Não"].includes(valor)) {
+    return "Selecione Sim ou Não.";
+  }
+  if (parametro.tipo === "situacao" && !["Ativo", "Inativo"].includes(valor)) {
+    return "Selecione uma situação válida.";
+  }
+  if (parametro.tipo === "lista" && valor && valor.split(",").some((item) => !item.trim())) {
+    return "Separe os itens por vírgula, sem itens vazios.";
+  }
+  if (valor.length > 1500) return "O valor deve ter no máximo 1.500 caracteres.";
+
+  return null;
+}
+
+const TIPOS_DESTAQUE_PRIMEIRA_PAGINA: TipoValorParametro[] = [
+  "texto",
+  "numero",
+  "data",
+  "lista",
+  "sim-nao",
+  "situacao",
+];
+
+/**
+ * Organiza a vitrine inicial com um exemplo de cada controle sem remover nem
+ * alterar a ordem relativa dos demais parâmetros.
+ */
+export function ordenarParametrosParaPrimeiraPagina(
+  parametros: ParametroSistema[],
+): ParametroSistema[] {
+  const idsDestacados = new Set<string>();
+  const destaques = TIPOS_DESTAQUE_PRIMEIRA_PAGINA.flatMap((tipo) => {
+    const encontrado = parametros.find(
+      (parametro) => parametro.tipo === tipo && !idsDestacados.has(parametro.id),
+    );
+    if (!encontrado) return [];
+    idsDestacados.add(encontrado.id);
+    return [encontrado];
+  });
+
+  return [...destaques, ...parametros.filter((parametro) => !idsDestacados.has(parametro.id))];
+}
+
 export const CADASTROS_COM_PARAMETROS = [
   { id: "gta-gerais" as const, label: "GTA — Parâmetros gerais" },
   { id: "gta-funcionalidades" as const, label: "GTA — Funcionalidades" },
@@ -45,11 +111,11 @@ const PARAMETROS_GERAIS_RAW: ParametroGeralRaw[] = [
   ["dataLimiteCadastroRTMedicosVeterinariosHabilitadosEventos", "Data limite para os médicos veterinários habilitados para eventos pecuários", "2025-04-07"],
   ["descEmitenteProdutor", "Variável que guarda o rótulo do campo emitente na impressão de GTA pelo produtor rural", "Documento emitido pelo IMA, sob requisição eletrônica do produtor rural"],
   ["dtBloqueioGtaAvesSuinosFormularioDigital", "Indica a data para bloqueio de emissão de GTAs para suínos ou aves utilizando formulário digital", "2018-04-04"],
-  ["emailsCargaGtaOe", "Lista de e-mails da rotina EnviarEmailCargaGtaOe", "e-mails cadastrados (diversos)"],
+  ["emailsCargaGtaOe", "Lista de e-mails da rotina EnviarEmailCargaGtaOe", "regional.bh@ima.mg.gov.br,regional.lavras@ima.mg.gov.br"],
   ["envioAutomaticoGtaPga", "Parâmetro para habilitar o envio automático para a PGA no momento da impressão da GTA", "Não"],
-  ["especiesObrigaCadastroPga", "Lista de códigos de espécies que obriga que o destino esteja cadastrado na PGA", "código das espécies"],
+  ["especiesObrigaCadastroPga", "Lista de códigos de espécies que obriga que o destino esteja cadastrado na PGA", "BOVINO,BUBALINO"],
   ["especiesProibicaoEmissaoSaidaGtaAftosa", "Espécies com proibição de emissão de GTA para fora do estado quando forem vacinadas contra aftosa", "BOVINO,BUBALINO,SUÍNO,CAPRINO,OVINO", "Inativo"],
-  ["especiesProibicaoEmissaoSaidaGtaBrucelose", "Espécies com proibição de emissão de GTA para fora do estado quando forem vacinadas contra brucelose", "Não"],
+  ["especiesProibicaoEmissaoSaidaGtaBrucelose", "Espécies com proibição de emissão de GTA para fora do estado quando forem vacinadas contra brucelose", ""],
   ["inAtivarValidacaoAtestadoExameGtaSidagro", "Variável que controla a obrigatoriedade do preenchimento dos campos de atestado na GTA interna", "Sim"],
   ["estadosNaoHabilitadosParaChile", "Lista de estados (área) não habilitados para o Chile", "AC,AL,AP,AM,BA,CE,DF,MA,PA,PB,PE,PI,RJ,RN,RR,SE"],
   ["estadosNaoHabilitadosParaUE", "Lista de estados (área) não habilitados para a União Europeia", "AC,AL,AP,AM,BA,CE,DF,MA,PA,PB,PI,RJ,RN,RR,RO,SE,TO,PE"],
@@ -57,7 +123,7 @@ const PARAMETROS_GERAIS_RAW: ParametroGeralRaw[] = [
   ["estadosNaoObrigaVacinaBrucelose", "Lista de estados que não obrigam a vacinação de brucelose na entrada de GTA de outro estado", "SC"],
   ["estadosObrigaCadastroPga", "Lista de estados que obriga que o destino esteja cadastrado na PGA", "TO,AC,RR,MT,SE,RO,RS,GO,ES,DF,SC,RJ,PE,MS,BA,SP"],
   ["estadosProibicaoEmissaoGtaAftosa", "Estados com proibição de emissão de GTA para animais vacinados contra febre aftosa", "", "Inativo"],
-  ["estadosProibicaoEmissaoGtaBrucelose", "Estados com proibição de emissão de GTA para animais vacinados contra brucelose", "Não"],
+  ["estadosProibicaoEmissaoGtaBrucelose", "Estados com proibição de emissão de GTA para animais vacinados contra brucelose", ""],
   ["gtaObservacoesProdutorSemVacinaAftosa", "Mensagem de observações da emissão de GTA quando não encontra vacina de aftosa", "Animais oriundos de estado livre de febre aftosa sem vacinação (IN MAPA 52/2020)", "Inativo"],
   ["nBloqueiaGtaProdutorNaoRecadastrado", "Controla o bloqueio da emissão de GTA caso o produtor não esteja recadastrado", "Sim"],
   ["inBloqueioExploracaoDestinoInadimplente", "Bloquear a emissão de GTA caso a exploração de destino encontre-se inadimplente", "Sim"],
@@ -135,71 +201,24 @@ const PARAMETROS_FUNCIONALIDADES_RAW: ParametroFuncionalidadeRaw[] = [
 
 function inferirTipo(nome: string, valor: string): TipoValorParametro {
   const nomeNormalizado = nome.toLowerCase();
-  if (/^(sim|não)$/i.test(valor)) return "sim-nao";
-  if (/^\d{4}-\d{2}-\d{2}$/.test(valor)) return "data";
-  if (/^-?\d+(\.\d+)?$/.test(valor)) return "numero";
   if (
     nomeNormalizado.includes("estados") ||
     nomeNormalizado.includes("especies") ||
     nomeNormalizado.includes("emails") ||
     nomeNormalizado.includes("tiposdestinos")
   ) return "lista";
+  if (/^(sim|não)$/i.test(valor)) return "sim-nao";
+  if (/^\d{4}-\d{2}-\d{2}$/.test(valor)) return "data";
+  if (/^-?\d+(\.\d+)?$/.test(valor)) return "numero";
   if (
     valor.length > 120 ||
+    nomeNormalizado.startsWith("desc") ||
     nomeNormalizado.startsWith("msg") ||
+    nomeNormalizado.includes("observacoes") ||
     nomeNormalizado.startsWith("textoinicial") ||
     nomeNormalizado.startsWith("textofinal")
   ) return "texto-longo";
   return "texto";
-}
-
-/** Faixa usada para desenhar o slider. rotuloMin/rotuloMax são opcionais —
- *  quando presentes, aparecem ao lado do valor extremo (ex.: "5% (CRÍTICO)"). */
-export interface FaixaNumero {
-  min: number;
-  max: number;
-  step: number;
-  unidade: string;
-  rotuloMin?: string;
-  rotuloMax?: string;
-}
-
-/**
- * Faixas configuradas manualmente para parâmetros específicos. Tem prioridade
- * sobre o cálculo automático — use quando o intervalo "genérico" não fizer
- * sentido para o parâmetro (ex.: validade de documento, multiplicador de taxa)
- * ou quando quiser rótulos descritivos nos extremos (ex.: "CRÍTICO"/"PADRÃO").
- * Para adicionar uma faixa própria, inclua uma entrada com a chave sendo o
- * "nome" exato do parâmetro (o primeiro valor do array bruto).
- */
-const FAIXAS_PERSONALIZADAS: Record<string, FaixaNumero> = {
-  // Faz sentido como slider: janela de cancelamento tem um teto operacional real (até 48h).
-  qtHorasEmissaoGtaSaidaEvento: { min: 1, max: 48, step: 1, unidade: "h" },
-  // Faz sentido como slider: percentual com rótulos de referência nos extremos.
-  vlPercentualMinimoAlertaEstoqueProdutor: {
-    min: 5,
-    max: 50,
-    step: 5,
-    unidade: "%",
-    rotuloMin: "CRÍTICO",
-    rotuloMax: "PADRÃO",
-  },
-  // nrDiasValidadePassaporteEquestre, nrDiasValidadeGta e vlMultiplicaTaxaEmissaoEvento
-  // ficam de fora de propósito: são valores livres (ex.: validade de documento), então
-  // caem no campo numérico manual em vez de slider.
-};
-
-/**
- * Retorna a faixa (min/max/step/unidade/rótulos) para exibir o slider do tipo
- * "numero", OU null quando o parâmetro não tem uma faixa curada — nesse caso
- * o card usa um campo numérico de digitação livre em vez de slider.
- * Só existe slider para parâmetros explicitamente cadastrados em
- * FAIXAS_PERSONALIZADAS: um valor "livre" (validade, quantidade, etc.) não
- * tem um teto natural e obrigar o usuário a usar um slider arbitrário
- * atrapalha mais do que ajuda.
- */
-export function calcularFaixaNumero(nome: string, _valor: string): FaixaNumero | null {
-  return FAIXAS_PERSONALIZADAS[nome] ?? null;
 }
 
 const NOMES_RESPONSAVEIS = ["João Silva", "Maria Lima", "Carlos Andrade", "Sofia Santos", "Ana Costa", "Pedro Oliveira"];
