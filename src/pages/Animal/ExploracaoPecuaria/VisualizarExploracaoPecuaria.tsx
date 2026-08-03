@@ -595,9 +595,7 @@ const GRUPOS_CERTIFICADOS_BOVINOS: GrupoCertificado[] = [
     certificados: [
       { id: "bv1", atualizadoEm: "14/04/2012", numero: "213456", validade: "14/06/2025", situacao: "Ativa", nucleos: ["Núcleo Setor A"] },
     ],
-    inativos: [
-      { id: "bvi1", atualizadoEm: "05/02/2021", numero: "185220", validade: "05/02/2024", situacao: "Vencida", nucleos: ["Núcleo Setor A"] },
-    ],
+
   },
   {
     id: 2,
