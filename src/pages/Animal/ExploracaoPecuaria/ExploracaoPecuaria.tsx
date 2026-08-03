@@ -19,6 +19,27 @@ import { Navbar } from "../../../components/Navbar";
 import { FloatSelect, FloatCombobox, FloatInput, SearchModal } from "../../../components/ui/FormKit";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
 import * as Icons from "../../../imports/icons";
+import { REGISTRO as REGISTRO_BASE } from "./VisualizarExploracaoPecuaria";
+
+// Monta o registro completo a partir da linha da busca (protótipo: os campos
+// que a listagem não tem são preenchidos com o mock base). O que importa é
+// que "especie" vá como objeto { nome, grupo } — é isso que o Visualizar usa
+// para decidir quais abas mostrar (Certificados / Biosseguridade / Ciclo).
+function montarRegistroParaVisualizar(e: Exploracao) {
+  return {
+    ...REGISTRO_BASE,
+    codigo: e.codigo,
+    situacao: e.situacao === "Suspenso" ? "Ativo" : e.situacao,
+    estabelecimento: {
+      ...REGISTRO_BASE.estabelecimento,
+      codigo: e.estabCodigo,
+      nome: e.estabNome,
+      municipio: `${e.municipio} - ${e.uf}`,
+    },
+    especie: { nome: e.especie, grupo: e.grupo },
+    subespecies: [],
+  };
+}
 
 const GREEN = "#1A7A3C";
 
@@ -28,7 +49,7 @@ const GREEN = "#1A7A3C";
 const ESTABELECIMENTOS_MOCK = [
   { id: 1, codigo: "31001040005", nome: "Fazenda Rio Preto", municipio: "Lavras - MG", proprietario: "333.888.777-11\n- Carlos Henrique Souza", },
   { id: 2, codigo: "10234567891", nome: "Fazenda do Rio", municipio: "Abadia dos Dourados - MG", proprietario: "526.820.747-11\n- João de Souza", },
-  { id: 3, codigo: "42001040005", nome: "Fazenda Vertentes", municipio: "Varginha - MG",  proprietario: "444.111.222-33\n- Maria Silva Mendes", },
+  { id: 3, codigo: "42001040005", nome: "Fazenda Vertentes", municipio: "Varginha - MG", proprietario: "444.111.222-33\n- Maria Silva Mendes", },
 ];
 
 interface ProdutorEntidade {
@@ -119,8 +140,24 @@ const EXPLORACOES_MOCK: Exploracao[] = [
     produtores: [{ nome: "Maria Aparecida Souza", documento: "117.333.215-95" }],
     responsaveis: [{ nome: "Carlos Henrique Reis", documento: "222.114.558-70" }],
     gta: [],
-    municipio: "Lavras", uf: "MG", group: "Peixes", especie: "Peixe Redondo",
+    municipio: "Lavras", uf: "MG", grupo: "Peixes", especie: "Peixe Redondo",
     dataVencimento: "2027-08-05", situacao: "Inativo",
+  },
+  {
+    id: 4, codigo: "310010400050004", estabCodigo: "31001040006", estabNome: "Granja Boa Esperança",
+    produtores: [{ nome: "Antônio Bezerra Filho", documento: "222.556.887-30" }],
+    responsaveis: [{ nome: "Fernanda Lima Rocha", documento: "111.556.887-30" }],
+    gta: [{ nome: "Fernanda Lima Rocha", documento: "111.556.887-30" }],
+    municipio: "Lavras", uf: "MG", grupo: "Suídeos", especie: "Suíno",
+    dataVencimento: "2029-05-20", situacao: "Ativo",
+  },
+  {
+    id: 5, codigo: "310010400050005", estabCodigo: "31001040007", estabNome: "Granja Avícola São José",
+    produtores: [{ nome: "Ricardo Alves Prado", documento: "333.789.221-64" }],
+    responsaveis: [{ nome: "Juliana Prado Alves", documento: "444.789.221-64" }],
+    gta: [{ nome: "Juliana Prado Alves", documento: "444.789.221-64" }],
+    municipio: "Três Pontas", uf: "MG", grupo: "Aves", especie: "Galinha",
+    dataVencimento: "2028-11-30", situacao: "Ativo",
   },
 ];
 
@@ -181,12 +218,12 @@ export function ExploracaoPecuariaPage({ onLogout, onNavigate }: PageProps) {
   const [responsavel, setResponsavel] = useState<any | null>(null);
   const [habilitadoGta, setHabilitadoGta] = useState<any | null>(null);
   const [municipio, setMunicipio] = useState("");
-  const [especie, setEspecie] = useState<any | null>(null); 
+  const [especie, setEspecie] = useState<any | null>(null);
   const [vencendoEm, setVencendoEm] = useState("");
   const [periodoDe, setPeriodoDe] = useState("");
   const [periodoAte, setPeriodoAte] = useState("");
   const [situacao, setSituacao] = useState("");
-  
+
   const [modalProdutor, setModalProdutor] = useState(false);
   const [tipoPessoa, setTipoPessoa] = useState("");
 
@@ -260,7 +297,7 @@ export function ExploracaoPecuariaPage({ onLogout, onNavigate }: PageProps) {
 
         {/* CONTAINER BRANCO ÚNICO (Engloba Filtros, Mensagens e Tabela) */}
         <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col gap-5">
-          
+
           {/* Barra Superior do Filtro (Código e Botão de Expansão) */}
           <div className="flex gap-3 items-stretch w-full">
             <div className="flex-1 bg-white border border-gray-200 rounded-md px-3 h-12 transition-all relative flex items-end pb-1.5 focus-within:border-[#1A7A3C] focus-within:ring-1 focus-within:ring-[#1A7A3C]">
@@ -291,7 +328,7 @@ export function ExploracaoPecuariaPage({ onLogout, onNavigate }: PageProps) {
           {/* Filtros Internos Avançados */}
           {showFilters && (
             <div className="animate-fadeIn flex flex-col gap-3 w-full">
-              
+
               {/* FILEIRA 1: Alinhamento Flex Dinâmico */}
               <div className="flex flex-col lg:flex-row items-end gap-3 w-full">
                 <div className="w-full lg:flex-1">
@@ -307,7 +344,7 @@ export function ExploracaoPecuariaPage({ onLogout, onNavigate }: PageProps) {
                       { label: "Município", key: "municipio" },
                       { label: "Proprietário", key: "proprietario" },
                     ]}
-                    icon={<img src={Icons.iconeEstabelecimentoUrl} alt="Estabelecimento Agropecuário" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}      
+                    icon={<img src={Icons.iconeEstabelecimentoUrl} alt="Estabelecimento Agropecuário" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}
                     title="Buscar"
                     subtitle="Busque por um estabelecimento cadastrado:"
                     onChange={(ent) => setEstabelecimento(ent)}
@@ -317,11 +354,11 @@ export function ExploracaoPecuariaPage({ onLogout, onNavigate }: PageProps) {
                 <div className="w-full lg:flex-1">
                   <FloatInput
                     label="Produtor"
-                    value={produtor ? produtor.nome : ""} 
-                    icon={<img src={Icons.iconeProdutorUrl} alt="Produtor" className="w-5 h-5 object-contain" />} 
+                    value={produtor ? produtor.nome : ""}
+                    icon={<img src={Icons.iconeProdutorUrl} alt="Produtor" className="w-5 h-5 object-contain" />}
                     onClick={() => setModalProdutor(true)}
                     readOnly
-                  />            
+                  />
                 </div>
 
                 <div className="w-full lg:flex-1">
@@ -440,60 +477,60 @@ export function ExploracaoPecuariaPage({ onLogout, onNavigate }: PageProps) {
           ) : (
             <div className="w-full">
               <div className="overflow-x-auto">
-               <table className="w-full text-sm border-collapse">
-  <thead>
-    <tr className=" border-b">
-      <th className="text-left px-4 py-3 font-semibold text-gray-600 uppercase whitespace-normal max-w-[100px]">Código</th>
-      <th className="text-left px-4 py-3 font-semibold text-gray-600 uppercase whitespace-normal max-w-[180px]">Estabelecimento Agropecuário</th>
-      <th className="text-left px-4 py-3 font-semibold text-gray-600 uppercase whitespace-normal max-w-[150px]">Produtores</th>
-      <th className="text-left px-4 py-3 font-semibold text-gray-600 uppercase whitespace-normal max-w-[150px]">Responsáveis Técnicos</th>
-      <th className="text-left px-4 py-3 font-semibold text-gray-600 uppercase whitespace-normal max-w-[120px]">Habilitados GTA</th>
-      <th className="text-left px-4 py-3 font-semibold text-gray-600 uppercase whitespace-normal max-w-[120px]">Município - UF</th>
-      <th className="text-left px-4 py-3 font-semibold text-gray-600 uppercasewhitespace-normal max-w-[120px]">Grupo - Espécie</th>
-      <th className="text-left px-4 py-3 font-semibold text-gray-600 uppercase whitespace-normal max-w-[110px]">Data de Vencimento</th>
-      <th className="text-left px-4 py-3 font-semibold text-gray-600 uppercase whitespace-normal max-w-[100px]">Situação</th>
-      <th className="px-4 py-3 w-[80px]" />
-    </tr>
-  </thead>
-  <tbody>
-    {pagina.map((e) => (
-      <tr key={e.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/60 transition">
-        <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">{e.codigo}</td>
-        
-        {/* Estabelecimento Agropecuário */}
-        <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">
-          <div>{e.estabCodigo}</div>
-          <div>{e.estabNome}</div>
-        </td>
-        
-        <td className="px-4 py-3 text-gray-500 text-sm"><CelulaPessoas pessoas={e.produtores} /></td>
-        <td className="px-4 py-3 text-gray-500 text-sm"><CelulaPessoas pessoas={e.responsaveis} /></td>
-        <td className="px-4 py-3 text-gray-500 text-sm"><CelulaPessoas pessoas={e.gta} /></td>
-        
-        {/* Município - UF */}
-        <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">
-          <div>{e.municipio}</div>
-          <div>{e.uf}</div>
-        </td>
-        
-        {/* Grupo - Espécie */}
-        <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">
-          <div>{e.grupo}</div>
-          <div>{e.especie}</div>
-        </td>
-        
-        <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">{fmtData(e.dataVencimento)}</td>
-        <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal"><div>{e.situacao}</div></td>
-        <td className="px-4 py-3">
-          <div className="flex items-center gap-1 justify-end">
-            <button onClick={() => onNavigate("visualizar-exploracao-pecuaria", e)} className="p-2 rounded-md hover:bg-green-50 transition" style={{ color: GREEN }} title="Visualizar"><ViewIcon size={18} /></button>
-            <button onClick={() => onNavigate("editar-exploracao-pecuaria", e)} className="p-2 rounded-md hover:bg-green-50 transition" style={{ color: GREEN }} title="Editar"><Pencil size={17} /></button>
-          </div>
-        </td>
-      </tr>
-    ))}
-  </tbody>
-</table>
+                <table className="w-full text-sm border-collapse">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left px-4 py-3 font-semibold text-gray-600 uppercase whitespace-normal max-w-[100px]">Código</th>
+                      <th className="text-left px-4 py-3 font-semibold text-gray-600 uppercase whitespace-normal max-w-[180px]">Estabelecimento Agropecuário</th>
+                      <th className="text-left px-4 py-3 font-semibold text-gray-600 uppercase whitespace-normal max-w-[150px]">Produtores</th>
+                      <th className="text-left px-4 py-3 font-semibold text-gray-600 uppercase whitespace-normal max-w-[150px]">Responsáveis Técnicos</th>
+                      <th className="text-left px-4 py-3 font-semibold text-gray-600 uppercase whitespace-normal max-w-[120px]">Habilitados GTA</th>
+                      <th className="text-left px-4 py-3 font-semibold text-gray-600 uppercase whitespace-normal max-w-[120px]">Município - UF</th>
+                      <th className="text-left px-4 py-3 font-semibold text-gray-600 uppercase whitespace-normal max-w-[120px]">Grupo - Espécie</th>
+                      <th className="text-left px-4 py-3 font-semibold text-gray-600 uppercase whitespace-normal max-w-[110px]">Data de Vencimento</th>
+                      <th className="text-left px-4 py-3 font-semibold text-gray-600 uppercase whitespace-normal max-w-[100px]">Situação</th>
+                      <th className="px-4 py-3 w-[80px]" />
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pagina.map((e) => (
+                      <tr key={e.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/60 transition">
+                        <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">{e.codigo}</td>
+
+                        {/* Estabelecimento Agropecuário */}
+                        <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">
+                          <div>{e.estabCodigo}</div>
+                          <div>{e.estabNome}</div>
+                        </td>
+
+                        <td className="px-4 py-3 text-gray-500 text-sm"><CelulaPessoas pessoas={e.produtores} /></td>
+                        <td className="px-4 py-3 text-gray-500 text-sm"><CelulaPessoas pessoas={e.responsaveis} /></td>
+                        <td className="px-4 py-3 text-gray-500 text-sm"><CelulaPessoas pessoas={e.gta} /></td>
+
+                        {/* Município - UF */}
+                        <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">
+                          <div>{e.municipio}</div>
+                          <div>{e.uf}</div>
+                        </td>
+
+                        {/* Grupo - Espécie */}
+                        <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">
+                          <div>{e.grupo}</div>
+                          <div>{e.especie}</div>
+                        </td>
+
+                        <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">{fmtData(e.dataVencimento)}</td>
+                        <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal"><div>{e.situacao}</div></td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-1 justify-end">
+                            <button onClick={() => onNavigate("visualizar-exploracao-pecuaria", montarRegistroParaVisualizar(e))} className="p-2 rounded-md hover:bg-green-50 transition" style={{ color: GREEN }} title="Visualizar"><ViewIcon size={18} /></button>
+                            <button onClick={() => onNavigate("editar-exploracao-pecuaria", e)} className="p-2 rounded-md hover:bg-green-50 transition" style={{ color: GREEN }} title="Editar"><Pencil size={17} /></button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
 
               {/* Paginação */}
@@ -517,11 +554,11 @@ export function ExploracaoPecuariaPage({ onLogout, onNavigate }: PageProps) {
         open={modalProdutor}
         onClose={() => {
           setModalProdutor(false);
-          setTipoPessoa(""); 
+          setTipoPessoa("");
         }}
         title="Buscar Produtor"
         subtitle="Busque por um produtor cadastrado no sistema:"
-        icon={<img src={Icons.iconeProdutorUrl} alt="Produtor" className="w-8 h-8 object-contain" />} 
+        icon={<img src={Icons.iconeProdutorUrl} alt="Produtor" className="w-8 h-8 object-contain" />}
         data={databaseFiltrada}
         columns={colunasModal}
         searchKeys={["nome", "documento"]}
@@ -530,7 +567,7 @@ export function ExploracaoPecuariaPage({ onLogout, onNavigate }: PageProps) {
         onConfirm={(p) => {
           setProdutor(p);
           setModalProdutor(false);
-          setTipoPessoa(""); 
+          setTipoPessoa("");
         }}
         headerActions={
           <FloatSelect
