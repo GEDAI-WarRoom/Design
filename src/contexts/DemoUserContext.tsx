@@ -7,7 +7,17 @@ const produtorEntryRoutes = new Set([
 	"pessoa-juridica",
 	"estabelecimento-agropecuario",
 	"exploracao-pecuaria",
+	"pendencias-confirmacao-gta",
+	"nucleo-producao",
+	"passaporte-equestre",
+	"unidade-consolidacao",
+	"partilha-vacina",
+	"declaracao-vacinacao",
+	"ajuste-rebanho",
+	"lancamento-rebanho",
+	"atualizacao-cadastral-rebanho",
 	"emissao-gta",
+	"emissao-ata",
 ]);
 
 const produtorAllowedRoutes = new Set([
@@ -24,6 +34,24 @@ const produtorAllowedRoutes = new Set([
 	"visualizar-estabelecimento-agropecuario",
 	"adicionar-exploracao-pecuaria",
 	"visualizar-exploracao-pecuaria",
+	"adicionar-nucleo-producao",
+	"visualizar-nucleo-producao",
+	"editar-nucleo-producao",
+	"adicionar-passaporte-equestre",
+	"visualizar-passaporte-equestre",
+	"editar-passaporte-equestre",
+	"adicionar-unidade-consolidacao",
+	"adicionar-partilha-vacina",
+	"adicionar-declaracao-vacinacao",
+	"adicionar-ajuste-rebanho",
+	"visualizar-ajuste-rebanho",
+	"editar-ajuste-rebanho",
+	"adicionar-lancamento-rebanho",
+	"visualizar-lancamento-rebanho",
+	"editar-lancamento-rebanho",
+	"adicionar-emissao-ata",
+	"editar-emissao-ata",
+	"visualizar-emissao-ata",
 	"adicionar-emissao-gta",
 	"visualizar-emissao-gta",
 	"emitir-emissao-gta",
@@ -34,7 +62,6 @@ const produtorAllowedRoutes = new Set([
 	"visualizar-atualizacao-cadastral-rebanho",
 	"atualizar-cadastro-rebanho",
 	"visualizar-rebanho-atualizado",
-	"adicionar-nucleo-producao",
 ]);
 
 interface DemoUserContextValue {
@@ -72,6 +99,9 @@ export function useDemoUser() {
 }
 
 export function isEntryRouteAllowed(role: DemoUserRole | null, route: string) {
+	if (route === "pendencias-confirmacao-gta") {
+		return role === "produtor";
+	}
 	return role !== "produtor" || produtorEntryRoutes.has(route);
 }
 

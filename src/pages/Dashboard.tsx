@@ -78,7 +78,11 @@ export const cadastrosCategories: MenuCategory[] = [
 		title: "Geral",
 		icon: <Globe size={32} color={GREEN} />,
 		items: [
-
+			{
+				label: "Central de Pendências",
+				route: "pendencias-confirmacao-gta",
+				icon: <Bell size={16} />,
+			},
 			{
 				label: "Aeroporto/Porto",
 				route: "aeroporto-porto",
