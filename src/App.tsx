@@ -465,8 +465,8 @@ export type Screen =
 	| "visualizar-indice"
 	| "acougue"
 	| "adicionar-acougue"
+	| "editar-acougue"
 	| "visualizar-acougue"
-	| "adicionar-indice"
 	| "editar-aeroporto-porto"
   | "visualizar-aeroporto-porto";
 
@@ -638,20 +638,6 @@ export default function App() {
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
 					dadosIniciais={screenData}
-				/>
-			);
-		case "divisao-municipal":
-			return (
-				<DivisaoMunicipalPage
-					onLogout={handleLogout}
-					onNavigate={handleNavigate}
-				/>
-			);
-		case "adicionar-divisao-municipal":
-			return (
-				<AdicionarDivisaoMunicipalPage
-					onLogout={handleLogout}
-					onNavigate={handleNavigate}
 				/>
 			);
 		case "estabelecimento-agropecuario":
@@ -2084,20 +2070,6 @@ export default function App() {
 					dados={screenData}
 				/>
 			);
-		case "acougue":
-			return (
-				<AcouguePage onLogout={handleLogout} onNavigate={handleNavigate} />
-			);
-		case "adicionar-acougue":
-		case "editar-acougue":
-		case "visualizar-acougue":
-			return (
-				<AdicionarAcouguePage
-					onLogout={handleLogout}
-					onNavigate={handleNavigate}
-				/>
-			);
-
 		default:
 			return (
 				<DashboardPage onLogout={handleLogout} onNavigate={handleNavigate} />
