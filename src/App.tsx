@@ -5,6 +5,8 @@ import { SelecionarUsuarioPage } from "./pages/SelecionarUsuario";
 import { isRouteAllowed, useDemoUser } from "./contexts/DemoUserContext";
 
 // GERAL
+import { VisualizarDivisaoMunicipalPage } from "./pages/Geral/DivisaoMunicipal/VisualizarDivisaoMunicipal";
+import { EditarDivisaoMunicipalPage } from "./pages/Geral/DivisaoMunicipal/EditarDivisaoMunicipal";
 import { EmissaoATAPage } from "./pages/GTA/EmissaoATA/EmissaoATA";
 import { AdicionarEmissaoATAPage } from "./pages/GTA/EmissaoATA/AdicionarEmissaoATA";
 import { VisualizarEmissaoATAPage } from "./pages/GTA/EmissaoATA/VisualizarEmissaoATA";
@@ -237,6 +239,8 @@ import { ParametrosSistemaPage } from "./pages/Controle/ParametrosSistema/Parame
 
 // 1. Adicionamos as novas rotas de Pessoa Jurídica no tipo Screen
 export type Screen =
+| "editar-divisao-municipal"
+  | "visualizar-divisao-municipal"
 	| "emissao-ata"
 	| "adicionar-emissao-ata"
 	| "editar-emissao-ata"
@@ -477,6 +481,22 @@ export default function App() {
 	};
 
 	switch (screen) {
+		case "divisao-municipal":
+      return (
+        <DivisaoMunicipalPage onLogout={handleLogout} onNavigate={handleNavigate} />
+      );
+    case "adicionar-divisao-municipal":
+      return (
+        <AdicionarDivisaoMunicipalPage onLogout={handleLogout} onNavigate={handleNavigate} />
+      );
+    case "editar-divisao-municipal":
+      return (
+        <EditarDivisaoMunicipalPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />
+      );
+    case "visualizar-divisao-municipal":
+      return (
+        <VisualizarDivisaoMunicipalPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />
+      );
 		case "emissao-ata":
 			return <EmissaoATAPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 		case "adicionar-emissao-ata":
