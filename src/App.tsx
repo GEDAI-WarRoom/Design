@@ -31,6 +31,7 @@ import { VisualizarClassificacaoSanitariaEstadoPage } from "./pages/Geral/Classi
 import { AdicionarDivisaoMunicipalPage } from "./pages/Geral/DivisaoMunicipal/AdicionarDivisaoMunicipal";
 import { DivisaoMunicipalPage } from "./pages/Geral/DivisaoMunicipal/DivisaoMunicipal";
 import { AdicionarEstabelecimentoAgropecuarioPage } from "./pages/Geral/EstabelecimentoAgropecuario/AdicionarEstabelecimentoAgropecuario";
+import { EditarEstabelecimentoAgropecuarioPage } from "./pages/Geral/EstabelecimentoAgropecuario/EditarEstabelecimentoAgropecuario";
 import { EstabelecimentoAgropecuarioPage } from "./pages/Geral/EstabelecimentoAgropecuario/EstabelecimentoAgropecuario";
 import { VisualizarEstabelecimentoAgropecuarioPage } from "./pages/Geral/EstabelecimentoAgropecuario/VisualizarEstabelecimentoAgropecuario";
 import { AdicionarInstituicaoEnsinoPesquisaPage } from "./pages/Geral/InstituiçãoEnsinoPesquisa/AdicionarInstituiçãoEnsinoPesquisa";
@@ -270,6 +271,7 @@ export type Screen =
 	| "adicionar-divisao-municipal"
 	| "estabelecimento-agropecuario"
 	| "adicionar-estabelecimento-agropecuario"
+	| "editar-estabelecimento-agropecuario"
 	| "visualizar-estabelecimento-agropecuario"
 	| "venda-propriedade"
 	| "adicionar-venda-propriedade"
@@ -658,6 +660,14 @@ export default function App() {
 				<AdicionarEstabelecimentoAgropecuarioPage
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
+				/>
+			);
+		case "editar-estabelecimento-agropecuario":
+			return (
+				<EditarEstabelecimentoAgropecuarioPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
 				/>
 			);
 		case "visualizar-estabelecimento-agropecuario":
@@ -2029,6 +2039,7 @@ export default function App() {
 				<VisualizarAtestadoExamePage
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
+					dados={screenData}
 				/>
 			);
 		case "editar-atestado-exame":
@@ -2036,6 +2047,7 @@ export default function App() {
 				<EditarAtestadoExamePage
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
+					dados={screenData}
 				/>
 			);
 		case "acougue":
