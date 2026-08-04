@@ -1,11 +1,9 @@
 import React, { useState } from "react";
-import { ArrowLeft, ChevronUp, ChevronDown, Info, Check, Eye } from "lucide-react";
+import { ArrowLeft, ChevronUp, ChevronDown, Info } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput } from "../../../components/ui/FormKit";
 
-
 const GREEN = "#1A7A3C";
-
 
 function Section({
   title,
@@ -36,74 +34,43 @@ function Section({
   );
 }
 
-
 interface PageProps {
   onLogout: () => void;
   onNavigate: (screen: any, data?: any) => void;
   dados?: any;
 }
 
-
 export function EditarPragaPage({ onLogout, onNavigate, dados }: PageProps) {
   const registroInicial = dados || {
     id: 1,
-    codigo: "112",
     nomeCientifico: "Cerodirphia rubripes",
     nomePopular: "Lagarta-Verde",
-    situacao: "Ativo",
   };
 
-
-  const [nomeCientifico, setNomeCientifico] = useState(registroInicial.nomeCientifico || "");
-  const [nomePopular, setNomePopular] = useState(registroInicial.nomePopular || "");
-  const [situacao, setSituacao] = useState<"Ativo" | "Inativo">(
-    registroInicial.situacao === "Inativo" ? "Inativo" : "Ativo"
+  const [nomeCientifico, setNomeCientifico] = useState(
+    registroInicial.nomeCientifico || "Cerodirphia rubripes"
+  );
+  const [nomePopular, setNomePopular] = useState(
+    registroInicial.nomePopular || "Lagarta-Verde"
   );
 
-
-  // Controle dos Modais
-  const [modalConfirm, setModalConfirm] = useState<"salvar" | "inativar" | "ativar" | null>(null);
-  const [isSucesso, setIsSucesso] = useState(false);
-
+  // Controle do Modal Único de Confirmação
+  const [modalConfirmSalvar, setModalConfirmSalvar] = useState(false);
 
   const getRegistroAtualizado = () => ({
     ...registroInicial,
     nomeCientifico,
     nomePopular,
-    situacao,
   });
 
-
-  const handleVisualizar = () => {
+  const handleConfirmSave = () => {
+    setModalConfirmSalvar(false);
     onNavigate("visualizar-praga", getRegistroAtualizado());
   };
-
-
-  const handleToggleSituacaoClick = () => {
-    if (situacao === "Ativo") {
-      setModalConfirm("inativar");
-    } else {
-      setModalConfirm("ativar");
-    }
-  };
-
-
-  const handleConfirmAction = () => {
-    if (modalConfirm === "inativar") {
-      setSituacao("Inativo");
-    } else if (modalConfirm === "ativar") {
-      setSituacao("Ativo");
-    } else if (modalConfirm === "salvar") {
-      setIsSucesso(true);
-    }
-    setModalConfirm(null);
-  };
-
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
       <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="praga" hideSearch />
-
 
       <main className="max-w-[1088px] mx-auto px-4 md:px-6 py-6 flex flex-col gap-4">
         {/* Cabeçalho */}
@@ -118,13 +85,12 @@ export function EditarPragaPage({ onLogout, onNavigate, dados }: PageProps) {
             Todas as Pragas
           </button>
 
-
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <h1 className="text-2xl font-semibold text-gray-900">Editar Praga</h1>
             <div className="flex items-center gap-3">
               <button
                 type="button"
-                onClick={() => setModalConfirm("salvar")}
+                onClick={() => setModalConfirmSalvar(true)}
                 className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm"
               >
                 Salvar
@@ -132,7 +98,6 @@ export function EditarPragaPage({ onLogout, onNavigate, dados }: PageProps) {
             </div>
           </div>
         </div>
-
 
         {/* Banner de Obrigatoriedade */}
         <div className="w-full bg-white border border-gray-100 rounded-lg p-5 shadow-sm flex items-center gap-3 mt-2">
@@ -143,7 +108,6 @@ export function EditarPragaPage({ onLogout, onNavigate, dados }: PageProps) {
             Campos indicados com <span className="text-red-500 font-bold">*</span> são obrigatórios e deverão ser preenchidos.
           </p>
         </div>
-
 
         {/* 1. Informações Básicas */}
         <Section title="Informações Básicas">
@@ -164,108 +128,34 @@ export function EditarPragaPage({ onLogout, onNavigate, dados }: PageProps) {
             />
           </div>
         </Section>
-
-
-        {/* 2. Situação do Cadastro */}
-        <Section title="Situação do Cadastro">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <p className="text-xs md:text-sm text-gray-500 font-normal">
-              Indica se o cadastro está ativo (em uso) ou inativo (excluído, mantido apenas para registro e histórico).
-            </p>
-            <div className="flex items-center gap-3 flex-shrink-0">
-              <span className={`text-sm font-semibold ${situacao === "Inativo" ? "text-gray-700" : "text-gray-400"}`}>
-                Inativo
-              </span>
-              <button
-                type="button"
-                onClick={handleToggleSituacaoClick}
-                className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                  situacao === "Ativo" ? "bg-[#1A7A3C]" : "bg-gray-300"
-                }`}
-              >
-                <span
-                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                    situacao === "Ativo" ? "translate-x-5" : "translate-x-0"
-                  }`}
-                />
-              </button>
-              <span className={`text-sm font-semibold ${situacao === "Ativo" ? "text-[#1A7A3C]" : "text-gray-400"}`}>
-                Ativo
-              </span>
-            </div>
-          </div>
-        </Section>
       </main>
 
-
-      {/* --- MODAIS DE CONFIRMAÇÃO --- */}
-      {modalConfirm && (
+      {/* MODAL DE CONFIRMAÇÃO DE SALVAMENTO (CENTRALIZADO) */}
+      {modalConfirmSalvar && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg p-6 flex flex-col gap-4">
-            <h3 className="text-lg md:text-xl font-bold text-gray-900">
-              {modalConfirm === "salvar" && "Salvar Alterações da Praga"}
-              {modalConfirm === "inativar" && "Inativar Praga"}
-              {modalConfirm === "ativar" && "Ativar Praga"}
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center flex flex-col items-center justify-center gap-4">
+            <h3 className="text-lg md:text-xl font-bold text-gray-900 text-center">
+              Salvar Alterações da Praga
             </h3>
 
-
-            <p className="text-sm text-gray-600 leading-relaxed">
-              {modalConfirm === "salvar" && `Deseja salvar as alterações da praga ${nomeCientifico}?`}
-              {modalConfirm === "inativar" && `Deseja inativar a praga ${nomeCientifico}?`}
-              {modalConfirm === "ativar" && `Deseja ativar a praga ${nomeCientifico}?`}
+            <p className="text-sm text-gray-600 leading-relaxed text-center">
+              Deseja salvar as alterações da praga {nomeCientifico}?
             </p>
 
-
-            <div className="flex items-center justify-end gap-3 mt-4">
+            <div className="flex items-center justify-center gap-3 w-full mt-2">
               <button
                 type="button"
-                onClick={() => setModalConfirm(null)}
+                onClick={() => setModalConfirmSalvar(false)}
                 className="px-6 py-2.5 border-2 border-[#1A7A3C] text-[#1A7A3C] font-bold text-sm rounded-lg hover:bg-green-50 transition"
               >
                 Cancelar
               </button>
               <button
                 type="button"
-                onClick={handleConfirmAction}
+                onClick={handleConfirmSave}
                 className="px-6 py-2.5 bg-[#1A7A3C] hover:bg-[#15612F] text-white font-bold text-sm rounded-lg transition shadow-sm"
               >
-                {modalConfirm === "salvar" && "Salvar"}
-                {modalConfirm === "inativar" && "Inativar"}
-                {modalConfirm === "ativar" && "Ativar"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-
-      {/* Modal de Sucesso */}
-      {isSucesso && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
-            <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4">
-              <Check size={28} className="text-[#1A7A3C]" strokeWidth={3} />
-            </div>
-            <h3 className="text-lg font-bold text-gray-900">Praga atualizada com sucesso!</h3>
-            <p className="text-sm text-gray-500 mt-1">As alterações no cadastro da praga foram salvas.</p>
-            <div className="flex gap-3 justify-center mt-6">
-              <button
-                onClick={() => {
-                  setIsSucesso(false);
-                  onNavigate("praga");
-                }}
-                className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition"
-              >
-                Voltar
-              </button>
-              <button
-                onClick={() => {
-                  setIsSucesso(false);
-                  handleVisualizar();
-                }}
-                className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition"
-              >
-                Visualizar
+                Salvar
               </button>
             </div>
           </div>
@@ -274,4 +164,6 @@ export function EditarPragaPage({ onLogout, onNavigate, dados }: PageProps) {
     </div>
   );
 }
+
+
 

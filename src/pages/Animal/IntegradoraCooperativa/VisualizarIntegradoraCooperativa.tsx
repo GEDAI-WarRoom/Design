@@ -1,13 +1,7 @@
 import React, { useState } from "react";
-import {
-  ArrowLeft,
-  ChevronUp,
-  ChevronDown,
-  Pencil,
-  Download,
-  Building2,
-} from "lucide-react";
+import { ArrowLeft, ChevronUp, ChevronDown, Download, Eye } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
+import { FloatInput, LargeTextArea } from "../../../components/ui/FormKit";
 
 const GREEN = "#1A7A3C";
 
@@ -22,39 +16,16 @@ function Section({
 }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="bg-white rounded-xl shadow-sm">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50 transition"
+        className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50 transition border-b border-gray-100"
       >
         <span className="text-base font-semibold text-gray-800">{title}</span>
-        {open ? (
-          <ChevronUp size={18} className="text-gray-400" />
-        ) : (
-          <ChevronDown size={18} className="text-gray-400" />
-        )}
+        {open ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
       </button>
-      {open && (
-        <div className="px-6 pb-6 border-t border-gray-100 pt-5">{children}</div>
-      )}
-    </div>
-  );
-}
-
-function DataField({
-  label,
-  value,
-}: {
-  label: string;
-  value?: string | number | null;
-}) {
-  return (
-    <div className="flex flex-col gap-1">
-      <span className="text-xs font-medium text-gray-500">{label}</span>
-      <span className="text-sm font-semibold text-gray-800">
-        {value || "—"}
-      </span>
+      {open && <div className="p-6 flex flex-col gap-5 bg-white">{children}</div>}
     </div>
   );
 }
@@ -70,13 +41,10 @@ export function VisualizarIntegradoraCooperativaPage({
   onNavigate,
   dados,
 }: PageProps) {
-  // Caso não venham dados na navegação, utilizamos um registro fictício padrão
   const registro = dados || {
     id: 1,
-    codigo: "112637890213",
-    nome: "Integradora São José",
+    nomeComercial: "Agro Alimentos Ferreira Ltda",
     tipo: "Integradora",
-    situacao: "Ativo",
     proprietarios: [
       {
         uid: "prop-1",
@@ -88,9 +56,13 @@ export function VisualizarIntegradoraCooperativaPage({
     ],
     endereco: {
       zona: "Rural",
+      cep: "37200-000",
       estado: "Minas Gerais",
       municipio: "Lavras",
+      bairro: "Centro",
       endereco: "Estrada de chão no Km 12",
+      numero: "S/N",
+      complemento: "Gleba 3",
       localidade: "Floresta",
       distrito: "Abaeté",
       latitude: '19° 09\' 57" S',
@@ -99,15 +71,39 @@ export function VisualizarIntegradoraCooperativaPage({
     contato: {
       utilizarContatoProprietario: "Não",
       emailFixo: "divino.sobrinho@email.com",
+      emailFixoObs: "",
       telefoneFixo: "(35) 99999-1111",
+      telefoneFixoObs: "",
     },
+    anexos: [
+      {
+        id: "1",
+        nome: "contrato_social.pdf",
+        descricao: "Contrato Social Registrado",
+      },
+    ],
     observacao: "Nenhuma observação registrada.",
-    anexos: [],
   };
 
   const handleEditar = () => {
     onNavigate("editar-integradora-cooperativa", registro);
   };
+
+  const nomeComercialVal = registro.nomeComercial || registro.nome || "Agro Alimentos Ferreira Ltda";
+  const tipoVal = registro.tipo || "Integradora";
+  const proprietariosList = (registro.proprietarios && registro.proprietarios.length > 0)
+    ? registro.proprietarios
+    : [
+        {
+          uid: "prop-1",
+          entidade: {
+            nome: "Divino de Souza Sobrinho",
+            documento: "444.009.956-40",
+          },
+        },
+      ];
+  const end = registro.endereco || {};
+  const cont = registro.contato || {};
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
@@ -119,39 +115,26 @@ export function VisualizarIntegradoraCooperativaPage({
       />
 
       <main className="max-w-[1088px] mx-auto px-4 md:px-6 py-6 flex flex-col gap-4">
-        {/* Cabeçalho com Botão de Voltar e Botão de Editar */}
+        {/* Cabeçalho */}
         <div>
           <button
             type="button"
             onClick={() => onNavigate("integradora-cooperativa")}
-            className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70"
+            className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70 font-semibold"
             style={{ color: GREEN }}
           >
             <ArrowLeft size={15} />
             Todas as Integradoras ou Cooperativas
           </button>
 
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-semibold text-gray-900">
-                Visualizar Integradora / Cooperativa
-              </h1>
-              <span
-                className={`text-xs px-2.5 py-1 rounded-full font-semibold ${
-                  registro.situacao === "Inativo"
-                    ? "bg-red-100 text-red-700"
-                    : "bg-green-100 text-green-700"
-                }`}
-              >
-                {registro.situacao || "Ativo"}
-              </span>
-            </div>
-
-            {/* BOTÃO DE EDITAR */}
+          <div className="flex justify-between items-center w-full">
+            <h1 className="text-2xl font-semibold text-gray-900">
+              Visualizar Integradora / Cooperativa
+            </h1>
             <button
               type="button"
               onClick={handleEditar}
-              className="flex items-center justify-center gap-2 px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm"
+              className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm"
             >
               Editar
             </button>
@@ -160,134 +143,229 @@ export function VisualizarIntegradoraCooperativaPage({
 
         {/* 1. Informações Básicas */}
         <Section title="Informações Básicas">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <DataField
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+            <FloatInput
               label="Nome Comercial da Integradora / Cooperativa"
-              value={registro.nome || registro.nomeComercial}
+              required
+              disabled
+              value={nomeComercialVal}
+              onChange={() => {}}
             />
-            <DataField label="Tipo" value={registro.tipo} />
-            <DataField label="Código" value={registro.codigo} />
+            <FloatInput
+              label="Integradora ou Cooperativa?"
+              required
+              disabled
+              value={tipoVal}
+              onChange={() => {}}
+            />
           </div>
         </Section>
 
         {/* 2. Proprietários */}
         <Section title="Proprietários">
-          {registro.proprietarios && registro.proprietarios.length > 0 ? (
-            <div className="flex flex-col gap-3">
-              {registro.proprietarios.map((item: any, index: number) => (
-                <div
-                  key={item.uid || index}
-                  className="flex items-center justify-between p-3.5 bg-gray-50 rounded-lg border border-gray-100"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-green-100 text-[#1A7A3C] flex items-center justify-center text-xs font-bold">
-                      {index + 1}
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-gray-800">
-                        {item.entidade?.nome || "Proprietário sem nome"}
-                      </p>
-                      {item.entidade?.documento && (
-                        <p className="text-xs text-gray-500">
-                          {item.entidade.documento}
-                        </p>
-                      )}
-                    </div>
+          <div className="flex flex-col gap-3">
+            {proprietariosList.map((item: any, idx: number) => {
+              const ent = item.entidade || item.proprietario || {};
+              const nomeProp = ent.nome || (typeof item === "string" ? item : "Divino de Souza Sobrinho");
+              const docProp = ent.documento || ent.cpf || "444.009.956-40";
+
+              return (
+                <div key={idx} className="flex items-center gap-3">
+                  <div className="grid flex-1 grid-cols-1 md:grid-cols-2 gap-3">
+                    <FloatInput
+                      label={`Proprietário ${idx + 1}`}
+                      required
+                      value={nomeProp}
+                      disabled
+                      onChange={() => {}}
+                    />
+                    <FloatInput
+                      label="CPF / CNPJ"
+                      value={docProp}
+                      disabled
+                      onChange={() => {}}
+                    />
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => ent && onNavigate("visualizar-pessoa", ent)}
+                    title="Visualizar Detalhes"
+                    className="flex h-11 w-11 flex-shrink-0 items-center justify-center bg-white text-gray-500 rounded-md transition-colors hover:bg-gray-50 hover:text-[#1A7A3C]"
+                  >
+                    <Eye size={18} />
+                  </button>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm text-gray-500 italic">
-              Nenhum proprietário vinculado.
-            </p>
-          )}
+              );
+            })}
+          </div>
         </Section>
 
         {/* 3. Informações de Localização */}
         <Section title="Informações de Localização">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <DataField label="Zona" value={registro.endereco?.zona} />
-            <DataField label="Estado" value={registro.endereco?.estado} />
-            <DataField label="Município" value={registro.endereco?.municipio} />
-            <DataField label="Endereço" value={registro.endereco?.endereco} />
-            <DataField label="Localidade" value={registro.endereco?.localidade} />
-            <DataField label="Distrito" value={registro.endereco?.distrito} />
-            <DataField label="Latitude" value={registro.endereco?.latitude} />
-            <DataField label="Longitude" value={registro.endereco?.longitude} />
+          <div className="flex flex-col gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
+              <FloatInput label="Zona" value={end.zona || "Rural"} disabled onChange={() => {}} />
+              <FloatInput label="CEP" value={end.cep || "37200-000"} disabled onChange={() => {}} />
+              <FloatInput label="Estado" value={end.estado || "Minas Gerais"} disabled onChange={() => {}} />
+              <FloatInput label="Município" value={end.municipio || "Lavras"} disabled onChange={() => {}} />
+              <FloatInput label="Bairro" value={end.bairro || "Centro"} disabled onChange={() => {}} />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
+              <div className="md:col-span-6">
+                <FloatInput label="Endereço" value={end.endereco || "Estrada de chão no Km 12"} disabled onChange={() => {}} />
+              </div>
+              <div className="md:col-span-3">
+                <FloatInput label="Número" value={end.numero || "S/N"} disabled onChange={() => {}} />
+              </div>
+              <div className="md:col-span-3">
+                <FloatInput label="Complemento" value={end.complemento || "Gleba 3"} disabled onChange={() => {}} />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <FloatInput label="Localidade" value={end.localidade || "Floresta"} disabled onChange={() => {}} />
+              <FloatInput label="Distrito" value={end.distrito || "Abaeté"} disabled onChange={() => {}} />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <FloatInput label="Latitude" value={end.latitude || '19° 09\' 57" S'} disabled onChange={() => {}} />
+              <FloatInput label="Longitude" value={end.longitude || '044° 21\' 48" W'} disabled onChange={() => {}} />
+            </div>
           </div>
         </Section>
 
         {/* 4. Informações de Contato */}
         <Section title="Informações de Contato">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <DataField
-              label="Utilizar contato do proprietário?"
-              value={registro.contato?.utilizarContatoProprietario}
-            />
-            <DataField
-              label="E-mail"
-              value={
-                registro.contato?.emailFixo || registro.contato?.emailProprietario
-              }
-            />
-            <DataField
-              label="Telefone"
-              value={
-                registro.contato?.telefoneFixo ||
-                registro.contato?.telefoneProprietario
-              }
-            />
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-2">
+              <span className="text-sm font-semibold text-gray-700">
+                Utilizar Contato de Proprietários? <span className="text-red-500">*</span>
+              </span>
+              <div className="flex items-center gap-6">
+                <label className="flex items-center gap-2 text-sm text-gray-600 cursor-not-allowed">
+                  <input
+                    type="radio"
+                    name="utilizarContatoProprietariosView"
+                    checked={cont.utilizarContatoProprietario === "Sim"}
+                    disabled
+                    className="h-4 w-4 text-[#1A7A3C] border-gray-300 focus:ring-0 cursor-not-allowed"
+                  />
+                  Sim
+                </label>
+                <label className="flex items-center gap-2 text-sm text-gray-600 cursor-not-allowed">
+                  <input
+                    type="radio"
+                    name="utilizarContatoProprietariosView"
+                    checked={cont.utilizarContatoProprietario !== "Sim"}
+                    disabled
+                    className="h-4 w-4 text-[#1A7A3C] border-gray-300 focus:ring-0 cursor-not-allowed"
+                  />
+                  Não
+                </label>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-5 pt-2 border-t border-gray-100">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+                <div className="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <FloatInput label="Tipo de Contato" value="E-mail" disabled onChange={() => {}} />
+                  <FloatInput label="E-mail" value={cont.emailFixo || cont.emailProprietario || "divino.sobrinho@email.com"} disabled onChange={() => {}} />
+                </div>
+                <div className="lg:col-span-7">
+                  <LargeTextArea label="Observação" value={cont.emailFixoObs || ""} disabled onChange={() => {}} />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start pt-4 border-t border-gray-100">
+                <div className="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <FloatInput label="Tipo de Contato" value="Telefone" disabled onChange={() => {}} />
+                  <FloatInput label="Número" value={cont.telefoneFixo || cont.telefoneProprietario || "(35) 99999-1111"} disabled onChange={() => {}} />
+                </div>
+                <div className="lg:col-span-7">
+                  <LargeTextArea label="Observação" value={cont.telefoneFixoObs || ""} disabled onChange={() => {}} />
+                </div>
+              </div>
+            </div>
           </div>
         </Section>
 
-        {/* 5. Observações */}
-        <Section title="Observações">
-          <p className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">
-            {registro.observacao || "Nenhuma observação registrada."}
-          </p>
-        </Section>
-
-        {/* 6. Anexos */}
+        {/* 5. Anexos */}
         <Section title="Anexos">
-          {registro.anexos && registro.anexos.length > 0 ? (
-            <div className="flex flex-col gap-3">
-              {registro.anexos.map((anexo: any, index: number) => (
-                <div
-                  key={anexo.id || index}
-                  className="flex items-center justify-between p-3.5 bg-gray-50 rounded-lg border border-gray-100"
-                >
+          <div className="flex flex-col gap-4">
+            {(registro.anexos && registro.anexos.length > 0) ? (
+              registro.anexos.map((anexo: any, idx: number) => (
+                <div key={idx} className="p-4 rounded-xl bg-white flex flex-col gap-1.5">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-green-50 text-[#1A7A3C] flex items-center justify-center">
-                      <Building2 size={18} />
+                    <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-[#1A7A3C] text-xs font-bold text-white">
+                      {idx + 1}
+                    </span>
+                    <div className="grid flex-1 grid-cols-1 md:grid-cols-2 gap-3">
+                      <FloatInput
+                        label="Documento"
+                        value={anexo.nome || `documento_${idx + 1}.pdf`}
+                        disabled
+                        onChange={() => {}}
+                      />
+                      <FloatInput
+                        label="Descrição"
+                        value={anexo.descricao || "-"}
+                        disabled
+                        onChange={() => {}}
+                      />
                     </div>
-                    <div>
-                      <p className="text-sm font-semibold text-gray-800">
-                        {anexo.nome || `Documento Anexo ${index + 1}`}
-                      </p>
-                      {anexo.descricao && (
-                        <p className="text-xs text-gray-500">
-                          {anexo.descricao}
-                        </p>
-                      )}
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => onNavigate("baixar-documento", anexo)}
+                      title="Baixar Anexo"
+                      className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-lg bg-white text-[#1A7A3C] hover:bg-green-50 transition"
+                    >
+                      <Download size={18} />
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="p-4 rounded-xl bg-white flex flex-col gap-1.5">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-[#1A7A3C] text-xs font-bold text-white">
+                    1
+                  </span>
+                  <div className="grid flex-1 grid-cols-1 md:grid-cols-2 gap-3">
+                    <FloatInput
+                      label="Documento"
+                      value="contrato_social.pdf"
+                      disabled
+                      onChange={() => {}}
+                    />
+                    <FloatInput
+                      label="Descrição"
+                      value="Contrato Social Registrado"
+                      disabled
+                      onChange={() => {}}
+                    />
                   </div>
                   <button
                     type="button"
-                    onClick={() => onNavigate("baixar-documento", anexo)}
-                    className="p-2 text-[#1A7A3C] hover:bg-green-100/50 rounded-lg transition"
-                    title="Baixar arquivo"
+                    title="Baixar Anexo"
+                    className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-lg bg-white text-[#1A7A3C] hover:bg-green-50 transition"
                   >
                     <Download size={18} />
                   </button>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm text-gray-500 italic">
-              Nenhum anexo cadastrado.
-            </p>
-          )}
+              </div>
+            )}
+          </div>
+        </Section>
+
+        {/* 6. Observações */}
+        <Section title="Observações">
+          <LargeTextArea
+            label="Observação"
+            value={registro.observacao || "Nenhuma observação registrada."}
+            disabled
+            onChange={() => {}}
+          />
         </Section>
       </main>
     </div>

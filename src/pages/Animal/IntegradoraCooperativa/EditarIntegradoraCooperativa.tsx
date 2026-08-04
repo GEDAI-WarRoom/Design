@@ -4,11 +4,9 @@ import {
   ChevronUp,
   ChevronDown,
   Info,
-  Check,
   Trash2,
   PlusCircle,
   Download,
-  Eye,
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import {
@@ -77,10 +75,8 @@ export function EditarIntegradoraCooperativaPage({
 }: PageProps) {
   const registroInicial = dados || {
     id: 1,
-    codigo: "112637890213",
-    nome: "Agro Alimentos Ferreira Ltda",
+    nomeComercial: "Agro Alimentos Ferreira Ltda",
     tipo: "Integradora",
-    situacao: "Ativo",
     proprietarios: [
       {
         uid: "prop-1",
@@ -94,7 +90,10 @@ export function EditarIntegradoraCooperativaPage({
       zona: "Rural",
       estado: "Minas Gerais",
       municipio: "Lavras",
+      bairro: "Centro",
       endereco: "Estrada de chão no Km 12",
+      numero: "S/N",
+      complemento: "Gleba 3",
       localidade: "Floresta",
       distrito: "Abaeté",
       latitude: '19° 09\' 57" S',
@@ -106,17 +105,19 @@ export function EditarIntegradoraCooperativaPage({
       telefoneFixo: "(35) 99999-1111",
     },
     observacao: "",
-    anexos: [],
+    anexos: [
+      {
+        id: "1",
+        nome: "contrato_social.pdf",
+        descricao: "Contrato Social Registrado",
+      },
+    ],
   };
 
-  const [codigo] = useState(registroInicial.codigo || "112637890213");
   const [nomeComercial, setNomeComercial] = useState(
-    registroInicial.nome || registroInicial.nomeComercial || "Agro Alimentos Ferreira Ltda"
+    registroInicial.nomeComercial || registroInicial.nome || "Agro Alimentos Ferreira Ltda"
   );
   const [tipo, setTipo] = useState(registroInicial.tipo || "Integradora");
-  const [situacao, setSituacao] = useState<"Ativo" | "Inativo">(
-    registroInicial.situacao === "Inativo" ? "Inativo" : "Ativo"
-  );
 
   const [proprietarios, setProprietarios] = useState<any[]>(
     registroInicial.proprietarios && registroInicial.proprietarios.length > 0
@@ -137,7 +138,10 @@ export function EditarIntegradoraCooperativaPage({
       zona: "Rural",
       estado: "Minas Gerais",
       municipio: "Lavras",
+      bairro: "Centro",
       endereco: "Estrada de chão no Km 12",
+      numero: "S/N",
+      complemento: "Gleba 3",
       localidade: "Floresta",
       distrito: "Abaeté",
       latitude: '19° 09\' 57" S',
@@ -156,17 +160,14 @@ export function EditarIntegradoraCooperativaPage({
   const [observacao, setObservacao] = useState(registroInicial.observacao || "");
   const [anexos, setAnexos] = useState<any[]>(registroInicial.anexos || []);
 
-  // Controle dos Modais
-  const [modalConfirm, setModalConfirm] = useState<"salvar" | "inativar" | "ativar" | null>(null);
-  const [isSucesso, setIsSucesso] = useState(false);
+  // Controle do Modal Único de Confirmação
+  const [modalConfirmSalvar, setModalConfirmSalvar] = useState(false);
 
   const getRegistroAtualizado = () => ({
     ...registroInicial,
-    codigo,
     nome: nomeComercial,
     nomeComercial,
     tipo,
-    situacao,
     proprietarios,
     endereco,
     contato,
@@ -174,29 +175,9 @@ export function EditarIntegradoraCooperativaPage({
     anexos,
   });
 
-  const handleVisualizar = () => {
+  const handleConfirmSave = () => {
+    setModalConfirmSalvar(false);
     onNavigate("visualizar-integradora-cooperativa", getRegistroAtualizado());
-  };
-
-  // Clique no botão do Toggle de Situação
-  const handleToggleSituacaoClick = () => {
-    if (situacao === "Ativo") {
-      setModalConfirm("inativar");
-    } else {
-      setModalConfirm("ativar");
-    }
-  };
-
-  // Confirmações dos Modais
-  const handleConfirmAction = () => {
-    if (modalConfirm === "inativar") {
-      setSituacao("Inativo");
-    } else if (modalConfirm === "ativar") {
-      setSituacao("Ativo");
-    } else if (modalConfirm === "salvar") {
-      setIsSucesso(true);
-    }
-    setModalConfirm(null);
   };
 
   return (
@@ -214,7 +195,7 @@ export function EditarIntegradoraCooperativaPage({
           <button
             type="button"
             onClick={() => onNavigate("integradora-cooperativa")}
-            className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70"
+            className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70 font-semibold"
             style={{ color: GREEN }}
           >
             <ArrowLeft size={15} />
@@ -228,7 +209,7 @@ export function EditarIntegradoraCooperativaPage({
             <div className="flex items-center gap-3">
               <button
                 type="button"
-                onClick={() => setModalConfirm("salvar")}
+                onClick={() => setModalConfirmSalvar(true)}
                 className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm"
               >
                 Salvar
@@ -332,25 +313,13 @@ export function EditarIntegradoraCooperativaPage({
           />
         </Section>
 
-        {/* 5. Observações */}
-        <Section title="Observações">
-          <LargeTextArea
-            label="Observação"
-            value={observacao}
-            onChange={setObservacao}
-            maxLength={1500}
-            hasTooltip
-            tooltipText="Informações adicionais pertinentes ao cadastro."
-          />
-        </Section>
-
-        {/* 6. Anexos */}
+        {/* 5. Anexos */}
         <Section title="Anexos">
           <div className="flex flex-col gap-6">
             {anexos.map((anexo, index) => (
               <div
                 key={anexo.id || index}
-                className="flex gap-4 items-start relative w-full rounded-xl p-4 bg-white border border-gray-100"
+                className="flex gap-4 items-start relative w-full rounded-xl p-4 bg-white"
               >
                 <div className="flex items-center justify-center bg-[#1A7A3C] text-white text-xs font-bold rounded-full w-6 h-6 flex-shrink-0 mt-3">
                   {index + 1}
@@ -433,118 +402,45 @@ export function EditarIntegradoraCooperativaPage({
           </div>
         </Section>
 
-        {/* 7. Situação do Cadastro (Inativar/Ativar) */}
-        <Section title="Situação do Cadastro">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <p className="text-xs md:text-sm text-gray-500 font-normal">
-              Indica se o cadastro está ativo (em uso) ou inativo (excluído, mantido
-              apenas para registro e histórico).
-            </p>
-            <div className="flex items-center gap-3 flex-shrink-0">
-              <span
-                className={`text-sm font-semibold ${
-                  situacao === "Inativo" ? "text-gray-700" : "text-gray-400"
-                }`}
-              >
-                Inativo
-              </span>
-              <button
-                type="button"
-                onClick={handleToggleSituacaoClick}
-                className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                  situacao === "Ativo" ? "bg-[#1A7A3C]" : "bg-gray-300"
-                }`}
-              >
-                <span
-                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                    situacao === "Ativo" ? "translate-x-5" : "translate-x-0"
-                  }`}
-                />
-              </button>
-              <span
-                className={`text-sm font-semibold ${
-                  situacao === "Ativo" ? "text-[#1A7A3C]" : "text-gray-400"
-                }`}
-              >
-                Ativo
-              </span>
-            </div>
-          </div>
+        {/* 6. Observações */}
+        <Section title="Observações">
+          <LargeTextArea
+            label="Observação"
+            value={observacao}
+            onChange={setObservacao}
+            maxLength={1500}
+            hasTooltip
+            tooltipText="Informações adicionais pertinentes ao cadastro."
+          />
         </Section>
       </main>
 
-      {/* --- MODAIS DE CONFIRMAÇÃO --- */}
-      {modalConfirm && (
+      {/* MODAL DE CONFIRMAÇÃO DE SALVAMENTO (CENTRALIZADO) */}
+      {modalConfirmSalvar && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg p-6 flex flex-col gap-4">
-            <h3 className="text-lg md:text-xl font-bold text-gray-900">
-              {modalConfirm === "salvar" && "Salvar Alterações da Integradora e Cooperativa"}
-              {modalConfirm === "inativar" && "Inativar Integradora e Cooperativa"}
-              {modalConfirm === "ativar" && "Ativar Integradora e Cooperativa"}
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center flex flex-col items-center justify-center gap-4">
+            <h3 className="text-lg md:text-xl font-bold text-gray-900 text-center">
+              Salvar Alterações da Integradora e Cooperativa
             </h3>
 
-            <p className="text-sm text-gray-600 leading-relaxed">
-              {modalConfirm === "salvar" &&
-                `Deseja salvar as alterações da integradora/cooperativa ${nomeComercial}?`}
-              {modalConfirm === "inativar" &&
-                `Deseja inativar a integradora/cooperativa ${nomeComercial}?`}
-              {modalConfirm === "ativar" &&
-                `Deseja ativar a integradora/cooperativa ${nomeComercial}?`}
+            <p className="text-sm text-gray-600 leading-relaxed text-center">
+              Deseja salvar as alterações da integradora/cooperativa {nomeComercial}?
             </p>
 
-            <div className="flex items-center justify-end gap-3 mt-4">
+            <div className="flex items-center justify-center gap-3 w-full mt-2">
               <button
                 type="button"
-                onClick={() => setModalConfirm(null)}
+                onClick={() => setModalConfirmSalvar(false)}
                 className="px-6 py-2.5 border-2 border-[#1A7A3C] text-[#1A7A3C] font-bold text-sm rounded-lg hover:bg-green-50 transition"
               >
                 Cancelar
               </button>
               <button
                 type="button"
-                onClick={handleConfirmAction}
+                onClick={handleConfirmSave}
                 className="px-6 py-2.5 bg-[#1A7A3C] hover:bg-[#15612F] text-white font-bold text-sm rounded-lg transition shadow-sm"
               >
-                {modalConfirm === "salvar" && "Salvar"}
-                {modalConfirm === "inativar" && "Inativar"}
-                {modalConfirm === "ativar" && "Ativar"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Modal de Sucesso Final */}
-      {isSucesso && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
-            <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4">
-              <Check size={28} className="text-[#1A7A3C]" strokeWidth={3} />
-            </div>
-            <h3 className="text-lg font-bold text-gray-900">
-              {tipo || "Integradora / Cooperativa"} atualizada com sucesso!
-            </h3>
-            <p className="text-sm text-gray-500 mt-1">
-              As alterações do cadastro foram salvas.
-            </p>
-            <div className="flex gap-3 justify-center mt-6">
-              <button
-                onClick={() => {
-                  setIsSucesso(false);
-                  onNavigate("integradora-cooperativa");
-                }}
-                className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition"
-              >
-                Voltar
-              </button>
-              <button
-                onClick={() => {
-                  setIsSucesso(false);
-                  handleVisualizar();
-                }}
-                className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition"
-              >
-                Visualizar
+                Salvar
               </button>
             </div>
           </div>
