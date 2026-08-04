@@ -5,6 +5,17 @@ import { SelecionarUsuarioPage } from "./pages/SelecionarUsuario";
 import { isRouteAllowed, useDemoUser } from "./contexts/DemoUserContext";
 
 // GERAL
+import { VisualizarUnidadeConsolidacaoPage } from "./pages/Vegetal/UnidadeConsolidacao/VisualizarUnidadeConsolidacao";
+import { EditarUnidadeConsolidacaoPage } from "./pages/Vegetal/UnidadeConsolidacao/EditarUnidadeConsolidacao";
+
+import { VisualizarCulturaPage } from "./pages/Vegetal/Cultura/VisualizarCultura";
+import { EditarCulturaPage } from "./pages/Vegetal/Cultura/EditarCultura";
+
+import { VisualizarPragaPage } from "./pages/Vegetal/Praga/VisualizarPraga";
+import { EditarPragaPage } from "./pages/Vegetal/Praga/EditarPraga";
+
+import { VisualizarProfissionalVegetalPage } from "./pages/Vegetal/ProfissionalVegetal/VisualizarProfissionalVegetal";
+import { EditarProfissionalVegetalPage } from "./pages/Vegetal/ProfissionalVegetal/EditarProfissionalVegetal";
 import { VisualizarAcouguePage } from "./pages/Geral/Acougue/VisualizarAcougue";
 import { EditarAcouguePage } from "./pages/Geral/Acougue/EditarAcougue";
 import { EmissaoATAPage } from "./pages/GTA/EmissaoATA/EmissaoATA";
@@ -239,6 +250,14 @@ import { ParametrosSistemaPage } from "./pages/Controle/ParametrosSistema/Parame
 
 // 1. Adicionamos as novas rotas de Pessoa Jurídica no tipo Screen
 export type Screen =
+| "editar-unidade-consolidacao"
+  | "visualizar-unidade-consolidacao"
+  | "editar-cultura"
+  | "visualizar-cultura"
+  | "editar-praga"
+  | "visualizar-praga"
+  | "editar-profissional-vegetal"
+  | "visualizar-profissional-vegetal"
 	| "emissao-ata"
 	| "adicionar-emissao-ata"
 	| "editar-emissao-ata"
@@ -479,6 +498,41 @@ export default function App() {
 	};
 
 	switch (screen) {
+		case "unidade-consolidacao":
+      return <UnidadeConsolidacaoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-unidade-consolidacao":
+      return <AdicionarUnidadeConsolidacaoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-unidade-consolidacao":
+      return <EditarUnidadeConsolidacaoPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-unidade-consolidacao":
+      return <VisualizarUnidadeConsolidacaoPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+
+    case "cultura":
+      return <CulturaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-cultura":
+      return <AdicionarCulturaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-cultura":
+      return <EditarCulturaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-cultura":
+      return <VisualizarCulturaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+
+    case "praga":
+      return <PragaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-praga":
+      return <AdicionarPragaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-praga":
+      return <EditarPragaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-praga":
+      return <VisualizarPragaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+
+  case "profissional-vegetal":
+      return <ProfissionalVegetalPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-profissional-vegetal":
+      return <AdicionarProfissionalVegetalPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-profissional-vegetal":
+      return <EditarProfissionalVegetalPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-profissional-vegetal":
+      return <VisualizarProfissionalVegetalPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
 		case "acougue":
       return (
         <AcouguePage onLogout={handleLogout} onNavigate={handleNavigate} />

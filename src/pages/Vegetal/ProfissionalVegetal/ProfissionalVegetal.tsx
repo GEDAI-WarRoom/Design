@@ -368,28 +368,28 @@ export function ProfissionalVegetalPage({ onLogout, onNavigate }: PageProps) {
                         <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">{p.habilitacao}</td>
                         <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">{p.numeroHabilitacao}</td>
                         <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">{p.situacao}  </td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-1 justify-end">
-                            <button
-                              type="button"
-                              onClick={() => onNavigate("visualizar-profissional-area-vegetal", p)}
-                              className="p-2 rounded-md hover:bg-green-50 transition"
-                              style={{ color: GREEN }}
-                              title="Visualizar"
-                            >
-                              <ViewIcon size={18} />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => onNavigate("editar-profissional-area-vegetal", p)}
-                              className="p-2 rounded-md hover:bg-green-50 transition"
-                              style={{ color: GREEN }}
-                              title="Editar"
-                            >
-                              <Pencil size={17} />
-                            </button>
-                          </div>
-                        </td>
+                       <td className="px-4 py-3">
+  <div className="flex items-center gap-1 justify-end">
+    <button
+      type="button"
+      onClick={() => onNavigate("visualizar-profissional-vegetal", p)} // <- AQUI (tiramos o "-area")
+      className="p-2 rounded-md hover:bg-green-50 transition"
+      style={{ color: GREEN }}
+      title="Visualizar"
+    >
+      <ViewIcon size={18} />
+    </button>
+    <button
+      type="button"
+      onClick={() => onNavigate("editar-profissional-vegetal", p)} // <- AQUI (tiramos o "-area")
+      className="p-2 rounded-md hover:bg-green-50 transition"
+      style={{ color: GREEN }}
+      title="Editar"
+    >
+      <Pencil size={17} />
+    </button>
+  </div>
+</td>
                       </tr>
                     ))}
                   </tbody>
