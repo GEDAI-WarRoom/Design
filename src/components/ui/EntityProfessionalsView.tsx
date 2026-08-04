@@ -30,6 +30,10 @@ interface EntityProfessionalsViewProps {
   entityKey: string;
   allowedTypes: TipoProfissionalEntidade[];
   fields: CampoVisualizacaoEntidade[];
+  heroImage?: {
+    src: string;
+    alt: string;
+  };
   historicoCadastros?: HistoricoCadastroItem<DadosHistoricoVisualizacao>[];
   onEdit?: () => void;
 }
@@ -61,6 +65,7 @@ export function EntityProfessionalsView({
   entityKey,
   allowedTypes,
   fields,
+  heroImage,
   historicoCadastros,
   onEdit,
 }: EntityProfessionalsViewProps) {
@@ -123,6 +128,16 @@ export function EntityProfessionalsView({
               </header>
 
               {avisoVersao}
+
+              {heroImage && (
+                <figure className="h-56 overflow-hidden rounded-xl border border-gray-100 bg-gray-200 shadow-sm sm:h-64">
+                  <img
+                    src={heroImage.src}
+                    alt={heroImage.alt}
+                    className="h-full w-full object-cover"
+                  />
+                </figure>
+              )}
 
               <Tabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
 

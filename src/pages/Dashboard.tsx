@@ -46,6 +46,7 @@ import {
 	ChevronLeft,
 	ChevronRight,
 	Download,
+	Plus,
 	Ham,
 } from "lucide-react";
 import { Navbar } from "../components/Navbar";

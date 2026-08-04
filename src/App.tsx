@@ -1485,7 +1485,7 @@ export default function App() {
 					onNavigate={handleNavigate}
 				/>
 			);
-		
+
       return <VisualizarAeroportoPortoPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
 		case "registro-venda-gta-fisica":
 			return (
