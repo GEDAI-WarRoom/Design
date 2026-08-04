@@ -7,6 +7,8 @@ import { isRouteAllowed, useDemoUser } from "./contexts/DemoUserContext";
 // GERAL
 import { VisualizarAeroportoPortoPage } from "./pages/Geral/AeroportoPorto/VisualizarAeroportoPorto";
 import { EditarAeroportoPortoPage } from "./pages/Geral/AeroportoPorto/EditarAeroportoPorto";
+import { VisualizarAcouguePage } from "./pages/Geral/Acougue/VisualizarAcougue";
+import { EditarAcouguePage } from "./pages/Geral/Acougue/EditarAcougue";
 import { EmissaoATAPage } from "./pages/GTA/EmissaoATA/EmissaoATA";
 import { AdicionarEmissaoATAPage } from "./pages/GTA/EmissaoATA/AdicionarEmissaoATA";
 import { VisualizarEmissaoATAPage } from "./pages/GTA/EmissaoATA/VisualizarEmissaoATA";
@@ -489,6 +491,33 @@ export default function App() {
       return <EditarAeroportoPortoPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "visualizar-aeroporto-porto":
       return <VisualizarAeroportoPortoPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+		case "acougue":
+      return (
+        <AcouguePage onLogout={handleLogout} onNavigate={handleNavigate} />
+      );
+    case "adicionar-acougue":
+      return (
+        <AdicionarAcouguePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "editar-acougue":
+      return (
+        <EditarAcouguePage
+          dados={screenData}
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "visualizar-acougue":
+      return (
+        <VisualizarAcouguePage
+          dados={screenData}
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
 		case "emissao-ata":
 			return <EmissaoATAPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 		case "adicionar-emissao-ata":
