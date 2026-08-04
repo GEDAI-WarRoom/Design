@@ -5,6 +5,8 @@ import { SelecionarUsuarioPage } from "./pages/SelecionarUsuario";
 import { isRouteAllowed, useDemoUser } from "./contexts/DemoUserContext";
 
 // GERAL
+import { EditarEstabelecimentoAgropecuarioPage } from "./pages/Geral/EstabelecimentoAgropecuario/EditarEstabelecimentoAgropecuario";
+import { EditarVendaPropriedadePage } from "./pages/Geral/VendaPropriedade/EditarVendaPropriedade";
 import { EmissaoATAPage } from "./pages/GTA/EmissaoATA/EmissaoATA";
 import { AdicionarEmissaoATAPage } from "./pages/GTA/EmissaoATA/AdicionarEmissaoATA";
 import { VisualizarEmissaoATAPage } from "./pages/GTA/EmissaoATA/VisualizarEmissaoATA";
@@ -237,6 +239,8 @@ import { ParametrosSistemaPage } from "./pages/Controle/ParametrosSistema/Parame
 
 // 1. Adicionamos as novas rotas de Pessoa Jurídica no tipo Screen
 export type Screen =
+| "editar-estabelecimento-agropecuario"
+  | "editar-venda-propriedade"
 	| "emissao-ata"
 	| "adicionar-emissao-ata"
 	| "editar-emissao-ata"
@@ -477,6 +481,22 @@ export default function App() {
 	};
 
 	switch (screen) {
+		case "estabelecimento-agropecuario":
+      return <EstabelecimentoAgropecuarioPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-estabelecimento-agropecuario":
+      return <AdicionarEstabelecimentoAgropecuarioPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-estabelecimento-agropecuario":
+      return <EditarEstabelecimentoAgropecuarioPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-estabelecimento-agropecuario":
+      return <VisualizarEstabelecimentoAgropecuarioPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+	  case "venda-propriedade":
+      return <VendaPropriedadePage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-venda-propriedade":
+      return <AdicionarVendaPropriedadePage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-venda-propriedade":
+      return <EditarVendaPropriedadePage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-venda-propriedade":
+      return <VisualizarVendaPropriedadePage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
 		case "emissao-ata":
 			return <EmissaoATAPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 		case "adicionar-emissao-ata":
