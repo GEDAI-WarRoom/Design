@@ -383,7 +383,7 @@ export function AdicionarEmissaoATAPage({ dados, onLogout, onNavigate }: { dados
             <ArrowLeft size={15} /> Todas as ATAs
           </button>
           <div className="flex justify-between items-center w-full">
-            <h1 className="text-2xl font-semibold text-gray-900">{isEdicao ? "Editar ATA" : "Emitir Nova ATA"}</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">{"Emitir ATA"}</h1>
             <button
               type="button"
               disabled={Boolean(interdicaoInfo) || !procedenciaConcluida}
