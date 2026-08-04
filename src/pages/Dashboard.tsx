@@ -571,6 +571,8 @@ export const thirdCategories: MenuCategory[] = [
 				route: "indice",
 				icon: <LineChart size={16} />,
 			},
+			{ label: "Item de Receita", route: "item-receita", icon: <ClipboardList size={16} /> },
+			{ label: "Valor de Índice", route: "valor-indice", icon: <LineChart size={16} /> },
 
 			{
 				label: "DAE",

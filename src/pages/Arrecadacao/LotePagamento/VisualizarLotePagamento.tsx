@@ -1,87 +1,50 @@
-import { ArrowLeft, ExternalLink, FileText, ReceiptText } from "lucide-react";
+import React, { useState } from "react";
+import { ArrowLeft, Pencil, ChevronDown, ChevronUp } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput } from "../../../components/ui/FormKit";
-import {
-  formatarDataLote,
-  formatarMoedaLote,
-  LotePagamento,
-} from "./lotePagamentoData";
 
-interface PageProps {
-  onLogout: () => void;
-  onNavigate: (screen: any, data?: any) => void;
-  dados?: LotePagamento;
+const GREEN = "#1A7A3C";
+
+function Section({ title, children }: { title: string; children: React.ReactNode; }) {
+  const [open, setOpen] = useState(true);
+  return (
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <button type="button" onClick={() => setOpen(!open)} className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50 transition border-b border-gray-100">
+        <span className="text-base font-semibold text-gray-800">{title}</span>
+        {open ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
+      </button>
+      {open && <div className="p-6 flex flex-col gap-5 bg-white">{children}</div>}
+    </div>
+  );
 }
 
-export function VisualizarLotePagamentoPage({ onLogout, onNavigate, dados }: PageProps) {
-  if (!dados) return null;
-  const lote = dados;
+export function VisualizarLotePagamentoPage({ dados, onLogout, onNavigate }: { dados?: any; onLogout: () => void; onNavigate: (s: string, d?: any) => void; }) {
+  const lote = dados || {};
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
       <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="lote-pagamento" hideSearch />
-      <main className="mx-auto flex max-w-5xl flex-col gap-4 px-4 py-6 md:px-6">
-        <button type="button" onClick={() => onNavigate("lote-pagamento")} className="flex items-center gap-1 text-sm font-semibold text-[#1A7A3C] hover:opacity-70">
-          <ArrowLeft size={15} />Todos os Lotes de Pagamento
-        </button>
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-900">Visualizar Lote de Pagamento</h1>
-            <p className="mt-1 text-sm text-gray-500">Lote nº {lote.numeroLote}</p>
-          </div>
-          <button
-            type="button"
-            onClick={() => onNavigate("visualizar-dae-lote-pagamento", { dae: lote.dae, lote })}
-            className="flex h-11 items-center gap-2 rounded-md border border-[#1A7A3C] bg-white px-5 text-sm font-semibold text-[#1A7A3C] hover:bg-green-50/40"
-          >
-            <ReceiptText size={18} />DAE Relacionado
+      <main className="max-w-[1088px] mx-auto px-4 md:px-6 py-6 flex flex-col gap-4">
+        <div>
+          <button type="button" onClick={() => onNavigate("lote-pagamento")} className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70 font-semibold" style={{ color: GREEN }}>
+            <ArrowLeft size={15} /> Todos os Lotes
           </button>
+          <div className="flex justify-between items-center w-full">
+            <h1 className="text-2xl font-semibold text-gray-900">Visualizar Lote de Pagamento</h1>
+            <button type="button" onClick={() => onNavigate("editar-lote-pagamento", lote)} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2">
+              <Pencil size={14} /> Editar
+            </button>
+          </div>
         </div>
 
-        <section className="rounded-xl bg-white shadow-sm">
-          <div className="border-b border-gray-100 px-6 py-4"><h2 className="text-base font-semibold text-gray-800">Informações Básicas</h2></div>
-          <div className="grid grid-cols-1 gap-4 p-6 md:grid-cols-2">
-            <FloatInput label="Número do Lote" value={String(lote.numeroLote)} disabled />
-            <FloatInput label="Documento" value={lote.documento} disabled />
-            <FloatInput label="Tipo de Lote de Pagamento" value={lote.tipoLote} disabled />
-            <FloatInput label="Unidade Administrativa" value={`${lote.unidadeAdministrativa.codigo} - ${lote.unidadeAdministrativa.nome}`} disabled />
-            <FloatInput label="Quantidade de Documentos" value={String(lote.quantidadeDocumentos)} disabled />
-            <FloatInput label="Valor do Lote de Pagamento" value={formatarMoedaLote(lote.valor)} disabled />
-            {lote.statusPagamento === "Pago" && <FloatInput label="Data Pagamento (Usuário)" value={formatarDataLote(lote.dataPagamentoUsuario)} disabled />}
-            {lote.statusPagamento === "Pago" && <FloatInput label="Data Pagamento (PRODEMGE)" value={formatarDataLote(lote.dataPagamentoProdemge)} disabled />}
-            <FloatInput label="Situação" value={lote.situacao} disabled />
-            <FloatInput label="Status do Pagamento" value={lote.statusPagamento} disabled />
+        <Section title="Informações do Lote">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <FloatInput label="Número do Lote" value={lote.numeroLote || "-"} disabled onChange={()=>{}} />
+            <FloatInput label="Documento" value={lote.documento || "-"} disabled onChange={()=>{}} />
+            <FloatInput label="Situação" value={lote.situacao || "Aberto"} disabled onChange={()=>{}} />
+            <FloatInput label="Status do Pagamento" value={lote.statusPagamento || "Pendente"} disabled onChange={()=>{}} />
           </div>
-        </section>
-
-        <section className="rounded-xl bg-white shadow-sm">
-          <div className="flex items-center gap-2 border-b border-gray-100 px-6 py-4">
-            <FileText size={18} className="text-[#1A7A3C]" />
-            <h2 className="text-base font-semibold text-gray-800">Documentos</h2>
-          </div>
-          <div className="overflow-x-auto p-6">
-            <table className="w-full border-collapse text-sm">
-              <thead><tr className="border-b border-gray-100"><th className="px-4 py-3 text-left font-semibold uppercase text-gray-600">Id</th><th className="px-4 py-3 text-left font-semibold uppercase text-gray-600">Status</th><th aria-label="Ações" /></tr></thead>
-              <tbody>
-                {lote.documentos.map((documento) => (
-                  <tr key={documento.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50">
-                    <td className="px-4 py-3 text-gray-700">{documento.id}</td>
-                    <td className="px-4 py-3 text-gray-700">{documento.status}</td>
-                    <td className="px-4 py-3 text-right">
-                      <button
-                        type="button"
-                        onClick={() => onNavigate("visualizar-documento-lote-pagamento", { documento, lote })}
-                        className="inline-flex items-center gap-2 rounded-md p-2 text-sm font-semibold text-[#1A7A3C] hover:bg-green-50"
-                      >
-                        <ExternalLink size={16} />Ver {documento.tipo}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
+        </Section>
       </main>
     </div>
   );

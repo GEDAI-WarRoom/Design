@@ -8,7 +8,8 @@ import {
   Eye,
   Search,
   SlidersHorizontal,
-  X, Calendar
+  X, Calendar,
+  Pencil,
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, FloatSelect } from "../../../components/ui/FormKit";
@@ -216,11 +217,24 @@ export function LotePagamentoPage({ onLogout, onNavigate }: PageProps) {
                       <td className="px-4 py-3 text-gray-700">{formatarDataLote(item.dataPagamentoProdemge)}</td>
                       <td className="px-4 py-3 text-gray-700">{item.situacao}</td>
                       <td className="px-4 py-3 text-gray-700">{item.statusPagamento}</td>
-                      <td className="px-4 py-3">
-                        <div className="flex justify-end">
-                          <button type="button" onClick={() => onNavigate("visualizar-lote-pagamento", item)} className="rounded-md p-2 text-[#1A7A3C] hover:bg-green-50" title="Visualizar"><Eye size={18} /></button>
-                        </div>
-                      </td>
+                      <td className="px-4 py-3 text-right whitespace-nowrap">
+  <div className="flex items-center justify-end gap-1">
+     <button 
+      onClick={() => onNavigate("visualizar-lote-pagamento")} 
+      className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md transition" 
+      title="Visualizar"
+    >
+      <Eye size={18} />
+    </button>
+    <button 
+      onClick={() => onNavigate("editar-lote-pagamento")} 
+      className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md transition" 
+      title="Editar"
+    >
+      <Pencil size={17} />
+    </button>
+  </div>
+</td>
                     </tr>
                   ))}
                 </tbody>

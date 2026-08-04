@@ -5,6 +5,11 @@ import { SelecionarUsuarioPage } from "./pages/SelecionarUsuario";
 import { isRouteAllowed, useDemoUser } from "./contexts/DemoUserContext";
 
 // GERAL
+import { EditarDAEPage } from "./pages/Arrecadacao/DAE/EditarDAE";
+import { EditarLotePagamentoPage } from "./pages/Arrecadacao/LotePagamento/EditarLotePagamento";
+import { VisualizarItemReceitaPage } from "./pages/Arrecadacao/ItemReceita/VisualizarItemReceita";
+import { EditarItemReceitaPage } from "./pages/Arrecadacao/ItemReceita/EditarItemReceita";
+import { EditarValorIndicePage } from "./pages/Arrecadacao/ValorIndice/EditarValorIndice";
 import { VisualizarAcouguePage } from "./pages/Geral/Acougue/VisualizarAcougue";
 import { EditarAcouguePage } from "./pages/Geral/Acougue/EditarAcougue";
 import { EmissaoATAPage } from "./pages/GTA/EmissaoATA/EmissaoATA";
@@ -239,6 +244,11 @@ import { ParametrosSistemaPage } from "./pages/Controle/ParametrosSistema/Parame
 
 // 1. Adicionamos as novas rotas de Pessoa Jurídica no tipo Screen
 export type Screen =
+| "editar-dae"
+  | "editar-lote-pagamento"
+  | "visualizar-item-receita"
+  | "editar-item-receita"
+  | "editar-valor-indice"
 	| "emissao-ata"
 	| "adicionar-emissao-ata"
 	| "editar-emissao-ata"
@@ -479,6 +489,31 @@ export default function App() {
 	};
 
 	switch (screen) {
+		case "dae":
+      return <DAEBuscaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-dae":
+      return <AdicionarDAEPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-dae":
+      return <EditarDAEPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-dae":
+      return <VisualizarDAEPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+	  case "lote-pagamento":
+      return <LotePagamentoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-lote-pagamento":
+      return <AdicionarLotePagamentoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-lote-pagamento":
+      return <EditarLotePagamentoPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-lote-pagamento":
+      return <VisualizarLotePagamentoPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+	  case "item-receita":
+      return <ItemReceitaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-item-receita":
+      return <AdicionarItemReceitaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-item-receita":
+      return <EditarItemReceitaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-item-receita":
+      return <VisualizarItemReceitaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+
 		case "acougue":
       return (
         <AcouguePage onLogout={handleLogout} onNavigate={handleNavigate} />
@@ -1320,26 +1355,13 @@ export default function App() {
 				/>
 			);
 		case "valor-indice":
-			return (
-				<ValorIndicePage onLogout={handleLogout} onNavigate={handleNavigate} />
-			);
-		case "adicionar-valor-indice":
-		case "editar-valor-indice": // <-- Mapeamos o editar aqui também
-			return (
-				<AdicionarValorIndicePage
-					onLogout={handleLogout}
-					onNavigate={handleNavigate}
-					dados={screenData} // <-- ISSO GARANTE O PREENCHIMENTO NO LÁPIS E NO BOTÃO
-				/>
-			);
-		case "visualizar-valor-indice":
-			return (
-				<VisualizarValorIndicePage
-					onLogout={handleLogout}
-					onNavigate={handleNavigate}
-					dados={screenData}
-				/>
-			);
+      return <ValorIndicePage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-valor-indice":
+      return <AdicionarValorIndicePage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-valor-indice":
+      return <EditarValorIndicePage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-valor-indice":
+      return <VisualizarValorIndicePage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
 
 		case "fundo-arrecadacao":
 			return (
