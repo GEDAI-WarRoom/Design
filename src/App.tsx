@@ -61,6 +61,7 @@ import { CertificadoraSISBOVPage } from "./pages/Animal/CertificadoraSISBOV/Cert
 import { AdicionarEspeciePage } from "./pages/Animal/Especie/AdicionarEspecie";
 import { EspeciePage } from "./pages/Animal/Especie/Especie";
 import { VisualizarEspeciePage } from "./pages/Animal/Especie/VisualizarEspecie";
+import { EditarEspeciePage } from "./pages/Animal/Especie/EditarEspecie";
 import { VisualizarEstabelecimentoAgroindustrialOutrasInspecoesPage } from "./pages/Animal/EstabelecimentoAgroindustrialOutrasInspecoes/VisualizarEstabelecimentoAgroindustrialOutrasInspecoes";
 import { AdicionarEstabelecimentoAgroindustrialSIEMGPage } from "./pages/Animal/EstabelecimentoAgroindustrialSIEMG/AdicionarEstabelecimentoAgroindustrialSIEMG";
 import { EstabelecimentoAgroindustrialSIEMGPage } from "./pages/Animal/EstabelecimentoAgroindustrialSIEMG/EstabelecimentoAgroindustrialSIEMG";
@@ -349,6 +350,7 @@ export type Screen =
 	| "especie"
 	| "adicionar-especie"
 	| "visualizar-especie"
+	| "editar-especie"
 	| "agroindustrial-sie"
 	| "adicionar-agroindustrial-sie"
 	| "visualizar-estabelecimento-poa"
@@ -1051,6 +1053,13 @@ export default function App() {
 		case "visualizar-especie":
 			return (
 				<VisualizarEspeciePage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "editar-especie":
+			return (
+				<EditarEspeciePage
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
 				/>
