@@ -526,6 +526,7 @@ function EntityPicker<T extends EntidadeGta = EntidadeGta>({
 function LocalDentroEstado({
   local,
   especieId,
+  grupoEspecieSelecionado,
   finalidade,
   onChange,
   disabled,
@@ -533,6 +534,7 @@ function LocalDentroEstado({
 }: {
   local: LocalGta | DestinoGta;
   especieId?: number;
+  grupoEspecieSelecionado?: string;
   finalidade?: string;
   onChange: (local: LocalGta | DestinoGta) => void;
   disabled: boolean;
@@ -545,16 +547,35 @@ function LocalDentroEstado({
     [local.estabelecimento]
   );
   const [modalInterdicao, setModalInterdicao] = useState(false);
+  // Explorações filtradas pela espécie selecionada (pré-filtro) e pelo estabelecimento
   const exploracoes = EXPLORACOES_GTA.filter(
     (item) =>
-      !local.estabelecimento ||
-      item.estabelecimentoId === local.estabelecimento.id,
+      (!especieId || item.especieId === especieId) &&
+      (!local.estabelecimento ||
+        item.estabelecimentoId === local.estabelecimento.id),
   );
+  // Estabelecimentos que possuem exploração da espécie selecionada
+  const estabelecimentos = especieId
+    ? ESTABELECIMENTOS_GTA.filter((estab) =>
+      EXPLORACOES_GTA.some(
+        (expl) =>
+          expl.estabelecimentoId === estab.id && expl.especieId === especieId,
+      ),
+    )
+    : ESTABELECIMENTOS_GTA;
   const nucleos = NUCLEOS_GTA.filter(
     (item) => !local.exploracao || item.exploracaoId === local.exploracao.id,
   );
 
+  // Núcleo de produção existe apenas para Aves e Suídeos (Bovinos não têm)
+  const grupoEspecie = grupoEspecieSelecionado ?? "";
+  const especieTemNucleo =
+    grupoEspecie === "Aves" ||
+    grupoEspecie === "Suídeos" ||
+    grupoEspecie === "Suínos";
+
   const temNucleosDisponiveis =
+    especieTemNucleo &&
     local.exploracao &&
     !interdicao &&
     NUCLEOS_GTA.some((nucleo) => nucleo.exploracaoId === local.exploracao?.id);
@@ -599,7 +620,7 @@ function LocalDentroEstado({
               <EntityPicker
                 label="Estabelecimento Agropecuário"
                 value={local.estabelecimento}
-                data={ESTABELECIMENTOS_GTA}
+                data={estabelecimentos}
                 codeLabel="Código do Estabelecimento"
                 icon={<img src={Icons.iconeEstabelecimentoUrl} alt="" className="w-5 h-5 object-contain" />}
 
@@ -863,20 +884,23 @@ function DadosComplementaresProcedencia({
           </div>
         </Section>
       )}
-      <Section
-        title={
-          nucleo
-            ? "Certificados do Núcleo de Produção"
-            : "Certificados da Exploração Pecuária"
-        }
-        defaultOpen={false}
-      >
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <FloatInput label="Tipo" value="Sanitário" disabled required />
-          <FloatInput label="Número" value="0212024" disabled required />
-          <FloatInput label="Validade" value="25/03/2027" disabled required />
-        </div>
-      </Section>
+      {value.especie?.grupo !== "Bovinos" &&
+        value.especie?.grupo !== "Bovídeos" && (
+          <Section
+            title={
+              nucleo
+                ? "Certificados do Núcleo de Produção"
+                : "Certificados da Exploração Pecuária"
+            }
+            defaultOpen={false}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <FloatInput label="Tipo" value="Sanitário" disabled required />
+              <FloatInput label="Número" value="0212024" disabled required />
+              <FloatInput label="Validade" value="25/03/2027" disabled required />
+            </div>
+          </Section>
+        )}
     </>
   );
 }
@@ -1323,6 +1347,7 @@ export function EmissaoGtaForm({
             <LocalDentroEstado
               local={value.procedencia}
               especieId={value.especie?.id}
+              grupoEspecieSelecionado={value.especie?.grupo}
               onChange={updateProcedencia}
               disabled={disabled}
             />
@@ -1368,6 +1393,7 @@ export function EmissaoGtaForm({
             <LocalDentroEstado
               local={value.destino}
               especieId={value.especie?.id}
+              grupoEspecieSelecionado={value.especie?.grupo}
               finalidade={value.finalidade?.nome}
               onChange={updateDestino}
               disabled={disabled}
@@ -1985,7 +2011,7 @@ export function EmissaoGtaForm({
         {/* Valor / Liquidação */}
         <div className="relative z-10">
           <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[#8FBF9F]">
-            Liquidação Final da ATA
+            Liquidação Final da GTA
             <CheckCircle2 size={14} className="text-[#8FBF9F]" />
           </p>
           <p className="text-[11px] uppercase tracking-wider text-[#6E9A7D] mt-0.5">
@@ -2002,7 +2028,7 @@ export function EmissaoGtaForm({
         {/* Total de animais na ATA */}
         <div className="relative z-10 sm:ml-auto sm:border-l sm:border-white/15 sm:pl-6">
           <p className="text-xs font-semibold uppercase tracking-wider text-[#8FBF9F]">
-            Animais na ATA
+            Animais na GTA
           </p>
           <p className="text-[11px] uppercase tracking-wider text-[#6E9A7D] mt-0.5">
             Total transportado nesta guia

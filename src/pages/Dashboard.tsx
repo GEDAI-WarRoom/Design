@@ -42,6 +42,8 @@ import {
   Truck,
   User,
   Wallet,
+	Ham,
+  Bell,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Navbar } from "../components/Navbar";
@@ -75,12 +77,16 @@ export const cadastrosCategories: MenuCategory[] = [
     title: "Geral",
     icon: <Globe size={32} color={GREEN} />,
     items: [
-      {
+			{
+				label: "Central de Pendências",
+				route: "pendencias-confirmacao-gta",
+				icon: <Bell size={16} />,
+			},      {
         label: "Aeroporto/Porto",
         route: "aeroporto-porto",
         icon: <TowerControl size={16} />,
       },
-      { label: "Açougue", route: "acougue", icon: <Store size={16} /> },
+      { label: "Açougue", route: "acougue", icon: <Ham size={16} /> },
       {
         label: "Divisão Municipal",
         route: "divisao-municipal",

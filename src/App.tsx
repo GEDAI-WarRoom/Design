@@ -5,6 +5,12 @@ import { LoginPage } from "./pages/Login";
 import { SelecionarUsuarioPage } from "./pages/SelecionarUsuario";
 
 // GERAL
+import { VisualizarDivisaoMunicipalPage } from "./pages/Geral/DivisaoMunicipal/VisualizarDivisaoMunicipal";
+import { EditarDivisaoMunicipalPage } from "./pages/Geral/DivisaoMunicipal/EditarDivisaoMunicipal";
+import { VisualizarAeroportoPortoPage } from "./pages/Geral/AeroportoPorto/VisualizarAeroportoPorto";
+import { EditarAeroportoPortoPage } from "./pages/Geral/AeroportoPorto/EditarAeroportoPorto";
+import { VisualizarAcouguePage } from "./pages/Geral/Acougue/VisualizarAcougue";
+import { EditarAcouguePage } from "./pages/Geral/Acougue/EditarAcougue";
 import { VisualizarIndice } from "./pages/Arrecadacao/Indice/VisualizarIndice";
 import { AdicionarReceitaPage } from "./pages/Arrecadacao/Receita/AdicionarReceita";
 import { EditarReceitaPage } from "./pages/Arrecadacao/Receita/EditarReceita";
@@ -22,6 +28,7 @@ import { VisualizarClassificacaoSanitariaEstadoPage } from "./pages/Geral/Classi
 import { AdicionarDivisaoMunicipalPage } from "./pages/Geral/DivisaoMunicipal/AdicionarDivisaoMunicipal";
 import { DivisaoMunicipalPage } from "./pages/Geral/DivisaoMunicipal/DivisaoMunicipal";
 import { AdicionarEstabelecimentoAgropecuarioPage } from "./pages/Geral/EstabelecimentoAgropecuario/AdicionarEstabelecimentoAgropecuario";
+import { EditarEstabelecimentoAgropecuarioPage } from "./pages/Geral/EstabelecimentoAgropecuario/EditarEstabelecimentoAgropecuario";
 import { EstabelecimentoAgropecuarioPage } from "./pages/Geral/EstabelecimentoAgropecuario/EstabelecimentoAgropecuario";
 import { VisualizarEstabelecimentoAgropecuarioPage } from "./pages/Geral/EstabelecimentoAgropecuario/VisualizarEstabelecimentoAgropecuario";
 import { AdicionarInstituicaoEnsinoPesquisaPage } from "./pages/Geral/InstituiçãoEnsinoPesquisa/AdicionarInstituiçãoEnsinoPesquisa";
@@ -240,6 +247,8 @@ import { VisualizarUsuariosPage } from "./pages/Controle/Usuarios/VisualizarUsua
 
 // 1. Adicionamos as novas rotas de Pessoa Jurídica no tipo Screen
 export type Screen =
+| "editar-divisao-municipal"
+  | "visualizar-divisao-municipal"
   | "emissao-ata"
   | "adicionar-emissao-ata"
   | "editar-emissao-ata"
@@ -265,6 +274,7 @@ export type Screen =
   | "adicionar-divisao-municipal"
   | "estabelecimento-agropecuario"
   | "adicionar-estabelecimento-agropecuario"
+	| "editar-estabelecimento-agropecuario"
   | "visualizar-estabelecimento-agropecuario"
   | "venda-propriedade"
   | "adicionar-venda-propriedade"
@@ -454,7 +464,9 @@ export type Screen =
   | "adicionar-acougue"
   | "evento-pecuario"
   | "adicionar-evento-pecuario"
-  | "visualizar-evento-pecuario";
+  | "visualizar-evento-pecuario"
+	| "editar-aeroporto-porto"
+  | "visualizar-aeroporto-porto";
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>("login");
@@ -481,6 +493,57 @@ export default function App() {
   };
 
   switch (screen) {
+		case "divisao-municipal":
+      return (
+        <DivisaoMunicipalPage onLogout={handleLogout} onNavigate={handleNavigate} />
+      );
+    case "adicionar-divisao-municipal":
+      return (
+        <AdicionarDivisaoMunicipalPage onLogout={handleLogout} onNavigate={handleNavigate} />
+      );
+    case "editar-divisao-municipal":
+      return (
+        <EditarDivisaoMunicipalPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />
+      );
+    case "visualizar-divisao-municipal":
+      return (
+        <VisualizarDivisaoMunicipalPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />
+);
+		case "aeroporto-porto":
+      return <AeroportoPorto onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-aeroporto-porto":
+      return <AdicionarAeroportoPorto onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-aeroporto-porto":
+      return <EditarAeroportoPortoPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-aeroporto-porto":
+      return <VisualizarAeroportoPortoPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+		case "acougue":
+      return (
+        <AcouguePage onLogout={handleLogout} onNavigate={handleNavigate} />
+      );
+    case "adicionar-acougue":
+      return (
+        <AdicionarAcouguePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "editar-acougue":
+      return (
+        <EditarAcouguePage
+          dados={screenData}
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "visualizar-acougue":
+      return (
+        <VisualizarAcouguePage
+          dados={screenData}
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
     case "emissao-ata":
       return <EmissaoATAPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-emissao-ata":
@@ -584,6 +647,14 @@ export default function App() {
           onNavigate={handleNavigate}
         />
       );
+		case "editar-estabelecimento-agropecuario":
+			return (
+				<EditarEstabelecimentoAgropecuarioPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
     case "visualizar-estabelecimento-agropecuario":
       return (
         <VisualizarEstabelecimentoAgropecuarioPage

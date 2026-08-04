@@ -49,7 +49,7 @@ export function AdicionarAeroportoPorto({ onLogout, onNavigate }: PageProps) {
   // 4. Contatos
   const [contatos, setContatos] = useState({
     utilizarContatoProprietario: "Não",
-    
+
     proprietariosSelecionados: [] as string[],
     emailFixo: "",
     emailFixoObs: "",
@@ -164,7 +164,7 @@ export function AdicionarAeroportoPorto({ onLogout, onNavigate }: PageProps) {
           <BlocoContatoFields
             data={contatos}
             onChange={(updated) => setContatos((prev) => ({ ...prev, ...updated }))}
-             proprietariosDisponiveis={[
+            proprietariosDisponiveis={[
               { id: "prop-1", nome: "Carlos Henrique Silva", cpf: "123.456.789-00", email: "carlos.silva@email.com", telefone: "(11) 98888-7777" },
               { id: "prop-2", nome: "Maria Fernanda Oliveira", cpf: "987.654.321-11", email: "maria.fernanda@email.com", telefone: "(21) 99999-8888" },
               { id: "prop-3", nome: "Antônio Marcos de Souza", cpf: "456.123.789-22", email: "antonio.marcos@email.com", telefone: "(31) 97777-6666" },
@@ -246,9 +246,7 @@ export function AdicionarAeroportoPorto({ onLogout, onNavigate }: PageProps) {
       {isSucesso && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
-            <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4">
-              <Check size={28} className="text-[#1A7A3C]" strokeWidth={3} />
-            </div>
+
             <h3 className="text-lg font-bold text-gray-900">Cadastro realizado com sucesso!</h3>
             <p className="text-sm text-gray-500 mt-1">O {tipoLocal || "Aeroporto / Porto"} "{nomeComercial}" foi adicionado.</p>
             <div className="flex gap-3 justify-center mt-6">
