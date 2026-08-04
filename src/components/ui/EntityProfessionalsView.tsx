@@ -1,12 +1,23 @@
 import { useState, type ReactNode } from "react";
 import { ArrowLeft, ChevronDown, FileText, UsersRound } from "lucide-react";
+import { motion } from "motion/react";
 import { Navbar } from "../Navbar";
 import { FloatInput, Tabs } from "./FormKit";
 import { EntityProfessionalsTab, type TipoProfissionalEntidade } from "./EntityProfessionals";
+import {
+  CLASSE_CAMPO_ALTERADO_HISTORICO,
+  HistoricoCadastroLayout,
+  campoHistoricoFoiAlterado,
+  type HistoricoCadastroItem,
+} from "./HistoricoCadastroLayout";
 
 export interface CampoVisualizacaoEntidade {
   label: string;
   value: string;
+}
+
+export interface DadosHistoricoVisualizacao {
+  campos: CampoVisualizacaoEntidade[];
 }
 
 interface EntityProfessionalsViewProps {
@@ -19,6 +30,8 @@ interface EntityProfessionalsViewProps {
   entityKey: string;
   allowedTypes: TipoProfissionalEntidade[];
   fields: CampoVisualizacaoEntidade[];
+  historicoCadastros?: HistoricoCadastroItem<DadosHistoricoVisualizacao>[];
+  onEdit?: () => void;
 }
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
@@ -48,6 +61,8 @@ export function EntityProfessionalsView({
   entityKey,
   allowedTypes,
   fields,
+  historicoCadastros,
+  onEdit,
 }: EntityProfessionalsViewProps) {
   const [activeTab, setActiveTab] = useState("cadastro");
   const tabs = [
@@ -58,38 +73,101 @@ export function EntityProfessionalsView({
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
       <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen={currentScreen as any} hideSearch />
-      <main className="mx-auto flex max-w-[1088px] flex-col gap-5 px-4 py-6 md:px-6">
-        <header>
-          <button
-            type="button"
-            onClick={() => onNavigate(backRoute)}
-            className="mb-4 flex items-center gap-1 text-sm text-[#1A7A3C] transition hover:opacity-70"
-          >
-            <ArrowLeft size={15} /> {backLabel}
-          </button>
-          <h1 className="text-2xl font-semibold text-gray-900">{title}</h1>
-        </header>
 
-        <Tabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
+      <HistoricoCadastroLayout
+        itens={historicoCadastros}
+        ativo={activeTab === "cadastro"}
+        resetKey={entityKey}
+        conteudoClassName="flex flex-col gap-5 px-4 py-6 md:px-6"
+        onVisualizarAutor={(nome) =>
+          onNavigate("visualizar-pessoa-fisica", { nome })
+        }
+      >
+        {({
+          avisoVersao,
+          botaoHistorico,
+          versaoAtual,
+          versaoSelecionada,
+          visualizandoVersaoAntiga,
+        }) => {
+          const camposAtuais = versaoAtual?.dados?.campos ?? fields;
+          const camposVisiveis = versaoSelecionada?.dados?.campos ?? fields;
 
-        {activeTab === "cadastro" && (
-          <Section title="Informações do Cadastro">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              {fields.map((field) => (
-                <FloatInput key={field.label} label={field.label} value={field.value} disabled onChange={() => {}} />
-              ))}
-            </div>
-          </Section>
-        )}
+          return (
+            <>
+              <header>
+                <button
+                  type="button"
+                  onClick={() => onNavigate(backRoute)}
+                  className="mb-4 flex items-center gap-1 text-sm text-[#1A7A3C] transition hover:opacity-70"
+                >
+                  <ArrowLeft size={15} /> {backLabel}
+                </button>
+                <div className="flex items-center justify-between gap-4">
+                  <h1 className="text-2xl font-semibold text-gray-900">{title}</h1>
+                  {activeTab === "cadastro" && (onEdit || botaoHistorico) && (
+                    <div className="flex items-center gap-3">
+                      {onEdit && (
+                        <button
+                          type="button"
+                          onClick={onEdit}
+                          className="h-10 rounded-md bg-[#1A7A3C] px-5 text-sm font-semibold text-white transition hover:bg-[#15612F]"
+                        >
+                          Editar
+                        </button>
+                      )}
+                      {botaoHistorico}
+                    </div>
+                  )}
+                </div>
+              </header>
 
-        {activeTab === "profissionais" && (
-          <EntityProfessionalsTab
-            entityKey={entityKey}
-            allowedTypes={allowedTypes}
-            onNavigate={onNavigate}
-          />
-        )}
-      </main>
+              {avisoVersao}
+
+              <Tabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
+
+              {activeTab === "cadastro" && (
+                <Section title="Informações do Cadastro">
+                  <motion.div
+                    key={versaoSelecionada?.id ?? "versao-atual"}
+                    initial={{ opacity: 0.35, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.25, ease: "easeOut" }}
+                    className="grid grid-cols-1 gap-4 md:grid-cols-2"
+                  >
+                    {camposVisiveis.map((field) => (
+                      <FloatInput
+                        key={field.label}
+                        label={field.label}
+                        value={field.value}
+                        disabled
+                        onChange={() => {}}
+                        className={
+                          campoHistoricoFoiAlterado(
+                            field,
+                            camposAtuais,
+                            visualizandoVersaoAntiga,
+                          )
+                            ? CLASSE_CAMPO_ALTERADO_HISTORICO
+                            : ""
+                        }
+                      />
+                    ))}
+                  </motion.div>
+                </Section>
+              )}
+
+              {activeTab === "profissionais" && (
+                <EntityProfessionalsTab
+                  entityKey={entityKey}
+                  allowedTypes={allowedTypes}
+                  onNavigate={onNavigate}
+                />
+              )}
+            </>
+          );
+        }}
+      </HistoricoCadastroLayout>
     </div>
   );
 }
