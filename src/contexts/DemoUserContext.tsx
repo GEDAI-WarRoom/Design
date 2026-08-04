@@ -30,6 +30,7 @@ const produtorAllowedRoutes = new Set([
 	"visualizar-pessoa-juridica",
 	"editar-pessoa-juridica",
 	"adicionar-estabelecimento-agropecuario",
+	"editar-estabelecimento-agropecuario",
 	"visualizar-estabelecimento-agropecuario",
 	"adicionar-exploracao-pecuaria",
 	"visualizar-exploracao-pecuaria",

@@ -1,21 +1,24 @@
 import { EntityProfessionalsView } from "../../../components/ui/EntityProfessionalsView";
+import {
+  ESTABELECIMENTOS_INICIAIS,
+  obterEstabelecimentoAgropecuario,
+  obterHistoricoEstabelecimentoAgropecuario,
+  type EstabelecimentoAgropecuario,
+} from "./estabelecimentoAgropecuarioData";
 
 interface PageProps {
   onLogout: () => void;
   onNavigate: (screen: any, data?: any) => void;
-  dados?: any;
+  dados?: EstabelecimentoAgropecuario;
 }
 
 export function VisualizarEstabelecimentoAgropecuarioPage({ onLogout, onNavigate, dados }: PageProps) {
-  const registro = dados || {
-    id: 1,
-    codigo: "51080590041",
-    nome: "Fazenda Rio Verde",
-    proprietarios: "José Aarão Neto - 555.009.956-40",
-    zona: "Rural",
-    municipioUf: "Lavras - MG",
-    situacao: "Ativo",
-  };
+  const registroInformado = dados ?? ESTABELECIMENTOS_INICIAIS[0];
+  const registro =
+    obterEstabelecimentoAgropecuario(
+      registroInformado.id ?? registroInformado.codigo,
+    ) ?? registroInformado;
+  const historico = obterHistoricoEstabelecimentoAgropecuario(registro);
 
   return (
     <EntityProfessionalsView
@@ -28,6 +31,8 @@ export function VisualizarEstabelecimentoAgropecuarioPage({ onLogout, onNavigate
       entityKey={`estabelecimento-agropecuario-${registro.id || registro.codigo}`}
       allowedTypes={["Responsável Técnico Animal", "Responsável Técnico Vegetal"]}
       heroImage={registro.imagem ? { src: registro.imagem, alt: `Vista de ${registro.nome}` } : undefined}
+      historicoCadastros={historico}
+      onEdit={() => onNavigate("editar-estabelecimento-agropecuario", registro)}
       fields={[
         { label: "Código do Estabelecimento", value: registro.codigo || "" },
         { label: "Nome do Estabelecimento", value: registro.nome || "" },

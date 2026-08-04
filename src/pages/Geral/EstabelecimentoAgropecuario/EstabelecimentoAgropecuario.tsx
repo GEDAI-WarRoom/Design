@@ -10,15 +10,11 @@ import {
   Eye as ViewIcon,
   Pencil,
   X,
-  Check,
-  Minus,
-  AlertTriangle,
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatSelect, FloatCombobox, SearchModal, FloatInput } from "../../../components/ui/FormKit";
 import * as Icons from "../../../imports/icons";
-import propriedadeSantaHelenaUrl from "../../../imports/images/propriedade-santa-helena.png";
-import propriedadeSaoJoseUrl from "../../../imports/images/propriedade-sao-jose.png";
+import { listarEstabelecimentosAgropecuarios } from "./estabelecimentoAgropecuarioData";
 
 const GREEN = "#1A7A3C";
 
@@ -54,87 +50,11 @@ interface ProprietarioEntidade {
   tipo: "Pessoa física" | "Pessoa jurídica"; // Corrigido para bater com os valores do Mock e da US051
 }
 
-interface EstabelecimentoAgropecuario {
-  id: number;
-  codigo: string;
-  nome: string;
-  imagem?: string;
-  proprietarios: string; // Exibe "Nome - CPF" conforme especificado
-  zona: "Rural" | "Urbana";
-  municipioUf: string; // "Lavras - MG"
-  situacao: "Ativo" | "Inativo" | "Suspenso";
-}
-
-const ESTABELECIMENTOS_MOCK: EstabelecimentoAgropecuario[] = [
-  {
-    id: 4,
-    codigo: "51080590041",
-    nome: "Fazenda Santa Helena",
-    imagem: propriedadeSantaHelenaUrl,
-    proprietarios: "Fernando - Produtor titular",
-    zona: "Rural",
-    municipioUf: "Uberlândia - MG",
-    situacao: "Ativo",
-  },
-  {
-    id: 5,
-    codigo: "31001040082",
-    nome: "Fazenda São José",
-    imagem: propriedadeSaoJoseUrl,
-    proprietarios: "Fernando - Produtor titular",
-    zona: "Rural",
-    municipioUf: "Patos de Minas - MG",
-    situacao: "Ativo",
-  },
-  { 
-    id: 1, 
-    codigo: "51080590041", 
-    nome: "Fazenda Rio Verde", 
-    proprietarios: "José Aarão Neto - 555.009.956-40", 
-    zona: "Rural", 
-    municipioUf: "Lavras - MG", 
-    situacao: "Ativo" 
-  },
-  { 
-    id: 2, 
-    codigo: "31001040082", 
-    nome: "Haras Vale Verde", 
-    proprietarios: "José Aarão Neto - 555.009.956-40", 
-    zona: "Rural", 
-    municipioUf: "Belo Horizonte - MG", 
-    situacao: "Ativo" 
-  },
-  { 
-    id: 3, 
-    codigo: "31001040090", 
-    nome: "Granja Alvorada", 
-    proprietarios: "Agro Cooperativa IMA - 12.345.678/0001-90", 
-    zona: "Urbana", 
-    municipioUf: "Varginha - MG", 
-    situacao: "Suspenso" 
-  },
-];
-
 const perPageDefault = 10;
 
 // ==========================================================
 // SUBCOMPONENTES
 // ==========================================================
-function SituacaoBadge({ situacao }: { situacao: EstabelecimentoAgropecuario["situacao"] }) {
-  const map = {
-    Ativo: { bg: "#E6F4EA", border: "#A3E2B8", text: "#1A7A3C", Icon: Check },
-    Inativo: { bg: "#F3F4F6", border: "#E5E7EB", text: "#6B7280", Icon: Minus },
-    Suspenso: { bg: "#FFF9E6", border: "#FFEAA3", text: "#B78103", Icon: AlertTriangle },
-  } as const;
-  const { bg, border, text, Icon } = map[situacao] || map["Inativo"];
-  return (
-    <span className="inline-flex items-center gap-1.5 px-3 h-7 rounded-full text-xs font-semibold whitespace-nowrap" style={{ backgroundColor: bg, border: `1px solid ${border}`, color: text }}>
-      <Icon size={13} strokeWidth={3} />
-      {situacao}
-    </span>
-  );
-}
-
 function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
     <div className="flex items-center gap-2 bg-[#1A7A3C] text-white text-xs font-medium px-3 py-1.5 rounded-md shadow-sm max-w-full">
@@ -173,6 +93,7 @@ export function EstabelecimentoAgropecuarioPage({ onLogout, onNavigate }: PagePr
 
   const [sortKey, setSortKey] = useState<SortKey>("nome");
   const [sortAsc, setSortAsc] = useState(true);
+  const [estabelecimentos] = useState(() => listarEstabelecimentosAgropecuarios());
     
   // Filtra os proprietários passados para o modal com base no tipo selecionado
   const proprietariosFiltradosModal = PROPRIETARIOS_MOCK.filter(
@@ -206,7 +127,7 @@ export function EstabelecimentoAgropecuarioPage({ onLogout, onNavigate }: PagePr
   }
 
   // --- Filtros da listagem ---
-  const filtrados = ESTABELECIMENTOS_MOCK.filter((d) => {
+  const filtrados = estabelecimentos.filter((d) => {
     const termo = busca.trim();
     const matchBusca = termo === "" || (d.nome ?? "").includes(termo) || (d.codigo ?? "").includes(termo);
     
@@ -375,19 +296,7 @@ export function EstabelecimentoAgropecuarioPage({ onLogout, onNavigate }: PagePr
                     {pagina.map((d) => (
                       <tr key={d.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/60 transition">
                         <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">{d.codigo}</td>
-                        <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">
-                          <div className="flex min-w-[210px] items-center gap-3">
-                            {d.imagem && (
-                              <img
-                                src={d.imagem}
-                                alt=""
-                                loading="lazy"
-                                className="h-10 w-14 shrink-0 rounded-md object-cover"
-                              />
-                            )}
-                            <span>{d.nome}</span>
-                          </div>
-                        </td>
+                        <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">{d.nome}</td>
                         <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal max-w-xs truncate" title={d.proprietarios}>
                           {d.proprietarios}
                         </td>
