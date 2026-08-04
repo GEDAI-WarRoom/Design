@@ -232,6 +232,7 @@ import { TaxaEmissaoGtaPage } from "./pages/GTA/TaxaEmissaoGta/TaxaEmissaoGta";
 import { VisualizarTaxaEmissaoGtaPage } from "./pages/GTA/TaxaEmissaoGta/VisualizarTaxaEmissaoGta";
 
 // CONTROLE
+import { EditarUsuarioPage } from "./pages/Controle/Usuarios/EditarUsuario"; // Ajuste o caminho se necessário
 import { AdicionarPapeisPage } from "./pages/Controle/Papeis/AdicionarPapeis";
 import { EditarPapelPage } from "./pages/Controle/Papeis/EditarPapel";
 import { PapeisPage } from "./pages/Controle/Papeis/Papeis";
@@ -243,6 +244,7 @@ import { ParametrosSistemaPage } from "./pages/Controle/ParametrosSistema/Parame
 
 // 1. Adicionamos as novas rotas de Pessoa Jurídica no tipo Screen
 export type Screen =
+| "editar-usuario"
 | "editar-divisao-municipal"
   | "visualizar-divisao-municipal"
 	| "emissao-ata"
@@ -487,6 +489,8 @@ export default function App() {
 	};
 
 	switch (screen) {
+		case "editar-usuario":
+      return <EditarUsuarioPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
 		case "divisao-municipal":
       return (
         <DivisaoMunicipalPage onLogout={handleLogout} onNavigate={handleNavigate} />
