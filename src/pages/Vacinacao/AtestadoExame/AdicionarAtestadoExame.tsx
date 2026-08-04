@@ -8,19 +8,28 @@ import * as Icons from "../../../imports/icons";
 const GREEN = "#1A7A3C";
 
 // ==========================================================
-// MOCKS LOCAIS
+// SIMULADOR DE BANCO DE DADOS (LOCALSTORAGE)
 // ==========================================================
+const MOCK_KEY = "ATESTADOS_DB";
+const getAtestados = () => {
+  const stored = localStorage.getItem(MOCK_KEY);
+  if (stored) return JSON.parse(stored);
+  return [];
+};
+const salvarNovoAtestado = (novoAtestado: any) => {
+  const db = getAtestados();
+  db.unshift(novoAtestado); // Adiciona no início da lista
+  localStorage.setItem(MOCK_KEY, JSON.stringify(db));
+};
+
 const DOENCAS_CORRIGIDAS_MOCK = [
   { id: 1, codigo: "D01", nome: "Febre Aftosa" },
   { id: 2, codigo: "D02", nome: "Brucelose" },
-  { id: 3, codigo: "D03", nome: "Tuberculose Bovina" },
+  { id: 3, codigo: "D03", nome: "Clostridiose" },
   { id: 4, codigo: "D04", nome: "Raiva" },
   { id: 5, codigo: "D05", nome: "Anemia Infecciosa Equina (AIE)" },
 ];
 
-// ==========================================================
-// HELPERS DE UI
-// ==========================================================
 function Section({ title, children, defaultOpen = true }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
@@ -34,32 +43,34 @@ function Section({ title, children, defaultOpen = true }: { title: string; child
   );
 }
 
-// ==========================================================
-// PÁGINA: ADICIONAR ATESTADO DE EXAME
-// ==========================================================
 interface PageProps {
   onLogout: () => void;
-  onNavigate: (screen: any, data?: any) => void;
+  onNavigate: (screen: string, data?: any) => void;
 }
 
 export function AdicionarAtestadoExamePage({ onLogout, onNavigate }: PageProps) {
-  // Estados dos campos do formulário
   const [descricao, setDescricao] = useState("");
   const [doenca, setDoenca] = useState<any | null>(null);
   const [diasValidade, setDiasValidade] = useState("");
 
-  // Estados dos Modais
   const [isSucesso, setIsSucesso] = useState(false);
   const [isErro, setIsErro] = useState(false);
 
   const handleSalvar = () => {
-    // Validações de campos obrigatórios antes do salvamento
     if (!descricao || !doenca || !diasValidade) {
       setIsErro(true);
       return;
     }
 
-    // Simula o sucesso do cadastro
+    // Salva no LocalStorage para que a tela de busca encontre
+    salvarNovoAtestado({
+      id: Date.now(),
+      descricao,
+      doenca: doenca.nome,
+      diasValidade,
+      situacao: "Ativo" // Situação default ao criar
+    });
+
     setIsSucesso(true);
   };
 
@@ -68,7 +79,6 @@ export function AdicionarAtestadoExamePage({ onLogout, onNavigate }: PageProps) 
       <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="atestado-exame" hideSearch />
 
       <main className="max-w-[1088px] mx-auto px-4 md:px-6 py-6 flex flex-col gap-4">
-        {/* Cabeçalho */}
         <div>
           <button
             type="button"
@@ -92,7 +102,6 @@ export function AdicionarAtestadoExamePage({ onLogout, onNavigate }: PageProps) 
           </div>
         </div>
 
-        {/* Alerta de Obrigatoriedade */}
         <div className="w-full bg-white border border-gray-100 rounded-lg p-5 shadow-sm flex items-center gap-3 mt-4 mb-6">
           <div className="text-gray-500 flex-shrink-0">
             <Info size={20} className="stroke-[2.5]" />
@@ -102,10 +111,8 @@ export function AdicionarAtestadoExamePage({ onLogout, onNavigate }: PageProps) 
           </p>
         </div>
 
-        {/* Formulário - Informações Básicas */}
         <Section title="Informações Básicas">
           <div className="flex flex-col gap-6">
-
             <div className="w-full">
               <FloatInput
                 label="Descrição do atestado"
@@ -124,9 +131,7 @@ export function AdicionarAtestadoExamePage({ onLogout, onNavigate }: PageProps) 
                 value={doenca ? doenca.nome : ""}
                 data={DOENCAS_CORRIGIDAS_MOCK}
                 searchKeys={["nome"]}
-                columns={[
-                  { label: "Nome da Doença", key: "nome" },
-                ]}
+                columns={[{ label: "Nome da Doença", key: "nome" }]}
                 title="Buscar Doença"
                 subtitle="Busque por uma doença cadastrada:"
                 icon={
@@ -148,24 +153,20 @@ export function AdicionarAtestadoExamePage({ onLogout, onNavigate }: PageProps) 
                 maxLength={3}
               />
             </div>
-
           </div>
         </Section>
       </main>
 
-      {/* Modal de Erro */}
       {isErro && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8 flex flex-col items-center text-center animate-in fade-in zoom-in-95 duration-200">
             <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mb-5">
               <AlertTriangle size={32} className="text-red-500" />
             </div>
-
             <h3 className="text-xl font-bold text-gray-900">Campos obrigatórios faltando</h3>
             <p className="text-sm text-gray-500 mt-2">
               Por favor, preencha todos os campos obrigatórios marcados com asterisco (*) antes de prosseguir.
             </p>
-
             <div className="flex justify-center mt-8 w-full">
               <button
                 type="button"
@@ -179,17 +180,14 @@ export function AdicionarAtestadoExamePage({ onLogout, onNavigate }: PageProps) 
         </div>
       )}
 
-      {/* Modal de Sucesso */}
       {isSucesso && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8 flex flex-col items-center text-center animate-in fade-in zoom-in-95 duration-200">
             <div className="w-16 h-16 bg-[#eaf4eb] rounded-full flex items-center justify-center mb-5">
               <Check size={32} className="text-[#1A7A3C] stroke-[3]" />
             </div>
-
             <h3 className="text-xl font-bold text-gray-900">Atestado adicionado com sucesso!</h3>
             <p className="text-sm text-gray-500 mt-2">O registro foi gravado.</p>
-
             <div className="flex gap-4 justify-center mt-8 w-full">
               <button
                 type="button"
@@ -200,7 +198,16 @@ export function AdicionarAtestadoExamePage({ onLogout, onNavigate }: PageProps) 
               </button>
               <button
                 type="button"
-                onClick={() => { setIsSucesso(false); onNavigate("visualizar-atestado-exame"); }}
+                onClick={() => { 
+                  setIsSucesso(false); 
+                  const currentDb = getAtestados();
+                  const recemCriado = currentDb[0];
+                  
+                  // CORREÇÃO: Salva o ID do item recém-criado na memória antes de navegar
+                  localStorage.setItem("CURRENT_ATESTADO_ID", recemCriado.id.toString());
+                  
+                  onNavigate("visualizar-atestado-exame", recemCriado); 
+                }}
                 className="px-8 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition w-full md:w-auto shadow-sm"
               >
                 Visualizar

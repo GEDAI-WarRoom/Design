@@ -1,14 +1,5 @@
-import React, { useState } from "react";
-import {
-  ArrowLeft,
-  Search,
-  SlidersHorizontal,
-  ChevronLeft,
-  ChevronRight,
-  Eye as ViewIcon,
-  Pencil,
-  X,
-} from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { ArrowLeft, Search, SlidersHorizontal, ChevronLeft, ChevronRight, Eye as ViewIcon, Pencil, X } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatSelect } from "../../../components/ui/FormKit";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
@@ -16,20 +7,21 @@ import * as Icons from "../../../imports/icons";
 
 const GREEN = "#1A7A3C";
 
-// MOCKS DE DOENÇAS PARA O SEARCH
+// ==========================================================
+// SIMULADOR DE BANCO DE DADOS (LOCALSTORAGE)
+// ==========================================================
+const MOCK_KEY = "ATESTADOS_DB";
+const getAtestados = () => {
+  const stored = localStorage.getItem(MOCK_KEY);
+  return stored ? JSON.parse(stored) : [];
+};
+
 const DOENCAS_MOCK = [
   { id: 1, nome: "Brucelose" },
   { id: 2, nome: "Febre Aftosa" },
-  { id: 3, nome: "Anemia Infecciosa Equina (AIE)" },
-  { id: 4, nome: "Raiva" },
-];
-
-// MOCKS DE ENTIDADE 
-const ATESTADOS_MOCK = [
-  { id: 1, descricao: "Atestado de Brucelose", doenca: "Brucelose", situacao: "Ativo" },
-  { id: 2, descricao: "Atestado de Febre Aftosa", doenca: "Febre Aftosa", situacao: "Inativo" },
-  { id: 3, descricao: "Atestado de Anemia Infecciosa Equina", doenca: "Anemia Infecciosa Equina (AIE)", situacao: "Ativo" },
-  { id: 4, descricao: "Atestado de Raiva", doenca: "Raiva", situacao: "Ativo" },
+  { id: 3, nome: "Clostridiose" },
+  { id: 4, nome: "Anemia Infecciosa Equina (AIE)" },
+  { id: 5, nome: "Raiva" },
 ];
 
 const SITUACOES = [
@@ -50,10 +42,11 @@ function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
 
 interface PageProps {
   onLogout: () => void;
-  onNavigate: (screen: any, data?: any) => void;
+  onNavigate: (screen: string, data?: any) => void;
 }
 
 export function AtestadoExamePage({ onLogout, onNavigate }: PageProps) {
+  const [atestadosDb, setAtestadosDb] = useState<any[]>([]);
   const [descricao, setDescricao] = useState("");
   const [doenca, setDoenca] = useState<any | null>(null);
   const [situacao, setSituacao] = useState("");
@@ -64,6 +57,10 @@ export function AtestadoExamePage({ onLogout, onNavigate }: PageProps) {
   const [erroFiltro, setErroFiltro] = useState(false);
   const [page, setPage] = useState(1);
   const perPage = 10;
+
+  useEffect(() => {
+    setAtestadosDb(getAtestados());
+  }, []);
 
   const handlePesquisar = () => {
     if (!descricao && !temFiltroAtivo) {
@@ -76,9 +73,9 @@ export function AtestadoExamePage({ onLogout, onNavigate }: PageProps) {
     setPage(1);
   };
 
-  const filtrados = ATESTADOS_MOCK.filter((a) => {
-    const matchDescricao = descricao === "" || a.descricao.toLowerCase().includes(descricao.toLowerCase());
-    const matchDoenca = !doenca || a.doenca.trim() === doenca.nome.trim();
+  const filtrados = atestadosDb.filter((a) => {
+    const matchDescricao = descricao === "" || (a.descricao && a.descricao.toLowerCase().includes(descricao.toLowerCase()));
+    const matchDoenca = !doenca || (a.doenca && a.doenca.trim() === doenca.nome.trim());
     const matchSituacao = situacao === "" || a.situacao === situacao;
     return matchDescricao && matchDoenca && matchSituacao;
   });
@@ -92,12 +89,17 @@ export function AtestadoExamePage({ onLogout, onNavigate }: PageProps) {
 
   const temFiltroAtivo = doenca || situacao;
 
+  // FUNÇÃO NOVA: Salva o ID antes de navegar
+  const handleAcaoTabela = (tela: string, item: any) => {
+    localStorage.setItem("CURRENT_ATESTADO_ID", item.id.toString());
+    onNavigate(tela, item);
+  };
+
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
       <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="atestado-exame" hideSearch />
 
       <main className="max-w-[1300px] mx-auto px-4 md:px-6 py-6">
-        {/* Topo da Página */}
         <div className="mb-4">
           <button onClick={() => onNavigate("dashboard")} className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70" style={{ color: GREEN }}>
             <ArrowLeft size={15} />
@@ -111,10 +113,7 @@ export function AtestadoExamePage({ onLogout, onNavigate }: PageProps) {
           </div>
         </div>
 
-        {/* CONTAINER BRANCO ÚNICO */}
         <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col gap-5">
-
-          {/* Barra Superior do Filtro */}
           <div className="flex gap-3 items-stretch w-full">
             <div className="flex-1 bg-white border border-gray-200 rounded-md px-3 h-12 transition-all relative flex items-end pb-1.5 focus-within:border-[#1A7A3C] focus-within:ring-1 focus-within:ring-[#1A7A3C]">
               <label className={`absolute left-3 transition-all duration-200 pointer-events-none ${focusDescricao || descricao ? "top-1 text-[10px] text-gray-400 font-medium" : "top-1/2 -translate-y-1/2 text-sm text-gray-400"}`}>
@@ -140,7 +139,6 @@ export function AtestadoExamePage({ onLogout, onNavigate }: PageProps) {
             </button>
           </div>
 
-          {/* Filtros Internos Avançados */}
           {showFilters && (
             <div className="animate-fadeIn flex flex-col lg:flex-row items-end gap-3 w-full">
               <div className="w-full lg:flex-1">
@@ -154,11 +152,7 @@ export function AtestadoExamePage({ onLogout, onNavigate }: PageProps) {
                   title="Buscar Doença"
                   subtitle="Busque por uma doença cadastrada:"
                   icon={
-                    <img
-                      src={Icons.iconeDoencaUrl || (Icons as any).iconedoencaurl}
-                      alt="Doença"
-                      className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0"
-                    />
+                    <img src={Icons.iconeDoencaUrl || (Icons as any).iconedoencaurl} alt="Doença" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />
                   }
                   hideEye={true}
                   onChange={(entidade) => setDoenca(entidade)}
@@ -166,20 +160,10 @@ export function AtestadoExamePage({ onLogout, onNavigate }: PageProps) {
               </div>
 
               <div className="w-full lg:w-1/4">
-                <FloatSelect
-                  label="Situação"
-                  value={situacao}
-                  onChange={setSituacao}
-                  options={SITUACOES}
-                />
+                <FloatSelect label="Situação" value={situacao} onChange={setSituacao} options={SITUACOES} />
               </div>
 
-              {/* Botão Pesquisar Compacto */}
-              <button
-                onClick={handlePesquisar}
-                className="h-12 w-full lg:w-fit px-8 rounded-md text-white text-sm font-semibold transition hover:opacity-90 flex items-center justify-center whitespace-nowrap"
-                style={{ backgroundColor: GREEN }}
-              >
+              <button onClick={handlePesquisar} className="h-12 w-full lg:w-fit px-8 rounded-md text-white text-sm font-semibold transition hover:opacity-90 flex items-center justify-center whitespace-nowrap" style={{ backgroundColor: GREEN }}>
                 Pesquisar
               </button>
             </div>
@@ -191,7 +175,6 @@ export function AtestadoExamePage({ onLogout, onNavigate }: PageProps) {
             </p>
           )}
 
-          {/* Chips de Filtros Ativos */}
           {temFiltroAtivo && (
             <div className="flex flex-wrap gap-2 animate-fadeIn">
               {doenca && <Chip label={`Doença: ${doenca.nome}`} onRemove={() => setDoenca(null)} />}
@@ -199,10 +182,8 @@ export function AtestadoExamePage({ onLogout, onNavigate }: PageProps) {
             </div>
           )}
 
-          {/* Linha Divisória sutil */}
           {hasSearched && <div className="border-t border-gray-100 my-1" />}
 
-          {/* ÁREA DE RESULTADOS */}
           {!hasSearched ? (
             <div className="py-12 text-center">
               <p className="text-sm text-gray-500">Busque por atestados utilizando o campo de busca e os filtros acima.</p>
@@ -231,8 +212,9 @@ export function AtestadoExamePage({ onLogout, onNavigate }: PageProps) {
                         <td className="px-4 py-4 text-gray-500 text-sm">{item.situacao}</td>
                         <td className="px-4 py-4">
                           <div className="flex items-center gap-1 justify-end">
-                            <button onClick={() => onNavigate("visualizar-atestado-exame", item)} className="p-2 rounded-md hover:bg-green-50 transition" style={{ color: GREEN }} title="Visualizar"><ViewIcon size={18} /></button>
-                            <button onClick={() => onNavigate("editar-atestado-exame", item)} className="p-2 rounded-md hover:bg-green-50 transition" style={{ color: GREEN }} title="Editar"><Pencil size={17} /></button>
+                            {/* Botões agora usam a função para salvar o ID selecionado */}
+                            <button onClick={() => handleAcaoTabela("visualizar-atestado-exame", item)} className="p-2 rounded-md hover:bg-green-50 transition" style={{ color: GREEN }} title="Visualizar"><ViewIcon size={18} /></button>
+                            <button onClick={() => handleAcaoTabela("editar-atestado-exame", item)} className="p-2 rounded-md hover:bg-green-50 transition" style={{ color: GREEN }} title="Editar"><Pencil size={17} /></button>
                           </div>
                         </td>
                       </tr>
@@ -241,7 +223,6 @@ export function AtestadoExamePage({ onLogout, onNavigate }: PageProps) {
                 </table>
               </div>
 
-              {/* Paginação */}
               <div className="flex items-center justify-between pt-4 text-sm text-gray-500">
                 <span>Itens por página: {perPage}</span>
                 <div className="flex items-center gap-4">
