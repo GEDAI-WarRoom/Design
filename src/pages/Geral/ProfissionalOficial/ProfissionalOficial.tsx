@@ -327,12 +327,16 @@ const matchUnidade = !unidadeAdministrativa || p.unidadeAdministrativa === unida
                         <td className="px-4 py-3 text-gray-500 whitespace-normal">
                           <SituacaoBadge situacao={item.situacao} />
                         </td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-1 justify-end">
-                            <button onClick={() => onNavigate("visualizar-profissional", item)} className="p-2 rounded-md hover:bg-green-50 transition" style={{ color: GREEN }} title="Visualizar" aria-label={`Visualizar ${item.nome}`}><ViewIcon size={18} /></button>
-                            <button onClick={() => onNavigate("editar-profissional", item)} className="p-2 rounded-md hover:bg-green-50 transition" style={{ color: GREEN }} title="Editar" aria-label={`Editar ${item.nome}`}><Pencil size={17} /></button>
-                          </div>
-                        </td>
+                        <td className="px-4 py-3 text-right whitespace-nowrap">
+  <div className="flex items-center justify-end gap-1">
+    <button onClick={() => onNavigate("visualizar-profissional-oficial")} className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md transition">
+      <ViewIcon size={18} />
+    </button>
+    <button onClick={() => onNavigate("editar-profissional-oficial")} className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md transition">
+      <Pencil size={17} />
+    </button>
+  </div>
+</td>
                       </tr>
                     ))}
                   </tbody>
