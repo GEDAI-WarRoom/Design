@@ -5,6 +5,8 @@ import { SelecionarUsuarioPage } from "./pages/SelecionarUsuario";
 import { isRouteAllowed, useDemoUser } from "./contexts/DemoUserContext";
 
 // GERAL
+import { VisualizarAeroportoPortoPage } from "./pages/Geral/AeroportoPorto/VisualizarAeroportoPorto";
+import { EditarAeroportoPortoPage } from "./pages/Geral/AeroportoPorto/EditarAeroportoPorto";
 import { EmissaoATAPage } from "./pages/GTA/EmissaoATA/EmissaoATA";
 import { AdicionarEmissaoATAPage } from "./pages/GTA/EmissaoATA/AdicionarEmissaoATA";
 import { VisualizarEmissaoATAPage } from "./pages/GTA/EmissaoATA/VisualizarEmissaoATA";
@@ -450,7 +452,9 @@ export type Screen =
 	| "acougue"
 	| "adicionar-acougue"
 	| "visualizar-acougue"
-	| "adicionar-indice";
+	| "adicionar-indice"
+	| "editar-aeroporto-porto"
+  | "visualizar-aeroporto-porto";
 
 export default function App() {
 	const [screen, setScreen] = useState<Screen>("login");
@@ -477,6 +481,14 @@ export default function App() {
 	};
 
 	switch (screen) {
+		case "aeroporto-porto":
+      return <AeroportoPorto onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-aeroporto-porto":
+      return <AdicionarAeroportoPorto onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-aeroporto-porto":
+      return <EditarAeroportoPortoPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-aeroporto-porto":
+      return <VisualizarAeroportoPortoPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
 		case "emissao-ata":
 			return <EmissaoATAPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 		case "adicionar-emissao-ata":
@@ -1414,17 +1426,8 @@ export default function App() {
 					onNavigate={handleNavigate}
 				/>
 			);
-		case "aeroporto-porto":
-			return (
-				<AeroportoPorto onLogout={handleLogout} onNavigate={handleNavigate} />
-			);
-		case "adicionar-aeroporto-porto":
-			return (
-				<AdicionarAeroportoPorto
-					onLogout={handleLogout}
-					onNavigate={handleNavigate}
-				/>
-			);
+		
+      return <VisualizarAeroportoPortoPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
 		case "registro-venda-gta-fisica":
 			return (
 				<RegistroVendaGtaFisicaPage
