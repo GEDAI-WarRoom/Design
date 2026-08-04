@@ -79,10 +79,10 @@ import { VisualizarExploracaoPecuariaPage } from "./pages/Animal/ExploracaoPecua
 import { AdicionarIntegradoraCooperativaPage } from "./pages/Animal/IntegradoraCooperativa/AdicionarIntegradoraCooperativa";
 import { IntegradoraCooperativaPage } from "./pages/Animal/IntegradoraCooperativa/IntegradoraCooperativa";
 import { VisualizarIntegradoraCooperativaPage } from "./pages/Animal/IntegradoraCooperativa/VisualizarIntegradoraCooperativa";
-import { AdicionarLocalRealizacaoExamePage } from "./pages/Animal/LocalRealizacaoExame/AdicionarLocalRealizacaoExame";
-import { EditarLocalRealizacaoExamePage } from "./pages/Animal/LocalRealizacaoExame/EditarLocalRealizacaoExame";
-import { LocalRealizacaoExamePage } from "./pages/Animal/LocalRealizacaoExame/LocalRealizacaoExame";
-import { VisualizarLocalRealizacaoExamePage } from "./pages/Animal/LocalRealizacaoExame/VisualizarLocalRealizacaoExame";
+import { AdicionarLocalRealizacaoExamePage } from "./pages/Exame/LocalRealizacaoExame/AdicionarLocalRealizacaoExame";
+import { EditarLocalRealizacaoExamePage } from "./pages/Exame/LocalRealizacaoExame/EditarLocalRealizacaoExame";
+import { LocalRealizacaoExamePage } from "./pages/Exame/LocalRealizacaoExame/LocalRealizacaoExame";
+import { VisualizarLocalRealizacaoExamePage } from "./pages/Exame/LocalRealizacaoExame/VisualizarLocalRealizacaoExame";
 import { AdicionarNucleoProducaoPage } from "./pages/Animal/NucleoProducao/AdicionarNucleoProducao";
 import { EditarNucleoProducaoPage } from "./pages/Animal/NucleoProducao/EditarNucleoProducao";
 import { NucleoProducaoPage } from "./pages/Animal/NucleoProducao/NucleoProducao";
@@ -136,6 +136,8 @@ import { AdicionarUnidadeConsolidacaoPage } from "./pages/Vegetal/UnidadeConsoli
 import { UnidadeConsolidacaoPage } from "./pages/Vegetal/UnidadeConsolidacao/UnidadeConsolidacao";
 
 // VACINAÇÃO
+import { VisualizarVendaComEntradaInsumosExamesPage } from "./pages/Exame/VendaComEntradaInsumosExames/VisualizarVendaComEntradaInsumosExames";
+import { EditarVendaComEntradaInsumosExamesPage } from "./pages/Exame/VendaComEntradaInsumosExames/EditarVendaComEntradaInsumosExames";
 import { AdicionarAutorizacaoVacinacaoPage } from "./pages/Vacinacao/AutorizacaoVacinacao/AdicionarAutorizacaoVacinacao";
 import { AutorizacaoVacinacaoPage } from "./pages/Vacinacao/AutorizacaoVacinacao/AutorizacaoVacinacao";
 import { AdicionarDeclaracaoVacinacaoPage } from "./pages/Vacinacao/DeclaracaoVacinacao/AdicionarDeclaracaoVacinacao";
@@ -150,27 +152,27 @@ import { AdicionarLancamentoDosesVacinaPage } from "./pages/Vacinacao/Lancamento
 import { LancamentoDosesVacinaPage } from "./pages/Vacinacao/LancamentoDoses/LancamentoDoses";
 import { AdicionarPartilhaVacinaPage } from "./pages/Vacinacao/PartilhaVacina/AdicionarPartilhaVacina";
 import { PartilhaVacinaPage } from "./pages/Vacinacao/PartilhaVacina/PartilhaVacina";
-import { AdicionarTipoInsumoExamePage } from "./pages/Vacinacao/TipoInsumoExame/AdicionarTipoInsumoExame";
-import { EditarTipoInsumoExamePage } from "./pages/Vacinacao/TipoInsumoExame/EditarTipoInsumoExame";
-import { TipoInsumoExamePage } from "./pages/Vacinacao/TipoInsumoExame/TipoInsumoExame";
-import { VisualizarTipoInsumoExamePage } from "./pages/Vacinacao/TipoInsumoExame/VisualizarTipoInsumoExame";
+import { AdicionarTipoInsumoExamePage } from "./pages/Exame/TipoInsumoExame/AdicionarTipoInsumoExame";
+import { EditarTipoInsumoExamePage } from "./pages/Exame/TipoInsumoExame/EditarTipoInsumoExame";
+import { TipoInsumoExamePage } from "./pages/Exame/TipoInsumoExame/TipoInsumoExame";
+import { VisualizarTipoInsumoExamePage } from "./pages/Exame/TipoInsumoExame/VisualizarTipoInsumoExame";
 import { AdicionarVacinadorPage } from "./pages/Vacinacao/Vacinador/AdicionarVacinador";
 import { VacinadorPage } from "./pages/Vacinacao/Vacinador/Vacinador";
-import { AdicionarVendaComEntradaInsumosExamesPage } from "./pages/Vacinacao/VendaComEntradaInsumosExames/AdicionarVendaComEntradaInsumosExames";
-import { VendaComEntradaInsumosExamesPage } from "./pages/Vacinacao/VendaComEntradaInsumosExames/VendaComEntradaInsumosExames";
+import { AdicionarVendaComEntradaInsumosExamesPage } from "./pages/Exame/VendaComEntradaInsumosExames/AdicionarVendaComEntradaInsumosExames";
+import { VendaComEntradaInsumosExamesPage } from "./pages/Exame/VendaComEntradaInsumosExames/VendaComEntradaInsumosExames";
 import { AdicionarVendaComEntradaVacinaPage } from "./pages/Vacinacao/VendaComEntradaVacina/AdicionarVendaComEntradaVacina";
 import { VendaComEntradaVacinaPage } from "./pages/Vacinacao/VendaComEntradaVacina/VendaComEntradaVacina";
 import { AdicionarVendaComSaidaVacinaPage } from "./pages/Vacinacao/VendaComSaidaVacina/AdicionarVendaComSaidaVacina";
 import { VendaComSaidaVacinaPage } from "./pages/Vacinacao/VendaComSaidaVacina/VendaComSaidaVacina";
-import { AjusteDosesInsumoPage } from "./pages/Vacinacao/AjusteDosesInsumo/AjusteDosesInsumo";
-import { AdicionarAjusteDosesInsumoPage } from "./pages/Vacinacao/AjusteDosesInsumo/AdicionarAjusteDosesInsumo";
-import { VisualizarAjusteDosesInsumoPage } from "./pages/Vacinacao/AjusteDosesInsumo/VisualizarAjusteDosesInsumo";
-import { EditarAjusteDosesInsumoPage } from "./pages/Vacinacao/AjusteDosesInsumo/EditarAjusteDosesInsumo";
+import { AjusteDosesInsumoPage } from "./pages/Exame/AjusteDosesInsumo/AjusteDosesInsumo";
+import { AdicionarAjusteDosesInsumoPage } from "./pages/Exame/AjusteDosesInsumo/AdicionarAjusteDosesInsumo";
+import { VisualizarAjusteDosesInsumoPage } from "./pages/Exame/AjusteDosesInsumo/VisualizarAjusteDosesInsumo";
+import { EditarAjusteDosesInsumoPage } from "./pages/Exame/AjusteDosesInsumo/EditarAjusteDosesInsumo";
 
-import { AtestadoExamePage } from "./pages/Vacinacao/AtestadoExame/AtestadoExame";
-import { AdicionarAtestadoExamePage } from "./pages/Vacinacao/AtestadoExame/AdicionarAtestadoExame";
-import { VisualizarAtestadoExamePage } from "./pages/Vacinacao/AtestadoExame/VisualizarAtestadoExame";
-import { EditarAtestadoExamePage } from "./pages/Vacinacao/AtestadoExame/EditarAtestadoExame";
+import { AtestadoExamePage } from "./pages/Exame/AtestadoExame/AtestadoExame";
+import { AdicionarAtestadoExamePage } from "./pages/Exame/AtestadoExame/AdicionarAtestadoExame";
+import { VisualizarAtestadoExamePage } from "./pages/Exame/AtestadoExame/VisualizarAtestadoExame";
+import { EditarAtestadoExamePage } from "./pages/Exame/AtestadoExame/EditarAtestadoExame";
 
 //ARRECADACAO
 import { FundoArrecadacaoPage } from "./pages/Arrecadacao/FundoArrecadacao/FundoArrecadacao";
@@ -441,6 +443,8 @@ export type Screen =
 	| "editar-atestado-exame"
 	| "venda-entrada-insumos-exames"
 	| "adicionar-venda-entrada-insumos-exames"
+	| "visualizar-venda-entrada-insumos-exames"
+	| "editar-venda-entrada-insumos-exames"
 	| "status-animal"
 	| "adicionar-status-animal"
 	| "visualizar-status-animal"
@@ -487,6 +491,26 @@ export default function App() {
 	};
 
 	switch (screen) {
+		// EXAME: Venda com Entrada de Insumos
+    case "venda-entrada-insumos-exames":
+      return <VendaComEntradaInsumosExamesPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-venda-entrada-insumos-exames":
+      return <AdicionarVendaComEntradaInsumosExamesPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-venda-entrada-insumos-exames":
+      return <VisualizarVendaComEntradaInsumosExamesPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-venda-entrada-insumos-exames":
+      return <EditarVendaComEntradaInsumosExamesPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+
+    // EXAME: Atestado
+    case "atestado-exame":
+      return <AtestadoExamePage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-atestado-exame":
+      return <AdicionarAtestadoExamePage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-atestado-exame":
+      return <VisualizarAtestadoExamePage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-atestado-exame":
+      return <EditarAtestadoExamePage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+  
 		case "divisao-municipal":
       return (
         <DivisaoMunicipalPage onLogout={handleLogout} onNavigate={handleNavigate} />
@@ -1995,20 +2019,7 @@ export default function App() {
 				/>
 			);
 
-		case "venda-entrada-insumos-exames":
-			return (
-				<VendaComEntradaInsumosExamesPage
-					onLogout={handleLogout}
-					onNavigate={handleNavigate}
-				/>
-			);
-		case "adicionar-venda-entrada-insumos-exames":
-			return (
-				<AdicionarVendaComEntradaInsumosExamesPage
-					onLogout={handleLogout}
-					onNavigate={handleNavigate}
-				/>
-			);
+		
 
 		case "atestado-exame":
 			return (
