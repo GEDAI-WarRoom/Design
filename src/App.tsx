@@ -77,6 +77,7 @@ import { VisualizarExploracaoPecuariaPage } from "./pages/Animal/ExploracaoPecua
 import { AdicionarIntegradoraCooperativaPage } from "./pages/Animal/IntegradoraCooperativa/AdicionarIntegradoraCooperativa";
 import { IntegradoraCooperativaPage } from "./pages/Animal/IntegradoraCooperativa/IntegradoraCooperativa";
 import { VisualizarIntegradoraCooperativaPage } from "./pages/Animal/IntegradoraCooperativa/VisualizarIntegradoraCooperativa";
+import { EditarIntegradoraCooperativaPage } from "./pages/Animal/IntegradoraCooperativa/EditarIntegradoraCooperativa";
 import { AdicionarLocalRealizacaoExamePage } from "./pages/Animal/LocalRealizacaoExame/AdicionarLocalRealizacaoExame";
 import { EditarLocalRealizacaoExamePage } from "./pages/Animal/LocalRealizacaoExame/EditarLocalRealizacaoExame";
 import { LocalRealizacaoExamePage } from "./pages/Animal/LocalRealizacaoExame/LocalRealizacaoExame";
@@ -128,6 +129,8 @@ import { CulturaPage } from "./pages/Vegetal/Cultura/Cultura";
 import { VisualizarEstabelecimentoAgroindustrialPOVPage } from "./pages/Vegetal/EstabelecimentoAgroindustrialPOV/VisualizarEstabelecimentoAgroindustrialPOV";
 import { AdicionarPragaPage } from "./pages/Vegetal/Praga/AdicionarPraga";
 import { PragaPage } from "./pages/Vegetal/Praga/Praga";
+import { EditarPragaPage } from "./pages/Vegetal/Praga/EditarPraga";
+import { VisualizarPragaPage } from "./pages/Vegetal/Praga/VisualizarPraga";
 import { AdicionarProfissionalVegetalPage } from "./pages/Vegetal/ProfissionalVegetal/AdicionarProfissionalVegetal";
 import { ProfissionalVegetalPage } from "./pages/Vegetal/ProfissionalVegetal/ProfissionalVegetal";
 import { AdicionarUnidadeConsolidacaoPage } from "./pages/Vegetal/UnidadeConsolidacao/AdicionarUnidadeConsolidacao";
@@ -376,6 +379,7 @@ export type Screen =
 	| "integradora-cooperativa"
 	| "adicionar-integradora-cooperativa"
 	| "visualizar-integradora-cooperativa"
+	| "editar-integradora-cooperativa"
 	| "profissional-animal"
 	| "adicionar-profissional-animal"
 	| "promotora-eventos"
@@ -390,6 +394,8 @@ export type Screen =
 	| "adicionar-cultura"
 	| "praga"
 	| "adicionar-praga"
+	| "editar-praga"
+	| "visualizar-praga"
 	| "profissional-vegetal"
 	| "adicionar-profissional-vegetal"
 	| "finalidade-transito"
@@ -1541,9 +1547,19 @@ export default function App() {
 					onNavigate={handleNavigate}
 				/>
 			);
+
 		case "visualizar-integradora-cooperativa":
 			return (
 				<VisualizarIntegradoraCooperativaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+
+		case "editar-integradora-cooperativa":
+			return (
+				<EditarIntegradoraCooperativaPage
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
 					dados={screenData}
@@ -1636,15 +1652,33 @@ export default function App() {
 			);
 
 		case "praga":
-			return <PragaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+            return <PragaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 
-		case "adicionar-praga":
-			return (
-				<AdicionarPragaPage
-					onLogout={handleLogout}
-					onNavigate={handleNavigate}
-				/>
-			);
+        case "adicionar-praga":
+            return (
+                <AdicionarPragaPage
+                    onLogout={handleLogout}
+                    onNavigate={handleNavigate}
+                />
+            );
+
+        case "editar-praga":
+            return (
+                <EditarPragaPage
+                    onLogout={handleLogout}
+                    onNavigate={handleNavigate}
+                    dados={screenData}
+                />
+            );
+
+        case "visualizar-praga":
+            return (
+                <VisualizarPragaPage
+                    onLogout={handleLogout}
+                    onNavigate={handleNavigate}
+                    dados={screenData}
+                />
+            );
 
 		case "profissional-vegetal":
 			return (
