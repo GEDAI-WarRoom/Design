@@ -69,6 +69,7 @@ import { AdicionarEstabelecimentoEventoPecuarioPage } from "./pages/Animal/Estab
 import { EstabelecimentoEventoPecuarioPage } from "./pages/Animal/EstabelecimentoEventoPecuario/EstabelecimentoEventoPecuario";
 import { AdicionarEventoPecuarioPage } from "./pages/Animal/EventoPecuario/AdicionarEventoPecuario";
 import { EventoPecuarioPage } from "./pages/Animal/EventoPecuario/EventoPecuario";
+import { VisualizarEventoPecuarioPage } from "./pages/Animal/EventoPecuario/VisualizarEventoPecuario";
 import { AdicionarExploracaoPecuariaPage } from "./pages/Animal/ExploracaoPecuaria/AdicionarExploracaoPecuaria";
 import { ExploracaoPecuariaPage } from "./pages/Animal/ExploracaoPecuaria/ExploracaoPecuaria";
 import { VisualizarExploracaoPecuariaPage } from "./pages/Animal/ExploracaoPecuaria/VisualizarExploracaoPecuaria";
@@ -452,7 +453,8 @@ export type Screen =
   | "acougue"
   | "adicionar-acougue"
   | "evento-pecuario"
-  | "adicionar-evento-pecuario";
+  | "adicionar-evento-pecuario"
+  | "visualizar-evento-pecuario";
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>("login");
@@ -480,9 +482,7 @@ export default function App() {
 
   switch (screen) {
     case "emissao-ata":
-      return (
-        <EmissaoATAPage onLogout={handleLogout} onNavigate={handleNavigate} />
-      );
+      return <EmissaoATAPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-emissao-ata":
     case "editar-emissao-ata":
       return (
@@ -503,11 +503,7 @@ export default function App() {
 
     case "visualizar-indice":
       return (
-        <VisualizarIndice
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-          dados={screenData}
-        />
+        <VisualizarIndice onLogout={handleLogout} onNavigate={handleNavigate} dados={screenData} />
       );
     case "login":
       return <LoginPage onLogin={() => setScreen("selecionar-usuario")} />;
@@ -522,22 +518,12 @@ export default function App() {
         />
       );
     case "dashboard":
-      return (
-        <DashboardPage onLogout={handleLogout} onNavigate={handleNavigate} />
-      );
+      return <DashboardPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "parametros-sistema":
-      return (
-        <ParametrosSistemaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <ParametrosSistemaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "classificacao-sanitaria-estado":
       return (
-        <ClassificacaoSanitariaEstadoPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <ClassificacaoSanitariaEstadoPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "adicionar-classificacao-sanitaria-estado":
       return (
@@ -564,16 +550,9 @@ export default function App() {
       );
 
     case "pessoa-fisica":
-      return (
-        <PessoaFisicaPage onLogout={handleLogout} onNavigate={handleNavigate} />
-      );
+      return <PessoaFisicaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-pessoa-fisica":
-      return (
-        <AdicionarPessoaFisicaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AdicionarPessoaFisicaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "visualizar-pessoa-fisica":
       return (
         <VisualizarPessoaFisica
@@ -591,25 +570,12 @@ export default function App() {
         />
       );
     case "divisao-municipal":
-      return (
-        <DivisaoMunicipalPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <DivisaoMunicipalPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-divisao-municipal":
-      return (
-        <AdicionarDivisaoMunicipalPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AdicionarDivisaoMunicipalPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "estabelecimento-agropecuario":
       return (
-        <EstabelecimentoAgropecuarioPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <EstabelecimentoAgropecuarioPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "adicionar-estabelecimento-agropecuario":
       return (
@@ -627,19 +593,9 @@ export default function App() {
         />
       );
     case "venda-propriedade":
-      return (
-        <VendaPropriedadePage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <VendaPropriedadePage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-venda-propriedade":
-      return (
-        <AdicionarVendaPropriedadePage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AdicionarVendaPropriedadePage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "visualizar-venda-propriedade":
       return (
         <VisualizarVendaPropriedadePage
@@ -649,76 +605,32 @@ export default function App() {
         />
       );
     case "produto":
-      return (
-        <ProdutoPage onLogout={handleLogout} onNavigate={handleNavigate} />
-      );
+      return <ProdutoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-produto":
-      return (
-        <AdicionarProdutoPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AdicionarProdutoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "profissional-oficial":
-      return (
-        <ProfissionalOficialPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <ProfissionalOficialPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-profissional-oficial":
       return (
-        <AdicionarProfissionalOficialPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <AdicionarProfissionalOficialPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "unidade-administrativa":
-      return (
-        <UnidadeAdministrativaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <UnidadeAdministrativaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-unidade-administrativa":
       return (
-        <AdicionarUnidadeAdministrativaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <AdicionarUnidadeAdministrativaPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "unidade-medida":
-      return (
-        <UnidadeMedidaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <UnidadeMedidaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-unidade-medida":
-      return (
-        <AdicionarUnidadeMedidaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AdicionarUnidadeMedidaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "receita":
-      return (
-        <ReceitaPage onLogout={handleLogout} onNavigate={handleNavigate} />
-      );
+      return <ReceitaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-receita":
-      return (
-        <AdicionarReceitaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AdicionarReceitaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "editar-receita":
       return (
-        <EditarReceitaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-          dados={screenData}
-        />
+        <EditarReceitaPage onLogout={handleLogout} onNavigate={handleNavigate} dados={screenData} />
       );
     case "visualizar-receita":
       return (
@@ -730,19 +642,9 @@ export default function App() {
       );
 
     case "pessoa-juridica":
-      return (
-        <PessoaJuridicaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <PessoaJuridicaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-pessoa-juridica":
-      return (
-        <AdicionarPessoaJuridicaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AdicionarPessoaJuridicaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "visualizar-pessoa-juridica":
       return (
         <VisualizarPessoaJuridicaPage
@@ -761,140 +663,58 @@ export default function App() {
       );
 
     case "laboratorio":
-      return (
-        <LaboratorioPage onLogout={handleLogout} onNavigate={handleNavigate} />
-      );
+      return <LaboratorioPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-laboratorio":
-      return (
-        <AdicionarLaboratorioPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AdicionarLaboratorioPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 
     case "venda-saida-vacina":
-      return (
-        <VendaComSaidaVacinaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <VendaComSaidaVacinaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-venda-saida-vacina":
       return (
-        <AdicionarVendaComSaidaVacinaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <AdicionarVendaComSaidaVacinaPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
 
     case "venda-entrada-vacina":
-      return (
-        <VendaComEntradaVacinaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <VendaComEntradaVacinaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-venda-entrada-vacina":
       return (
-        <AdicionarVendaComEntradaVacinaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <AdicionarVendaComEntradaVacinaPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
 
     case "partilha-vacina":
-      return (
-        <PartilhaVacinaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <PartilhaVacinaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-partilha-vacina":
-      return (
-        <AdicionarPartilhaVacinaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AdicionarPartilhaVacinaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "lancamento-doses-vacina":
-      return (
-        <LancamentoDosesVacinaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <LancamentoDosesVacinaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-lancamento-doses-vacina":
       return (
-        <AdicionarLancamentoDosesVacinaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <AdicionarLancamentoDosesVacinaPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "etapa-vacinacao":
-      return (
-        <EtapaVacinacaoPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <EtapaVacinacaoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-etapa-vacinacao":
-      return (
-        <AdicionarEtapaVacinacaoPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AdicionarEtapaVacinacaoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "autorizacao-vacinacao":
-      return (
-        <AutorizacaoVacinacaoPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AutorizacaoVacinacaoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-autorizacao-vacinacao":
       return (
-        <AdicionarAutorizacaoVacinacaoPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <AdicionarAutorizacaoVacinacaoPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "declaracao-vacinacao":
-      return (
-        <DeclaracaoVacinacaoPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <DeclaracaoVacinacaoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-declaracao-vacinacao":
       return (
-        <AdicionarDeclaracaoVacinacaoPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <AdicionarDeclaracaoVacinacaoPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "doenca":
       return <DoencaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-doenca":
-      return (
-        <AdicionarDoencaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AdicionarDoencaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "tipo-insumo-exame":
-      return (
-        <TipoInsumoExamePage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <TipoInsumoExamePage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-tipo-insumo-exame":
-      return (
-        <AdicionarTipoInsumoExamePage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AdicionarTipoInsumoExamePage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "visualizar-tipo-insumo-exame":
       return (
         <VisualizarTipoInsumoExamePage
@@ -912,19 +732,9 @@ export default function App() {
         />
       );
     case "ajuste-doses-insumo":
-      return (
-        <AjusteDosesInsumoPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AjusteDosesInsumoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-ajuste-doses-insumo":
-      return (
-        <AdicionarAjusteDosesInsumoPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AdicionarAjusteDosesInsumoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "visualizar-ajuste-doses-insumo":
       return (
         <VisualizarAjusteDosesInsumoPage
@@ -943,18 +753,10 @@ export default function App() {
       );
 
     case "registro-venda-gta-digital":
-      return (
-        <RegistroVendaGTADigitalPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <RegistroVendaGTADigitalPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-registro-venda-gta-digital":
       return (
-        <AdicionarRegistroVendaGTADigitalPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <AdicionarRegistroVendaGTADigitalPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "visualizar-registro-venda-gta-digital":
       return (
@@ -982,30 +784,15 @@ export default function App() {
       );
 
     case "vacinador":
-      return (
-        <VacinadorPage onLogout={handleLogout} onNavigate={handleNavigate} />
-      );
+      return <VacinadorPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 
     case "adicionar-vacinador":
-      return (
-        <AdicionarVacinadorPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AdicionarVacinadorPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "revendedora-agropecuario":
-      return (
-        <RevendedoraAgropecuarioPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <RevendedoraAgropecuarioPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-revendedora-agropecuario":
       return (
-        <AdicionarRevendedoraAgropecuarioPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <AdicionarRevendedoraAgropecuarioPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "visualizar-revendedora-agropecuario":
       return (
@@ -1024,70 +811,28 @@ export default function App() {
         />
       );
     case "usuarios":
-      return (
-        <UsuariosPage onLogout={handleLogout} onNavigate={handleNavigate} />
-      );
+      return <UsuariosPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-usuario":
-      return (
-        <AdicionarUsuariosPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AdicionarUsuariosPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "visualizar-usuario":
-      return (
-        <VisualizarUsuariosPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <VisualizarUsuariosPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 
     case "certificadora-sisbov":
-      return (
-        <CertificadoraSISBOVPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <CertificadoraSISBOVPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-certificadora-sisbov":
       return (
-        <AdicionarCertificadoraSISBOVPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <AdicionarCertificadoraSISBOVPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "especie":
-      return (
-        <EspeciePage onLogout={handleLogout} onNavigate={handleNavigate} />
-      );
+      return <EspeciePage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-especie":
-      return (
-        <AdicionarEspeciePage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AdicionarEspeciePage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "visualizar-especie":
-      return (
-        <VisualizarEspeciePage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <VisualizarEspeciePage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "nucleo-producao":
-      return (
-        <NucleoProducaoPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <NucleoProducaoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-nucleo-producao":
-      return (
-        <AdicionarNucleoProducaoPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AdicionarNucleoProducaoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "visualizar-nucleo-producao":
       return (
         <VisualizarNucleoProducaoPage
@@ -1124,18 +869,10 @@ export default function App() {
         />
       );
     case "exploracao-pecuaria":
-      return (
-        <ExploracaoPecuariaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <ExploracaoPecuariaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-exploracao-pecuaria":
       return (
-        <AdicionarExploracaoPecuariaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <AdicionarExploracaoPecuariaPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "visualizar-exploracao-pecuaria":
       return (
@@ -1147,10 +884,7 @@ export default function App() {
       );
     case "atualizacao-cadastral-rebanho":
       return (
-        <AtualizacaoCadastralRebanhoPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <AtualizacaoCadastralRebanhoPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "confirmar-dados-produtor-rebanho":
       return (
@@ -1169,47 +903,17 @@ export default function App() {
         />
       );
     case "atualizar-cadastro-rebanho":
-      return (
-        <AtualizarCadastroRebanhoPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AtualizarCadastroRebanhoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "ajuste-rebanho":
-      return (
-        <AjusteRebanhoPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AjusteRebanhoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "lancamento-rebanho":
-      return (
-        <LancamentoRebanhoPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <LancamentoRebanhoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-ajuste-rebanho":
-      return (
-        <AdicionarAjusteRebanhoPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AdicionarAjusteRebanhoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-lancamento-rebanho":
-      return (
-        <AdicionarLancamentoRebanhoPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AdicionarLancamentoRebanhoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "visualizar-ajuste-rebanho":
-      return (
-        <VisualizarAjusteRebanhoPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <VisualizarAjusteRebanhoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "visualizar-lancamento-rebanho":
       return (
         <VisualizarLancamentoRebanhoPage
@@ -1220,18 +924,10 @@ export default function App() {
       );
     case "visualizar-rebanho-atualizado":
       return (
-        <VisualizarRebanhoAtualizadoPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <VisualizarRebanhoAtualizadoPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "editar-ajuste-rebanho":
-      return (
-        <EditarAjusteRebanhoPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <EditarAjusteRebanhoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "editar-lancamento-rebanho":
       return (
         <EditarLancamentoRebanhoPage
@@ -1279,18 +975,10 @@ export default function App() {
         />
       );
     case "passaporte-equestre":
-      return (
-        <PassaporteEquestrePage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <PassaporteEquestrePage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-passaporte-equestre":
       return (
-        <AdicionarPassaporteEquestrePage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <AdicionarPassaporteEquestrePage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "visualizar-passaporte-equestre":
       return (
@@ -1310,9 +998,7 @@ export default function App() {
         />
       );
     case "valor-indice":
-      return (
-        <ValorIndicePage onLogout={handleLogout} onNavigate={handleNavigate} />
-      );
+      return <ValorIndicePage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-valor-indice":
     case "editar-valor-indice": // <-- Mapeamos o editar aqui também
       return (
@@ -1332,19 +1018,9 @@ export default function App() {
       );
 
     case "fundo-arrecadacao":
-      return (
-        <FundoArrecadacaoPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <FundoArrecadacaoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-fundo-arrecadacao":
-      return (
-        <AdicionarFundoArrecadacaoPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AdicionarFundoArrecadacaoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "visualizar-fundo-arrecadacao":
       return (
         <VisualizarFundoArrecadacaoPage
@@ -1365,9 +1041,7 @@ export default function App() {
     //  return <AdicionarPassaporteEquestrePage onLogout={handleLogout} onNavigate={handleNavigate} />;
 
     case "emissao-gta":
-      return (
-        <EmissaoGtaPage onLogout={handleLogout} onNavigate={handleNavigate} />
-      );
+      return <EmissaoGtaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "pendencias-confirmacao-gta":
       return (
         <PendenciasConfirmacaoPage
@@ -1417,59 +1091,30 @@ export default function App() {
         />
       );
     case "distribuicao-formularios-gta":
-      return (
-        <DistribuicaoFormulariosGta
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <DistribuicaoFormulariosGta onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-distribuicao-formularios-gta":
       return (
-        <AdicionarDistribuicaoFormulariosGta
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <AdicionarDistribuicaoFormulariosGta onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "aeroporto-porto":
-      return (
-        <AeroportoPorto onLogout={handleLogout} onNavigate={handleNavigate} />
-      );
+      return <AeroportoPorto onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-aeroporto-porto":
-      return (
-        <AdicionarAeroportoPorto
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AdicionarAeroportoPorto onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "registro-venda-gta-fisica":
-      return (
-        <RegistroVendaGtaFisicaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <RegistroVendaGtaFisicaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-registro-venda-gta-fisica":
       return (
-        <AdicionarRegistroVendaGtaFisicaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <AdicionarRegistroVendaGtaFisicaPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
 
     case "visualizar-registro-venda-gta-fisica":
       return (
-        <VisualizarRegistroVendaGtaFisicaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <VisualizarRegistroVendaGtaFisicaPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
 
     case "estabelecimento-evento-pecuario":
       return (
-        <EstabelecimentoEventoPecuarioPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <EstabelecimentoEventoPecuarioPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "adicionar-estabelecimento-evento-pecuario":
       return (
@@ -1480,18 +1125,10 @@ export default function App() {
       );
 
     case "local-realizacao-exame":
-      return (
-        <LocalRealizacaoExamePage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <LocalRealizacaoExamePage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-local-realizacao-exame":
       return (
-        <AdicionarLocalRealizacaoExamePage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <AdicionarLocalRealizacaoExamePage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "visualizar-local-realizacao-exame":
       return (
@@ -1511,19 +1148,11 @@ export default function App() {
       );
 
     case "integradora-cooperativa":
-      return (
-        <IntegradoraCooperativaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <IntegradoraCooperativaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 
     case "adicionar-integradora-cooperativa":
       return (
-        <AdicionarIntegradoraCooperativaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <AdicionarIntegradoraCooperativaPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "visualizar-integradora-cooperativa":
       return (
@@ -1535,51 +1164,25 @@ export default function App() {
       );
 
     case "profissional-animal":
-      return (
-        <ProfissionalAnimalPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <ProfissionalAnimalPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 
     case "adicionar-profissional-animal":
       return (
-        <AdicionarProfissionalAnimalPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <AdicionarProfissionalAnimalPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
 
     case "promotora-eventos":
-      return (
-        <PromotoraEventosPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <PromotoraEventosPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 
     case "adicionar-promotora-eventos":
-      return (
-        <AdicionarPromotoraEventosPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AdicionarPromotoraEventosPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 
     case "revendedora-animais":
-      return (
-        <RevendedoraAnimaisPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <RevendedoraAnimaisPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 
     case "adicionar-revendedora-animais":
       return (
-        <AdicionarRevendedoraAnimaisPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <AdicionarRevendedoraAnimaisPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "visualizar-revendedora-animais-vivos":
       return (
@@ -1591,104 +1194,51 @@ export default function App() {
       );
 
     case "unidade-consolidacao":
-      return (
-        <UnidadeConsolidacaoPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <UnidadeConsolidacaoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 
     case "adicionar-unidade-consolidacao":
       return (
-        <AdicionarUnidadeConsolidacaoPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <AdicionarUnidadeConsolidacaoPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
 
     case "cultura":
-      return (
-        <CulturaPage onLogout={handleLogout} onNavigate={handleNavigate} />
-      );
+      return <CulturaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 
     case "adicionar-cultura":
-      return (
-        <AdicionarCulturaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AdicionarCulturaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 
     case "praga":
       return <PragaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 
     case "adicionar-praga":
-      return (
-        <AdicionarPragaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AdicionarPragaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 
     case "profissional-vegetal":
-      return (
-        <ProfissionalVegetalPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <ProfissionalVegetalPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 
     case "adicionar-profissional-vegetal":
       return (
-        <AdicionarProfissionalVegetalPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <AdicionarProfissionalVegetalPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
 
     case "finalidade-transito":
-      return (
-        <FinalidadeTransitoPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <FinalidadeTransitoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 
     case "adicionar-finalidade-transito":
       return (
-        <AdicionarFinalidadeTransitoPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <AdicionarFinalidadeTransitoPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "papeis":
       return <PapeisPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 
     case "adicionar-papeis":
-      return (
-        <AdicionarPapeisPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AdicionarPapeisPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "visualizar-papel":
-      return (
-        <VisualizarPapelPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <VisualizarPapelPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "editar-papel":
-      return (
-        <EditarPapelPage onLogout={handleLogout} onNavigate={handleNavigate} />
-      );
+      return <EditarPapelPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "instituicao-ensino-pesquisa":
-      return (
-        <InstituicaoEnsinoPesquisa
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <InstituicaoEnsinoPesquisa onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-instituicao-ensino-pesquisa":
       return (
         <AdicionarInstituicaoEnsinoPesquisaPage
@@ -1697,27 +1247,12 @@ export default function App() {
         />
       );
     case "isencao-taxa-gta":
-      return (
-        <IsencaoTaxaGtaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <IsencaoTaxaGtaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-isencao-taxa-gta":
-      return (
-        <AdicionarIsencaoTaxaGtaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AdicionarIsencaoTaxaGtaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 
     case "adicionar-taxa-emissao-gta":
-      return (
-        <AdicionarTaxaEmissaoGtaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AdicionarTaxaEmissaoGtaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "visualizar-taxa-emissao-gta":
       return (
         <VisualizarTaxaEmissaoGtaPage
@@ -1727,26 +1262,13 @@ export default function App() {
         />
       );
     case "taxa-emissao-gta":
-      return (
-        <TaxaEmissaoGtaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <TaxaEmissaoGtaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 
     case "recolhimento-mensal-gta":
-      return (
-        <RecolhimentoMensalGTAPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <RecolhimentoMensalGTAPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-recolhimento-mensal-gta":
       return (
-        <AdicionarRecolhimentoMensalGTAPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <AdicionarRecolhimentoMensalGTAPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "visualizar-recolhimento-mensal-gta":
       return (
@@ -1781,41 +1303,19 @@ export default function App() {
         />
       );
     case "item-receita":
-      return (
-        <ItemReceitaPage onLogout={handleLogout} onNavigate={handleNavigate} />
-      );
+      return <ItemReceitaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "notificacoes-estabelecimentos":
       return (
-        <NotificacoesEstabelecimentosPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <NotificacoesEstabelecimentosPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "tipo-veiculo":
-      return (
-        <TipoVeiculoPage onLogout={handleLogout} onNavigate={handleNavigate} />
-      );
+      return <TipoVeiculoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-item-receita":
-      return (
-        <AdicionarItemReceitaPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AdicionarItemReceitaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "lote-pagamento":
-      return (
-        <LotePagamentoPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <LotePagamentoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-lote-pagamento":
-      return (
-        <AdicionarLotePagamentoPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AdicionarLotePagamentoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "visualizar-lote-pagamento":
       return (
         <VisualizarLotePagamentoPage
@@ -1837,20 +1337,12 @@ export default function App() {
       );
 
     case "dae":
-      return (
-        <DAEBuscaPage onLogout={handleLogout} onNavigate={handleNavigate} />
-      );
+      return <DAEBuscaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-dae":
-      return (
-        <AdicionarDAEPage onLogout={handleLogout} onNavigate={handleNavigate} />
-      );
+      return <AdicionarDAEPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "visualizar-dae":
       return (
-        <VisualizarDAEPage
-          dados={screenData}
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <VisualizarDAEPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "visualizar-documento-lote-pagamento":
       return (
@@ -1869,23 +1361,11 @@ export default function App() {
         />
       );
     case "adicionar-tipo-veiculo":
-      return (
-        <AdicionarTipoVeiculoPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AdicionarTipoVeiculoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "status-animal":
-      return (
-        <StatusAnimalPage onLogout={handleLogout} onNavigate={handleNavigate} />
-      );
+      return <StatusAnimalPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-status-animal":
-      return (
-        <AdicionarStatusAnimalPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AdicionarStatusAnimalPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "visualizar-status-animal":
       return (
         <VisualizarStatusAnimalPage
@@ -1903,12 +1383,7 @@ export default function App() {
         />
       );
     case "etapa-atualizacao-cadastral":
-      return (
-        <EtapaAtualizacaoCadastralPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <EtapaAtualizacaoCadastralPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-etapa-atualizacao-cadastral":
       return (
         <AdicionarEtapaAtualizacaoCadastralPage
@@ -1952,10 +1427,7 @@ export default function App() {
 
     case "venda-entrada-insumos-exames":
       return (
-        <VendaComEntradaInsumosExamesPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
+        <VendaComEntradaInsumosExamesPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
     case "adicionar-venda-entrada-insumos-exames":
       return (
@@ -1966,64 +1438,27 @@ export default function App() {
       );
 
     case "atestado-exame":
-      return (
-        <AtestadoExamePage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AtestadoExamePage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-atestado-exame":
-      return (
-        <AdicionarAtestadoExamePage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AdicionarAtestadoExamePage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "visualizar-atestado-exame":
-      return (
-        <VisualizarAtestadoExamePage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <VisualizarAtestadoExamePage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "editar-atestado-exame":
-      return (
-        <EditarAtestadoExamePage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <EditarAtestadoExamePage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "acougue":
-      return (
-        <AcouguePage onLogout={handleLogout} onNavigate={handleNavigate} />
-      );
+      return <AcouguePage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-acougue":
     case "editar-acougue":
     case "visualizar-acougue":
-      return (
-        <AdicionarAcouguePage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AdicionarAcouguePage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "evento-pecuario":
-      return (
-        <EventoPecuarioPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <EventoPecuarioPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-evento-pecuario":
-      return (
-        <AdicionarEventoPecuarioPage
-          onLogout={handleLogout}
-          onNavigate={handleNavigate}
-        />
-      );
+      return <AdicionarEventoPecuarioPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-evento-pecuario":
+      return <VisualizarEventoPecuarioPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 
     default:
-      return (
-        <DashboardPage onLogout={handleLogout} onNavigate={handleNavigate} />
-      );
+      return <DashboardPage onLogout={handleLogout} onNavigate={handleNavigate} />;
   }
 }

@@ -14,10 +14,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { Navbar } from "../../../components/Navbar";
-import {
-  DynamicListWrapper,
-  EntitySearchInput,
-} from "../../../components/ui/EntitySearch";
+import { DynamicListWrapper, EntitySearchInput } from "../../../components/ui/EntitySearch";
 import {
   FloatInput,
   FloatSelect,
@@ -186,10 +183,7 @@ const EVENTOS_PECUARIOS_MOCK = [
       nome: "Fazenda Rio Preto",
       codigo: "34523423567",
     },
-    responsaveisTecnicos: [
-      RESPONSAVEIS_TECNICOS_MOCK[0],
-      RESPONSAVEIS_TECNICOS_MOCK[1],
-    ],
+    responsaveisTecnicos: [RESPONSAVEIS_TECNICOS_MOCK[0], RESPONSAVEIS_TECNICOS_MOCK[1]],
     anexos: [],
     observacoes: "",
     situacao: "Ativo",
@@ -240,8 +234,7 @@ const EVENTOS_PECUARIOS_MOCK = [
   },
 ];
 
-const uid = (p: string) =>
-  `${p}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+const uid = (p: string) => `${p}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 
 function Section({
   title,
@@ -267,9 +260,7 @@ function Section({
           <ChevronDown size={18} className="text-gray-400" />
         )}
       </button>
-      {open && (
-        <div className="px-6 pb-6 border-t border-gray-100">{children}</div>
-      )}
+      {open && <div className="px-6 pb-6 border-t border-gray-100">{children}</div>}
     </div>
   );
 }
@@ -300,10 +291,8 @@ interface PageProps {
   onNavigate: (screen: any, data?: any) => void;
 }
 
-export function AdicionarEventoPecuarioPage({
-  onLogout,
-  onNavigate,
-}: PageProps) {
+export function AdicionarEventoPecuarioPage({ onLogout, onNavigate }: PageProps) {
+  const [isSucesso, setIsSucesso] = useState(false);
   const [nomeEvento, setNomeEvento] = useState("");
   const [tipoEvento, setTipoEvento] = useState("");
   const [situacao, setSituacao] = useState("");
@@ -322,9 +311,7 @@ export function AdicionarEventoPecuarioPage({
   const [observacao, setObservacao] = useState("");
   const [anexos, setAnexos] = useState<any[]>([]);
   const [estabelecimento, setEstabelecimento] = useState<any | null>(null);
-  const [responsavelTecnico, setResponsavelTecnico] = useState<any | null>(
-    null,
-  );
+  const [responsavelTecnico, setResponsavelTecnico] = useState<any | null>(null);
   const [promotora, setPromotora] = useState<any | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [focusNome, setFocusNome] = useState(false);
@@ -367,10 +354,7 @@ export function AdicionarEventoPecuarioPage({
   const pageAtual = Math.min(page, totalPages);
   const inicio = total === 0 ? 0 : (pageAtual - 1) * perPage + 1;
   const fim = Math.min(pageAtual * perPage, total);
-  const pagina = filtrados.slice(
-    (pageAtual - 1) * perPage,
-    pageAtual * perPage,
-  );
+  const pagina = filtrados.slice((pageAtual - 1) * perPage, pageAtual * perPage);
   const adicionarEspecie = () => {
     setEspecie((old) => [
       ...old,
@@ -381,9 +365,7 @@ export function AdicionarEventoPecuarioPage({
     ]);
   };
   const alterarEspecie = (index: number, especie: any) => {
-    setEspecie((old) =>
-      old.map((item, i) => (i === index ? { ...item, especie } : item)),
-    );
+    setEspecie((old) => old.map((item, i) => (i === index ? { ...item, especie } : item)));
   };
   const removerEspecie = (index: number) => {
     setEspecie((old) => old.filter((_, i) => i !== index));
@@ -410,11 +392,9 @@ export function AdicionarEventoPecuarioPage({
             Todos os Eventos Pecuários
           </button>
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-semibold text-gray-900">
-              Adicionar Evento Pecuário
-            </h1>
+            <h1 className="text-2xl font-semibold text-gray-900">Adicionar Evento Pecuário</h1>
             <button
-              onClick={() => onNavigate("adicionar-evento-pecuario")}
+              onClick={() => setIsSucesso(true)}
               className="px-5 py-3 rounded-md text-white text-sm font-semibold transition hover:opacity-90 active:scale-[0.98]"
               style={{ backgroundColor: GREEN }}
             >
@@ -429,9 +409,8 @@ export function AdicionarEventoPecuarioPage({
             <Info size={20} className="stroke-[2.5]" />
           </div>
           <p className="text-sm text-gray-600 font-medium leading-relaxed">
-            Campos indicados com{" "}
-            <span className="text-red-500 font-bold">*</span> são obrigatórios e
-            deverão ser preenchidos.
+            Campos indicados com <span className="text-red-500 font-bold">*</span> são obrigatórios
+            e deverão ser preenchidos.
           </p>
         </div>
 
@@ -532,6 +511,7 @@ export function AdicionarEventoPecuarioPage({
                 title="Buscar Promotora"
                 subtitle="Busque por uma promotora cadastrada:"
                 onChange={(ent) => setPromotora(ent)}
+                required
               />
             </div>
           </div>
@@ -553,6 +533,7 @@ export function AdicionarEventoPecuarioPage({
                 title="Buscar Estabelecimento"
                 subtitle="Busque por um estabelecimento cadastrado:"
                 onChange={(ent) => setEstabelecimento(ent)}
+                required
               />
             </div>
           </div>
@@ -643,9 +624,7 @@ export function AdicionarEventoPecuarioPage({
                             placeholder="Descrição opcional..."
                             onChange={(v) =>
                               setAnexos((prev) =>
-                                prev.map((a, i) =>
-                                  i === index ? { ...a, descricao: v } : a,
-                                ),
+                                prev.map((a, i) => (i === index ? { ...a, descricao: v } : a)),
                               )
                             }
                           />
@@ -653,9 +632,7 @@ export function AdicionarEventoPecuarioPage({
                         <div className="h-12 flex items-center">
                           <button
                             type="button"
-                            onClick={() =>
-                              alert(`Fazendo download de: ${anexo.nome}`)
-                            }
+                            onClick={() => alert(`Fazendo download de: ${anexo.nome}`)}
                             className="p-2.5 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"
                           >
                             <Download size={20} />
@@ -667,11 +644,7 @@ export function AdicionarEventoPecuarioPage({
                     <div className="h-12 flex items-center">
                       <button
                         type="button"
-                        onClick={() =>
-                          setAnexos((prev) =>
-                            prev.filter((a) => a.id !== anexo.id),
-                          )
-                        }
+                        onClick={() => setAnexos((prev) => prev.filter((a) => a.id !== anexo.id))}
                         className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
                       >
                         <Trash2 size={20} />
@@ -686,10 +659,7 @@ export function AdicionarEventoPecuarioPage({
             <button
               type="button"
               onClick={() =>
-                setAnexos((prev) => [
-                  ...prev,
-                  { id: String(Date.now()), nome: "", descricao: "" },
-                ])
+                setAnexos((prev) => [...prev, { id: String(Date.now()), nome: "", descricao: "" }])
               }
               className="flex items-center mt-5 gap-2 text-sm font-semibold px-4 py-2.5 rounded-md border border-[#1A7A3C] text-[#1A7A3C] hover:bg-green-50 self-start transition"
             >
@@ -708,6 +678,40 @@ export function AdicionarEventoPecuarioPage({
             />
           </div>
         </Section>
+        {/* Modal de Sucesso */}
+        {isSucesso && (
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
+            <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
+              {" "}
+              <h3 className="text-lg font-bold text-gray-900">
+                Evento pecuário cadastrado com sucesso!
+              </h3>
+              <p className="text-sm text-gray-500 mt-1">
+                {especie ? `O evento de ${nomeEvento}` : "O evento"} foi cadastrado.
+              </p>
+              <div className="flex gap-3 justify-center mt-6">
+                <button
+                  onClick={() => {
+                    setIsSucesso(false);
+                    onNavigate("evento-pecuario");
+                  }}
+                  className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition"
+                >
+                  Voltar
+                </button>
+                <button
+                  onClick={() => {
+                    setIsSucesso(false);
+                    onNavigate("visualizar-evento-pecuario");
+                  }}
+                  className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition"
+                >
+                  Visualizar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

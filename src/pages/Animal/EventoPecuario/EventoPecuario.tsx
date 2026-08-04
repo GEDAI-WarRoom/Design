@@ -1,8 +1,8 @@
 import {
   ArrowLeft,
-  Calendar,
   CalendarArrowUpIcon,
   CalendarRange,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   Pencil,
@@ -13,10 +13,10 @@ import {
   Eye as ViewIcon,
   X,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Navbar } from "../../../components/Navbar";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
-import { FloatInput, FloatSelect } from "../../../components/ui/FormKit";
+import { CustomButton, FloatInput, FloatSelect } from "../../../components/ui/FormKit";
 
 const GREEN = "#1A7A3C";
 
@@ -178,10 +178,7 @@ const EVENTOS_PECUARIOS_MOCK = [
       nome: "Fazenda Rio Preto",
       codigo: "34523423567",
     },
-    responsaveisTecnicos: [
-      RESPONSAVEIS_TECNICOS_MOCK[0],
-      RESPONSAVEIS_TECNICOS_MOCK[1],
-    ],
+    responsaveisTecnicos: [RESPONSAVEIS_TECNICOS_MOCK[0], RESPONSAVEIS_TECNICOS_MOCK[1]],
     anexos: [],
     observacoes: "",
     situacao: "Ativo",
@@ -232,17 +229,13 @@ const EVENTOS_PECUARIOS_MOCK = [
   },
 ];
 
-const uid = (p: string) =>
-  `${p}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+const uid = (p: string) => `${p}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 
 function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
     <div className="flex items-center gap-2 bg-[#1A7A3C] text-white text-xs font-medium px-3 py-1.5 rounded-md shadow-sm max-w-full">
       <span className="truncate">{label}</span>
-      <button
-        onClick={onRemove}
-        className="hover:opacity-80 transition flex-shrink-0"
-      >
+      <button onClick={onRemove} className="hover:opacity-80 transition flex-shrink-0">
         <X size={14} className="stroke-[2.5]" />
       </button>
     </div>
@@ -253,6 +246,62 @@ function formatarData(iso: string) {
   if (!iso) return "";
   const [ano, mes, dia] = iso.split("-");
   return `${dia}/${mes}/${ano}`;
+}
+
+interface FloatPopoverProps {
+  label: string;
+  value: string;
+  children: React.ReactNode;
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+export function FloatPopover({ label, value, children, isOpen, onOpenChange }: FloatPopoverProps) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        onOpenChange(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [onOpenChange]);
+
+  return (
+    <div ref={ref} className="relative">
+      <div
+        onClick={() => onOpenChange(!isOpen)}
+        className={`relative border border-gray-300 cursor-pointer rounded-md h-12 flex items-end px-3 pb-1.5 transition-all select-none ${isOpen ? "border-[#1A7A3C] ring-1 ring-[#1A7A3C] z-30" : "z-10"}`}
+      >
+        <div
+          className={`absolute left-3 transition-all duration-150 pointer-events-none
+              ${
+                isOpen || value !== ""
+                  ? "top-1 text-[10px] text-gray-400 font-medium"
+                  : "top-1/2 -translate-y-1/2 text-sm text-gray-400"
+              }`}
+        >
+          {label}
+        </div>
+
+        <div className="absolute left-3 top-1/2 mt-1.5 -translate-y-1/2 text-sm">{value}</div>
+
+        <ChevronDown
+          size={16}
+          className={`ml-auto text-gray-400 flex-shrink-0 transition-transform mb-2 ${isOpen ? "rotate-180" : ""}`}
+        />
+      </div>
+
+      {isOpen && (
+        <div className="absolute top-full left-0 mt-1 w-80 bg-white rounded-lg border shadow-lg p-4 z-50">
+          {children}
+        </div>
+      )}
+    </div>
+  );
 }
 
 interface PageProps {
@@ -270,14 +319,15 @@ export function EventoPecuarioPage({ onLogout, onNavigate }: PageProps) {
   const [especie, setEspecie] = useState<any | null>(null);
   const [validade, setValidade] = useState("");
   const [estabelecimento, setEstabelecimento] = useState<any | null>(null);
-  const [responsavelTecnico, setResponsavelTecnico] = useState<any | null>(
-    null,
-  );
+  const [responsavelTecnico, setResponsavelTecnico] = useState<any | null>(null);
   const [promotora, setPromotora] = useState<any | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [focusNome, setFocusNome] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [page, setPage] = useState(1);
+  const [dataInicio, setDataInicio] = useState("");
+  const [dataFim, setDataFim] = useState("");
+  const [open, setOpen] = useState(false);
   const perPage = 10;
 
   const temFiltroAtivo =
@@ -305,18 +355,11 @@ export function EventoPecuarioPage({ onLogout, onNavigate }: PageProps) {
       e.nomeEvento.toLowerCase().includes(nomeEvento.trim().toLowerCase());
     const matchTipo = tipoEvento === "" || e.tipoEventoPecuario === tipoEvento;
     const matchSituacao = situacao === "" || e.situacao === situacao;
-    const matchEspecie =
-      !especie || e.especies.some((esp) => esp.id === especie.id);
+    const matchEspecie = !especie || e.especies.some((esp) => esp.id === especie.id);
     const matchResponsavelTecnico =
       !responsavelTecnico ||
       e.responsaveisTecnicos.some((resp) => resp.id === responsavelTecnico.id);
-    return (
-      matchNome &&
-      matchTipo &&
-      matchSituacao &&
-      matchEspecie &&
-      matchResponsavelTecnico
-    );
+    return matchNome && matchTipo && matchSituacao && matchEspecie && matchResponsavelTecnico;
   });
 
   const total = filtrados.length;
@@ -324,10 +367,14 @@ export function EventoPecuarioPage({ onLogout, onNavigate }: PageProps) {
   const pageAtual = Math.min(page, totalPages);
   const inicio = total === 0 ? 0 : (pageAtual - 1) * perPage + 1;
   const fim = Math.min(pageAtual * perPage, total);
-  const pagina = filtrados.slice(
-    (pageAtual - 1) * perPage,
-    pageAtual * perPage,
-  );
+  const pagina = filtrados.slice((pageAtual - 1) * perPage, pageAtual * perPage);
+
+  const formatarDataResumida = (data: string) => {
+    if (!data) return "";
+
+    const [ano, mes, dia] = data.split("-");
+    return `${dia}/${mes}`;
+  };
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
@@ -350,9 +397,7 @@ export function EventoPecuarioPage({ onLogout, onNavigate }: PageProps) {
             Inicial
           </button>
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-semibold text-gray-900">
-              Evento Pecuário
-            </h1>
+            <h1 className="text-2xl font-semibold text-gray-900">Evento Pecuário</h1>
             <button
               onClick={() => onNavigate("adicionar-evento-pecuario")}
               className="px-5 py-3 rounded-md text-white text-sm font-semibold transition hover:opacity-90 active:scale-[0.98]"
@@ -384,10 +429,7 @@ export function EventoPecuarioPage({ onLogout, onNavigate }: PageProps) {
                   onKeyDown={(e) => e.key === "Enter" && handlePesquisar()}
                   className="w-full bg-transparent text-sm text-gray-800 outline-none h-6"
                 />
-                <Search
-                  size={15}
-                  className="text-gray-400 ml-2 flex-shrink-0 mb-0.5"
-                />
+                <Search size={15} className="text-gray-400 ml-2 flex-shrink-0 mb-0.5" />
               </div>
             </div>
 
@@ -501,13 +543,36 @@ export function EventoPecuarioPage({ onLogout, onNavigate }: PageProps) {
                   />
                 </div>
                 <div className="w-full lg:flex-1">
-                  <FloatInput
+                  {/* <FloatInput
                     label="Período"
                     type="date"
                     value={validade}
                     onChange={setValidade}
                     icon={<Calendar size={18} />}
-                  />
+                  /> */}
+                  <FloatPopover
+                    label="Período do Evento"
+                    value={
+                      dataInicio && dataFim
+                        ? `${formatarDataResumida(dataInicio)} a ${formatarDataResumida(dataFim)}`
+                        : ""
+                    }
+                    isOpen={open}
+                    onOpenChange={setOpen}
+                  >
+                    <div className="space-y-3">
+                      <div className="grid grid-cols-2 gap-3">
+                        <FloatInput
+                          label="De"
+                          type="date"
+                          value={dataInicio}
+                          onChange={setDataInicio}
+                        />
+                        <FloatInput label="Até" type="date" value={dataFim} onChange={setDataFim} />
+                      </div>
+                      <CustomButton onClick={() => setOpen(false)}>Aplicar</CustomButton>
+                    </div>
+                  </FloatPopover>
                 </div>
                 <div className="w-full lg:flex-1">
                   <FloatSelect
@@ -525,28 +590,16 @@ export function EventoPecuarioPage({ onLogout, onNavigate }: PageProps) {
           {temFiltroAtivo && (
             <div className="flex flex-wrap gap-2 animate-fadeIn">
               {nomeEvento.trim() && (
-                <Chip
-                  label={`Nome do Evento: ${nomeEvento}`}
-                  onRemove={() => setNomeEvento("")}
-                />
+                <Chip label={`Nome do Evento: ${nomeEvento}`} onRemove={() => setNomeEvento("")} />
               )}
               {tipoEvento && (
-                <Chip
-                  label={`Tipo de Evento: ${tipoEvento}`}
-                  onRemove={() => setTipoEvento("")}
-                />
+                <Chip label={`Tipo de Evento: ${tipoEvento}`} onRemove={() => setTipoEvento("")} />
               )}
               {especie && (
-                <Chip
-                  label={`Espécie: ${especie.nome}`}
-                  onRemove={() => setEspecie(null)}
-                />
+                <Chip label={`Espécie: ${especie.nome}`} onRemove={() => setEspecie(null)} />
               )}
               {situacao && (
-                <Chip
-                  label={`Situação: ${situacao}`}
-                  onRemove={() => setSituacao("")}
-                />
+                <Chip label={`Situação: ${situacao}`} onRemove={() => setSituacao("")} />
               )}
             </div>
           )}
@@ -557,15 +610,12 @@ export function EventoPecuarioPage({ onLogout, onNavigate }: PageProps) {
           {!hasSearched ? (
             <div className="py-5 text-center">
               <p className="text-sm text-gray-500">
-                Busque por evento pecuário utilizando o campo de busca e os
-                filtros acima.
+                Busque por evento pecuário utilizando o campo de busca e os filtros acima.
               </p>
             </div>
           ) : total === 0 ? (
             <div className="py-5 text-center">
-              <p className="text-sm text-gray-500">
-                Nenhum resultado foi encontrado.
-              </p>
+              <p className="text-sm text-gray-500">Nenhum resultado foi encontrado.</p>
             </div>
           ) : (
             <div className="w-full">
@@ -608,8 +658,7 @@ export function EventoPecuarioPage({ onLogout, onNavigate }: PageProps) {
                         </td>
                         <td className="px-4 py-3 text-gray-500 text-sm whitespace-nowrap flex items-center gap-1.5">
                           <CalendarRange size={13} className="text-gray-400" />
-                          {formatarData(e.periodoDe)} -{" "}
-                          {formatarData(e.periodoAte)}
+                          {formatarData(e.periodoDe)} - {formatarData(e.periodoAte)}
                         </td>
                         <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">
                           {e.tipoEventoPecuario}
@@ -623,9 +672,7 @@ export function EventoPecuarioPage({ onLogout, onNavigate }: PageProps) {
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-1 justify-end">
                             <button
-                              onClick={() =>
-                                onNavigate("visualizar-evento-pecuario", e)
-                              }
+                              onClick={() => onNavigate("visualizar-evento-pecuario", e)}
                               className="p-2 rounded-md hover:bg-green-50 transition"
                               style={{ color: GREEN }}
                               title="Visualizar"
@@ -633,9 +680,7 @@ export function EventoPecuarioPage({ onLogout, onNavigate }: PageProps) {
                               <ViewIcon size={18} />
                             </button>
                             <button
-                              onClick={() =>
-                                onNavigate("editar-evento-pecuario", e)
-                              }
+                              onClick={() => onNavigate("editar-evento-pecuario", e)}
                               className="p-2 rounded-md hover:bg-green-50 transition"
                               style={{ color: GREEN }}
                               title="Editar"
@@ -666,9 +711,7 @@ export function EventoPecuarioPage({ onLogout, onNavigate }: PageProps) {
                       <ChevronLeft size={18} />
                     </button>
                     <button
-                      onClick={() =>
-                        setPage((p) => Math.min(totalPages, p + 1))
-                      }
+                      onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                       disabled={pageAtual === totalPages}
                       className="p-1.5 rounded-md hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition"
                     >
