@@ -19,6 +19,10 @@ interface EntityProfessionalsViewProps {
   entityKey: string;
   allowedTypes: TipoProfissionalEntidade[];
   fields: CampoVisualizacaoEntidade[];
+  heroImage?: {
+    src: string;
+    alt: string;
+  };
 }
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
@@ -48,6 +52,7 @@ export function EntityProfessionalsView({
   entityKey,
   allowedTypes,
   fields,
+  heroImage,
 }: EntityProfessionalsViewProps) {
   const [activeTab, setActiveTab] = useState("cadastro");
   const tabs = [
@@ -69,6 +74,16 @@ export function EntityProfessionalsView({
           </button>
           <h1 className="text-2xl font-semibold text-gray-900">{title}</h1>
         </header>
+
+        {heroImage && (
+          <figure className="h-56 overflow-hidden rounded-xl border border-gray-100 bg-gray-200 shadow-sm sm:h-64">
+            <img
+              src={heroImage.src}
+              alt={heroImage.alt}
+              className="h-full w-full object-cover"
+            />
+          </figure>
+        )}
 
         <Tabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
 

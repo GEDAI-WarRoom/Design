@@ -27,6 +27,7 @@ export function VisualizarEstabelecimentoAgropecuarioPage({ onLogout, onNavigate
       title="Visualizar Estabelecimento Agropecuário"
       entityKey={`estabelecimento-agropecuario-${registro.id || registro.codigo}`}
       allowedTypes={["Responsável Técnico Animal", "Responsável Técnico Vegetal"]}
+      heroImage={registro.imagem ? { src: registro.imagem, alt: `Vista de ${registro.nome}` } : undefined}
       fields={[
         { label: "Código do Estabelecimento", value: registro.codigo || "" },
         { label: "Nome do Estabelecimento", value: registro.nome || "" },

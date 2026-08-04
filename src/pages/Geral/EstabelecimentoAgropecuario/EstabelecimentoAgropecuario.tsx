@@ -17,6 +17,8 @@ import {
 import { Navbar } from "../../../components/Navbar";
 import { FloatSelect, FloatCombobox, SearchModal, FloatInput } from "../../../components/ui/FormKit";
 import * as Icons from "../../../imports/icons";
+import propriedadeSantaHelenaUrl from "../../../imports/images/propriedade-santa-helena.png";
+import propriedadeSaoJoseUrl from "../../../imports/images/propriedade-sao-jose.png";
 
 const GREEN = "#1A7A3C";
 
@@ -56,6 +58,7 @@ interface EstabelecimentoAgropecuario {
   id: number;
   codigo: string;
   nome: string;
+  imagem?: string;
   proprietarios: string; // Exibe "Nome - CPF" conforme especificado
   zona: "Rural" | "Urbana";
   municipioUf: string; // "Lavras - MG"
@@ -63,6 +66,26 @@ interface EstabelecimentoAgropecuario {
 }
 
 const ESTABELECIMENTOS_MOCK: EstabelecimentoAgropecuario[] = [
+  {
+    id: 4,
+    codigo: "51080590041",
+    nome: "Fazenda Santa Helena",
+    imagem: propriedadeSantaHelenaUrl,
+    proprietarios: "Fernando - Produtor titular",
+    zona: "Rural",
+    municipioUf: "Uberlândia - MG",
+    situacao: "Ativo",
+  },
+  {
+    id: 5,
+    codigo: "31001040082",
+    nome: "Fazenda São José",
+    imagem: propriedadeSaoJoseUrl,
+    proprietarios: "Fernando - Produtor titular",
+    zona: "Rural",
+    municipioUf: "Patos de Minas - MG",
+    situacao: "Ativo",
+  },
   { 
     id: 1, 
     codigo: "51080590041", 
@@ -352,7 +375,19 @@ export function EstabelecimentoAgropecuarioPage({ onLogout, onNavigate }: PagePr
                     {pagina.map((d) => (
                       <tr key={d.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/60 transition">
                         <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">{d.codigo}</td>
-                        <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">{d.nome}</td>
+                        <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">
+                          <div className="flex min-w-[210px] items-center gap-3">
+                            {d.imagem && (
+                              <img
+                                src={d.imagem}
+                                alt=""
+                                loading="lazy"
+                                className="h-10 w-14 shrink-0 rounded-md object-cover"
+                              />
+                            )}
+                            <span>{d.nome}</span>
+                          </div>
+                        </td>
                         <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal max-w-xs truncate" title={d.proprietarios}>
                           {d.proprietarios}
                         </td>

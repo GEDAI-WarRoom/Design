@@ -46,11 +46,16 @@ import {
 	ChevronLeft,
 	ChevronRight,
 	Download,
+	Plus,
 } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { PendenciasConfirmacaoGta } from "../components/PendenciasConfirmacaoGta";
 import * as Icons from "../imports/icons";
 import campanhaVacinacao2026Url from "../imports/images/campanha-vacinacao-2026.png";
+import armazenamentoGraos2026Url from "../imports/images/armazenamento-graos-2026.png";
+import inovacaoDigitalCampoUrl from "../imports/images/inovacao-digital-campo.png";
+import propriedadeSantaHelenaUrl from "../imports/images/propriedade-santa-helena.png";
+import propriedadeSaoJoseUrl from "../imports/images/propriedade-sao-jose.png";
 import {
 	isEntryRouteAllowed,
 	useDemoUser,
@@ -769,7 +774,7 @@ const avisosProdutor = [
 		titulo: "Novas Normas para Armazenamento de Grãos",
 		descricao: "O IMA publica novas diretrizes técnicas para silos e armazéns visando a segurança fitossanitária da safra 2025/26.",
 		acao: "Ver Documentação",
-		imagem: "https://lh3.googleusercontent.com/aida-public/AB6AXuBExVO6qTYxSMVXWc4LvuGH_59KRGVh7EAT-BVdL-IHfAWkbjKJsKB0ZD0Hww7V1JMQPiyzeJiHBIaWQs71_LzDz96wjDhjUlF8pS4MkKNfi7BBbeDfus8suEXyJ8zPYBDqbmoR0cdVA4LA905_GmQ0IRv3dLowAum3M6zVAMMacfT1jxbrAlcc9CFrnNNsVYpBADjo6vj1tsXUg8iDPgqm6xOZ2IHupHccxxHAh7o4wdLqdltgu7kb",
+		imagem: armazenamentoGraos2026Url,
 		alt: "Silos",
 	},
 	{
@@ -777,28 +782,65 @@ const avisosProdutor = [
 		titulo: "Inovação Digital no Campo",
 		descricao: "Lançamento do novo aplicativo de gestão de propriedades. Mais agilidade na emissão de guias e controle sanitário direto do celular.",
 		acao: "Baixar App",
-		imagem: "https://lh3.googleusercontent.com/aida-public/AB6AXuAZQyeCdCXZmHpA__EYRTMXvGDj8RA2pzlKUMaIT4LuQ2Be5V6LhRaofs0bDs4uYjQEiQ5Q1hgnRwfpa5xxrs77Us6yGXQgMGiiG6uA7Zzbs4OZn53jyQ3pZVF3q6sV9FQj6s7V9K0jUaAy8IPKi3ZrWmbCpdBJ8NM9T0aUpNAtNfO8znJJ8hBfRd_q7x_lVW0ENHhzNV_UFFxvI5XimQL7uZePyIur_z-eyrnNnDEGAMX0-T767NQT",
+		imagem: inovacaoDigitalCampoUrl,
 		alt: "Tecnologia no campo",
+	},
+];
+
+const DURACAO_SLIDE_AVISO = 7000;
+
+const propriedadesProdutor = [
+	{
+		id: 1,
+		codigo: "51080590041",
+		nome: "Fazenda Santa Helena",
+		municipioUf: "Uberlândia - MG",
+		area: "150 hectares",
+		situacao: "Ativo",
+		proprietarios: "Fernando - Produtor titular",
+		zona: "Rural",
+		imagem: propriedadeSantaHelenaUrl,
+		alt: "Pastagem da Fazenda Santa Helena",
+		rebanhos: ["128 bovinos", "54 ovinos"],
+	},
+	{
+		id: 2,
+		codigo: "31001040082",
+		nome: "Fazenda São José",
+		municipioUf: "Patos de Minas - MG",
+		area: "85 hectares",
+		situacao: "Ativo",
+		proprietarios: "Fernando - Produtor titular",
+		zona: "Rural",
+		imagem: propriedadeSaoJoseUrl,
+		alt: "Área produtiva da Fazenda São José",
+		rebanhos: ["42 bovinos", "12 caprinos"],
 	},
 ];
 
 function AvisosNoticias() {
 	const [slideAtivo, setSlideAtivo] = useState(0);
+	const [reinicioProgresso, setReinicioProgresso] = useState(0);
 
 	useEffect(() => {
-		const intervalo = window.setInterval(
+		const temporizador = window.setTimeout(
 			() => setSlideAtivo((atual) => (atual + 1) % avisosProdutor.length),
-			7000,
+			DURACAO_SLIDE_AVISO,
 		);
-		return () => window.clearInterval(intervalo);
-	}, []);
+		return () => window.clearTimeout(temporizador);
+	}, [slideAtivo, reinicioProgresso]);
+
+	const selecionarSlide = (index: number) => {
+		setSlideAtivo(index);
+		setReinicioProgresso((atual) => atual + 1);
+	};
 
 	const anterior = () =>
-		setSlideAtivo((atual) =>
-			atual === 0 ? avisosProdutor.length - 1 : atual - 1,
+		selecionarSlide(
+			slideAtivo === 0 ? avisosProdutor.length - 1 : slideAtivo - 1,
 		);
 	const proximo = () =>
-		setSlideAtivo((atual) => (atual + 1) % avisosProdutor.length);
+		selecionarSlide((slideAtivo + 1) % avisosProdutor.length);
 
 	return (
 		<section className="mb-6" aria-label="Avisos e Notícias">
@@ -808,12 +850,16 @@ function AvisosNoticias() {
 						<button
 							key={aviso.titulo}
 							type="button"
-							onClick={() => setSlideAtivo(index)}
+							onClick={() => selecionarSlide(index)}
 							aria-label={`Exibir notícia ${index + 1}`}
 							aria-current={index === slideAtivo}
-							className="h-1 w-12 overflow-hidden rounded-full bg-gray-300"
+							className="h-1.5 w-20 overflow-hidden rounded-full bg-gray-300"
 						>
-							<span className={`block h-full bg-[#1A7A3C] transition-all duration-500 ${index === slideAtivo ? "w-full" : "w-0"}`} />
+							<span
+								key={`${index}-${slideAtivo}-${reinicioProgresso}`}
+								className={`block h-full w-full origin-left transform-gpu bg-[#1A7A3C] will-change-transform ${index === slideAtivo ? "" : "scale-x-0"}`}
+								style={index === slideAtivo ? { animation: `progresso-slide-aviso ${DURACAO_SLIDE_AVISO}ms linear forwards` } : undefined}
+							/>
 						</button>
 					))}
 				</div>
@@ -824,9 +870,9 @@ function AvisosNoticias() {
 					<article
 						key={aviso.titulo}
 						aria-hidden={index !== slideAtivo}
-						className={`absolute inset-0 transition-opacity duration-700 ${index === slideAtivo ? "z-10 opacity-100" : "pointer-events-none opacity-0"}`}
+						className={`absolute inset-0 transform-gpu transition-opacity duration-1000 ease-in-out will-change-[opacity] ${index === slideAtivo ? "z-10 opacity-100" : "pointer-events-none opacity-0"}`}
 					>
-						<img src={aviso.imagem} alt={aviso.alt} className="absolute inset-0 h-full w-full object-cover" />
+						<img src={aviso.imagem} alt={aviso.alt} loading="eager" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
 						<div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/55 to-black/10" />
 						<div className="absolute inset-0 flex max-w-3xl flex-col justify-end p-6 sm:p-9 md:p-12">
 							<span className="mb-4 w-fit rounded-full bg-green-100 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-[#1A7A3C]">
@@ -854,6 +900,91 @@ function AvisosNoticias() {
 						<ChevronRight size={22} />
 					</button>
 				</div>
+			</div>
+		</section>
+	);
+}
+
+function PropriedadesProdutor({
+	onNavigate,
+}: {
+	onNavigate: (screen: any, data?: any) => void;
+}) {
+	return (
+		<section className="mb-6" aria-labelledby="propriedades-produtor-title">
+			<div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+				<div>
+					<h2 id="propriedades-produtor-title" className="text-xl font-semibold text-gray-800">
+						Suas propriedades
+					</h2>
+					<p className="mt-1 text-sm text-gray-500">
+						Acesse rapidamente os dados e rebanhos de cada propriedade.
+					</p>
+				</div>
+				<button
+					type="button"
+					onClick={() => onNavigate("adicionar-estabelecimento-agropecuario")}
+					className="inline-flex h-10 items-center gap-2 rounded-lg bg-[#1A7A3C] px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-[#15612F]"
+				>
+					<Plus size={17} strokeWidth={2.5} />
+					Nova propriedade
+				</button>
+			</div>
+
+			<div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+				{propriedadesProdutor.map((propriedade, index) => (
+					<article
+						key={propriedade.id}
+						className="group overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"
+					>
+						<div className="relative h-48 overflow-hidden bg-gray-200">
+							<img
+								src={propriedade.imagem}
+								alt={propriedade.alt}
+								loading="lazy"
+								className={`h-full w-full object-cover opacity-90 transition duration-500 group-hover:scale-[1.03] group-hover:opacity-100 ${index === 1 ? "object-[center_65%]" : "object-center"}`}
+							/>
+							<div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
+							<span className="absolute left-4 top-4 rounded-md bg-[#1A7A3C] px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-white shadow-sm">
+								Ativa
+							</span>
+						</div>
+
+						<div className="p-5">
+							<h3 className="text-lg font-semibold text-gray-900">{propriedade.nome}</h3>
+							<p className="mt-1 text-sm text-gray-500">
+								{propriedade.municipioUf} <span aria-hidden="true">•</span> {propriedade.area}
+							</p>
+
+							<div className="mt-5 flex flex-wrap items-center justify-between gap-4 border-t border-gray-100 pt-4">
+								<div className="flex flex-wrap gap-2">
+									{propriedade.rebanhos.map((rebanho, rebanhoIndex) => (
+										<span
+											key={rebanho}
+											className={`rounded-md px-2.5 py-1 text-xs font-semibold ${
+												rebanhoIndex === 0
+													? "bg-amber-50 text-amber-700"
+													: "bg-green-50 text-[#1A7A3C]"
+											}`}
+										>
+											{rebanho}
+										</span>
+									))}
+								</div>
+								<button
+									type="button"
+									onClick={() =>
+										onNavigate("visualizar-estabelecimento-agropecuario", propriedade)
+									}
+									className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#1A7A3C] transition hover:text-[#15612F]"
+								>
+									Gerenciar
+									<ArrowRight size={16} />
+								</button>
+							</div>
+						</div>
+					</article>
+				))}
 			</div>
 		</section>
 	);
@@ -912,6 +1043,10 @@ export function DashboardPage({ onLogout, onNavigate }: any) {
 						</div>
 					))}
 				</div>
+
+				{role === "produtor" && (
+					<PropriedadesProdutor onNavigate={onNavigate} />
+				)}
 
 				{visibleFourth.length > 0 && (
 					<div className="bg-white rounded-xl shadow-sm p-6">
