@@ -46,6 +46,7 @@ import {
 	ChevronLeft,
 	ChevronRight,
 	Download,
+	Ham,
 } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { PendenciasConfirmacaoGta } from "../components/PendenciasConfirmacaoGta";
@@ -88,7 +89,7 @@ export const cadastrosCategories: MenuCategory[] = [
 				route: "aeroporto-porto",
 				icon: <TowerControl size={16} />,
 			},
-			{ label: "Açougue", route: "acougue", icon: <Store size={16} /> },
+			{ label: "Açougue", route: "acougue", icon: <Ham size={16} /> },
 			{
 				label: "Divisão Municipal",
 				route: "divisao-municipal",
