@@ -351,8 +351,8 @@ export function PartilhaVacinaPage({ onLogout, onNavigate }: PageProps) {
                           <td className="px-6 py-4 text-gray-500 whitespace-nowrap font-medium">{d.situacao}</td>
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-1 justify-end">
-                              <button onClick={() => onNavigate("visualizar-doacao-partilha-vacina", d)} className="p-2 rounded-md hover:bg-green-50 transition" style={{ color: GREEN }} title="Visualizar"><ViewIcon size={18} /></button>
-                              <button onClick={() => onNavigate("editar-doacao-partilha-vacina", d)} className="p-2 rounded-md hover:bg-green-50 transition" style={{ color: GREEN }} title="Editar"><Pencil size={17} /></button>
+                              <button onClick={() => onNavigate("visualizar-partilha-vacina", d)} className="p-2 rounded-md hover:bg-green-50 transition" style={{ color: GREEN }} title="Visualizar"><ViewIcon size={18} /></button>
+                              <button onClick={() => onNavigate("editar-partilha-vacina", d)} className="p-2 rounded-md hover:bg-green-50 transition" style={{ color: GREEN }} title="Editar"><Pencil size={17} /></button>
                             </div>
                           </td>
                         </tr>

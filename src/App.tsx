@@ -167,11 +167,20 @@ import { AjusteDosesInsumoPage } from "./pages/Vacinacao/AjusteDosesInsumo/Ajust
 import { AdicionarAjusteDosesInsumoPage } from "./pages/Vacinacao/AjusteDosesInsumo/AdicionarAjusteDosesInsumo";
 import { VisualizarAjusteDosesInsumoPage } from "./pages/Vacinacao/AjusteDosesInsumo/VisualizarAjusteDosesInsumo";
 import { EditarAjusteDosesInsumoPage } from "./pages/Vacinacao/AjusteDosesInsumo/EditarAjusteDosesInsumo";
-
 import { AtestadoExamePage } from "./pages/Vacinacao/AtestadoExame/AtestadoExame";
 import { AdicionarAtestadoExamePage } from "./pages/Vacinacao/AtestadoExame/AdicionarAtestadoExame";
 import { VisualizarAtestadoExamePage } from "./pages/Vacinacao/AtestadoExame/VisualizarAtestadoExame";
 import { EditarAtestadoExamePage } from "./pages/Vacinacao/AtestadoExame/EditarAtestadoExame";
+import { VisualizarLaboratorioPage } from "./pages/Vacinacao/Laboratorio/VisualizarLaboratorio";
+import { EditarLaboratorioPage } from "./pages/Vacinacao/Laboratorio/EditarLaboratorio";
+import { VisualizarVendaComSaidaVacinaPage } from "./pages/Vacinacao/VendaComSaidaVacina/VisualizarVendaComSaidaVacina";
+import { EditarVendaComSaidaVacinaPage } from "./pages/Vacinacao/VendaComSaidaVacina/EditarVendaComSaidaVacina";
+import { VisualizarVendaComEntradaVacinaPage } from "./pages/Vacinacao/VendaComEntradaVacina/VisualizarVendaComEntradaVacina";
+import { EditarVendaComEntradaVacinaPage } from "./pages/Vacinacao/VendaComEntradaVacina/EditarVendaComEntradaVacina";
+import { VisualizarPartilhaVacinaPage } from "./pages/Vacinacao/PartilhaVacina/VisualizarPartilhaVacina";
+import { EditarPartilhaVacinaPage } from "./pages/Vacinacao/PartilhaVacina/EditarPartilhaVacina";
+import { EditarLancamentoDosesVacinaPage } from "./pages/Vacinacao/LancamentoDoses/EditarLancamentoDosesVacina";
+import { VisualizarLancamentoDosesVacinaPage } from "./pages/Vacinacao/LancamentoDoses/VisualizarLancamentoDosesVacina";
 
 //ARRECADACAO
 import { FundoArrecadacaoPage } from "./pages/Arrecadacao/FundoArrecadacao/FundoArrecadacao";
@@ -241,9 +250,18 @@ import { AdicionarUsuariosPage } from "./pages/Controle/Usuarios/AdicionarUsuari
 import { UsuariosPage } from "./pages/Controle/Usuarios/Usuarios";
 import { VisualizarUsuariosPage } from "./pages/Controle/Usuarios/VisualizarUsuarios";
 import { ParametrosSistemaPage } from "./pages/Controle/ParametrosSistema/ParametrosSistema";
-
 // 1. Adicionamos as novas rotas de Pessoa Jurídica no tipo Screen
 export type Screen =
+| "visualizar-laboratorio"
+  | "editar-laboratorio"
+  | "visualizar-venda-saida-vacina"
+  | "editar-venda-saida-vacina"
+  | "visualizar-venda-entrada-vacina"
+  | "editar-venda-entrada-vacina"
+  | "visualizar-partilha-vacina"
+  | "editar-partilha-vacina"
+  | "visualizar-lancamento-doses-vacina"
+  | "editar-lancamento-doses-vacina"
 | "editar-divisao-municipal"
   | "visualizar-divisao-municipal"
 	| "emissao-ata"
@@ -489,6 +507,37 @@ export default function App() {
 	};
 
 	switch (screen) {
+		// LABORATORIO
+    case "visualizar-laboratorio":
+      return <VisualizarLaboratorioPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-laboratorio":
+      return <EditarLaboratorioPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+
+    // VENDA COM SAÍDA DE VACINA
+    case "visualizar-venda-saida-vacina":
+      return <VisualizarVendaComSaidaVacinaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-venda-saida-vacina":
+      return <EditarVendaComSaidaVacinaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+
+    // VENDA COM ENTRADA DE VACINA
+    case "visualizar-venda-entrada-vacina":
+      return <VisualizarVendaComEntradaVacinaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-venda-entrada-vacina":
+      return <EditarVendaComEntradaVacinaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+
+    // DOAÇÃO / PARTILHA DE VACINA
+    case "visualizar-partilha-vacina":
+      return <VisualizarPartilhaVacinaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-partilha-vacina":
+      return <EditarPartilhaVacinaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+
+    // AJUSTE DE DOSES DE VACINA
+    case "visualizar-lancamento-doses-vacina":
+      return <VisualizarLancamentoDosesVacinaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-lancamento-doses-vacina":
+      return <EditarLancamentoDosesVacinaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+
+	  
 		case "divisao-municipal":
       return (
         <DivisaoMunicipalPage onLogout={handleLogout} onNavigate={handleNavigate} />
@@ -823,6 +872,7 @@ export default function App() {
 					onNavigate={handleNavigate}
 				/>
 			);
+			
 
 		case "venda-saida-vacina":
 			return (
