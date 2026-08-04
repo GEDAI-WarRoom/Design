@@ -373,20 +373,8 @@ export function TipoVeiculoPage({
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-1 justify-end">
-                            <button
-                              className="p-2 rounded-md hover:bg-green-50 transition"
-                              style={{ color: GREEN }}
-                              title="Visualizar"
-                            >
-                              <ViewIcon size={18} />
-                            </button>
-                            <button
-                              className="p-2 rounded-md hover:bg-green-50 transition"
-                              style={{ color: GREEN }}
-                              title="Editar"
-                            >
-                              <Pencil size={17} />
-                            </button>
+                            <button onClick={() => onNavigate("visualizar-tipo-veiculo")} className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"><ViewIcon size={18} /></button>
+<button onClick={() => onNavigate("editar-tipo-veiculo")} className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"><Pencil size={17} /></button>
                           </div>
                         </td>
                       </tr>
