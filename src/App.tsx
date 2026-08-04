@@ -1662,7 +1662,7 @@ export default function App() {
                 />
             );
 
-        case "editar-praga":
+        case "editar-praga": 
             return (
                 <EditarPragaPage
                     onLogout={handleLogout}
