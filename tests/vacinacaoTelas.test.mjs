@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { parse } from "@babel/parser";
 
 const raiz = resolve(import.meta.dirname, "..");
 const ler = (caminho) => readFileSync(resolve(raiz, caminho), "utf8");
@@ -22,6 +23,11 @@ const app = ler("src/App.tsx");
 const modoCompartilhado = ler("src/pages/Vacinacao/shared/CadastroVacinacaoMode.tsx");
 const estilosGlobais = ler("src/styles/globals.css");
 const formKit = ler("src/components/ui/FormKit.tsx");
+
+assert.doesNotThrow(
+  () => parse(app, { sourceType: "module", plugins: ["jsx", "typescript"] }),
+  "App.tsx contém declarações ou importações duplicadas incompatíveis com o Vite",
+);
 
 assert.match(modoCompartilhado, /setAttribute\("inert"/, "Visualização não bloqueia componentes personalizados");
 assert.match(modoCompartilhado, /controle\.disabled = true/, "Visualização não desabilita controles HTML");

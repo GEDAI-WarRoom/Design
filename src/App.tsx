@@ -211,14 +211,6 @@ import { AdicionarVendaComEntradaVacinaPage } from "./pages/Vacinacao/VendaComEn
 import { VendaComEntradaVacinaPage } from "./pages/Vacinacao/VendaComEntradaVacina/VendaComEntradaVacina";
 import { AdicionarVendaComSaidaVacinaPage } from "./pages/Vacinacao/VendaComSaidaVacina/AdicionarVendaComSaidaVacina";
 import { VendaComSaidaVacinaPage } from "./pages/Vacinacao/VendaComSaidaVacina/VendaComSaidaVacina";
-import { AjusteDosesInsumoPage } from "./pages/Vacinacao/AjusteDosesInsumo/AjusteDosesInsumo";
-import { AdicionarAjusteDosesInsumoPage } from "./pages/Vacinacao/AjusteDosesInsumo/AdicionarAjusteDosesInsumo";
-import { VisualizarAjusteDosesInsumoPage } from "./pages/Vacinacao/AjusteDosesInsumo/VisualizarAjusteDosesInsumo";
-import { EditarAjusteDosesInsumoPage } from "./pages/Vacinacao/AjusteDosesInsumo/EditarAjusteDosesInsumo";
-import { AtestadoExamePage } from "./pages/Vacinacao/AtestadoExame/AtestadoExame";
-import { AdicionarAtestadoExamePage } from "./pages/Vacinacao/AtestadoExame/AdicionarAtestadoExame";
-import { VisualizarAtestadoExamePage } from "./pages/Vacinacao/AtestadoExame/VisualizarAtestadoExame";
-import { EditarAtestadoExamePage } from "./pages/Vacinacao/AtestadoExame/EditarAtestadoExame";
 import { VisualizarLaboratorioPage } from "./pages/Vacinacao/Laboratorio/VisualizarLaboratorio";
 import { EditarLaboratorioPage } from "./pages/Vacinacao/Laboratorio/EditarLaboratorio";
 import { VisualizarVendaComSaidaVacinaPage } from "./pages/Vacinacao/VendaComSaidaVacina/VisualizarVendaComSaidaVacina";
@@ -310,7 +302,6 @@ import { AdicionarPapeisPage } from "./pages/Controle/Papeis/AdicionarPapeis";
 import { EditarPapelPage } from "./pages/Controle/Papeis/EditarPapel";
 import { PapeisPage } from "./pages/Controle/Papeis/Papeis";
 import { VisualizarPapelPage } from "./pages/Controle/Papeis/VisualizarPapel";
-import { ParametrosSistemaPage } from "./pages/Controle/ParametrosSistema/ParametrosSistema";
 import { AdicionarUsuariosPage } from "./pages/Controle/Usuarios/AdicionarUsuarios";
 import { UsuariosPage } from "./pages/Controle/Usuarios/Usuarios";
 import { VisualizarUsuariosPage } from "./pages/Controle/Usuarios/VisualizarUsuarios";
@@ -337,10 +328,7 @@ export type Screen =
   | "editar-doenca"
   | "visualizar-vacinador-brucelose"
   | "editar-vacinador-brucelose"
-
-// 1. Adicionamos as novas rotas de Pessoa Jurídica no tipo Screen
-export type Screen =
-| "editar-usuario"
+  | "editar-usuario"
 | "editar-finalidade-transito"
   | "visualizar-finalidade-transito"
   | "editar-distribuicao-formularios-gta"
