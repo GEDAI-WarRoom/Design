@@ -14,6 +14,7 @@ import {
 import { Navbar } from "../../../components/Navbar";
 import { SearchModal } from "../../../components/ui/FormKit";
 import * as Icons from "../../../imports/icons";
+import { listarRegistrosMock } from "../../../components/ui/mockCollectionStorage";
 
 const GREEN = "#1A7A3C";
 
@@ -141,7 +142,7 @@ export function PartilhaVacinaPage({ onLogout, onNavigate }: PageProps) {
     setPage(1);
   };
 
-  const filtrados = DOACOES_MOCK.filter((d) => {
+  const filtrados = listarRegistrosMock("partilhas-vacina", DOACOES_MOCK).filter((d) => {
     const matchCodigo = codigo === "" || d.codigo.includes(codigo);
     const matchOrigem = !produtorOrigem || d.origemDoc === produtorOrigem.documento;
     const matchDestino = !produtorDestino || d.destinoDoc === produtorDestino.documento;
@@ -351,8 +352,8 @@ export function PartilhaVacinaPage({ onLogout, onNavigate }: PageProps) {
                           <td className="px-6 py-4 text-gray-500 whitespace-nowrap font-medium">{d.situacao}</td>
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-1 justify-end">
-                              <button onClick={() => onNavigate("visualizar-doacao-partilha-vacina", d)} className="p-2 rounded-md hover:bg-green-50 transition" style={{ color: GREEN }} title="Visualizar"><ViewIcon size={18} /></button>
-                              <button onClick={() => onNavigate("editar-doacao-partilha-vacina", d)} className="p-2 rounded-md hover:bg-green-50 transition" style={{ color: GREEN }} title="Editar"><Pencil size={17} /></button>
+                              <button onClick={() => onNavigate("visualizar-partilha-vacina", d)} className="p-2 rounded-md hover:bg-green-50 transition" style={{ color: GREEN }} title="Visualizar"><ViewIcon size={18} /></button>
+                              <button onClick={() => onNavigate("editar-partilha-vacina", d)} className="p-2 rounded-md hover:bg-green-50 transition" style={{ color: GREEN }} title="Editar"><Pencil size={17} /></button>
                             </div>
                           </td>
                         </tr>

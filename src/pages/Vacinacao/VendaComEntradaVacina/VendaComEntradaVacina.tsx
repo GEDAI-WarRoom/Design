@@ -14,6 +14,7 @@ import {
 import { Navbar } from "../../../components/Navbar";
 import { FloatSelect } from "../../../components/ui/FormKit";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
+import { listarRegistrosMock } from "../../../components/ui/mockCollectionStorage";
 import * as Icons from "../../../imports/icons";
 
 const GREEN = "#1A7A3C";
@@ -148,7 +149,7 @@ export function VendaComEntradaVacinaPage({ onLogout, onNavigate }: PageProps) {
     if (erroValidacao) setErroValidacao(false);
   };
 
-  const filtrados = VENDAS_MOCK.filter((v) => {
+  const filtrados = listarRegistrosMock("vendas-entrada-vacina", VENDAS_MOCK).filter((v) => {
     const matchRevendedora = !revendedora || v.revendedoraCodigo === revendedora.codigo;
     const matchFornecedor = !fornecedor || v.fornecedor === fornecedor.nome;
     const matchNF = numeroNotaFiscal === "" || v.numeroNotaFiscal.includes(numeroNotaFiscal);

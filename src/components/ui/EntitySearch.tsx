@@ -242,6 +242,7 @@ export function EntitySearchInput({
 	return (
 		<>
 			<div
+				data-form-control
 				className="w-full cursor-pointer"
 				onClick={() => setModalAberto(true)}>
 				<div className="pointer-events-none">

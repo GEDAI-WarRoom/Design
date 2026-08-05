@@ -12,6 +12,7 @@ import {
 import { Navbar } from "../../../components/Navbar";
 import { FloatSelect, FloatCombobox, FloatInput, SearchModal, FloatMultiSelect } from "../../../components/ui/FormKit";
 import * as Icons from "../../../imports/icons";
+import { listarRegistrosMock } from "../../../components/ui/mockCollectionStorage";
 
 const GREEN = "#1A7A3C";
 
@@ -161,7 +162,7 @@ export function LaboratorioPage({ onLogout, onNavigate }: PageProps) {
     setPage(1);
   };
 
-  const filtrados = LABORATORIOS_MOCK.filter((l) => {
+  const filtrados = listarRegistrosMock("laboratorios", LABORATORIOS_MOCK).filter((l) => {
     const termo = busca.trim().toLowerCase();
     const matchBusca = termo === "" || l.nome.toLowerCase().includes(termo);
     const matchProp = !produtor || l.produtor.some((p) => p.documento === produtor.documento);
