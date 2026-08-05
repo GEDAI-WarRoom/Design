@@ -269,7 +269,7 @@ export function TaxaEmissaoGtaPage({ onLogout, onNavigate }: { onLogout: () => v
                             <button
                               type="button"
                               onClick={() => onNavigate("visualizar-taxa-emissao-gta", item)}
-                              className="p-2 text-gray-600 hover:bg-gray-100 rounded-md transition"
+                              className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"
                               title="Visualizar"
                             >
                               <Eye size={18} />
