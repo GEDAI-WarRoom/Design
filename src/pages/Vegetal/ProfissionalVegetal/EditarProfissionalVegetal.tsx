@@ -72,7 +72,7 @@ export function EditarProfissionalVegetalPage({ dados, onLogout, onNavigate }: {
         <Section title="Informações Básicas">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <FloatInput label="Nome Completo" required value={nome} onChange={setNome} maxLength={255} />
-            <FloatInput label="CPF" required value={cpf} onChange={setCpf} maxLength={14} disabled />
+            <FloatInput label="CPF" required value={cpf} onChange={() => {}} maxLength={14} disabled />
           </div>
         </Section>
 

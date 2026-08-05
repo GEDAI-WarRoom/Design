@@ -155,11 +155,9 @@ import { VisualizarLancamentoRebanhoPage } from "./pages/Rebanho/LancamentoReban
 import { AdicionarCulturaPage } from "./pages/Vegetal/Cultura/AdicionarCultura";
 import { CulturaPage } from "./pages/Vegetal/Cultura/Cultura";
 import { VisualizarEstabelecimentoAgroindustrialPOVPage } from "./pages/Vegetal/EstabelecimentoAgroindustrialPOV/VisualizarEstabelecimentoAgroindustrialPOV";
-import { AdicionarPragaPage } from "./pages/Vegetal/Praga/AdicionarPraga";
-import { PragaPage } from "./pages/Vegetal/Praga/Praga";
-import { EditarPragaPage } from "./pages/Vegetal/Praga/EditarPraga";
-import { VisualizarPragaPage } from "./pages/Vegetal/Praga/VisualizarPraga";
-import { AdicionarProfissionalVegetalPage } from "./pages/Vegetal/ProfissionalVegetal/AdicionarProfissionalVegetal";
+	import { AdicionarPragaPage } from "./pages/Vegetal/Praga/AdicionarPraga";
+	import { PragaPage } from "./pages/Vegetal/Praga/Praga";
+	import { AdicionarProfissionalVegetalPage } from "./pages/Vegetal/ProfissionalVegetal/AdicionarProfissionalVegetal";
 import { ProfissionalVegetalPage } from "./pages/Vegetal/ProfissionalVegetal/ProfissionalVegetal";
 import { AdicionarUnidadeConsolidacaoPage } from "./pages/Vegetal/UnidadeConsolidacao/AdicionarUnidadeConsolidacao";
 import { UnidadeConsolidacaoPage } from "./pages/Vegetal/UnidadeConsolidacao/UnidadeConsolidacao";
