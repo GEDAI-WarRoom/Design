@@ -115,7 +115,7 @@ export function VisualizarPromotoraEventosPage({ onLogout, onNavigate, data }: P
                 onClick={() => onNavigate("editar-promotora-eventos", promotora)}
                 className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2"
               >
-                Editar
+                Editar 
               </button>
               <button
                 type="button"
