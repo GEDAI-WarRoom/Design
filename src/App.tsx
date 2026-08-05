@@ -275,6 +275,7 @@ import { TaxaEmissaoGtaPage } from "./pages/GTA/TaxaEmissaoGta/TaxaEmissaoGta";
 import { VisualizarTaxaEmissaoGtaPage } from "./pages/GTA/TaxaEmissaoGta/VisualizarTaxaEmissaoGta";
 
 // CONTROLE
+import { EditarUsuarioPage } from "./pages/Controle/Usuarios/EditarUsuario"; // Ajuste o caminho se necessário
 import { AdicionarPapeisPage } from "./pages/Controle/Papeis/AdicionarPapeis";
 import { EditarPapelPage } from "./pages/Controle/Papeis/EditarPapel";
 import { PapeisPage } from "./pages/Controle/Papeis/Papeis";
@@ -286,6 +287,7 @@ import { VisualizarUsuariosPage } from "./pages/Controle/Usuarios/VisualizarUsua
 
 // 1. Adicionamos as novas rotas de Pessoa Jurídica no tipo Screen
 export type Screen =
+| "editar-usuario"
 | "editar-finalidade-transito"
   | "visualizar-finalidade-transito"
   | "editar-distribuicao-formularios-gta"
@@ -731,6 +733,32 @@ export type Screen =
   | "visualizar-aeroporto-porto";
 
 export default function App() {
+	const [screen, setScreen] = useState<Screen>("login");
+	const [screenData, setScreenData] = useState<any>(null);
+	const { role, selectRole, clearRole } = useDemoUser();
+
+	const handleLogout = () => {
+		clearRole();
+		setScreen("login");
+		setScreenData(null);
+	};
+
+	const handleNavigate = (targetScreen: Screen, data?: any) => {
+		if (!isRouteAllowed(role, targetScreen)) {
+			setScreenData(null);
+			setScreen("dashboard");
+			return;
+		}
+
+		if (data !== undefined) {
+			setScreenData(data);
+		}
+		setScreen(targetScreen);
+	};
+
+	switch (screen) {
+		case "editar-usuario":
+      return <EditarUsuarioPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
   const [screen, setScreen] = useState<Screen>("login");
   const [screenData, setScreenData] = useState<any>(null);
   const { role, selectRole, clearRole } = useDemoUser();
