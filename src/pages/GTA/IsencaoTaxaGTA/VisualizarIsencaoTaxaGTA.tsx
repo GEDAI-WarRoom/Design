@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { ArrowLeft, Pencil, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronUp } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
-import { FloatInput, LargeTextArea } from "../../../components/ui/FormKit";
+import { FloatInput } from "../../../components/ui/FormKit";
 
 const GREEN = "#1A7A3C";
 
@@ -19,7 +19,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 export function VisualizarIsencaoTaxaGtaPage({ dados, onLogout, onNavigate }: { dados?: any; onLogout: () => void; onNavigate: (s: string, d?: any) => void; }) {
-  const isencao = dados || {};
+  const isencao = { id: 1, motivo: "Instituição de pesquisa", situacao: "Ativo", ...(dados || {}) };
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
@@ -31,22 +31,17 @@ export function VisualizarIsencaoTaxaGtaPage({ dados, onLogout, onNavigate }: { 
           </button>
           <div className="flex justify-between items-center w-full">
             <h1 className="text-2xl font-semibold text-gray-900">Visualizar Isenção de Taxa de GTA</h1>
-            <button type="button" onClick={() => onNavigate("editar-isencao-taxa-gta", isencao)} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2">
-              <Pencil size={14} /> Editar
+            <button type="button" onClick={() => onNavigate("editar-isencao-taxa-gta", isencao)} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm">
+              Editar
             </button>
           </div>
         </div>
 
         <Section title="Informações Básicas">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <FloatInput label="Espécie" value={isencao.especie || "-"} disabled onChange={() => {}} />
-            <FloatInput label="Finalidade" value={isencao.finalidade || "-"} disabled onChange={() => {}} />
+            <FloatInput label="Motivo da Isenção de Taxa de GTA" value={isencao.motivo || "Instituição de pesquisa"} disabled onChange={() => {}} />
             <FloatInput label="Situação" value={isencao.situacao || "Ativo"} disabled onChange={() => {}} />
           </div>
-        </Section>
-
-        <Section title="Observações">
-          <LargeTextArea label="Observações" value={isencao.observacao || "Nenhuma observação registrada."} disabled onChange={() => {}} />
         </Section>
       </main>
     </div>

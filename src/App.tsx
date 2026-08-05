@@ -525,7 +525,7 @@ export default function App() {
     case "editar-registro-venda-gta-fisica":
       return <EditarRegistroVendaGtaFisicaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "visualizar-registro-venda-gta-fisica":
-      return <VisualizarRegistroVendaGtaFisicaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+      return <VisualizarRegistroVendaGtaFisicaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
 
     case "isencao-taxa-gta":
       return <IsencaoTaxaGtaPage onLogout={handleLogout} onNavigate={handleNavigate} />;

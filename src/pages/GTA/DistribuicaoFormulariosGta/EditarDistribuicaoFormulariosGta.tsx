@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { ArrowLeft, Info, Check, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowLeft, Info, ChevronDown, ChevronUp } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
-import { FloatInput, LargeTextArea } from "../../../components/ui/FormKit";
+import { FloatInput, FloatSelect } from "../../../components/ui/FormKit";
 
 const GREEN = "#1A7A3C";
 
@@ -20,11 +20,19 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 export function EditarDistribuicaoFormulariosGtaPage({ dados, onLogout, onNavigate }: { dados?: any; onLogout: () => void; onNavigate: (screen: string, data?: any) => void; }) {
   const [isSucesso, setIsSucesso] = useState(false);
-  const [unidade, setUnidade] = useState(dados?.unidade || "");
-  const [data, setData] = useState(dados?.data || "");
-  const [numeroInicial, setNumeroInicial] = useState(dados?.numeroInicial || "");
-  const [numeroFinal, setNumeroFinal] = useState(dados?.numeroFinal || "");
-  const [observacao, setObservacao] = useState(dados?.observacao || "");
+  const [escritorio, setEscritorio] = useState(dados?.escritorio?.nome || "Escritório Seccional de Lavras");
+  const [serie, setSerie] = useState(dados?.serie || "A1");
+  const [numeroInicial, setNumeroInicial] = useState(String(dados?.numeroInicial || 1));
+  const [numeroFinal, setNumeroFinal] = useState(String(dados?.numeroFinal || 500));
+  const [situacao, setSituacao] = useState(dados?.situacao || "Ativo");
+  const distribuicaoAtualizada = {
+    id: dados?.id || 1,
+    escritorio: { ...(dados?.escritorio || { id: 1 }), nome: escritorio },
+    serie,
+    numeroInicial: Number(numeroInicial) || 1,
+    numeroFinal: Number(numeroFinal) || 500,
+    situacao,
+  };
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
@@ -37,7 +45,7 @@ export function EditarDistribuicaoFormulariosGtaPage({ dados, onLogout, onNaviga
           <div className="flex justify-between items-center w-full">
             <h1 className="text-2xl font-semibold text-gray-900">Editar Distribuição de Formulários</h1>
             <button type="button" onClick={() => setIsSucesso(true)} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm">
-              Salvar Alterações
+              Salvar
             </button>
           </div>
         </div>
@@ -47,29 +55,25 @@ export function EditarDistribuicaoFormulariosGtaPage({ dados, onLogout, onNaviga
           <p className="text-sm text-gray-600 font-medium leading-relaxed">Campos indicados com <span className="text-red-500 font-bold">*</span> são obrigatórios.</p>
         </div>
 
-        <Section title="Detalhes da Distribuição">
+        <Section title="Informações Básicas">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <FloatInput label="Unidade Administrativa" required value={unidade} onChange={setUnidade} />
-            <FloatInput label="Data de Distribuição" type="date" required value={data} onChange={setData} />
+            <FloatInput label="Escritório Seccional" required value={escritorio} onChange={setEscritorio} />
+            <FloatInput label="Série" required value={serie} onChange={setSerie} maxLength={2} />
             <FloatInput label="Número Inicial" required value={numeroInicial} onChange={setNumeroInicial} maxLength={10} />
             <FloatInput label="Número Final" required value={numeroFinal} onChange={setNumeroFinal} maxLength={10} />
+            <FloatSelect label="Situação" required value={situacao} onChange={setSituacao} options={[{ value: "Ativo", label: "Ativo" }, { value: "Cancelado", label: "Cancelado" }]} />
           </div>
-        </Section>
-
-        <Section title="Observações">
-          <LargeTextArea label="Observações" value={observacao} onChange={setObservacao} />
         </Section>
       </main>
 
       {isSucesso && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4 animate-fadeIn">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
-            <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4"><Check size={28} className="text-[#1A7A3C]" strokeWidth={3} /></div>
             <h3 className="text-lg font-bold text-gray-900">Alterações salvas!</h3>
             <p className="text-sm text-gray-500 mt-1">A distribuição de formulários foi atualizada.</p>
             <div className="flex gap-3 justify-center mt-6">
               <button onClick={() => { setIsSucesso(false); onNavigate("distribuicao-formularios-gta"); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50 transition">Voltar</button>
-              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-distribuicao-formularios-gta", dados); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
+              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-distribuicao-formularios-gta", distribuicaoAtualizada); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
             </div>
           </div>
         </div>

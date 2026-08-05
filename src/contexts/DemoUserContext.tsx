@@ -18,6 +18,7 @@ const produtorEntryRoutes = new Set([
 	"atualizacao-cadastral-rebanho",
 	"emissao-gta",
 	"emissao-ata",
+	"finalidade-transito",
 ]);
 
 const produtorAllowedRoutes = new Set([
@@ -57,6 +58,9 @@ const produtorAllowedRoutes = new Set([
 	"emitir-emissao-gta",
 	"cancelar-emissao-gta",
 	"pagar-emissao-gta",
+	"adicionar-finalidade-transito",
+	"visualizar-finalidade-transito",
+	"editar-finalidade-transito",
 	"atualizacao-cadastral-rebanho",
 	"confirmar-dados-produtor-rebanho",
 	"visualizar-atualizacao-cadastral-rebanho",

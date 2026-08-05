@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { ArrowLeft, Info, Check, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowLeft, Info, ChevronDown, ChevronUp } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
-import { FloatInput, LargeTextArea } from "../../../components/ui/FormKit";
+import { FloatInput, FloatSelect } from "../../../components/ui/FormKit";
 
 const GREEN = "#1A7A3C";
 
@@ -20,12 +20,24 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 export function EditarRegistroVendaGtaFisicaPage({ dados, onLogout, onNavigate }: { dados?: any; onLogout: () => void; onNavigate: (screen: string, data?: any) => void; }) {
   const [isSucesso, setIsSucesso] = useState(false);
-  const [produtor, setProdutor] = useState(dados?.produtor || "");
-  const [serie, setSerie] = useState(dados?.serie || "");
-  const [numeroInicial, setNumeroInicial] = useState(dados?.numeroInicial || "");
-  const [numeroFinal, setNumeroFinal] = useState(dados?.numeroFinal || "");
-  const [data, setData] = useState(dados?.data || "");
-  const [observacao, setObservacao] = useState(dados?.observacao || "");
+  const [medicoNome, setMedicoNome] = useState(dados?.medicoNome || dados?.medico?.nome || "Dr. Carlos Eduardo Silva");
+  const [escritorioNome, setEscritorioNome] = useState(dados?.escritorioNome || dados?.escritorio?.nome || "Coordenadoria Regional de Belo Horizonte");
+  const [serie, setSerie] = useState(dados?.serie || "A1");
+  const [numeroInicial, setNumeroInicial] = useState(dados?.numInicial || dados?.numeroInicial || "000001");
+  const [numeroFinal, setNumeroFinal] = useState(dados?.numFinal || dados?.numeroFinal || "000050");
+  const [situacao, setSituacao] = useState(dados?.situacao || "Gravada");
+  const registroAtualizado = {
+    ...(dados || {}),
+    id: dados?.id || 1,
+    medicoNome,
+    medico: { ...(dados?.medico || {}), nome: medicoNome },
+    escritorioNome,
+    escritorio: { ...(dados?.escritorio || {}), nome: escritorioNome },
+    serie,
+    numInicial: numeroInicial,
+    numFinal: numeroFinal,
+    situacao,
+  };
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
@@ -36,9 +48,9 @@ export function EditarRegistroVendaGtaFisicaPage({ dados, onLogout, onNavigate }
             <ArrowLeft size={15} /> Todos os Registros
           </button>
           <div className="flex justify-between items-center w-full">
-            <h1 className="text-2xl font-semibold text-gray-900">Editar Registro de Venda (GTA Física)</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">Editar Registro de Venda GTA Física</h1>
             <button type="button" onClick={() => setIsSucesso(true)} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm">
-              Salvar Alterações
+              Salvar
             </button>
           </div>
         </div>
@@ -48,31 +60,25 @@ export function EditarRegistroVendaGtaFisicaPage({ dados, onLogout, onNavigate }
           <p className="text-sm text-gray-600 font-medium leading-relaxed">Campos indicados com <span className="text-red-500 font-bold">*</span> são obrigatórios.</p>
         </div>
 
-        <Section title="Detalhes do Registro">
+        <Section title="Informações Básicas">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <FloatInput label="Produtor" required value={produtor} onChange={setProdutor} />
-            <FloatInput label="Data da Venda" type="date" required value={data} onChange={setData} />
+            <FloatInput label="Médico Veterinário" required value={medicoNome} onChange={setMedicoNome} />
+            <FloatInput label="Escritório Seccional" required value={escritorioNome} onChange={setEscritorioNome} />
             <FloatInput label="Série" required value={serie} onChange={setSerie} maxLength={2} />
-            <div className="hidden md:block"></div>
             <FloatInput label="Número Inicial" required value={numeroInicial} onChange={setNumeroInicial} maxLength={10} />
             <FloatInput label="Número Final" required value={numeroFinal} onChange={setNumeroFinal} maxLength={10} />
           </div>
-        </Section>
-
-        <Section title="Observações">
-          <LargeTextArea label="Observações" value={observacao} onChange={setObservacao} />
         </Section>
       </main>
 
       {isSucesso && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4 animate-fadeIn">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
-            <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4"><Check size={28} className="text-[#1A7A3C]" strokeWidth={3} /></div>
             <h3 className="text-lg font-bold text-gray-900">Alterações salvas!</h3>
             <p className="text-sm text-gray-500 mt-1">O registro de venda foi atualizado.</p>
             <div className="flex gap-3 justify-center mt-6">
               <button onClick={() => { setIsSucesso(false); onNavigate("registro-venda-gta-fisica"); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50 transition">Voltar</button>
-              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-registro-venda-gta-fisica", dados); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
+              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-registro-venda-gta-fisica", registroAtualizado); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
             </div>
           </div>
         </div>

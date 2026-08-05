@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { ArrowLeft, Pencil, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronUp } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
-import { FloatInput, LargeTextArea } from "../../../components/ui/FormKit";
+import { FloatInput } from "../../../components/ui/FormKit";
 
 const GREEN = "#1A7A3C";
 
@@ -19,7 +19,15 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 export function VisualizarDistribuicaoFormulariosGtaPage({ dados, onLogout, onNavigate }: { dados?: any; onLogout: () => void; onNavigate: (s: string, d?: any) => void; }) {
-  const dist = dados || {};
+  const dist = {
+    id: 1,
+    escritorio: { id: 1, nome: "Escritório Seccional de Lavras" },
+    serie: "A1",
+    numeroInicial: 1,
+    numeroFinal: 500,
+    situacao: "Ativo",
+    ...(dados || {}),
+  };
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
@@ -31,23 +39,20 @@ export function VisualizarDistribuicaoFormulariosGtaPage({ dados, onLogout, onNa
           </button>
           <div className="flex justify-between items-center w-full">
             <h1 className="text-2xl font-semibold text-gray-900">Visualizar Distribuição de Formulários</h1>
-            <button type="button" onClick={() => onNavigate("editar-distribuicao-formularios-gta", dist)} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2">
-              <Pencil size={14} /> Editar
+            <button type="button" onClick={() => onNavigate("editar-distribuicao-formularios-gta", dist)} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm">
+              Editar
             </button>
           </div>
         </div>
 
-        <Section title="Detalhes da Distribuição">
+        <Section title="Informações Básicas">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <FloatInput label="Unidade Administrativa" value={dist.unidade || "-"} disabled onChange={() => {}} />
-            <FloatInput label="Data de Distribuição" value={dist.data || "-"} disabled onChange={() => {}} />
-            <FloatInput label="Número Inicial" value={dist.numeroInicial || "-"} disabled onChange={() => {}} />
-            <FloatInput label="Número Final" value={dist.numeroFinal || "-"} disabled onChange={() => {}} />
+            <FloatInput label="Escritório Seccional" value={dist.escritorio?.nome || "Escritório Seccional de Lavras"} disabled onChange={() => {}} />
+            <FloatInput label="Série" value={dist.serie || "A1"} disabled onChange={() => {}} />
+            <FloatInput label="Número Inicial" value={String(dist.numeroInicial || 1)} disabled onChange={() => {}} />
+            <FloatInput label="Número Final" value={String(dist.numeroFinal || 500)} disabled onChange={() => {}} />
+            <FloatInput label="Situação" value={dist.situacao || "Ativo"} disabled onChange={() => {}} />
           </div>
-        </Section>
-
-        <Section title="Observações">
-          <LargeTextArea label="Observações" value={dist.observacao || "Nenhuma observação registrada."} disabled onChange={() => {}} />
         </Section>
       </main>
     </div>

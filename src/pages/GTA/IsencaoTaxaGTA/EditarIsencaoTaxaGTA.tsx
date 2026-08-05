@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { ArrowLeft, Info, Check, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowLeft, Info, ChevronDown, ChevronUp } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
-import { FloatInput, FloatSelect, LargeTextArea } from "../../../components/ui/FormKit";
+import { FloatInput, FloatSelect } from "../../../components/ui/FormKit";
 
 const GREEN = "#1A7A3C";
 
@@ -20,10 +20,9 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 export function EditarIsencaoTaxaGtaPage({ dados, onLogout, onNavigate }: { dados?: any; onLogout: () => void; onNavigate: (screen: string, data?: any) => void; }) {
   const [isSucesso, setIsSucesso] = useState(false);
-  const [especie, setEspecie] = useState(dados?.especie || "");
-  const [finalidade, setFinalidade] = useState(dados?.finalidade || "");
+  const [motivo, setMotivo] = useState(dados?.motivo || "Instituição de pesquisa");
   const [situacao, setSituacao] = useState(dados?.situacao || "Ativo");
-  const [observacao, setObservacao] = useState(dados?.observacao || "");
+  const isencaoAtualizada = { id: dados?.id || 1, motivo, situacao };
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
@@ -36,7 +35,7 @@ export function EditarIsencaoTaxaGtaPage({ dados, onLogout, onNavigate }: { dado
           <div className="flex justify-between items-center w-full">
             <h1 className="text-2xl font-semibold text-gray-900">Editar Isenção de Taxa de GTA</h1>
             <button type="button" onClick={() => setIsSucesso(true)} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm">
-              Salvar Alterações
+              Salvar
             </button>
           </div>
         </div>
@@ -48,26 +47,20 @@ export function EditarIsencaoTaxaGtaPage({ dados, onLogout, onNavigate }: { dado
 
         <Section title="Informações Básicas">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <FloatInput label="Espécie" required value={especie} onChange={setEspecie} />
-            <FloatInput label="Finalidade" required value={finalidade} onChange={setFinalidade} />
+            <FloatInput label="Motivo da Isenção de Taxa de GTA" required value={motivo} onChange={setMotivo} />
             <FloatSelect label="Situação" required value={situacao} onChange={setSituacao} options={[ { value: "Ativo", label: "Ativo" }, { value: "Inativo", label: "Inativo" } ]} />
           </div>
-        </Section>
-
-        <Section title="Observações">
-          <LargeTextArea label="Observações" value={observacao} onChange={setObservacao} />
         </Section>
       </main>
 
       {isSucesso && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4 animate-fadeIn">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
-            <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4"><Check size={28} className="text-[#1A7A3C]" strokeWidth={3} /></div>
             <h3 className="text-lg font-bold text-gray-900">Alterações salvas!</h3>
-            <p className="text-sm text-gray-500 mt-1">A isenção para a espécie "{especie}" foi atualizada.</p>
+            <p className="text-sm text-gray-500 mt-1">A isenção "{motivo}" foi atualizada.</p>
             <div className="flex gap-3 justify-center mt-6">
               <button onClick={() => { setIsSucesso(false); onNavigate("isencao-taxa-gta"); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50 transition">Voltar</button>
-              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-isencao-taxa-gta", dados); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
+              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-isencao-taxa-gta", isencaoAtualizada); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
             </div>
           </div>
         </div>
