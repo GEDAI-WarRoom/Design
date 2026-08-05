@@ -1,6 +1,5 @@
 import {
   ArrowRight,
-  BadgePercent,
   BriefcaseBusiness,
   BriefcaseMedical,
   Calendar,
@@ -597,7 +596,13 @@ export const thirdCategories: MenuCategory[] = [
       {
         label: "Taxa de Emissão de Documento Sanitário",
         route: "taxa-emissao-gta",
-        icon: <BadgePercent size={16} />,
+        icon: (
+          <img
+            src={Icons.iconeTaxaGTAUrl}
+            alt="Taxa de Emissão de Documento Sanitário"
+            className="w-4 h-4 object-contain"
+          />
+        ),
       },
       {
         label: "Isenção de Taxa de Documento Sanitário",
