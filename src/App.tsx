@@ -758,32 +758,8 @@ export default function App() {
 
 	switch (screen) {
 		case "editar-usuario":
-      return <EditarUsuarioPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
-  const [screen, setScreen] = useState<Screen>("login");
-  const [screenData, setScreenData] = useState<any>(null);
-  const { role, selectRole, clearRole } = useDemoUser();
-
-  const handleLogout = () => {
-    clearRole();
-    setScreen("login");
-    setScreenData(null);
-  };
-
-  const handleNavigate = (targetScreen: Screen, data?: any) => {
-    if (!isRouteAllowed(role, targetScreen)) {
-      setScreenData(null);
-      setScreen("dashboard");
-      return;
-    }
-
-    if (data !== undefined) {
-      setScreenData(data);
-    }
-    setScreen(targetScreen);
-  };
-
-  switch (screen) {
-		case "finalidade-transito":
+	      return <EditarUsuarioPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+			case "finalidade-transito":
       return <FinalidadeTransitoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-finalidade-transito":
       return <AdicionarFinalidadeTransitoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
