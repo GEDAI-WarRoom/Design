@@ -99,6 +99,10 @@ export function AdicionarUnidadeAdministrativaPage({ onLogout, onNavigate }: Pag
 
   const [isSucesso, setIsSucesso] = useState(false);
 
+  // Neste protótipo, a confirmação pode ser exibida mesmo com o formulário
+  // incompleto, facilitando a navegação e a validação visual do fluxo.
+  const handleAdicionar = () => setIsSucesso(true);
+
   // Unidade Pai só quando o tipo ≠ Escritório Central
   const mostrarUnidadePai = tipo !== "" && tipo !== "Escritório Central";
   const tipoPaiImediato = tipo ? TIPO_PAI[tipo] : undefined;
@@ -126,7 +130,7 @@ export function AdicionarUnidadeAdministrativaPage({ onLogout, onNavigate }: Pag
           </button>
           <div className="flex justify-between items-center w-full">
             <h1 className="text-2xl font-semibold text-gray-900">Adicionar Unidade Administrativa</h1>
-            <button type="button" onClick={() => setIsSucesso(true)} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm">Adicionar</button>
+            <button type="button" onClick={handleAdicionar} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm">Adicionar</button>
           </div>
         </div>
 
@@ -160,16 +164,16 @@ export function AdicionarUnidadeAdministrativaPage({ onLogout, onNavigate }: Pag
               />
             </div>
 
-                      {mostrarUnidadePai && (
-            <UnidadeAdministrativaInput
-              label="Unidade Pai"
-              required
-              tipoFiltro={tipoPaiImediato}
-              value={unidadePai ? unidadePai.nome : ""}
-              onChange={(ent: any) => setUnidadePai(ent)}
-              onEyeClick={() => unidadePai && onNavigate("visualizar-unidade-administrativa", unidadePai)}
-            />
-          )}
+            {mostrarUnidadePai && (
+              <UnidadeAdministrativaInput
+                label="Unidade Pai"
+                required
+                tipoFiltro={tipoPaiImediato}
+                value={unidadePai ? unidadePai.nome : ""}
+                onChange={(ent: any) => setUnidadePai(ent)}
+                onEyeClick={() => unidadePai && onNavigate("visualizar-unidade-administrativa", unidadePai)}
+              />
+            )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               {/* Unidade Pai — só se o tipo ≠ Escritório Central; lista do tipo pai imediato */}
@@ -240,16 +244,22 @@ export function AdicionarUnidadeAdministrativaPage({ onLogout, onNavigate }: Pag
       {isSucesso && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
-            <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4"><Check size={28} className="text-[#1A7A3C]" strokeWidth={3} /></div>
             <h3 className="text-lg font-bold text-gray-900">Unidade administrativa adicionada com sucesso!</h3>
             <p className="text-sm text-gray-500 mt-1">{nome ? `"${nome}"` : "A unidade administrativa"} foi adicionada.</p>
             <div className="flex gap-3 justify-center mt-6">
               <button onClick={() => { setIsSucesso(false); onNavigate("unidade-administrativa"); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition">Voltar</button>
-              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-unidade-administrativa", {
-                nome, sigla, tipo,
-                unidadePai: unidadePai?.nome ?? "",
-                situacao: "Ativo",
-              }); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
+              <button onClick={() => {
+                setIsSucesso(false); onNavigate("visualizar-unidade-administrativa", {
+                  nome, sigla, tipo,
+                  unidadePai: unidadePai?.nome ?? "",
+                  municipio: endereco.municipio,
+                  endereco,
+                  email,
+                  telefones,
+                  observacao: "Unidade administrativa cadastrada para demonstração.",
+                  situacao: "Ativo",
+                });
+              }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
             </div>
           </div>
         </div>

@@ -1,12 +1,11 @@
-import { useState } from "react";
 import {
   ArrowLeft,
-  Check,
   ChevronDown,
   ChevronUp,
   ExternalLink,
   Info,
 } from "lucide-react";
+import { useState } from "react";
 import { Navbar } from "../../../components/Navbar";
 import {
   CustomButton,
@@ -83,7 +82,7 @@ export function ConfirmarDadosProdutorRebanhoPage({
 
   const salvar = () => {
     if (!confirmado) return;
-    
+
     // 1. Marca os dados do produtor como confirmados
     confirmarDadosProdutor(atualizacao);
 
@@ -124,8 +123,8 @@ export function ConfirmarDadosProdutorRebanhoPage({
               </h1>
             </div>
             <p className="text-xs sm:text-sm text-gray-600 mt-1">
-              Confirme os dados de contato do produtor para realizar a atualização
-              cadastral de rebanho:
+              Confirme os dados de contato do produtor para realizar a
+              atualização cadastral de rebanho:
             </p>
           </div>
 
@@ -154,7 +153,10 @@ export function ConfirmarDadosProdutorRebanhoPage({
                     </h2>
                     <div className="flex flex-col gap-3">
                       {contatosObrigatorios.map((contato) => (
-                        <ContatoSomenteLeitura key={contato.id} contato={contato} />
+                        <ContatoSomenteLeitura
+                          key={contato.id}
+                          contato={contato}
+                        />
                       ))}
                     </div>
                   </div>
@@ -166,7 +168,10 @@ export function ConfirmarDadosProdutorRebanhoPage({
                       </h2>
                       <div className="flex flex-col gap-3">
                         {contatosAdicionais.map((contato) => (
-                          <ContatoSomenteLeitura key={contato.id} contato={contato} />
+                          <ContatoSomenteLeitura
+                            key={contato.id}
+                            contato={contato}
+                          />
                         ))}
                       </div>
                     </div>
@@ -191,8 +196,8 @@ export function ConfirmarDadosProdutorRebanhoPage({
                     onChange={(event) => setConfirmado(event.target.checked)}
                     className="mt-0.5 h-4 w-4 rounded accent-[#1A7A3C] shrink-0"
                   />
-                  Declaro que todas as informações prestadas são verdadeiras e refletem
-                  a situação atual do cadastro.
+                  Declaro que todas as informações prestadas são verdadeiras e
+                  refletem a situação atual do cadastro.
                 </span>
               </span>
             </label>
@@ -217,10 +222,7 @@ export function ConfirmarDadosProdutorRebanhoPage({
                 >
                   Cancelar
                 </CustomButton>
-                <CustomButton
-                  onClick={salvar}
-                  disabled={!confirmado}
-                >
+                <CustomButton onClick={salvar} disabled={!confirmado}>
                   Salvar
                 </CustomButton>
               </div>

@@ -42,6 +42,9 @@ interface Profissional {
   crea: string;
   habilitacao: string;
   numeroHabilitacao: string;
+  coordenadoria: string;
+  anexos: Array<{ nome: string; descricao: string }>;
+  observacao: string;
   situacao: "Ativo" | "Inativo";
 }
 
@@ -54,6 +57,9 @@ const PROFISSIONAIS_MOCK: Profissional[] = [
     crea: "506779200",
     habilitacao: "Habilitado para emissão de PTV",
     numeroHabilitacao: "31250001",
+    coordenadoria: "Coordenadoria Regional de Oliveira",
+    anexos: [{ nome: "registro_crea.pdf", descricao: "Comprovante de registro profissional" }],
+    observacao: "Profissional habilitado para emissão de PTV na regional de Oliveira.",
     situacao: "Ativo",
   },
   {
@@ -64,6 +70,9 @@ const PROFISSIONAIS_MOCK: Profissional[] = [
     crea: "9913",
     habilitacao: "Habilitado para emissão de CFO/CFOC",
     numeroHabilitacao: "31250034",
+    coordenadoria: "Coordenadoria Regional de Lavras",
+    anexos: [{ nome: "certificado_cfo.pdf", descricao: "Certificado de habilitação" }],
+    observacao: "Profissional habilitado para emissão de CFO e CFOC.",
     situacao: "Ativo",
   },
   {
@@ -74,6 +83,9 @@ const PROFISSIONAIS_MOCK: Profissional[] = [
     crea: "778112004",
     habilitacao: "Habilitado para emissão de CFO/CFOC",
     numeroHabilitacao: "31250087",
+    coordenadoria: "Coordenadoria Regional de Varginha",
+    anexos: [{ nome: "registro_profissional.pdf", descricao: "Registro profissional" }],
+    observacao: "Cadastro inativo mantido para consulta histórica.",
     situacao: "Inativo",
   },
 ];
@@ -196,7 +208,7 @@ export function ProfissionalVegetalPage({ onLogout, onNavigate }: PageProps) {
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
-      <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="profissional-area-vegetal" hideSearch />
+      <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="profissional-vegetal" hideSearch />
 
       <main className="max-w-[1300px] mx-auto px-4 md:px-6 py-6 flex flex-col gap-4">
         
@@ -368,28 +380,28 @@ export function ProfissionalVegetalPage({ onLogout, onNavigate }: PageProps) {
                         <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">{p.habilitacao}</td>
                         <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">{p.numeroHabilitacao}</td>
                         <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">{p.situacao}  </td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-1 justify-end">
-                            <button
-                              type="button"
-                              onClick={() => onNavigate("visualizar-profissional-area-vegetal", p)}
-                              className="p-2 rounded-md hover:bg-green-50 transition"
-                              style={{ color: GREEN }}
-                              title="Visualizar"
-                            >
-                              <ViewIcon size={18} />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => onNavigate("editar-profissional-area-vegetal", p)}
-                              className="p-2 rounded-md hover:bg-green-50 transition"
-                              style={{ color: GREEN }}
-                              title="Editar"
-                            >
-                              <Pencil size={17} />
-                            </button>
-                          </div>
-                        </td>
+                       <td className="px-4 py-3">
+  <div className="flex items-center gap-1 justify-end">
+    <button
+      type="button"
+      onClick={() => onNavigate("visualizar-profissional-vegetal", p)} // <- AQUI (tiramos o "-area")
+      className="p-2 rounded-md hover:bg-green-50 transition"
+      style={{ color: GREEN }}
+      title="Visualizar"
+    >
+      <ViewIcon size={18} />
+    </button>
+    <button
+      type="button"
+      onClick={() => onNavigate("editar-profissional-vegetal", p)} // <- AQUI (tiramos o "-area")
+      className="p-2 rounded-md hover:bg-green-50 transition"
+      style={{ color: GREEN }}
+      title="Editar"
+    >
+      <Pencil size={17} />
+    </button>
+  </div>
+</td>
                       </tr>
                     ))}
                   </tbody>

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
-import { RequiredFieldsNotice, TaxaEmissaoGtaForm, taxaValida } from "./TaxaEmissaoGtaForm";
-import { adicionarTaxaEmissaoGta, criarTaxaVazia } from "./taxaEmissaoGtaData";
+import { RequiredFieldsNotice, TaxaEmissaoGtaForm } from "./TaxaEmissaoGtaForm";
+import { ESPECIES_TAXA_MOCK, adicionarTaxaEmissaoGta, criarTaxaVazia, type TaxaEmissaoGtaDraft } from "./taxaEmissaoGtaData";
 
 interface AdicionarTaxaEmissaoGtaPageProps {
   onLogout: () => void;
@@ -14,7 +14,18 @@ export function AdicionarTaxaEmissaoGtaPage({ onLogout, onNavigate }: AdicionarT
   const [error, setError] = useState("");
 
   const salvar = () => {
-    const resultado = adicionarTaxaEmissaoGta(taxa);
+    const taxaPreenchida: TaxaEmissaoGtaDraft = {
+      ...taxa,
+      especie: taxa.especie.id ? taxa.especie : ESPECIES_TAXA_MOCK[5],
+      dataInicioVigencia: taxa.dataInicioVigencia || "2026-08-01",
+      tipoCobranca: taxa.tipoCobranca || "Por Cabeça",
+      itemReceita: taxa.tipoCobranca === "Por Quantidade" ? taxa.itemReceita : (taxa.itemReceita || "Abelhas"),
+      porCabeca: taxa.tipoCobranca === "Por Quantidade" ? (taxa.porCabeca || "Até") : taxa.porCabeca,
+      itemReceitaPorCabeca: taxa.tipoCobranca === "Por Quantidade" ? (taxa.itemReceitaPorCabeca || "Abelhas") : taxa.itemReceitaPorCabeca,
+      itemReceitaPorDocumento: taxa.tipoCobranca === "Por Quantidade" ? (taxa.itemReceitaPorDocumento || "Aves") : taxa.itemReceitaPorDocumento,
+      quantidadeAnimais: taxa.tipoCobranca === "Por Quantidade" ? (taxa.quantidadeAnimais || "20") : taxa.quantidadeAnimais,
+    };
+    const resultado = adicionarTaxaEmissaoGta(taxaPreenchida);
     if (resultado.erro) {
       setError(resultado.erro);
       return;
@@ -46,8 +57,7 @@ export function AdicionarTaxaEmissaoGtaPage({ onLogout, onNavigate }: AdicionarT
             <button
               type="button"
               onClick={salvar}
-              disabled={!taxaValida(taxa)}
-              className="px-5 h-10 text-xs font-bold rounded-md text-white bg-[#1A7A3C] hover:bg-[#15612F] disabled:opacity-50 disabled:cursor-not-allowed transition"
+              className="px-5 h-10 text-xs font-bold rounded-md text-white bg-[#1A7A3C] hover:bg-[#15612F] transition"
             >
               Adicionar
             </button>

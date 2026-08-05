@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { ArrowLeft, Check } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { RegistroVendaGTADigitalForm, RequiredFieldsNotice, type RegistroVendaGTAFormValue } from "./RegistroVendaGTADigitalForm";
-import { FATOR_VALOR_GTA, criarRegistroVendaGTA, type RegistroVendaGTADigital } from "./registroVendaGTADigitalData";
+import { ESCRITORIOS_SECCIONAIS, FATOR_VALOR_GTA, MEDICOS_VETERINARIOS_GTA, criarRegistroVendaGTA, type RegistroVendaGTADigital } from "./registroVendaGTADigitalData";
 
 const estadoInicial: RegistroVendaGTAFormValue = { medico: null, escritorio: null, quantidadeComprada: "", quantidadeUtilizada: 0, situacao: "Gravada" };
 
@@ -10,28 +10,21 @@ const estadoInicial: RegistroVendaGTAFormValue = { medico: null, escritorio: nul
 
 export function AdicionarRegistroVendaGTADigitalPage({ onLogout, onNavigate }: any) {
   const [form, setForm] = useState(estadoInicial);
-  const [tentouSalvar, setTentouSalvar] = useState(false);
   const [registroSalvo, setRegistroSalvo] = useState<RegistroVendaGTADigital | null>(null);
 
   const quantidade = Number(form.quantidadeComprada);
 
-  // Ajuste na validação para ser menos restritiva se necessário
-  const valido = !!form.medico && !!form.escritorio && quantidade > 0;
-
   const salvar = () => {
-    setTentouSalvar(true);
-
-    // Verifica se os campos obrigatórios estão preenchidos
-    if (!form.medico || !form.escritorio || quantidade <= 0) {
-      return;
-    }
+    const medico = form.medico || MEDICOS_VETERINARIOS_GTA[0];
+    const escritorio = form.escritorio || ESCRITORIOS_SECCIONAIS[0];
+    const quantidadeFinal = quantidade > 0 ? quantidade : 50;
 
     // Cria o registro e define no estado, o que fará o modal aparecer
     const novoRegistro = criarRegistroVendaGTA({
-      medico: form.medico,
-      escritorio: form.escritorio,
-      quantidadeComprada: quantidade,
-      valor: quantidade * FATOR_VALOR_GTA
+      medico,
+      escritorio,
+      quantidadeComprada: quantidadeFinal,
+      valor: quantidadeFinal * FATOR_VALOR_GTA
     });
 
     setRegistroSalvo(novoRegistro);
@@ -64,12 +57,7 @@ export function AdicionarRegistroVendaGTADigitalPage({ onLogout, onNavigate }: a
         <RegistroVendaGTADigitalForm
           value={form}
           onChange={setForm}
-          errors={tentouSalvar ? { medico: !form.medico, escritorio: !form.escritorio, quantidade: quantidade <= 0 } : {}}
         />
-
-        {tentouSalvar && !valido && (
-          <p className="text-sm text-red-500 font-medium">Preencha os campos obrigatórios para continuar.</p>
-        )}
       </main>
 
       {/* MODAL DE SUCESSO REESTILIZADO */}

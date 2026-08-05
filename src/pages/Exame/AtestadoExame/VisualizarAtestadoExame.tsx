@@ -1,59 +1,188 @@
 import React, { useState } from "react";
-import { ArrowLeft, ChevronUp, ChevronDown } from "lucide-react";
+import { ArrowLeft, ChevronUp, ChevronDown, Eye, Pencil } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
-import { FloatInput } from "../../../components/ui/FormKit";
-import { DoencaInput } from "../../../components/ui/EntitySearch";
+import { FloatInput, FloatSelect } from "../../../components/ui/FormKit";
+import {
+  CLASSE_CAMPO_ALTERADO_HISTORICO,
+  HistoricoCadastroLayout,
+  campoHistoricoFoiAlterado,
+  type CampoHistoricoComparavel,
+} from "../../../components/ui/HistoricoCadastroLayout";
+import {
+  obterAtestadoExame,
+  obterHistoricoAtestadoExame,
+  type DadosAtestadoExame,
+} from "./atestadoExameData";
 
 const GREEN = "#1A7A3C";
 
-function Section({ title, children }: { title: string; children: React.ReactNode; }) {
-  const [open, setOpen] = useState(true);
+function camposComparaveis(dados: DadosAtestadoExame): CampoHistoricoComparavel[] {
+  return [
+    { label: "Descrição do atestado", value: dados.descricao },
+    { label: "Doença", value: dados.doenca.nome },
+    { label: "Dias de Validade do Exame", value: dados.diasValidade },
+    { label: "Situação", value: dados.situacao },
+  ];
+}
+
+// HELPERS DE UI
+function Section({ title, children, defaultOpen = true }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) {
+  const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-      <button type="button" onClick={() => setOpen(!open)} className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50 transition border-b border-gray-100">
+    <div className="bg-white rounded-xl shadow-sm">
+      <button type="button" onClick={() => setOpen(!open)} className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50 transition">
         <span className="text-base font-semibold text-gray-800">{title}</span>
         {open ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
       </button>
-      {open && <div className="p-6 flex flex-col gap-5 bg-white">{children}</div>}
+      {open && <div className="px-6 pb-6 border-t border-gray-100 pt-5">{children}</div>}
     </div>
   );
 }
 
-export function VisualizarAtestadoExamePage({ onLogout, onNavigate, dados }: { dados?: any; onLogout?: () => void; onNavigate?: (s: string, d?: any) => void; }) {
-  const atestado = dados || { descricao: "Atestado para realização de exame de Brucelose", doenca: { id: 2, codigo: "D02", nome: "Brucelose" }, diasValidade: "60" };
-  const nomeDoenca = atestado.doenca?.nome || "";
+// Componente para exibir entidades selecionadas com o botão de visualizar ("olhinho")
+function EntidadeLeitura({ label, value, icon, onVer, className = "" }: { label: string; value: string; icon?: React.ReactNode; onVer?: () => void; className?: string }) {
+  return (
+    <div className="flex items-center gap-2 w-full">
+      <div className="flex-1">
+        <FloatInput label={label} value={value} icon={icon} disabled onChange={() => { }} className={className} />
+      </div>
+      {onVer && (
+        <button
+          type="button"
+          onClick={onVer}
+          title={`Visualizar ${label}`}
+          className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md transition h-12 flex items-center flex-shrink-0 cursor-pointer"
+        >
+          <Eye size={20} />
+        </button>
+      )}
+    </div>
+  );
+}
+
+// PÁGINA: VISUALIZAR ATESTADO DE EXAME
+interface PageProps {
+  onLogout?: () => void;
+  onNavigate?: (screen: string, data?: any) => void;
+  dados?: any;
+}
+
+export function VisualizarAtestadoExamePage({
+  onLogout = () => {},
+  onNavigate = (screen) => console.log("navigate:", screen),
+  dados,
+}: PageProps) {
+  const dadosAtuais = obterAtestadoExame(dados);
+  const historico = obterHistoricoAtestadoExame(dadosAtuais);
+  const camposAtuais = camposComparaveis(dadosAtuais);
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
-      <Navbar onLogout={onLogout!} onNavigate={onNavigate!} currentScreen="atestado-exame" hideSearch />
+      <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="atestado-exame" hideSearch />
 
-      <main className="max-w-[1088px] mx-auto px-4 md:px-6 py-6 flex flex-col gap-4">
+      <HistoricoCadastroLayout<DadosAtestadoExame>
+        itens={historico}
+        resetKey={dadosAtuais.id}
+        conteudoClassName="flex flex-col gap-4 px-4 py-6 md:px-6"
+        onVisualizarAutor={(nome) =>
+          onNavigate("visualizar-pessoa-fisica", { nome })
+        }
+      >
+        {({ botaoHistorico, avisoVersao, dadosSelecionados, visualizandoVersaoAntiga }) => {
+          const r = dadosSelecionados ?? dadosAtuais;
+          const classeCampo = (label: string, value: unknown) =>
+            campoHistoricoFoiAlterado(
+              { label, value },
+              camposAtuais,
+              visualizandoVersaoAntiga,
+            )
+              ? CLASSE_CAMPO_ALTERADO_HISTORICO
+              : "";
+
+          return (
+          <>
+        {/* Cabeçalho */}
         <div>
-          <button type="button" onClick={() => onNavigate!("atestado-exame")} className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70 font-semibold" style={{ color: GREEN }}>
-            <ArrowLeft size={15} /> Todos os Atestados de Exame
+          <button 
+            type="button" 
+            onClick={() => onNavigate("atestado-exame")} 
+            className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70" 
+            style={{ color: GREEN }}
+          >
+            <ArrowLeft size={15} />
+            Todos os Atestados de Exame
           </button>
           
-          <div className="flex justify-between items-center w-full">
+          <div className="flex justify-between items-center gap-4 w-full">
             <h1 className="text-2xl font-semibold text-gray-900">Visualizar Atestado de Exame</h1>
-            <button type="button" onClick={() => onNavigate!("editar-atestado-exame", atestado)} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2">
-              Editar
-            </button>
+            <div className="flex items-center gap-3">
+              {botaoHistorico}
+              {!visualizandoVersaoAntiga && (
+                <button
+                  type="button"
+                  onClick={() => onNavigate("editar-atestado-exame", dadosAtuais)}
+                  className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2"
+                >
+                  <Pencil size={16} />
+                  Editar
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
+        {avisoVersao}
+
+        {/* Formulário - Informações Básicas (Somente Leitura) */}
         <Section title="Informações Básicas">
           <div className="flex flex-col gap-6">
+            
             <div className="w-full">
-              <FloatInput label="Descrição do atestado" required value={atestado.descricao} disabled onChange={() => {}} maxLength={255} />
+              <FloatInput
+                label="Descrição do atestado"
+                value={r.descricao}
+                disabled
+                onChange={() => {}}
+                className={classeCampo("Descrição do atestado", r.descricao)}
+              />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start w-full">
-              <DoencaInput required disabled data={[atestado.doenca]} value={nomeDoenca} onChange={() => {}} />
-              <FloatInput label="Dias de Validade do Exame" required value={String(atestado.diasValidade)} disabled onChange={() => {}} maxLength={3} />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start w-full">
+              
+              {/* Leitura da Entidade Doença com olhinho para ver detalhes */}
+              <EntidadeLeitura 
+                label="Doença" 
+                value={r.doenca.nome} 
+                onVer={() => alert(`Visualizar detalhes da doença: ${r.doenca.nome}`)} 
+                className={classeCampo("Doença", r.doenca.nome)}
+              />
+
+              <FloatInput
+                label="Dias de Validade do Exame"
+                value={r.diasValidade}
+                disabled
+                onChange={() => {}}
+                className={classeCampo("Dias de Validade do Exame", r.diasValidade)}
+              />
+
+              {/* Situação agora é exibida, conforme AC de "Disponível após o cadastro" */}
+              <FloatSelect
+                label="Situação"
+                value={r.situacao}
+                options={[{ value: r.situacao, label: r.situacao }]}
+                disabled
+                onChange={() => {}}
+                className={classeCampo("Situação", r.situacao)}
+              />
+
             </div>
+
           </div>
         </Section>
-      </main>
+          </>
+          );
+        }}
+      </HistoricoCadastroLayout>
     </div>
   );
 }

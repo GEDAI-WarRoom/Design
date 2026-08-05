@@ -4,7 +4,6 @@ import { Navbar } from "../../../components/Navbar";
 import {
   RequiredFieldsNotice,
   VendaPropriedadeForm,
-  vendaPropriedadeValida,
   type VendaPropriedadeFormValue,
 } from "./VendaPropriedadeForm";
 import { criarVendaPropriedade, type VendaPropriedade } from "./vendaPropriedadeData";
@@ -25,25 +24,34 @@ const estadoInicial: VendaPropriedadeFormValue = {
 
 export function AdicionarVendaPropriedadePage({ onLogout, onNavigate }: PageProps) {
   const [form, setForm] = useState<VendaPropriedadeFormValue>(estadoInicial);
-  const [erro, setErro] = useState("");
   const [registroSalvo, setRegistroSalvo] = useState<VendaPropriedade | null>(null);
 
   const adicionar = () => {
-    if (!vendaPropriedadeValida(form)) {
-      setErro("Preencha todos os campos obrigatórios para continuar.");
-      return;
-    }
-
     const registro = criarVendaPropriedade({
-      vendedor: form.vendedor!,
-      estabelecimento: form.estabelecimento!,
+      vendedor: form.vendedor ?? {
+        id: 0,
+        nome: "Não informado",
+        documento: "Não informado",
+        tipo: "PF",
+      },
+      estabelecimento: form.estabelecimento ?? {
+        id: 0,
+        codigo: "Não informado",
+        nome: "Não informado",
+        municipio: "Não informado",
+        proprietarioId: form.vendedor?.id ?? 0,
+      },
       dataVenda: form.dataVenda,
-      comprador: form.comprador!,
-      porteiraFechada: form.porteiraFechada!,
-      tipoTransferencia: form.tipoTransferencia!,
+      comprador: form.comprador ?? {
+        id: 0,
+        nome: "Não informado",
+        documento: "Não informado",
+        tipo: "PF",
+      },
+      porteiraFechada: form.porteiraFechada || "Não",
+      tipoTransferencia: form.tipoTransferencia || "Venda",
     });
 
-    setErro("");
     setRegistroSalvo(registro);
   };
 
@@ -73,23 +81,30 @@ export function AdicionarVendaPropriedadePage({ onLogout, onNavigate }: PageProp
         </div>
 
         <RequiredFieldsNotice />
-        <VendaPropriedadeForm value={form} onChange={(valor) => { setForm(valor); setErro(""); }} />
-        {erro && <p className="text-sm text-red-500 font-medium">{erro}</p>}
+        <VendaPropriedadeForm
+          value={form}
+          onChange={setForm}
+          onViewPessoa={(pessoa) => onNavigate(
+            pessoa.tipo === "PF" ? "visualizar-pessoa-fisica" : "visualizar-pessoa-juridica",
+            pessoa,
+          )}
+          onViewEstabelecimento={(estabelecimento) => (
+            onNavigate("visualizar-estabelecimento-agropecuario", estabelecimento)
+          )}
+        />
       </main>
 
       {registroSalvo && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
-            <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4">
-              <Check size={28} className="text-[#1A7A3C]" strokeWidth={3} />
-            </div>
-            <h2 className="text-lg font-bold text-gray-900">Venda de propriedade cadastrada com sucesso!</h2>
-            <p className="text-sm text-gray-500 mt-1">A transferência do estabelecimento {registroSalvo.estabelecimento.nome} foi registrada.</p>
+
+            <h2 className="text-lg font-bold text-gray-900">Venda cadastrada!</h2>
+            <p className="text-sm text-gray-500 mt-1">O registro da venda foi cadastrado com sucesso.</p>
             <div className="flex gap-3 justify-center mt-6">
               <button
                 type="button"
                 onClick={() => onNavigate("venda-propriedade")}
-                className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition"
+                className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50 transition"
               >
                 Voltar
               </button>
