@@ -10,8 +10,6 @@ import {
   Eye as ViewIcon,
   Pencil,
   X,
-  Check,
-  Minus,
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, FloatSelect, FloatCombobox } from "../../../components/ui/FormKit";
@@ -65,20 +63,6 @@ const perPageDefault = 10;
 // ==========================================================
 // SUBCOMPONENTES DO SEU PADRÃO
 // ==========================================================
-function SituacaoBadge({ situacao }: { situacao: Profissional["situacao"] }) {
-  const map = {
-    Ativo: { bg: "#E6F4EA", border: "#A3E2B8", text: "#1A7A3C", Icon: Check },
-    Inativo: { bg: "#F3F4F6", border: "#E5E7EB", text: "#6B7280", Icon: Minus },
-  } as const;
-  const { bg, border, text, Icon } = map[situacao];
-  return (
-    <span className="inline-flex items-center gap-1.5 px-3 h-7 rounded-full text-xs font-semibold whitespace-nowrap" style={{ backgroundColor: bg, border: `1px solid ${border}`, color: text }}>
-      <Icon size={13} strokeWidth={3} />
-      {situacao}
-    </span>
-  );
-}
-
 function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
     <div className="flex items-center gap-2 bg-[#1A7A3C] text-white text-xs font-medium px-3 py-1.5 rounded-md shadow-sm max-w-full">
@@ -307,10 +291,10 @@ const matchUnidade = !unidadeAdministrativa || p.unidadeAdministrativa === unida
                       ))}
                       <th
                         onClick={() => toggleSort("situacao")}
-                        className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-normal cursor-pointer select-none hover:text-gray-900"
+                        className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-normal uppercase cursor-pointer select-none hover:text-gray-900"
                       >
                         <span className="inline-flex items-center gap-1">
-                          SITUAÇÃO
+                          Situação
                           {sortKey === "situacao" && (sortAsc ? <ChevronUp size={14} /> : <ChevronDown size={14} />)}
                         </span>
                       </th>
@@ -324,15 +308,13 @@ const matchUnidade = !unidadeAdministrativa || p.unidadeAdministrativa === unida
                         <td className="px-4 py-3 text-gray-500 whitespace-normal">{item.cpf}</td>
                         <td className="px-4 py-3 text-gray-500 whitespace-normal">{item.esfera}</td>
                         <td className="px-4 py-3 text-gray-500 whitespace-normal">{item.unidadeAdministrativa}</td>
-                        <td className="px-4 py-3 text-gray-500 whitespace-normal">
-                          <SituacaoBadge situacao={item.situacao} />
-                        </td>
+                        <td className="px-4 py-3 text-gray-500 whitespace-normal">{item.situacao}</td>
                         <td className="px-4 py-3 text-right whitespace-nowrap">
   <div className="flex items-center justify-end gap-1">
-    <button onClick={() => onNavigate("visualizar-profissional-oficial")} className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md transition">
+    <button onClick={() => onNavigate("visualizar-profissional-oficial", item)} className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md transition">
       <ViewIcon size={18} />
     </button>
-    <button onClick={() => onNavigate("editar-profissional-oficial")} className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md transition">
+    <button onClick={() => onNavigate("editar-profissional-oficial", item)} className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md transition">
       <Pencil size={17} />
     </button>
   </div>
