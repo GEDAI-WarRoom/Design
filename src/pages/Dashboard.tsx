@@ -644,7 +644,7 @@ export const thirdCategories: MenuCategory[] = [
         ),
       },
       {
-        label: "Taxa de Emissão de GTA",
+        label: "Taxa de Emissão de Documento Sanitário",
         route: "taxa-emissao-gta",
         icon: <BadgePercent size={16} />,
       },

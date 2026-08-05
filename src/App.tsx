@@ -273,6 +273,7 @@ import { AdicionarRegistroVendaGtaFisicaPage } from "./pages/GTA/RegistroVendaGT
 import { RegistroVendaGtaFisicaPage } from "./pages/GTA/RegistroVendaGTAFisica/RegistroVendaGTAFisica";
 import { VisualizarRegistroVendaGtaFisicaPage } from "./pages/GTA/RegistroVendaGTAFisica/VisualizarRegistroVendaGTAFisica";
 import { AdicionarTaxaEmissaoGtaPage } from "./pages/GTA/TaxaEmissaoGta/AdicionarTaxaEmissaoGta";
+import { EditarTaxaEmissaoGtaPage } from "./pages/GTA/TaxaEmissaoGta/EditarTaxaEmissaoGta";
 import { TaxaEmissaoGtaPage } from "./pages/GTA/TaxaEmissaoGta/TaxaEmissaoGta";
 import { VisualizarTaxaEmissaoGtaPage } from "./pages/GTA/TaxaEmissaoGta/VisualizarTaxaEmissaoGta";
 
@@ -2906,6 +2907,14 @@ export default function App() {
           dados={screenData}
         />
       );
+    case "editar-taxa-emissao-gta":
+      return (
+        <EditarTaxaEmissaoGtaPage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+          dados={screenData}
+        />
+      );
     case "taxa-emissao-gta":
       return <TaxaEmissaoGtaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 
@@ -3094,12 +3103,6 @@ export default function App() {
       return <VisualizarAtestadoExamePage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "editar-atestado-exame":
       return <EditarAtestadoExamePage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
-    case "acougue":
-      return <AcouguePage onLogout={handleLogout} onNavigate={handleNavigate} />;
-    case "adicionar-acougue":
-    case "editar-acougue":
-    case "visualizar-acougue":
-      return <AdicionarAcouguePage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "evento-pecuario":
       return <EventoPecuarioPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-evento-pecuario":

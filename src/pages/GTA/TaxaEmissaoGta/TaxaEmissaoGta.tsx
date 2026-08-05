@@ -1,11 +1,24 @@
 import { useMemo, useState } from "react";
-import { ArrowLeft, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Dna, Eye, Pencil, SlidersHorizontal, X } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Dna, Eye, Pencil, X } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
 import { FloatSelect } from "../../../components/ui/FormKit";
-import { ESPECIES_TAXA_MOCK, TAXAS_EMISSAO_GTA_MOCK, TIPOS_COBRANCA, formatarData, type EspecieTaxa, type TaxaEmissaoGta } from "./taxaEmissaoGtaData";
+import {
+  ESPECIES_TAXA_MOCK,
+  TIPOS_COBRANCA,
+  TIPOS_DOCUMENTO_SANITARIO,
+  formatarData,
+  listarTaxasEmissaoDocumentoSanitario,
+  type EspecieTaxa,
+  type TaxaEmissaoGta,
+} from "./taxaEmissaoGtaData";
 
-type SortKey = "especie" | "tipoCobranca" | "dataInicioVigencia" | "situacao";
+type SortKey =
+  | "tipoDocumentoSanitario"
+  | "especie"
+  | "tipoCobranca"
+  | "dataInicioVigencia"
+  | "situacao";
 
 const SITUACAO_OPTIONS = [
   { value: "Ativo", label: "Ativo" },
@@ -24,6 +37,7 @@ function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
 }
 
 export function TaxaEmissaoGtaPage({ onLogout, onNavigate }: { onLogout: () => void; onNavigate: (screen: any, data?: any) => void }) {
+  const [tipoDocumentoSanitario, setTipoDocumentoSanitario] = useState("");
   const [especie, setEspecie] = useState<EspecieTaxa | null>(null);
   const [tipoCobranca, setTipoCobranca] = useState("");
   const [situacao, setSituacao] = useState("");
@@ -34,18 +48,26 @@ export function TaxaEmissaoGtaPage({ onLogout, onNavigate }: { onLogout: () => v
   const [page, setPage] = useState(1);
   const perPage = 10;
 
-  const hasFilter = Boolean(especie || tipoCobranca || situacao);
+  const hasFilter = Boolean(
+    tipoDocumentoSanitario || especie || tipoCobranca || situacao,
+  );
 
   const results = useMemo(() => {
-    const filtered = TAXAS_EMISSAO_GTA_MOCK.filter((item) => {
+    const filtered = listarTaxasEmissaoDocumentoSanitario().filter((item) => {
+      const matchTipoDocumento =
+        !tipoDocumentoSanitario ||
+        item.tipoDocumentoSanitario === tipoDocumentoSanitario;
       const matchEspecie = !especie || item.especie.id === especie.id;
       const matchTipoCobranca = !tipoCobranca || item.tipoCobranca === tipoCobranca;
 
-      // Obtém o valor da situação do item (com fallback se for booleano ou string)
-      const itemSituacao = (item as any).situacao || ((item as any).ativo ? "Ativo" : "Ativo");
-      const matchSituacao = !situacao || itemSituacao === situacao;
+      const matchSituacao = !situacao || item.situacao === situacao;
 
-      return matchEspecie && matchTipoCobranca && matchSituacao;
+      return (
+        matchTipoDocumento &&
+        matchEspecie &&
+        matchTipoCobranca &&
+        matchSituacao
+      );
     });
 
     if (!sortKey) return filtered;
@@ -57,8 +79,8 @@ export function TaxaEmissaoGtaPage({ onLogout, onNavigate }: { onLogout: () => v
         first = a.especie.nome;
         second = b.especie.nome;
       } else if (sortKey === "situacao") {
-        first = (a as any).situacao || "Ativo";
-        second = (b as any).situacao || "Ativo";
+        first = a.situacao;
+        second = b.situacao;
       } else {
         first = a[sortKey] || "";
         second = b[sortKey] || "";
@@ -66,7 +88,14 @@ export function TaxaEmissaoGtaPage({ onLogout, onNavigate }: { onLogout: () => v
 
       return sortAsc ? first.localeCompare(second) : second.localeCompare(first);
     });
-  }, [especie, tipoCobranca, situacao, sortKey, sortAsc]);
+  }, [
+    tipoDocumentoSanitario,
+    especie,
+    tipoCobranca,
+    situacao,
+    sortKey,
+    sortAsc,
+  ]);
 
   const totalPages = Math.max(1, Math.ceil(results.length / perPage));
   const currentPage = Math.min(page, totalPages);
@@ -87,6 +116,7 @@ export function TaxaEmissaoGtaPage({ onLogout, onNavigate }: { onLogout: () => v
 
   const label = (key: SortKey) =>
   ({
+    tipoDocumentoSanitario: "Tipo de Documento Sanitário",
     especie: "Espécie",
     tipoCobranca: "Descrição da Taxa",
     dataInicioVigencia: "Data Início de Vigência",
@@ -103,7 +133,7 @@ export function TaxaEmissaoGtaPage({ onLogout, onNavigate }: { onLogout: () => v
             Inicial
           </button>
           <div className="flex items-center justify-between gap-4">
-            <h1 className="text-2xl font-semibold text-gray-900">Taxa de Emissão de GTA</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">Taxa de Emissão de Documento Sanitário</h1>
             <button
               type="button"
               onClick={() => onNavigate("adicionar-taxa-emissao-gta")}
@@ -115,7 +145,19 @@ export function TaxaEmissaoGtaPage({ onLogout, onNavigate }: { onLogout: () => v
         </div>
 
         <section className="bg-white rounded-xl shadow-sm p-6 flex flex-col gap-5">
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 items-end gap-4 w-full">
+          <div className="grid w-full grid-cols-1 items-end gap-4 md:grid-cols-2 lg:grid-cols-5">
+            <div className="w-full">
+              <FloatSelect
+                label="Tipo de Documento Sanitário"
+                value={tipoDocumentoSanitario}
+                onChange={(next) => {
+                  setTipoDocumentoSanitario(next);
+                  setError(false);
+                }}
+                options={TIPOS_DOCUMENTO_SANITARIO}
+              />
+            </div>
+
             {/* Filtro: Espécie */}
             <div className="w-full">
               <EntitySearchInput
@@ -177,6 +219,12 @@ export function TaxaEmissaoGtaPage({ onLogout, onNavigate }: { onLogout: () => v
 
           {hasFilter && (
             <div className="flex flex-wrap gap-2 animate-fadeIn">
+              {tipoDocumentoSanitario && (
+                <Chip
+                  label={`Tipo de Documento: ${tipoDocumentoSanitario}`}
+                  onRemove={() => setTipoDocumentoSanitario("")}
+                />
+              )}
               {especie && <Chip label={`Espécie: ${especie.nome}`} onRemove={() => setEspecie(null)} />}
               {tipoCobranca && <Chip label={`Tipo de Cobrança: ${tipoCobranca}`} onRemove={() => setTipoCobranca("")} />}
               {situacao && <Chip label={`Situação: ${situacao}`} onRemove={() => setSituacao("")} />}
@@ -192,7 +240,7 @@ export function TaxaEmissaoGtaPage({ onLogout, onNavigate }: { onLogout: () => v
               <table className="w-full text-sm border-collapse">
                 <thead>
                   <tr className="border-b border-gray-100">
-                    {(["especie", "tipoCobranca", "dataInicioVigencia", "situacao"] as SortKey[]).map((key) => (
+                    {(["tipoDocumentoSanitario", "especie", "tipoCobranca", "dataInicioVigencia", "situacao"] as SortKey[]).map((key) => (
                       <th key={key} onClick={() => sort(key)} className="text-left px-4 py-3 font-semibold text-gray-600 uppercase cursor-pointer">
                         <span className="inline-flex items-center gap-1">
                           {label(key)}
@@ -205,15 +253,16 @@ export function TaxaEmissaoGtaPage({ onLogout, onNavigate }: { onLogout: () => v
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {rows.map((item: TaxaEmissaoGta) => {
-                    const statusText = (item as any).situacao || ((item as any).ativo === false ? "Inativo" : "Ativo");
-
                     return (
                       <tr key={item.id} className="hover:bg-gray-50/50 transition-colors">
+                        <td className="px-4 py-3.5 text-gray-700">
+                          {item.tipoDocumentoSanitario}
+                        </td>
                         <td className="px-4 py-3.5 text-gray-800 font-medium">{item.especie.nome}</td>
                         <td className="px-4 py-3.5 text-gray-700">{item.tipoCobranca}</td>
                         <td className="px-4 py-3.5 text-gray-700">{formatarData(item.dataInicioVigencia)}</td>
                         <td className="px-4 py-3.5 text-gray-700">
-                          {statusText}
+                          {item.situacao}
                         </td>
                         <td className="px-4 py-3.5">
                           <div className="flex justify-end gap-1">
