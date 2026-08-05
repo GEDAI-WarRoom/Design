@@ -118,7 +118,7 @@ export function LocalRealizacaoExameForm({
 }: LocalRealizacaoExameFormProps) {
   const [modalVeterinariosAberto, setModalVeterinariosAberto] = useState(false);
   const isView = mode === "view";
-  const profissionaisBloqueados = mode !== "create";
+  const profissionaisBloqueados = isView;
   const veterinariosDisponiveis = useMemo(
     () => listarVeterinariosHabilitados(),
     [modalVeterinariosAberto],
@@ -144,20 +144,6 @@ export function LocalRealizacaoExameForm({
     <>
       <Section title="Informações Básicas">
         <div className="flex flex-col gap-5">
-          {codigo && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FloatInput label="Código" required value={codigo} maxLength={10} disabled />
-              <FloatSelect
-                label="Situação"
-                required
-                value={value.situacao}
-                onChange={(situacao) => onChange({ ...value, situacao: situacao as SituacaoLocalExame })}
-                options={SITUACOES_LOCAL_EXAME}
-                disabled={isView}
-              />
-            </div>
-          )}
-
           <div>
             <h3 className="text-sm font-semibold text-gray-700 mb-4">Proprietários</h3>
             {isView ? (
@@ -208,7 +194,7 @@ export function LocalRealizacaoExameForm({
           {isView ? (
             <>
               <FloatInput
-                label="Localizado em Estabelecimento Agropecuário Cadastrado?"
+                label="Local de Realização de Exame Localizado em Estabelecimento Agropecuário Cadastrado?"
                 value={value.localizadoEmEstabelecimento ? "Sim" : "Não"}
                 disabled
               />

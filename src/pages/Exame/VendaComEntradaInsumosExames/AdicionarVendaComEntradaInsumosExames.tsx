@@ -415,7 +415,7 @@ export function LoteCardItem({
 					columns={[{ label: "Nome da Doença", key: "nome" }]}
 					icon={
 						<img
-							src={Icons.iconeDoencaUrl || (Icons as any).iconedoencaurl}
+							src={Icons.iconeDoencaUrl}
 							alt="Doença"
 							className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0"
 						/>
@@ -605,7 +605,16 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
 			map.set(nome, (map.get(nome) || 0) + totalLote);
 		});
 		return Array.from(map, ([doenca, total]) => ({ doenca, total }));
-	}, [lotes]);
+		}, [lotes]);
+	const vendaCadastrada = {
+		fornecedor,
+		destinatario: destinatario || "Revendedora de Produtos Agropecuários",
+		revendedora,
+		medicoVeterinario,
+		numeroNotaFiscal,
+		ufNotaFiscal,
+		lotes,
+	};
 
 	return (
 		<div className="min-h-screen bg-[#f2f3f5]">
@@ -827,7 +836,7 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
 							<button
 								onClick={() => {
 									setIsSucesso(false);
-									onNavigate("visualizar-venda-entrada-insumos-exames");
+									onNavigate("visualizar-venda-entrada-insumos-exames", vendaCadastrada);
 								}}
 								className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition cursor-pointer">
 								Visualizar

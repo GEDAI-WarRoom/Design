@@ -317,6 +317,17 @@ export function atualizarAjusteDosesInsumo(
   return atualizado;
 }
 
+export function salvarAjusteDosesInsumo(
+  id: number,
+  dados: Pick<AjusteDosesInsumo, "revendedora" | "notasFiscais">,
+) {
+  const index = AJUSTES_DOSES_INSUMO_MOCK.findIndex((item) => item.id === id);
+  if (index === -1) return null;
+  const atualizado = { ...AJUSTES_DOSES_INSUMO_MOCK[index], ...dados };
+  AJUSTES_DOSES_INSUMO_MOCK[index] = atualizado;
+  return atualizado;
+}
+
 export function notasDaRevendedora(codigo?: string) {
   if (!codigo) return [];
   return NOTAS_FISCAIS_INSUMO_MOCK.filter(

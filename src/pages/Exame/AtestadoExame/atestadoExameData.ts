@@ -14,6 +14,8 @@ export interface DadosAtestadoExame {
   situacao: string;
 }
 
+export type AtestadoExame = DadosAtestadoExame;
+
 export const REGISTRO_ATESTADO_EXAME_MOCK: DadosAtestadoExame = {
   id: 1,
   descricao: "Atestado de Raiva",
@@ -21,6 +23,33 @@ export const REGISTRO_ATESTADO_EXAME_MOCK: DadosAtestadoExame = {
   diasValidade: "180",
   situacao: "Ativo",
 };
+
+export const ATESTADOS_EXAME_MOCK: AtestadoExame[] = [
+  REGISTRO_ATESTADO_EXAME_MOCK,
+  {
+    id: 2,
+    descricao: "Atestado de Mormo",
+    doenca: { codigo: "D06", nome: "Mormo" },
+    diasValidade: "60",
+    situacao: "Ativo",
+  },
+];
+
+export function listarAtestadosExame() {
+  return ATESTADOS_EXAME_MOCK;
+}
+
+export function adicionarAtestadoExame(
+  novo: Omit<AtestadoExame, "id" | "situacao">,
+) {
+  const item: AtestadoExame = {
+    id: Date.now(),
+    situacao: "Ativo",
+    ...novo,
+  };
+  ATESTADOS_EXAME_MOCK.unshift(item);
+  return item;
+}
 
 export function normalizarAtestadoExame(registro?: any): DadosAtestadoExame {
   const base = registro || REGISTRO_ATESTADO_EXAME_MOCK;

@@ -165,13 +165,19 @@ export function AjusteDosesInsumoForm({
   mode = "create",
 }: FormProps) {
   const [modalNotaOrigemOpen, setModalNotaOrigemOpen] = useState(false);
-  const [insumosSelecionados, setInsumosSelecionados] = useState<any[]>([]);
+  const [insumosSelecionados, setInsumosSelecionados] = useState<any[]>(() =>
+    value.notasFiscais.flatMap((nota) => nota.itens.map((item) => ({
+      ...item,
+      nome: item.numeroPartida,
+      quantidadeFrascos: item.frascosLancados,
+      quantidadeDoses: item.dosesLancadas,
+    }))),
+  );
   const [lotesMinimizados, setLotesMinimizados] = useState<Record<string, boolean>>({});
   const [apresentacoesMinimizadas, setApresentacoesMinimizadas] = useState<Record<string, boolean>>({});
   const [graficoAtivo, setGraficoAtivo] = useState<{ itemId: string; index: number } | null>(null);
 
   const disabled = mode === "view";
-  const cadastro = mode === "create";
   const revendedora = value.revendedora;
 
   // Total de doses lançadas
@@ -183,9 +189,22 @@ export function AjusteDosesInsumoForm({
   };
 
   const alterarItemInsumo = (id: string, patch: Record<string, any>) => {
-    setInsumosSelecionados((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, ...patch } : item))
-    );
+    const atualizados = insumosSelecionados.map((item) => (item.id === id ? { ...item, ...patch } : item));
+    setInsumosSelecionados(atualizados);
+    const notasFiscais = value.notasFiscais.map((nota) => ({
+      ...nota,
+      itens: nota.itens.map((item) => {
+        const atualizado = atualizados.find((selecionado) => selecionado.id === item.id);
+        if (!atualizado) return item;
+        return {
+          ...item,
+          frascosLancados: String(atualizado.quantidadeFrascos ?? ""),
+          dosesLancadas: String(atualizado.quantidadeDoses ?? ""),
+          justificativa: atualizado.justificativa ?? "",
+        };
+      }),
+    }));
+    onChange({ ...value, notasFiscais });
   };
 
   const removerGrupoLote = (loteNome: string) => {
@@ -212,11 +231,11 @@ export function AjusteDosesInsumoForm({
     <>
       {/* Seção 1: Informações Básicas */}
       <Section title="Informações Básicas">
-        {cadastro ? (
           <EntitySearchInput
             label="Revendedora de Insumos"
             placeholder="Buscar por código ou nome."
             required
+            disabled={disabled}
             value={value.revendedora?.nome ?? ""}
             data={REVENDEDORAS_INSUMO_MOCK}
             searchKeys={["codigo", "nome"]}
@@ -231,12 +250,6 @@ export function AjusteDosesInsumoForm({
             confirmLabel="Selecionar"
             onChange={selecionarRevendedora}
           />
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FloatInput label="Revendedora de Insumos" required value={value.revendedora?.nome ?? ""} disabled />
-            <FloatInput label="Código da Revendedora" required value={value.revendedora?.codigo ?? ""} disabled />
-          </div>
-        )}
       </Section>
 
       {/* Seção 2: Saldo de Insumos / Lote */}
@@ -580,12 +593,6 @@ export function AjusteDosesInsumoForm({
           )}
         </div>
       </Section>
-
-      {!cadastro && (
-        <Section title="Situação">
-          <FloatInput label="Situação" value={value.situacao} disabled />
-        </Section>
-      )}
 
       {/* Modal de Seleção Múltipla de Lotes/Insumos */}
       <MultiSearchModal
