@@ -100,6 +100,8 @@ import { VisualizarVendaPropriedadePage } from "./pages/Geral/VendaPropriedade/V
 // ANIMAL
 import { AdicionarCertificadoraSISBOVPage } from "./pages/Animal/CertificadoraSISBOV/AdicionarCertificadoraSISBOV";
 import { CertificadoraSISBOVPage } from "./pages/Animal/CertificadoraSISBOV/CertificadoraSISBOV";
+import { EditarCertificadoraSISBOVPage } from "./pages/Animal/CertificadoraSISBOV/EditarCertificadoraSISBOV";
+import { VisualizarCertificadoraSISBOVPage } from "./pages/Animal/CertificadoraSISBOV/VisualizarCertificadoraSISBOV";
 import { AdicionarEspeciePage } from "./pages/Animal/Especie/AdicionarEspecie";
 import { EspeciePage } from "./pages/Animal/Especie/Especie";
 import { VisualizarEspeciePage } from "./pages/Animal/Especie/VisualizarEspecie";
@@ -417,8 +419,10 @@ export type Screen =
 	| "adicionar-revendedora-agropecuario"
 	| "visualizar-revendedora-agropecuario"
 	| "editar-revendedora-agropecuario"
-	| "certiificadora-sisbov"
-	| "adicionar-certiificadora-sisbov"
+	| "certificadora-sisbov"
+	| "adicionar-certificadora-sisbov"
+	| "visualizar-certificadora-sisbov"
+	| "editar-certificadora-sisbov"
 	| "especie"
 	| "adicionar-especie"
 	| "visualizar-especie"
@@ -1237,6 +1241,22 @@ export default function App() {
 					onNavigate={handleNavigate}
 				/>
 			);
+		case "visualizar-certificadora-sisbov":
+			return (
+				<VisualizarCertificadoraSISBOVPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "editar-certificadora-sisbov":
+			return (
+				<EditarCertificadoraSISBOVPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
 		case "especie":
 			return (
 				<EspeciePage onLogout={handleLogout} onNavigate={handleNavigate} />
@@ -1815,7 +1835,7 @@ export default function App() {
                 />
             );
 
-        case "editar-praga":
+        case "editar-praga": 
             return (
                 <EditarPragaPage
                     onLogout={handleLogout}
