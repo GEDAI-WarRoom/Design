@@ -5,6 +5,16 @@ import { SelecionarUsuarioPage } from "./pages/SelecionarUsuario";
 import { isRouteAllowed, useDemoUser } from "./contexts/DemoUserContext";
 
 // GERAL
+import { VisualizarFinalidadeTransitoPage } from "./pages/GTA/FinalidadeTransito/VisualizarFinalidadeTransito";
+import { EditarFinalidadeTransitoPage } from "./pages/GTA/FinalidadeTransito/EditarFinalidadeTransito";
+
+import { VisualizarDistribuicaoFormulariosGtaPage } from "./pages/GTA/DistribuicaoFormulariosGta/VisualizarDistribuicaoFormulariosGta";
+import { EditarDistribuicaoFormulariosGtaPage } from "./pages/GTA/DistribuicaoFormulariosGta/EditarDistribuicaoFormulariosGta";
+
+import { EditarRegistroVendaGtaFisicaPage } from "./pages/GTA/RegistroVendaGTAFisica/EditarRegistroVendaGTAFisica";
+
+import { VisualizarIsencaoTaxaGtaPage } from "./pages/GTA/IsencaoTaxaGTA/VisualizarIsencaoTaxaGTA";
+import { EditarIsencaoTaxaGtaPage } from "./pages/GTA/IsencaoTaxaGTA/EditarIsencaoTaxaGTA";
 import { VisualizarUnidadeConsolidacaoPage } from "./pages/Vegetal/UnidadeConsolidacao/VisualizarUnidadeConsolidacao";
 import { EditarUnidadeConsolidacaoPage } from "./pages/Vegetal/UnidadeConsolidacao/EditarUnidadeConsolidacao";
 
@@ -270,6 +280,13 @@ import { ParametrosSistemaPage } from "./pages/Controle/ParametrosSistema/Parame
 
 // 1. Adicionamos as novas rotas de Pessoa Jurídica no tipo Screen
 export type Screen =
+| "editar-finalidade-transito"
+  | "visualizar-finalidade-transito"
+  | "editar-distribuicao-formularios-gta"
+  | "visualizar-distribuicao-formularios-gta"
+  | "editar-registro-venda-gta-fisica"
+  | "editar-isencao-taxa-gta"
+  | "visualizar-isencao-taxa-gta"
 | "editar-unidade-consolidacao"
   | "visualizar-unidade-consolidacao"
   | "editar-cultura"
@@ -539,6 +556,41 @@ export default function App() {
 	};
 
 	switch (screen) {
+		case "finalidade-transito":
+      return <FinalidadeTransitoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-finalidade-transito":
+      return <AdicionarFinalidadeTransitoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-finalidade-transito":
+      return <EditarFinalidadeTransitoPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-finalidade-transito":
+      return <VisualizarFinalidadeTransitoPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+
+    case "distribuicao-formularios-gta":
+      return <DistribuicaoFormulariosGta onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-distribuicao-formularios-gta":
+      return <AdicionarDistribuicaoFormulariosGta onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-distribuicao-formularios-gta":
+      return <EditarDistribuicaoFormulariosGtaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-distribuicao-formularios-gta":
+      return <VisualizarDistribuicaoFormulariosGtaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+
+    case "registro-venda-gta-fisica":
+      return <RegistroVendaGtaFisicaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-registro-venda-gta-fisica":
+      return <AdicionarRegistroVendaGtaFisicaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-registro-venda-gta-fisica":
+      return <EditarRegistroVendaGtaFisicaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-registro-venda-gta-fisica":
+      return <VisualizarRegistroVendaGtaFisicaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+
+    case "isencao-taxa-gta":
+      return <IsencaoTaxaGtaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-isencao-taxa-gta":
+      return <AdicionarIsencaoTaxaGtaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-isencao-taxa-gta":
+      return <EditarIsencaoTaxaGtaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-isencao-taxa-gta":
+      return <VisualizarIsencaoTaxaGtaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
 		case "unidade-consolidacao":
       return <UnidadeConsolidacaoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-unidade-consolidacao":
@@ -1797,21 +1849,7 @@ export default function App() {
 				/>
 			);
 
-		case "finalidade-transito":
-			return (
-				<FinalidadeTransitoPage
-					onLogout={handleLogout}
-					onNavigate={handleNavigate}
-				/>
-			);
-
-		case "adicionar-finalidade-transito":
-			return (
-				<AdicionarFinalidadeTransitoPage
-					onLogout={handleLogout}
-					onNavigate={handleNavigate}
-				/>
-			);
+		
 		case "papeis":
 			return <PapeisPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 

@@ -1,6 +1,5 @@
 import {
 	ArrowLeft,
-	Check,
 	ChevronDown,
 	ChevronUp,
 	Dna,
@@ -143,6 +142,21 @@ export function AdicionarFinalidadeTransitoPage({
 		setProcedencias((prev) =>
 			prev.map((item, i) => (i === index ? { ...item, [campo]: valor } : item)),
 		);
+	};
+
+	const finalidadeCadastrada = {
+		id: Date.now(),
+		finalidade: finalidadeTransito || "Abate",
+		codigoMapa: codigoMapa || "01",
+		tipoProcedencia: tiposProcedencia[0] || "Frigorífico",
+		tiposProcedencia: tiposProcedencia.length ? tiposProcedencia : ["Frigorífico"],
+		tipoDestino: tiposDestino[0] || "Frigorífico",
+		tiposDestino: tiposDestino.length ? tiposDestino : ["Frigorífico"],
+		especies: especies.length ? especies : [ESPECIES_MOCK[0]],
+		emiteAcessoExterno,
+		taxasCobrar,
+		procedencias,
+		situacao: "Ativo",
 	};
 
 	return (
@@ -371,9 +385,6 @@ export function AdicionarFinalidadeTransitoPage({
 				isSucesso && (
 					<div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
 						<div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
-							<div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4">
-								<Check size={28} className="text-[#1A7A3C]" strokeWidth={3} />
-							</div>
 							<h3 className="text-lg font-bold text-gray-900">
 								Finalidade de Trânsito cadastrada com sucesso!
 							</h3>
@@ -392,7 +403,13 @@ export function AdicionarFinalidadeTransitoPage({
 									className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition">
 									Voltar
 								</button>
-								<button className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">
+								<button
+									type="button"
+									onClick={() => {
+										setIsSucesso(false);
+										onNavigate("visualizar-finalidade-transito", finalidadeCadastrada);
+									}}
+									className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">
 									Visualizar
 								</button>
 							</div>
