@@ -24,17 +24,17 @@ export function AdicionarAcouguePage({ onLogout, onNavigate }: { onLogout: () =>
   const [nomeComercial, setNomeComercial] = useState("");
   const [tipoLocal, setTipoLocal] = useState("");
   const [proprietarios, setProprietarios] = useState<any[]>([{ uid: uid("prop"), entidade: null }]);
-  
+
   const [endereco, setEndereco] = useState({
     zona: "Urbana", cep: "", estado: "Minas Gerais", municipio: "", bairro: "",
     endereco: "", numero: "", complemento: "", localidade: "", distrito: "", latitude: "", longitude: ""
   });
-  
+
   const [contatos, setContatos] = useState({
     utilizarContatoProprietario: "Não" as const, proprietariosSelecionados: [] as string[],
     emailFixo: "", emailFixoObs: "", telefoneFixo: "", telefoneFixoObs: "", contatosAdicionais: [] as any[]
   });
-  
+
   const [anexos, setAnexos] = useState<any[]>([]);
   const [observacao, setObservacao] = useState("");
   const [isSucesso, setIsSucesso] = useState(false);
@@ -43,7 +43,7 @@ export function AdicionarAcouguePage({ onLogout, onNavigate }: { onLogout: () =>
     <div className="min-h-screen bg-[#f2f3f5]">
       <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="acougue" hideSearch />
       <main className="max-w-[1088px] mx-auto px-4 md:px-6 py-6 flex flex-col gap-4">
-        
+
         <div>
           <button type="button" onClick={() => onNavigate("acougue")} className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70 font-semibold" style={{ color: GREEN }}>
             <ArrowLeft size={15} /> Todos os Açougues
@@ -72,7 +72,7 @@ export function AdicionarAcouguePage({ onLogout, onNavigate }: { onLogout: () =>
               onChange={setNomeComercial}
               maxLength={255}
             />
-            
+
           </div>
         </Section>
 
@@ -110,7 +110,7 @@ export function AdicionarAcouguePage({ onLogout, onNavigate }: { onLogout: () =>
         <Section title="Informações de Contato">
           <BlocoContatoFields
             data={contatos}
-            onChange={(updated) => setContatos((prev) => ({ ...prev, ...updated }))} 
+            onChange={(updated) => setContatos((prev) => ({ ...prev, ...updated }))}
             proprietariosDisponiveis={[]}
           />
         </Section>
@@ -148,12 +148,11 @@ export function AdicionarAcouguePage({ onLogout, onNavigate }: { onLogout: () =>
       {isSucesso && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
-            <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4"><Check size={28} className="text-[#1A7A3C]" strokeWidth={3} /></div>
             <h3 className="text-lg font-bold text-gray-900">Cadastro realizado com sucesso!</h3>
             <p className="text-sm text-gray-500 mt-1">O {tipoLocal || "Açougue"} "{nomeComercial}" foi adicionado.</p>
             <div className="flex gap-3 justify-center mt-6">
               <button onClick={() => { setIsSucesso(false); onNavigate("acougue"); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50 transition">Voltar</button>
-              <button onClick={() => { setIsSucesso(false); onNavigate("acougue"); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
+              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-acougue"); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
             </div>
           </div>
         </div>

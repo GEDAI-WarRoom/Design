@@ -2,17 +2,28 @@ import React, { useState } from "react";
 import { ArrowLeft, ChevronUp, ChevronDown, Eye, Pencil } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, FloatSelect } from "../../../components/ui/FormKit";
+import {
+  CLASSE_CAMPO_ALTERADO_HISTORICO,
+  HistoricoCadastroLayout,
+  campoHistoricoFoiAlterado,
+  type CampoHistoricoComparavel,
+} from "../../../components/ui/HistoricoCadastroLayout";
+import {
+  obterAtestadoExame,
+  obterHistoricoAtestadoExame,
+  type DadosAtestadoExame,
+} from "./atestadoExameData";
 
 const GREEN = "#1A7A3C";
 
-// MOCK DO REGISTRO 
-const REGISTRO_MOCK = {
-  id: 1,
-  descricao: "Atestado de Raiva",
-  doenca: { codigo: "D04", nome: "Raiva" },
-  diasValidade: "180",
-  situacao: "Ativo"
-};
+function camposComparaveis(dados: DadosAtestadoExame): CampoHistoricoComparavel[] {
+  return [
+    { label: "Descrição do atestado", value: dados.descricao },
+    { label: "Doença", value: dados.doenca.nome },
+    { label: "Dias de Validade do Exame", value: dados.diasValidade },
+    { label: "Situação", value: dados.situacao },
+  ];
+}
 
 // HELPERS DE UI
 function Section({ title, children, defaultOpen = true }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) {
@@ -29,11 +40,11 @@ function Section({ title, children, defaultOpen = true }: { title: string; child
 }
 
 // Componente para exibir entidades selecionadas com o botão de visualizar ("olhinho")
-function EntidadeLeitura({ label, value, icon, onVer }: { label: string; value: string; icon?: React.ReactNode; onVer?: () => void }) {
+function EntidadeLeitura({ label, value, icon, onVer, className = "" }: { label: string; value: string; icon?: React.ReactNode; onVer?: () => void; className?: string }) {
   return (
     <div className="flex items-center gap-2 w-full">
       <div className="flex-1">
-        <FloatInput label={label} value={value} icon={icon} disabled onChange={() => { }} />
+        <FloatInput label={label} value={value} icon={icon} disabled onChange={() => { }} className={className} />
       </div>
       {onVer && (
         <button
@@ -53,20 +64,43 @@ function EntidadeLeitura({ label, value, icon, onVer }: { label: string; value: 
 interface PageProps {
   onLogout?: () => void;
   onNavigate?: (screen: string, data?: any) => void;
+  dados?: any;
 }
 
 export function VisualizarAtestadoExamePage({
   onLogout = () => {},
   onNavigate = (screen) => console.log("navigate:", screen),
+  dados,
 }: PageProps) {
-  
-  const r = REGISTRO_MOCK;
+  const dadosAtuais = obterAtestadoExame(dados);
+  const historico = obterHistoricoAtestadoExame(dadosAtuais);
+  const camposAtuais = camposComparaveis(dadosAtuais);
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
       <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="atestado-exame" hideSearch />
 
-      <main className="max-w-[1088px] mx-auto px-4 md:px-6 py-6 flex flex-col gap-4">
+      <HistoricoCadastroLayout<DadosAtestadoExame>
+        itens={historico}
+        resetKey={dadosAtuais.id}
+        conteudoClassName="flex flex-col gap-4 px-4 py-6 md:px-6"
+        onVisualizarAutor={(nome) =>
+          onNavigate("visualizar-pessoa-fisica", { nome })
+        }
+      >
+        {({ botaoHistorico, avisoVersao, dadosSelecionados, visualizandoVersaoAntiga }) => {
+          const r = dadosSelecionados ?? dadosAtuais;
+          const classeCampo = (label: string, value: unknown) =>
+            campoHistoricoFoiAlterado(
+              { label, value },
+              camposAtuais,
+              visualizandoVersaoAntiga,
+            )
+              ? CLASSE_CAMPO_ALTERADO_HISTORICO
+              : "";
+
+          return (
+          <>
         {/* Cabeçalho */}
         <div>
           <button 
@@ -79,20 +113,25 @@ export function VisualizarAtestadoExamePage({
             Todos os Atestados de Exame
           </button>
           
-          <div className="flex justify-between items-center w-full">
+          <div className="flex justify-between items-center gap-4 w-full">
             <h1 className="text-2xl font-semibold text-gray-900">Visualizar Atestado de Exame</h1>
-            
-            {/* Botão de Editar ao invés de Salvar */}
-            <button 
-              type="button" 
-              onClick={() => onNavigate("editar-atestado-exame", r)} 
-              className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2"
-            >
-              <Pencil size={16} />
-              Editar
-            </button>
+            <div className="flex items-center gap-3">
+              {botaoHistorico}
+              {!visualizandoVersaoAntiga && (
+                <button
+                  type="button"
+                  onClick={() => onNavigate("editar-atestado-exame", dadosAtuais)}
+                  className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2"
+                >
+                  <Pencil size={16} />
+                  Editar
+                </button>
+              )}
+            </div>
           </div>
         </div>
+
+        {avisoVersao}
 
         {/* Formulário - Informações Básicas (Somente Leitura) */}
         <Section title="Informações Básicas">
@@ -104,6 +143,7 @@ export function VisualizarAtestadoExamePage({
                 value={r.descricao}
                 disabled
                 onChange={() => {}}
+                className={classeCampo("Descrição do atestado", r.descricao)}
               />
             </div>
 
@@ -114,6 +154,7 @@ export function VisualizarAtestadoExamePage({
                 label="Doença" 
                 value={r.doenca.nome} 
                 onVer={() => alert(`Visualizar detalhes da doença: ${r.doenca.nome}`)} 
+                className={classeCampo("Doença", r.doenca.nome)}
               />
 
               <FloatInput
@@ -121,6 +162,7 @@ export function VisualizarAtestadoExamePage({
                 value={r.diasValidade}
                 disabled
                 onChange={() => {}}
+                className={classeCampo("Dias de Validade do Exame", r.diasValidade)}
               />
 
               {/* Situação agora é exibida, conforme AC de "Disponível após o cadastro" */}
@@ -130,13 +172,17 @@ export function VisualizarAtestadoExamePage({
                 options={[{ value: r.situacao, label: r.situacao }]}
                 disabled
                 onChange={() => {}}
+                className={classeCampo("Situação", r.situacao)}
               />
 
             </div>
 
           </div>
         </Section>
-      </main>
+          </>
+          );
+        }}
+      </HistoricoCadastroLayout>
     </div>
   );
 }

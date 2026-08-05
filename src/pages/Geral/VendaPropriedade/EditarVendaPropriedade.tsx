@@ -1,57 +1,64 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowLeft, Check } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import {
   RequiredFieldsNotice,
   VendaPropriedadeForm,
+  vendaPropriedadeValida,
   type VendaPropriedadeFormValue,
 } from "./VendaPropriedadeForm";
-import { criarVendaPropriedade, type VendaPropriedade } from "./vendaPropriedadeData";
+import {
+  atualizarVendaPropriedade,
+  VENDAS_PROPRIEDADE_MOCK,
+  type VendaPropriedade,
+} from "./vendaPropriedadeData";
 
 interface PageProps {
+  dados?: VendaPropriedade | null;
   onLogout: () => void;
   onNavigate: (screen: any, data?: any) => void;
 }
 
-const estadoInicial: VendaPropriedadeFormValue = {
-  vendedor: null,
-  estabelecimento: null,
-  dataVenda: "",
-  comprador: null,
-  porteiraFechada: "",
-  tipoTransferencia: "",
-};
+function toFormValue(venda: VendaPropriedade): VendaPropriedadeFormValue {
+  return {
+    vendedor: venda.vendedor,
+    estabelecimento: venda.estabelecimento,
+    dataVenda: venda.dataVenda,
+    comprador: venda.comprador,
+    porteiraFechada: venda.porteiraFechada,
+    tipoTransferencia: venda.tipoTransferencia,
+  };
+}
 
-export function AdicionarVendaPropriedadePage({ onLogout, onNavigate }: PageProps) {
-  const [form, setForm] = useState<VendaPropriedadeFormValue>(estadoInicial);
+export function EditarVendaPropriedadePage({ dados, onLogout, onNavigate }: PageProps) {
+  const venda = dados ?? VENDAS_PROPRIEDADE_MOCK[0];
+  const [form, setForm] = useState<VendaPropriedadeFormValue>(() => toFormValue(venda));
+  const [erro, setErro] = useState("");
   const [registroSalvo, setRegistroSalvo] = useState<VendaPropriedade | null>(null);
 
-  const adicionar = () => {
-    const registro = criarVendaPropriedade({
-      vendedor: form.vendedor ?? {
-        id: 0,
-        nome: "Não informado",
-        documento: "Não informado",
-        tipo: "PF",
-      },
-      estabelecimento: form.estabelecimento ?? {
-        id: 0,
-        codigo: "Não informado",
-        nome: "Não informado",
-        municipio: "Não informado",
-        proprietarioId: form.vendedor?.id ?? 0,
-      },
+  useEffect(() => {
+    setForm(toFormValue(venda));
+    setErro("");
+    setRegistroSalvo(null);
+  }, [venda.id]);
+
+  const salvar = () => {
+    if (!vendaPropriedadeValida(form)) {
+      setErro("Preencha todos os campos obrigatórios para continuar.");
+      return;
+    }
+
+    const registro = atualizarVendaPropriedade({
+      id: venda.id,
+      vendedor: form.vendedor!,
+      estabelecimento: form.estabelecimento!,
       dataVenda: form.dataVenda,
-      comprador: form.comprador ?? {
-        id: 0,
-        nome: "Não informado",
-        documento: "Não informado",
-        tipo: "PF",
-      },
-      porteiraFechada: form.porteiraFechada || "Não",
-      tipoTransferencia: form.tipoTransferencia || "Venda",
+      comprador: form.comprador!,
+      porteiraFechada: form.porteiraFechada!,
+      tipoTransferencia: form.tipoTransferencia!,
     });
 
+    setErro("");
     setRegistroSalvo(registro);
   };
 
@@ -69,13 +76,13 @@ export function AdicionarVendaPropriedadePage({ onLogout, onNavigate }: PageProp
             <ArrowLeft size={15} /> Todas as Vendas de Propriedade
           </button>
           <div className="flex items-center justify-between gap-4">
-            <h1 className="text-2xl font-semibold text-gray-900">Adicionar Venda de Propriedade</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">Editar Venda de Propriedade</h1>
             <button
               type="button"
-              onClick={adicionar}
+              onClick={salvar}
               className="px-5 h-10 rounded-md text-white text-sm font-semibold bg-[#1A7A3C] hover:bg-[#15612F] transition"
             >
-              Adicionar
+              Salvar
             </button>
           </div>
         </div>
@@ -83,7 +90,10 @@ export function AdicionarVendaPropriedadePage({ onLogout, onNavigate }: PageProp
         <RequiredFieldsNotice />
         <VendaPropriedadeForm
           value={form}
-          onChange={setForm}
+          onChange={(valor) => {
+            setForm(valor);
+            setErro("");
+          }}
           onViewPessoa={(pessoa) => onNavigate(
             pessoa.tipo === "PF" ? "visualizar-pessoa-fisica" : "visualizar-pessoa-juridica",
             pessoa,
@@ -92,14 +102,17 @@ export function AdicionarVendaPropriedadePage({ onLogout, onNavigate }: PageProp
             onNavigate("visualizar-estabelecimento-agropecuario", estabelecimento)
           )}
         />
+        {erro && <p className="text-sm text-red-500 font-medium">{erro}</p>}
       </main>
 
       {registroSalvo && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
-
-            <h2 className="text-lg font-bold text-gray-900">Venda cadastrada!</h2>
-            <p className="text-sm text-gray-500 mt-1">O registro da venda foi cadastrado com sucesso.</p>
+            <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4">
+              <Check size={28} className="text-[#1A7A3C]" strokeWidth={3} />
+            </div>
+            <h2 className="text-lg font-bold text-gray-900">Alterações salvas!</h2>
+            <p className="text-sm text-gray-500 mt-1">O registro da venda foi atualizado com sucesso.</p>
             <div className="flex gap-3 justify-center mt-6">
               <button
                 type="button"

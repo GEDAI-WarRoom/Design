@@ -3,6 +3,11 @@ import { ArrowLeft, ChevronUp, ChevronDown, Info, AlertTriangle, Check } from "l
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, FloatSelect } from "../../../components/ui/FormKit";
 import { DoencaInput } from "../../../components/ui/EntitySearch";
+import {
+  obterAtestadoExame,
+  salvarEdicaoAtestadoExame,
+  type DadosAtestadoExame,
+} from "./atestadoExameData";
 
 const GREEN = "#1A7A3C";
 
@@ -21,15 +26,6 @@ const SITUACOES = [
   { value: "Ativo", label: "Ativo" },
   { value: "Inativo", label: "Inativo" },
 ];
-
-// Simulando o registro recuperado da base de dados para edição
-const REGISTRO_MOCK = {
-  id: 1,
-  descricao: "Atestado de Raiva",
-  doenca: { codigo: "D04", nome: "Raiva" },
-  diasValidade: "180",
-  situacao: "Ativo"
-};
 
 // ==========================================================
 // HELPERS DE UI
@@ -53,18 +49,21 @@ function Section({ title, children, defaultOpen = true }: { title: string; child
 interface PageProps {
   onLogout?: () => void;
   onNavigate?: (screen: string, data?: any) => void;
+  dados?: any;
 }
 
 export function EditarAtestadoExamePage({ 
   onLogout = () => {}, 
-  onNavigate = (screen) => console.log("navigate:", screen) 
+  onNavigate = (screen) => console.log("navigate:", screen),
+  dados,
 }: PageProps) {
-  
-  // Estados inicializados com os dados simulados do backend
-  const [descricao, setDescricao] = useState(REGISTRO_MOCK.descricao);
-  const [doenca, setDoenca] = useState<any | null>(REGISTRO_MOCK.doenca);
-  const [diasValidade, setDiasValidade] = useState(REGISTRO_MOCK.diasValidade);
-  const [situacao, setSituacao] = useState(REGISTRO_MOCK.situacao);
+  const [registroAtual, setRegistroAtual] = useState<DadosAtestadoExame>(() =>
+    obterAtestadoExame(dados),
+  );
+  const [descricao, setDescricao] = useState(registroAtual.descricao);
+  const [doenca, setDoenca] = useState<any | null>(registroAtual.doenca);
+  const [diasValidade, setDiasValidade] = useState(registroAtual.diasValidade);
+  const [situacao, setSituacao] = useState(registroAtual.situacao);
 
   // Estados dos Modais
   const [isSucesso, setIsSucesso] = useState(false);
@@ -77,7 +76,15 @@ export function EditarAtestadoExamePage({
       return;
     }
     
-    // Simula o sucesso da atualização
+    const dadosAtuais: DadosAtestadoExame = {
+      ...registroAtual,
+      descricao,
+      doenca,
+      diasValidade,
+      situacao,
+    };
+    const resultado = salvarEdicaoAtestadoExame(registroAtual, dadosAtuais);
+    setRegistroAtual(resultado.registro);
     setIsSucesso(true);
   };
 
@@ -90,7 +97,7 @@ export function EditarAtestadoExamePage({
         <div>
           <button 
             type="button" 
-            onClick={() => onNavigate("visualizar-atestado-exame")} 
+            onClick={() => onNavigate("visualizar-atestado-exame", registroAtual)}
             className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70" 
             style={{ color: GREEN }}
           >
@@ -216,7 +223,7 @@ export function EditarAtestadoExamePage({
               </button>
               <button 
                 type="button"
-                onClick={() => { setIsSucesso(false); onNavigate("visualizar-atestado-exame"); }} 
+                onClick={() => { setIsSucesso(false); onNavigate("visualizar-atestado-exame", registroAtual); }}
                 className="px-8 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition w-full md:w-auto shadow-sm"
               >
                 Visualizar

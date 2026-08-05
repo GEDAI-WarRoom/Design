@@ -80,67 +80,66 @@ export function AdicionarDivisaoMunicipalPage({ onLogout, onNavigate }: PageProp
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <FloatSelect label="Tipo" required value={tipo} onChange={(v) => setTipo(v ?? "")} options={TIPOS} />
             <FloatInput label="Divisão Municipal" required value={nome} onChange={(v) => setNome(v ?? "")} maxLength={255} />
-          <FloatCombobox label="Estado" required value={estado} onChange={(v) => { setEstado(v ?? ""); setMunicipio(""); }} options={ESTADOS_MOCK} />
-              <FloatCombobox label="Município" required value={municipio} onChange={(v) => setMunicipio(v ?? "")} options={MUNICIPIOS_MOCK} />
-           
+            <FloatCombobox label="Estado" required value={estado} onChange={(v) => { setEstado(v ?? ""); setMunicipio(""); }} options={ESTADOS_MOCK} />
+            <FloatCombobox label="Município" required value={municipio} onChange={(v) => setMunicipio(v ?? "")} options={MUNICIPIOS_MOCK} />
+
           </div>
 
           <div className="pt-4">
-              
-              {!(latitude && longitude) ? (
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(true)}
-                  className="w-full flex items-center justify-center gap-2 border border-[#1A7A3C] rounded-md h-11 text-sm font-semibold text-[#1A7A3C] hover:bg-green-50/50 transition shadow-sm cursor-pointer"
-                >
-                  <MapPin size={16} /> Adicionar Coordenadas no Mapa
-                </button>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-end">
-                  <div className="sm:col-span-2">
-                    <button
-                      type="button"
-                      onClick={() => setIsModalOpen(true)}
-                      className="w-full flex items-center justify-center border border-[#1A7A3C] rounded-md h-11 bg-white hover:bg-green-50/30 text-[#1A7A3C] transition cursor-pointer"
-                      title="Editar Coordenadas"
-                    >
-                      <MapPin size={18} />
-                    </button>
-                  </div>
-                  <div className="sm:col-span-5">
-                    <FloatInput label="Latitude" value={latitude} onChange={(v) => setLatitude(v ?? "")} disabled />
-                  </div>
-                  <div className="sm:col-span-5">
-                    <FloatInput label="Longitude" value={longitude} onChange={(v) => setLongitude(v ?? "")} disabled />
-                  </div>
+
+            {!(latitude && longitude) ? (
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(true)}
+                className="w-full flex items-center justify-center gap-2 border border-[#1A7A3C] rounded-md h-11 text-sm font-semibold text-[#1A7A3C] hover:bg-green-50/50 transition shadow-sm cursor-pointer"
+              >
+                <MapPin size={16} /> Adicionar Coordenadas no Mapa
+              </button>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-end">
+                <div className="sm:col-span-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(true)}
+                    className="w-full flex items-center justify-center border border-[#1A7A3C] rounded-md h-11 bg-white hover:bg-green-50/30 text-[#1A7A3C] transition cursor-pointer"
+                    title="Editar Coordenadas"
+                  >
+                    <MapPin size={18} />
+                  </button>
                 </div>
-              )}
-            </div>
+                <div className="sm:col-span-5">
+                  <FloatInput label="Latitude" value={latitude} onChange={(v) => setLatitude(v ?? "")} disabled />
+                </div>
+                <div className="sm:col-span-5">
+                  <FloatInput label="Longitude" value={longitude} onChange={(v) => setLongitude(v ?? "")} disabled />
+                </div>
+              </div>
+            )}
+          </div>
         </Section>
 
-      
+
       </main>
 
       {/* Modal de Sucesso */}
       {isSucesso && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
-            <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4"><Check size={28} className="text-[#1A7A3C]" strokeWidth={3} /></div>
             <h3 className="text-lg font-bold text-gray-900">Divisão municipal adicionada com sucesso!</h3>
             <p className="text-sm text-gray-500 mt-1">{nome ? `"${nome}"` : "A divisão municipal"} foi adicionada.</p>
             <div className="flex gap-3 justify-center mt-6">
               <button onClick={() => { setIsSucesso(false); onNavigate("divisao-municipal"); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition">Voltar</button>
-              <button onClick={() => { 
-                setIsSucesso(false); 
+              <button onClick={() => {
+                setIsSucesso(false);
                 onNavigate("visualizar-divisao-municipal", {
-                  nome, 
+                  nome,
                   tipo,
-                  estado, 
+                  estado,
                   municipio,
-                  latitude: Number(latitude) || 0, 
+                  latitude: Number(latitude) || 0,
                   longitude: Number(longitude) || 0,
                   situacao: "Ativo",
-                }); 
+                });
               }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
             </div>
           </div>
@@ -197,9 +196,9 @@ function MapModal({ onClose, onConfirm, initialLat, initialLng }: MapModalProps)
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 px-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl p-8 flex flex-col gap-6 relative font-sans text-gray-800 animate-in fade-in zoom-in-95 duration-150">
-        <button 
-          type="button" 
-          onClick={onClose} 
+        <button
+          type="button"
+          onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-lg font-bold transition p-1"
         >
           ✕
@@ -216,16 +215,16 @@ function MapModal({ onClose, onConfirm, initialLat, initialLng }: MapModalProps)
         {/* Simulador visual do mapa */}
         <div className="w-full h-[240px] rounded-xl border border-gray-200 overflow-hidden relative bg-gray-100 flex items-center justify-center">
           <div className="absolute top-3 right-3 z-10 bg-white rounded-lg shadow-sm border border-gray-200 p-0.5 flex gap-0.5">
-            <button 
-              type="button" 
-              onClick={() => setMapType("mapa")} 
+            <button
+              type="button"
+              onClick={() => setMapType("mapa")}
               className={`text-[10px] font-bold px-3 py-1.5 rounded transition ${mapType === "mapa" ? "bg-[#1A7A3C] text-white" : "text-gray-600 hover:bg-gray-50"}`}
             >
               Mapa
             </button>
-            <button 
-              type="button" 
-              onClick={() => setMapType("satelite")} 
+            <button
+              type="button"
+              onClick={() => setMapType("satelite")}
               className={`text-[10px] font-bold px-3 py-1.5 rounded transition ${mapType === "satelite" ? "bg-[#1A7A3C] text-white" : "text-gray-600 hover:bg-gray-50"}`}
             >
               Satélite
@@ -275,9 +274,9 @@ function MapModal({ onClose, onConfirm, initialLat, initialLng }: MapModalProps)
         </div>
 
         <div className="flex justify-center items-center gap-3 w-full pt-2">
-          <button 
-            type="button" 
-            onClick={onClose} 
+          <button
+            type="button"
+            onClick={onClose}
             className="px-10 py-2.5 bg-white text-[#1A7A3C] text-sm font-semibold rounded-md border border-[#1A7A3C] hover:bg-gray-50 shadow-sm transition"
           >
             Cancelar
