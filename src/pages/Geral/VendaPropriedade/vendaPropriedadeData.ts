@@ -93,6 +93,18 @@ export function criarVendaPropriedade(dados: Omit<VendaPropriedade, "id">) {
   return novaVenda;
 }
 
+export function atualizarVendaPropriedade(vendaAtualizada: VendaPropriedade) {
+  const indice = VENDAS_PROPRIEDADE_MOCK.findIndex(
+    (venda) => venda.id === vendaAtualizada.id,
+  );
+
+  if (indice >= 0) {
+    VENDAS_PROPRIEDADE_MOCK[indice] = vendaAtualizada;
+  }
+
+  return vendaAtualizada;
+}
+
 export function formatarEstabelecimento(estabelecimento: EstabelecimentoVendaPropriedade) {
   return `${estabelecimento.codigo} - ${estabelecimento.nome}`;
 }
