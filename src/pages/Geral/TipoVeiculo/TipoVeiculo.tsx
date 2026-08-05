@@ -37,6 +37,7 @@ interface TipoVeiculo {
   id: number;
   tipoVeiculo: string;
   meioTransporte: string;
+  observacao: string;
   situacao: "Ativo" | "Inativo";
 }
 
@@ -45,36 +46,42 @@ const TIPOS_VEICULO_MOCK: TipoVeiculo[] = [
     id: 1,
     tipoVeiculo: "Caminhão Boiadeiro",
     meioTransporte: "Rodoviário",
+    observacao: "Veículo utilizado no transporte rodoviário de animais de produção.",
     situacao: "Ativo",
   },
   {
     id: 2,
     tipoVeiculo: "Carreta",
     meioTransporte: "Rodoviário",
+    observacao: "Veículo rodoviário destinado ao transporte de cargas de maior capacidade.",
     situacao: "Ativo",
   },
   {
     id: 3,
     tipoVeiculo: "Balsa",
     meioTransporte: "Marítimo/Fluvial",
+    observacao: "Embarcação utilizada em travessias e transportes fluviais.",
     situacao: "Ativo",
   },
   {
     id: 4,
     tipoVeiculo: "Vagão de Carga",
     meioTransporte: "Ferroviário",
+    observacao: "Tipo mantido inativo para consulta a registros ferroviários anteriores.",
     situacao: "Inativo",
   },
   {
     id: 5,
     tipoVeiculo: "Aeronave de Carga",
     meioTransporte: "Aéreo",
+    observacao: "Aeronave destinada ao transporte aéreo de cargas autorizadas.",
     situacao: "Ativo",
   },
   {
     id: 6,
     tipoVeiculo: "Condução a Pé (Tropa)",
     meioTransporte: "A Pé",
+    observacao: "Modalidade histórica mantida inativa para consulta.",
     situacao: "Inativo",
   },
 ];
@@ -373,8 +380,8 @@ export function TipoVeiculoPage({
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-1 justify-end">
-                            <button onClick={() => onNavigate("visualizar-tipo-veiculo")} className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"><ViewIcon size={18} /></button>
-<button onClick={() => onNavigate("editar-tipo-veiculo")} className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"><Pencil size={17} /></button>
+                            <button onClick={() => onNavigate("visualizar-tipo-veiculo", t)} className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"><ViewIcon size={18} /></button>
+                            <button onClick={() => onNavigate("editar-tipo-veiculo", t)} className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"><Pencil size={17} /></button>
                           </div>
                         </td>
                       </tr>

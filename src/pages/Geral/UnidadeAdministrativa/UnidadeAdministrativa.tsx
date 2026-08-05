@@ -52,15 +52,24 @@ interface Unidade {
   nome: string;
   sigla: string;
   tipo: string;
-  unidadePai: string; 
+  unidadePai: string;
+  municipio: string;
+  endereco: {
+    zona: string; cep: string; estado: string; municipio: string; bairro: string;
+    endereco: string; numero: string; complemento: string; localidade: string;
+    distrito: string; latitude: string; longitude: string;
+  };
+  email: string;
+  telefones: Array<{ numero: string; observacao: string }>;
+  observacao: string;
   situacao: "Ativo" | "Inativo";
 }
 
 const UNIDADES_MOCK: Unidade[] = [
-  { id: 1, nome: "Escritório Seccional de Lavras", sigla: "SECLAV3820", tipo: "Escritório Seccional", unidadePai: "Coordenadoria Regional de Oliveira", situacao: "Ativo" },
-  { id: 2, nome: "Coordenadoria Regional de Oliveira", sigla: "CROLI1200", tipo: "Coordenadoria Regional", unidadePai: "Escritório Central", situacao: "Ativo" },
-  { id: 3, nome: "Escritório Municipal de Ijaci", sigla: "EMIJ5540", tipo: "Escritório Municipal", unidadePai: "Escritório Seccional de Lavras", situacao: "Inativo" },
-  { id: 4, nome: "Escritório Central", sigla: "ECBH0001", tipo: "Escritório Central", unidadePai: "", situacao: "Ativo" },
+  { id: 1, nome: "Escritório Seccional de Lavras", sigla: "SECLAV3820", tipo: "Escritório Seccional", unidadePai: "Coordenadoria Regional de Oliveira", municipio: "Lavras", endereco: { zona: "Urbana", cep: "37200-000", estado: "Minas Gerais", municipio: "Lavras", bairro: "Centro", endereco: "Rua Raul Soares", numero: "65", complemento: "2º andar", localidade: "Centro", distrito: "", latitude: "-21.2453", longitude: "-44.9997" }, email: "lavras@ima.mg.gov.br", telefones: [{ numero: "(35) 3821-1224", observacao: "Atendimento e WhatsApp" }], observacao: "Atendimento ao público de segunda a sexta-feira, das 8h às 17h.", situacao: "Ativo" },
+  { id: 2, nome: "Coordenadoria Regional de Oliveira", sigla: "CROLI1200", tipo: "Coordenadoria Regional", unidadePai: "Escritório Central", municipio: "Oliveira", endereco: { zona: "Urbana", cep: "35540-000", estado: "Minas Gerais", municipio: "Oliveira", bairro: "Centro", endereco: "Avenida Maracanã", numero: "120", complemento: "Sala 3", localidade: "Centro", distrito: "", latitude: "-20.6975", longitude: "-44.8274" }, email: "oliveira@ima.mg.gov.br", telefones: [{ numero: "(37) 3331-2040", observacao: "Telefone fixo" }], observacao: "Unidade responsável pela coordenação regional.", situacao: "Ativo" },
+  { id: 3, nome: "Escritório Municipal de Ijaci", sigla: "EMIJ5540", tipo: "Escritório Municipal", unidadePai: "Escritório Seccional de Lavras", municipio: "Ijaci", endereco: { zona: "Urbana", cep: "37205-000", estado: "Minas Gerais", municipio: "Ijaci", bairro: "Centro", endereco: "Praça Prefeito Elias Antônio Filho", numero: "10", complemento: "", localidade: "Centro", distrito: "", latitude: "-21.1738", longitude: "-44.9233" }, email: "ijaci@ima.mg.gov.br", telefones: [{ numero: "(35) 3843-1180", observacao: "Telefone fixo" }], observacao: "Unidade temporariamente inativa para atendimento presencial.", situacao: "Inativo" },
+  { id: 4, nome: "Escritório Central", sigla: "ECBH0001", tipo: "Escritório Central", unidadePai: "", municipio: "Belo Horizonte", endereco: { zona: "Urbana", cep: "30150-100", estado: "Minas Gerais", municipio: "Belo Horizonte", bairro: "Funcionários", endereco: "Avenida Afonso Pena", numero: "2000", complemento: "", localidade: "Funcionários", distrito: "", latitude: "-19.9245", longitude: "-43.9352" }, email: "central@ima.mg.gov.br", telefones: [{ numero: "(31) 3915-8600", observacao: "Central de atendimento" }], observacao: "Sede administrativa central do IMA.", situacao: "Ativo" },
 ];
 
 const UNIDADES_PAI_MOCK = UNIDADES_MOCK.map((u) => ({ id: u.id, nome: u.nome, sigla: u.sigla, tipo: u.tipo }));

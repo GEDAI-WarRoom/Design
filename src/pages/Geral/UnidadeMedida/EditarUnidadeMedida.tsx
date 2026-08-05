@@ -1,9 +1,23 @@
 import React, { useState } from "react";
 import { ArrowLeft, Info, Check, ChevronDown, ChevronUp } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
-import { FloatInput, FloatSelect, LargeTextArea } from "../../../components/ui/FormKit";
+import { CheckboxGroup, FloatInput, FloatSelect, LargeTextArea } from "../../../components/ui/FormKit";
 
 const GREEN = "#1A7A3C";
+
+const OPCOES_TIPO = [
+  { value: "Animal", label: "Animal" },
+  { value: "Vegetal", label: "Vegetal" },
+  { value: "Agrotóxico", label: "Agrotóxico" },
+];
+
+const EXEMPLO_UNIDADE = {
+  nome: "Quilograma",
+  sigla: "kg",
+  tipos: ["Animal"],
+  situacao: "Ativo",
+  observacao: "Unidade utilizada para registrar peso em cadastros e movimentações de origem animal.",
+};
 
 function Section({ title, children }: { title: string; children: React.ReactNode; }) {
   const [open, setOpen] = useState(true);
@@ -20,10 +34,13 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 export function EditarUnidadeMedidaPage({ dados, onLogout, onNavigate }: { dados?: any; onLogout: () => void; onNavigate: (screen: string, data?: any) => void; }) {
   const [isSucesso, setIsSucesso] = useState(false);
-  const [nome, setNome] = useState(dados?.nome || "");
-  const [sigla, setSigla] = useState(dados?.sigla || "");
-  const [situacao, setSituacao] = useState(dados?.situacao || "Ativo");
-  const [observacao, setObservacao] = useState(dados?.observacao || "");
+  const [nome, setNome] = useState(dados?.nome || EXEMPLO_UNIDADE.nome);
+  const [sigla, setSigla] = useState(dados?.sigla || EXEMPLO_UNIDADE.sigla);
+  const [tipos, setTipos] = useState<string[]>(dados?.tipos?.length ? dados.tipos : dados?.tipo ? [dados.tipo] : EXEMPLO_UNIDADE.tipos);
+  const [situacao, setSituacao] = useState(dados?.situacao || EXEMPLO_UNIDADE.situacao);
+  const [observacao, setObservacao] = useState(dados?.observacao || EXEMPLO_UNIDADE.observacao);
+
+  const dadosAtualizados = { ...dados, nome, sigla, tipo: tipos[0] || "Animal", tipos, situacao, observacao };
 
   const handleSalvar = () => setIsSucesso(true);
 
@@ -38,7 +55,7 @@ export function EditarUnidadeMedidaPage({ dados, onLogout, onNavigate }: { dados
           <div className="flex justify-between items-center w-full">
             <h1 className="text-2xl font-semibold text-gray-900">Editar Unidade de Medida</h1>
             <button type="button" onClick={handleSalvar} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm">
-              Salvar Alterações
+              Salvar
             </button>
           </div>
         </div>
@@ -50,9 +67,12 @@ export function EditarUnidadeMedidaPage({ dados, onLogout, onNavigate }: { dados
 
         <Section title="Informações Básicas">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <FloatInput label="Nome" required value={nome} onChange={setNome} maxLength={255} />
-            <FloatInput label="Sigla" required value={sigla} onChange={setSigla} maxLength={10} />
-            <FloatSelect label="Situação" required value={situacao} onChange={setSituacao} options={[ { value: "Ativo", label: "Ativo" }, { value: "Inativo", label: "Inativo" } ]} />
+            <FloatInput label="Unidade de Medida" required value={nome} onChange={setNome} maxLength={255} />
+            <FloatInput label="Descrição" required value={sigla} onChange={setSigla} maxLength={10} />
+            <FloatSelect label="Situação" required value={situacao} onChange={setSituacao} options={[{ value: "Ativo", label: "Ativo" }, { value: "Inativo", label: "Inativo" }]} />
+          </div>
+          <div className="border-t border-gray-100 pt-5">
+            <CheckboxGroup title="Tipo de Unidade de Medida" required options={OPCOES_TIPO} orientation="horizontal" defaultValue={tipos} onChange={setTipos} />
           </div>
         </Section>
 
@@ -64,12 +84,11 @@ export function EditarUnidadeMedidaPage({ dados, onLogout, onNavigate }: { dados
       {isSucesso && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center animate-fadeIn">
-            <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4"><Check size={28} className="text-[#1A7A3C]" strokeWidth={3} /></div>
             <h3 className="text-lg font-bold text-gray-900">Alterações salvas!</h3>
             <p className="text-sm text-gray-500 mt-1">A unidade de medida "{nome}" foi atualizada.</p>
             <div className="flex gap-3 justify-center mt-6">
               <button onClick={() => { setIsSucesso(false); onNavigate("unidade-medida"); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50 transition">Voltar</button>
-              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-unidade-medida", dados); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
+              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-unidade-medida", dadosAtualizados); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
             </div>
           </div>
         </div>

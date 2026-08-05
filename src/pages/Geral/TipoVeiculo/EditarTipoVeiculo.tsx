@@ -5,6 +5,15 @@ import { FloatInput, FloatSelect, LargeTextArea } from "../../../components/ui/F
 
 const GREEN = "#1A7A3C";
 
+const MEIOS_TRANSPORTE = ["Aéreo", "A Pé", "Ferroviário", "Marítimo/Fluvial", "Rodoviário"];
+
+const EXEMPLO_TIPO_VEICULO = {
+  tipoVeiculo: "Caminhão Boiadeiro",
+  meioTransporte: "Rodoviário",
+  situacao: "Ativo",
+  observacao: "Veículo utilizado no transporte rodoviário de animais de produção.",
+};
+
 function Section({ title, children }: { title: string; children: React.ReactNode; }) {
   const [open, setOpen] = useState(true);
   return (
@@ -20,9 +29,12 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 export function EditarTipoVeiculoPage({ dados, onLogout, onNavigate }: { dados?: any; onLogout: () => void; onNavigate: (screen: string, data?: any) => void; }) {
   const [isSucesso, setIsSucesso] = useState(false);
-  const [tipo, setTipo] = useState(dados?.tipo || "");
-  const [situacao, setSituacao] = useState(dados?.situacao || "Ativo");
-  const [observacao, setObservacao] = useState(dados?.observacao || "");
+  const [tipoVeiculo, setTipoVeiculo] = useState(dados?.tipoVeiculo || dados?.tipo || EXEMPLO_TIPO_VEICULO.tipoVeiculo);
+  const [meioTransporte, setMeioTransporte] = useState(dados?.meioTransporte || EXEMPLO_TIPO_VEICULO.meioTransporte);
+  const [situacao, setSituacao] = useState(dados?.situacao || EXEMPLO_TIPO_VEICULO.situacao);
+  const [observacao, setObservacao] = useState(dados?.observacao || EXEMPLO_TIPO_VEICULO.observacao);
+
+  const dadosAtualizados = { ...dados, tipoVeiculo, meioTransporte, situacao, observacao };
 
   const handleSalvar = () => setIsSucesso(true);
 
@@ -37,7 +49,7 @@ export function EditarTipoVeiculoPage({ dados, onLogout, onNavigate }: { dados?:
           <div className="flex justify-between items-center w-full">
             <h1 className="text-2xl font-semibold text-gray-900">Editar Tipo de Veículo</h1>
             <button type="button" onClick={handleSalvar} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm">
-              Salvar Alterações
+              Salvar
             </button>
           </div>
         </div>
@@ -49,8 +61,8 @@ export function EditarTipoVeiculoPage({ dados, onLogout, onNavigate }: { dados?:
 
         <Section title="Informações Básicas">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <FloatInput label="Tipo do Veículo" required value={tipo} onChange={setTipo} maxLength={255} />
-            <FloatSelect label="Situação" required value={situacao} onChange={setSituacao} options={[ { value: "Ativo", label: "Ativo" }, { value: "Inativo", label: "Inativo" } ]} />
+            <FloatInput label="Tipo do Veículo" required value={tipoVeiculo} onChange={setTipoVeiculo} maxLength={255} />
+            <FloatSelect label="Meio de Transporte" required value={meioTransporte} onChange={setMeioTransporte} options={MEIOS_TRANSPORTE.map((item) => ({ value: item, label: item }))} />
           </div>
         </Section>
 
@@ -64,10 +76,10 @@ export function EditarTipoVeiculoPage({ dados, onLogout, onNavigate }: { dados?:
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center animate-fadeIn">
             <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4"><Check size={28} className="text-[#1A7A3C]" strokeWidth={3} /></div>
             <h3 className="text-lg font-bold text-gray-900">Alterações salvas!</h3>
-            <p className="text-sm text-gray-500 mt-1">O tipo "{tipo}" foi atualizado com sucesso.</p>
+            <p className="text-sm text-gray-500 mt-1">O tipo "{tipoVeiculo}" foi atualizado com sucesso.</p>
             <div className="flex gap-3 justify-center mt-6">
               <button onClick={() => { setIsSucesso(false); onNavigate("tipo-veiculo"); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50 transition">Voltar</button>
-              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-tipo-veiculo", dados); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
+              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-tipo-veiculo", dadosAtualizados); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
             </div>
           </div>
         </div>
