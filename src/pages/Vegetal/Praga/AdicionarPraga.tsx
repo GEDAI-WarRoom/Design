@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { ArrowLeft, ChevronUp, ChevronDown, Info, Check } from "lucide-react";
+import { ArrowLeft, ChevronUp, ChevronDown, Info } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
-import { FloatInput } from "../../../components/ui/FormKit";
+import { FloatInput, LargeTextArea } from "../../../components/ui/FormKit";
 
 const GREEN = "#1A7A3C";
 
@@ -32,6 +32,7 @@ interface PageProps {
 export function AdicionarPragaPage({ onLogout, onNavigate }: PageProps) {
   const [nomeCientifico, setNomeCientifico] = useState("");
   const [nomePopular, setNomePopular] = useState("");
+  const [observacao, setObservacao] = useState("");
 
   const [isSucesso, setIsSucesso] = useState(false);
 
@@ -80,6 +81,10 @@ export function AdicionarPragaPage({ onLogout, onNavigate }: PageProps) {
             />
           </div>
         </Section>
+
+        <Section title="Observações">
+          <LargeTextArea label="Observações" value={observacao} onChange={setObservacao} />
+        </Section>
       </main>
 
       {/* Modal de Sucesso */}
@@ -90,7 +95,7 @@ export function AdicionarPragaPage({ onLogout, onNavigate }: PageProps) {
             <p className="text-sm text-gray-500 mt-1">{nomeCientifico ? `"${nomeCientifico}"` : "A praga"} foi cadastrada.</p>
             <div className="flex gap-3 justify-center mt-6">
               <button onClick={() => { setIsSucesso(false); onNavigate("praga"); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition">Voltar</button>
-              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-praga", { nomeCientifico, nomePopular, situacao: "Ativo" }); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
+              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-praga", { nomeCientifico, nomePopular, observacao, situacao: "Ativo" }); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
             </div>
           </div>
         </div>

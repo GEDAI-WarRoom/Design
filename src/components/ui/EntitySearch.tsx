@@ -919,6 +919,7 @@ interface DoencaInputProps {
 	tooltipText?: string;
 	data?: any[];
 	apenasVacinaveis?: boolean; // 👈 Adicionado aqui para resolver o erro de tipagem
+	disabled?: boolean;
 }
 
 export function DoencaInput({
@@ -929,6 +930,7 @@ export function DoencaInput({
 	tooltipText,
 	data = DOENCAS_MOCK,
 	apenasVacinaveis = false, // 👈 Inicializa como false por padrão
+	disabled = false,
 }: DoencaInputProps) {
 	// 💡 Se 'apenasVacinaveis' for true, você pode filtrar os dados aqui se o seu mock tiver esse campo,
 	// ou apenas repassar a lista completa por enquanto.
@@ -950,6 +952,7 @@ export function DoencaInput({
 						label="Doença"
 						placeholder="Buscar por nome da doença."
 						required={required}
+						disabled={disabled}
 						value={BlacklistedOuSelecionada?.nome || ""}
 						data={dadosFiltrados}
 						searchKeys={["nome"]}
@@ -974,7 +977,7 @@ export function DoencaInput({
 					/>
 				</div>
 
-				{value && BlacklistedOuSelecionada && (
+				{!disabled && value && BlacklistedOuSelecionada && (
 					<EyeAction onClick={onEyeClick} />
 				)}
 			</div>
@@ -990,16 +993,18 @@ export function ProprietarioInput({
 	onChange,
 	onEyeClick,
 	required = false,
+	disabled = false,
+	data = PRODUTORES_MOCK,
 }: DomainInputProps) {
 	const [tipoPessoa, setTipoPessoa] = useState<string>("");
 
-	const entidadeSelecionada = PRODUTORES_MOCK.find(
+	const entidadeSelecionada = data.find(
 		(x) => x.nome === value || x.documento === value,
 	);
 
 	const databaseFiltrada = tipoPessoa
-		? PRODUTORES_MOCK.filter((p) => p.tipo === tipoPessoa)
-		: PRODUTORES_MOCK;
+		? data.filter((p: any) => p.tipo === tipoPessoa)
+		: data;
 
 	// Definição estrita das colunas baseada no estado atual
 	const colunasModal = [
@@ -1035,6 +1040,7 @@ export function ProprietarioInput({
 					label="Proprietário"
 					placeholder="Buscar pelo nome do proprietário."
 					required={required}
+					disabled={disabled}
 					value={entidadeSelecionada?.nome || ""}
 					data={databaseFiltrada}
 					title="Buscar Proprietário"
@@ -1094,6 +1100,8 @@ interface DomainInputProps {
 	value: string; // Nome selecionado
 	documento?: string; // Documento selecionado (CPF/CNPJ)
 	required?: boolean;
+	disabled?: boolean;
+	data?: any[];
 	onChange: (selectedEntity: any) => void;
 	onEyeClick?: () => void;
 }

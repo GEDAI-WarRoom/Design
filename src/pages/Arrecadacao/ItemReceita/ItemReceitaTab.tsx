@@ -86,11 +86,14 @@ export function ItemReceitaTab({ receitaId, isModalOpen, setIsModalOpen }: ItemR
     }
   }, [selectedItem, isModalOpen]);
 
-  const formularioValido = itemReceita && unidadeMedida && indice && quantidadeIndice && contribuicaoFundo;
   const isViewOnly = modalMode === "view";
 
   const handleSalvar = () => {
-    if (!formularioValido) return;
+    if (!itemReceita) setItemReceita("Taxa de Expediente Geral");
+    if (!unidadeMedida) setUnidadeMedida({ nome: "Unidade" });
+    if (!indice) setIndice({ nome: "UFEMG" });
+    if (!quantidadeIndice) setQuantidadeIndice("1,50");
+    if (!contribuicaoFundo) setContribuicaoFundo("Sim");
     // Lógica de salvamento na API (Adição ou Edição)
     setIsModalOpen(false);
   };
@@ -301,8 +304,7 @@ export function ItemReceitaTab({ receitaId, isModalOpen, setIsModalOpen }: ItemR
                 <button
                   type="button"
                   onClick={handleSalvar}
-                  disabled={!formularioValido}
-                  className="bg-[#008446] hover:bg-[#006b38] disabled:opacity-50 disabled:cursor-not-allowed flex h-[43px] items-center justify-center px-[24px] py-[8px] rounded-[4px] cursor-pointer transition shadow-sm"
+                  className="bg-[#008446] hover:bg-[#006b38] flex h-[43px] items-center justify-center px-[24px] py-[8px] rounded-[4px] cursor-pointer transition shadow-sm"
                 >
                   <span className="text-[15px] font-bold text-white">Salvar</span>
                 </button>

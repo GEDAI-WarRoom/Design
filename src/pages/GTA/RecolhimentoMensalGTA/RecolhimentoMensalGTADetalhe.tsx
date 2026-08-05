@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { ArrowLeft, ChevronDown, ChevronUp, Eye, FileText, Info, Pencil, ReceiptText } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronUp, Eye, FileText, Info } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { CustomButton, FloatInput } from "../../../components/ui/FormKit";
 import {
@@ -32,7 +32,15 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 }
 
 function DetalhePage({ onLogout, onNavigate, dados, mode }: Props & { mode: "view" | "edit" }) {
-  const inicial = dados ?? obterRecolhimento(null);
+  const exemplo = obterRecolhimento(null);
+  const inicial = dados && exemplo
+    ? {
+      ...exemplo,
+      ...dados,
+      contribuinte: { ...exemplo.contribuinte, ...(dados.contribuinte || {}) },
+      boletos: dados.boletos?.length ? dados.boletos : exemplo.boletos,
+    }
+    : exemplo;
   const [registro, setRegistro] = useState<RecolhimentoMensalGTA | null>(inicial);
   if (!registro) return null;
 
@@ -75,8 +83,18 @@ function DetalhePage({ onLogout, onNavigate, dados, mode }: Props & { mode: "vie
 
         <Section title="Informações Básicas">
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-            <FloatInput label="Contribuinte" required value={registro.contribuinte.nome} disabled />
-            <FloatInput label="CPF/CNPJ" required value={registro.contribuinte.documento} disabled />
+            <div className="flex items-end gap-2 md:col-span-2">
+              <div className="flex-1"><FloatInput label="Contribuinte" required value={registro.contribuinte.nome} disabled /></div>
+              <div className="flex-1"><FloatInput label={registro.contribuinte.tipo === "Pessoa Jurídica" ? "CNPJ Contribuinte" : "CPF Contribuinte"} required value={registro.contribuinte.documento} disabled /></div>
+              <button
+                type="button"
+                onClick={() => onNavigate(registro.contribuinte.tipo === "Pessoa Jurídica" ? "visualizar-pessoa-juridica" : "visualizar-pessoa-fisica", registro.contribuinte)}
+                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md text-[#1A7A3C] hover:bg-green-50"
+                title="Visualizar detalhes do contribuinte"
+              >
+                <Eye size={20} />
+              </button>
+            </div>
             <FloatInput label="Ano para referência" required value={String(registro.anoReferencia)} disabled />
             <FloatInput label="Mês para referência" required value={MESES[registro.mesReferencia - 1]} disabled />
             {temBoletos && (
