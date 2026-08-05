@@ -1,18 +1,22 @@
 import {
+  AlertTriangle,
   ArrowLeft,
   Calendar,
   CalendarArrowUpIcon,
+  Check,
   ChevronDown,
   ChevronUp,
   Dna,
   Download,
+  Eye,
   Info,
   PlusCircle,
   Store,
   Trash2,
   User,
+  Warehouse,
 } from "lucide-react";
-import { useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Navbar } from "../../../components/Navbar";
 import { DynamicListWrapper, EntitySearchInput } from "../../../components/ui/EntitySearch";
 import {
@@ -22,245 +26,68 @@ import {
   SimNao,
   UploadField,
 } from "../../../components/ui/FormKit";
+import {
+  ATIVIDADES_COMERCIAIS,
+  ATIVIDADES_NAO_COMERCIAIS,
+  calcularSituacaoAutomatica,
+  criarEventoPecuarioInicial,
+  ESPECIES_EVENTO_MOCK,
+  ESTABELECIMENTOS_AUXILIARES_MOCK,
+  gerarCodigoEvento,
+  obterAlertasEventoPecuario,
+  possuiEspecieBovideos,
+  PROMOTORAS_EVENTO_MOCK,
+  RECINTOS_EVENTO_MOCK,
+  RESPONSAVEIS_EVENTO_MOCK,
+  TIPOS_EVENTO,
+  TIPOS_LEILAO,
+  validarEventoPecuario,
+  type AnexoEvento,
+  type EspecieEvento,
+  type EstabelecimentoAuxiliar,
+  type EventoPecuarioRegistro,
+  type PromotoraEvento,
+  type RecintoEvento,
+  type ResponsavelEvento,
+  type SimNaoEvento,
+  type SituacaoEventoPecuario,
+} from "./eventoPecuarioData";
 
 const GREEN = "#1A7A3C";
+const uid = (prefixo: string) =>
+  `${prefixo}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 
-// --- mocks ---
-export const TIPOS_EVENTO = [
-  { value: "Com finalidade comercial", label: "Com finalidade comercial" },
-  { value: "Sem finalidade comercial", label: "Sem finalidade comercial" },
-];
+export type EventoPecuarioMode = "create" | "edit" | "view";
 
-const MUNICIPIOS = [
-  { value: "São Paulo", label: "São Paulo" },
-  { value: "Rio de Janeiro", label: "Rio de Janeiro" },
-  { value: "Belo Horizonte", label: "Belo Horizonte" },
-  { value: "Lavras", label: "Lavras" },
-  { value: "Abaeté", label: "Abaeté" },
-  { value: "Abadia dos Dourados", label: "Abadia dos Dourados" },
-  { value: "Passos", label: "Passos" },
-];
+interface PageProps {
+  onLogout: () => void;
+  onNavigate: (screen: any, data?: any) => void;
+  mode?: EventoPecuarioMode;
+  dados?: any;
+  data?: any;
+}
 
-const ESTADOS = [
-  { value: "Minas Gerais", label: "Minas Gerais" },
-  { value: "São Paulo", label: "São Paulo" },
-  { value: "Rio de Janeiro", label: "Rio de Janeiro" },
-  { value: "Belo Horizonte", label: "Belo Horizonte" },
-];
-
-const SITUACOES = [
-  { value: "Ativo", label: "Ativo" },
-  { value: "Inativo", label: "Inativo" },
-  { value: "Suspenso", label: "Suspenso" },
-];
-
-const EMITIDO = [
-  { value: "Sim", label: "Sim" },
-  { value: "Não", label: "Não" },
-];
-
-export const ESPECIES_EVENTO_MOCK = [
-  { id: 1, codigo: "ESP-001", nome: "Bovino", grupo: "Bovídeos" },
-  { id: 2, codigo: "ESP-002", nome: "Bubalino", grupo: "Bovídeos" },
-  { id: 3, codigo: "ESP-003", nome: "Equino", grupo: "Equídeos" },
-  { id: 4, codigo: "ESP-004", nome: "Suíno", grupo: "Suídeos" },
-  { id: 5, codigo: "ESP-005", nome: "Caprino", grupo: "Caprinos" },
-  { id: 6, codigo: "ESP-006", nome: "Galinha", grupo: "Aves" },
-];
-
-export const PROMOTORAS_EVENTO_MOCK = [
-  {
-    id: 1,
-    nome: "PH Leilões LTDA",
-    numeroRegistro: "14385",
-    nomeFantasiaProprietario: "PH Agronegócios",
-    cnpjProprietario: "12.345.678/0001-90",
-  },
-  {
-    id: 2,
-    nome: "Central de Leilões Minas",
-    numeroRegistro: "20981",
-    nomeFantasiaProprietario: "CLM Eventos",
-    cnpjProprietario: "23.456.789/0001-11",
-  },
-  {
-    id: 3,
-    nome: "Associação de Criadores do Sul",
-    numeroRegistro: "30442",
-    nomeFantasiaProprietario: "ACS Eventos Pecuários",
-    cnpjProprietario: "34.567.890/0001-22",
-  },
-];
-
-export const RECINTOS_EVENTO_MOCK = [
-  {
-    id: 1,
-    nome: "Fazenda Japecanga",
-    municipio: "Lavras/MG",
-    proprietario: "João Batista Ferreira",
-    codigo: "940877688",
-  },
-  {
-    id: 2,
-    nome: "Parque de Exposições Vale Verde",
-    municipio: "Varginha/MG",
-    proprietario: "Associação Rural Vale Verde",
-    codigo: "562349001",
-  },
-  {
-    id: 3,
-    nome: "Recinto Serra do Café",
-    municipio: "Três Pontas/MG",
-    proprietario: "Cooperativa Serra do Café",
-    codigo: "851239859",
-  },
-];
-
-export const RESPONSAVEIS_EVENTO_MOCK = [
-  {
-    id: 1,
-    nome: "José Teixeira Sabino",
-    documento: "444.009.956-40",
-    habilitadoGta: true,
-  },
-  {
-    id: 2,
-    nome: "Marina Couto Dias",
-    documento: "333.221.115-09",
-    habilitadoGta: true,
-  },
-  {
-    id: 3,
-    nome: "Carlos Henrique Reis",
-    documento: "222.114.558-70",
-    habilitadoGta: false,
-  },
-];
-
-const EVENTOS_PECUARIOS_MOCK = [
-  {
-    id: 1,
-    codigo: "86237",
-    nomeEvento: "Torneio de Pássaros de São João del Rei",
-    periodoDe: "2026-06-01",
-    periodoAte: "2026-06-03",
-    especies: [ESPECIES_EVENTO_MOCK[5]],
-    tipoEventoPecuario: "Sem finalidade comercial",
-    atividadeEvento: "Torneio de Canto",
-    isencaoBrucelose: "",
-    promotora: PROMOTORAS_EVENTO_MOCK[0],
-    recinto: RECINTOS_EVENTO_MOCK[0],
-    possuiAuxilioEstabelecimento: "Não",
-    estabelecimentoAgropecuario: null,
-    responsaveisTecnicos: [RESPONSAVEIS_EVENTO_MOCK[0]],
-    anexos: [
-      {
-        uid: "a1",
-        nomeArquivo: "regulamento.pdf",
-        descricao: "Regulamento do torneio",
-      },
-    ],
-    observacoes: "Este evento acontecerá no salão de eventos da fazenda.",
-    situacao: "Ativo",
-    usuarioUltimaAlteracao: "Lucas Pedro Conte",
-    dataUltimaModificacao: "14/04/2026 07:29",
-  },
-  {
-    id: 2,
-    codigo: "86241",
-    nomeEvento: "Leilão Genética Premium",
-    periodoDe: "2026-07-10",
-    periodoAte: "2026-07-10",
-    especies: [ESPECIES_EVENTO_MOCK[0], ESPECIES_EVENTO_MOCK[1]],
-    tipoEventoPecuario: "Com finalidade comercial",
-    atividadeEvento: "Leilão",
-    tipoLeilao:
-      "Animais com registro genealógico ou com finalidade de reprodução ou produção leiteira",
-    promotora: PROMOTORAS_EVENTO_MOCK[1],
-    recinto: RECINTOS_EVENTO_MOCK[1],
-    possuiAuxilioEstabelecimento: "Sim",
-    estabelecimentoAgropecuario: {
-      nome: "Fazenda Rio Preto",
-      codigo: "34523423567",
-    },
-    responsaveisTecnicos: [RESPONSAVEIS_EVENTO_MOCK[0], RESPONSAVEIS_EVENTO_MOCK[1]],
-    anexos: [],
-    observacoes: "",
-    situacao: "Ativo",
-    usuarioUltimaAlteracao: "Marina Couto Dias",
-    dataUltimaModificacao: "02/07/2026 15:10",
-  },
-  {
-    id: 3,
-    codigo: "86255",
-    nomeEvento: "Feira Agropecuária de Três Pontas",
-    periodoDe: "2026-03-12",
-    periodoAte: "2026-03-15",
-    especies: [ESPECIES_EVENTO_MOCK[0], ESPECIES_EVENTO_MOCK[3]],
-    tipoEventoPecuario: "Com finalidade comercial",
-    atividadeEvento: "Feira",
-    isencaoBrucelose: "Não",
-    promotora: PROMOTORAS_EVENTO_MOCK[2],
-    recinto: RECINTOS_EVENTO_MOCK[2],
-    possuiAuxilioEstabelecimento: "Não",
-    estabelecimentoAgropecuario: null,
-    responsaveisTecnicos: [],
-    anexos: [],
-    observacoes: "",
-    situacao: "Suspenso",
-    usuarioUltimaAlteracao: "Carlos Henrique Reis",
-    dataUltimaModificacao: "20/03/2026 09:45",
-  },
-  {
-    id: 4,
-    codigo: "86260",
-    nomeEvento: "Exposição Equina Regional",
-    periodoDe: "2025-11-01",
-    periodoAte: "2025-11-05",
-    especies: [ESPECIES_EVENTO_MOCK[2]],
-    tipoEventoPecuario: "Sem finalidade comercial",
-    atividadeEvento: "Exposição",
-    isencaoBrucelose: "Sim",
-    promotora: PROMOTORAS_EVENTO_MOCK[0],
-    recinto: RECINTOS_EVENTO_MOCK[0],
-    possuiAuxilioEstabelecimento: "Não",
-    estabelecimentoAgropecuario: null,
-    responsaveisTecnicos: [RESPONSAVEIS_EVENTO_MOCK[2]],
-    anexos: [],
-    observacoes: "",
-    situacao: "Inativo",
-    usuarioUltimaAlteracao: "José Teixeira Sabino",
-    dataUltimaModificacao: "06/11/2025 18:00",
-  },
-];
-
-const uid = (p: string) => `${p}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-
-function Section({
-  title,
-  children,
-  defaultOpen = true,
-}: {
+interface SectionProps {
   title: string;
   children: React.ReactNode;
   defaultOpen?: boolean;
-}) {
+}
+
+function Section({ title, children, defaultOpen = true }: SectionProps) {
   const [open, setOpen] = useState(defaultOpen);
   return (
     <div className="bg-white rounded-xl shadow-sm">
       <button
         type="button"
+        data-view-action
         onClick={() => setOpen(!open)}
+        aria-expanded={open}
         className="w-full flex items-center justify-between px-6 py-4 text-left rounded-xl hover:bg-gray-50 transition"
       >
         <span className="text-base font-semibold text-gray-800">{title}</span>
-        {open ? (
-          <ChevronUp size={18} className="text-gray-400" />
-        ) : (
-          <ChevronDown size={18} className="text-gray-400" />
-        )}
+        {open ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
       </button>
-      {open && <div className="px-6 pb-6 border-t border-gray-100">{children}</div>}
+      {open && <div className="evento-form-fields px-6 pb-6 border-t border-gray-100 pt-5">{children}</div>}
     </div>
   );
 }
@@ -270,10 +97,9 @@ function SubGrupo({
   children,
   comDivisor = false,
 }: {
-  titulo: string;
+  titulo: React.ReactNode;
   children: React.ReactNode;
   comDivisor?: boolean;
-  procedencia?: any[];
 }) {
   return (
     <>
@@ -286,160 +112,276 @@ function SubGrupo({
   );
 }
 
-interface PageProps {
-  onLogout: () => void;
-  onNavigate: (screen: any, data?: any) => void;
+function BotaoVer({ onClick, title }: { onClick: () => void; title: string }) {
+  return (
+    <button
+      type="button"
+      data-view-action
+      onClick={onClick}
+      title={title}
+      aria-label={title}
+      className="h-12 p-2.5 text-[#1A7A3C] hover:bg-green-50 rounded-md transition flex items-center justify-center"
+    >
+      <Eye size={19} />
+    </button>
+  );
 }
 
-export function AdicionarEventoPecuarioPage({ onLogout, onNavigate }: PageProps) {
-  const [isSucesso, setIsSucesso] = useState(false);
-  const [nomeEvento, setNomeEvento] = useState("");
-  const [tipoEvento, setTipoEvento] = useState("");
-  const [situacao, setSituacao] = useState("");
-  const [estado, setEstado] = useState("");
-  const [municipio, setMunicipio] = useState("");
-  const [emitido, setEmitido] = useState("");
-  const [validadeDe, setValidadeDe] = useState("");
-  const [validadeAte, setValidadeAte] = useState("");
-  const [especie, setEspecie] = useState([
-    {
-      id: crypto.randomUUID(),
-      especie: null,
-    },
-  ]);
-  const [possuiAuxilio, setPossuiAuxilio] = useState(false);
-  const [observacao, setObservacao] = useState("");
-  const [anexos, setAnexos] = useState<any[]>([]);
-  const [estabelecimento, setEstabelecimento] = useState<any | null>(null);
-  const [responsavelTecnico, setResponsavelTecnico] = useState<any | null>(null);
-  const [promotora, setPromotora] = useState<any | null>(null);
-  const [showFilters, setShowFilters] = useState(false);
-  const [focusNome, setFocusNome] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
-  const [page, setPage] = useState(1);
-  const perPage = 10;
+function agoraFormatado() {
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date()).replace(",", "");
+}
 
-  const temFiltroAtivo =
-    nomeEvento.trim() !== "" ||
-    tipoEvento !== "" ||
-    situacao !== "" ||
-    !!especie ||
-    !!estabelecimento ||
-    !!responsavelTecnico ||
-    !!promotora;
+export function AdicionarEventoPecuarioPage({
+  onLogout,
+  onNavigate,
+  mode = "create",
+  dados,
+  data,
+}: PageProps) {
+  const origem = dados ?? data ?? {};
+  const isView = mode === "view";
+  const isEdit = mode === "edit";
+  const mainRef = useRef<HTMLElement>(null);
+  const inicial = useMemo(
+    () => criarEventoPecuarioInicial(origem, mode !== "create"),
+    [],
+  );
 
-  const handlePesquisar = () => {
-    if (!temFiltroAtivo) {
-      setHasSearched(false);
+  const [codigo] = useState(inicial.codigo || gerarCodigoEvento());
+  const [nomeEvento, setNomeEvento] = useState(inicial.nomeEvento);
+  const [periodoDe, setPeriodoDe] = useState(inicial.periodoDe);
+  const [periodoAte, setPeriodoAte] = useState(inicial.periodoAte);
+  const [especies, setEspecies] = useState<Array<{ uid: string; especie: EspecieEvento | null }>>(
+    inicial.especies.length
+      ? inicial.especies.map((especie, index) => ({ uid: `esp-${especie.id ?? index}`, especie }))
+      : [{ uid: uid("esp"), especie: null }],
+  );
+  const [tipoEvento, setTipoEvento] = useState(inicial.tipoEventoPecuario);
+  const [atividadeEvento, setAtividadeEvento] = useState(inicial.atividadeEvento);
+  const [tipoLeilao, setTipoLeilao] = useState(inicial.tipoLeilao);
+  const [isencaoBrucelose, setIsencaoBrucelose] = useState<SimNaoEvento | "">(inicial.isencaoBrucelose);
+  const [promotora, setPromotora] = useState<PromotoraEvento | null>(inicial.promotora);
+  const [recinto, setRecinto] = useState<RecintoEvento | null>(inicial.recinto);
+  const [possuiAuxilio, setPossuiAuxilio] = useState<SimNaoEvento>(inicial.possuiAuxilioEstabelecimento);
+  const [estabelecimentoAuxiliar, setEstabelecimentoAuxiliar] = useState<EstabelecimentoAuxiliar | null>(
+    inicial.estabelecimentoAgropecuario,
+  );
+  const [responsaveis, setResponsaveis] = useState<Array<{ uid: string; responsavel: ResponsavelEvento | null }>>(
+    inicial.responsaveisTecnicos.map((responsavel, index) => ({
+      uid: `rt-${responsavel.id ?? index}`,
+      responsavel,
+    })),
+  );
+  const [anexos, setAnexos] = useState<AnexoEvento[]>(inicial.anexos);
+  const [observacoes, setObservacoes] = useState(inicial.observacoes);
+  const [situacao, setSituacao] = useState<SituacaoEventoPecuario>(inicial.situacao);
+  const [erros, setErros] = useState<string[]>([]);
+  const [mostrarSucesso, setMostrarSucesso] = useState(false);
+  const [confirmarEdicao, setConfirmarEdicao] = useState(false);
+
+  const especiesSelecionadas = especies
+    .map((item) => item.especie)
+    .filter((item): item is EspecieEvento => Boolean(item));
+  const responsaveisSelecionados = responsaveis
+    .map((item) => item.responsavel)
+    .filter((item): item is ResponsavelEvento => Boolean(item));
+  const atividadeExigeIsencao = ["Feira", "Leilão"].includes(atividadeEvento);
+  const exibeTipoLeilao = atividadeEvento === "Leilão" && possuiEspecieBovideos(especiesSelecionadas);
+  const atividades = tipoEvento === "Com finalidade comercial"
+    ? ATIVIDADES_COMERCIAIS
+    : tipoEvento === "Sem finalidade comercial"
+      ? ATIVIDADES_NAO_COMERCIAIS
+      : [];
+  const situacaoEfetiva = calcularSituacaoAutomatica(
+    periodoAte,
+    situacao,
+    Boolean(origem?.possuiPendencias),
+  );
+
+  const registroAtual: EventoPecuarioRegistro = {
+    ...inicial,
+    ...origem,
+    codigo,
+    nomeEvento,
+    periodoDe,
+    periodoAte,
+    especies: especiesSelecionadas,
+    tipoEventoPecuario: tipoEvento,
+    atividadeEvento,
+    tipoLeilao: exibeTipoLeilao ? tipoLeilao : "",
+    isencaoBrucelose: (atividadeExigeIsencao ? isencaoBrucelose : "Não") as SimNaoEvento,
+    promotora,
+    recinto,
+    possuiAuxilioEstabelecimento: possuiAuxilio,
+    estabelecimentoAgropecuario: possuiAuxilio === "Sim" ? estabelecimentoAuxiliar : null,
+    responsaveisTecnicos: responsaveisSelecionados,
+    anexos,
+    observacoes,
+    situacao: situacaoEfetiva,
+    usuarioUltimaAlteracao: inicial.usuarioUltimaAlteracao || "Usuário atual",
+    dataUltimaModificacao: inicial.dataUltimaModificacao || agoraFormatado(),
+  };
+  const alertasNegocio = obterAlertasEventoPecuario(registroAtual);
+
+  useEffect(() => {
+    if (!isView || !mainRef.current) return;
+    const container = mainRef.current;
+    const desabilitar = () => {
+      container
+        .querySelectorAll<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | HTMLButtonElement>(
+          ".evento-form-fields input, .evento-form-fields textarea, .evento-form-fields select, .evento-form-fields button:not([data-view-action])",
+        )
+        .forEach((controle) => {
+          controle.disabled = true;
+        });
+    };
+    desabilitar();
+    const observer = new MutationObserver(desabilitar);
+    observer.observe(container, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, [isView]);
+
+  const alterarTipoEvento = (valor: string) => {
+    setTipoEvento(valor);
+    setAtividadeEvento("");
+    setTipoLeilao("");
+    setIsencaoBrucelose("");
+  };
+
+  const alterarAtividade = (valor: string) => {
+    setAtividadeEvento(valor);
+    if (valor !== "Leilão") setTipoLeilao("");
+    setIsencaoBrucelose(["Feira", "Leilão"].includes(valor) ? "" : "Não");
+  };
+
+  const validarEContinuar = () => {
+    const errosEncontrados = validarEventoPecuario(registroAtual, isEdit);
+    setErros(errosEncontrados);
+    if (errosEncontrados.length) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
-    setHasSearched(true);
-    setPage(1);
+    if (isEdit) setConfirmarEdicao(true);
+    else setMostrarSucesso(true);
   };
 
-  const filtrados = EVENTOS_PECUARIOS_MOCK.filter((e) => {
-    const matchNome =
-      nomeEvento.trim() === "" ||
-      e.nomeEvento.toLowerCase().includes(nomeEvento.trim().toLowerCase());
-    const matchTipo = tipoEvento === "" || e.tipoEventoPecuario === tipoEvento;
-    const matchSituacao = situacao === "" || e.situacao === situacao;
-    const matchResponsavelTecnico =
-      !responsavelTecnico ||
-      e.responsaveisTecnicos.some((resp) => resp.id === responsavelTecnico.id);
-    return matchNome && matchTipo && matchSituacao && matchResponsavelTecnico;
+  const registroSalvo = () => ({
+    ...registroAtual,
+    codigo: codigo || gerarCodigoEvento(),
+    usuarioUltimaAlteracao: "Usuário atual",
+    dataUltimaModificacao: agoraFormatado(),
   });
 
-  const total = filtrados.length;
-  const totalPages = Math.max(1, Math.ceil(total / perPage));
-  const pageAtual = Math.min(page, totalPages);
-  const inicio = total === 0 ? 0 : (pageAtual - 1) * perPage + 1;
-  const fim = Math.min(pageAtual * perPage, total);
-  const pagina = filtrados.slice((pageAtual - 1) * perPage, pageAtual * perPage);
-  const adicionarEspecie = () => {
-    setEspecie((old) => [
-      ...old,
-      {
-        id: crypto.randomUUID(),
-        especie: null,
-      },
-    ]);
-  };
-  const alterarEspecie = (index: number, especie: any) => {
-    setEspecie((old) => old.map((item, i) => (i === index ? { ...item, especie } : item)));
-  };
-  const removerEspecie = (index: number) => {
-    setEspecie((old) => old.filter((_, i) => i !== index));
-  };
+  const titulo = isView
+    ? "Visualizar Evento Pecuário"
+    : isEdit
+      ? "Editar Evento Pecuário"
+      : "Adicionar Evento Pecuário";
 
   return (
-    <div className="min-h-screen bg-[#f2f3f5]">
-      <Navbar
-        onLogout={onLogout}
-        onNavigate={onNavigate}
-        currentScreen="evento-pecuario"
-        hideSearch
-      />
+    <div className={`min-h-screen bg-[#f2f3f5] ${isView ? "evento-pecuario-view" : ""}`}>
+      <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="evento-pecuario" hideSearch />
 
-      <main className="max-w-5xl mx-auto px-4 md:px-6 py-6 flex flex-col gap-4">
-        {/* --- topo da pagina --- */}
+      <main ref={mainRef} className="max-w-5xl mx-auto px-4 md:px-6 py-6 flex flex-col gap-4">
         <div>
           <button
-            onClick={() => onNavigate("evento-pecuario")}
+            type="button"
+            data-view-action
+            onClick={() => isEdit
+              ? onNavigate("visualizar-evento-pecuario", registroAtual)
+              : onNavigate("evento-pecuario")}
             className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70"
             style={{ color: GREEN }}
           >
             <ArrowLeft size={15} />
-            Todos os Eventos Pecuários
+            {isEdit ? "Visualizar Evento Pecuário" : "Todos os Eventos Pecuários"}
           </button>
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-semibold text-gray-900">Adicionar Evento Pecuário</h1>
-            <button
-              onClick={() => setIsSucesso(true)}
-              className="px-5 py-3 rounded-md text-white text-sm font-semibold transition hover:opacity-90 active:scale-[0.98]"
-              style={{ backgroundColor: GREEN }}
-            >
-              Adicionar
-            </button>
+          <div className="flex items-center justify-between gap-4">
+            <h1 className="text-2xl font-semibold text-gray-900">{titulo}</h1>
+            {isView ? (
+              <button
+                type="button"
+                data-view-action
+                onClick={() => onNavigate("editar-evento-pecuario", registroAtual)}
+                className="px-5 py-3 rounded-md text-white text-sm font-semibold transition hover:opacity-90"
+                style={{ backgroundColor: GREEN }}
+              >
+                Editar
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={validarEContinuar}
+                className="px-5 py-3 rounded-md text-white text-sm font-semibold transition hover:opacity-90"
+                style={{ backgroundColor: GREEN }}
+              >
+                {isEdit ? "Salvar" : "Adicionar"}
+              </button>
+            )}
           </div>
         </div>
 
-        {/* --- alerta de campos obrigatorios --- */}
-        <div className="w-full bg-white border border-gray-100 rounded-xl p-5 shadow-sm flex items-center gap-3">
-          <div className="text-gray-500 flex-shrink-0">
-            <Info size={20} className="stroke-[2.5]" />
+        {!isView && (
+          <div className="w-full bg-white border border-gray-100 rounded-xl p-5 shadow-sm flex items-center gap-3">
+            <Info size={20} className="text-gray-500 flex-shrink-0 stroke-[2.5]" />
+            <p className="text-sm text-gray-600 font-medium leading-relaxed">
+              Campos indicados com <span className="text-red-500 font-bold">*</span> são obrigatórios e deverão ser preenchidos.
+            </p>
           </div>
-          <p className="text-sm text-gray-600 font-medium leading-relaxed">
-            Campos indicados com <span className="text-red-500 font-bold">*</span> são obrigatórios
-            e deverão ser preenchidos.
-          </p>
-        </div>
+        )}
+
+        {erros.length > 0 && !isView && (
+          <div role="alert" className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">
+            <p className="font-semibold mb-2">Revise os dados do evento:</p>
+            <ul className="list-disc pl-5 space-y-1">
+              {erros.map((erro) => <li key={erro}>{erro}</li>)}
+            </ul>
+          </div>
+        )}
+
+        {alertasNegocio.length > 0 && (
+          <div role="status" className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800 flex gap-3">
+            <AlertTriangle size={20} className="flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="font-semibold mb-1">Alertas sobre os responsáveis técnicos</p>
+              {alertasNegocio.map((alerta) => <p key={alerta}>{alerta}</p>)}
+            </div>
+          </div>
+        )}
 
         <Section title="Informações Básicas">
-          <div className="pt-5 flex flex-col gap-5">
-            <div className="items-center">
-              <FloatInput
-                label="Nome do Evento"
-                required
-                value={nomeEvento}
-                onChange={setNomeEvento}
-                maxLength={100}
-              />
-            </div>
-            <SubGrupo titulo="Periodo do evento" comDivisor>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+          <div className="flex flex-col gap-5">
+            {mode !== "create" && (
+              <FloatInput label="Código do Evento" value={codigo} onChange={() => {}} disabled />
+            )}
+            <FloatInput
+              label="Nome do Evento"
+              required
+              value={nomeEvento}
+              onChange={setNomeEvento}
+              maxLength={255}
+            />
+            <SubGrupo titulo="Período do Evento" comDivisor>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FloatInput
                   label="Período - De"
                   type="date"
-                  value={validadeDe}
-                  onChange={setValidadeDe}
+                  value={periodoDe}
+                  onChange={setPeriodoDe}
                   icon={<Calendar size={18} />}
                   required
                 />
                 <FloatInput
                   label="Período - Até"
                   type="date"
-                  value={validadeAte}
-                  onChange={setValidadeAte}
+                  value={periodoAte}
+                  onChange={setPeriodoAte}
                   icon={<Calendar size={18} />}
                   required
                 />
@@ -447,272 +389,464 @@ export function AdicionarEventoPecuarioPage({ onLogout, onNavigate }: PageProps)
             </SubGrupo>
           </div>
         </Section>
+
         <Section title="Informações Complementares">
-          <div className="pt-5 flex flex-col gap-5">
-            <SubGrupo titulo="Espécies do Evento">
+          <div className="flex flex-col gap-5">
+            <SubGrupo titulo="Espécies do Evento (Uma ou mais)">
               <DynamicListWrapper
-                items={especie}
+                items={especies}
                 behavior="at-least-one"
                 addButtonLabel="Adicionar Espécie"
                 itemLabel="Espécie"
-                onAddItem={adicionarEspecie}
-                onRemoveItem={removerEspecie}
+                onAddItem={() => setEspecies((atuais) => [...atuais, { uid: uid("esp"), especie: null }])}
+                onRemoveItem={(index) => setEspecies((atuais) => atuais.filter((_, i) => i !== index))}
                 variant="plain"
                 showCounter
                 smallCounter
+                disabled={isView}
               >
                 {(item, index) => (
-                  <EntitySearchInput
-                    label="Espécie"
-                    placeholder="Buscar espécie"
-                    value={item.especie?.nome ?? ""}
-                    data={ESPECIES_EVENTO_MOCK}
-                    searchKeys={["nome", "grupo"]}
-                    columns={[
-                      { label: "Nome", key: "nome" },
-                      { label: "Grupo", key: "grupo" },
-                    ]}
-                    icon={<Dna size={18} color={GREEN} />}
-                    title="Buscar Espécie"
-                    subtitle="Busque por uma espécie cadastrada:"
-                    onChange={(ent) => alterarEspecie(index, ent)}
-                    required
-                  />
+                  <div className="flex items-end gap-2">
+                    <div className="flex-1">
+                      <EntitySearchInput
+                        label="Espécie"
+                        placeholder="Buscar por nome ou grupo da espécie"
+                        value={item.especie?.nome ?? ""}
+                        data={ESPECIES_EVENTO_MOCK}
+                        searchKeys={["nome", "grupo"]}
+                        columns={[{ label: "Nome da Espécie", key: "nome" }, { label: "Grupo da Espécie", key: "grupo" }]}
+                        icon={<Dna size={18} color={GREEN} />}
+                        title="Buscar Espécie"
+                        subtitle="Busque por nome ou grupo da espécie:"
+                        onChange={(entidade) => setEspecies((atuais) =>
+                          atuais.map((atual, i) => i === index ? { ...atual, especie: entidade } : atual))}
+                        required
+                      />
+                    </div>
+                    {item.especie && (
+                      <BotaoVer
+                        title="Visualizar espécie"
+                        onClick={() => onNavigate("visualizar-especie", item.especie)}
+                      />
+                    )}
+                  </div>
                 )}
               </DynamicListWrapper>
             </SubGrupo>
-            <SubGrupo titulo="Caracterização do evento" comDivisor>
-              <div className="items-center">
+
+            <SubGrupo titulo="Caracterização do Evento" comDivisor>
+              <FloatSelect
+                label="Tipo de Evento Pecuário"
+                value={tipoEvento}
+                onChange={alterarTipoEvento}
+                options={TIPOS_EVENTO}
+                required
+              />
+              {tipoEvento && (
                 <FloatSelect
-                  label="Tipo de Evento Pecuário"
-                  value={tipoEvento}
-                  onChange={setTipoEvento}
-                  options={TIPOS_EVENTO}
+                  label="Atividade do Evento"
+                  value={atividadeEvento}
+                  onChange={alterarAtividade}
+                  options={atividades}
                   required
                 />
-              </div>
+              )}
+              {exibeTipoLeilao && (
+                <FloatSelect
+                  label="Tipo de Leilão"
+                  value={tipoLeilao}
+                  onChange={setTipoLeilao}
+                  options={TIPOS_LEILAO}
+                  required
+                />
+              )}
+              {atividadeEvento && (
+                <SimNao
+                  label="Possui isenção de exame de brucelose/tuberculose?"
+                  name={`isencao-brucelose-${mode}`}
+                  value={atividadeExigeIsencao ? isencaoBrucelose : "Não"}
+                  onChange={(valor) => setIsencaoBrucelose(valor ? "Sim" : "Não")}
+                  disabled={!atividadeExigeIsencao}
+                  required
+                />
+              )}
             </SubGrupo>
           </div>
         </Section>
+
         <Section title="Promotora do Evento">
-          <div className="pt-5 flex flex-col gap-5">
-            <div className="items-center">
-              <EntitySearchInput
-                label="Promotora de Evento"
-                placeholder="Buscar por nome da promotora"
-                value={promotora ? promotora.nome : ""}
-                data={PROMOTORAS_EVENTO_MOCK}
-                searchKeys={["nome", "grupo"]}
-                columns={[
-                  { label: "Promotora de Evento", key: "nome" },
-                  { label: "Registro da Promotora", key: "numeroRegistro" },
-                ]}
-                icon={<CalendarArrowUpIcon size={18} color={GREEN} />}
-                title="Buscar Promotora"
-                subtitle="Busque por uma promotora cadastrada:"
-                onChange={(ent) => setPromotora(ent)}
-                required
-              />
-            </div>
-          </div>
-        </Section>
-        <Section title="Estabelecimento de Evento">
-          <div className="pt-5 flex flex-col gap-5">
-            <div className="items-center">
-              <EntitySearchInput
-                label="Estabelecimento de Evento"
-                placeholder="Buscar por nome do estabelecimento"
-                value={estabelecimento ? estabelecimento.nome : ""}
-                data={RECINTOS_EVENTO_MOCK}
-                searchKeys={["nome", "municipio"]}
-                columns={[
-                  { label: "Nome", key: "nome" },
-                  { label: "Código", key: "codigo" },
-                ]}
-                icon={<Store size={18} color={GREEN} />}
-                title="Buscar Estabelecimento"
-                subtitle="Busque por um estabelecimento cadastrado:"
-                onChange={(ent) => setEstabelecimento(ent)}
-                required
-              />
-            </div>
-          </div>
-        </Section>
-        <Section title="Estabelecimento Agropecuário">
-          <div className="pt-5 flex flex-col gap-5">
-            <div className="items-center">
-              <SimNao
-                label="Possui auxílio de um Estabelecimento Agropecuário próximo para o alojamento de animais?"
-                name="possui-auxilio"
-                value={possuiAuxilio}
-                onChange={setPossuiAuxilio}
-                required
-              />
-            </div>
-          </div>
-        </Section>
-        <Section title="Responsável Técnico">
-          <div className="pt-5 flex flex-col gap-5">
-            <DynamicListWrapper
-              items={especie}
-              behavior="at-least-one"
-              addButtonLabel="Adicionar Responsável"
-              itemLabel="Espécie"
-              onAddItem={adicionarEspecie}
-              onRemoveItem={removerEspecie}
-              variant="plain"
-              showCounter
-              smallCounter
-            >
-              {(item, index) => (
+          <div className="flex flex-col gap-4">
+            <div className="flex items-end gap-2">
+              <div className="flex-1">
                 <EntitySearchInput
-                  label="Responsável Técnico"
-                  placeholder="Buscar por um responsável técnico"
-                  value={responsavelTecnico ? responsavelTecnico.nome : ""}
-                  data={RESPONSAVEIS_EVENTO_MOCK}
-                  searchKeys={["nome", "municipio"]}
+                  label="Promotora de Eventos Pecuários"
+                  placeholder="Buscar por nome, registro, proprietário ou CNPJ"
+                  value={promotora?.nome ?? ""}
+                  data={PROMOTORAS_EVENTO_MOCK}
+                  searchKeys={["nome", "numeroRegistro", "nomeFantasiaProprietario", "cnpjProprietario"]}
                   columns={[
                     { label: "Nome", key: "nome" },
-                    { label: "CPF", key: "documento" },
+                    { label: "Número de Registro", key: "numeroRegistro" },
+                    { label: "Proprietário", key: "nomeFantasiaProprietario" },
+                    { label: "CNPJ", key: "cnpjProprietario" },
                   ]}
-                  icon={<User size={18} color={GREEN} />}
-                  title="Buscar Responsável Técnico"
-                  subtitle="Busque por um responsável técnico cadastrado:"
-                  onChange={(ent) => setResponsavelTecnico(ent)}
+                  icon={<CalendarArrowUpIcon size={18} color={GREEN} />}
+                  title="Buscar Promotora de Eventos Pecuários"
+                  subtitle="Busque por nome, número de registro ou dados do proprietário:"
+                  onChange={setPromotora}
+                  required
+                />
+              </div>
+              {promotora && (
+                <BotaoVer
+                  title="Visualizar promotora"
+                  onClick={() => onNavigate("visualizar-promotora-eventos", promotora)}
                 />
               )}
-            </DynamicListWrapper>
+            </div>
+            {promotora && (
+              <FloatInput
+                label="Número de Registro da Promotora de Eventos"
+                value={promotora.numeroRegistro ?? ""}
+                onChange={() => {}}
+                disabled
+                required
+              />
+            )}
           </div>
         </Section>
-        <Section title="Anexo">
+
+        <Section title="Estabelecimento/Recinto do Evento">
+          <div className="flex items-end gap-2">
+            <div className="flex-1">
+              <EntitySearchInput
+                label="Estabelecimento/Recinto de Eventos Pecuários"
+                placeholder="Buscar por nome ou dados do proprietário"
+                value={recinto?.nome ?? ""}
+                data={RECINTOS_EVENTO_MOCK}
+                searchKeys={["nome", "proprietario", "documentoProprietario"]}
+                columns={[
+                  { label: "Estabelecimento/Recinto", key: "nome" },
+                  { label: "Proprietário", key: "proprietario" },
+                  { label: "CPF/CNPJ", key: "documentoProprietario" },
+                ]}
+                icon={<Store size={18} color={GREEN} />}
+                title="Buscar Estabelecimento/Recinto de Eventos Pecuários"
+                subtitle="Busque por nome do recinto ou dados do proprietário:"
+                onChange={setRecinto}
+                required
+              />
+            </div>
+            {recinto && (
+              <BotaoVer
+                title="Visualizar estabelecimento/recinto"
+                onClick={() => onNavigate("estabelecimento-evento-pecuario", recinto)}
+              />
+            )}
+          </div>
+        </Section>
+
+        <Section title="Estabelecimento Agropecuário">
+          <div className="flex flex-col gap-5">
+            <SimNao
+              label="Possui auxílio de um Estabelecimento Agropecuário próximo para o alojamento de animais?"
+              name={`possui-auxilio-${mode}`}
+              value={possuiAuxilio}
+              onChange={(valor) => {
+                setPossuiAuxilio(valor ? "Sim" : "Não");
+                if (!valor) setEstabelecimentoAuxiliar(null);
+              }}
+              required
+            />
+            {possuiAuxilio === "Sim" && (
+              <>
+                <div className="flex items-end gap-2">
+                  <div className="flex-1">
+                    <EntitySearchInput
+                      label="Estabelecimento Agropecuário"
+                      placeholder="Buscar por nome, código, município ou proprietário"
+                      value={estabelecimentoAuxiliar?.nome ?? ""}
+                      data={ESTABELECIMENTOS_AUXILIARES_MOCK}
+                      searchKeys={["nome", "codigo", "municipio", "proprietario"]}
+                      columns={[
+                        { label: "Nome", key: "nome" },
+                        { label: "Código", key: "codigo" },
+                        { label: "Município", key: "municipio" },
+                        { label: "Proprietário", key: "proprietario" },
+                      ]}
+                      icon={<Warehouse size={18} color={GREEN} />}
+                      title="Buscar Estabelecimento Agropecuário"
+                      subtitle="Busque pelo nome, código, município ou proprietário:"
+                      onChange={setEstabelecimentoAuxiliar}
+                      required
+                    />
+                  </div>
+                  {estabelecimentoAuxiliar && (
+                    <BotaoVer
+                      title="Visualizar estabelecimento agropecuário"
+                      onClick={() => onNavigate("visualizar-estabelecimento-agropecuario", estabelecimentoAuxiliar)}
+                    />
+                  )}
+                </div>
+                {estabelecimentoAuxiliar && (
+                  <FloatInput
+                    label="Código do Estabelecimento Agropecuário"
+                    value={estabelecimentoAuxiliar.codigo}
+                    onChange={() => {}}
+                    disabled
+                    required
+                  />
+                )}
+              </>
+            )}
+          </div>
+        </Section>
+
+        <Section title="Responsável Técnico (Um ou mais)">
+          <DynamicListWrapper
+            items={responsaveis}
+            behavior="zero-or-more"
+            addButtonLabel="Adicionar Responsável Técnico"
+            itemLabel="Responsável Técnico"
+            onAddItem={() => setResponsaveis((atuais) => [...atuais, { uid: uid("rt"), responsavel: null }])}
+            onRemoveItem={(index) => setResponsaveis((atuais) => atuais.filter((_, i) => i !== index))}
+            variant="plain"
+            showCounter
+            smallCounter
+            disabled={isView}
+          >
+            {(item, index) => (
+              <div className="flex flex-col gap-3">
+                <div className="flex items-end gap-2">
+                  <div className="flex-1">
+                    <EntitySearchInput
+                      label="Responsável Técnico"
+                      placeholder="Buscar por nome ou CPF"
+                      value={item.responsavel?.nome ?? ""}
+                      data={RESPONSAVEIS_EVENTO_MOCK}
+                      searchKeys={["nome", "documento"]}
+                      columns={[{ label: "Nome", key: "nome" }, { label: "CPF", key: "documento" }]}
+                      icon={<User size={18} color={GREEN} />}
+                      title="Buscar Responsável Técnico"
+                      subtitle="Busque por nome ou CPF do profissional:"
+                      onChange={(entidade) => setResponsaveis((atuais) =>
+                        atuais.map((atual, i) => i === index ? { ...atual, responsavel: entidade } : atual))}
+                    />
+                  </div>
+                  {item.responsavel && (
+                    <BotaoVer
+                      title="Visualizar responsável técnico"
+                      onClick={() => onNavigate("profissional-animal", item.responsavel)}
+                    />
+                  )}
+                </div>
+                {item.responsavel && (
+                  <FloatInput
+                    label="CPF"
+                    value={item.responsavel.documento}
+                    onChange={() => {}}
+                    disabled
+                    required
+                  />
+                )}
+              </div>
+            )}
+          </DynamicListWrapper>
+        </Section>
+
+        <Section title="Anexos (zero ou mais)">
           <div className="flex flex-col gap-6">
+            {anexos.length === 0 && isView && (
+              <p className="text-sm text-gray-500 italic">Nenhum anexo informado.</p>
+            )}
             {anexos.map((anexo, index) => (
-              <div
-                key={anexo.id}
-                className="flex gap-4 items-start relative w-full rounded-xl p-4 bg-white"
-              >
-                {/* Número indicador do anexo (Igual ao Representante Legal) */}
+              <div key={anexo.id} className="flex gap-4 items-start w-full rounded-xl p-4 bg-white">
                 <div className="flex items-center justify-center bg-[#1A7A3C] text-white text-xs font-bold rounded-full w-6 h-6 flex-shrink-0 mt-3">
                   {index + 1}
                 </div>
-                <div className="flex-1 flex flex-col gap-4">
-                  <div className="flex gap-3 items-start w-full">
-                    <UploadField
-                      label="Documento"
-                      required
-                      fileName={anexo.nome}
-                      onSelectFile={() =>
-                        setAnexos((prev) =>
-                          prev.map((a, i) =>
-                            i === index
-                              ? {
-                                  ...a,
-                                  nome: `documento_geral_${index + 1}.pdf`,
-                                }
-                              : a,
-                          ),
-                        )
-                      }
-                    />
-                    {/* Campos de Descrição e Download (Só abrem se houver documento anexado) */}
-                    {anexo.nome && (
-                      <>
-                        <div className="flex-1">
-                          <FloatInput
-                            label="Descrição"
-                            value={anexo.descricao || ""}
-                            placeholder="Descrição opcional..."
-                            onChange={(v) =>
-                              setAnexos((prev) =>
-                                prev.map((a, i) => (i === index ? { ...a, descricao: v } : a)),
-                              )
-                            }
-                          />
-                        </div>
-                        <div className="h-12 flex items-center">
-                          <button
-                            type="button"
-                            onClick={() => alert(`Fazendo download de: ${anexo.nome}`)}
-                            className="p-2.5 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"
-                          >
-                            <Download size={20} />
-                          </button>
-                        </div>
-                      </>
-                    )}
-                    {/* Botão de Excluir o Anexo */}
-                    <div className="h-12 flex items-center">
+                <div className="flex-1 flex gap-3 items-start">
+                  <UploadField
+                    label="Documento"
+                    required
+                    disabled={isView}
+                    fileName={anexo.nome}
+                    onSelectFile={() => setAnexos((atuais) => atuais.map((item, i) =>
+                      i === index ? { ...item, nome: `documento_evento_${index + 1}.pdf` } : item))}
+                  />
+                  {anexo.nome && (
+                    <>
+                      <div className="flex-1">
+                        <FloatInput
+                          label="Descrição"
+                          value={anexo.descricao}
+                          disabled={isView}
+                          maxLength={255}
+                          onChange={(valor) => setAnexos((atuais) => atuais.map((item, i) =>
+                            i === index ? { ...item, descricao: valor.slice(0, 255) } : item))}
+                        />
+                      </div>
                       <button
                         type="button"
-                        onClick={() => setAnexos((prev) => prev.filter((a) => a.id !== anexo.id))}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+                        data-view-action
+                        onClick={() => window.alert(`Download de ${anexo.nome}`)}
+                        title={`Baixar ${anexo.nome}`}
+                        className="h-12 p-2.5 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"
                       >
-                        <Trash2 size={20} />
+                        <Download size={20} />
                       </button>
-                    </div>
-                  </div>
+                    </>
+                  )}
+                  {!isView && (
+                    <button
+                      type="button"
+                      onClick={() => setAnexos((atuais) => atuais.filter((_, i) => i !== index))}
+                      title="Remover anexo"
+                      className="h-12 p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+                    >
+                      <Trash2 size={20} />
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
+            {!isView && (
+              <button
+                type="button"
+                onClick={() => setAnexos((atuais) => [...atuais, { id: uid("anexo"), nome: "", descricao: "" }])}
+                className="flex items-center gap-2 text-sm font-semibold px-4 py-2.5 rounded-md border border-[#1A7A3C] text-[#1A7A3C] hover:bg-green-50 self-start transition"
+              >
+                <PlusCircle size={16} /> Adicionar Anexo
+              </button>
+            )}
+          </div>
+        </Section>
 
-            {/* Botão para Adicionar Novo Anexo */}
-            <button
-              type="button"
-              onClick={() =>
-                setAnexos((prev) => [...prev, { id: String(Date.now()), nome: "", descricao: "" }])
-              }
-              className="flex items-center mt-5 gap-2 text-sm font-semibold px-4 py-2.5 rounded-md border border-[#1A7A3C] text-[#1A7A3C] hover:bg-green-50 self-start transition"
-            >
-              <PlusCircle size={16} /> Adicionar Anexo
-            </button>
-          </div>
-        </Section>
         <Section title="Observações">
-          <div className="mt-5">
-            <LargeTextArea
-              label="Observação"
-              value={observacao}
-              onChange={setObservacao}
-              hasTooltip
-              tooltipText="Informações adicionais pertinentes ao cadastro."
-            />
-          </div>
+          <LargeTextArea
+            label="Observação"
+            value={observacoes}
+            onChange={setObservacoes}
+            maxLength={1500}
+            hasTooltip
+            tooltipText="Informações adicionais pertinentes ao cadastro."
+          />
         </Section>
-        {/* Modal de Sucesso */}
-        {isSucesso && (
-          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
-            <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
-              {" "}
-              <h3 className="text-lg font-bold text-gray-900">
-                Evento pecuário cadastrado com sucesso!
-              </h3>
-              <p className="text-sm text-gray-500 mt-1">
-                {especie ? `O evento de ${nomeEvento}` : "O evento"} foi cadastrado.
-              </p>
-              <div className="flex gap-3 justify-center mt-6">
-                <button
-                  onClick={() => {
-                    setIsSucesso(false);
-                    onNavigate("evento-pecuario");
-                  }}
-                  className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition"
-                >
-                  Voltar
-                </button>
-                <button
-                  onClick={() => {
-                    setIsSucesso(false);
-                    onNavigate("visualizar-evento-pecuario");
-                  }}
-                  className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition"
-                >
-                  Visualizar
-                </button>
-              </div>
+
+        {mode !== "create" && (
+          <Section title="Dados do Registro">
+            <div className="flex flex-col gap-5">
+              <SubGrupo titulo="Situação do Cadastro">
+                <div className="flex flex-col md:flex-row md:items-end gap-3">
+                  <div className="flex-1">
+                    <FloatInput label="Situação" value={situacaoEfetiva} onChange={() => {}} disabled />
+                  </div>
+                  {isEdit && (
+                    <div className="flex flex-wrap gap-2">
+                      {situacaoEfetiva !== "Ativo" && (
+                        <button type="button" onClick={() => setSituacao("Ativo")} className="h-12 px-4 rounded-md bg-[#1A7A3C] text-white text-sm font-semibold">
+                          Ativar
+                        </button>
+                      )}
+                      {situacaoEfetiva === "Ativo" && (
+                        <button type="button" onClick={() => setSituacao("Inativo")} className="h-12 px-4 rounded-md border border-red-300 text-red-600 text-sm font-semibold">
+                          Inativar
+                        </button>
+                      )}
+                      {situacaoEfetiva !== "Suspenso" && (
+                        <button type="button" onClick={() => setSituacao("Suspenso")} className="h-12 px-4 rounded-md border border-amber-300 text-amber-700 text-sm font-semibold">
+                          Suspender
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </SubGrupo>
+              <SubGrupo titulo="Alterações do Cadastro" comDivisor>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FloatInput
+                    label="Usuário"
+                    value={registroAtual.usuarioUltimaAlteracao}
+                    onChange={() => {}}
+                    disabled
+                  />
+                  <FloatInput
+                    label="Data e Hora da Última Modificação"
+                    value={registroAtual.dataUltimaModificacao}
+                    onChange={() => {}}
+                    disabled
+                  />
+                </div>
+              </SubGrupo>
             </div>
-          </div>
+          </Section>
         )}
       </main>
+
+      {mostrarSucesso && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
+            <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4">
+              <Check size={28} className="text-[#1A7A3C]" strokeWidth={3} />
+            </div>
+            <h3 className="text-lg font-bold text-gray-900">Evento pecuário cadastrado com sucesso!</h3>
+            <p className="text-sm text-gray-500 mt-1">O evento "{nomeEvento}" foi cadastrado.</p>
+            <div className="flex gap-3 justify-center mt-6">
+              <button
+                onClick={() => {
+                  setMostrarSucesso(false);
+                  onNavigate("evento-pecuario");
+                }}
+                className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold"
+              >
+                Voltar
+              </button>
+              <button
+                onClick={() => {
+                  setMostrarSucesso(false);
+                  onNavigate("visualizar-evento-pecuario", registroSalvo());
+                }}
+                className="px-5 h-11 rounded-md bg-[#1A7A3C] text-white text-sm font-semibold"
+              >
+                Visualizar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {confirmarEdicao && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
+            <h3 className="text-lg font-bold text-gray-900">Confirmar alterações?</h3>
+            <p className="text-sm text-gray-500 mt-1">Revise os dados antes de salvar a edição do evento.</p>
+            <div className="flex gap-3 justify-center mt-6">
+              <button
+                onClick={() => setConfirmarEdicao(false)}
+                className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => {
+                  setConfirmarEdicao(false);
+                  onNavigate("visualizar-evento-pecuario", registroSalvo());
+                }}
+                className="px-5 h-11 rounded-md bg-[#1A7A3C] text-white text-sm font-semibold"
+              >
+                Salvar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
+export {
+  ESPECIES_EVENTO_MOCK,
+  PROMOTORAS_EVENTO_MOCK,
+  RECINTOS_EVENTO_MOCK,
+  RESPONSAVEIS_EVENTO_MOCK,
+  TIPOS_EVENTO,
+};

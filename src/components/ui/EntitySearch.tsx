@@ -1051,7 +1051,6 @@ export function ProprietarioInput({
 					required={required}
 					value={entidadeExibida?.nome || ""}
 					disabled={disabled}
-					value={entidadeSelecionada?.nome || ""}
 					data={databaseFiltrada}
 					title="Buscar Proprietário"
 					subtitle="Busque por um proprietário cadastrado:"

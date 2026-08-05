@@ -6,6 +6,7 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite",
+    "test:evento-pecuario": "node tests/eventoPecuarioUS066.test.mjs",
     "test:parametros": "node tests/parametrosSistema.test.mjs",
     "test:vacinacao": "node tests/vacinacaoTelas.test.mjs"
   },

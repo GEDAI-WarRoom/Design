@@ -81,6 +81,46 @@
   opacity: 0.55;
 }
 
+/* Evento pecuário em modo de visualização: os campos mantêm o layout do
+   cadastro, ficam sem interação e usam marcadores claros. Ações previstas na
+   US066 (ver item, editar, navegar e baixar anexo) continuam disponíveis. */
+.evento-pecuario-view .evento-form-fields {
+  pointer-events: none;
+  user-select: none;
+}
+
+.evento-pecuario-view .evento-form-fields [data-view-action] {
+  pointer-events: auto;
+}
+
+.evento-pecuario-view .evento-form-fields input:disabled,
+.evento-pecuario-view .evento-form-fields textarea:disabled,
+.evento-pecuario-view .evento-form-fields select:disabled,
+.evento-pecuario-view .evento-form-fields button:disabled {
+  opacity: 1;
+  color: #374151;
+  -webkit-text-fill-color: #374151;
+}
+
+.evento-pecuario-view .evento-form-fields [class*="bg-gray-50"] {
+  background-color: #ffffff !important;
+}
+
+.evento-pecuario-view .evento-form-fields [class*="bg-[#1A7A3C]"],
+.evento-pecuario-view .evento-form-fields [class*="bg-green-600"] {
+  background-color: #d1d5db !important;
+  color: #6b7280 !important;
+}
+
+.evento-pecuario-view .evento-form-fields [class*="text-[#1A7A3C]"],
+.evento-pecuario-view .evento-form-fields [class*="text-green-600"] {
+  color: #9ca3af !important;
+}
+
+.evento-pecuario-view .evento-form-fields [class*="border-[#1A7A3C]"] {
+  border-color: #d1d5db !important;
+}
+
 .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
