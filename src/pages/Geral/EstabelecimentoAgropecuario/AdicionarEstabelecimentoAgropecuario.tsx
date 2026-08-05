@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { 
+import {
   ArrowLeft, Info, Check, MapPin, Map, X, PlusCircle, Trash2, FileText, Upload
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
-import { FloatInput, FloatSelect, FloatCombobox, SimNao, LargeTextArea, UploadField} from "../../../components/ui/FormKit";
+import { FloatInput, FloatSelect, FloatCombobox, SimNao, LargeTextArea, UploadField } from "../../../components/ui/FormKit";
 import { ProprietarioInput, DynamicListWrapper, BlocoEnderecoFields, BlocoContatoFields, SelectedChipsContainer, } from "../../../components/ui/EntitySearch";
 
 import * as Icons from "../../../imports/icons";
@@ -14,10 +14,10 @@ const GREEN = "#1A7A3C";
 // MOCKS E CONSTANTES (US050)
 // ==========================================================
 const TIPOS_ESTAB = [
-  "Apartamento", "Assentamento", "Casa", "Centro de Treinamento", "Chácara", 
-  "Clínica Veterinária", "Condomínio", "Distribuidora", "Estância", "Fazenda", 
-  "Galpão", "Gleba", "Haras", "Hípica", "Hospital Veterinário", 
-  "Instituição de Ensino", "Lote", "Parque de Exposições", "Rancho", 
+  "Apartamento", "Assentamento", "Casa", "Centro de Treinamento", "Chácara",
+  "Clínica Veterinária", "Condomínio", "Distribuidora", "Estância", "Fazenda",
+  "Galpão", "Gleba", "Haras", "Hípica", "Hospital Veterinário",
+  "Instituição de Ensino", "Lote", "Parque de Exposições", "Rancho",
   "Residência", "Sítio", "Terreno"
 ].map(t => ({ value: t, label: t }));
 
@@ -75,11 +75,11 @@ export function AdicionarEstabelecimentoAgropecuarioPage({ onLogout, onNavigate 
   const [provisorio, setProvisorio] = useState("Não");
   const [zona, setZona] = useState("Rural");
   const [unidadeMedida, setUnidadeMedida] = useState("Hectares");
-const [areaTotal, setAreaTotal] = useState("");
-const [areaProdutiva, setAreaProdutiva] = useState("");
-const [numeroCar, setNumeroCar] = useState("");
-const [confrontantes, setConfrontantes] = useState("");
-const [viasAcesso, setViasAcesso] = useState("");
+  const [areaTotal, setAreaTotal] = useState("");
+  const [areaProdutiva, setAreaProdutiva] = useState("");
+  const [numeroCar, setNumeroCar] = useState("");
+  const [confrontantes, setConfrontantes] = useState("");
+  const [viasAcesso, setViasAcesso] = useState("");
 
   // Localização
   const [estado, setEstado] = useState("Minas Gerais");
@@ -112,7 +112,7 @@ const [viasAcesso, setViasAcesso] = useState("");
   const [isSucesso, setIsSucesso] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-   // Anexos (zero ou mais) e Observações
+  // Anexos (zero ou mais) e Observações
   const [anexos, setAnexos] = useState<any[]>([]);
   const [observacao, setObservacao] = useState("");
 
@@ -155,30 +155,30 @@ const [viasAcesso, setViasAcesso] = useState("");
         {/* 1. Informações Básicas */}
         <Section title="Informações Básicas">
           <div className="flex flex-col gap-5 overflow-visible pb-10">
-            
+
             {/* Primeira Linha do Formulário */}
             <div className="flex flex-col md:flex-row gap-5 w-full relative z-50">
               <div className="w-full md:w-1/3">
-                <FloatSelect 
-                  label="Tipo de Estabelecimento" 
-                  required 
-                  value={tipo} 
-                  onChange={setTipo} 
+                <FloatSelect
+                  label="Tipo de Estabelecimento"
+                  required
+                  value={tipo}
+                  onChange={setTipo}
                   options={TIPOS_ESTAB}
                 />
               </div>
-              
+
               <div className="flex-1">
-                <FloatInput 
-                  label="Nome do Estabelecimento Agropecuário" 
-                  required 
-                  value={nome} 
-                  onChange={handleNomeChange} 
+                <FloatInput
+                  label="Nome do Estabelecimento Agropecuário"
+                  required
+                  value={nome}
+                  onChange={handleNomeChange}
 
                 />
               </div>
             </div>
-            
+
             {/* Segunda Linha do Formulário */}
             <div className="flex flex-col md:flex-row gap-5 w-full relative z-40">
               <div className="w-full md:w-1/3">
@@ -211,8 +211,8 @@ const [viasAcesso, setViasAcesso] = useState("");
                   label="Proprietário"
                   required
                   value={item.proprietario ? item.proprietario.nome : ""}
-                  onChange={(ent: any) => 
-                    setProprietarios((p) => 
+                  onChange={(ent: any) =>
+                    setProprietarios((p) =>
                       p.map((x) => (x.uid === item.uid ? { ...x, proprietario: ent } : x))
                     )
                   }
@@ -223,7 +223,7 @@ const [viasAcesso, setViasAcesso] = useState("");
           </DynamicListWrapper>
         </Section>
 
-        
+
         {/* Informações de Localização */}
         <Section title="Informações de Localização">
           <div className="flex flex-col gap-6">
@@ -238,74 +238,74 @@ const [viasAcesso, setViasAcesso] = useState("");
         </Section>
 
         {/* 4. Informações Complementares */}
-<Section title="Informações Complementares">
-  <div className="flex flex-col gap-6">
-    {/* Subgrupo padrão para as Áreas (comum a Urbana e Rural) */}
-    <SubGrupo titulo="Áreas">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <FloatSelect 
-          label="Unidade de Medida das Áreas" 
-          required 
-          value={unidadeMedida} 
-          onChange={setUnidadeMedida} 
-          options={[
-            { value: "Hectares", label: "Hectares" }, 
-            { value: "Metros Quadrados", label: "Metros Quadrados" }
-          ]} 
-        />
-        <FloatInput 
-          label="Área Total" 
-          required 
-          value={areaTotal} 
-          onChange={setAreaTotal} 
-          placeholder="0,00" 
-        />
-        <FloatInput 
-          label="Área Produtiva" 
-          required 
-          value={areaProdutiva} 
-          onChange={setAreaProdutiva} 
-          placeholder="0,00" 
-        />
-      </div>
-    </SubGrupo>
+        <Section title="Informações Complementares">
+          <div className="flex flex-col gap-6">
+            {/* Subgrupo padrão para as Áreas (comum a Urbana e Rural) */}
+            <SubGrupo titulo="Áreas">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <FloatSelect
+                  label="Unidade de Medida das Áreas"
+                  required
+                  value={unidadeMedida}
+                  onChange={setUnidadeMedida}
+                  options={[
+                    { value: "Hectares", label: "Hectares" },
+                    { value: "Metros Quadrados", label: "Metros Quadrados" }
+                  ]}
+                />
+                <FloatInput
+                  label="Área Total"
+                  required
+                  value={areaTotal}
+                  onChange={setAreaTotal}
+                  placeholder="0,00"
+                />
+                <FloatInput
+                  label="Área Produtiva"
+                  required
+                  value={areaProdutiva}
+                  onChange={setAreaProdutiva}
+                  placeholder="0,00"
+                />
+              </div>
+            </SubGrupo>
 
-    {/* Renderização Condicional: Só exibe se a zona for Rural */}
-    {zona === "Rural" && (
-      <SubGrupo titulo="Outras Informações" comDivisor={true}>
-        <div className="flex flex-col gap-5">
-          {/* Campo Número do CAR */}
-          <div className="w-full md:w-1/2">
-            <FloatInput 
-              label="Número do CAR" 
-              value={numeroCar} 
-              onChange={setNumeroCar} 
-              placeholder="Ex: MG-3100104-XXXX..."
-            />
+            {/* Renderização Condicional: Só exibe se a zona for Rural */}
+            {zona === "Rural" && (
+              <SubGrupo titulo="Outras Informações" comDivisor={true}>
+                <div className="flex flex-col gap-5">
+                  {/* Campo Número do CAR */}
+                  <div className="w-full md:w-1/2">
+                    <FloatInput
+                      label="Número do CAR"
+                      value={numeroCar}
+                      onChange={setNumeroCar}
+                      placeholder="Ex: MG-3100104-XXXX..."
+                    />
+                  </div>
+
+                  {/* Textareas de Confrontantes e Vias de Acesso */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <LargeTextArea
+                      label="Confrontantes"
+                      value={confrontantes}
+                      onChange={setConfrontantes}
+                      placeholder="Descreva os limites e confrontantes do estabelecimento..."
+                    />
+                    <LargeTextArea
+                      label="Vias de Acesso"
+                      value={viasAcesso}
+                      onChange={setViasAcesso}
+                      placeholder="Descreva as principais estradas e rotas de chegada..."
+                    />
+                  </div>
+                </div>
+              </SubGrupo>
+            )}
           </div>
+        </Section>
 
-          {/* Textareas de Confrontantes e Vias de Acesso */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <LargeTextArea
-              label="Confrontantes"
-              value={confrontantes}
-              onChange={setConfrontantes}
-              placeholder="Descreva os limites e confrontantes do estabelecimento..."
-            />
-            <LargeTextArea
-              label="Vias de Acesso"
-              value={viasAcesso}
-              onChange={setViasAcesso}
-              placeholder="Descreva as principais estradas e rotas de chegada..."
-            />
-          </div>
-        </div>
-      </SubGrupo>
-    )}
-  </div>
-</Section>
-
-         {/* Seção Anexo Geral Dinâmica com Numeração */}
+        {/* Seção Anexo Geral Dinâmica com Numeração */}
         <Section title="Anexo">
           <div className="flex flex-col gap-6">
             {anexos.map((anexo, index) => (
@@ -383,7 +383,7 @@ const [viasAcesso, setViasAcesso] = useState("");
           </div>
         </Section>
 
-         {/* 5. Observações */}
+        {/* 5. Observações */}
         <Section title="Observações">
           <LargeTextArea
             label="Observação"
@@ -400,12 +400,11 @@ const [viasAcesso, setViasAcesso] = useState("");
       {isSucesso && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
-            <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4"><Check size={28} className="text-[#1A7A3C]" strokeWidth={3} /></div>
             <h3 className="text-lg font-bold text-gray-900">Estabelecimento adicionado!</h3>
             <p className="text-sm text-gray-500 mt-1">O cadastro de "{nome}" foi realizado com sucesso.</p>
             <div className="flex gap-3 justify-center mt-6">
               <button onClick={() => onNavigate("estabelecimento-agropecuario")} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition">Voltar</button>
-              <button onClick={() => onNavigate("visualizar-estabelecimento", { nome })} className="px-5 h-11 rounded-md bg-[#1A7A3C] text-white text-sm font-semibold transition">Visualizar</button>
+              <button onClick={() => onNavigate("visualizar-estabelecimento-agropecuario", { nome })} className="px-5 h-11 rounded-md bg-[#1A7A3C] text-white text-sm font-semibold transition">Visualizar</button>
             </div>
           </div>
         </div>
@@ -448,14 +447,14 @@ function MapModal({ onClose, onConfirm, initialLat, initialLng }: any) {
         </div>
 
         <div className="w-full h-80 bg-gray-100 rounded-xl relative flex items-center justify-center border border-gray-200 overflow-hidden">
-           <MapPin size={40} className="text-red-500 animate-bounce" />
-           <p className="text-xs font-medium text-gray-400">[Mapa Interativo]</p>
+          <MapPin size={40} className="text-red-500 animate-bounce" />
+          <p className="text-xs font-medium text-gray-400">[Mapa Interativo]</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-           <FloatSelect label="Formato" value={formatType} onChange={setFormatType} options={[{value:"decimal", label:"Decimal"}, {value:"dms", label:"DMS"}]} />
-           <FloatInput label="Latitude" value={lat} onChange={setLat} />
-           <FloatInput label="Longitude" value={lng} onChange={setLng} />
+          <FloatSelect label="Formato" value={formatType} onChange={setFormatType} options={[{ value: "decimal", label: "Decimal" }, { value: "dms", label: "DMS" }]} />
+          <FloatInput label="Latitude" value={lat} onChange={setLat} />
+          <FloatInput label="Longitude" value={lng} onChange={setLng} />
         </div>
 
         <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
