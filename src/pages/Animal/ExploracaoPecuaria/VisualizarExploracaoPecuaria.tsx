@@ -732,7 +732,7 @@ export const REGISTRO = {
   nomeReservatorio: "",
   fonteOutro: "",
   finalidadeProducao: "Ciclo Completo",
-  tipoPiscicultura: "Unidade de Production",
+  tipoPiscicultura: "Unidade de Produção",
   origemMatrizes: ["Nacional", "Própria"],
   sistemaProducao: "Fechado",
   sistFechado: ["Aquário", "Tanque Suspenso"],
@@ -972,8 +972,7 @@ export function VisualizarExploracaoPecuariaPage({
     value: g.titulo,
     label: g.titulo,
   }));
-  const isOrnamental =
-    r.aptidao === "Ornamental" || r.especie.nome === "Peixe Ornamental";
+  const isOrnamental = r.especie.nome === "Peixe Ornamental";
 
   const showRepro =
     r.finalidadeProducao === "Ciclo Completo" ||
@@ -1414,13 +1413,6 @@ export function VisualizarExploracaoPecuariaPage({
               <Section title="Caracterização do Sistema Produtivo">
                 <div className="flex flex-col gap-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-                    <FloatSelect
-                      label="Finalidade de Production"
-                      value={r.finalidadeProducao}
-                      onChange={() => { }}
-                      disabled
-                      options={toOptions([r.finalidadeProducao])}
-                    />
                     {isOrnamental && (
                       <FloatSelect
                         label="Tipo de Piscicultura Ornamental"
@@ -1430,6 +1422,13 @@ export function VisualizarExploracaoPecuariaPage({
                         options={toOptions([r.tipoPiscicultura])}
                       />
                     )}
+                    <FloatSelect
+                      label="Finalidade de Produção"
+                      value={r.finalidadeProducao}
+                      onChange={() => { }}
+                      disabled
+                      options={toOptions([r.finalidadeProducao])}
+                    />
                   </div>
 
                   <CheckboxGroup

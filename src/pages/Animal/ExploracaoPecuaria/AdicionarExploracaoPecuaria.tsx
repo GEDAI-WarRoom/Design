@@ -134,7 +134,6 @@ const FINALIDADE_PRODUCAO = [
   "Recreação",
   "Quarentena",
   "Subsistência",
-  "Outra",
 ];
 // Ornamentais: apenas Ciclo Completo e Cria/Recria
 const FINALIDADE_PRODUCAO_ORNAMENTAL = ["Ciclo Completo", "Cria/Recria"];
@@ -510,7 +509,6 @@ export function AdicionarExploracaoPecuariaPage({
   const [nomeReservatorio, setNomeReservatorio] = useState("");
   const [fonteOutro, setFonteOutro] = useState("");
   const [finalidadeProducao, setFinalidadeProducao] = useState("");
-  const [finalidadeOutra, setFinalidadeOutra] = useState("");
   const [tipoPiscicultura, setTipoPiscicultura] = useState("");
   const [origemMatrizes, setOrigemMatrizes] = useState<string[]>([]);
   const [origemMatrizesOutra, setOrigemMatrizesOutra] = useState("");
@@ -551,8 +549,7 @@ export function AdicionarExploracaoPecuariaPage({
   const isCapOv = nomeEspecie === "Caprino" || nomeEspecie === "Ovino";
   const isEqui = grupo === "Equídeos";
   const isPeixes = grupo === "Peixes";
-  const isOrnamental =
-    aptidao === "Ornamental" || nomeEspecie === "Peixe Ornamental";
+  const isOrnamental = nomeEspecie === "Peixe Ornamental";
 
   // Área produtiva (somente leitura, conforme unidade)
   const areaProdutiva = estabelecimento
@@ -587,9 +584,10 @@ export function AdicionarExploracaoPecuariaPage({
   const destinoOpcoes = isOrnamental ? DESTINO_ORNAMENTAL : DESTINO_DEMAIS;
 
   // Listas que variam entre ornamentais e demais (peixes)
-  const finalidadeOpcoes = isOrnamental
-    ? FINALIDADE_PRODUCAO_ORNAMENTAL
-    : FINALIDADE_PRODUCAO;
+  const finalidadeOpcoes =
+    isOrnamental && tipoPiscicultura !== "Unidade de Distribuição"
+      ? FINALIDADE_PRODUCAO_ORNAMENTAL
+      : FINALIDADE_PRODUCAO;
   const sistemaProducaoOpcoes = isOrnamental
     ? SISTEMA_PRODUCAO_ORNAMENTAL
     : SISTEMA_PRODUCAO;
@@ -952,6 +950,9 @@ export function AdicionarExploracaoPecuariaPage({
                   onChange={(ent) => {
                     setEspecie(ent);
                     setRaca(null); // Reseta a raça selecionada
+                    setTipoPiscicultura("");
+                    setFinalidadeProducao("");
+                    setSistemaProducao("");
 
                     if (ent) {
                       const nomeEspecieLC = ent.nome.toLowerCase();
@@ -1236,6 +1237,18 @@ export function AdicionarExploracaoPecuariaPage({
             <div className="flex flex-col gap-6">
               <div className="flex flex-col gap-12 mt-2">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                  {isOrnamental && (
+                    <FloatSelect
+                      label="Tipo de Piscicultura Ornamental"
+                      required
+                      value={tipoPiscicultura}
+                      onChange={(value) => {
+                        setTipoPiscicultura(value);
+                        setFinalidadeProducao("");
+                      }}
+                      options={toOptions(TIPO_PISC_ORNAMENTAL)}
+                    />
+                  )}
                   <FloatSelect
                     label="Finalidade de Produção"
                     required
@@ -1243,24 +1256,6 @@ export function AdicionarExploracaoPecuariaPage({
                     onChange={setFinalidadeProducao}
                     options={toOptions(finalidadeOpcoes)}
                   />
-                  {finalidadeProducao === "Outra" && (
-                    <FloatInput
-                      label="Finalidade"
-                      required
-                      value={finalidadeOutra}
-                      onChange={setFinalidadeOutra}
-                      maxLength={255}
-                    />
-                  )}
-                  {isOrnamental && (
-                    <FloatSelect
-                      label="Tipo de Piscicultura Ornamental"
-                      required
-                      value={tipoPiscicultura}
-                      onChange={setTipoPiscicultura}
-                      options={toOptions(TIPO_PISC_ORNAMENTAL)}
-                    />
-                  )}
                 </div>
 
                 {/* 💡 Flex-row alinha o Checkbox e o Input na mesma linha */}
