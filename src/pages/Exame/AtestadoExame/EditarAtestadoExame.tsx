@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { ArrowLeft, ChevronUp, ChevronDown, Info, AlertTriangle, Check } from "lucide-react";
+import { ArrowLeft, ChevronUp, ChevronDown, Info, AlertTriangle } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
-import { FloatInput, FloatSelect } from "../../../components/ui/FormKit";
+import { FloatInput } from "../../../components/ui/FormKit";
 import { DoencaInput } from "../../../components/ui/EntitySearch";
 
 const GREEN = "#1A7A3C";
@@ -27,25 +27,24 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 export function EditarAtestadoExamePage({ dados, onLogout, onNavigate }: { dados?: any; onLogout?: () => void; onNavigate?: (s: string, d?: any) => void; }) {
-  const registroAtual = dados || { descricao: "", doenca: null, diasValidade: "", situacao: "Ativo" };
+  const registroAtual = dados || { descricao: "Atestado para realização de exame de Brucelose", doenca: DOENCAS_CORRIGIDAS_MOCK[1], diasValidade: "60" };
 
   const [descricao, setDescricao] = useState(registroAtual.descricao || "");
   const [doenca, setDoenca] = useState<any | null>(registroAtual.doenca || null);
   const [diasValidade, setDiasValidade] = useState(String(registroAtual.diasValidade || ""));
-  const [situacao, setSituacao] = useState(registroAtual.situacao || "Ativo");
 
   const [isSucesso, setIsSucesso] = useState(false);
   const [isErro, setIsErro] = useState(false);
 
   const handleSalvar = () => {
-    if (!descricao || !doenca || !diasValidade || !situacao) {
+    if (!descricao || !doenca || !diasValidade) {
       setIsErro(true);
       return;
     }
     setIsSucesso(true);
   };
 
-  const objetoAtualizado = { ...registroAtual, descricao, doenca, diasValidade, situacao };
+  const objetoAtualizado = { ...registroAtual, descricao, doenca, diasValidade };
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
@@ -60,7 +59,7 @@ export function EditarAtestadoExamePage({ dados, onLogout, onNavigate }: { dados
           <div className="flex justify-between items-center w-full">
             <h1 className="text-2xl font-semibold text-gray-900">Editar Atestado de Exame</h1>
             <button type="button" onClick={handleSalvar} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm">
-              Salvar Alterações
+              Salvar
             </button>
           </div>
         </div>
@@ -76,10 +75,9 @@ export function EditarAtestadoExamePage({ dados, onLogout, onNavigate }: { dados
               <FloatInput label="Descrição do atestado" required value={descricao} onChange={setDescricao} maxLength={255} />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start w-full">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start w-full">
               <DoencaInput required data={DOENCAS_CORRIGIDAS_MOCK} value={doenca ? doenca.nome : ""} onChange={(entidade) => setDoenca(entidade)} onEyeClick={() => {}} />
               <FloatInput label="Dias de Validade do Exame" required value={diasValidade} onChange={(v) => setDiasValidade(v.replace(/\D/g, ""))} maxLength={3} />
-              <FloatSelect label="Situação" required value={situacao} onChange={setSituacao} options={[{ value: "Ativo", label: "Ativo" }, { value: "Inativo", label: "Inativo" }]} />
             </div>
           </div>
         </Section>
@@ -99,7 +97,6 @@ export function EditarAtestadoExamePage({ dados, onLogout, onNavigate }: { dados
       {isSucesso && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8 flex flex-col items-center text-center">
-            <Check size={32} className="text-[#1A7A3C] mb-5 stroke-[3]" />
             <h3 className="text-xl font-bold text-gray-900">Atestado atualizado com sucesso!</h3>
             <div className="flex gap-4 justify-center mt-8 w-full">
               <button onClick={() => { setIsSucesso(false); onNavigate!("atestado-exame"); }} className="px-8 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold">Voltar</button>

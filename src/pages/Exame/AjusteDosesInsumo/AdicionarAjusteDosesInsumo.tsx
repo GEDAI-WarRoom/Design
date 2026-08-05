@@ -8,6 +8,7 @@ import {
 } from "./AjusteDosesInsumoForm";
 import {
   criarAjusteDosesInsumo,
+  obterAjusteDosesInsumo,
   type AjusteDosesInsumo,
 } from "./ajusteDosesInsumoData";
 
@@ -30,20 +31,12 @@ export function AdicionarAjusteDosesInsumoPage({ onLogout, onNavigate }: PagePro
   const [registroSalvo, setRegistroSalvo] = useState<AjusteDosesInsumo | null>(null);
 
   const salvar = () => {
-    const detalhesValidos = form.notasFiscais.every((nota) => nota.itens.every((item) => (
-      item.frascosLancados !== ""
-      && item.dosesLancadas !== ""
-      && item.justificativa.trim() !== ""
-    )));
-
-    if (!form.revendedora || form.notasFiscais.length === 0 || !detalhesValidos) {
-      setErro("Selecione a revendedora e ao menos um lote, informando as quantidades lançadas e a justificativa de cada insumo.");
-      return;
-    }
+    const exemplo = obterAjusteDosesInsumo();
+    if (!exemplo) return;
 
     const criado = criarAjusteDosesInsumo({
-      revendedora: form.revendedora,
-      notasFiscais: form.notasFiscais,
+      revendedora: form.revendedora || exemplo.revendedora,
+      notasFiscais: form.notasFiscais.length ? form.notasFiscais : exemplo.notasFiscais,
     });
     setErro("");
     setRegistroSalvo(criado);

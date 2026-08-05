@@ -238,7 +238,7 @@ export function criarLocalRealizacaoExame(
 
 export function atualizarLocalRealizacaoExame(
   id: number,
-  dados: Omit<LocalRealizacaoExame, "id" | "codigo" | "veterinarios">,
+  dados: Omit<LocalRealizacaoExame, "id" | "codigo">,
 ) {
   const index = LOCAIS_REALIZACAO_EXAME_MOCK.findIndex((item) => item.id === id);
   if (index === -1) return null;

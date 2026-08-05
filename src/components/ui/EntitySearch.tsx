@@ -918,6 +918,7 @@ interface DoencaInputProps {
 	tooltipText?: string;
 	data?: any[];
 	apenasVacinaveis?: boolean; // 👈 Adicionado aqui para resolver o erro de tipagem
+	disabled?: boolean;
 }
 
 export function DoencaInput({
@@ -928,6 +929,7 @@ export function DoencaInput({
 	tooltipText,
 	data = DOENCAS_MOCK,
 	apenasVacinaveis = false, // 👈 Inicializa como false por padrão
+	disabled = false,
 }: DoencaInputProps) {
 	// 💡 Se 'apenasVacinaveis' for true, você pode filtrar os dados aqui se o seu mock tiver esse campo,
 	// ou apenas repassar a lista completa por enquanto.
@@ -949,6 +951,7 @@ export function DoencaInput({
 						label="Doença"
 						placeholder="Buscar por nome da doença."
 						required={required}
+						disabled={disabled}
 						value={BlacklistedOuSelecionada?.nome || ""}
 						data={dadosFiltrados}
 						searchKeys={["nome"]}
@@ -973,7 +976,7 @@ export function DoencaInput({
 					/>
 				</div>
 
-				{value && BlacklistedOuSelecionada && (
+				{!disabled && value && BlacklistedOuSelecionada && (
 					<EyeAction onClick={onEyeClick} />
 				)}
 			</div>

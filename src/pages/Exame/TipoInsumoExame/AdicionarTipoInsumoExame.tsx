@@ -3,6 +3,7 @@ import { ArrowLeft, Check } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import {
   criarTipoInsumoExame,
+  obterTipoInsumoExame,
   type TipoInsumoExame,
 } from "./tipoInsumoExameData";
 import { RequiredFieldsNotice, TipoInsumoExameForm, type TipoInsumoExameFormValue } from "./TipoInsumoExameForm";
@@ -22,18 +23,14 @@ const criarEstadoInicial = (): TipoInsumoExameFormValue => ({
 
 export function AdicionarTipoInsumoExamePage({ onLogout, onNavigate }: PageProps) {
   const [form, setForm] = useState<TipoInsumoExameFormValue>(criarEstadoInicial());
-  const [tentouSalvar, setTentouSalvar] = useState(false);
   const [registroSalvo, setRegistroSalvo] = useState<TipoInsumoExame | null>(null);
 
-  const formValido = form.nome.trim() !== "";
-
   const handleSalvar = () => {
-    setTentouSalvar(true);
-    if (!formValido) return;
+    const exemplo = obterTipoInsumoExame(null);
 
     const novo: Omit<TipoInsumoExame, "id"> = {
-      nome: form.nome.trim(),
-      doencas: form.doencas,
+      nome: form.nome.trim() || "Antígeno para Diagnóstico de Brucelose",
+      doencas: form.doencas.length ? form.doencas : (exemplo?.doencas ?? []),
       situacao: "Ativo",
     };
 
@@ -78,9 +75,6 @@ export function AdicionarTipoInsumoExamePage({ onLogout, onNavigate }: PageProps
           onChange={setForm}
         />
 
-        {tentouSalvar && !formValido && (
-          <p className="text-sm text-red-500 font-medium">Preencha o nome do tipo de insumo para continuar.</p>
-        )}
       </main>
 
       {registroSalvo && (

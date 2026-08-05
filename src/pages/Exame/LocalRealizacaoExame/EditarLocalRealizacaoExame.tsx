@@ -63,6 +63,7 @@ export function EditarLocalRealizacaoExamePage({ onLogout, onNavigate, dados }: 
       localizadoEmEstabelecimento: form.localizadoEmEstabelecimento === true,
       estabelecimento: form.estabelecimento,
       endereco: form.endereco,
+      veterinarios: form.veterinarios,
       situacao: form.situacao,
     });
 

@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { ArrowLeft, ChevronUp, ChevronDown, Eye, Pencil } from "lucide-react";
+import { ArrowLeft, ChevronUp, ChevronDown } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
-import { FloatInput, FloatSelect } from "../../../components/ui/FormKit";
+import { FloatInput } from "../../../components/ui/FormKit";
+import { DoencaInput } from "../../../components/ui/EntitySearch";
 
 const GREEN = "#1A7A3C";
 
@@ -18,23 +19,8 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-function EntidadeLeitura({ label, value, onVer }: { label: string; value: string; onVer?: () => void }) {
-  return (
-    <div className="flex items-center gap-2 w-full">
-      <div className="flex-1">
-        <FloatInput label={label} value={value} disabled onChange={() => { }} />
-      </div>
-      {onVer && (
-        <button type="button" onClick={onVer} title={`Visualizar ${label}`} className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md transition h-12 flex items-center flex-shrink-0 cursor-pointer">
-          <Eye size={20} />
-        </button>
-      )}
-    </div>
-  );
-}
-
 export function VisualizarAtestadoExamePage({ onLogout, onNavigate, dados }: { dados?: any; onLogout?: () => void; onNavigate?: (s: string, d?: any) => void; }) {
-  const atestado = dados || { descricao: "", doenca: { nome: "" }, diasValidade: "", situacao: "" };
+  const atestado = dados || { descricao: "Atestado para realização de exame de Brucelose", doenca: { id: 2, codigo: "D02", nome: "Brucelose" }, diasValidade: "60" };
   const nomeDoenca = atestado.doenca?.nome || "";
 
   return (
@@ -50,7 +36,7 @@ export function VisualizarAtestadoExamePage({ onLogout, onNavigate, dados }: { d
           <div className="flex justify-between items-center w-full">
             <h1 className="text-2xl font-semibold text-gray-900">Visualizar Atestado de Exame</h1>
             <button type="button" onClick={() => onNavigate!("editar-atestado-exame", atestado)} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2">
-              <Pencil size={16} /> Editar
+              Editar
             </button>
           </div>
         </div>
@@ -58,13 +44,12 @@ export function VisualizarAtestadoExamePage({ onLogout, onNavigate, dados }: { d
         <Section title="Informações Básicas">
           <div className="flex flex-col gap-6">
             <div className="w-full">
-              <FloatInput label="Descrição do atestado" value={atestado.descricao || "-"} disabled onChange={() => {}} />
+              <FloatInput label="Descrição do atestado" required value={atestado.descricao} disabled onChange={() => {}} maxLength={255} />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start w-full">
-              <EntidadeLeitura label="Doença" value={nomeDoenca || "-"} onVer={() => alert(`Visualizar: ${nomeDoenca}`)} />
-              <FloatInput label="Dias de Validade do Exame" value={atestado.diasValidade || "-"} disabled onChange={() => {}} />
-              <FloatSelect label="Situação" value={atestado.situacao || "Ativo"} options={[{ value: atestado.situacao || "Ativo", label: atestado.situacao || "Ativo" }]} disabled onChange={() => {}} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start w-full">
+              <DoencaInput required disabled data={[atestado.doenca]} value={nomeDoenca} onChange={() => {}} />
+              <FloatInput label="Dias de Validade do Exame" required value={String(atestado.diasValidade)} disabled onChange={() => {}} maxLength={3} />
             </div>
           </div>
         </Section>

@@ -1,4 +1,4 @@
-import { ArrowLeft, Pencil } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { CustomButton } from "../../../components/ui/FormKit";
 import {
@@ -45,10 +45,9 @@ export function VisualizarAjusteDosesInsumoPage({ onLogout, onNavigate, dados }:
           <div className="flex items-center justify-between gap-4">
             <h1 className="text-2xl font-semibold text-gray-900">Visualizar Ajuste de Doses de Insumo</h1>
             {registro.situacao === "Gravada" && <CustomButton
-              icon={<Pencil size={17} />}
               onClick={() => onNavigate("editar-ajuste-doses-insumo", registro)}
             >
-              Cancelar
+              Editar
             </CustomButton>}
           </div>
         </div>
