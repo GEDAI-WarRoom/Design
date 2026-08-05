@@ -986,6 +986,7 @@ export function DoencaInput({
 // ==========================================================
 export function ProprietarioInput({
 	value,
+	documento,
 	onChange,
 	onEyeClick,
 	required = false,
@@ -995,6 +996,14 @@ export function ProprietarioInput({
 	const entidadeSelecionada = PRODUTORES_MOCK.find(
 		(x) => x.nome === value || x.documento === value,
 	);
+	const entidadeExibida = entidadeSelecionada || (value
+		? {
+			id: "proprietario-atual",
+			nome: value,
+			documento: documento || "",
+			tipo: documento?.includes("/") ? "PJ" : "PF",
+		}
+		: null);
 
 	const databaseFiltrada = tipoPessoa
 		? PRODUTORES_MOCK.filter((p) => p.tipo === tipoPessoa)
@@ -1034,7 +1043,7 @@ export function ProprietarioInput({
 					label="Proprietário"
 					placeholder="Buscar pelo nome do proprietário."
 					required={required}
-					value={entidadeSelecionada?.nome || ""}
+					value={entidadeExibida?.nome || ""}
 					data={databaseFiltrada}
 					title="Buscar Proprietário"
 					subtitle="Busque por um proprietário cadastrado:"
@@ -1068,13 +1077,13 @@ export function ProprietarioInput({
 				/>
 
 				{/* Campo Extra reboque */}
-				{value && entidadeSelecionada && (
+				{value && entidadeExibida && (
 					<div className="flex items-center gap-2 animate-fadeIn w-full">
 						<div className="flex-1">
 							<FloatInput
-								label={entidadeSelecionada.tipo === "PJ" ? "CNPJ" : "CPF"}
+								label={entidadeExibida.tipo === "PJ" ? "CNPJ" : "CPF"}
 								required={required}
-								value={entidadeSelecionada.documento}
+								value={entidadeExibida.documento}
 								onChange={() => { }}
 								disabled
 								className="w-full"

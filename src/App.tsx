@@ -1760,7 +1760,7 @@ export default function App() {
 				<VisualizarPromotoraEventosPage
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
-					dados={screenData}
+					data={screenData}
 				/>
 			);
 			
