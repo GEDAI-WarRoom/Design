@@ -41,6 +41,46 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
+/* Visualização da promotora: mantém a estética do cadastro, mas comunica
+   o estado somente leitura pelos marcadores e ícones em cinza claro. */
+.promotora-eventos-view .promotora-form-fields {
+  pointer-events: none;
+  user-select: none;
+}
+
+.promotora-eventos-view .promotora-form-fields input:disabled,
+.promotora-eventos-view .promotora-form-fields textarea:disabled,
+.promotora-eventos-view .promotora-form-fields select:disabled,
+.promotora-eventos-view .promotora-form-fields button:disabled {
+  opacity: 1;
+  color: #374151;
+  -webkit-text-fill-color: #374151;
+}
+
+.promotora-eventos-view .promotora-form-fields [class*="bg-gray-50"] {
+  background-color: #ffffff !important;
+}
+
+.promotora-eventos-view .promotora-form-fields [class*="bg-[#1A7A3C]"],
+.promotora-eventos-view .promotora-form-fields [class*="bg-green-600"] {
+  background-color: #d1d5db !important;
+  color: #6b7280 !important;
+}
+
+.promotora-eventos-view .promotora-form-fields [class*="text-[#1A7A3C]"],
+.promotora-eventos-view .promotora-form-fields [class*="text-green-600"] {
+  color: #9ca3af !important;
+}
+
+.promotora-eventos-view .promotora-form-fields [class*="border-[#1A7A3C]"] {
+  border-color: #d1d5db !important;
+}
+
+.promotora-eventos-view .promotora-form-fields img {
+  filter: grayscale(1);
+  opacity: 0.55;
+}
+
 .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);

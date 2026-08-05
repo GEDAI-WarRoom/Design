@@ -990,6 +990,7 @@ export function DoencaInput({
 // ==========================================================
 export function ProprietarioInput({
 	value,
+	documento,
 	onChange,
 	onEyeClick,
 	required = false,
@@ -1001,6 +1002,14 @@ export function ProprietarioInput({
 	const entidadeSelecionada = data.find(
 		(x) => x.nome === value || x.documento === value,
 	);
+	const entidadeExibida = entidadeSelecionada || (value
+		? {
+			id: "proprietario-atual",
+			nome: value,
+			documento: documento || "",
+			tipo: documento?.includes("/") ? "PJ" : "PF",
+		}
+		: null);
 
 	const databaseFiltrada = tipoPessoa
 		? data.filter((p: any) => p.tipo === tipoPessoa)
@@ -1040,6 +1049,7 @@ export function ProprietarioInput({
 					label="Proprietário"
 					placeholder="Buscar pelo nome do proprietário."
 					required={required}
+					value={entidadeExibida?.nome || ""}
 					disabled={disabled}
 					value={entidadeSelecionada?.nome || ""}
 					data={databaseFiltrada}
@@ -1075,13 +1085,13 @@ export function ProprietarioInput({
 				/>
 
 				{/* Campo Extra reboque */}
-				{value && entidadeSelecionada && (
+				{value && entidadeExibida && (
 					<div className="flex items-center gap-2 animate-fadeIn w-full">
 						<div className="flex-1">
 							<FloatInput
-								label={entidadeSelecionada.tipo === "PJ" ? "CNPJ" : "CPF"}
+								label={entidadeExibida.tipo === "PJ" ? "CNPJ" : "CPF"}
 								required={required}
-								value={entidadeSelecionada.documento}
+								value={entidadeExibida.documento}
 								onChange={() => { }}
 								disabled
 								className="w-full"

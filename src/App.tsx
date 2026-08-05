@@ -138,6 +138,8 @@ import { AdicionarProfissionalAnimalPage } from "./pages/Animal/ProfissionalAnim
 import { ProfissionalAnimalPage } from "./pages/Animal/ProfissionalAnimal/ProfissionalAnimal";
 import { AdicionarPromotoraEventosPage } from "./pages/Animal/PromotoraEventos/AdicionarPromotoraEventos";
 import { PromotoraEventosPage } from "./pages/Animal/PromotoraEventos/PromotoraEventos";
+import { EditarPromotoraEventosPage } from "./pages/Animal/PromotoraEventos/EditarPromotoraEventos";
+import { VisualizarPromotoraEventosPage } from "./pages/Animal/PromotoraEventos/VisualizarPromotoraEventos";
 import { AdicionarRevendedoraAnimaisPage } from "./pages/Animal/RevendedoraAnimais/AdicionarRevendedoraAnimais";
 import { RevendedoraAnimaisPage } from "./pages/Animal/RevendedoraAnimais/RevendedoraAnimais";
 import { VisualizarRevendedoraAnimaisPage } from "./pages/Animal/RevendedoraAnimais/VisualizarRevendedoraAnimais";
@@ -694,6 +696,8 @@ export type Screen =
 	| "adicionar-profissional-animal"
 	| "promotora-eventos"
 	| "adicionar-promotora-eventos"
+	| "editar-promotora-eventos"
+	| "visualizar-promotora-eventos"
 	| "revendedora-animais"
 	| "adicionar-revendedora-animais"
 	| "visualizar-revendedora-animais-vivos"
@@ -2166,6 +2170,71 @@ export default function App() {
 				/>
 			);
 
+		case "adicionar-profissional-animal":
+			return (
+				<AdicionarProfissionalAnimalPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+
+		case "promotora-eventos":
+			return (
+				<PromotoraEventosPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+
+		case "adicionar-promotora-eventos":
+			return (
+				<AdicionarPromotoraEventosPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+
+		case "visualizar-promotora-eventos":
+			return (
+				<VisualizarPromotoraEventosPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					data={screenData}
+				/>
+			);
+			
+		case "editar-promotora-eventos":
+			return (
+			<EditarPromotoraEventosPage
+				onLogout={handleLogout}
+				onNavigate={handleNavigate}
+				data={screenData}
+			/>
+			);
+
+		case "revendedora-animais":
+			return (
+				<RevendedoraAnimaisPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+
+		case "adicionar-revendedora-animais":
+			return (
+				<AdicionarRevendedoraAnimaisPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-revendedora-animais-vivos":
+			return (
+				<VisualizarRevendedoraAnimaisPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
     case "venda-entrada-vacina":
       return <VendaComEntradaVacinaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-venda-entrada-vacina":
