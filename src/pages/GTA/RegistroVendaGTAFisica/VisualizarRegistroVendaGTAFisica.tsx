@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ArrowLeft, Info, Pencil, Check, Eye, FileText, CreditCard, Clock, RotateCcw, Calendar, ScrollText, ScanBarcode } from "lucide-react";
+import { ArrowLeft, Info, Check, Eye, FileText, CreditCard, Clock, RotateCcw, Calendar, ScrollText, ScanBarcode } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput } from "../../../components/ui/FormKit";
 import * as Icons from "../../../imports/icons";
@@ -61,15 +61,32 @@ const formatCurrency = (val: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(val);
 
 interface PageProps {
+  dados?: any;
   onLogout?: () => void;
   onNavigate?: (screen: string, data?: any) => void;
 }
 
 export function VisualizarRegistroVendaGtaFisicaPage({
+  dados,
   onLogout = () => { },
   onNavigate = (screen: string) => console.log("navigate:", screen),
 }: PageProps = {}) {
-  const r = REGISTRO_BASE;
+  const r = {
+    ...REGISTRO_BASE,
+    ...(dados || {}),
+    medico: {
+      ...REGISTRO_BASE.medico,
+      ...(dados?.medico || {}),
+      nome: dados?.medicoNome || dados?.medico?.nome || REGISTRO_BASE.medico.nome,
+      cpf: dados?.medicoCpf || dados?.medico?.cpf || REGISTRO_BASE.medico.cpf,
+    },
+    escritorio: {
+      ...REGISTRO_BASE.escritorio,
+      ...(dados?.escritorio || {}),
+      nome: dados?.escritorioNome || dados?.escritorio?.nome || REGISTRO_BASE.escritorio.nome,
+      sigla: dados?.escritorioCodigo || dados?.escritorio?.sigla || REGISTRO_BASE.escritorio.sigla,
+    },
+  };
 
   // ── ESTADOS DINÂMICOS PARA A DEMONSTRAÇÃO ───────────────────────
   // Sempre inicia como "pendente" ao entrar na página
@@ -116,14 +133,14 @@ export function VisualizarRegistroVendaGtaFisicaPage({
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
-      <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="registro-venda-gta" hideSearch />
+      <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="registro-venda-gta-fisica" hideSearch />
 
       <main className="max-w-[1088px] mx-auto px-4 md:px-6 py-6 flex flex-col gap-4">
         <div>
           <div className="flex items-center justify-between mb-3">
             <button
               type="button"
-              onClick={() => onNavigate("busca-venda-gta")}
+              onClick={() => onNavigate("registro-venda-gta-fisica")}
               className="flex items-center gap-1 text-sm transition hover:opacity-70"
               style={{ color: GREEN }}
             >
@@ -154,7 +171,7 @@ export function VisualizarRegistroVendaGtaFisicaPage({
 
               <button
                 type="button"
-                onClick={() => onNavigate("editar-venda-gta", r)}
+                onClick={() => onNavigate("editar-registro-venda-gta-fisica", r)}
                 className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2"
               >
                 Editar

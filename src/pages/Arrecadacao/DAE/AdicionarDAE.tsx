@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ArrowLeft, Check, Info } from "lucide-react";
+import { ArrowLeft, Info } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput } from "../../../components/ui/FormKit";
 
@@ -36,7 +36,7 @@ export function AdicionarDAEPage({ onLogout, onNavigate }: PageProps) {
   const [isSucesso, setIsSucesso] = useState(false);
 
   const handleConsultarPagamento = () => {
-    if (!codigoBarras) return;
+    if (!codigoBarras) setCodigoBarras("85660000001584650048100902026080151234567890");
     setIsSucesso(true);
   };
 
@@ -109,8 +109,7 @@ export function AdicionarDAEPage({ onLogout, onNavigate }: PageProps) {
             <button
               type="button"
               onClick={handleConsultarPagamento}
-              disabled={!codigoBarras}
-              className="flex items-center gap-2 px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm"
             >
               Consultar Pagamento
             </button>
@@ -152,10 +151,6 @@ export function AdicionarDAEPage({ onLogout, onNavigate }: PageProps) {
       {isSucesso && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
-            <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4">
-              <Check size={28} className="text-[#1A7A3C]" strokeWidth={3} />
-            </div>
-
             <h3 className="text-lg font-bold text-gray-900">
               DAE consultado com sucesso!
             </h3>
