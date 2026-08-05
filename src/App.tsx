@@ -135,6 +135,7 @@ import { PromotoraEventosPage } from "./pages/Animal/PromotoraEventos/PromotoraE
 import { EditarPromotoraEventosPage } from "./pages/Animal/PromotoraEventos/EditarPromotoraEventos";
 import { VisualizarPromotoraEventosPage } from "./pages/Animal/PromotoraEventos/VisualizarPromotoraEventos";
 import { AdicionarRevendedoraAnimaisPage } from "./pages/Animal/RevendedoraAnimais/AdicionarRevendedoraAnimais";
+import { EditarRevendedoraAnimaisPage } from "./pages/Animal/RevendedoraAnimais/EditarRevendedoraAnimais";
 import { RevendedoraAnimaisPage } from "./pages/Animal/RevendedoraAnimais/RevendedoraAnimais";
 import { VisualizarRevendedoraAnimaisPage } from "./pages/Animal/RevendedoraAnimais/VisualizarRevendedoraAnimais";
 import { AdicionarStatusAnimalPage } from "./pages/Animal/StatusAnimal/AdicionarStatusAnimal";
@@ -1791,6 +1792,14 @@ export default function App() {
 		case "visualizar-revendedora-animais-vivos":
 			return (
 				<VisualizarRevendedoraAnimaisPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "editar-revendedora-animais":
+			return (
+				<EditarRevendedoraAnimaisPage
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
 					dados={screenData}

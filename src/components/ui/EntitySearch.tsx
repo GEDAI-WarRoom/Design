@@ -126,6 +126,18 @@ export const PRODUTORES_MOCK = [
 		documento: "12.345.678/0001-99",
 		tipo: "PJ",
 	},
+	{
+		id: 4,
+		nome: "Divino de Souza Sobrinho",
+		documento: "444.009.956-40",
+		tipo: "PF",
+	},
+	{
+		id: 5,
+		nome: "Agropecuária Vale Verde Ltda.",
+		documento: "56.338.814/0001-95",
+		tipo: "PJ",
+	},
 ];
 
 export const REVENDEDORAS_MOCK = [
