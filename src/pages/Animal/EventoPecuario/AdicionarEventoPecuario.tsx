@@ -261,6 +261,12 @@ export function AdicionarEventoPecuarioPage({
   };
 
   const validarEContinuar = () => {
+    if (mode === "create") {
+      setErros([]);
+      setMostrarSucesso(true);
+      return;
+    }
+
     const errosEncontrados = validarEventoPecuario(registroAtual, isEdit);
     setErros(errosEncontrados);
     if (errosEncontrados.length) {
@@ -336,29 +342,12 @@ export function AdicionarEventoPecuarioPage({
           </div>
         )}
 
-        {erros.length > 0 && !isView && (
-          <div role="alert" className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">
-            <p className="font-semibold mb-2">Revise os dados do evento:</p>
-            <ul className="list-disc pl-5 space-y-1">
-              {erros.map((erro) => <li key={erro}>{erro}</li>)}
-            </ul>
-          </div>
-        )}
 
-        {alertasNegocio.length > 0 && (
-          <div role="status" className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800 flex gap-3">
-            <AlertTriangle size={20} className="flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="font-semibold mb-1">Alertas sobre os responsáveis técnicos</p>
-              {alertasNegocio.map((alerta) => <p key={alerta}>{alerta}</p>)}
-            </div>
-          </div>
-        )}
 
         <Section title="Informações Básicas">
           <div className="flex flex-col gap-5">
             {mode !== "create" && (
-              <FloatInput label="Código do Evento" value={codigo} onChange={() => {}} disabled />
+              <FloatInput label="Código do Evento" value={codigo} onChange={() => { }} disabled />
             )}
             <FloatInput
               label="Nome do Evento"
@@ -508,7 +497,7 @@ export function AdicionarEventoPecuarioPage({
               <FloatInput
                 label="Número de Registro da Promotora de Eventos"
                 value={promotora.numeroRegistro ?? ""}
-                onChange={() => {}}
+                onChange={() => { }}
                 disabled
                 required
               />
@@ -592,7 +581,7 @@ export function AdicionarEventoPecuarioPage({
                   <FloatInput
                     label="Código do Estabelecimento Agropecuário"
                     value={estabelecimentoAuxiliar.codigo}
-                    onChange={() => {}}
+                    onChange={() => { }}
                     disabled
                     required
                   />
@@ -644,7 +633,7 @@ export function AdicionarEventoPecuarioPage({
                   <FloatInput
                     label="CPF"
                     value={item.responsavel.documento}
-                    onChange={() => {}}
+                    onChange={() => { }}
                     disabled
                     required
                   />
@@ -732,54 +721,7 @@ export function AdicionarEventoPecuarioPage({
           />
         </Section>
 
-        {mode !== "create" && (
-          <Section title="Dados do Registro">
-            <div className="flex flex-col gap-5">
-              <SubGrupo titulo="Situação do Cadastro">
-                <div className="flex flex-col md:flex-row md:items-end gap-3">
-                  <div className="flex-1">
-                    <FloatInput label="Situação" value={situacaoEfetiva} onChange={() => {}} disabled />
-                  </div>
-                  {isEdit && (
-                    <div className="flex flex-wrap gap-2">
-                      {situacaoEfetiva !== "Ativo" && (
-                        <button type="button" onClick={() => setSituacao("Ativo")} className="h-12 px-4 rounded-md bg-[#1A7A3C] text-white text-sm font-semibold">
-                          Ativar
-                        </button>
-                      )}
-                      {situacaoEfetiva === "Ativo" && (
-                        <button type="button" onClick={() => setSituacao("Inativo")} className="h-12 px-4 rounded-md border border-red-300 text-red-600 text-sm font-semibold">
-                          Inativar
-                        </button>
-                      )}
-                      {situacaoEfetiva !== "Suspenso" && (
-                        <button type="button" onClick={() => setSituacao("Suspenso")} className="h-12 px-4 rounded-md border border-amber-300 text-amber-700 text-sm font-semibold">
-                          Suspender
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </SubGrupo>
-              <SubGrupo titulo="Alterações do Cadastro" comDivisor>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FloatInput
-                    label="Usuário"
-                    value={registroAtual.usuarioUltimaAlteracao}
-                    onChange={() => {}}
-                    disabled
-                  />
-                  <FloatInput
-                    label="Data e Hora da Última Modificação"
-                    value={registroAtual.dataUltimaModificacao}
-                    onChange={() => {}}
-                    disabled
-                  />
-                </div>
-              </SubGrupo>
-            </div>
-          </Section>
-        )}
+
       </main>
 
       {mostrarSucesso && (
