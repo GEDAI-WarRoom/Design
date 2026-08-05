@@ -23,11 +23,19 @@ export interface CampoHistoricoComparavel {
 }
 
 export function campoHistoricoFoiAlterado(
-  campo: CampoHistoricoComparavel,
-  camposAtuais: CampoHistoricoComparavel[],
+  campo: CampoHistoricoComparavel | unknown,
+  camposAtuais: CampoHistoricoComparavel[] | unknown,
   visualizandoVersaoAntiga: boolean,
 ) {
   if (!visualizandoVersaoAntiga) return false;
+  if (
+    !campo ||
+    typeof campo !== "object" ||
+    !("label" in campo) ||
+    !Array.isArray(camposAtuais)
+  ) {
+    return String(campo ?? "").trim() !== String(camposAtuais ?? "").trim();
+  }
   const campoAtual = camposAtuais.find((item) => item.label === campo.label);
   return Boolean(
     campoAtual &&

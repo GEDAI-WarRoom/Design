@@ -5,6 +5,7 @@ import { FloatInput, FloatSelect, FloatCombobox, CustomButton, UploadField, Larg
 // Importado o MultiSearchModal para fazer a seleção múltipla via botão
 import { ProprietarioInput, DynamicListWrapper, BlocoEnderecoFields, BlocoContatoFields, SelectedChipsContainer, } from "../../../components/ui/EntitySearch";
 import * as Icons from "../../../imports/icons";
+import { CadastroVacinacaoHeader, cadastroVacinacaoPageClass, mensagemSucessoCadastro, preencherComExemplo, type CadastroVacinacaoModeProps } from "../shared/CadastroVacinacaoMode";
 
 const GREEN = "#1A7A3C";
 
@@ -62,19 +63,38 @@ function SubGrupo({ titulo, children, comDivisor = false }: { titulo: string; ch
 // ==========================================================
 // PÁGINA: ADICIONAR LABORATÓRIO (US0V3 - AC3)
 // ==========================================================
-interface PageProps {
+interface PageProps extends CadastroVacinacaoModeProps {
   onLogout: () => void;
   onNavigate: (screen: any, data?: any) => void;
 }
 
-export function AdicionarLaboratorioPage({ onLogout, onNavigate }: PageProps) {
+export function AdicionarLaboratorioPage({ onLogout, onNavigate, mode = "create", dados }: PageProps) {
+  const preenchendoRegistro = mode !== "create";
+  const normalizarAtuacao = (valor: string) => {
+    const semPrefixo = valor.replace(/^Realiza\s+/i, "");
+    return semPrefixo.charAt(0).toUpperCase() + semPrefixo.slice(1);
+  };
+  const atuacoesIniciais = (dados?.atuacao ?? (preenchendoRegistro ? ["Produção de vacinas", "Diagnóstico de doenças"] : [])).map(normalizarAtuacao);
+  const doencasIniciais = dados?.doencasPorAtuacao ?? Object.fromEntries(
+    atuacoesIniciais.map((item: string) => [item, item === "Produção de vacinas"
+      ? [{ id: "d-2", nome: "Brucelose" }]
+      : [{ id: "d-1", nome: "Febre Aftosa" }]])
+  );
+  const proprietariosIniciais = dados?.proprietarios?.length
+    ? dados.proprietarios
+    : dados?.produtor?.length
+      ? dados.produtor.map((pessoa: any) => ({ uid: uid("prop"), proprietario: pessoa }))
+      : preenchendoRegistro
+        ? [{ uid: uid("prop"), proprietario: { id: "prop-1", nome: "José Aarão Neto", documento: "555.009.956-40" } }]
+        : [{ uid: uid("prop"), proprietario: null }];
+
   // Informações Básicas
-  const [nome, setNome] = useState("");
-  const [atuacao, setAtuacao] = useState<string[]>([]);
-  const [observacaoResidencia, setObservacaoResidencia] = useState("");
+  const [nome, setNome] = useState(dados?.nome ?? "");
+  const [atuacao, setAtuacao] = useState<string[]>(atuacoesIniciais);
+  const [observacaoResidencia, setObservacaoResidencia] = useState(dados?.observacao ?? (preenchendoRegistro ? "Cadastro de laboratório vinculado ao programa sanitário estadual." : ""));
 
   // Doenças por atuação selecionada: { [atuacao]: [{ uid, doenca }] }
-  const [doencasPorAtuacao, setDoencasPorAtuacao] = useState<Record<string, any[]>>({});
+  const [doencasPorAtuacao, setDoencasPorAtuacao] = useState<Record<string, any[]>>(doencasIniciais);
   const [notaFiscal, setNotaFiscal] = useState("");
   const [modalNotaOrigemOpen, setModalNotaOrigemOpen] = useState(false);
   const [notasFiscaisOrigem, setNotasFiscaisOrigem] = useState<any[]>([]);
@@ -86,36 +106,38 @@ export function AdicionarLaboratorioPage({ onLogout, onNavigate }: PageProps) {
   const [atuacaoModalAberta, setAtuacaoModalAberta] = useState<string | null>(null);
 
   // Proprietários (um ou mais)
-  const [proprietarios, setProprietarios] = useState<any[]>([{ uid: uid("prop"), proprietario: null }]);
+  const [proprietarios, setProprietarios] = useState<any[]>(proprietariosIniciais);
   const [modalMapaOpen, setModalMapaOpen] = useState(false);
 
   // Anexos e Observações
-  const [anexos, setAnexos] = useState<any[]>([]);
+  const [anexos, setAnexos] = useState<any[]>(dados?.anexos ?? []);
   const [isSucesso, setIsSucesso] = useState(false);
 
   const [endereco, setEndereco] = useState({
     zona: "Urbana",
-    cep: "",
-    estado: "Minas Gerais",
-    municipio: "",
-    bairro: "",
-    endereco: "",
-    numero: "",
-    complemento: "",
-    localidade: "",
-    distrito: "",
-    latitude: "",
-    longitude: ""
+    cep: dados?.cep ?? (preenchendoRegistro ? "37200-000" : ""),
+    estado: dados?.estado ?? "Minas Gerais",
+    municipio: dados?.municipio ?? "",
+    bairro: dados?.bairro ?? (preenchendoRegistro ? "Centro" : ""),
+    endereco: dados?.logradouro ?? (preenchendoRegistro ? "Rua das Acácias" : ""),
+    numero: dados?.numero ?? (preenchendoRegistro ? "120" : ""),
+    complemento: dados?.complemento ?? (preenchendoRegistro ? "Unidade Laboratorial" : ""),
+    localidade: dados?.localidade ?? (preenchendoRegistro ? "Sede" : ""),
+    distrito: dados?.distrito ?? (preenchendoRegistro ? "Distrito Sede" : ""),
+    latitude: dados?.latitude ?? (preenchendoRegistro ? "-21.2450" : ""),
+    longitude: dados?.longitude ?? (preenchendoRegistro ? "-44.9998" : ""),
+    ...(dados?.endereco ?? {}),
   });
 
   const [contatoLaboratorio, setContatoLaboratorio] = useState({
     utilizarContatoProprietario: "Não",
     proprietariosSelecionados: [] as string[],
-    emailFixo: "",
+    emailFixo: preenchendoRegistro ? "contato@laboratorio.com.br" : "",
     emailFixoObs: "",
-    telefoneFixo: "",
+    telefoneFixo: preenchendoRegistro ? "(35) 3821-4500" : "",
     telefoneFixoObs: "",
-    contatosAdicionais: [] as any[]
+    contatosAdicionais: [] as any[],
+    ...(dados?.contatoLaboratorio ?? {}),
   });
 
   // Sincroniza as doenças por atuação quando a seleção de atuação muda
@@ -128,8 +150,41 @@ export function AdicionarLaboratorioPage({ onLogout, onNavigate }: PageProps) {
     });
   };
 
+  const registroAtual = preencherComExemplo({
+    ...(dados ?? {}),
+    id: dados?.id ?? `laboratorio-${Date.now()}`,
+    nome,
+    atuacao,
+    doencasPorAtuacao,
+    proprietarios,
+    endereco,
+    contatoLaboratorio,
+    anexos,
+    observacao: observacaoResidencia,
+  }, {
+    id: "laboratorio-exemplo",
+    nome: "Laboratório Saúde Animal",
+    atuacao: ["Produção de vacinas", "Diagnóstico de doenças"],
+    doencasPorAtuacao: {
+      "Produção de vacinas": [{ id: "d-2", nome: "Brucelose" }],
+      "Diagnóstico de doenças": [{ id: "d-1", nome: "Febre Aftosa" }],
+    },
+    proprietarios: [{ uid: "proprietario-exemplo", proprietario: { id: "prop-1", nome: "José Aarão Neto", documento: "555.009.956-40" } }],
+    endereco: {
+      zona: "Urbana", cep: "37200-000", estado: "Minas Gerais", municipio: "Lavras",
+      bairro: "Centro", endereco: "Rua das Acácias", numero: "120", complemento: "Unidade Laboratorial",
+      localidade: "Sede", distrito: "Distrito Sede", latitude: "-21.2450", longitude: "-44.9998",
+    },
+    contatoLaboratorio: {
+      utilizarContatoProprietario: "Não", proprietariosSelecionados: [], emailFixo: "contato@laboratorio.com.br",
+      emailFixoObs: "Contato institucional", telefoneFixo: "(35) 3821-4500", telefoneFixoObs: "Recepção", contatosAdicionais: [],
+    },
+    anexos: [],
+    observacao: "Cadastro de exemplo de laboratório vinculado ao programa sanitário estadual.",
+  });
+
   return (
-    <div className="min-h-screen bg-[#f2f3f5]">
+    <div className={cadastroVacinacaoPageClass(mode, "min-h-screen bg-[#f2f3f5]")}>
       <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="laboratorio" hideSearch />
 
       <main className="max-w-[1088px] mx-auto px-4 md:px-6 py-6 flex flex-col gap-4">
@@ -139,10 +194,7 @@ export function AdicionarLaboratorioPage({ onLogout, onNavigate }: PageProps) {
             <ArrowLeft size={15} />
             Todos os Laboratórios
           </button>
-          <div className="flex justify-between items-center w-full">
-            <h1 className="text-2xl font-semibold text-gray-900">Adicionar Laboratório</h1>
-            <button type="button" onClick={() => setIsSucesso(true)} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm">Adicionar</button>
-          </div>
+          <CadastroVacinacaoHeader mode={mode} nomeCadastro="Laboratório" rotaEditar="editar-laboratorio" dados={dados} onNavigate={onNavigate} onSubmit={() => setIsSucesso(true)} />
         </div>
 
         <div className="w-full bg-white border border-gray-100 rounded-lg p-5 shadow-sm flex items-center gap-3 mt-4 mb-6">
@@ -400,11 +452,11 @@ export function AdicionarLaboratorioPage({ onLogout, onNavigate }: PageProps) {
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
             <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4"><Check size={28} className="text-[#1A7A3C]" strokeWidth={3} /></div>
-            <h3 className="text-lg font-bold text-gray-900">Laboratório adicionado com sucesso!</h3>
+            <h3 className="text-lg font-bold text-gray-900">{mensagemSucessoCadastro(mode, "Laboratório")}</h3>
             <p className="text-sm text-gray-500 mt-1">{nome ? `"${nome}"` : "O laboratório"} foi adicionado.</p>
             <div className="flex gap-3 justify-center mt-6">
               <button onClick={() => { setIsSucesso(false); onNavigate("laboratorio"); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition">Voltar</button>
-              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-laboratorio"); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
+              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-laboratorio", registroAtual); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
             </div>
           </div>
         </div>

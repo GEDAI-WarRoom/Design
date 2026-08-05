@@ -254,6 +254,7 @@ export function EntitySearchInput({
 	return (
 		<>
 			<div
+				data-form-control
 				className="w-full cursor-pointer"
 				onClick={() => setModalAberto(true)}>
 				<div className="pointer-events-none">
@@ -930,6 +931,7 @@ interface DoencaInputProps {
 	tooltipText?: string;
 	data?: any[];
 	apenasVacinaveis?: boolean; // 👈 Adicionado aqui para resolver o erro de tipagem
+	disabled?: boolean;
 }
 
 export function DoencaInput({
@@ -940,6 +942,7 @@ export function DoencaInput({
 	tooltipText,
 	data = DOENCAS_MOCK,
 	apenasVacinaveis = false, // 👈 Inicializa como false por padrão
+	disabled = false,
 }: DoencaInputProps) {
 	// 💡 Se 'apenasVacinaveis' for true, você pode filtrar os dados aqui se o seu mock tiver esse campo,
 	// ou apenas repassar a lista completa por enquanto.
@@ -961,6 +964,7 @@ export function DoencaInput({
 						label="Doença"
 						placeholder="Buscar por nome da doença."
 						required={required}
+						disabled={disabled}
 						value={BlacklistedOuSelecionada?.nome || ""}
 						data={dadosFiltrados}
 						searchKeys={["nome"]}
@@ -985,7 +989,7 @@ export function DoencaInput({
 					/>
 				</div>
 
-				{value && BlacklistedOuSelecionada && (
+				{!disabled && value && BlacklistedOuSelecionada && (
 					<EyeAction onClick={onEyeClick} />
 				)}
 			</div>
@@ -998,19 +1002,30 @@ export function DoencaInput({
 // ==========================================================
 export function ProprietarioInput({
 	value,
+	documento,
 	onChange,
 	onEyeClick,
 	required = false,
+	disabled = false,
+	data = PRODUTORES_MOCK,
 }: DomainInputProps) {
 	const [tipoPessoa, setTipoPessoa] = useState<string>("");
 
-	const entidadeSelecionada = PRODUTORES_MOCK.find(
+	const entidadeSelecionada = data.find(
 		(x) => x.nome === value || x.documento === value,
 	);
+	const entidadeExibida = entidadeSelecionada || (value
+		? {
+			id: "proprietario-atual",
+			nome: value,
+			documento: documento || "",
+			tipo: documento?.includes("/") ? "PJ" : "PF",
+		}
+		: null);
 
 	const databaseFiltrada = tipoPessoa
-		? PRODUTORES_MOCK.filter((p) => p.tipo === tipoPessoa)
-		: PRODUTORES_MOCK;
+		? data.filter((p: any) => p.tipo === tipoPessoa)
+		: data;
 
 	// Definição estrita das colunas baseada no estado atual
 	const colunasModal = [
@@ -1046,7 +1061,8 @@ export function ProprietarioInput({
 					label="Proprietário"
 					placeholder="Buscar pelo nome do proprietário."
 					required={required}
-					value={entidadeSelecionada?.nome || ""}
+					value={entidadeExibida?.nome || ""}
+					disabled={disabled}
 					data={databaseFiltrada}
 					title="Buscar Proprietário"
 					subtitle="Busque por um proprietário cadastrado:"
@@ -1080,13 +1096,13 @@ export function ProprietarioInput({
 				/>
 
 				{/* Campo Extra reboque */}
-				{value && entidadeSelecionada && (
+				{value && entidadeExibida && (
 					<div className="flex items-center gap-2 animate-fadeIn w-full">
 						<div className="flex-1">
 							<FloatInput
-								label={entidadeSelecionada.tipo === "PJ" ? "CNPJ" : "CPF"}
+								label={entidadeExibida.tipo === "PJ" ? "CNPJ" : "CPF"}
 								required={required}
-								value={entidadeSelecionada.documento}
+								value={entidadeExibida.documento}
 								onChange={() => { }}
 								disabled
 								className="w-full"
@@ -1105,6 +1121,8 @@ interface DomainInputProps {
 	value: string; // Nome selecionado
 	documento?: string; // Documento selecionado (CPF/CNPJ)
 	required?: boolean;
+	disabled?: boolean;
+	data?: any[];
 	onChange: (selectedEntity: any) => void;
 	onEyeClick?: () => void;
 }
@@ -1693,9 +1711,33 @@ export function BlocoEnderecoFields({
 					disabled={fieldsDisabled}
 					onChange={(v) => onChange("estado", v)}
 					options={[
+						{ value: "Acre", label: "Acre" },
+						{ value: "Alagoas", label: "Alagoas" },
+						{ value: "Amapá", label: "Amapá" },
+						{ value: "Amazonas", label: "Amazonas" },
+						{ value: "Bahia", label: "Bahia" },
+						{ value: "Ceará", label: "Ceará" },
+						{ value: "Distrito Federal", label: "Distrito Federal" },
+						{ value: "Espírito Santo", label: "Espírito Santo" },
+						{ value: "Goiás", label: "Goiás" },
+						{ value: "Maranhão", label: "Maranhão" },
+						{ value: "Mato Grosso", label: "Mato Grosso" },
+						{ value: "Mato Grosso do Sul", label: "Mato Grosso do Sul" },
 						{ value: "Minas Gerais", label: "Minas Gerais" },
-						{ value: "São Paulo", label: "São Paulo" },
+						{ value: "Pará", label: "Pará" },
+						{ value: "Paraíba", label: "Paraíba" },
+						{ value: "Paraná", label: "Paraná" },
+						{ value: "Pernambuco", label: "Pernambuco" },
+						{ value: "Piauí", label: "Piauí" },
 						{ value: "Rio de Janeiro", label: "Rio de Janeiro" },
+						{ value: "Rio Grande do Norte", label: "Rio Grande do Norte" },
+						{ value: "Rio Grande do Sul", label: "Rio Grande do Sul" },
+						{ value: "Rondônia", label: "Rondônia" },
+						{ value: "Roraima", label: "Roraima" },
+						{ value: "Santa Catarina", label: "Santa Catarina" },
+						{ value: "São Paulo", label: "São Paulo" },
+						{ value: "Sergipe", label: "Sergipe" },
+						{ value: "Tocantins", label: "Tocantins" },
 					]}
 				/>
 				<FloatCombobox
@@ -3119,6 +3161,7 @@ interface ResponsavelTecnicoInputProps {
 	value: string;
 	onChange: (entidade: any) => void;
 	onEyeClick?: () => void;
+	icon?: React.ReactNode;
 	error?: boolean;
 	disabled?: boolean;
 	required?: boolean;
@@ -3131,6 +3174,7 @@ export const ResponsavelTecnicoInput: React.FC<
 	value,
 	onChange,
 	onEyeClick,
+	icon,
 	error,
 	disabled,
 	required = false,
@@ -3157,13 +3201,13 @@ export const ResponsavelTecnicoInput: React.FC<
 							{ label: "Nome", key: "nome" },
 							{ label: "CPF", key: "documento" },
 						]}
-						icon={
+						icon={icon || (
 							<UserRoundCheck
 								size={18}
 								color={GREEN}
 								className="mr-2 -ml-1 flex-shrink-0"
 							/>
-						}
+						)}
 						title="Buscar Responsável Técnico"
 						subtitle="Busque por um profissional responsável técnico cadastrado:"
 						onChange={onChange}

@@ -1,95 +1,14 @@
-import React, { useState } from "react";
-import {
-  ArrowLeft, ChevronUp, ChevronDown, Pencil, RotateCcw,
-  Eye, Check, MapPin, Building2, FileText, Mail, Phone
-} from "lucide-react";
-import { Navbar } from "../../../components/Navbar";
-
-const GREEN = "#1A7A3C";
-
-// Componente utilitário para exibição de campo apenas-leitura (Data View)
-function DataField({
-  label,
-  value,
-  icon,
-}: {
-  label: string;
-  value?: React.ReactNode;
-  icon?: React.ReactNode;
-}) {
-  return (
-    <div className="flex flex-col gap-1 p-3.5 bg-gray-50/80 border border-gray-100 rounded-lg">
-      <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">{label}</span>
-      <div className="flex items-center gap-2 text-sm font-medium text-gray-900">
-        {icon}
-        <span>{value || "-"}</span>
-      </div>
-    </div>
-  );
-}
-
-// Componente de Seção (Accordion)
-function Section({
-  title,
-  children,
-  defaultOpen = true,
-}: {
-  title: string;
-  children: React.ReactNode;
-  defaultOpen?: boolean;
-}) {
-  const [open, setOpen] = useState(defaultOpen);
-  return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50 transition"
-      >
-        <span className="text-base font-semibold text-gray-800">{title}</span>
-        {open ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
-      </button>
-      {open && <div className="px-6 pb-6 border-t border-gray-100 pt-5">{children}</div>}
-    </div>
-  );
-}
+import React from "react";
+import { AdicionarPromotoraEventosPage } from "./AdicionarPromotoraEventos";
 
 interface PageProps {
   onLogout: () => void;
   onNavigate: (screen: string, data?: any) => void;
   data?: any;
+  dados?: any;
 }
 
-export function VisualizarPromotoraEventosPage({ onLogout, onNavigate, data }: PageProps) {
-  const [activeTab, setActiveTab] = useState<"cadastro" | "fiscalizacoes" | "recolhimento">("cadastro");
-
-  // Dados consolidados para exibição
-  const promotora = {
-    nomeComercial: data?.nome || "Promotora São José",
-    numeroRegistro: data?.numeroRegistro || "14385",
-    aderidaFundesa: "Não",
-    proprietario: {
-      nome: data?.proprietarioNomeFantasia || "Divino de Souza Sobrinho",
-      cpfCnpj: data?.proprietarioCnpj || "444.009.956-40",
-    },
-    localizacao: {
-      zona: "Rural",
-      estado: data?.estado || "Minas Gerais",
-      municipio: data?.municipio || "Lavras",
-      endereco: "Estrada de chão no Km 12",
-      localidade: "Floresta",
-      distrito: "Abaeté",
-      latitude: "19º 09' 57\"S",
-      longitude: "044º 21' 48\" W",
-    },
-    contatos: [
-      { tipo: "E-mail", valor: "revsaojose@email.com", observacao: "" },
-      { tipo: "Telefone", valor: "(35) 98456-5654", observacao: "" },
-    ],
-    anexos: [],
-    situacao: data?.situacao || "Ativa",
-  };
-
+export function VisualizarPromotoraEventosPage(props: PageProps) {
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
       <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="promotora-eventos" hideSearch />
@@ -291,5 +210,10 @@ export function VisualizarPromotoraEventosPage({ onLogout, onNavigate, data }: P
         )}
       </main>
     </div>
+    <AdicionarPromotoraEventosPage
+      {...props}
+      mode="view"
+      data={props.data ?? props.dados}
+    />
   );
 }

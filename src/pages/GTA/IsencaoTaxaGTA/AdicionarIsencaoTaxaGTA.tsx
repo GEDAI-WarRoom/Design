@@ -2,6 +2,11 @@ import React, { useState } from "react";
 import { ArrowLeft, ChevronUp, ChevronDown, Check, Info, Pencil } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, FloatSelect } from "../../../components/ui/FormKit";
+import {
+  adicionarIsencaoTaxaDocumentoSanitario,
+  atualizarIsencaoTaxaDocumentoSanitario,
+  type IsencaoTaxaDocumentoSanitario,
+} from "./isencaoTaxaGtaData";
 
 const GREEN = "#1A7A3C";
 
@@ -31,17 +36,11 @@ function Section({ title, children, defaultOpen = true }: { title: string; child
 
 // --- tipos ---
 
-interface IsencaoTaxaGtaData {
-  id?: number;
-  motivo: string;
-  situacao: "Ativo" | "Inativo";
-}
-
 interface PageProps {
   onLogout: () => void;
   onNavigate: (screen: any, data?: any) => void;
   // Presente em modo visualização/edição
-  data?: IsencaoTaxaGtaData;
+  data?: IsencaoTaxaDocumentoSanitario;
   // Quando true junto com "data", a tela abre em modo somente-leitura (AC4)
   readOnly?: boolean;
 }
@@ -52,17 +51,36 @@ export function AdicionarIsencaoTaxaGtaPage({ onLogout, onNavigate, data, readOn
   const camposDesabilitados = isVisualizacao;
 
   const [motivo, setMotivo] = useState(data?.motivo ?? "");
-  const [situacao, setSituacao] = useState<string>(data?.situacao ?? "Ativo");
+  const [situacao, setSituacao] = useState<"Ativo" | "Inativo">(
+    data?.situacao ?? "Ativo",
+  );
 
   const [isSucesso, setIsSucesso] = useState(false);
+  const [registroSalvo, setRegistroSalvo] =
+    useState<IsencaoTaxaDocumentoSanitario | null>(null);
 
   const formularioValido = motivo.trim() !== "";
 
   const titulo = isVisualizacao
-    ? "Visualizar Isenção de Taxa de GTA"
+    ? "Visualizar Isenção de Taxa de Documento Sanitário"
     : isEdicao
-    ? "Editar Isenção de Taxa de GTA"
-    : "Adicionar Isenção de Taxa de GTA";
+    ? "Editar Isenção de Taxa de Documento Sanitário"
+    : "Adicionar Isenção de Taxa de Documento Sanitário";
+
+  const salvar = () => {
+    if (!formularioValido) return;
+
+    const registro = isEdicao && data
+      ? atualizarIsencaoTaxaDocumentoSanitario({
+          id: data.id,
+          motivo: motivo.trim(),
+          situacao,
+        }).registro
+      : adicionarIsencaoTaxaDocumentoSanitario(motivo);
+
+    setRegistroSalvo(registro);
+    setIsSucesso(true);
+  };
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
@@ -78,7 +96,7 @@ export function AdicionarIsencaoTaxaGtaPage({ onLogout, onNavigate, data, readOn
             style={{ color: GREEN }}
           >
             <ArrowLeft size={15} />
-            Todas as Isenções de Taxa de GTA
+            Todas as Isenções de Taxa de Documento Sanitário
           </button>
           <div className="flex justify-between items-center w-full">
             <h1 className="text-2xl font-semibold text-gray-900">{titulo}</h1>
@@ -95,7 +113,7 @@ export function AdicionarIsencaoTaxaGtaPage({ onLogout, onNavigate, data, readOn
               <button
                 type="button"
                 disabled={!formularioValido}
-                onClick={() => setIsSucesso(true)}
+                onClick={salvar}
                 className="px-5 py-3 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-bold rounded-md transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isEdicao ? "Salvar" : "Adicionar"}
@@ -120,7 +138,7 @@ export function AdicionarIsencaoTaxaGtaPage({ onLogout, onNavigate, data, readOn
         <Section title="Informações Básicas">
           <div className={`grid grid-cols-1 ${isEdicao || isVisualizacao ? "md:grid-cols-2" : ""} gap-4 items-center`}>
             <FloatInput
-              label="Motivo da Isenção de Taxa de GTA"
+              label="Motivo da Isenção de Taxa de Documento Sanitário"
               required
               disabled={camposDesabilitados}
               value={motivo}
@@ -135,7 +153,9 @@ export function AdicionarIsencaoTaxaGtaPage({ onLogout, onNavigate, data, readOn
                 required
                 disabled={camposDesabilitados}
                 value={situacao}
-                onChange={setSituacao}
+                onChange={(valor) =>
+                  setSituacao(valor as "Ativo" | "Inativo")
+                }
                 options={toOptions(SITUACOES)}
               />
             )}
@@ -151,7 +171,7 @@ export function AdicionarIsencaoTaxaGtaPage({ onLogout, onNavigate, data, readOn
               <Check size={28} className="text-[#1A7A3C]" strokeWidth={3} />
             </div>
             <h3 className="text-lg font-bold text-gray-900">
-              {isEdicao ? "Isenção de Taxa de GTA atualizada com sucesso!" : "Isenção de Taxa de GTA cadastrada com sucesso!"}
+              {isEdicao ? "Isenção de Taxa de Documento Sanitário atualizada com sucesso!" : "Isenção de Taxa de Documento Sanitário cadastrada com sucesso!"}
             </h3>
             <p className="text-sm text-gray-500 mt-1">
               {motivo ? `A isenção "${motivo}"` : "A isenção"} foi {isEdicao ? "atualizada" : "cadastrada"}.
@@ -169,7 +189,10 @@ export function AdicionarIsencaoTaxaGtaPage({ onLogout, onNavigate, data, readOn
               <button
                 onClick={() => {
                   setIsSucesso(false);
-                  onNavigate("visualizar-isencao-taxa-gta", { id: data?.id, motivo, situacao });
+                  onNavigate(
+                    "visualizar-isencao-taxa-gta",
+                    registroSalvo ?? data,
+                  );
                 }}
                 className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition"
               >

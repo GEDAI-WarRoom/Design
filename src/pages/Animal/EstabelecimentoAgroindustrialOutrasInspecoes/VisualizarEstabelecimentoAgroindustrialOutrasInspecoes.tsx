@@ -1,4 +1,4 @@
-import { EntityProfessionalsView } from "../../../components/ui/EntityProfessionalsView";
+import { AdicionarEstabelecimentoAgroindustrialOutrasInspecoesPage } from "./AdicionarEstabelecimentoAgroindustrialOutrasInspecoes";
 
 interface PageProps {
   onLogout: () => void;
@@ -7,22 +7,12 @@ interface PageProps {
 }
 
 export function VisualizarEstabelecimentoAgroindustrialOutrasInspecoesPage({ onLogout, onNavigate, dados }: PageProps) {
-  const registro = dados || { codigo: "POA-OUT-0001", nome: "Agroindústria Serra Verde", situacao: "Ativo" };
   return (
-    <EntityProfessionalsView
+    <AdicionarEstabelecimentoAgroindustrialOutrasInspecoesPage
       onLogout={onLogout}
       onNavigate={onNavigate}
-      currentScreen="dashboard"
-      backRoute="dashboard"
-      backLabel="Inicial"
-      title="Visualizar Estabelecimento Agroindustrial POA - Outras Inspeções"
-      entityKey={`agroindustrial-outras-${registro.id || registro.codigo}`}
-      allowedTypes={["Responsável Técnico Animal"]}
-      fields={[
-        { label: "Código", value: registro.codigo || "" },
-        { label: "Nome do Estabelecimento", value: registro.nome || "" },
-        { label: "Situação", value: registro.situacao || "" },
-      ]}
+      dados={dados}
+      modo="visualizar"
     />
   );
 }

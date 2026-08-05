@@ -10,6 +10,7 @@ import { FloatInput,  MultiSearchModal } from "../../../components/ui/FormKit";
 //   (restringe às espécies suscetíveis à doença selecionada).
 import { DoencaInput, EntitySearchInput,  DynamicListWrapper, SelectedChipsContainer } from "../../../components/ui/EntitySearch";
 import * as Icons from "../../../imports/icons";
+import { CadastroVacinacaoHeader, cadastroVacinacaoPageClass, mensagemSucessoCadastro, preencherComExemplo, type CadastroVacinacaoModeProps } from "../shared/CadastroVacinacaoMode";
 
 
 const GREEN = "#1A7A3C";
@@ -82,17 +83,17 @@ const codigoCalculado = `${new Date().getFullYear()}/01`;
 // ==========================================================
 // PÁGINA: ADICIONAR ETAPA DE VACINAÇÃO (US0V6 - AC3)
 // ==========================================================
-interface PageProps {
+interface PageProps extends CadastroVacinacaoModeProps {
   onLogout: () => void;
   onNavigate: (screen: any, data?: any) => void;
 }
 
-export function AdicionarEtapaVacinacaoPage({ onLogout, onNavigate }: PageProps) {
-  const [dataInicio, setDataInicio] = useState("");
-  const [dataFim, setDataFim] = useState("");
+export function AdicionarEtapaVacinacaoPage({ onLogout, onNavigate, mode = "create", dados }: PageProps) {
+  const [dataInicio, setDataInicio] = useState(dados?.dataInicio ?? "");
+  const [dataFim, setDataFim] = useState(dados?.dataFim ?? "");
 const [doencaSelecionada, setDoencaSelecionada] = useState<any>({
-  doenca: null,
-  especies: []
+  doenca: dados?.doencaSelecionada?.doenca ?? ((dados?.doenca ?? dados?.doencas?.[0]) ? { nome: dados?.doenca ?? dados?.doencas?.[0] } : null),
+  especies: dados?.doencaSelecionada?.especies ?? (dados?.especies ?? []).map((especie: any) => typeof especie === "string" ? { uid: uid("e"), especie: { nome: especie } } : especie)
 });
 const [especieModalAberta, setEspecieModalAberta] = useState(false);
   const [isSucesso, setIsSucesso] = useState(false);
@@ -112,8 +113,38 @@ const [especieModalAberta, setEspecieModalAberta] = useState(false);
       ? { ...d, especies: d.especies.map((e: any) => (e.uid === eUid ? { ...e, especie: ent } : e)) }
       : d)));
 
+  const registroAtual = preencherComExemplo({
+    ...(dados ?? {}),
+    id: dados?.id ?? `etapa-${Date.now()}`,
+    codigo: dados?.codigo ?? codigoCalculado,
+    dataInicio,
+    dataFim,
+    doencaSelecionada,
+    doenca: doencaSelecionada.doenca?.nome,
+    doencas: doencaSelecionada.doenca?.nome ? [doencaSelecionada.doenca.nome] : [],
+    especies: doencaSelecionada.especies,
+  }, {
+    id: "etapa-exemplo",
+    codigo: "2026/01",
+    dataInicio: "2026-02-11",
+    dataFim: "2026-04-12",
+    doencaSelecionada: {
+      doenca: { id: 1, codigo: "D-001", nome: "Brucelose" },
+      especies: [
+        { uid: "especie-bovino", especie: { id: "1", nome: "Bovino", faixasEtarias: ["De 3 a 8 meses"] } },
+        { uid: "especie-bubalino", especie: { id: "2", nome: "Bubalino", faixasEtarias: ["De 3 a 8 meses"] } },
+      ],
+    },
+    doenca: "Brucelose",
+    doencas: ["Brucelose"],
+    especies: [
+      { uid: "especie-bovino", especie: { id: "1", nome: "Bovino", faixasEtarias: ["De 3 a 8 meses"] } },
+      { uid: "especie-bubalino", especie: { id: "2", nome: "Bubalino", faixasEtarias: ["De 3 a 8 meses"] } },
+    ],
+  });
+
   return (
-    <div className="min-h-screen bg-[#f2f3f5]">
+    <div className={cadastroVacinacaoPageClass(mode, "min-h-screen bg-[#f2f3f5]")}>
       <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="etapa-vacinacao" hideSearch />
 
       <main className="max-w-[1088px] mx-auto px-4 md:px-6 py-6 flex flex-col gap-4">
@@ -123,10 +154,7 @@ const [especieModalAberta, setEspecieModalAberta] = useState(false);
             <ArrowLeft size={15} />
             Todas as Etapas de Vacinação
           </button>
-          <div className="flex justify-between items-center w-full">
-            <h1 className="text-2xl font-semibold text-gray-900">Adicionar Etapa de Vacinação</h1>
-            <button type="button" onClick={() => setIsSucesso(true)} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm">Adicionar</button>
-          </div>
+          <CadastroVacinacaoHeader mode={mode} nomeCadastro="Etapa de Vacinação" rotaEditar="editar-etapa-vacinacao" dados={dados} onNavigate={onNavigate} onSubmit={() => setIsSucesso(true)} />
           
         </div>
 
@@ -260,11 +288,11 @@ const [especieModalAberta, setEspecieModalAberta] = useState(false);
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
             <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4"><Check size={28} className="text-[#1A7A3C]" strokeWidth={3} /></div>
-            <h3 className="text-lg font-bold text-gray-900">Etapa de vacinação adicionada com sucesso!</h3>
+            <h3 className="text-lg font-bold text-gray-900">{mensagemSucessoCadastro(mode, "Etapa de Vacinação")}</h3>
             <p className="text-sm text-gray-500 mt-1">A etapa {codigoCalculado} foi criada.</p>
             <div className="flex gap-3 justify-center mt-6">
               <button onClick={() => { setIsSucesso(false); onNavigate("etapa-vacinacao"); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition">Voltar</button>
-              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-etapa-vacinacao"); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
+              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-etapa-vacinacao", registroAtual); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
             </div>
           </div>
         </div>
