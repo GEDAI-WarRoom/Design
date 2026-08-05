@@ -1,89 +1,45 @@
-import React, { useState } from "react";
-import { ArrowLeft, Info, Check, ChevronDown, ChevronUp } from "lucide-react";
+import { useState } from "react";
+import { ArrowLeft, Check, Info } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
-import { FloatInput, FloatSelect, LargeTextArea } from "../../../components/ui/FormKit";
+import { PessoaFisicaCadastroForm, normalizarPessoaFisica } from "./PessoaFisicaCadastroForm";
 
-const GREEN = "#1A7A3C";
-
-function Section({ title, children, defaultOpen = true }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) {
-  const [open, setOpen] = useState(defaultOpen);
-  return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-      <button type="button" onClick={() => setOpen(!open)} className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50 transition border-b border-gray-100">
-        <span className="text-base font-semibold text-gray-800">{title}</span>
-        {open ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
-      </button>
-      {open && <div className="p-6 flex flex-col gap-5 bg-white">{children}</div>}
-    </div>
-  );
+interface Props {
+  dadosIniciais?: any;
+  onLogout: () => void;
+  onNavigate: (screen: string, data?: any) => void;
 }
 
-export function EditarPessoaFisica({ dadosIniciais, onLogout, onNavigate }: { dadosIniciais?: any; onLogout: () => void; onNavigate: (screen: string, data?: any) => void; }) {
-  const [isSucesso, setIsSucesso] = useState(false);
-  
-  // Populando os estados com os dados recebidos da listagem
-  const [nome, setNome] = useState(dadosIniciais?.nome || "");
-  const [cpf, setCpf] = useState(dadosIniciais?.cpf || "");
-  const [telefone, setTelefone] = useState(dadosIniciais?.telefone || "");
-  const [email, setEmail] = useState(dadosIniciais?.email || "");
-  const [situacao, setSituacao] = useState(dadosIniciais?.situacao || "Ativo");
-  const [observacao, setObservacao] = useState(dadosIniciais?.observacao || "");
-
-  const handleSalvar = () => {
-    setIsSucesso(true);
-  };
-
+export function EditarPessoaFisica({ dadosIniciais, onLogout, onNavigate }: Props) {
+  const [form, setForm] = useState(() => normalizarPessoaFisica(dadosIniciais));
+  const [sucesso, setSucesso] = useState(false);
   return (
-    <div className="min-h-screen bg-[#f2f3f5]">
+    <div className="min-h-screen bg-[#f2f3f5] pb-16">
       <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="pessoa-fisica" hideSearch />
-      <main className="max-w-[1088px] mx-auto px-4 md:px-6 py-6 flex flex-col gap-4">
-        
-        <div>
-          <button type="button" onClick={() => onNavigate("pessoa-fisica")} className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70 font-semibold" style={{ color: GREEN }}>
+      <main className="mx-auto flex max-w-[1088px] flex-col gap-5 px-4 py-6 md:px-6">
+        <header>
+          <button type="button" onClick={() => onNavigate("pessoa-fisica")} className="mb-3 flex items-center gap-1 text-sm font-semibold text-[#1A7A3C] hover:opacity-70">
             <ArrowLeft size={15} /> Todas as Pessoas Físicas
           </button>
-          <div className="flex justify-between items-center w-full">
+          <div className="flex items-center justify-between gap-4">
             <h1 className="text-2xl font-semibold text-gray-900">Editar Pessoa Física</h1>
-            <button type="button" onClick={handleSalvar} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm">
-              Salvar Alterações
-            </button>
+            <button type="button" onClick={() => setSucesso(true)} className="h-10 rounded-md bg-[#1A7A3C] px-5 text-sm font-semibold text-white hover:bg-[#15612F]">Salvar</button>
           </div>
+        </header>
+        <div className="flex items-center gap-3 rounded-lg border border-gray-100 bg-white p-5 shadow-sm">
+          <Info size={20} className="shrink-0 text-gray-500" />
+          <p className="text-sm font-medium text-gray-600">Campos indicados com <span className="font-bold text-red-500">*</span> são obrigatórios.</p>
         </div>
-
-        <div className="w-full bg-white border border-gray-100 rounded-lg p-5 shadow-sm flex items-center gap-3 mt-4 mb-6">
-          <div className="text-gray-500 flex-shrink-0"><Info size={20} className="stroke-[2.5]" /></div>
-          <p className="text-sm text-gray-600 font-medium leading-relaxed">
-            Campos indicados com <span className="text-red-500 font-bold">*</span> são obrigatórios e deverão ser preenchidos.
-          </p>
-        </div>
-
-        <Section title="Informações Básicas">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <FloatInput label="Nome Completo" required value={nome} onChange={setNome} maxLength={255} />
-            <FloatInput label="CPF" required value={cpf} onChange={setCpf} maxLength={14} />
-            <FloatInput label="E-mail" value={email} onChange={setEmail} />
-            <FloatInput label="Telefone" value={telefone} onChange={setTelefone} />
-            <FloatSelect
-              label="Situação" required value={situacao} onChange={setSituacao}
-              options={[ { value: "Ativo", label: "Ativo" }, { value: "Inativo", label: "Inativo" } ]}
-            />
-          </div>
-        </Section>
-
-        <Section title="Observações">
-          <LargeTextArea label="Observações" value={observacao} onChange={setObservacao} hasTooltip tooltipText="Informações adicionais pertinentes ao cadastro." />
-        </Section>
+        <PessoaFisicaCadastroForm value={form} onChange={setForm} onNavigate={onNavigate} />
       </main>
-
-      {isSucesso && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center animate-fadeIn">
-            <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4"><Check size={28} className="text-[#1A7A3C]" strokeWidth={3} /></div>
-            <h3 className="text-lg font-bold text-gray-900">Alterações salvas!</h3>
-            <p className="text-sm text-gray-500 mt-1">O cadastro de "{nome}" foi atualizado com sucesso.</p>
-            <div className="flex gap-3 justify-center mt-6">
-              <button onClick={() => { setIsSucesso(false); onNavigate("pessoa-fisica"); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50 transition">Voltar</button>
-              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-pessoa-fisica", dadosIniciais); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
+      {sucesso && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 text-center shadow-xl">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#E6F4EA]"><Check size={28} className="text-[#1A7A3C]" strokeWidth={3} /></div>
+            <h2 className="text-lg font-bold text-gray-900">Alterações salvas!</h2>
+            <p className="mt-1 text-sm text-gray-500">O cadastro de “{form.nome}” foi atualizado com sucesso.</p>
+            <div className="mt-6 flex justify-center gap-3">
+              <button type="button" onClick={() => onNavigate("pessoa-fisica")} className="h-11 rounded-md border border-[#1A7A3C] px-5 text-sm font-semibold text-[#1A7A3C] hover:bg-green-50">Voltar</button>
+              <button type="button" onClick={() => onNavigate("visualizar-pessoa-fisica", form)} className="h-11 rounded-md bg-[#1A7A3C] px-5 text-sm font-semibold text-white hover:bg-[#15612F]">Visualizar</button>
             </div>
           </div>
         </div>

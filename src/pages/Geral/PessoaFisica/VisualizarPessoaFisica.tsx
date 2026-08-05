@@ -1,61 +1,32 @@
-import React, { useState } from "react";
-import { ArrowLeft, Pencil, ChevronDown, ChevronUp } from "lucide-react";
+import { useState } from "react";
+import { ArrowLeft, Pencil } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
-import { FloatInput, LargeTextArea } from "../../../components/ui/FormKit";
+import { PessoaFisicaCadastroForm, normalizarPessoaFisica } from "./PessoaFisicaCadastroForm";
 
-const GREEN = "#1A7A3C";
-
-function Section({ title, children, defaultOpen = true }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) {
-  const [open, setOpen] = useState(defaultOpen);
-  return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-      <button type="button" onClick={() => setOpen(!open)} className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50 transition border-b border-gray-100">
-        <span className="text-base font-semibold text-gray-800">{title}</span>
-        {open ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
-      </button>
-      {open && <div className="p-6 flex flex-col gap-5 bg-white">{children}</div>}
-    </div>
-  );
+interface Props {
+  dados?: any;
+  onLogout: () => void;
+  onNavigate: (screen: string, data?: any) => void;
 }
 
-export function VisualizarPessoaFisica({ dados, onLogout, onNavigate }: { dados?: any; onLogout: () => void; onNavigate: (s: string, d?: any) => void; }) {
-  const pessoa = dados || {};
-
+export function VisualizarPessoaFisica({ dados, onLogout, onNavigate }: Props) {
+  const [pessoa] = useState(() => normalizarPessoaFisica(dados));
   return (
-    <div className="min-h-screen bg-[#f2f3f5]">
+    <div className="min-h-screen bg-[#f2f3f5] pb-16">
       <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="pessoa-fisica" hideSearch />
-      <main className="max-w-[1088px] mx-auto px-4 md:px-6 py-6 flex flex-col gap-4">
-        
-        <div>
-          <button type="button" onClick={() => onNavigate("pessoa-fisica")} className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70 font-semibold" style={{ color: GREEN }}>
+      <main className="mx-auto flex max-w-[1088px] flex-col gap-5 px-4 py-6 md:px-6">
+        <header>
+          <button type="button" onClick={() => onNavigate("pessoa-fisica")} className="mb-3 flex items-center gap-1 text-sm font-semibold text-[#1A7A3C] hover:opacity-70">
             <ArrowLeft size={15} /> Todas as Pessoas Físicas
           </button>
-          <div className="flex justify-between items-center w-full">
+          <div className="flex items-center justify-between gap-4">
             <h1 className="text-2xl font-semibold text-gray-900">Visualizar Pessoa Física</h1>
-            <button 
-              type="button" 
-              onClick={() => onNavigate("editar-pessoa-fisica", pessoa)} 
-              className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2"
-            >
-              <Pencil size={14} /> Editar
+            <button type="button" onClick={() => onNavigate("editar-pessoa-fisica", pessoa)} className="flex h-10 items-center gap-2 rounded-md bg-[#1A7A3C] px-5 text-sm font-semibold text-white hover:bg-[#15612F]">
+              Editar
             </button>
           </div>
-        </div>
-
-        <Section title="Informações Básicas">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <FloatInput label="Nome Complero" value={pessoa.nome || "-"} disabled onChange={() => {}} />
-            <FloatInput label="CPF" value={pessoa.cpf || "-"} disabled onChange={() => {}} />
-            <FloatInput label="E-mail" value={pessoa.email || "-"} disabled onChange={() => {}} />
-            <FloatInput label="Telefone" value={pessoa.telefone || "-"} disabled onChange={() => {}} />
-            <FloatInput label="Situação" value={pessoa.situacao || "Ativo"} disabled onChange={() => {}} />
-          </div>
-        </Section>
-
-        <Section title="Observações">
-          <LargeTextArea label="Observações" value={pessoa.observacao || "Nenhuma observação registrada."} disabled onChange={() => {}} />
-        </Section>
-
+        </header>
+        <PessoaFisicaCadastroForm value={pessoa} onChange={() => { }} disabled onNavigate={onNavigate} />
       </main>
     </div>
   );

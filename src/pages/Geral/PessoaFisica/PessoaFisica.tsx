@@ -63,7 +63,7 @@ export function PessoaFisicaPage({ onLogout, onNavigate }: { onLogout: () => voi
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-semibold text-gray-900">Pessoa Física</h1>
             <button onClick={() => onNavigate("adicionar-pessoa-fisica")} className="px-5 py-3 rounded-md bg-[#1A7A3C] text-white text-sm font-semibold hover:opacity-90 shadow-sm flex items-center gap-2">
-              <PlusCircle size={18} /> Adicionar Novo
+              Adicionar Nova
             </button>
           </div>
         </div>
@@ -117,15 +117,15 @@ export function PessoaFisicaPage({ onLogout, onNavigate }: { onLogout: () => voi
                       <td className="px-4 py-3 text-gray-600">{r.situacao}</td>
                       <td className="px-4 py-3 text-right whitespace-nowrap">
                         <div className="flex items-center justify-end gap-1">
-                          <button 
-                            onClick={() => onNavigate("visualizar-pessoa-fisica", r)} 
+                          <button
+                            onClick={() => onNavigate("visualizar-pessoa-fisica", r)}
                             className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"
                             title="Visualizar"
                           >
                             <ViewIcon size={18} />
                           </button>
-                          <button 
-                            onClick={() => onNavigate("editar-pessoa-fisica", r)} 
+                          <button
+                            onClick={() => onNavigate("editar-pessoa-fisica", r)}
                             className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"
                             title="Editar"
                           >
