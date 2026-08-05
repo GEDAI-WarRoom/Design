@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import {
   ArrowLeft,
-  Check,
   ChevronDown,
   ChevronUp,
   Eye,
@@ -21,11 +20,13 @@ import {
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
 import {
   criarLotePagamento,
+  atualizarLotePagamento,
   DOCUMENTOS_CADASTRO_OPTIONS,
   DOCUMENTOS_DISPONIVEIS_LOTE,
   DocumentoLotePagamento,
   formatarMoedaLote,
   LotePagamento,
+  normalizarLotePagamento,
   PESSOAS_LOTE,
   PessoaLote,
   TipoDocumentoLote,
@@ -54,14 +55,17 @@ interface PageProps {
   onNavigate: (screen: any, data?: any) => void;
   onViewPessoa?: (pessoa: PessoaLote) => void;
   onViewUnidade?: (unidade: UnidadeAdministrativaLote) => void;
+  dados?: LotePagamento;
+  modoEdicao?: boolean;
 }
 
-export function AdicionarLotePagamentoPage({ onLogout, onNavigate, onViewPessoa, onViewUnidade }: PageProps) {
-  const [documento, setDocumento] = useState<TipoDocumentoLote | "">("");
-  const [titular, setTitular] = useState<PessoaLote | null>(null);
+export function AdicionarLotePagamentoPage({ onLogout, onNavigate, onViewPessoa, onViewUnidade, dados, modoEdicao = false }: PageProps) {
+  const loteInicial = modoEdicao ? normalizarLotePagamento(dados) : null;
+  const [documento, setDocumento] = useState<TipoDocumentoLote | "">(loteInicial?.documento || "");
+  const [titular, setTitular] = useState<PessoaLote | null>(loteInicial?.titular || null);
   const [tipoPessoa, setTipoPessoa] = useState<string>("");
-  const [unidade, setUnidade] = useState<UnidadeAdministrativaLote | null>(null);
-  const [documentos, setDocumentos] = useState<DocumentoLotePagamento[]>([]);
+  const [unidade, setUnidade] = useState<UnidadeAdministrativaLote | null>(loteInicial?.unidadeAdministrativa || null);
+  const [documentos, setDocumentos] = useState<DocumentoLotePagamento[]>(loteInicial?.documentos || []);
   const [documentosModalOpen, setDocumentosModalOpen] = useState(false);
   const [savedLote, setSavedLote] = useState<LotePagamento | null>(null);
 
@@ -90,7 +94,6 @@ export function AdicionarLotePagamentoPage({ onLogout, onNavigate, onViewPessoa,
   const informacoesPreenchidas = Boolean(documento && titular && unidade);
   const quantidade = documentos.length;
   const valor = documentos.reduce((total, item) => total + item.valor, 0);
-  const formularioValido = informacoesPreenchidas && quantidade > 0;
 
   const changeDocumento = (value: string) => {
     setDocumento(value as TipoDocumentoLote | "");
@@ -101,8 +104,31 @@ export function AdicionarLotePagamentoPage({ onLogout, onNavigate, onViewPessoa,
   };
 
   const salvar = () => {
-    if (!documento || !titular || !unidade || documentos.length === 0) return;
-    setSavedLote(criarLotePagamento({ documento, titular, unidadeAdministrativa: unidade, documentos }));
+    const documentoFinal: TipoDocumentoLote = documento || loteInicial?.documento || "GTA";
+    const titularFinal = titular || loteInicial?.titular || PESSOAS_LOTE.find((pessoa) =>
+      documentoFinal === "GTA" ? pessoa.origemGta : pessoa.origemPtv,
+    ) || PESSOAS_LOTE[0];
+    const unidadeFinal = unidade || loteInicial?.unidadeAdministrativa || UNIDADES_ADMINISTRATIVAS_LOTE[0];
+    const documentosDoTitular = DOCUMENTOS_DISPONIVEIS_LOTE.filter(
+      (item) => item.tipo === documentoFinal && item.titularId === titularFinal.id,
+    );
+    const documentosFinal = documentos.length
+      ? documentos
+      : (documentosDoTitular.length
+        ? documentosDoTitular
+        : DOCUMENTOS_DISPONIVEIS_LOTE.filter((item) => item.tipo === documentoFinal)
+      ).slice(0, 2);
+    const payload = {
+      documento: documentoFinal,
+      titular: titularFinal,
+      unidadeAdministrativa: unidadeFinal,
+      documentos: documentosFinal,
+    };
+    setSavedLote(
+      modoEdicao && loteInicial
+        ? atualizarLotePagamento(loteInicial.id, payload)
+        : criarLotePagamento(payload),
+    );
   };
 
   // 🌟 Rótulos dinâmicos
@@ -120,8 +146,8 @@ export function AdicionarLotePagamentoPage({ onLogout, onNavigate, onViewPessoa,
             <ArrowLeft size={15} />Todos os Lotes de Pagamento
           </button>
           <div className="flex items-center justify-between gap-4">
-            <h1 className="text-2xl font-semibold text-gray-900">Adicionar Lote de Pagamento</h1>
-            <CustomButton onClick={salvar} disabled={!formularioValido}>Adicionar</CustomButton>
+            <h1 className="text-2xl font-semibold text-gray-900">{modoEdicao ? "Editar Lote de Pagamento" : "Adicionar Lote de Pagamento"}</h1>
+            <CustomButton onClick={salvar}>{modoEdicao ? "Salvar" : "Adicionar"}</CustomButton>
           </div>
         </div>
 
@@ -353,14 +379,11 @@ export function AdicionarLotePagamentoPage({ onLogout, onNavigate, onViewPessoa,
       {savedLote && (
         <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/40 p-4">
           <div className="w-full max-w-md rounded-2xl bg-white p-6 text-center shadow-xl">
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#E6F4EA]">
-              <Check size={28} className="text-[#1A7A3C]" strokeWidth={3} />
-            </div>
-            <h2 className="text-lg font-bold text-gray-900">Lote de pagamento cadastrado com sucesso!</h2>
-            <p className="mt-1 text-sm text-gray-500">O lote nº {savedLote.numeroLote} foi cadastrado.</p>
+            <h2 className="text-lg font-bold text-gray-900">{modoEdicao ? "Lote de pagamento atualizado com sucesso!" : "Lote de pagamento cadastrado com sucesso!"}</h2>
+            <p className="mt-1 text-sm text-gray-500">O lote nº {savedLote.numeroLote} foi {modoEdicao ? "atualizado" : "cadastrado"}.</p>
             <div className="mt-6 flex justify-center gap-3">
               <button type="button" onClick={() => onNavigate("lote-pagamento")} className="h-11 rounded-md border border-[#1A7A3C] px-5 text-sm font-semibold text-[#1A7A3C] hover:bg-green-50/40">Voltar</button>
-              <button type="button" onClick={() => onNavigate("", savedLote)} className="h-11 rounded-md bg-[#1A7A3C] px-5 text-sm font-semibold text-white hover:bg-[#15612F]">Visualizar</button>
+              <button type="button" onClick={() => onNavigate("visualizar-lote-pagamento", savedLote)} className="h-11 rounded-md bg-[#1A7A3C] px-5 text-sm font-semibold text-white hover:bg-[#15612F]">Visualizar</button>
             </div>
           </div>
         </div>

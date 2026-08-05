@@ -7,7 +7,6 @@ import {
   Eye as ViewIcon,
   Pencil,
   X,
-  Check,
   Minus,
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";

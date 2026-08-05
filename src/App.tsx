@@ -482,6 +482,7 @@ export type Screen =
 	| "lote-pagamento"
 	| "adicionar-lote-pagamento"
 	| "visualizar-lote-pagamento"
+	| "editar-lote-pagamento"
 	| "visualizar-documento-lote-pagamento"
 	| "visualizar-dae-lote-pagamento"
 	| "tipo-veiculo"
@@ -1966,6 +1967,15 @@ export default function App() {
 					onNavigate={handleNavigate}
 				/>
 			);
+		case "editar-lote-pagamento":
+			return (
+				<AdicionarLotePagamentoPage
+					dados={screenData}
+					modoEdicao
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
 		case "visualizar-lote-pagamento":
 			return (
 				<VisualizarLotePagamentoPage
@@ -2006,7 +2016,7 @@ export default function App() {
 		case "visualizar-dae":
 			return (
 				<VisualizarDAEPage
-					dados={screenData}
+					dae={screenData}
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
 				/>
