@@ -755,7 +755,6 @@ export default function App() {
   };
 
   switch (screen) {
-	switch (screen) {
 		case "finalidade-transito":
       return <FinalidadeTransitoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-finalidade-transito":
@@ -3101,39 +3100,4 @@ export default function App() {
     default:
       return <DashboardPage onLogout={handleLogout} onNavigate={handleNavigate} />;
   }
-		case "atestado-exame":
-			return (
-				<AtestadoExamePage
-					onLogout={handleLogout}
-					onNavigate={handleNavigate}
-				/>
-			);
-		case "adicionar-atestado-exame":
-			return (
-				<AdicionarAtestadoExamePage
-					onLogout={handleLogout}
-					onNavigate={handleNavigate}
-				/>
-			);
-		case "visualizar-atestado-exame":
-			return (
-				<VisualizarAtestadoExamePage
-					onLogout={handleLogout}
-					onNavigate={handleNavigate}
-					dados={screenData}
-				/>
-			);
-		case "editar-atestado-exame":
-			return (
-				<EditarAtestadoExamePage
-					onLogout={handleLogout}
-					onNavigate={handleNavigate}
-					dados={screenData}
-				/>
-			);
-		default:
-			return (
-				<DashboardPage onLogout={handleLogout} onNavigate={handleNavigate} />
-			);
-	}
 }

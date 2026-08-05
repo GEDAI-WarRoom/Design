@@ -59,8 +59,6 @@ import {
   useDemoUser,
   type DemoUserRole,
 } from "../contexts/DemoUserContext";
-import * as Icons from "../imports/icons";
-import campanhaVacinacao2026Url from "../imports/images/campanha-vacinacao-2026.png";
 
 const GREEN = "#1A7A3C";
 
@@ -1046,6 +1044,8 @@ export function DashboardPage({ onLogout, onNavigate }: any) {
           ))}
         </div>
 
+        {role === "produtor" && <PropriedadesProdutor onNavigate={onNavigate} />}
+
         {visibleFourth.length > 0 && (
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -1062,70 +1062,4 @@ export function DashboardPage({ onLogout, onNavigate }: any) {
       </main>
     </div>
   );
-	const { role } = useDemoUser();
-	const visibleCadastros = filterCategoriesByRole(cadastrosCategories, role);
-	const visibleSecondary = filterCategoriesByRole(secondaryCategories, role);
-	const visibleThird = filterCategoriesByRole(thirdCategories, role);
-	const visibleFourth = filterCategoriesByRole(fourthCategories, role);
-	const mainCategoryGroups = role === "produtor"
-		? [[...visibleCadastros, ...visibleSecondary, ...visibleThird]]
-		: [visibleCadastros, visibleSecondary, visibleThird].filter(
-			(group) => group.length > 0,
-		);
-
-	return (
-		<div className="min-h-screen bg-[#f2f3f5]">
-			{/* Importação limpa da Navbar que está na pasta de componentes */}
-			<Navbar
-				onLogout={onLogout}
-				onNavigate={onNavigate}
-				currentScreen="dashboard"
-			/>
-
-			<main className="max-w-5xl mx-auto px-4 md:px-6 py-6">
-
-				{role === "produtor" && (
-					<>
-						<div className="mb-6">
-							<h1 className="text-2xl font-semibold text-gray-900">
-								Bem-vindo, Fernando
-							</h1>
-							<p className="mt-1 text-sm text-gray-600">
-								Gerencie suas propriedades e movimentações agropecuárias.
-							</p>
-						</div>
-						<AvisosNoticias />
-						<PendenciasConfirmacaoGta onNavigate={onNavigate} />
-					</>
-				)}
-
-				{/* Bloco de Cadastros (Exatamente como estava) */}
-				<div className="flex flex-col bg-white rounded-xl shadow-sm p-6 mb-6 gap-6">
-					<h2 className="text-xl font-semibold text-gray-800">Cadastros</h2>
-					{mainCategoryGroups.map((categories, index) => (
-						<div
-							key={index}
-							className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
-						>
-							{categories.map((cat) => (
-								<CategoryCard key={cat.title} cat={cat} onNavigate={onNavigate} />
-							))}
-						</div>
-					))}
-				</div>
-
-				{role === "produtor" && <PropriedadesProdutor onNavigate={onNavigate} />}
-
-				{visibleFourth.length > 0 && (
-					<div className="bg-white rounded-xl shadow-sm p-6">
-						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-							{visibleFourth.map((cat) => (
-								<CategoryCard key={cat.title} cat={cat} onNavigate={onNavigate} />
-							))}
-						</div>
-					</div>
-				)}
-			</main>
-		</div>
-	);
 }
