@@ -190,6 +190,16 @@ import { VisualizarPartilhaVacinaPage } from "./pages/Vacinacao/PartilhaVacina/V
 import { EditarPartilhaVacinaPage } from "./pages/Vacinacao/PartilhaVacina/EditarPartilhaVacina";
 import { EditarLancamentoDosesVacinaPage } from "./pages/Vacinacao/LancamentoDoses/EditarLancamentoDosesVacina";
 import { VisualizarLancamentoDosesVacinaPage } from "./pages/Vacinacao/LancamentoDoses/VisualizarLancamentoDosesVacina";
+import { VisualizarEtapaVacinacaoPage } from "./pages/Vacinacao/EtapaVacinacao/VisualizarEtapaVacinacao";
+import { EditarEtapaVacinacaoPage } from "./pages/Vacinacao/EtapaVacinacao/EditarEtapaVacinacao";
+import { VisualizarAutorizacaoVacinacaoPage } from "./pages/Vacinacao/AutorizacaoVacinacao/VisualizarAutorizacaoVacinacao";
+import { EditarAutorizacaoVacinacaoPage } from "./pages/Vacinacao/AutorizacaoVacinacao/EditarAutorizacaoVacinacao";
+import { VisualizarDeclaracaoVacinacaoPage } from "./pages/Vacinacao/DeclaracaoVacinacao/VisualizarDeclaracaoVacinacao";
+import { EditarDeclaracaoVacinacaoPage } from "./pages/Vacinacao/DeclaracaoVacinacao/EditarDeclaracaoVacinacao";
+import { VisualizarDoencaPage } from "./pages/Vacinacao/Doenca/VisualizarDoenca";
+import { EditarDoencaPage } from "./pages/Vacinacao/Doenca/EditarDoenca";
+import { VisualizarVacinadorPage } from "./pages/Vacinacao/Vacinador/VisualizarVacinador";
+import { EditarVacinadorPage } from "./pages/Vacinacao/Vacinador/EditarVacinador";
 
 //ARRECADACAO
 import { FundoArrecadacaoPage } from "./pages/Arrecadacao/FundoArrecadacao/FundoArrecadacao";
@@ -271,6 +281,16 @@ export type Screen =
   | "editar-partilha-vacina"
   | "visualizar-lancamento-doses-vacina"
   | "editar-lancamento-doses-vacina"
+  | "visualizar-etapa-vacinacao"
+  | "editar-etapa-vacinacao"
+  | "visualizar-autorizacao-vacinacao"
+  | "editar-autorizacao-vacinacao"
+  | "visualizar-declaracao-vacinacao"
+  | "editar-declaracao-vacinacao"
+  | "visualizar-doenca"
+  | "editar-doenca"
+  | "visualizar-vacinador-brucelose"
+  | "editar-vacinador-brucelose"
 | "editar-produto"
   | "visualizar-produto"
   | "editar-profissional-oficial"
@@ -527,33 +547,54 @@ export default function App() {
 	switch (screen) {
 		// LABORATORIO
     case "visualizar-laboratorio":
-      return <VisualizarLaboratorioPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+      return <VisualizarLaboratorioPage key={`visualizar-laboratorio-${screenData?.id ?? "novo"}`} dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "editar-laboratorio":
       return <EditarLaboratorioPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
 
     // VENDA COM SAÍDA DE VACINA
     case "visualizar-venda-saida-vacina":
-      return <VisualizarVendaComSaidaVacinaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+      return <VisualizarVendaComSaidaVacinaPage key={`visualizar-venda-saida-vacina-${screenData?.id ?? "novo"}`} dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "editar-venda-saida-vacina":
       return <EditarVendaComSaidaVacinaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
 
     // VENDA COM ENTRADA DE VACINA
     case "visualizar-venda-entrada-vacina":
-      return <VisualizarVendaComEntradaVacinaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+      return <VisualizarVendaComEntradaVacinaPage key={`visualizar-venda-entrada-vacina-${screenData?.id ?? "novo"}`} dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "editar-venda-entrada-vacina":
       return <EditarVendaComEntradaVacinaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
 
     // DOAÇÃO / PARTILHA DE VACINA
     case "visualizar-partilha-vacina":
-      return <VisualizarPartilhaVacinaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+      return <VisualizarPartilhaVacinaPage key={`visualizar-partilha-vacina-${screenData?.id ?? "novo"}`} dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "editar-partilha-vacina":
       return <EditarPartilhaVacinaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
 
     // AJUSTE DE DOSES DE VACINA
     case "visualizar-lancamento-doses-vacina":
-      return <VisualizarLancamentoDosesVacinaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+      return <VisualizarLancamentoDosesVacinaPage key={`visualizar-lancamento-doses-vacina-${screenData?.id ?? "novo"}`} dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "editar-lancamento-doses-vacina":
       return <EditarLancamentoDosesVacinaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+
+    case "visualizar-etapa-vacinacao":
+      return <VisualizarEtapaVacinacaoPage key={`visualizar-etapa-vacinacao-${screenData?.id ?? "novo"}`} dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-etapa-vacinacao":
+      return <EditarEtapaVacinacaoPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-autorizacao-vacinacao":
+      return <VisualizarAutorizacaoVacinacaoPage key={`visualizar-autorizacao-vacinacao-${screenData?.id ?? "novo"}`} dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-autorizacao-vacinacao":
+      return <EditarAutorizacaoVacinacaoPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-declaracao-vacinacao":
+      return <VisualizarDeclaracaoVacinacaoPage key={`visualizar-declaracao-vacinacao-${screenData?.id ?? "novo"}`} dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-declaracao-vacinacao":
+      return <EditarDeclaracaoVacinacaoPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-doenca":
+      return <VisualizarDoencaPage key={`visualizar-doenca-${screenData?.id ?? "novo"}`} dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-doenca":
+      return <EditarDoencaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-vacinador-brucelose":
+      return <VisualizarVacinadorPage key={`visualizar-vacinador-brucelose-${screenData?.id ?? "novo"}`} dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-vacinador-brucelose":
+      return <EditarVacinadorPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
 
 	  
 		case "produto":

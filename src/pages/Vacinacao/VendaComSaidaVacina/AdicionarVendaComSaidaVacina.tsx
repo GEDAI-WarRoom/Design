@@ -41,6 +41,7 @@ import {
   UploadField,
   EntitySelector
 } from "../../../components/ui/FormKit";
+import { CadastroVacinacaoHeader, cadastroVacinacaoPageClass, mensagemSucessoCadastro, preencherComExemplo, type CadastroVacinacaoModeProps } from "../shared/CadastroVacinacaoMode";
 
 
 
@@ -128,9 +129,9 @@ function SubGrupo({ titulo, children, comDivisor = false }) {
 }
 
 
-interface AdicionarVendaVacinaProps {
+interface AdicionarVendaVacinaProps extends CadastroVacinacaoModeProps {
   onLogout: () => void;
-  onNavigate: (screen: any) => void;
+  onNavigate: (screen: any, data?: any) => void;
 }
 
 
@@ -325,36 +326,52 @@ interface ContatoAdicional {
   observacao: string;
 }
 
-export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate }: AdicionarVendaVacinaProps) {
+export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = "create", dados }: AdicionarVendaVacinaProps) {
+  const preenchendoRegistro = mode !== "create";
   // Estados da Seção 1: Informações Básicas
-  const [notaFiscal, setNotaFiscal] = useState("");
-  const [dataVenda, setDataVenda] = useState("");
-  const [revendedora, setRevendedora] = useState("");
-  const [cnpjRevendedora, setCnpjRevendedora] = useState("");
-  const [tipoDestinatario, setTipoDestinatario] = useState("");
-  const [destinatario, setDestinatario] = useState("");
-  const [isDentroEstado, setIsDentroEstado] = useState<"sim" | "não" | "">("");
-  const [codigoDestinatario, setCodigoDestinatario] = useState("");
+  const [notaFiscal, setNotaFiscal] = useState(dados?.notaFiscal ?? dados?.numeroNotaFiscal ?? "");
+  const [dataVenda, setDataVenda] = useState(dados?.dataVenda ?? (preenchendoRegistro ? "2026-05-15" : ""));
+  const [revendedora, setRevendedora] = useState(dados?.revendedora ?? dados?.fornecedor ?? "");
+  const [cnpjRevendedora, setCnpjRevendedora] = useState(dados?.cnpjRevendedora ?? (preenchendoRegistro ? "12.345.678/0001-99" : ""));
+  const [tipoDestinatario, setTipoDestinatario] = useState(dados?.tipoDestinatario === "Médico Veterinário" ? "medico_veterinario" : dados?.tipoDestinatario ?? (preenchendoRegistro ? "produtor" : ""));
+  const [destinatario, setDestinatario] = useState(dados?.destinatario ?? "");
+  const [isDentroEstado, setIsDentroEstado] = useState<"sim" | "não" | "">(dados?.isDentroEstado ?? (preenchendoRegistro ? "sim" : ""));
+  const [codigoDestinatario, setCodigoDestinatario] = useState(dados?.codigoDestinatario ?? dados?.cpfCnpjDestinatario ?? (preenchendoRegistro ? "555.009.956-40" : ""));
   const [modalDestinatarioOpen, setModalDestinatarioOpen] = useState(false);
   const [modalDestinatarioRevendedoraOpen, setModalDestinatarioRevendedoraOpen] = useState(false);
   const [modalNotaOrigemOpen, setModalNotaOrigemOpen] = useState(false);
-  const [notasFiscaisOrigem, setNotasFiscaisOrigem] = useState<any[]>([]);
+  const [notasFiscaisOrigem, setNotasFiscaisOrigem] = useState<any[]>(dados?.notasFiscaisOrigem ?? (dados?.partida || dados?.numeroPartida ? [{
+    id: `partida-${dados?.id ?? "registro"}`,
+    nome: dados?.partida ?? dados?.numeroPartida,
+    numeroPartida: dados?.partida ?? dados?.numeroPartida,
+    laboratorio: dados?.laboratorio,
+    doenca: dados?.doenca,
+    tipoVacina: dados?.tipoVacina,
+    validade: dados?.validade ?? "20/12/2026",
+    dosesDisponiveisTotais: dados?.quantidadeDoses ?? 100,
+    dosesPerFrasco: dados?.dosesPerFrasco ?? 20,
+    quantidadeDoses: dados?.quantidadeDoses ?? 20,
+    quantidadeFrascos: dados?.quantidadeFrascos ?? 1,
+    exigeReceituario: dados?.exigeReceituario ?? true,
+  }] : []));
   const [graficoAtivo, setGraficoAtivo] = useState<{ loteId: string; index: number } | null>(null);
   const [notasListasMinimizadas, setNotasListasMinimizadas] = useState<Record<string, boolean>>({});
   const [lotesMinimizados, setLotesMinimizados] = useState<Record<string, boolean>>({});
-  const [outrosContatos, setOutrosContatos] = useState<ContatoAdicional[]>([]);
+  const [outrosContatos, setOutrosContatos] = useState<ContatoAdicional[]>(dados?.outrosContatos ?? (preenchendoRegistro ? [{ id: "contato-1", tipo: "Celular", valor: "(35) 99999-1234", observacao: "Contato principal" }] : []));
 
   // Estados adicionais para quando o destinatário for de FORA do estado (Inputs manuais)
-  const [destinatarioFora, setDestinatarioFora] = useState("");
-  const [codigoFora, setCodigoFora] = useState("");
+  const [destinatarioFora, setDestinatarioFora] = useState(dados?.destinatarioFora ?? "");
+  const [codigoFora, setCodigoFora] = useState(dados?.codigoFora ?? "");
 
   // Informações Adicionais
-  const [previsaoUso, setPrevisaoUso] = useState("");               // "Sim" | "Não sei informar"
-  const [exploracao, setExploracao] = useState<any[]>([
-    { id: String(Date.now()), codigo: "", especie: "" }
+  const [previsaoUso, setPrevisaoUso] = useState(dados?.previsaoUso ?? (preenchendoRegistro ? "Sim" : ""));               // "Sim" | "Não sei informar"
+  const [exploracao, setExploracao] = useState<any[]>(dados?.exploracao?.length ? dados.exploracao : [
+    { id: String(Date.now()), codigo: preenchendoRegistro ? "3100104050003" : "", especie: preenchendoRegistro ? "Bovino" : "" }
   ]);
   // Receituários por doença: { [nomeDoenca]: { nome, descricao } }
-  const [receituariosPorDoenca, setReceituariosPorDoenca] = useState<Record<string, { nome: string; descricao: string }>>({});
+  const [receituariosPorDoenca, setReceituariosPorDoenca] = useState<Record<string, { nome: string; descricao: string }>>(dados?.receituariosPorDoenca ?? (preenchendoRegistro && dados?.doenca ? {
+    [dados.doenca]: { nome: `receituario_${dados.doenca.toLowerCase().replace(/\s+/g, "_")}.pdf`, descricao: "Receituário vinculado à venda." }
+  } : {}));
 
   // Doenças únicas das partidas selecionadas que exigem receituário para venda de vacina
   const doencasQueExigemReceituario = React.useMemo(() => {
@@ -405,8 +422,53 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate }: Adici
     onNavigate("venda-saida-vacina");
   };
 
+  const registroAtual = preencherComExemplo({
+    ...(dados ?? {}),
+    id: dados?.id ?? `venda-saida-${Date.now()}`,
+    notaFiscal,
+    numeroNotaFiscal: notaFiscal,
+    dataVenda,
+    revendedora,
+    cnpjRevendedora,
+    tipoDestinatario,
+    destinatario,
+    isDentroEstado,
+    codigoDestinatario,
+    notasFiscaisOrigem,
+    destinatarioFora,
+    codigoFora,
+    exploracao,
+    doencaExigeReceituario,
+    outrosContatos,
+    previsaoUso,
+    receituariosPorDoenca,
+  }, {
+    id: "venda-saida-exemplo",
+    notaFiscal: "15420",
+    numeroNotaFiscal: "15420",
+    dataVenda: "2026-05-15",
+    revendedora: "Distribuidora de Vacinas Alfa LTDA",
+    cnpjRevendedora: "12.345.678/0001-99",
+    tipoDestinatario: "produtor",
+    destinatario: "João da Silva Sauro",
+    isDentroEstado: "sim",
+    codigoDestinatario: "555.009.956-40",
+    notasFiscaisOrigem: [{
+      id: "partida-exemplo", nome: "0013225/24", numeroPartida: "0013225/24", laboratorio: "Laboratório Biovet",
+      doenca: "Brucelose", tipoVacina: "B19", validade: "20/12/2026", dosesDisponiveisTotais: 100,
+      dosesPerFrasco: 20, quantidadeDoses: 20, quantidadeFrascos: 1, exigeReceituario: true,
+    }],
+    destinatarioFora: "",
+    codigoFora: "",
+    exploracao: [{ id: "exploracao-exemplo", codigo: "3100104050003", especie: "Bovino" }],
+    doencaExigeReceituario: true,
+    outrosContatos: [{ id: "contato-exemplo", tipo: "Celular", valor: "(35) 99999-1234", observacao: "Contato principal" }],
+    previsaoUso: "Sim",
+    receituariosPorDoenca: { Brucelose: { nome: "receituario_brucelose.pdf", descricao: "Receituário de exemplo." } },
+  });
+
   return (
-    <div className="min-h-screen bg-[#f2f3f5]">
+    <div className={cadastroVacinacaoPageClass(mode, "min-h-screen bg-[#f2f3f5]")}>
       <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="venda-saida-vacina" hideSearch={true} />
 
       <main className="max-w-[1088px] mx-auto px-4 md:px-6 py-6">
@@ -421,16 +483,7 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate }: Adici
             <ArrowLeft size={15} />
             Todas Vendas com Saídas de Vacina
           </button>
-          <div className="flex justify-between items-center w-full">
-            <h1 className="text-2xl font-semibold text-gray-900">Adicionar Venda com Saída de Vacina</h1>
-            <button
-              type="button"
-              onClick={() => setIsSucesso(true)}
-              className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition flex items-center gap-2 shadow-sm"
-            >
-              Adicionar
-            </button>
-          </div>
+          <CadastroVacinacaoHeader mode={mode} nomeCadastro="Venda com Saída de Vacina" rotaEditar="editar-venda-saida-vacina" dados={dados} onNavigate={onNavigate} onSubmit={() => setIsSucesso(true)} />
         </div>
 
         {/* 🔥 ALERTA CORRIGIDO: Adicionado mb-6 para dar respiro até a próxima seção */}
@@ -1459,33 +1512,18 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate }: Adici
       {isSucesso && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
-            <h3 className="text-lg font-bold text-gray-900">Núcleo de Produção adicionado com sucesso!</h3>
+            <h3 className="text-lg font-bold text-gray-900">{mensagemSucessoCadastro(mode, "Venda com Saída de Vacina")}</h3>
             <p className="text-sm text-gray-500 mt-1">
-              {"O núcleo"} foi adicionado como um novo Núcleo de Produção.
+              Os dados da venda com saída de vacina foram gravados.
             </p>
             <div className="flex gap-3 justify-center mt-6">
-              <button onClick={() => { setIsSucesso(false); onNavigate("nucleo-producao"); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition">
+              <button onClick={() => { setIsSucesso(false); onNavigate("venda-saida-vacina"); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition">
                 Voltar
               </button>
               <button
                 onClick={() => {
                   setIsSucesso(false);
-                  onNavigate("visualizar-nucleo-producao", {
-
-                    notaFiscal,
-                    dataVenda,
-                    revendedora,
-                    tipoDestinatario,
-                    destinatario,
-                    isDentroEstado,
-                    codigoDestinatario,
-                    notasFiscaisOrigem,
-                    destinatarioFora,
-                    codigoFora,
-                    exploracao,
-                    doencaExigeReceituario,
-
-                  });
+                  onNavigate("visualizar-venda-saida-vacina", registroAtual);
                 }}
                 className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition"
               >

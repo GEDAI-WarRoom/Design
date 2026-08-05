@@ -1,0 +1,72 @@
+/* Visualização dos cadastros de Vacinação reutiliza o formulário de inclusão.
+   Os campos permanecem estruturalmente idênticos, mas ficam somente para leitura. */
+.cadastro-vacinacao-view main > :not(:first-child) {
+  pointer-events: none;
+}
+
+.cadastro-vacinacao-view main > form {
+  pointer-events: none;
+}
+
+.cadastro-vacinacao-view main input,
+.cadastro-vacinacao-view main textarea,
+.cadastro-vacinacao-view main select {
+  cursor: not-allowed !important;
+  color: #374151 !important;
+  -webkit-text-fill-color: #374151;
+}
+
+.cadastro-vacinacao-view main [inert] {
+  cursor: not-allowed;
+}
+
+.cadastro-vacinacao-view main [inert] input,
+.cadastro-vacinacao-view main [inert] textarea,
+.cadastro-vacinacao-view main [inert] select,
+.cadastro-vacinacao-view main [inert] [role="button"] {
+  cursor: not-allowed !important;
+}
+
+.cadastro-vacinacao-view main [inert] [data-form-control] {
+  background-color: #ffffff !important;
+  border-color: #d1d5db !important;
+  color: #6b7280 !important;
+  cursor: not-allowed !important;
+}
+
+.cadastro-vacinacao-view main [inert] [data-form-control] svg,
+.cadastro-vacinacao-view main [inert] button:not([data-cadastro-header-action]) {
+  color: #9ca3af !important;
+  opacity: 0.7;
+}
+
+/* No modo de visualização, somente os marcadores originalmente verdes
+   assumem um cinza claro; o fundo dos campos continua branco. */
+.cadastro-vacinacao-view main [inert] [class*="bg-[#1A7A3C]"],
+.cadastro-vacinacao-view main [inert] input:checked[class*="checked:bg-[#1A7A3C]"],
+.cadastro-vacinacao-view main [inert] [style*="background-color: rgb(26, 122, 60)"],
+.cadastro-vacinacao-view main [inert] [style*="background-color: #1A7A3C"] {
+  background-color: #cbd5e1 !important;
+}
+
+.cadastro-vacinacao-view main [inert] [class*="text-[#1A7A3C]"],
+.cadastro-vacinacao-view main [inert] [style*="color: rgb(26, 122, 60)"],
+.cadastro-vacinacao-view main [inert] [style*="color: #1A7A3C"] {
+  color: #94a3b8 !important;
+}
+
+.cadastro-vacinacao-view main [inert] [class*="border-[#1A7A3C]"],
+.cadastro-vacinacao-view main [inert] [class*="border-l-[#1A7A3C]"],
+.cadastro-vacinacao-view main [inert] [style*="border-color: rgb(26, 122, 60)"],
+.cadastro-vacinacao-view main [inert] [style*="border-left-color: rgb(26, 122, 60)"] {
+  border-color: #cbd5e1 !important;
+}
+
+.cadastro-vacinacao-view main [inert] img {
+  filter: grayscale(1);
+  opacity: 0.6;
+}
+
+.cadastro-vacinacao-view main button:not([data-cadastro-header-action]) {
+  cursor: default;
+}

@@ -6,11 +6,12 @@ import {
   Trash2,
   CheckCircle2,
   X,
-  Info, ChevronUp
+  Info, ChevronUp, ChevronDown
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, FloatSelect, CheckboxGroup, SearchModal, CustomRadio, SimNao  } from "../../../components/ui/FormKit";
 import { EntitySearchInput, DynamicListWrapper } from "../../../components/ui/EntitySearch";
+import { CadastroVacinacaoHeader, cadastroVacinacaoPageClass, mensagemSucessoCadastro, preencherComExemplo, type CadastroVacinacaoModeProps } from "../shared/CadastroVacinacaoMode";
 
 const GREEN = "#1A7A3C";
 
@@ -70,6 +71,46 @@ const novaEspecie = (): EspecieSuscetivel => ({
   tiposVacina: [{ uid: uid("tv"), nome: "" }],
 });
 
+const tipoVacinaPorDoenca = (nomeDoenca: string) => {
+  const nomeNormalizado = nomeDoenca.toLocaleLowerCase("pt-BR");
+  if (nomeNormalizado.includes("brucelose")) return "B19";
+  if (nomeNormalizado.includes("aftosa")) return "Bivalente";
+  if (nomeNormalizado.includes("raiva")) return "Inativada";
+  if (nomeNormalizado.includes("clostridiose")) return "Polivalente";
+  return "Vacina padrão";
+};
+
+const especiesIniciais = (dados: any, preenchendoRegistro: boolean): EspecieSuscetivel[] => {
+  if (dados?.especies?.length) {
+    return dados.especies.map((item: Partial<EspecieSuscetivel>) => ({
+      ...novaEspecie(),
+      ...item,
+      uid: item.uid ?? uid("esp"),
+      tiposVacina: item.tiposVacina?.length
+        ? item.tiposVacina.map((tipo) => ({ ...tipo, uid: tipo.uid ?? uid("tv") }))
+        : [{ uid: uid("tv"), nome: tipoVacinaPorDoenca(dados?.nome ?? "") }],
+    }));
+  }
+
+  if (!preenchendoRegistro) return [novaEspecie()];
+
+  const possuiVacina = dados?.possuiVacina ?? "Não";
+  const especie = ESPECIES_MOCK[0];
+
+  return [{
+    uid: uid("esp"),
+    especie,
+    possuiVacina,
+    faixasUnico: [],
+    faixasMacho: especie.faixas.slice(0, 1),
+    faixasFemea: especie.faixas.slice(0, 2),
+    exigeReceituario: possuiVacina === "Sim" ? "Sim" : "Não",
+    possuiVacinacaoOficial: dados?.possuiVacinacaoOficial ?? "Não",
+    possuiTipoVacina: possuiVacina === "Sim" ? "Sim" : "Não",
+    tiposVacina: [{ uid: uid("tv"), nome: tipoVacinaPorDoenca(dados?.nome ?? "") }],
+  }];
+};
+
 // ==========================================================
 // SUBCOMPONENTES
 // ==========================================================
@@ -88,14 +129,15 @@ function Section({ title, children, defaultOpen = true }: { title: string; child
   );
 }
 
-interface PageProps {
+interface PageProps extends CadastroVacinacaoModeProps {
   onLogout: () => void;
   onNavigate: (screen: any, data?: any) => void;
 }
 
-export function AdicionarDoencaPage({ onLogout, onNavigate }: PageProps) {
-  const [nome, setNome] = useState("");
-  const [especies, setEspecies] = useState<EspecieSuscetivel[]>([novaEspecie()]);
+export function AdicionarDoencaPage({ onLogout, onNavigate, mode = "create", dados }: PageProps) {
+  const preenchendoRegistro = mode !== "create";
+  const [nome, setNome] = useState(dados?.nome ?? "");
+  const [especies, setEspecies] = useState<EspecieSuscetivel[]>(() => especiesIniciais(dados, preenchendoRegistro));
 
   const [tentouSalvar, setTentouSalvar] = useState(false);
   const [sucesso, setSucesso] = useState(false);
@@ -137,6 +179,10 @@ export function AdicionarDoencaPage({ onLogout, onNavigate }: PageProps) {
   const formValido = nome.trim() !== "" && especies.length > 0 && especies.every(especieValida);
 
   const handleSalvar = () => {
+    if (mode === "create") {
+      setSucesso(true);
+      return;
+    }
     setTentouSalvar(true);
     if (!formValido) return;
     setSucesso(true);
@@ -147,8 +193,36 @@ export function AdicionarDoencaPage({ onLogout, onNavigate }: PageProps) {
   // espécie do modal ativo (para filtrar já selecionadas, se quiser)
   const especieAtiva = especies.find((e) => e.uid === modalEspecieUid) ?? null;
 
+  const registroAtual = preencherComExemplo({
+    ...(dados ?? {}),
+    id: dados?.id ?? `doenca-${Date.now()}`,
+    nome,
+    possuiVacina: especies.some((e) => e.possuiVacina === "Sim") ? "Sim" : "Não",
+    possuiVacinacaoOficial: especies.some((e) => e.possuiVacinacaoOficial === "Sim") ? "Sim" : "Não",
+    situacao: "Ativo",
+    especies,
+  }, {
+    id: "doenca-exemplo",
+    nome: "Brucelose",
+    possuiVacina: "Sim",
+    possuiVacinacaoOficial: "Sim",
+    situacao: "Ativo",
+    especies: [{
+      uid: "especie-exemplo",
+      especie: ESPECIES_MOCK[0],
+      possuiVacina: "Sim",
+      faixasUnico: [],
+      faixasMacho: ["De 0 a 12 meses"],
+      faixasFemea: ["De 0 a 12 meses", "De 13 a 24 meses"],
+      exigeReceituario: "Sim",
+      possuiVacinacaoOficial: "Sim",
+      possuiTipoVacina: "Sim",
+      tiposVacina: [{ uid: "tipo-vacina-exemplo", nome: "B19" }],
+    }],
+  });
+
   return (
-    <div className="min-h-screen bg-[#f2f3f5] pb-24">
+    <div className={cadastroVacinacaoPageClass(mode, "min-h-screen bg-[#f2f3f5] pb-24")}>
       <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="doenca" hideSearch />
 
       <main className="max-w-[1300px] mx-auto px-4 md:px-6 py-6 flex flex-col gap-5">
@@ -158,7 +232,7 @@ export function AdicionarDoencaPage({ onLogout, onNavigate }: PageProps) {
             <ArrowLeft size={15} />
             Todas Doenças
           </button>
-          <h1 className="text-2xl font-semibold text-gray-900">Adicionar Doença</h1>
+          <CadastroVacinacaoHeader mode={mode} nomeCadastro="Doença" rotaEditar="editar-doenca" dados={dados} onNavigate={onNavigate} onSubmit={handleSalvar} />
         
         </div>
 
@@ -406,7 +480,7 @@ export function AdicionarDoencaPage({ onLogout, onNavigate }: PageProps) {
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 text-center">
             <div className="flex justify-center mb-4"><CheckCircle2 size={48} style={{ color: GREEN }} /></div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-1">Doença adicionada com sucesso!</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-1">{mensagemSucessoCadastro(mode, "Doença")}</h3>
             <p className="text-sm text-gray-500 mb-6">
               A doença <span className="font-medium text-gray-700">{nome}</span> foi cadastrada no sistema.
             </p>
@@ -418,13 +492,7 @@ export function AdicionarDoencaPage({ onLogout, onNavigate }: PageProps) {
                 Voltar
               </button>
               <button
-                onClick={() => onNavigate("visualizar-doenca", {
-                  nome,
-                  possuiVacina: especies.some((e) => e.possuiVacina === "Sim") ? "Sim" : "Não",
-                  possuiVacinacaoOficial: especies.some((e) => e.possuiVacinacaoOficial === "Sim") ? "Sim" : "Não",
-                  situacao: "Ativo",
-                  especies,
-                })}
+                onClick={() => onNavigate("visualizar-doenca", registroAtual)}
                 className="px-5 py-2.5 rounded-md text-white text-sm font-semibold transition hover:opacity-90"
                 style={{ backgroundColor: GREEN }}
               >

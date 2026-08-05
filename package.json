@@ -6,7 +6,8 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite",
-    "test:parametros": "node tests/parametrosSistema.test.mjs"
+    "test:parametros": "node tests/parametrosSistema.test.mjs",
+    "test:vacinacao": "node tests/vacinacaoTelas.test.mjs"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",

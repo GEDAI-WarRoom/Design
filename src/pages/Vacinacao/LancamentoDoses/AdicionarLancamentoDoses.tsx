@@ -4,6 +4,7 @@ import { Navbar } from "../../../components/Navbar";
 import { FloatInput, MultiSearchModal } from "../../../components/ui/FormKit";
 import { RevendedoraInput } from "../../../components/ui/EntitySearch";
 import { PieChart, Pie, Cell, Sector } from "recharts";
+import { CadastroVacinacaoHeader, cadastroVacinacaoPageClass, mensagemSucessoCadastro, preencherComExemplo, type CadastroVacinacaoModeProps } from "../shared/CadastroVacinacaoMode";
 
 const GREEN = "#1A7A3C";
 
@@ -59,24 +60,61 @@ const renderActiveShape = (props: any) => {
   );
 };
 
-interface PageProps {
+interface PageProps extends CadastroVacinacaoModeProps {
   onLogout: () => void;
   onNavigate: (screen: any, data?: any) => void;
 }
 
-export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate }: PageProps) {
-  const [revendedora, setRevendedora] = useState<any | null>(null);
-  const [lancamentos, setLancamentos] = useState<Record<string, { dosesLancadas: string; justificativa: string }>>({});
+export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate, mode = "create", dados }: PageProps) {
+  const preenchendoRegistro = mode !== "create";
+  const idPartidaInicial = `partida-${dados?.id ?? "registro"}`;
+  const [revendedora, setRevendedora] = useState<any | null>(dados?.revendedora ?? (dados?.revendedoraNome ? { codigo: dados.revendedoraCodigo, nome: dados.revendedoraNome } : preenchendoRegistro ? { codigo: "3120938028", nome: "Comercial AgroVat" } : null));
+  const [lancamentos, setLancamentos] = useState<Record<string, { dosesLancadas: string; justificativa: string }>>(dados?.lancamentos ?? (preenchendoRegistro ? {
+    [idPartidaInicial]: { dosesLancadas: String(dados?.quantidadeDoses ?? 20), justificativa: dados?.justificativa ?? `Ajuste referente a ${dados?.tipoLancamento ?? "conferência de estoque"}.` }
+  } : {}));
   const [isSucesso, setIsSucesso] = useState(false);
 
   const [modalNotaOrigemOpen, setModalNotaOrigemOpen] = useState(false);
-  const [notasFiscaisOrigem, setNotasFiscaisOrigem] = useState<any[]>([]);
+  const [notasFiscaisOrigem, setNotasFiscaisOrigem] = useState<any[]>(dados?.notasFiscaisOrigem ?? (preenchendoRegistro ? [{
+    id: idPartidaInicial,
+    nome: dados?.numeroPartida ?? "025/24",
+    numeroPartida: dados?.numeroPartida ?? "025/24",
+    laboratorio: dados?.laboratorio ?? "Laboratório BioMed",
+    doenca: dados?.doenca ?? "Brucelose",
+    tipoVacina: dados?.tipoVacina ?? "B19",
+    validade: dados?.validade ?? "20/12/2026",
+    dosesDisponiveisTotais: dados?.quantidadeDosesDisponiveis ?? 100,
+    dosesPerFrasco: dados?.dosesPerFrasco ?? 20,
+    quantidadeDoses: dados?.quantidadeDoses ?? 20,
+    quantidadeFrascos: dados?.quantidadeFrascos ?? 1,
+  }] : []));
   const [graficoAtivo, setGraficoAtivo] = useState<{ loteId: string; index: number } | null>(null);
   const [notasListasMinimizadas, setNotasListasMinimizadas] = useState<Record<string, boolean>>({});
   const [lotesMinimizados, setLotesMinimizados] = useState<Record<string, boolean>>({});
 
+  const registroAtual = preencherComExemplo({
+    ...(dados ?? {}),
+    id: dados?.id ?? `ajuste-dose-${Date.now()}`,
+    revendedora,
+    revendedoraCodigo: revendedora?.codigo,
+    revendedoraNome: revendedora?.nome,
+    notasFiscaisOrigem,
+    lancamentos,
+  }, {
+    id: "ajuste-dose-exemplo",
+    revendedora: { id: 1, codigo: "3120938028", nome: "Comercial AgroVat" },
+    revendedoraCodigo: "3120938028",
+    revendedoraNome: "Comercial AgroVat",
+    notasFiscaisOrigem: [{
+      id: "partida-exemplo", nome: "025/24", numeroPartida: "025/24", laboratorio: "Laboratório BioMed",
+      doenca: "Brucelose", tipoVacina: "B19", validade: "20/12/2026", dosesDisponiveisTotais: 100,
+      dosesPerFrasco: 20, quantidadeDoses: 20, quantidadeFrascos: 1,
+    }],
+    lancamentos: { "partida-exemplo": { dosesLancadas: "20", justificativa: "Ajuste de exemplo para conferência de estoque." } },
+  });
+
   return (
-    <div className="min-h-screen bg-[#f2f3f5]">
+    <div className={cadastroVacinacaoPageClass(mode, "min-h-screen bg-[#f2f3f5]")}>
       <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="lancamento-doses-vacina" hideSearch />
 
       <main className="max-w-[1088px] mx-auto px-4 md:px-6 py-6">
@@ -86,10 +124,7 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate }: Pag
             <ArrowLeft size={15} />
             Todos Ajustes de Doses de Vacina
           </button>
-          <div className="flex justify-between items-center w-full">
-            <h1 className="text-2xl font-semibold text-gray-900">Adicionar Ajuste de Doses de Vacina</h1>
-            <button type="button" onClick={() => setIsSucesso(true)} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm">Adicionar</button>
-          </div>
+          <CadastroVacinacaoHeader mode={mode} nomeCadastro="Ajuste de Doses de Vacina" rotaEditar="editar-lancamento-doses-vacina" dados={dados} onNavigate={onNavigate} onSubmit={() => setIsSucesso(true)} />
         </div>
 
         {/* ALERTA */}
@@ -555,11 +590,11 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate }: Pag
             <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4">
               <Check size={28} className="text-[#1A7A3C]" strokeWidth={3} />
             </div>
-            <h3 className="text-lg font-bold text-gray-900">Lançamento de doses adicionado com sucesso!</h3>
+            <h3 className="text-lg font-bold text-gray-900">{mensagemSucessoCadastro(mode, "Ajuste de Doses de Vacina")}</h3>
             <p className="text-sm text-gray-500 mt-1">O registro foi gravado.</p>
             <div className="flex gap-3 justify-center mt-6">
               <button onClick={() => { setIsSucesso(false); onNavigate("lancamento-doses-vacina"); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition">Voltar</button>
-              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-lancamento-doses-vacina"); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
+              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-lancamento-doses-vacina", registroAtual); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
             </div>
           </div>
         </div>
