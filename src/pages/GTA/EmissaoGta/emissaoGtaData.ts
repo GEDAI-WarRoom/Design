@@ -65,7 +65,6 @@ export interface DestinoGta extends LocalGta {
   municipio: string;
   responsavelExterno: string;
   documentoResponsavelExterno: string;
-  codigoLocal: string;
   estabelecimentoExterno: string;
   codigoEstabelecimentoExterno: string;
   codigoExploracaoExterna: string;
@@ -130,6 +129,7 @@ export interface EmissaoGtaFormValue {
   possuiParadaDescanso: "Sim" | "Não";
   enderecoParadaDescanso?: EnderecoParadaDescanso; // 👈 Adicione esta linha (com ? se opcional)
   faixasAnimais: FaixaAnimalGta[];
+  possuiMotivoIsencaoTaxa: "Sim" | "Não" | "";
   motivoIsencaoTaxa: EntidadeGta | null;
   valorGta: number;
   dataRaivaPrimeiraEtapa: string;
@@ -310,6 +310,26 @@ export const EXPLORACOES_GTA: ExploracaoGta[] = [
     especie: "Suínos",
     produtores: "Maria Oliveira",
   },
+  {
+    id: 4,
+    codigo: "310020300411004",
+    nome: "Exploração Bovinos - Santa Rita",
+    estabelecimentoId: 3,
+    responsavelId: 2,
+    especieId: 1,
+    especie: "Bovinos",
+    produtores: "Maria Oliveira",
+  },
+  {
+    id: 5,
+    codigo: "310020300401005",
+    nome: "Exploração Suínos - Vale Verde",
+    estabelecimentoId: 2,
+    responsavelId: 3,
+    especieId: 4,
+    especie: "Suínos",
+    produtores: "Marcos Silva, Ana Paula Nunes",
+  },
 ];
 
 export const NUCLEOS_GTA: NucleoGta[] = [
@@ -338,6 +358,10 @@ export const NUCLEOS_GTA: NucleoGta[] = [
     classificacao: "Ciclo Completo",
   },
 ];
+
+export const NUCLEOS_EXTERNOS_GTA: Record<string, string> = {
+  "33009457901392301": "Núcleo 09",
+};
 
 export const FRIGORIFICOS_GTA: EntidadeGta[] = [
   { id: 1, codigo: "33013646850", nome: "Frigorífico Vale da Sapucaí Ltda" },
@@ -414,10 +438,32 @@ export const ESTADOS_BRASIL = [
 ];
 
 export const MUNICIPIOS_POR_ESTADO: Record<string, string[]> = {
-  Goiás: ["Anápolis", "Goiânia", "Rio Verde"],
-  "Rio de Janeiro": ["Campos dos Goytacazes", "Rio de Janeiro", "Volta Redonda"],
-  "São Paulo": ["Campinas", "Sorocaba", "Valinhos"],
+  Acre: ["Cruzeiro do Sul", "Rio Branco"],
+  Alagoas: ["Arapiraca", "Maceió"],
+  Amapá: ["Macapá", "Santana"],
+  Amazonas: ["Manaus", "Parintins"],
   Bahia: ["Feira de Santana", "Salvador", "Vitória da Conquista"],
+  Ceará: ["Fortaleza", "Juazeiro do Norte"],
+  "Distrito Federal": ["Brasília", "Taguatinga"],
+  "Espírito Santo": ["Vila Velha", "Vitória"],
+  Goiás: ["Anápolis", "Goiânia", "Rio Verde"],
+  Maranhão: ["Imperatriz", "São Luís"],
+  "Mato Grosso": ["Cuiabá", "Rondonópolis"],
+  "Mato Grosso do Sul": ["Campo Grande", "Dourados"],
+  Pará: ["Belém", "Santarém"],
+  Paraíba: ["Campina Grande", "João Pessoa"],
+  Paraná: ["Curitiba", "Londrina"],
+  Pernambuco: ["Caruaru", "Recife"],
+  Piauí: ["Parnaíba", "Teresina"],
+  "Rio de Janeiro": ["Campos dos Goytacazes", "Rio de Janeiro", "Volta Redonda"],
+  "Rio Grande do Norte": ["Mossoró", "Natal"],
+  "Rio Grande do Sul": ["Caxias do Sul", "Porto Alegre"],
+  Rondônia: ["Ji-Paraná", "Porto Velho"],
+  Roraima: ["Boa Vista", "Rorainópolis"],
+  "Santa Catarina": ["Florianópolis", "Joinville"],
+  "São Paulo": ["Campinas", "Sorocaba", "Valinhos"],
+  Sergipe: ["Aracaju", "Itabaiana"],
+  Tocantins: ["Araguaína", "Palmas"],
 };
 
 export const MEIOS_TRANSPORTE = [
@@ -447,7 +493,6 @@ export const criarDestinoVazio = (): DestinoGta => ({
   municipio: "",
   responsavelExterno: "",
   documentoResponsavelExterno: "",
-  codigoLocal: "",
   estabelecimentoExterno: "",
   codigoEstabelecimentoExterno: "",
   codigoExploracaoExterna: "",
@@ -493,6 +538,7 @@ export function criarEmissaoGtaVazia(): EmissaoGtaFormValue {
     placaVeiculo: "",
     possuiParadaDescanso: "Não",
     faixasAnimais: [],
+    possuiMotivoIsencaoTaxa: "",
     motivoIsencaoTaxa: null,
     valorGta: 0,
     dataRaivaPrimeiraEtapa: "2025-03-25",
@@ -519,8 +565,8 @@ function criarRegistroInicial(
     ...criarLocalVazio(),
     tipo: "Estabelecimento Agropecuário",
     responsavel: PESSOAS_GTA[0],
-    estabelecimento: ESTABELECIMENTOS_GTA[0],
-    exploracao: EXPLORACOES_GTA[0],
+    estabelecimento: ESTABELECIMENTOS_GTA[1],
+    exploracao: EXPLORACOES_GTA[1],
   };
   const destino: DestinoGta = {
     ...criarDestinoVazio(),
@@ -531,6 +577,7 @@ function criarRegistroInicial(
   };
   return {
     ...form,
+    possuiMotivoIsencaoTaxa: "Não",
     id,
     serieNumero,
     tipoFormulario: id === 1 ? "Digital" : "Manual",
@@ -560,10 +607,13 @@ function criarRegistroInicial(
 export const EMISSOES_GTA_MOCK: EmissaoGta[] = [
   criarRegistroInicial(1, "MG - 184526", ESPECIES_GTA[0], FINALIDADES_GTA[0], "Gravada"),
   criarRegistroInicial(2, "MG - 184527", ESPECIES_GTA[1], FINALIDADES_GTA[3], "Emitida"),
+  criarRegistroInicial(3, "MG - 184528", ESPECIES_GTA[3], FINALIDADES_GTA[0], "Gravada"),
+  criarRegistroInicial(4, "MG - 184529", ESPECIES_GTA[2], FINALIDADES_GTA[1], "Gravada"),
+  criarRegistroInicial(5, "MG - 184530", ESPECIES_GTA[0], FINALIDADES_GTA[2], "Emitida"),
 ];
 
-let proximoId = 3;
-let proximoNumero = 184528;
+let proximoId = 6;
+let proximoNumero = 184531;
 
 export function adicionarEmissaoGta(form: EmissaoGtaFormValue): EmissaoGta {
   const nova: EmissaoGta = {

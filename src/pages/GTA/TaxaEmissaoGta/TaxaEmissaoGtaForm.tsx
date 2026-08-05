@@ -1,37 +1,49 @@
 import { useState, type ReactNode } from "react";
-import { ChevronDown, ChevronUp, Dna, Info, Calendar, Receipt, ListTree } from "lucide-react";
+import {
+  Calendar,
+  ChevronDown,
+  ChevronUp,
+  Dna,
+  Info,
+  ListTree,
+} from "lucide-react";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
 import { FloatInput, FloatSelect } from "../../../components/ui/FormKit";
 import {
   ESPECIES_TAXA_MOCK,
-  FAIXAS_POR_CABECA,
+  ITENS_RECEITA_TAXA_MOCK,
+  MODALIDADES_FAIXA,
   TIPOS_COBRANCA,
-  type FaixaPorCabeca,
+  TIPOS_DOCUMENTO_SANITARIO,
+  modalidadeOposta,
+  type ItemReceitaTaxa,
+  type ModalidadeFaixa,
   type TaxaEmissaoGtaDraft,
   type TipoCobranca,
+  type TipoDocumentoSanitario,
 } from "./taxaEmissaoGtaData";
-
-// Mock de exemplo para os Itens de Receita
-const ITENS_RECEITA_MOCK = [
-  { id: "1", codigo: "001", nome: "Taxa de Emissão GTA - Bovinos", quantidadeUfmg: "2 UFMG" },
-  { id: "2", codigo: "002", nome: "Taxa de Emissão GTA - Aves", quantidadeUfmg: "1 UFMG" },
-  { id: "3", codigo: "003", nome: "Taxa de Emissão GTA - Suínos", quantidadeUfmg: "1 UFMG" },
-  { id: "4", codigo: "004", nome: "Taxa de Emissão GTA - Equídeos", quantidadeUfmg: "3 UFMG" },
-];
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   const [open, setOpen] = useState(true);
   return (
-    <section className="bg-white rounded-xl shadow-sm overflow-visible">
+    <section className="overflow-visible rounded-xl bg-white shadow-sm">
       <button
         type="button"
-        onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gray-50 transition rounded-xl"
+        onClick={() => setOpen((value) => !value)}
+        className="flex w-full items-center justify-between rounded-xl px-6 py-4 text-left transition hover:bg-gray-50"
       >
         <span className="text-base font-semibold text-gray-800">{title}</span>
-        {open ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
+        {open ? (
+          <ChevronUp size={18} className="text-gray-400" />
+        ) : (
+          <ChevronDown size={18} className="text-gray-400" />
+        )}
       </button>
-      {open && <div className="px-6 pb-6 border-t border-gray-100 pt-5">{children}</div>}
+      {open && (
+        <div className="border-t border-gray-100 px-6 pb-6 pt-5">
+          {children}
+        </div>
+      )}
     </section>
   );
 }
@@ -40,209 +52,338 @@ interface TaxaEmissaoGtaFormProps {
   value: TaxaEmissaoGtaDraft;
   onChange?: (value: TaxaEmissaoGtaDraft) => void;
   mode?: "create" | "edit" | "view";
+  fieldClassName?: (label: string, value: unknown) => string;
 }
 
-export function TaxaEmissaoGtaForm({ value, onChange, mode = "create" }: TaxaEmissaoGtaFormProps) {
+interface ItemReceitaFieldProps {
+  item: ItemReceitaTaxa | null;
+  label: string;
+  mode: "create" | "edit" | "view";
+  onChange: (item: ItemReceitaTaxa) => void;
+  fieldClassName: (label: string, value: unknown) => string;
+}
+
+function ItemReceitaField({
+  item,
+  label,
+  mode,
+  onChange,
+  fieldClassName,
+}: ItemReceitaFieldProps) {
+  const quantidadeLabel = `${label} - Quantidade do Índice`;
+
+  return (
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-[minmax(0,2fr)_minmax(180px,1fr)]">
+      {mode === "view" ? (
+        <FloatInput
+          label={label}
+          required
+          value={item?.nome ?? ""}
+          disabled
+          className={fieldClassName(label, item?.nome)}
+        />
+      ) : (
+        <EntitySearchInput
+          label={label}
+          placeholder="Buscar item de receita"
+          value={item?.nome ?? ""}
+          data={ITENS_RECEITA_TAXA_MOCK}
+          searchKeys={["codigo", "nome", "quantidadeIndice"]}
+          columns={[
+            { label: "Item de Receita", key: "nome" },
+            { label: "Quantidade do Índice", key: "quantidadeIndice" },
+          ]}
+          icon={<ListTree size={18} color="#1A7A3C" />}
+          onChange={onChange}
+          required
+          title="Buscar Item de Receita"
+          subtitle="Busque por um item de receita cadastrado:"
+        />
+      )}
+
+      <FloatInput
+        label="Quantidade do Índice"
+        value={item?.quantidadeIndice ?? ""}
+        disabled
+        className={fieldClassName(quantidadeLabel, item?.quantidadeIndice)}
+      />
+    </div>
+  );
+}
+
+export function TaxaEmissaoGtaForm({
+  value,
+  onChange,
+  mode = "create",
+  fieldClassName = () => "",
+}: TaxaEmissaoGtaFormProps) {
   const disabled = mode === "view";
+  const update = <K extends keyof TaxaEmissaoGtaDraft>(
+    field: K,
+    fieldValue: TaxaEmissaoGtaDraft[K],
+  ) => onChange?.({ ...value, [field]: fieldValue });
 
-  const update = <K extends keyof TaxaEmissaoGtaDraft>(field: K, fieldValue: TaxaEmissaoGtaDraft[K]) =>
-    onChange?.({ ...value, [field]: fieldValue });
-
-  const updateTipoCobranca = (tipoCobranca: string) => {
-    const tipo = tipoCobranca as TipoCobranca;
+  const updateTipoCobranca = (next: string) => {
     onChange?.({
       ...value,
-      tipoCobranca: tipo,
-      itemReceita: tipo === "Por Quantidade" ? "" : value.itemReceita,
-      porCabeca: tipo === "Por Quantidade" ? value.porCabeca : "",
-      itemReceitaPorCabeca: tipo === "Por Quantidade" ? value.itemReceitaPorCabeca : "",
-      itemReceitaPorDocumento: tipo === "Por Quantidade" ? value.itemReceitaPorDocumento : "",
-      quantidadeAnimais: tipo === "Por Quantidade" ? value.quantidadeAnimais : "",
+      tipoCobranca: next as TipoCobranca,
+      itemReceita: null,
+      tamanhoLote: "",
+      itemReceitaLote: null,
+      limiteFaixa: "",
+      cobrancaAteLimite: "",
+      itemReceitaAteLimite: null,
+      cobrancaAcimaLimite: "",
+      itemReceitaAcimaLimite: null,
     });
   };
 
-  const updateFaixa = (faixa: string) =>
+  const updateCobrancaAte = (next: string) => {
+    const modalidade = next as ModalidadeFaixa;
     onChange?.({
       ...value,
-      porCabeca: faixa as FaixaPorCabeca,
-      itemReceitaPorDocumento: faixa === "A cada" ? "" : value.itemReceitaPorDocumento,
+      cobrancaAteLimite: modalidade,
+      cobrancaAcimaLimite: modalidadeOposta(modalidade),
     });
+  };
 
   return (
-    <Section title="Informações Básicas">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        {/* 1. Espécie */}
-        {mode === "create" ? (
-          <EntitySearchInput
-            label="Espécie"
-            placeholder="Busque por espécie ou grupo"
-            value={value.especie.id ? `${value.especie.nome}` : ""}
-            data={ESPECIES_TAXA_MOCK}
-            searchKeys={["nome", "grupo"]}
-            columns={[
-              { label: "Espécie", key: "nome" },
-              { label: "Grupo", key: "grupo" },
-            ]}
-            icon={<Dna size={18} color="#1A7A3C" />}
-            onChange={(especie) => update("especie", especie)}
+    <>
+      <Section title="Informações Básicas">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+          <FloatSelect
+            label="Tipo de Documento Sanitário"
             required
+            value={value.tipoDocumentoSanitario}
+            onChange={(next) =>
+              update(
+                "tipoDocumentoSanitario",
+                next as TipoDocumentoSanitario,
+              )
+            }
+            options={TIPOS_DOCUMENTO_SANITARIO}
             disabled={disabled}
-            title="Buscar Espécie"
-            subtitle="Busque por uma espécie cadastrada no sistema:"
+            className={fieldClassName(
+              "Tipo de Documento Sanitário",
+              value.tipoDocumentoSanitario,
+            )}
           />
-        ) : (
-          <FloatInput
-            label="Espécie"
-            required
-            value={`${value.especie.codigo} - ${value.especie.nome}`}
-            onChange={() => { }}
-            disabled
-          />
-        )}
 
-        {/* 2. Data Início de Vigência */}
-        <FloatInput
-          label="Data Início de Vigência"
-          type="date"
-          value={value.dataInicioVigencia}
-          icon={<Calendar size={18} color="#1A7A3C" />}
-          onChange={(next) => update("dataInicioVigencia", next)}
-          disabled={disabled}
-        />
-
-        {/* 3. Tipo de Cobrança */}
-        <FloatSelect
-          label="Tipo de Cobrança"
-          required
-          value={value.tipoCobranca}
-          onChange={updateTipoCobranca}
-          options={TIPOS_COBRANCA}
-          disabled={disabled}
-        />
-
-        {/* Item de Receita para 'Por Cabeça' e 'Por Documento' (Seleção de Entidade) */}
-        {(value.tipoCobranca === "Por Cabeça" || value.tipoCobranca === "Por Documento") && (
-          <div className="md:col-span-2">
+          {mode === "create" ? (
             <EntitySearchInput
-              label="Item de Receita"
-              placeholder="Buscar item de receita"
-              value={value.itemReceita}
-              data={ITENS_RECEITA_MOCK}
-              searchKeys={["nome", "quantidadeUfmg"]}
+              label="Espécie"
+              placeholder="Buscar por espécie ou grupo"
+              value={value.especie.nome}
+              data={ESPECIES_TAXA_MOCK}
+              searchKeys={["codigo", "nome", "grupo"]}
               columns={[
-                { label: "Item de Receita", key: "nome" },
-                { label: "Quantidade do Índice", key: "quantidadeUfmg" },
+                { label: "Espécie", key: "nome" },
+                { label: "Grupo", key: "grupo" },
               ]}
-              icon={<ListTree size={18} color="#1A7A3C" />}
-              onChange={(item) => update("itemReceita", item ? item.nome : "")}
+              icon={<Dna size={18} color="#1A7A3C" />}
+              onChange={(especie) => update("especie", especie)}
               required
+              title="Buscar Espécie"
+              subtitle="Busque por uma espécie cadastrada no sistema:"
+            />
+          ) : (
+            <FloatInput
+              label="Espécie"
+              required
+              value={value.especie.nome}
+              disabled
+              className={fieldClassName("Espécie", value.especie.nome)}
+            />
+          )}
+
+          <FloatInput
+            label="Data Início de Vigência"
+            type="date"
+            required
+            value={value.dataInicioVigencia}
+            icon={<Calendar size={18} color="#1A7A3C" />}
+            onChange={(next) => update("dataInicioVigencia", next)}
+            disabled={disabled}
+            className={fieldClassName(
+              "Data Início de Vigência",
+              value.dataInicioVigencia,
+            )}
+          />
+        </div>
+      </Section>
+
+      <Section title="Informações de Cobrança">
+        <div className="flex flex-col gap-5">
+          <div className="max-w-md">
+            <FloatSelect
+              label="Tipo de Cobrança"
+              required
+              value={value.tipoCobranca}
+              onChange={updateTipoCobranca}
+              options={TIPOS_COBRANCA}
               disabled={disabled}
-              title="Buscar Item de Receita"
-              subtitle="Busque por item de receita cadastrado:"
+              className={fieldClassName(
+                "Tipo de Cobrança",
+                value.tipoCobranca,
+              )}
             />
           </div>
-        )}
-      </div>
 
-      {/* Bloco de Cobrança por Quantidade */}
-      {value.tipoCobranca === "Por Quantidade" && (
-        <div className="mt-6 pt-6 border-t border-gray-100">
-          <h3 className="text-sm font-semibold text-gray-700 mb-5">Cobrança por Quantidade</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {(value.tipoCobranca === "Por Cabeça" ||
+            value.tipoCobranca === "Por Documento") && (
+            <ItemReceitaField
+              label={`Item de Receita (cobrado por ${
+                value.tipoCobranca === "Por Cabeça" ? "cabeça" : "documento"
+              })`}
+              item={value.itemReceita}
+              mode={mode}
+              onChange={(item) => update("itemReceita", item)}
+              fieldClassName={fieldClassName}
+            />
+          )}
 
-            {/* Item de Receita por Cabeça (Seleção de Entidade) */}
-            <div className="md:col-span-2">
-              <EntitySearchInput
-                label="Item de Receita por Cabeça"
-                placeholder="Buscar item de receita por cabeça"
-                value={value.itemReceitaPorCabeca}
-                data={ITENS_RECEITA_MOCK}
-                searchKeys={["nome", "quantidadeUfmg"]}
-                columns={[
-                  { label: "Item de Receita", key: "nome" },
-                  { label: "Quantidade do Índice", key: "quantidadeUfmg" },
-                ]}
-                icon={<ListTree size={18} color="#1A7A3C" />}
-                onChange={(item) => update("itemReceitaPorCabeca", item ? item.nome : "")}
-                required
-                disabled={disabled}
-                title="Buscar Item de Receita por Cabeça"
-                subtitle="Busque por item de receita cadastrado:"
+          {value.tipoCobranca === "Por Lotes" && (
+            <div className="flex flex-col gap-5">
+              <div className="max-w-md">
+                <FloatInput
+                  label="Tamanho dos lotes de animais"
+                  required
+                  value={value.tamanhoLote}
+                  onChange={(next) => update("tamanhoLote", next)}
+                  disabled={disabled}
+                  className={fieldClassName(
+                    "Tamanho dos lotes de animais",
+                    value.tamanhoLote,
+                  )}
+                />
+              </div>
+              <ItemReceitaField
+                label={
+                  value.tamanhoLote
+                    ? `Item de Receita (cobrado a cada ${value.tamanhoLote} animais)`
+                    : "Item de Receita (cobrado por lote)"
+                }
+                item={value.itemReceitaLote}
+                mode={mode}
+                onChange={(item) => update("itemReceitaLote", item)}
+                fieldClassName={fieldClassName}
               />
             </div>
+          )}
 
-            <FloatSelect
-              label="Por cabeça"
-              required
-              value={value.porCabeca}
-              onChange={updateFaixa}
-              options={FAIXAS_POR_CABECA}
-              disabled={disabled}
-            />
-
-            <FloatInput
-              label="Quantidade de Animais"
-              required
-              value={value.quantidadeAnimais}
-              onChange={(next) => update("quantidadeAnimais", next.replace(/\D/g, ""))}
-              maxLength={255}
-              disabled={disabled}
-            />
-
-            {/* Exibição condicional de "Por documento" (somente leitura) e "Item de Receita por Documento" */}
-            {(value.porCabeca === "Acima de" || value.porCabeca === "Até") && (
-              <>
+          {value.tipoCobranca === "Por Faixas" && (
+            <div className="flex flex-col gap-5">
+              <div className="max-w-md">
                 <FloatInput
-                  label="Por documento"
-                  value={value.porCabeca === "Até" ? "Acima de" : "Até"}
-                  disabled
-                  onChange={() => { }}
-                />
-
-                {/* Item de Receita por Documento (Seleção de Entidade) */}
-                <EntitySearchInput
-                  label="Item de Receita por Documento"
-                  placeholder="Buscar item de receita por documento"
-                  value={value.itemReceitaPorDocumento}
-                  data={ITENS_RECEITA_MOCK}
-                  searchKeys={["nome", "quantidadeUfmg"]}
-                  columns={[
-                    { label: "Item de Receita", key: "nome" },
-                    { label: "Quantidade do Índice", key: "quantidadeUfmg" },
-                  ]}
-                  icon={<ListTree size={18} color="#1A7A3C" />}
-                  onChange={(item) => update("itemReceitaPorDocumento", item ? item.nome : "")}
+                  label="Limite de animais entre as faixas"
                   required
+                  value={value.limiteFaixa}
+                  onChange={(next) =>
+                    update("limiteFaixa", next.replace(/\D/g, ""))
+                  }
                   disabled={disabled}
-                  title="Buscar Item de Receita por Documento"
-                  subtitle="Busque por item de receita cadastrado:"
+                  className={fieldClassName(
+                    "Limite de animais entre as faixas",
+                    value.limiteFaixa,
+                  )}
                 />
-              </>
-            )}
-          </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                <FloatSelect
+                  label={`Até ${value.limiteFaixa || "[Limite]"} animais`}
+                  required
+                  value={value.cobrancaAteLimite}
+                  onChange={updateCobrancaAte}
+                  options={MODALIDADES_FAIXA}
+                  disabled={disabled}
+                  className={fieldClassName(
+                    "Cobrança até o limite",
+                    value.cobrancaAteLimite,
+                  )}
+                />
+                <FloatInput
+                  label={`Acima de ${value.limiteFaixa || "[Limite]"} animais`}
+                  required
+                  value={value.cobrancaAcimaLimite}
+                  disabled
+                  className={fieldClassName(
+                    "Cobrança acima do limite",
+                    value.cobrancaAcimaLimite,
+                  )}
+                />
+              </div>
+
+              <ItemReceitaField
+                label={`Item de Receita (${modalidadeEmMinusculo(
+                  value.cobrancaAteLimite,
+                )} até ${value.limiteFaixa || "[Limite]"} animais)`}
+                item={value.itemReceitaAteLimite}
+                mode={mode}
+                onChange={(item) => update("itemReceitaAteLimite", item)}
+                fieldClassName={fieldClassName}
+              />
+
+              <ItemReceitaField
+                label={`Item de Receita (${modalidadeEmMinusculo(
+                  value.cobrancaAcimaLimite,
+                )} acima de ${value.limiteFaixa || "[Limite]"} animais)`}
+                item={value.itemReceitaAcimaLimite}
+                mode={mode}
+                onChange={(item) => update("itemReceitaAcimaLimite", item)}
+                fieldClassName={fieldClassName}
+              />
+            </div>
+          )}
         </div>
-      )}
-    </Section>
+      </Section>
+    </>
   );
+}
+
+function modalidadeEmMinusculo(modalidade: ModalidadeFaixa | "") {
+  if (!modalidade) return "cobrado por [Cabeça | Documento]";
+  return modalidade.replace("Cobrar", "cobrado");
 }
 
 export function RequiredFieldsNotice() {
   return (
-    <div className="w-full bg-white border border-gray-100 rounded-xl p-5 shadow-sm flex items-center gap-3">
-      <Info size={20} className="text-gray-500 flex-shrink-0 stroke-[2.5]" />
-      <p className="text-sm text-gray-600 font-medium leading-relaxed">
-        Campos indicados * com <span className="text-red-500 font-bold">*</span> são obrigatórios e deverão ser preenchidos.
+    <div className="flex w-full items-center gap-3 rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
+      <Info size={20} className="shrink-0 text-gray-500 stroke-[2.5]" />
+      <p className="text-sm font-medium leading-relaxed text-gray-600">
+        Campos indicados com <span className="font-bold text-red-500">*</span>{" "}
+        são obrigatórios e deverão ser preenchidos.
       </p>
     </div>
   );
 }
 
 export function taxaValida(taxa: TaxaEmissaoGtaDraft) {
-  if (!taxa.especie.id || !taxa.tipoCobranca) return false;
-  if (taxa.tipoCobranca !== "Por Quantidade") return Boolean(taxa.itemReceita);
+  if (
+    !taxa.tipoDocumentoSanitario ||
+    !taxa.especie.id ||
+    !taxa.dataInicioVigencia ||
+    !taxa.tipoCobranca
+  ) {
+    return false;
+  }
 
-  const qtdValida = Boolean(taxa.quantidadeAnimais) && Number(taxa.quantidadeAnimais) > 0;
-  if (!taxa.porCabeca || !taxa.itemReceitaPorCabeca || !qtdValida) return false;
+  if (
+    taxa.tipoCobranca === "Por Cabeça" ||
+    taxa.tipoCobranca === "Por Documento"
+  ) {
+    return Boolean(taxa.itemReceita);
+  }
 
-  return taxa.porCabeca === "A cada" || Boolean(taxa.itemReceitaPorDocumento);
+  if (taxa.tipoCobranca === "Por Lotes") {
+    return Boolean(taxa.tamanhoLote.trim() && taxa.itemReceitaLote);
+  }
+
+  return Boolean(
+    Number(taxa.limiteFaixa) > 0 &&
+      taxa.cobrancaAteLimite &&
+      taxa.cobrancaAcimaLimite &&
+      taxa.itemReceitaAteLimite &&
+      taxa.itemReceitaAcimaLimite,
+  );
 }

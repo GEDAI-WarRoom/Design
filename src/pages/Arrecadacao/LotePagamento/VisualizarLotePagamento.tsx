@@ -1,10 +1,12 @@
-import { ArrowLeft, ExternalLink, FileText, ReceiptText } from "lucide-react";
+import { useState } from "react";
+import { ArrowLeft, ChevronDown, ChevronUp, ExternalLink, ReceiptText } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput } from "../../../components/ui/FormKit";
 import {
   formatarDataLote,
   formatarMoedaLote,
   LotePagamento,
+  normalizarLotePagamento,
 } from "./lotePagamentoData";
 
 interface PageProps {
@@ -14,8 +16,8 @@ interface PageProps {
 }
 
 export function VisualizarLotePagamentoPage({ onLogout, onNavigate, dados }: PageProps) {
-  if (!dados) return null;
-  const lote = dados;
+  const lote = normalizarLotePagamento(dados);
+  const [tabelaExpandida, setTabelaExpandida] = useState(true);
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
@@ -27,15 +29,23 @@ export function VisualizarLotePagamentoPage({ onLogout, onNavigate, dados }: Pag
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-semibold text-gray-900">Visualizar Lote de Pagamento</h1>
-            <p className="mt-1 text-sm text-gray-500">Lote nº {lote.numeroLote}</p>
           </div>
-          <button
-            type="button"
-            onClick={() => onNavigate("visualizar-dae-lote-pagamento", { dae: lote.dae, lote })}
-            className="flex h-11 items-center gap-2 rounded-md border border-[#1A7A3C] bg-white px-5 text-sm font-semibold text-[#1A7A3C] hover:bg-green-50/40"
-          >
-            <ReceiptText size={18} />DAE Relacionado
-          </button>
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={() => onNavigate("editar-lote-pagamento", lote)}
+              className="h-11 rounded-md bg-[#1A7A3C] px-5 text-sm font-semibold text-white hover:bg-[#15612F]"
+            >
+              Editar
+            </button>
+            <button
+              type="button"
+              onClick={() => onNavigate("visualizar-dae-lote-pagamento", { dae: lote.dae, lote })}
+              className="flex h-11 items-center gap-2 rounded-md border border-[#1A7A3C] bg-white px-5 text-sm font-semibold text-[#1A7A3C] hover:bg-green-50/40"
+            >
+              <ReceiptText size={18} />DAE Relacionado
+            </button>
+          </div>
         </div>
 
         <section className="rounded-xl bg-white shadow-sm">
@@ -55,31 +65,56 @@ export function VisualizarLotePagamentoPage({ onLogout, onNavigate, dados }: Pag
         </section>
 
         <section className="rounded-xl bg-white shadow-sm">
-          <div className="flex items-center gap-2 border-b border-gray-100 px-6 py-4">
-            <FileText size={18} className="text-[#1A7A3C]" />
-            <h2 className="text-base font-semibold text-gray-800">Documentos</h2>
+          <div className="border-b border-gray-100 px-6 py-4">
+            <h2 className="text-base font-semibold text-gray-800">Itens Lote {lote.documento}</h2>
           </div>
-          <div className="overflow-x-auto p-6">
-            <table className="w-full border-collapse text-sm">
-              <thead><tr className="border-b border-gray-100"><th className="px-4 py-3 text-left font-semibold uppercase text-gray-600">Id</th><th className="px-4 py-3 text-left font-semibold uppercase text-gray-600">Status</th><th aria-label="Ações" /></tr></thead>
-              <tbody>
-                {lote.documentos.map((documento) => (
-                  <tr key={documento.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50">
-                    <td className="px-4 py-3 text-gray-700">{documento.id}</td>
-                    <td className="px-4 py-3 text-gray-700">{documento.status}</td>
-                    <td className="px-4 py-3 text-right">
+          <div className="p-6">
+            <div className="overflow-x-auto rounded-lg border border-gray-100 bg-white shadow-sm">
+              <table className="w-full border-collapse text-sm">
+                <thead>
+                  <tr className="border-b border-gray-100 bg-gray-50 text-gray-600">
+                    <th className="px-4 py-3 text-left font-semibold">Código</th>
+                    <th className="px-4 py-3 text-left font-semibold">Valor</th>
+                    <th className="px-4 py-3 text-right font-normal">
                       <button
                         type="button"
-                        onClick={() => onNavigate("visualizar-documento-lote-pagamento", { documento, lote })}
-                        className="inline-flex items-center gap-2 rounded-md p-2 text-sm font-semibold text-[#1A7A3C] hover:bg-green-50"
+                        onClick={() => setTabelaExpandida((expandida) => !expandida)}
+                        className="inline-flex items-center gap-1 font-semibold text-gray-500 transition hover:text-gray-800"
                       >
-                        <ExternalLink size={16} />Ver {documento.tipo}
+                        <span className="text-xs">{tabelaExpandida ? "Minimizar" : "Expandir"}</span>
+                        {tabelaExpandida ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                       </button>
-                    </td>
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                {tabelaExpandida && (
+                  <tbody>
+                    {lote.documentos.map((documento) => (
+                      <tr key={documento.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50">
+                        <td className="px-4 py-3 font-medium text-gray-700">{documento.id}</td>
+                        <td className="px-4 py-3 text-gray-700">{formatarMoedaLote(documento.valor)}</td>
+                        <td className="px-4 py-3 text-right">
+                          <button
+                            type="button"
+                            onClick={() => onNavigate("visualizar-documento-lote-pagamento", { documento, lote })}
+                            className="inline-flex items-center gap-2 rounded-md p-2 text-sm font-semibold text-[#1A7A3C] hover:bg-green-50"
+                          >
+                            <ExternalLink size={16} />Visualizar
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                )}
+                <tfoot>
+                  <tr className="border-t border-gray-100 bg-gray-50/80 font-bold text-gray-800">
+                    <td className="px-4 py-3 text-left">Documentos selecionados ({lote.documentos.length})</td>
+                    <td className="px-4 py-3 text-[#1A7A3C]">{formatarMoedaLote(lote.valor)}</td>
+                    <td />
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
           </div>
         </section>
       </main>

@@ -43,6 +43,10 @@ export function AdicionarUnidadeMedidaPage({ onLogout, onNavigate }: PageProps) 
 
   const [isSucesso, setIsSucesso] = useState(false);
 
+  // Fluxo demonstrativo: permite abrir a confirmação sem bloquear pelos
+  // campos obrigatórios, assim como em Unidade Administrativa.
+  const handleAdicionar = () => setIsSucesso(true);
+
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
       <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="unidade-medida" hideSearch />
@@ -56,7 +60,7 @@ export function AdicionarUnidadeMedidaPage({ onLogout, onNavigate }: PageProps) 
           </button>
           <div className="flex justify-between items-center w-full">
             <h1 className="text-2xl font-semibold text-gray-900">Adicionar Unidade de Medida</h1>
-            <button type="button" onClick={() => setIsSucesso(true)} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm">Adicionar</button>
+            <button type="button" onClick={handleAdicionar} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm">Adicionar</button>
           </div>
         </div>
 
@@ -85,22 +89,23 @@ export function AdicionarUnidadeMedidaPage({ onLogout, onNavigate }: PageProps) 
                 title="Tipo de Unidade de Medida"
                 required
                 options={OPCOES_TIPO}
-                orientation = "horizontal"
-                selectedValues={tiposSelecionados}
+                orientation="horizontal"
+                defaultValue={tiposSelecionados}
                 onChange={setTiposSelecionados}
               />
             </div>
           </div>
         </Section>
 
-       
+        <Section title="Observações">
+          <LargeTextArea label="Observações" value={observacao} onChange={setObservacao} />
+        </Section>
       </main>
 
       {/* Modal de Sucesso */}
       {isSucesso && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
-            <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4"><Check size={28} className="text-[#1A7A3C]" strokeWidth={3} /></div>
             <h3 className="text-lg font-bold text-gray-900">Unidade de medida adicionada com sucesso!</h3>
             <p className="text-sm text-gray-500 mt-1">{nome ? `"${nome}"` : "A unidade de medida"} foi adicionada.</p>
             <div className="flex gap-3 justify-center mt-6">

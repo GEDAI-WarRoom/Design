@@ -1,13 +1,11 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import {
-  BadgeCheck,
   Calendar,
   Eye,
-  PawPrint,
-  Sprout,
   User,
   UsersRound,
 } from "lucide-react";
+import * as Icons from "../../imports/icons";
 import {
   AccordionCardGroup,
   FloatInput,
@@ -45,6 +43,7 @@ interface EntityProfessionalsTabProps {
   allowedTypes: TipoProfissionalEntidade[];
   onNavigate: (screen: any, data?: any) => void;
   initialProfessionals?: ProfissionalEntidade[];
+  addRequestKey?: number;
 }
 
 const registrosPorEntidade = new Map<string, ProfissionalEntidade[]>();
@@ -83,13 +82,25 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 
-function iconeTipo(tipo: TipoProfissionalEntidade) {
+function iconeTipo(tipo: TipoProfissionalEntidade, branco = false) {
+  const imageClassName = `h-6 w-6 object-contain ${branco ? "brightness-0 invert" : ""}`;
   if (tipo === "Responsável Técnico Vegetal" || tipo === "Habilitado para Emissão de PTV") {
-    return <Sprout size={21} />;
+    return (
+      <img
+        src={Icons.iconeProfissionalVegetalUrl}
+        alt="Profissional da Área Vegetal"
+        className={imageClassName}
+      />
+    );
   }
-  if (tipo === "Habilitado para Emissão de GTA") return <BadgeCheck size={21} />;
-  if (tipo === "Funcionário") return <UsersRound size={21} />;
-  return <PawPrint size={21} />;
+  if (tipo === "Funcionário") return <UsersRound size={21} className={branco ? "text-white" : ""} />;
+  return (
+    <img
+      src={Icons.iconeProfissionalAnimalUrl}
+      alt="Profissional da Área Animal"
+      className={imageClassName}
+    />
+  );
 }
 
 function ProfessionalCard({ item, onView }: { item: ProfissionalEntidade; onView: () => void }) {
@@ -137,6 +148,7 @@ export function EntityProfessionalsTab({
   allowedTypes,
   onNavigate,
   initialProfessionals = [],
+  addRequestKey = 0,
 }: EntityProfessionalsTabProps) {
   const [registros, setRegistros] = useState<ProfissionalEntidade[]>(() => {
     if (!registrosPorEntidade.has(entityKey)) {
@@ -194,6 +206,10 @@ export function EntityProfessionalsTab({
     setSomenteLeitura(false);
     setModalOpen(true);
   };
+
+  useEffect(() => {
+    if (addRequestKey > 0) abrirNovo();
+  }, [addRequestKey]);
 
   const abrirProfissional = (item: ProfissionalEntidade) => {
     setProfissionalId(item.id);
@@ -271,16 +287,6 @@ export function EntityProfessionalsTab({
   return (
     <>
       <div className="flex flex-col gap-5">
-        <div className="flex justify-end">
-          <button
-            type="button"
-            onClick={abrirNovo}
-            className="h-10 rounded bg-[#1A7A3C] px-5 text-sm font-semibold text-white transition hover:bg-[#15612F]"
-          >
-            Adicionar Profissional
-          </button>
-        </div>
-
         {allowedTypes.map((tipoGrupo) => {
           const ativos = registros.filter((item) => item.tipo === tipoGrupo && item.situacao === "Ativo");
           const inativos = registros.filter((item) => item.tipo === tipoGrupo && item.situacao === "Inativo");
@@ -290,7 +296,7 @@ export function EntityProfessionalsTab({
               title={TITULOS[tipoGrupo]}
               activeCountText={`${ativos.length} ${ativos.length === 1 ? "cadastro ativo" : "cadastros ativos"}`}
               variant="sem-vinculacao"
-              icon={iconeTipo(tipoGrupo)}
+              icon={iconeTipo(tipoGrupo, true)}
               historicoTitle={`Histórico de ${TITULOS[tipoGrupo]}`}
               historicoChildren={inativos.map((item) => (
                 <ProfessionalCard key={item.id} item={item} onView={() => abrirProfissional(item)} />
@@ -310,7 +316,7 @@ export function EntityProfessionalsTab({
         onSave={salvar}
         title={profissionalId ? "Visualizar Profissional" : "Adicionar Profissional"}
         subtitle="Preencha os campos para vincular um profissional à entidade."
-        icon={<User size={24} color="#1A7A3C" />}
+        icon={iconeTipo(tipo)}
         saveText={somenteLeitura ? "Editar" : "Salvar"}
         width="820px"
       >

@@ -27,4 +27,21 @@
   color: #1f2937 !important;
   -webkit-text-fill-color: #1f2937;
   opacity: 1;
+@import './globals.css';
+
+@keyframes progresso-slide-aviso {
+  from {
+    transform: translate3d(0, 0, 0) scaleX(0);
+  }
+
+  to {
+    transform: translate3d(0, 0, 0) scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [style*='progresso-slide-aviso'] {
+    animation: none !important;
+    transform: scaleX(1);
+  }
 }

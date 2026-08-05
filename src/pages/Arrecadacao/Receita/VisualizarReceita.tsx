@@ -2,12 +2,13 @@ import { useState } from "react";
 import { ArrowLeft, Pencil, FileText, Layers, PlusCircle, ListTree } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, Tabs } from "../../../components/ui/FormKit";
-import { classificacaoLabel, Receita } from "./receitaData";
+import { classificacaoLabel, Receita, RECEITAS_MOCK } from "./receitaData";
 import { ItemReceitaTab } from "../ItemReceita/ItemReceitaTab";
 
-export function VisualizarReceitaPage({ dados, onLogout, onNavigate }: { dados: Receita; onLogout: () => void; onNavigate: (screen: any, data?: any) => void }) {
+export function VisualizarReceitaPage({ dados, onLogout, onNavigate }: { dados?: Receita; onLogout: () => void; onNavigate: (screen: any, data?: any) => void }) {
   const [activeTab, setActiveTab] = useState("cadastro");
   const [isModalItemOpen, setIsModalItemOpen] = useState(false);
+  const receita = { ...RECEITAS_MOCK[0], ...(dados || {}) };
 
   const tabs = [
     { id: "cadastro", label: "Cadastro", icon: (active: boolean) => <FileText size={18} className={active ? "text-[#1A7A3C]" : "text-gray-400"} /> },
@@ -31,7 +32,7 @@ export function VisualizarReceitaPage({ dados, onLogout, onNavigate }: { dados: 
             {activeTab === "cadastro" && (
               <button
                 type="button"
-                onClick={() => onNavigate("editar-receita", dados)}
+                onClick={() => onNavigate("editar-receita", receita)}
                 className="px-5 h-10 bg-[#1A7A3C] text-white text-xs font-bold rounded-md flex items-center gap-2 hover:bg-[#15612F] transition shadow-sm"
               >
                 Editar
@@ -56,10 +57,10 @@ export function VisualizarReceitaPage({ dados, onLogout, onNavigate }: { dados: 
           <section className="bg-white rounded-xl shadow-sm p-6 animate-fadeIn">
             <h2 className="text-base font-semibold text-gray-800 mb-5 border-b border-gray-100 pb-3">Informações Básicas</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <FloatInput label="Código" value={dados.codigo} disabled onChange={() => { }} />
-              <FloatInput label="Descrição" value={dados.descricao} disabled onChange={() => { }} />
-              <FloatInput label="Classificação de Receita" value={classificacaoLabel(dados.classificacao)} disabled onChange={() => { }} className="md:col-span-2" />
-              <FloatInput label="Situação" value={dados.situacao} disabled onChange={() => { }} />
+              <FloatInput label="Código" value={receita.codigo} disabled onChange={() => { }} />
+              <FloatInput label="Descrição" value={receita.descricao} disabled onChange={() => { }} />
+              <FloatInput label="Classificação de Receita" value={classificacaoLabel(receita.classificacao)} disabled onChange={() => { }} className="md:col-span-2" />
+              <FloatInput label="Situação" value={receita.situacao} disabled onChange={() => { }} />
             </div>
           </section>
         )}
@@ -67,7 +68,7 @@ export function VisualizarReceitaPage({ dados, onLogout, onNavigate }: { dados: 
         {activeTab === "itens-receita" && (
           <div className="animate-fadeIn">
             <ItemReceitaTab
-              receitaId={dados.id}
+              receitaId={receita.id}
               isModalOpen={isModalItemOpen}
               setIsModalOpen={setIsModalItemOpen}
             />
