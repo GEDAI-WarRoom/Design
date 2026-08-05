@@ -16,6 +16,9 @@ import {
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatSelect } from "../../../components/ui/FormKit";
+import {
+  listarIsencoesTaxaDocumentoSanitario,
+} from "./isencaoTaxaGtaData";
 
 const GREEN = "#1A7A3C";
 
@@ -27,20 +30,6 @@ const SITUACOES = [
 ];
 
 // --- mocks ---
-
-interface IsencaoTaxaGta {
-  id: number;
-  motivo: string;
-  situacao: "Ativo" | "Inativo";
-}
-
-const ISENCOES_MOCK: IsencaoTaxaGta[] = [
-  { id: 1, motivo: "Instituição de pesquisa", situacao: "Ativo" },
-  { id: 2, motivo: "Saída de eventos", situacao: "Ativo" },
-  { id: 3, motivo: "Doação a órgão público", situacao: "Inativo" },
-  { id: 4, motivo: "Programa de repovoamento", situacao: "Ativo" },
-  { id: 5, motivo: "Uso científico/laboratorial", situacao: "Inativo" },
-];
 
 function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
@@ -87,7 +76,7 @@ export function IsencaoTaxaGtaPage({ onLogout, onNavigate }: PageProps) {
     }
   };
 
-  const filtrados = ISENCOES_MOCK.filter((i) => {
+  const filtrados = listarIsencoesTaxaDocumentoSanitario().filter((i) => {
     const matchMotivo =
       motivo.trim() === "" || i.motivo.toLowerCase().includes(motivo.trim().toLowerCase());
     const matchSituacao = situacao === "" || i.situacao === situacao;
@@ -131,7 +120,7 @@ export function IsencaoTaxaGtaPage({ onLogout, onNavigate }: PageProps) {
             Inicial
           </button>
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-semibold text-gray-900">Isenção de Taxa de GTA</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">Isenção de Taxa de Documento Sanitário</h1>
             <button
               onClick={() => onNavigate("adicionar-isencao-taxa-gta")}
               className="px-5 py-3 rounded-md text-white text-sm font-semibold transition hover:opacity-90 active:scale-[0.98]"
@@ -154,7 +143,7 @@ export function IsencaoTaxaGtaPage({ onLogout, onNavigate }: PageProps) {
                     : "top-1/2 -translate-y-1/2 text-sm text-gray-400"
                 }`}
               >
-                Motivo de Isenção de Taxa de GTA
+                Motivo de Isenção de Taxa de Documento Sanitário
               </label>
               <div className="flex items-center w-full">
                 <input
@@ -216,7 +205,7 @@ export function IsencaoTaxaGtaPage({ onLogout, onNavigate }: PageProps) {
           {!hasSearched ? (
             <div className="py-5 text-center">
               <p className="text-sm text-gray-500">
-                Busque por isenção de taxa de GTA utilizando o campo de busca e os filtros acima.
+                Busque por isenção de taxa de documento sanitário utilizando o campo de busca e os filtros acima.
               </p>
             </div>
           ) : total === 0 ? (
@@ -234,7 +223,7 @@ export function IsencaoTaxaGtaPage({ onLogout, onNavigate }: PageProps) {
                         className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-normal uppercase"
                       >
                         <div className="flex items-center gap-1.5">
-                          Motivo de Isenção de Taxa de GTA
+                          Motivo de Isenção de Taxa de Documento Sanitário
                           <SortIcon col="motivo" />
                         </div>
                       </th>

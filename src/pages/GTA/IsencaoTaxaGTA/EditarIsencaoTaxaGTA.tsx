@@ -2,6 +2,11 @@ import React, { useState } from "react";
 import { ArrowLeft, Info, ChevronDown, ChevronUp } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, FloatSelect } from "../../../components/ui/FormKit";
+import {
+  atualizarIsencaoTaxaDocumentoSanitario,
+  obterIsencaoTaxaDocumentoSanitario,
+  type IsencaoTaxaDocumentoSanitario,
+} from "./isencaoTaxaGtaData";
 
 const GREEN = "#1A7A3C";
 
@@ -18,11 +23,28 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-export function EditarIsencaoTaxaGtaPage({ dados, onLogout, onNavigate }: { dados?: any; onLogout: () => void; onNavigate: (screen: string, data?: any) => void; }) {
+export function EditarIsencaoTaxaGtaPage({ dados, onLogout, onNavigate }: { dados?: Partial<IsencaoTaxaDocumentoSanitario>; onLogout: () => void; onNavigate: (screen: string, data?: any) => void; }) {
+  const registroAtual = obterIsencaoTaxaDocumentoSanitario(dados);
   const [isSucesso, setIsSucesso] = useState(false);
-  const [motivo, setMotivo] = useState(dados?.motivo || "Instituição de pesquisa");
-  const [situacao, setSituacao] = useState(dados?.situacao || "Ativo");
-  const isencaoAtualizada = { id: dados?.id || 1, motivo, situacao };
+  const [motivo, setMotivo] = useState(registroAtual.motivo);
+  const [situacao, setSituacao] = useState<"Ativo" | "Inativo">(
+    registroAtual.situacao,
+  );
+  const [registroSalvo, setRegistroSalvo] =
+    useState<IsencaoTaxaDocumentoSanitario | null>(null);
+  const isencaoAtualizada: IsencaoTaxaDocumentoSanitario = {
+    id: registroAtual.id,
+    motivo: motivo.trim(),
+    situacao,
+  };
+
+  const salvar = () => {
+    if (!motivo.trim()) return;
+    const resultado =
+      atualizarIsencaoTaxaDocumentoSanitario(isencaoAtualizada);
+    setRegistroSalvo(resultado.registro);
+    setIsSucesso(true);
+  };
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
@@ -33,8 +55,8 @@ export function EditarIsencaoTaxaGtaPage({ dados, onLogout, onNavigate }: { dado
             <ArrowLeft size={15} /> Todas as Isenções
           </button>
           <div className="flex justify-between items-center w-full">
-            <h1 className="text-2xl font-semibold text-gray-900">Editar Isenção de Taxa de GTA</h1>
-            <button type="button" onClick={() => setIsSucesso(true)} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm">
+            <h1 className="text-2xl font-semibold text-gray-900">Editar Isenção de Taxa de Documento Sanitário</h1>
+            <button type="button" disabled={!motivo.trim()} onClick={salvar} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm disabled:cursor-not-allowed disabled:opacity-50">
               Salvar
             </button>
           </div>
@@ -47,8 +69,8 @@ export function EditarIsencaoTaxaGtaPage({ dados, onLogout, onNavigate }: { dado
 
         <Section title="Informações Básicas">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <FloatInput label="Motivo da Isenção de Taxa de GTA" required value={motivo} onChange={setMotivo} />
-            <FloatSelect label="Situação" required value={situacao} onChange={setSituacao} options={[ { value: "Ativo", label: "Ativo" }, { value: "Inativo", label: "Inativo" } ]} />
+            <FloatInput label="Motivo da Isenção de Taxa de Documento Sanitário" required value={motivo} onChange={setMotivo} />
+            <FloatSelect label="Situação" required value={situacao} onChange={(valor) => setSituacao(valor as "Ativo" | "Inativo")} options={[ { value: "Ativo", label: "Ativo" }, { value: "Inativo", label: "Inativo" } ]} />
           </div>
         </Section>
       </main>
@@ -60,7 +82,7 @@ export function EditarIsencaoTaxaGtaPage({ dados, onLogout, onNavigate }: { dado
             <p className="text-sm text-gray-500 mt-1">A isenção "{motivo}" foi atualizada.</p>
             <div className="flex gap-3 justify-center mt-6">
               <button onClick={() => { setIsSucesso(false); onNavigate("isencao-taxa-gta"); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50 transition">Voltar</button>
-              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-isencao-taxa-gta", isencaoAtualizada); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
+              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-isencao-taxa-gta", registroSalvo ?? isencaoAtualizada); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
             </div>
           </div>
         </div>

@@ -45,6 +45,7 @@ import iconeStatusUrl from "./Ícone=Status.svg";
 import iconeVendaPropriedadeUrl from "./Ícone=Venda de Propriedade.svg";
 import iconePapéisUrl from "./Ícone=Papéis.svg";
 import iconeIsencaoTaxaUrl from "./Ícone=Isenção de Taxa.svg";
+import iconeTaxaGTAUrl from "./Ícone=Taxa GTA.svg";
 import iconeAjusteRebanhoUrl from "./Ícone=Ajuste.svg";
 import iconeEtapaUrl from "./Ícone=Etapa.svg";
 
@@ -99,6 +100,7 @@ export {
   iconeVendaPropriedadeUrl,
   iconePapéisUrl,
   iconeIsencaoTaxaUrl,
+  iconeTaxaGTAUrl,
   iconeAjusteRebanhoUrl,
   iconeEtapaUrl
 };
