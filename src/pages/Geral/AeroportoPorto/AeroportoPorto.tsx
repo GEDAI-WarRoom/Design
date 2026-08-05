@@ -289,24 +289,22 @@ export function AeroportoPorto({
                       <td className="px-4 py-3 text-gray-600">
                         {r.situacao}
                       </td>
-                      <td className="px-4 py-3 text-right">
-                        <button
-                          onClick={() =>
-                            onNavigate("visualizar", r)
-                          }
-                          className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md"
-                        >
-                          <ViewIcon size={18} />
-                        </button>
-                        <button
-                          onClick={() =>
-                            onNavigate("editar", r)
-                          }
-                          className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md"
-                        >
-                          <Pencil size={18} />
-                        </button>
-                      </td>
+                      <td className="px-4 py-3 text-right whitespace-nowrap">
+  <div className="flex items-center justify-end gap-1">
+    <button
+      onClick={() => onNavigate("visualizar-aeroporto-porto", r)}
+      className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md"
+    >
+      <ViewIcon size={18} />
+    </button>
+    <button
+      onClick={() => onNavigate("editar-aeroporto-porto", r)}
+      className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md"
+    >
+      <Pencil size={17} />
+    </button>
+  </div>
+</td>
                     </tr>
                   ))}
                 </tbody>

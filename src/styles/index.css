@@ -1,3 +1,20 @@
 @import './fonts.css';
 @import './tailwind.css';
 @import './theme.css';
+
+@keyframes progresso-slide-aviso {
+  from {
+    transform: translate3d(0, 0, 0) scaleX(0);
+  }
+
+  to {
+    transform: translate3d(0, 0, 0) scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [style*='progresso-slide-aviso'] {
+    animation: none !important;
+    transform: scaleX(1);
+  }
+}

@@ -13,11 +13,17 @@ function CadastroSection({ title, children }: { title: string; children: ReactNo
     </section>
   );
 }
+import {
+  ESTABELECIMENTOS_INICIAIS,
+  obterEstabelecimentoAgropecuario,
+  obterHistoricoEstabelecimentoAgropecuario,
+  type EstabelecimentoAgropecuario,
+} from "./estabelecimentoAgropecuarioData";
 
 interface PageProps {
   onLogout: () => void;
   onNavigate: (screen: any, data?: any) => void;
-  dados?: any;
+  dados?: EstabelecimentoAgropecuario;
 }
 
 export function VisualizarEstabelecimentoAgropecuarioPage({ onLogout, onNavigate, dados }: PageProps) {
@@ -70,6 +76,12 @@ export function VisualizarEstabelecimentoAgropecuarioPage({ onLogout, onNavigate
     latitude: registro.latitude || "-21.2453",
     longitude: registro.longitude || "-44.9997",
   };
+  const registroInformado = dados ?? ESTABELECIMENTOS_INICIAIS[0];
+  const registro =
+    obterEstabelecimentoAgropecuario(
+      registroInformado.id ?? registroInformado.codigo,
+    ) ?? registroInformado;
+  const historico = obterHistoricoEstabelecimentoAgropecuario(registro);
 
   const cadastroContent = (
     <div className="flex flex-col gap-5">
@@ -169,6 +181,9 @@ export function VisualizarEstabelecimentoAgropecuarioPage({ onLogout, onNavigate
       allowedTypes={["Responsável Técnico Animal", "Responsável Técnico Vegetal"]}
       cadastroContent={cadastroContent}
       onEditCadastro={() => onNavigate("editar-estabelecimento-agropecuario", registro)}
+      heroImage={registro.imagem ? { src: registro.imagem, alt: `Vista de ${registro.nome}` } : undefined}
+      historicoCadastros={historico}
+      onEdit={() => onNavigate("editar-estabelecimento-agropecuario", registro)}
       fields={[
         { label: "Código do Estabelecimento", value: registro.codigo || "" },
         { label: "Nome do Estabelecimento", value: registro.nome || "" },

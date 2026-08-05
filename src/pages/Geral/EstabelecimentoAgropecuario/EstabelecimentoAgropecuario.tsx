@@ -10,13 +10,11 @@ import {
   Eye as ViewIcon,
   Pencil,
   X,
-  Check,
-  Minus,
-  AlertTriangle,
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatSelect, FloatCombobox, SearchModal, FloatInput } from "../../../components/ui/FormKit";
 import * as Icons from "../../../imports/icons";
+import { listarEstabelecimentosAgropecuarios } from "./estabelecimentoAgropecuarioData";
 
 const GREEN = "#1A7A3C";
 
@@ -97,21 +95,6 @@ const perPageDefault = 10;
 // ==========================================================
 // SUBCOMPONENTES
 // ==========================================================
-function SituacaoBadge({ situacao }: { situacao: EstabelecimentoAgropecuario["situacao"] }) {
-  const map = {
-    Ativo: { bg: "#E6F4EA", border: "#A3E2B8", text: "#1A7A3C", Icon: Check },
-    Inativo: { bg: "#F3F4F6", border: "#E5E7EB", text: "#6B7280", Icon: Minus },
-    Suspenso: { bg: "#FFF9E6", border: "#FFEAA3", text: "#B78103", Icon: AlertTriangle },
-  } as const;
-  const { bg, border, text, Icon } = map[situacao] || map["Inativo"];
-  return (
-    <span className="inline-flex items-center gap-1.5 px-3 h-7 rounded-full text-xs font-semibold whitespace-nowrap" style={{ backgroundColor: bg, border: `1px solid ${border}`, color: text }}>
-      <Icon size={13} strokeWidth={3} />
-      {situacao}
-    </span>
-  );
-}
-
 function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
     <div className="flex items-center gap-2 bg-[#1A7A3C] text-white text-xs font-medium px-3 py-1.5 rounded-md shadow-sm max-w-full">
@@ -151,6 +134,8 @@ export function EstabelecimentoAgropecuarioPage({ onLogout, onNavigate }: PagePr
   const [sortKey, setSortKey] = useState<SortKey>("nome");
   const [sortAsc, setSortAsc] = useState(true);
 
+  const [estabelecimentos] = useState(() => listarEstabelecimentosAgropecuarios());
+    
   // Filtra os proprietários passados para o modal com base no tipo selecionado
   const proprietariosFiltradosModal = PROPRIETARIOS_MOCK.filter(
     (p) => p.tipo === tipoPessoa
@@ -183,7 +168,7 @@ export function EstabelecimentoAgropecuarioPage({ onLogout, onNavigate }: PagePr
   }
 
   // --- Filtros da listagem ---
-  const filtrados = ESTABELECIMENTOS_MOCK.filter((d) => {
+  const filtrados = estabelecimentos.filter((d) => {
     const termo = busca.trim();
     const matchBusca = termo === "" || (d.nome ?? "").includes(termo) || (d.codigo ?? "").includes(termo);
 

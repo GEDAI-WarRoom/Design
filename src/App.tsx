@@ -7,6 +7,12 @@ import { isRouteAllowed, useDemoUser } from "./contexts/DemoUserContext";
 // GERAL
 import { EditarEstabelecimentoAgropecuarioPage } from "./pages/Geral/EstabelecimentoAgropecuario/EditarEstabelecimentoAgropecuario";
 import { EditarVendaPropriedadePage } from "./pages/Geral/VendaPropriedade/EditarVendaPropriedade";
+import { VisualizarDivisaoMunicipalPage } from "./pages/Geral/DivisaoMunicipal/VisualizarDivisaoMunicipal";
+import { EditarDivisaoMunicipalPage } from "./pages/Geral/DivisaoMunicipal/EditarDivisaoMunicipal";
+import { VisualizarAeroportoPortoPage } from "./pages/Geral/AeroportoPorto/VisualizarAeroportoPorto";
+import { EditarAeroportoPortoPage } from "./pages/Geral/AeroportoPorto/EditarAeroportoPorto";
+import { VisualizarAcouguePage } from "./pages/Geral/Acougue/VisualizarAcougue";
+import { EditarAcouguePage } from "./pages/Geral/Acougue/EditarAcougue";
 import { EmissaoATAPage } from "./pages/GTA/EmissaoATA/EmissaoATA";
 import { AdicionarEmissaoATAPage } from "./pages/GTA/EmissaoATA/AdicionarEmissaoATA";
 import { VisualizarEmissaoATAPage } from "./pages/GTA/EmissaoATA/VisualizarEmissaoATA";
@@ -27,6 +33,7 @@ import { VisualizarClassificacaoSanitariaEstadoPage } from "./pages/Geral/Classi
 import { AdicionarDivisaoMunicipalPage } from "./pages/Geral/DivisaoMunicipal/AdicionarDivisaoMunicipal";
 import { DivisaoMunicipalPage } from "./pages/Geral/DivisaoMunicipal/DivisaoMunicipal";
 import { AdicionarEstabelecimentoAgropecuarioPage } from "./pages/Geral/EstabelecimentoAgropecuario/AdicionarEstabelecimentoAgropecuario";
+import { EditarEstabelecimentoAgropecuarioPage } from "./pages/Geral/EstabelecimentoAgropecuario/EditarEstabelecimentoAgropecuario";
 import { EstabelecimentoAgropecuarioPage } from "./pages/Geral/EstabelecimentoAgropecuario/EstabelecimentoAgropecuario";
 import { VisualizarEstabelecimentoAgropecuarioPage } from "./pages/Geral/EstabelecimentoAgropecuario/VisualizarEstabelecimentoAgropecuario";
 import { AdicionarInstituicaoEnsinoPesquisaPage } from "./pages/Geral/InstituiçãoEnsinoPesquisa/AdicionarInstituiçãoEnsinoPesquisa";
@@ -75,6 +82,7 @@ import { VisualizarExploracaoPecuariaPage } from "./pages/Animal/ExploracaoPecua
 import { AdicionarIntegradoraCooperativaPage } from "./pages/Animal/IntegradoraCooperativa/AdicionarIntegradoraCooperativa";
 import { IntegradoraCooperativaPage } from "./pages/Animal/IntegradoraCooperativa/IntegradoraCooperativa";
 import { VisualizarIntegradoraCooperativaPage } from "./pages/Animal/IntegradoraCooperativa/VisualizarIntegradoraCooperativa";
+import { EditarIntegradoraCooperativaPage } from "./pages/Animal/IntegradoraCooperativa/EditarIntegradoraCooperativa";
 import { AdicionarLocalRealizacaoExamePage } from "./pages/Animal/LocalRealizacaoExame/AdicionarLocalRealizacaoExame";
 import { EditarLocalRealizacaoExamePage } from "./pages/Animal/LocalRealizacaoExame/EditarLocalRealizacaoExame";
 import { LocalRealizacaoExamePage } from "./pages/Animal/LocalRealizacaoExame/LocalRealizacaoExame";
@@ -126,6 +134,8 @@ import { CulturaPage } from "./pages/Vegetal/Cultura/Cultura";
 import { VisualizarEstabelecimentoAgroindustrialPOVPage } from "./pages/Vegetal/EstabelecimentoAgroindustrialPOV/VisualizarEstabelecimentoAgroindustrialPOV";
 import { AdicionarPragaPage } from "./pages/Vegetal/Praga/AdicionarPraga";
 import { PragaPage } from "./pages/Vegetal/Praga/Praga";
+import { EditarPragaPage } from "./pages/Vegetal/Praga/EditarPraga";
+import { VisualizarPragaPage } from "./pages/Vegetal/Praga/VisualizarPraga";
 import { AdicionarProfissionalVegetalPage } from "./pages/Vegetal/ProfissionalVegetal/AdicionarProfissionalVegetal";
 import { ProfissionalVegetalPage } from "./pages/Vegetal/ProfissionalVegetal/ProfissionalVegetal";
 import { AdicionarUnidadeConsolidacaoPage } from "./pages/Vegetal/UnidadeConsolidacao/AdicionarUnidadeConsolidacao";
@@ -241,6 +251,8 @@ import { ParametrosSistemaPage } from "./pages/Controle/ParametrosSistema/Parame
 export type Screen =
 | "editar-estabelecimento-agropecuario"
   | "editar-venda-propriedade"
+| "editar-divisao-municipal"
+  | "visualizar-divisao-municipal"
 	| "emissao-ata"
 	| "adicionar-emissao-ata"
 	| "editar-emissao-ata"
@@ -266,6 +278,7 @@ export type Screen =
 	| "adicionar-divisao-municipal"
 	| "estabelecimento-agropecuario"
 	| "adicionar-estabelecimento-agropecuario"
+	| "editar-estabelecimento-agropecuario"
 	| "visualizar-estabelecimento-agropecuario"
 	| "venda-propriedade"
 	| "adicionar-venda-propriedade"
@@ -376,6 +389,7 @@ export type Screen =
 	| "integradora-cooperativa"
 	| "adicionar-integradora-cooperativa"
 	| "visualizar-integradora-cooperativa"
+	| "editar-integradora-cooperativa"
 	| "profissional-animal"
 	| "adicionar-profissional-animal"
 	| "promotora-eventos"
@@ -390,6 +404,8 @@ export type Screen =
 	| "adicionar-cultura"
 	| "praga"
 	| "adicionar-praga"
+	| "editar-praga"
+	| "visualizar-praga"
 	| "profissional-vegetal"
 	| "adicionar-profissional-vegetal"
 	| "finalidade-transito"
@@ -453,8 +469,10 @@ export type Screen =
 	| "visualizar-indice"
 	| "acougue"
 	| "adicionar-acougue"
+	| "editar-acougue"
 	| "visualizar-acougue"
-	| "adicionar-indice";
+	| "editar-aeroporto-porto"
+  | "visualizar-aeroporto-porto";
 
 export default function App() {
 	const [screen, setScreen] = useState<Screen>("login");
@@ -497,6 +515,57 @@ export default function App() {
       return <EditarVendaPropriedadePage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "visualizar-venda-propriedade":
       return <VisualizarVendaPropriedadePage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+		case "divisao-municipal":
+      return (
+        <DivisaoMunicipalPage onLogout={handleLogout} onNavigate={handleNavigate} />
+      );
+    case "adicionar-divisao-municipal":
+      return (
+        <AdicionarDivisaoMunicipalPage onLogout={handleLogout} onNavigate={handleNavigate} />
+      );
+    case "editar-divisao-municipal":
+      return (
+        <EditarDivisaoMunicipalPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />
+      );
+    case "visualizar-divisao-municipal":
+      return (
+        <VisualizarDivisaoMunicipalPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />
+);
+		case "aeroporto-porto":
+      return <AeroportoPorto onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-aeroporto-porto":
+      return <AdicionarAeroportoPorto onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-aeroporto-porto":
+      return <EditarAeroportoPortoPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-aeroporto-porto":
+      return <VisualizarAeroportoPortoPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+		case "acougue":
+      return (
+        <AcouguePage onLogout={handleLogout} onNavigate={handleNavigate} />
+      );
+    case "adicionar-acougue":
+      return (
+        <AdicionarAcouguePage
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "editar-acougue":
+      return (
+        <EditarAcouguePage
+          dados={screenData}
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
+    case "visualizar-acougue":
+      return (
+        <VisualizarAcouguePage
+          dados={screenData}
+          onLogout={handleLogout}
+          onNavigate={handleNavigate}
+        />
+      );
 		case "emissao-ata":
 			return <EmissaoATAPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 		case "adicionar-emissao-ata":
@@ -591,20 +660,6 @@ export default function App() {
 					dadosIniciais={screenData}
 				/>
 			);
-		case "divisao-municipal":
-			return (
-				<DivisaoMunicipalPage
-					onLogout={handleLogout}
-					onNavigate={handleNavigate}
-				/>
-			);
-		case "adicionar-divisao-municipal":
-			return (
-				<AdicionarDivisaoMunicipalPage
-					onLogout={handleLogout}
-					onNavigate={handleNavigate}
-				/>
-			);
 		case "estabelecimento-agropecuario":
 			return (
 				<EstabelecimentoAgropecuarioPage
@@ -617,6 +672,14 @@ export default function App() {
 				<AdicionarEstabelecimentoAgropecuarioPage
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
+				/>
+			);
+		case "editar-estabelecimento-agropecuario":
+			return (
+				<EditarEstabelecimentoAgropecuarioPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
 				/>
 			);
 		case "visualizar-estabelecimento-agropecuario":
@@ -1434,17 +1497,8 @@ export default function App() {
 					onNavigate={handleNavigate}
 				/>
 			);
-		case "aeroporto-porto":
-			return (
-				<AeroportoPorto onLogout={handleLogout} onNavigate={handleNavigate} />
-			);
-		case "adicionar-aeroporto-porto":
-			return (
-				<AdicionarAeroportoPorto
-					onLogout={handleLogout}
-					onNavigate={handleNavigate}
-				/>
-			);
+
+      return <VisualizarAeroportoPortoPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
 		case "registro-venda-gta-fisica":
 			return (
 				<RegistroVendaGtaFisicaPage
@@ -1529,9 +1583,19 @@ export default function App() {
 					onNavigate={handleNavigate}
 				/>
 			);
+
 		case "visualizar-integradora-cooperativa":
 			return (
 				<VisualizarIntegradoraCooperativaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+
+		case "editar-integradora-cooperativa":
+			return (
+				<EditarIntegradoraCooperativaPage
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
 					dados={screenData}
@@ -1624,15 +1688,33 @@ export default function App() {
 			);
 
 		case "praga":
-			return <PragaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+            return <PragaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 
-		case "adicionar-praga":
-			return (
-				<AdicionarPragaPage
-					onLogout={handleLogout}
-					onNavigate={handleNavigate}
-				/>
-			);
+        case "adicionar-praga":
+            return (
+                <AdicionarPragaPage
+                    onLogout={handleLogout}
+                    onNavigate={handleNavigate}
+                />
+            );
+
+        case "editar-praga":
+            return (
+                <EditarPragaPage
+                    onLogout={handleLogout}
+                    onNavigate={handleNavigate}
+                    dados={screenData}
+                />
+            );
+
+        case "visualizar-praga":
+            return (
+                <VisualizarPragaPage
+                    onLogout={handleLogout}
+                    onNavigate={handleNavigate}
+                    dados={screenData}
+                />
+            );
 
 		case "profissional-vegetal":
 			return (
@@ -1997,6 +2079,7 @@ export default function App() {
 				<VisualizarAtestadoExamePage
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
+					dados={screenData}
 				/>
 			);
 		case "editar-atestado-exame":
@@ -2004,22 +2087,9 @@ export default function App() {
 				<EditarAtestadoExamePage
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
+					dados={screenData}
 				/>
 			);
-		case "acougue":
-			return (
-				<AcouguePage onLogout={handleLogout} onNavigate={handleNavigate} />
-			);
-		case "adicionar-acougue":
-		case "editar-acougue":
-		case "visualizar-acougue":
-			return (
-				<AdicionarAcouguePage
-					onLogout={handleLogout}
-					onNavigate={handleNavigate}
-				/>
-			);
-
 		default:
 			return (
 				<DashboardPage onLogout={handleLogout} onNavigate={handleNavigate} />
