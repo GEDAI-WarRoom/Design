@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ArrowLeft, Info, Check, PlusCircle, Trash2, Download } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
-import { FloatInput, FloatSelect, LargeTextArea, UploadField } from "../../../components/ui/FormKit";
+import { FloatInput, LargeTextArea, UploadField } from "../../../components/ui/FormKit";
 import {
   ProprietarioInput,
   BlocoEnderecoFields,
@@ -34,7 +34,6 @@ interface PageProps {
 export function AdicionarAeroportoPorto({ onLogout, onNavigate }: PageProps) {
   // 1. Informações Básicas
   const [nomeComercial, setNomeComercial] = useState("");
-  const [tipoLocal, setTipoLocal] = useState("");
 
   // 2. Proprietários
   const [proprietarios, setProprietarios] = useState<any[]>([{ uid: uid("prop"), entidade: null }]);
@@ -85,10 +84,10 @@ export function AdicionarAeroportoPorto({ onLogout, onNavigate }: PageProps) {
         <div>
           <button type="button" onClick={() => onNavigate("aeroporto-porto")} className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70 font-semibold" style={{ color: GREEN }}>
             <ArrowLeft size={15} />
-            Todos os Aeroportos e Portos
+            Todas as Unidades de Vigilância Agropecuária
           </button>
           <div className="flex justify-between items-center w-full">
-            <h1 className="text-2xl font-semibold text-gray-900">Adicionar Aeroporto / Porto</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">Adicionar Unidade de Vigilância Agropecuária</h1>
             <button type="button" onClick={() => setIsSucesso(true)} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm">
               Adicionar
             </button>
@@ -105,23 +104,13 @@ export function AdicionarAeroportoPorto({ onLogout, onNavigate }: PageProps) {
 
         {/* 1. Informações Básicas */}
         <Section title="Informações Básicas">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 gap-5">
             <FloatInput
-              label="Nome Comercial do Aeroporto / Porto"
+              label="Nome da Unidade de Vigilância Agropecuária"
               required
               value={nomeComercial}
               onChange={setNomeComercial}
               maxLength={255}
-            />
-            <FloatSelect
-              label="Aeroporto ou Porto?"
-              required
-              value={tipoLocal}
-              onChange={setTipoLocal}
-              options={[
-                { value: "Aeroporto", label: "Aeroporto" },
-                { value: "Porto", label: "Porto" }
-              ]}
             />
           </div>
         </Section>
@@ -188,7 +177,7 @@ export function AdicionarAeroportoPorto({ onLogout, onNavigate }: PageProps) {
                       required
                       fileName={anexo.nome}
                       onSelectFile={() =>
-                        setAnexos(prev => prev.map((a, i) => i === index ? { ...a, nome: `anexo_aeroporto_porto_${index + 1}.pdf` } : a))
+                        setAnexos(prev => prev.map((a, i) => i === index ? { ...a, nome: `anexo_unidade_vigilancia_${index + 1}.pdf` } : a))
                       }
                     />
 
@@ -248,7 +237,7 @@ export function AdicionarAeroportoPorto({ onLogout, onNavigate }: PageProps) {
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
 
             <h3 className="text-lg font-bold text-gray-900">Cadastro realizado com sucesso!</h3>
-            <p className="text-sm text-gray-500 mt-1">O {tipoLocal || "Aeroporto / Porto"} "{nomeComercial}" foi adicionado.</p>
+            <p className="text-sm text-gray-500 mt-1">A unidade de vigilância agropecuária "{nomeComercial}" foi adicionada.</p>
             <div className="flex gap-3 justify-center mt-6">
               <button onClick={() => { setIsSucesso(false); onNavigate("aeroporto-porto"); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition">
                 Voltar

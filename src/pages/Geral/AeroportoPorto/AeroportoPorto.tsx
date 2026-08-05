@@ -59,43 +59,35 @@ const SITUACOES = [
   { value: "Ativo", label: "Ativo" },
   { value: "Inativo", label: "Inativo" },
 ];
-const TIPO_LOCAL = [
-  { value: "Aeroporto", label: "Aeroporto" },
-  { value: "Porto", label: "Porto" },
-];
-
-interface AeroportoPorto {
+interface UnidadeVigilanciaAgropecuaria {
   id: number;
   codigo: string;
   nome: string;
   proprietarios: string[];
   municipio: string;
   uf: string;
-  tipo: "Aeroporto" | "Porto";
   situacao: "Ativo" | "Inativo";
 }
 
-const DADOS_MOCK: AeroportoPorto[] = [
+const DADOS_MOCK: UnidadeVigilanciaAgropecuaria[] = [
   {
     id: 1,
     codigo: "3100000001",
-    nome: "Aeroporto Internacional de BH",
+    nome: "Unidade de Vigilância Agropecuária de Belo Horizonte",
     proprietarios: [
       "12.345.678/0001-99 - Aero Concessões Ltda",
     ],
     municipio: "Belo Horizonte",
     uf: "MG",
-    tipo: "Aeroporto",
     situacao: "Ativo",
   },
   {
     id: 2,
     codigo: "3100000002",
-    nome: "Porto Seco de Uberlândia",
+    nome: "Unidade de Vigilância Agropecuária de Uberlândia",
     proprietarios: ["99.888.777/0001-00 - Logística Sul S.A"],
     municipio: "Uberlândia",
     uf: "MG",
-    tipo: "Porto",
     situacao: "Ativo",
   },
 ];
@@ -113,7 +105,6 @@ export function AeroportoPorto({
   const [modalProprietario, setModalProprietario] = useState(false); 
   const [estado, setEstado] = useState("");
   const [municipio, setMunicipio] = useState("");
-  const [tipoLocal, setTipoLocal] = useState("");
   const [situacao, setSituacao] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
@@ -155,7 +146,6 @@ export function AeroportoPorto({
       (!estado ||
         r.uf === (estado === "Minas Gerais" ? "MG" : "SP")) &&
       (!municipio || r.municipio === municipio) &&
-      (!tipoLocal || r.tipo === tipoLocal) &&
       (!situacao || r.situacao === situacao)
     );
   });
@@ -178,7 +168,7 @@ export function AeroportoPorto({
           </button>
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-semibold text-gray-900">
-              Aeroportos e Portos
+              Unidades de Vigilância Agropecuária
             </h1>
             <button
               onClick={() =>
@@ -196,7 +186,7 @@ export function AeroportoPorto({
             <div className="flex-1 border border-gray-300 rounded-md px-3 h-12 flex items-center bg-white">
               <input
                 type="text"
-                placeholder="Código ou Nome do Aeroporto / Porto"
+                placeholder="Código ou Nome da Unidade de Vigilância Agropecuária"
                 value={busca}
                 onChange={(e) => setBusca(e.target.value)}
                 className="w-full h-full text-sm outline-none"
@@ -235,12 +225,6 @@ export function AeroportoPorto({
                 ) }
               
               <FloatSelect
-                label="Aeroporto ou Porto?"
-                value={tipoLocal}
-                onChange={setTipoLocal}
-                options={TIPO_LOCAL}
-              />
-              <FloatSelect
                 label="Situação"
                 value={situacao}
                 onChange={setSituacao}
@@ -260,7 +244,6 @@ export function AeroportoPorto({
                     <th className="px-4 py-3">
                       Município - UF
                     </th>
-                    <th className="px-4 py-3">Tipo</th>
                     <th className="px-4 py-3">Situação</th>
                     <th className="px-4 py-3"></th>
                   </tr>
@@ -282,9 +265,6 @@ export function AeroportoPorto({
                       </td>
                       <td className="px-4 py-3 text-gray-600">
                         {r.municipio} - {r.uf}
-                      </td>
-                      <td className="px-4 py-3 text-gray-600">
-                        {r.tipo}
                       </td>
                       <td className="px-4 py-3 text-gray-600">
                         {r.situacao}

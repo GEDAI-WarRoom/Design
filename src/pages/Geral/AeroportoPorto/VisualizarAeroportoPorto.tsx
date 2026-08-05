@@ -29,10 +29,10 @@ export function VisualizarAeroportoPortoPage({ dados, onLogout, onNavigate }: { 
         {/* Cabeçalho */}
         <div>
           <button type="button" onClick={() => onNavigate("aeroporto-porto")} className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70 font-semibold" style={{ color: GREEN }}>
-            <ArrowLeft size={15} /> Todos os Aeroportos/Portos
+            <ArrowLeft size={15} /> Todas as Unidades de Vigilância Agropecuária
           </button>
           <div className="flex justify-between items-center w-full">
-            <h1 className="text-2xl font-semibold text-gray-900">Visualizar Aeroporto / Porto</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">Visualizar Unidade de Vigilância Agropecuária</h1>
             <button
               type="button"
               onClick={() => onNavigate("editar-aeroporto-porto", local)}
@@ -44,10 +44,9 @@ export function VisualizarAeroportoPortoPage({ dados, onLogout, onNavigate }: { 
 
         {/* Informações Básicas */}
         <Section title="Informações Básicas">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            <FloatInput label="Código" value={local.codigo || "AP-001"} disabled onChange={() => { }} />
-            <FloatInput label="Nome Comercial do Aeroporto/Porto" value={local.nome || "Aeroporto Regional"} disabled onChange={() => { }} />
-            <FloatInput label="Aeroporto ou Porto?" value={local.tipo || "Aeroporto"} disabled onChange={() => { }} />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <FloatInput label="Código" value={local.codigo || "UVA-001"} disabled onChange={() => { }} />
+            <FloatInput label="Nome da Unidade de Vigilância Agropecuária" value={local.nome || "Unidade de Vigilância Agropecuária Regional"} disabled onChange={() => { }} />
           </div>
         </Section>
 
@@ -130,7 +129,7 @@ export function VisualizarAeroportoPortoPage({ dados, onLogout, onNavigate }: { 
             {/* Linha 2: Endereço, Número e Complemento */}
             <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
               <div className="md:col-span-6">
-                <FloatInput label="Endereço" value={local.endereco || "Avenida Aeroporto"} disabled onChange={() => { }} />
+                <FloatInput label="Endereço" value={local.endereco || "Avenida Principal"} disabled onChange={() => { }} />
               </div>
               <div className="md:col-span-3">
                 <FloatInput label="Número" value={local.numero || "S/N"} disabled onChange={() => { }} />
@@ -197,7 +196,7 @@ export function VisualizarAeroportoPortoPage({ dados, onLogout, onNavigate }: { 
                   />
                   <FloatInput
                     label="E-mail"
-                    value={local.email || "contato@aeroporto.com.br"}
+                    value={local.email || "contato@uvaregional.gov.br"}
                     disabled
                     onChange={() => { }}
                   />
@@ -261,7 +260,7 @@ export function VisualizarAeroportoPortoPage({ dados, onLogout, onNavigate }: { 
                       />
                       <FloatInput
                         label="Descrição"
-                        value={typeof anexo === "string" ? "-" : anexo?.descricao || "Licença do Aeroporto"}
+                        value={typeof anexo === "string" ? "-" : anexo?.descricao || "Documento de funcionamento da unidade"}
                         disabled
                         onChange={() => { }}
                       />

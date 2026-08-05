@@ -86,7 +86,7 @@ export const cadastrosCategories: MenuCategory[] = [
 				route: "pendencias-confirmacao-gta",
 				icon: <Bell size={16} />,
 			},      {
-        label: "Aeroporto/Porto",
+        label: "Unidade de Vigilância Agropecuária",
         route: "aeroporto-porto",
         icon: <TowerControl size={16} />,
       },

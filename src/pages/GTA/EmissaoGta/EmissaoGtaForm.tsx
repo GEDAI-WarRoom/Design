@@ -502,6 +502,7 @@ function EntityPicker<T extends EntidadeGta = EntidadeGta>({
   icon,
   semComplemento,
   devValue,
+  tooltipText,
 }: {
   label: string;
   value: T | null;
@@ -517,6 +518,7 @@ function EntityPicker<T extends EntidadeGta = EntidadeGta>({
   icon?: ReactNode;
   semComplemento?: boolean;
   devValue?: string;
+  tooltipText?: string;
 }) {
   const codigo = value?.[codeKey] ?? "";
   const colunasModal = columns ?? [
@@ -548,6 +550,8 @@ function EntityPicker<T extends EntidadeGta = EntidadeGta>({
       title={`Buscar ${label}`}
       subtitle={`Busque por ${label.toLowerCase()} cadastrado no sistema:`}
       confirmLabel="Selecionar"
+      hasTooltip={Boolean(tooltipText)}
+      tooltipText={tooltipText}
       onChange={onChange}
     />
   );
@@ -638,7 +642,7 @@ function LocalDentroEstado({
     <div className="flex flex-col gap-5">
       <EntityPicker
         label={isDestino ? "Responsável de Destino" : "Responsável de Procedência"}
-        devValue={isDestino ? "José Aarão Neto" : "Agro Pecuária Vale Verde Ltda"}
+        devValue={isDestino ? "José Aarão Neto" : undefined}
         value={local.responsavel}
         data={PESSOAS_GTA}
         codeLabel="CPF/CNPJ"
@@ -674,7 +678,7 @@ function LocalDentroEstado({
               )}
               <EntityPicker
                 label="Estabelecimento Agropecuário"
-                devValue={isDestino ? "Fazenda Recanto dos Pássaros" : "Granja Vale Verde"}
+                devValue={isDestino ? "[INTERDITADO] Fazenda Recanto dos Pássaros" : undefined}
                 value={local.estabelecimento}
                 data={estabelecimentos}
                 codeLabel="Código do Estabelecimento"
@@ -706,7 +710,7 @@ function LocalDentroEstado({
                 <div className="md:col-span-12">
                   <EntityPicker
                     label="Exploração Pecuária"
-                    devValue="Exploração Aves - Vale Verde\nCódigo: 310020300401002"
+                    devValue={isDestino ? "Exploração Aves - Vale Verde\nCódigo: 310020300401002" : undefined}
                     value={local.exploracao}
                     data={exploracoes}
                     codeLabel="Espécie"
@@ -728,7 +732,7 @@ function LocalDentroEstado({
                   <div className="md:col-span-12 animate-fadeIn">
                     <EntityPicker
                       label="Núcleo de Produção"
-                      devValue="Núcleo A"
+                      devValue={isDestino ? "Núcleo A" : undefined}
                       value={local.nucleo}
                       data={nucleos}
                       codeLabel="Código do Núcleo"
@@ -912,54 +916,80 @@ function DadosComplementaresProcedencia({
   const nucleo = value.procedencia.nucleo;
   const exploracao = value.procedencia.exploracao;
   if (!nucleo && !exploracao) return null;
+  const exibeCertificados =
+    value.especie?.grupo !== "Bovinos" &&
+    value.especie?.grupo !== "Bovídeos";
   return (
-    <>
+    <Section title="Informações Adicionais da Procedência" defaultOpen={false}>
       {nucleo && (
-        <Section title="Característica do Núcleo de Produção" defaultOpen={false}>
+        <div className="flex flex-col gap-4">
+          <h3 className="border-b border-gray-100 pb-3 text-sm font-semibold text-gray-700">
+            Característica
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            <FloatInput
-              label={
-                value.especie?.grupo === "Suídeos"
-                  ? "Tipo de Produção"
-                  : "Característica"
-              }
-              value={nucleo.caracteristica}
-              disabled
-              required
-            />
-            <FloatInput
-              label="Área de Atuação"
-              value={nucleo.areaAtuacao}
-              disabled
-              required
-            />
-            <FloatInput
-              label="Classificação"
-              value={nucleo.classificacao}
-              disabled
-              required
-            />
+            {value.especie?.grupo === "Aves" ? (
+              <>
+                <FloatInput
+                  label="Área de Atuação"
+                  value={nucleo.areaAtuacao}
+                  disabled
+                  required
+                />
+                <FloatInput
+                  label="Classificação"
+                  value={nucleo.classificacao}
+                  disabled
+                  required
+                />
+                <FloatInput
+                  label="Caracterização Adicional"
+                  value={nucleo.caracteristica}
+                  disabled
+                  required
+                />
+              </>
+            ) : (
+              <>
+                <FloatInput
+                  label={
+                    value.especie?.grupo === "Suídeos"
+                      ? "Tipo de Produção Técnica"
+                      : "Característica"
+                  }
+                  value={nucleo.caracteristica}
+                  disabled
+                  required
+                />
+                <FloatInput
+                  label="Área de Atuação"
+                  value={nucleo.areaAtuacao}
+                  disabled
+                  required
+                />
+                <FloatInput
+                  label="Classificação"
+                  value={nucleo.classificacao}
+                  disabled
+                  required
+                />
+              </>
+            )}
           </div>
-        </Section>
+        </div>
       )}
-      {value.especie?.grupo !== "Bovinos" &&
-        value.especie?.grupo !== "Bovídeos" && (
-          <Section
-            title={
-              nucleo
-                ? "Certificados do Núcleo de Produção"
-                : "Certificados da Exploração Pecuária"
-            }
-            defaultOpen={false}
-          >
+      {exibeCertificados && (
+        <div className="flex flex-col gap-4">
+          <h3 className="border-b border-gray-100 pb-3 text-sm font-semibold text-gray-700">
+            Certificado
+          </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               <FloatInput label="Tipo" value="Sanitário" disabled required />
               <FloatInput label="Número" value="0212024" disabled required />
               <FloatInput label="Validade" value="25/03/2027" disabled required />
             </div>
-          </Section>
-        )}
-    </>
+        </div>
+      )}
+    </Section>
   );
 }
 
@@ -1311,6 +1341,12 @@ export function EmissaoGtaForm({
   const especieGrandesAnimais = ["Bovídeos", "Equídeos"].includes(
     value.especie?.grupo ?? "",
   );
+  const selecoesIniciaisPreenchidas = Boolean(
+    value.especie && value.finalidade,
+  );
+  const mensagemSelecoesIniciais = value.especie
+    ? "Selecione uma finalidade de trânsito para carregar."
+    : "Selecione uma espécie para carregar.";
   const [endereco, setEndereco] = useState<EnderecoState>({
     zona: "Urbana",
     cep: "",
@@ -1425,6 +1461,7 @@ export function EmissaoGtaForm({
             />
             <EntityPicker
               label="Finalidade de Trânsito"
+              tooltipText="Selecione a finalidade para a qual os animais serão transportados."
               value={value.finalidade}
               data={FINALIDADES_GTA}
               icon={<Truck size={18} className="text-[#1A7A3C]" />}
@@ -1456,7 +1493,12 @@ export function EmissaoGtaForm({
       )}
 
       <Section title="Informações da Procedência">
-        <div className="flex flex-col gap-5">
+        {!selecoesIniciaisPreenchidas ? (
+          <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-500">
+            {mensagemSelecoesIniciais}
+          </p>
+        ) : (
+          <div className="flex flex-col gap-5">
           <FloatSelect
             label="Tipo de Procedência"
             required
@@ -1479,13 +1521,21 @@ export function EmissaoGtaForm({
               disabled={disabled}
             />
           )}
-        </div>
+          </div>
+        )}
       </Section>
 
-      <DadosComplementaresProcedencia value={value} />
+      {selecoesIniciaisPreenchidas && (
+        <DadosComplementaresProcedencia value={value} />
+      )}
 
       <Section title="Informações de Destino">
-        <div className="flex flex-col gap-5">
+        {!selecoesIniciaisPreenchidas ? (
+          <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-500">
+            {mensagemSelecoesIniciais}
+          </p>
+        ) : (
+          <div className="flex flex-col gap-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <FloatSelect
               label="Tipo de Destino"
@@ -1534,14 +1584,14 @@ export function EmissaoGtaForm({
               disabled={disabled}
             />
           )}
-        </div>
+          </div>
+        )}
       </Section>
 
       <Section title="Informações do Trânsito">
         <div className="flex flex-col gap-5">
-          {/* Adicionado items-end para alinhar todos os filhos pela parte de baixo */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-5 items-end">
-            <div className="md:col-span-3">
+          <div>
+            <div>
               <MeioTransporteSelector
                 label="Meio de Transporte"
                 value={value.meiosTransporte}
@@ -1552,30 +1602,11 @@ export function EmissaoGtaForm({
               />
             </div>
 
-            {value.meiosTransporte.includes("Rodoviário") && (
-              <div className="md:col-span-1">
-                <FloatInput
-                  label="Placa do Veículo"
-                  value={value.placaVeiculo}
-                  maxLength={7}
-                  onChange={(placaVeiculo) =>
-                    update(
-                      "placaVeiculo",
-                      placaVeiculo
-                        .replace(/[^a-zA-Z0-9]/g, "")
-                        .toUpperCase()
-                        .slice(0, 7),
-                    )
-                  }
-                  disabled={disabled}
-                />
-              </div>
-            )}
           </div>
           {value.especie?.nome !== "Bovino" && (
             <SimNao
               name="possuiParadaDescanso"
-              label="Possui Parada para Descanso?"
+              label="Possui Parada para Descanso dos Animais?"
               required
               value={value.possuiParadaDescanso ?? "Não"}
               onChange={(val) => update("possuiParadaDescanso", val)}
@@ -1601,6 +1632,7 @@ export function EmissaoGtaForm({
         </div>
       </Section>
 
+      {selecoesIniciaisPreenchidas && (
       <Section title="Informações dos Animais">
         {!value.especie ? (
           <p className="text-sm text-gray-500">
@@ -1751,6 +1783,7 @@ export function EmissaoGtaForm({
           </div>
         )}
       </Section>
+      )}
 
 
 
@@ -1875,6 +1908,7 @@ export function EmissaoGtaForm({
         </Section>
       )}
 
+      {selecoesIniciaisPreenchidas && (
       <Section title="Atestados">
         <div className="flex flex-col gap-4">
           <UploadField
@@ -1967,7 +2001,9 @@ export function EmissaoGtaForm({
           </DynamicListWrapper>
         </div>
       </Section>
+      )}
 
+      {selecoesIniciaisPreenchidas && (
       <Section title="Observações">
         <div className="flex flex-col gap-6">
           {value.especie?.grupo === "Aves" && value.procedencia.nucleo && (
@@ -2081,6 +2117,7 @@ export function EmissaoGtaForm({
           />
         </div>
       </Section>
+      )}
       <Section title="Informações da GTA">
         <div className="flex flex-col gap-5">
           <SimNao
@@ -2251,12 +2288,6 @@ export function emissaoGtaValida(value: EmissaoGtaFormValue) {
     value.meiosTransporte.length === 0 ||
     !value.atestadoSanitario ||
     !value.observacoes.trim()
-  )
-    return false;
-  if (
-    value.meiosTransporte.includes("Rodoviário") &&
-    value.placaVeiculo &&
-    !/^[A-Z]{3}\d(?:[A-Z]\d{2}|\d{3})$/.test(value.placaVeiculo)
   )
     return false;
   const hoje = new Date().toISOString().slice(0, 10);

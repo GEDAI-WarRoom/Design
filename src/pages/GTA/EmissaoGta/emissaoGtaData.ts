@@ -125,7 +125,6 @@ export interface EmissaoGtaFormValue {
   procedencia: LocalGta;
   destino: DestinoGta;
   meiosTransporte: string[];
-  placaVeiculo: string;
   possuiParadaDescanso: "Sim" | "Não";
   enderecoParadaDescanso?: EnderecoParadaDescanso; // 👈 Adicione esta linha (com ? se opcional)
   faixasAnimais: FaixaAnimalGta[];
@@ -246,7 +245,7 @@ export const PESSOAS_GTA: EntidadeGta[] = [
 ];
 
 export const ESTABELECIMENTOS_GTA: EntidadeGta[] = [
-  { id: 1, codigo: "31002030039", nome: "Fazenda Recanto dos Pássaros", municipio: "Lavras - MG", proprietarios: "Carlos Henrique Souza" },
+  { id: 1, codigo: "31002030039", nome: "[INTERDITADO] Fazenda Recanto dos Pássaros", municipio: "Lavras - MG", proprietarios: "Carlos Henrique Souza" },
   { id: 2, codigo: "31002030040", nome: "Granja Vale Verde", municipio: "Nepomuceno - MG", proprietarios: "Marcos Silva, Ana Paula Nunes" },
   { id: 3, codigo: "31002030041", nome: "Fazenda Santa Rita", municipio: "Ijaci - MG", proprietarios: "Maria Oliveira" },
 ];
@@ -259,7 +258,7 @@ export const ESTABELECIMENTOS_INTERDITADOS_GTA: Record<string, {
   status: string[];
   observacao: string;
 }> = {
-  "Fazenda Recanto dos Pássaros": {
+  "[INTERDITADO] Fazenda Recanto dos Pássaros": {
     inicio: "20/02/2026",
     validade: "20/05/2026",
     status: [
@@ -535,7 +534,6 @@ export function criarEmissaoGtaVazia(): EmissaoGtaFormValue {
     procedencia: criarLocalVazio(),
     destino: criarDestinoVazio(),
     meiosTransporte: [],
-    placaVeiculo: "",
     possuiParadaDescanso: "Não",
     faixasAnimais: [],
     possuiMotivoIsencaoTaxa: "",
@@ -586,7 +584,6 @@ function criarRegistroInicial(
     procedencia,
     destino,
     meiosTransporte: ["Rodoviário"],
-    placaVeiculo: "ABC1D23",
     faixasAnimais: criarFaixasAnimais(especie).map((item, index) => ({
       ...item,
       animaisGta: index < 2 ? 5 : 0,
