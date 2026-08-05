@@ -63,7 +63,11 @@ import { EspeciePage } from "./pages/Animal/Especie/Especie";
 import { VisualizarEspeciePage } from "./pages/Animal/Especie/VisualizarEspecie";
 import { EditarEspeciePage } from "./pages/Animal/Especie/EditarEspecie";
 import { VisualizarEstabelecimentoAgroindustrialOutrasInspecoesPage } from "./pages/Animal/EstabelecimentoAgroindustrialOutrasInspecoes/VisualizarEstabelecimentoAgroindustrialOutrasInspecoes";
+import { AdicionarEstabelecimentoAgroindustrialOutrasInspecoesPage } from "./pages/Animal/EstabelecimentoAgroindustrialOutrasInspecoes/AdicionarEstabelecimentoAgroindustrialOutrasInspecoes";
+import { EditarEstabelecimentoAgroindustrialOutrasInspecoesPage } from "./pages/Animal/EstabelecimentoAgroindustrialOutrasInspecoes/EditarEstabelecimentoAgroindustrialOutrasInspecoes";
+import { EstabelecimentoAgroindustrialOutrasInspecoesPage } from "./pages/Animal/EstabelecimentoAgroindustrialOutrasInspecoes/EstabelecimentoAgroindustrialOutrasInspecoes";
 import { AdicionarEstabelecimentoAgroindustrialSIEMGPage } from "./pages/Animal/EstabelecimentoAgroindustrialSIEMG/AdicionarEstabelecimentoAgroindustrialSIEMG";
+import { EditarEstabelecimentoAgroindustrialSIEMGPage } from "./pages/Animal/EstabelecimentoAgroindustrialSIEMG/EditarEstabelecimentoAgroindustrialSIEMG";
 import { EstabelecimentoAgroindustrialSIEMGPage } from "./pages/Animal/EstabelecimentoAgroindustrialSIEMG/EstabelecimentoAgroindustrialSIEMG";
 import { VisualizarEstabelecimentoAgroindustrialSIEMGPage } from "./pages/Animal/EstabelecimentoAgroindustrialSIEMG/VisualizarEstabelecimentoAgroindustrialSIEMG";
 import { AdicionarEstabelecimentoEventoPecuarioPage } from "./pages/Animal/EstabelecimentoEventoPecuario/AdicionarEstabelecimentoEventoPecuario";
@@ -122,6 +126,9 @@ import { VisualizarLancamentoRebanhoPage } from "./pages/Rebanho/LancamentoReban
 // VEGETAL
 import { AdicionarCulturaPage } from "./pages/Vegetal/Cultura/AdicionarCultura";
 import { CulturaPage } from "./pages/Vegetal/Cultura/Cultura";
+import { AdicionarEstabelecimentoAgroindustrialPOVPage } from "./pages/Vegetal/EstabelecimentoAgroindustrialPOV/AdicionarEstabelecimentoAgroindustrialPOV";
+import { EditarEstabelecimentoAgroindustrialPOVPage } from "./pages/Vegetal/EstabelecimentoAgroindustrialPOV/EditarEstabelecimentoAgroindustrialPOV";
+import { EstabelecimentoAgroindustrialPOVPage } from "./pages/Vegetal/EstabelecimentoAgroindustrialPOV/EstabelecimentoAgroindustrialPOV";
 import { VisualizarEstabelecimentoAgroindustrialPOVPage } from "./pages/Vegetal/EstabelecimentoAgroindustrialPOV/VisualizarEstabelecimentoAgroindustrialPOV";
 import { AdicionarPragaPage } from "./pages/Vegetal/Praga/AdicionarPraga";
 import { PragaPage } from "./pages/Vegetal/Praga/Praga";
@@ -354,8 +361,15 @@ export type Screen =
 	| "agroindustrial-sie"
 	| "adicionar-agroindustrial-sie"
 	| "visualizar-estabelecimento-poa"
+	| "editar-estabelecimento-poa"
+	| "agroindustrial-outras-inspecoes"
+	| "adicionar-agroindustrial-outras-inspecoes"
 	| "visualizar-agroindustrial-outras-inspecoes"
+	| "editar-agroindustrial-outras-inspecoes"
+	| "agroindustrial-pov"
+	| "adicionar-agroindustrial-pov"
 	| "visualizar-agroindustrial-pov"
+	| "editar-agroindustrial-pov"
 	| "distribuicao-formularios-gta"
 	| "adicionar-distribuicao-formularios-gta"
 	| "valor-indice"
@@ -1252,6 +1266,14 @@ export default function App() {
 					dados={screenData}
 				/>
 			);
+		case "editar-estabelecimento-poa":
+			return (
+				<EditarEstabelecimentoAgroindustrialSIEMGPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
 		case "visualizar-agroindustrial-outras-inspecoes":
 			return (
 				<VisualizarEstabelecimentoAgroindustrialOutrasInspecoesPage
@@ -1260,9 +1282,53 @@ export default function App() {
 					dados={screenData}
 				/>
 			);
+		case "agroindustrial-outras-inspecoes":
+			return (
+				<EstabelecimentoAgroindustrialOutrasInspecoesPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-agroindustrial-outras-inspecoes":
+			return (
+				<AdicionarEstabelecimentoAgroindustrialOutrasInspecoesPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "editar-agroindustrial-outras-inspecoes":
+			return (
+				<EditarEstabelecimentoAgroindustrialOutrasInspecoesPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
 		case "visualizar-agroindustrial-pov":
 			return (
 				<VisualizarEstabelecimentoAgroindustrialPOVPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "agroindustrial-pov":
+			return (
+				<EstabelecimentoAgroindustrialPOVPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-agroindustrial-pov":
+			return (
+				<AdicionarEstabelecimentoAgroindustrialPOVPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "editar-agroindustrial-pov":
+			return (
+				<EditarEstabelecimentoAgroindustrialPOVPage
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
 					dados={screenData}

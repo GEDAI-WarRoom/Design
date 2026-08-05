@@ -6,13 +6,13 @@ interface PageProps {
   dados?: any;
 }
 
-export function VisualizarEstabelecimentoAgroindustrialSIEMGPage({ onLogout, onNavigate, dados }: PageProps) {
+export function EditarEstabelecimentoAgroindustrialSIEMGPage({ onLogout, onNavigate, dados }: PageProps) {
   return (
     <AdicionarEstabelecimentoAgroindustrialSIEMGPage
       onLogout={onLogout}
       onNavigate={onNavigate}
       dados={dados}
-      modo="visualizar"
+      modo="editar"
     />
   );
 }

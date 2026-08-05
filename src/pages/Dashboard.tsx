@@ -231,8 +231,8 @@ export const cadastrosCategories: MenuCategory[] = [
 					/>
 				),
 			},
-			{
-				label: "Estabelecimento Agroindustrial POA - SIE/MG",
+				{
+					label: "Estabelecimento Agroindustrial POA - SIE/MG",
 				route: "agroindustrial-sie",
 				icon: (
 					<img
@@ -240,8 +240,19 @@ export const cadastrosCategories: MenuCategory[] = [
 						alt="Estabelecimento Agroindustrial"
 						className="w-4 h-4"
 					/>
-				),
-			},
+					),
+				},
+				{
+					label: "Estabelecimento Agroindustrial POA - Outras Inspeções",
+					route: "agroindustrial-outras-inspecoes",
+					icon: (
+						<img
+							src={Icons.iconeEstabelecimentoAgroindustrialUrl}
+							alt="Estabelecimento Agroindustrial"
+							className="w-4 h-4"
+						/>
+					),
+				},
 			{
 				label: "Passaporte Equestre",
 				route: "passaporte-equestre",
@@ -317,6 +328,17 @@ export const cadastrosCategories: MenuCategory[] = [
 			/>
 		),
 		items: [
+			{
+				label: "Estabelecimento Agroindustrial POV",
+				route: "agroindustrial-pov",
+				icon: (
+					<img
+						src={Icons.iconeEstabelecimentoAgroindustrialUrl}
+						alt="Estabelecimento Agroindustrial POV"
+						className="w-4 h-4 object-contain"
+					/>
+				),
+			},
 			{
 				label: "Unidade de Consolidação",
 				route: "unidade-consolidacao",

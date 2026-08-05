@@ -1678,9 +1678,33 @@ export function BlocoEnderecoFields({
 					disabled={isGlobalDisabled}
 					onChange={(v) => onChange("estado", v)}
 					options={[
+						{ value: "Acre", label: "Acre" },
+						{ value: "Alagoas", label: "Alagoas" },
+						{ value: "Amapá", label: "Amapá" },
+						{ value: "Amazonas", label: "Amazonas" },
+						{ value: "Bahia", label: "Bahia" },
+						{ value: "Ceará", label: "Ceará" },
+						{ value: "Distrito Federal", label: "Distrito Federal" },
+						{ value: "Espírito Santo", label: "Espírito Santo" },
+						{ value: "Goiás", label: "Goiás" },
+						{ value: "Maranhão", label: "Maranhão" },
+						{ value: "Mato Grosso", label: "Mato Grosso" },
+						{ value: "Mato Grosso do Sul", label: "Mato Grosso do Sul" },
 						{ value: "Minas Gerais", label: "Minas Gerais" },
-						{ value: "São Paulo", label: "São Paulo" },
+						{ value: "Pará", label: "Pará" },
+						{ value: "Paraíba", label: "Paraíba" },
+						{ value: "Paraná", label: "Paraná" },
+						{ value: "Pernambuco", label: "Pernambuco" },
+						{ value: "Piauí", label: "Piauí" },
 						{ value: "Rio de Janeiro", label: "Rio de Janeiro" },
+						{ value: "Rio Grande do Norte", label: "Rio Grande do Norte" },
+						{ value: "Rio Grande do Sul", label: "Rio Grande do Sul" },
+						{ value: "Rondônia", label: "Rondônia" },
+						{ value: "Roraima", label: "Roraima" },
+						{ value: "Santa Catarina", label: "Santa Catarina" },
+						{ value: "São Paulo", label: "São Paulo" },
+						{ value: "Sergipe", label: "Sergipe" },
+						{ value: "Tocantins", label: "Tocantins" },
 					]}
 				/>
 				<FloatCombobox
@@ -3100,6 +3124,7 @@ interface ResponsavelTecnicoInputProps {
 	value: string;
 	onChange: (entidade: any) => void;
 	onEyeClick?: () => void;
+	icon?: React.ReactNode;
 	error?: boolean;
 	disabled?: boolean;
 	required?: boolean;
@@ -3112,6 +3137,7 @@ export const ResponsavelTecnicoInput: React.FC<
 	value,
 	onChange,
 	onEyeClick,
+	icon,
 	error,
 	disabled,
 	required = false,
@@ -3138,13 +3164,13 @@ export const ResponsavelTecnicoInput: React.FC<
 							{ label: "Nome", key: "nome" },
 							{ label: "CPF", key: "documento" },
 						]}
-						icon={
+						icon={icon || (
 							<UserRoundCheck
 								size={18}
 								color={GREEN}
 								className="mr-2 -ml-1 flex-shrink-0"
 							/>
-						}
+						)}
 						title="Buscar Responsável Técnico"
 						subtitle="Busque por um profissional responsável técnico cadastrado:"
 						onChange={onChange}

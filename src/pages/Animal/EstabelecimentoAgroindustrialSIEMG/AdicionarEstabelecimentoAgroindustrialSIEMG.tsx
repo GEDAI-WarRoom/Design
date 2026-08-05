@@ -1,15 +1,15 @@
 import React, { useState, useMemo, ReactNode } from "react";
 import {
   ArrowLeft, ChevronUp, ChevronDown, Check, Info, Trash2, PlusCircle, ShoppingCart,
-  Download, Dna, Package, Ruler, Calendar, Shuffle, Beef, Milk, Disc, Layers, Home, Activity, Hexagon, Egg, Fish
+  Download, Dna, Package, Ruler, Calendar, Shuffle, Beef, Milk, Disc, Layers, Home, Activity, Hexagon, Egg, Fish, Pencil, CircleCheck
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import {
-  FloatInput, FloatSelect, FloatCombobox, CustomButton, UploadField,
-  LargeTextArea, CheckboxGroup, SimNao, FloatMultiSelect,
+  FloatInput, FloatSelect, CustomButton, UploadField,
+  LargeTextArea, CheckboxGroup, SimNao, MultiSearchModal,
 } from "../../../components/ui/FormKit";
 import {
-  DynamicListWrapper, ProprietarioInput, ResponsavelTecnicoInput,
+  DynamicListWrapper, EntitySearchInput, ProprietarioInput, ResponsavelTecnicoInput,
   ExploracaoPecuariaInput, BlocoEnderecoFields, BlocoContatoFields,
 } from "../../../components/ui/EntitySearch";
 import * as Icons from "../../../imports/icons";
@@ -43,10 +43,27 @@ const UNIDADES_MEDIDA_ANIMAL_MOCK = [
   { id: 2, nome: "Toneladas" },
 ];
 const PRODUTOS_MOCK = [
-  { id: 1, nome: "Ovo", areaAtuacao: ["Ovos"], classificacao: ["matéria-prima", "produtos finais"], unidade: "Unidades" },
-  { id: 2, nome: "Iogurte", areaAtuacao: ["Leite"], classificacao: ["produtos finais"], unidade: "Litros" },
-  { id: 3, nome: "Queijo Minas", areaAtuacao: ["Leite"], classificacao: ["produtos finais"], unidade: "Kg" },
-  { id: 4, nome: "Carne Bovina", areaAtuacao: ["Carne"], classificacao: ["matéria-prima", "produtos finais"], unidade: "Kg" },
+  // Carne
+  { id: 1, nome: "Carcaça Bovina", areaAtuacao: ["Carne"], classificacao: ["matéria-prima"], unidade: "Kg" },
+  { id: 2, nome: "Carne Bovina", areaAtuacao: ["Carne"], classificacao: ["produtos finais"], unidade: "Kg" },
+  { id: 3, nome: "Linguiça Suína", areaAtuacao: ["Carne"], classificacao: ["produtos finais"], unidade: "Kg" },
+  // Leite
+  { id: 4, nome: "Leite Cru Refrigerado", areaAtuacao: ["Leite"], classificacao: ["matéria-prima"], unidade: "Litros" },
+  { id: 5, nome: "Leite Pasteurizado", areaAtuacao: ["Leite"], classificacao: ["produtos finais"], unidade: "Litros" },
+  { id: 6, nome: "Iogurte", areaAtuacao: ["Leite"], classificacao: ["produtos finais"], unidade: "Litros" },
+  { id: 7, nome: "Queijo Minas", areaAtuacao: ["Leite"], classificacao: ["produtos finais"], unidade: "Kg" },
+  // Mel
+  { id: 8, nome: "Mel In Natura", areaAtuacao: ["Mel"], classificacao: ["matéria-prima"], unidade: "Kg" },
+  { id: 9, nome: "Mel Beneficiado", areaAtuacao: ["Mel"], classificacao: ["produtos finais"], unidade: "Kg" },
+  { id: 10, nome: "Própolis", areaAtuacao: ["Mel"], classificacao: ["produtos finais"], unidade: "Kg" },
+  // Ovos
+  { id: 11, nome: "Ovo em Casca", areaAtuacao: ["Ovos"], classificacao: ["matéria-prima"], unidade: "Unidades" },
+  { id: 12, nome: "Ovos Classificados", areaAtuacao: ["Ovos"], classificacao: ["produtos finais"], unidade: "Dúzias" },
+  { id: 13, nome: "Ovo Líquido Pasteurizado", areaAtuacao: ["Ovos"], classificacao: ["produtos finais"], unidade: "Litros" },
+  // Pescado
+  { id: 14, nome: "Pescado Inteiro Fresco", areaAtuacao: ["Pescado"], classificacao: ["matéria-prima"], unidade: "Kg" },
+  { id: 15, nome: "Filé de Peixe Congelado", areaAtuacao: ["Pescado"], classificacao: ["produtos finais"], unidade: "Kg" },
+  { id: 16, nome: "Pescado Eviscerado", areaAtuacao: ["Pescado"], classificacao: ["produtos finais"], unidade: "Kg" },
 ];
 
 // ==========================================================
@@ -132,83 +149,135 @@ const uid = (p: string) => `${p}-${Date.now()}-${Math.random().toString(36).slic
 interface PageProps {
   onLogout: () => void;
   onNavigate: (screen: any, data?: any) => void;
+  dados?: any;
+  modo?: "adicionar" | "visualizar" | "editar";
 }
 
-export function AdicionarEstabelecimentoAgroindustrialSIEMGPage({ onLogout, onNavigate }: PageProps) {
-  const [nomeComercial, setNomeComercial] = useState("");
-  const [possuiIsencaoIE, setPossuiIsencaoIE] = useState<boolean | "">("");
-  const [inscricaoEstadual, setInscricaoEstadual] = useState("");
+export const EXEMPLO_ESTABELECIMENTO_AGROINDUSTRIAL_SIE_MG = {
+  id: 1,
+  codigoUnico: "3100000001",
+  numeroRegistro: "3100000001",
+  situacao: "Ativo",
+  nomeComercial: "Frigorífico São José",
+  possuiIsencaoIE: false,
+  inscricaoEstadual: "1453705800094",
+  proprietarios: [{ uid: "prop-exemplo", proprietario: { id: 1, nome: "José Aarão Neto", documento: "555.009.956-40" } }],
+  ehEapp: false,
+  codigoSie: "17126",
+  dataHabilitacaoSie: "2025-01-01",
+  areaAtuacao: ["Carne"],
+  classifCarne: ["Abatedouro Frigorífico"],
+  ativAbatedouroCarne: ["Desossa", "Industrialização"],
+  especiesAbateCarne: [{ uid: "eac-exemplo", especie: ESPECIES_ABATE_MOCK[0], capacidade: "100", unidade: "Cabeças" }],
+  recepcaoDiaria: [{ uid: "rec-exemplo", produto: PRODUTOS_MOCK[0], quantidade: "250", unidade: "Kg" }],
+  producaoDiaria: [{ uid: "prod-exemplo", produto: PRODUTOS_MOCK[1], quantidade: "180", unidade: "Kg" }],
+  integradoSisbi: true,
+  dataIntegracaoSisbi: "2025-02-10",
+  possuiSeloArte: true,
+  produtosSeloArte: ["Carne Bovina"],
+  numerosSeloArte: { "Carne Bovina": "ARTE/MG/001/2026" },
+  endereco: {
+    zona: "Urbana", cep: "37200-000", estado: "Minas Gerais", municipio: "Lavras", bairro: "Centro",
+    endereco: "Rua das Indústrias", numero: "250", complemento: "Galpão 2", localidade: "", distrito: "",
+  },
+  contato: {
+    utilizarContatoProprietario: "Não", proprietariosSelecionados: [], emailFixo: "contato@frigorificiosaojose.com.br",
+    emailFixoObs: "Comercial", telefoneFixo: "(35) 3333-4455", telefoneFixoObs: "Recepção", contatosAdicionais: [],
+  },
+  anexos: [{ id: "anexo-exemplo", nome: "registro_sie.pdf", descricao: "Registro do estabelecimento" }],
+  observacao: "Estabelecimento habilitado para processamento de produtos cárneos.",
+};
 
-  const [proprietarios, setProprietarios] = useState<any[]>([{ uid: uid("prop"), proprietario: null }]);
+let proximoCodigoSequencial = 2;
+const gerarCodigoUnico = () => `31${String(proximoCodigoSequencial++).padStart(8, "0")}`;
 
-  // 🔥 CORREÇÃO 1: Iniciar como false para ignorar a trava oculta do backlog
-  const [ehEapp, setEhEapp] = useState<boolean | "">(false);
-  const [tipoEapp, setTipoEapp] = useState("");
-  const [numeroCaf, setNumeroCaf] = useState("");
-  const [validadeCaf, setValidadeCaf] = useState("");
-  const [comprovanteCaf, setComprovanteCaf] = useState("");
-  const [situacaoHabEapp, setSituacaoHabEapp] = useState("");
-  const [validadeCadastroEapp, setValidadeCadastroEapp] = useState("");
-  const [ultimaComprovacaoEapp, setUltimaComprovacaoEapp] = useState("");
-  const [comprovanteProdRural, setComprovanteProdRural] = useState<any>(null);
-  const [descricaoProdRural, setDescricaoProdRural] = useState<string>("");
-  const [descricaoCaf, setDescricaoCaf] = useState("");
+export function AdicionarEstabelecimentoAgroindustrialSIEMGPage({ onLogout, onNavigate, dados, modo = "adicionar" }: PageProps) {
+  const isView = modo === "visualizar";
+  const isEdit = modo === "editar";
+  const registroInicial: any = modo === "adicionar" ? {} : { ...EXEMPLO_ESTABELECIMENTO_AGROINDUSTRIAL_SIE_MG, ...(dados || {}) };
 
-  const [codigoSie, setCodigoSie] = useState("");
-  const [dataHabilitacaoSie, setDataHabilitacaoSie] = useState("");
+  const [codigoUnico, setCodigoUnico] = useState(registroInicial.codigoUnico || "");
+  const [situacao, setSituacao] = useState(registroInicial.situacao || "Ativo");
+  const [nomeComercial, setNomeComercial] = useState(registroInicial.nomeComercial || "");
+  const [possuiIsencaoIE, setPossuiIsencaoIE] = useState<boolean | "">(registroInicial.possuiIsencaoIE ?? false);
+  const [inscricaoEstadual, setInscricaoEstadual] = useState(registroInicial.inscricaoEstadual || "");
 
-  const [areaAtuacao, setAreaAtuacao] = useState<string[]>([]);
-  const [classifCarne, setClassifCarne] = useState<string[]>([]);
-  const [classifLeite, setClassifLeite] = useState<string[]>([]);
-  const [classifPescado, setClassifPescado] = useState<string[]>([]);
+  const [proprietarios, setProprietarios] = useState<any[]>(registroInicial.proprietarios || [{ uid: uid("prop"), proprietario: null }]);
 
-  const [ativAbatedouroCarne, setAtivAbatedouroCarne] = useState<string[]>([]);
-  const [ativBenefCarne, setAtivBenefCarne] = useState<string[]>([]);
-  const [ativEntrepostoLeite, setAtivEntrepostoLeite] = useState<string[]>([]);
-  const [ativQueijaria, setAtivQueijaria] = useState<string[]>([]);
-  const [ativBenefLeite, setAtivBenefLeite] = useState<string[]>([]);
-  const [ativMel, setAtivMel] = useState<string[]>([]);
-  const [ativOvos, setAtivOvos] = useState<string[]>([]);
-  const [ativBenefPescado, setAtivBenefPescado] = useState<string[]>([]);
-  const [ativMista, setAtivMista] = useState<string[]>([]);
-  const [recebePescadoGta, setRecebePescadoGta] = useState<boolean | "">("");
+  const [ehEapp, setEhEapp] = useState<boolean | "">(registroInicial.ehEapp ?? false);
+  const [tipoEapp, setTipoEapp] = useState(registroInicial.tipoEapp || "");
+  const [numeroCaf, setNumeroCaf] = useState(registroInicial.numeroCaf || "");
+  const [validadeCaf, setValidadeCaf] = useState(registroInicial.validadeCaf || "");
+  const [comprovanteCaf, setComprovanteCaf] = useState(registroInicial.comprovanteCaf || "");
+  const [situacaoHabEapp, setSituacaoHabEapp] = useState(registroInicial.situacaoHabEapp || "");
+  const [validadeCadastroEapp, setValidadeCadastroEapp] = useState(registroInicial.validadeCadastroEapp || "");
+  const [ultimaComprovacaoEapp, setUltimaComprovacaoEapp] = useState(registroInicial.ultimaComprovacaoEapp || "");
+  const [comprovanteProdRural, setComprovanteProdRural] = useState<any>(registroInicial.comprovanteProdRural || null);
+  const [descricaoProdRural, setDescricaoProdRural] = useState<string>(registroInicial.descricaoProdRural || "");
+  const [descricaoCaf, setDescricaoCaf] = useState(registroInicial.descricaoCaf || "");
 
-  const [especiesAbateCarne, setEspeciesAbateCarne] = useState<any[]>([{ uid: uid("eac"), especie: null, capacidade: "", unidade: "" }]);
-  const [especiesAbatePescado, setEspeciesAbatePescado] = useState<any[]>([{ uid: uid("eap"), especie: null, capacity: "", unidade: "" }]);
+  const [codigoSie, setCodigoSie] = useState(registroInicial.codigoSie || "");
+  const [dataHabilitacaoSie, setDataHabilitacaoSie] = useState(registroInicial.dataHabilitacaoSie || "");
 
-  const [recebeQueijariasOutras, setRecebeQueijariasOutras] = useState<boolean | "">("");
-  const [queijariasParceiras, setQueijariasParceiras] = useState<any[]>([{ uid: uid("qp"), queijaria: null }]);
-  const [entrepostosParceiros, setEntrepostosParceiros] = useState<any[]>([{ uid: uid("ep"), entreposto: null }]);
+  const areasAtuacaoIniciais = Array.isArray(registroInicial.areaAtuacao)
+    ? registroInicial.areaAtuacao
+    : String(registroInicial.areaAtuacao || "")
+        .split(",")
+        .map((area) => area.trim())
+        .filter(Boolean);
+  const [areaAtuacao, setAreaAtuacao] = useState<string[]>(areasAtuacaoIniciais);
+  const [classifCarne, setClassifCarne] = useState<string[]>(registroInicial.classifCarne || (registroInicial.classificacao ? [registroInicial.classificacao] : []));
+  const [classifLeite, setClassifLeite] = useState<string[]>(registroInicial.classifLeite || []);
+  const [classifPescado, setClassifPescado] = useState<string[]>(registroInicial.classifPescado || []);
 
-  const [fonteLeite, setFonteLeite] = useState<string[]>([]);
-  const [fornecedoresLeite, setFornecedoresLeite] = useState<any[]>([{ uid: uid("fl"), exploracao: null }]);
-  const [fonteMel, setFonteMel] = useState<string[]>([]);
-  const [fornecedoresMel, setFornecedoresMel] = useState<any[]>([{ uid: uid("fm"), exploracao: null }]);
-  const [fonteOvos, setFonteOvos] = useState<string[]>([]);
-  const [fornecedoresOvos, setFornecedoresOvos] = useState<any[]>([{ uid: uid("fo"), exploracao: null }]);
+  const [ativAbatedouroCarne, setAtivAbatedouroCarne] = useState<string[]>(registroInicial.ativAbatedouroCarne || []);
+  const [ativBenefCarne, setAtivBenefCarne] = useState<string[]>(registroInicial.ativBenefCarne || []);
+  const [ativEntrepostoLeite, setAtivEntrepostoLeite] = useState<string[]>(registroInicial.ativEntrepostoLeite || []);
+  const [ativQueijaria, setAtivQueijaria] = useState<string[]>(registroInicial.ativQueijaria || []);
+  const [ativBenefLeite, setAtivBenefLeite] = useState<string[]>(registroInicial.ativBenefLeite || []);
+  const [ativMel, setAtivMel] = useState<string[]>(registroInicial.ativMel || []);
+  const [ativOvos, setAtivOvos] = useState<string[]>(registroInicial.ativOvos || []);
+  const [ativAbatedouroPescado, setAtivAbatedouroPescado] = useState<string[]>(registroInicial.ativAbatedouroPescado || []);
+  const [ativBenefPescado, setAtivBenefPescado] = useState<string[]>(registroInicial.ativBenefPescado || []);
+  const [ativMista, setAtivMista] = useState<string[]>(registroInicial.ativMista || []);
+  const [recebePescadoGta, setRecebePescadoGta] = useState<boolean | "">(registroInicial.recebePescadoGta ?? "");
 
-  const [recepcaoDiaria, setRecepcaoDiaria] = useState<any[]>([{ uid: uid("rec"), produto: null, quantidade: "", unidade: "" }]);
-  const [producaoDiaria, setProducaoDiaria] = useState<any[]>([{ uid: uid("prod"), produto: null, quantidade: "", unidade: "" }]);
+  const [especiesAbateCarne, setEspeciesAbateCarne] = useState<any[]>(registroInicial.especiesAbateCarne || [{ uid: uid("eac"), especie: null, capacidade: "", unidade: "" }]);
+  const [especiesAbatePescado, setEspeciesAbatePescado] = useState<any[]>(registroInicial.especiesAbatePescado || [{ uid: uid("eap"), especie: null, capacidade: "", unidade: "" }]);
 
-  const [integradoSisbi, setIntegradoSisbi] = useState<boolean | "">("");
-  const [dataIntegracaoSisbi, setDataIntegracaoSisbi] = useState("");
-  const [possuiSeloArte, setPossuiSeloArte] = useState<boolean | "">("");
-  const [produtosSeloArte, setProdutosSeloArte] = useState<string[]>([]);
-  const [numerosSeloArte, setNumerosSeloArte] = useState<Record<string, string>>({});
-  const [possuiSeloQueijo, setPossuiSeloQueijo] = useState<boolean | "">("");
-  const [produtosSeloQueijo, setProdutosSeloQueijo] = useState<string[]>([]);
-  const [numerosSeloQueijo, setNumerosSeloQueijo] = useState<Record<string, string>>({});
+  const [recebeQueijariasOutras, setRecebeQueijariasOutras] = useState<boolean | "">(registroInicial.recebeQueijariasOutras ?? false);
+  const [queijariasParceiras, setQueijariasParceiras] = useState<any[]>(registroInicial.queijariasParceiras || [{ uid: uid("qp"), queijaria: null }]);
+  const [entrepostosParceiros, setEntrepostosParceiros] = useState<any[]>(registroInicial.entrepostosParceiros || [{ uid: uid("ep"), entreposto: null }]);
 
-  const [endereco, setEndereco] = useState<any>({
+  const [fonteLeite, setFonteLeite] = useState<string[]>(registroInicial.fonteLeite || []);
+  const [fornecedoresLeite, setFornecedoresLeite] = useState<any[]>(registroInicial.fornecedoresLeite || [{ uid: uid("fl"), exploracao: null }]);
+  const [fonteMel, setFonteMel] = useState<string[]>(registroInicial.fonteMel || []);
+  const [fornecedoresMel, setFornecedoresMel] = useState<any[]>(registroInicial.fornecedoresMel || [{ uid: uid("fm"), exploracao: null }]);
+  const [fonteOvos, setFonteOvos] = useState<string[]>(registroInicial.fonteOvos || []);
+  const [fornecedoresOvos, setFornecedoresOvos] = useState<any[]>(registroInicial.fornecedoresOvos || [{ uid: uid("fo"), exploracao: null }]);
+
+  const [recepcaoDiaria, setRecepcaoDiaria] = useState<any[]>(registroInicial.recepcaoDiaria || [{ uid: uid("rec"), produto: null, quantidade: "", unidade: "" }]);
+  const [producaoDiaria, setProducaoDiaria] = useState<any[]>(registroInicial.producaoDiaria || [{ uid: uid("prod"), produto: null, quantidade: "", unidade: "" }]);
+
+  const [integradoSisbi, setIntegradoSisbi] = useState<boolean | "">(registroInicial.integradoSisbi ?? "");
+  const [dataIntegracaoSisbi, setDataIntegracaoSisbi] = useState(registroInicial.dataIntegracaoSisbi || "");
+  const [possuiSeloArte, setPossuiSeloArte] = useState<boolean | "">(registroInicial.possuiSeloArte ?? "");
+  const [produtosSeloArte, setProdutosSeloArte] = useState<string[]>(registroInicial.produtosSeloArte || []);
+  const [numerosSeloArte, setNumerosSeloArte] = useState<Record<string, string>>(registroInicial.numerosSeloArte || {});
+  const [possuiSeloQueijo, setPossuiSeloQueijo] = useState<boolean | "">(registroInicial.possuiSeloQueijo ?? "");
+  const [produtosSeloQueijo, setProdutosSeloQueijo] = useState<string[]>(registroInicial.produtosSeloQueijo || []);
+  const [numerosSeloQueijo, setNumerosSeloQueijo] = useState<Record<string, string>>(registroInicial.numerosSeloQueijo || {});
+
+  const [endereco, setEndereco] = useState<any>(registroInicial.endereco || {
     zona: "", cep: "", estado: "Minas Gerais", municipio: "", bairro: "",
     endereco: "", numero: "", complemento: "", localidade: "", distrito: "",
   });
-  const [contato, setContato] = useState<any>({
+  const [contato, setContato] = useState<any>(registroInicial.contato || {
     utilizarContatoProprietario: "Não", proprietariosSelecionados: [],
     emailFixo: "", emailFixoObs: "", telefoneFixo: "", telefoneFixoObs: "", contatosAdicionais: [],
   });
-  const [anexos, setAnexos] = useState<any[]>([]);
-  const [observacao, setObservacao] = useState("");
+  const [anexos, setAnexos] = useState<any[]>(registroInicial.anexos || []);
+  const [observacao, setObservacao] = useState(registroInicial.observacao || "");
 
   const [isSucesso, setIsSucesso] = useState(false);
 
@@ -247,34 +316,141 @@ export function AdicionarEstabelecimentoAgroindustrialSIEMGPage({ onLogout, onNa
   const produtosProducao = producaoDiaria.map((p) => p.produto).filter(Boolean);
   const opcoesSeloProdutos = Array.from(new Set(produtosProducao.map((p: any) => p.nome)));
 
+  const montarRegistro = (codigo = codigoUnico) => ({
+    id: dados?.id || codigo || Date.now(),
+    codigoUnico: codigo,
+    numeroRegistro: isNaoEapp || situacaoHabEapp === "Registro" ? codigo : "",
+    numeroCadastro: isEapp && situacaoHabEapp === "Cadastro" ? codigo : "",
+    situacao,
+    nomeComercial,
+    possuiIsencaoIE,
+    inscricaoEstadual,
+    proprietarios,
+    ehEapp,
+    tipoEapp,
+    numeroCaf,
+    validadeCaf,
+    comprovanteCaf,
+    descricaoCaf,
+    situacaoHabEapp,
+    validadeCadastroEapp,
+    ultimaComprovacaoEapp,
+    comprovanteProdRural,
+    descricaoProdRural,
+    codigoSie,
+    dataHabilitacaoSie,
+    areaAtuacao,
+    areaAtuacaoTexto: areaAtuacao.join(", "),
+    classificacao: [...classifCarne, ...classifLeite, ...classifPescado].join(", "),
+    classifCarne,
+    classifLeite,
+    classifPescado,
+    ativAbatedouroCarne,
+    ativBenefCarne,
+    ativEntrepostoLeite,
+    ativQueijaria,
+    ativBenefLeite,
+    ativMel,
+    ativOvos,
+    ativAbatedouroPescado,
+    ativBenefPescado,
+    ativMista,
+    recebePescadoGta,
+    especiesAbateCarne,
+    especiesAbatePescado,
+    recebeQueijariasOutras,
+    queijariasParceiras,
+    entrepostosParceiros,
+    fonteLeite,
+    fornecedoresLeite,
+    fonteMel,
+    fornecedoresMel,
+    fonteOvos,
+    fornecedoresOvos,
+    recepcaoDiaria,
+    producaoDiaria,
+    integradoSisbi,
+    dataIntegracaoSisbi,
+    possuiSeloArte,
+    produtosSeloArte,
+    numerosSeloArte,
+    possuiSeloQueijo,
+    produtosSeloQueijo,
+    numerosSeloQueijo,
+    endereco,
+    municipioUf: endereco.municipio ? `${endereco.municipio} - MG` : "",
+    contato,
+    anexos,
+    observacao,
+  });
+
+  const concluirFormulario = () => {
+    const codigo = codigoUnico || gerarCodigoUnico();
+    if (!codigoUnico) setCodigoUnico(codigo);
+
+    if (isEdit) {
+      onNavigate("visualizar-estabelecimento-poa", montarRegistro(codigo));
+      return;
+    }
+
+    setIsSucesso(true);
+  };
+
+  const tituloPagina = isView
+    ? "Visualizar Estabelecimento Agroindustrial POA — SIE/MG"
+    : isEdit
+      ? "Editar Estabelecimento Agroindustrial POA — SIE/MG"
+      : "Adicionar Estabelecimento Agroindustrial POA — SIE/MG";
+
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
-      <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="estabelecimento-agroindustrial" hideSearch />
+      <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="agroindustrial-sie" hideSearch />
 
       <main className="max-w-[1088px] mx-auto px-4 md:px-6 py-6 flex flex-col gap-4">
         <div>
-          <button type="button" onClick={() => onNavigate("estabelecimento-agroindustrial")} className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70" style={{ color: GREEN }}>
+          <button type="button" onClick={() => onNavigate("agroindustrial-sie")} className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70" style={{ color: GREEN }}>
             <ArrowLeft size={15} />
             Todos os Estabelecimentos Agroindustriais POA — SIE/MG
           </button>
           <div className="flex justify-between items-center w-full">
-            <h1 className="text-2xl font-semibold text-gray-900">Adicionar Estabelecimento Agroindustrial POA — SIE/MG</h1>
-            <button type="button" onClick={() => setIsSucesso(true)} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm">Adicionar</button>
+            <h1 className="text-2xl font-semibold text-gray-900">{tituloPagina}</h1>
+            {isView ? (
+              <button type="button" onClick={() => onNavigate("editar-estabelecimento-poa", montarRegistro())} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold rounded-md transition shadow-sm flex items-center gap-2">
+                <Pencil size={16} /> Editar
+              </button>
+            ) : (
+              <button type="button" onClick={concluirFormulario} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold rounded-md transition shadow-sm">
+                {isEdit ? "Salvar" : "Adicionar"}
+              </button>
+            )}
           </div>
         </div>
 
-        <div className="w-full bg-white border border-gray-100 rounded-lg p-5 shadow-sm flex items-center gap-3 mt-4 mb-6">
+        {!isView && <div className="w-full bg-white border border-gray-100 rounded-lg p-5 shadow-sm flex items-center gap-3 mt-4 mb-6">
           <div className="text-gray-500 flex-shrink-0">
             <Info size={20} className="stroke-[2.5]" />
           </div>
           <p className="text-sm text-gray-600 font-medium leading-relaxed">
             Campos indicados com <span className="text-red-500 font-bold">*</span> são obrigatórios e deverão ser preenchidos.
           </p>
-        </div>
+        </div>}
+
+        <fieldset disabled={isView} className={`border-0 p-0 m-0 min-w-0 flex flex-col gap-4 ${isView ? "poa-readonly" : ""}`}>
 
         {/* 1. Informações Básicas */}
         <Section title="Informações Básicas">
           <div className="flex flex-col gap-4">
+            {(isView || isEdit) && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <FloatInput label="Código do Estabelecimento Agroindustrial" value={codigoUnico} disabled />
+                <FloatInput
+                  label={isEapp && situacaoHabEapp === "Cadastro" ? "Número de Cadastro do Estabelecimento" : "Número de Registro do Estabelecimento"}
+                  value={codigoUnico}
+                  disabled
+                />
+                <FloatSelect label="Situação" value={situacao} onChange={setSituacao} options={toOptions(["Ativo", "Inativo", "Suspenso"])} disabled={isView} />
+              </div>
+            )}
             <FloatInput label="Nome Comercial do Estabelecimento Agroindustrial" required value={nomeComercial} onChange={setNomeComercial} maxLength={255} />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
               <SimNao 
@@ -674,7 +850,7 @@ export function AdicionarEstabelecimentoAgroindustrialSIEMGPage({ onLogout, onNa
                 { id: "Industrialização", label: "Industrialização" },
                 { id: "Distribuição de produtos de origem animal (POA) de terceiros", label: "Distribuição de produtos de origem animal (POA) de terceiros" }
               ]}
-              defaultValue={ativBenefPescado} onChange={setAtivBenefPescado} 
+              defaultValue={ativAbatedouroPescado} onChange={setAtivAbatedouroPescado}
             />
             <EspeciesAbatidas titulo="Espécies Abatidas no Frigorífico" especiesData={ESPECIES_PESCADO_MOCK} unidadesData={UNIDADES_MEDIDA_ANIMAL_MOCK} items={especiesAbatePescado} setItems={setEspeciesAbatePescado} />
           </div>
@@ -752,7 +928,7 @@ export function AdicionarEstabelecimentoAgroindustrialSIEMGPage({ onLogout, onNa
               <SubGrupo titulo="Selo Arte" comDivisor>
                 <SimNao label="Possui Selo Arte?" name="selo-arte" required value={possuiSeloArte} onChange={setPossuiSeloArte} />
                 {possuiSeloArte === true && (
-                  <FloatInput opcoes={opcoesSeloProdutos} selecionados={produtosSeloArte} icon={<Calendar size={16}/>} setSelecionados={setProdutosSeloArte} numeros={numerosSeloArte} setNumeros={setNumerosSeloArte} />
+                  <SeloProdutos tituloModal="Selo Arte" opcoes={opcoesSeloProdutos} selecionados={produtosSeloArte} setSelecionados={setProdutosSeloArte} numeros={numerosSeloArte} setNumeros={setNumerosSeloArte} />
                 )}
               </SubGrupo>
 
@@ -760,7 +936,7 @@ export function AdicionarEstabelecimentoAgroindustrialSIEMGPage({ onLogout, onNa
                 <SubGrupo titulo="Selo de Queijo Artesanal" comDivisor>
                   <SimNao label="Possui Selo de Queijo Artesanal?" name="selo-queijo" required value={possuiSeloQueijo} onChange={setPossuiSeloQueijo} />
                   {possuiSeloQueijo === true && (
-                    <SeloProdutos opcoes={opcoesSeloProdutos} selecionados={produtosSeloQueijo} icon={<Calendar size={16}/>} setSelecionados={setProdutosSeloQueijo} numeros={numerosSeloQueijo} setNumeros={setNumerosSeloQueijo} />
+                    <SeloProdutos tituloModal="Selo de Queijo Artesanal" opcoes={opcoesSeloProdutos} selecionados={produtosSeloQueijo} setSelecionados={setProdutosSeloQueijo} numeros={numerosSeloQueijo} setNumeros={setNumerosSeloQueijo} />
                   )}
                 </SubGrupo>
               )}
@@ -814,6 +990,7 @@ export function AdicionarEstabelecimentoAgroindustrialSIEMGPage({ onLogout, onNa
         <Section title="Observação">
           <LargeTextArea label="Observação" value={observacao} onChange={setObservacao} hasTooltip tooltipText="Informações adicionais pertinentes ao cadastro." />
         </Section>
+        </fieldset>
       </main>
 
       {/* Modal de Sucesso */}
@@ -824,8 +1001,8 @@ export function AdicionarEstabelecimentoAgroindustrialSIEMGPage({ onLogout, onNa
             <h3 className="text-lg font-bold text-gray-900">Estabelecimento agroindustrial cadastrado com sucesso!</h3>
             <p className="text-sm text-gray-500 mt-1">{nomeComercial ? `O estabelecimento "${nomeComercial}"` : "O estabelecimento"} foi cadastrado.</p>
             <div className="flex gap-3 justify-center mt-6">
-              <button onClick={() => { setIsSucesso(false); onNavigate("estabelecimento-agroindustrial"); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition">Voltar</button>
-              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-estabelecimento-agroindustrial"); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
+              <button onClick={() => { setIsSucesso(false); onNavigate("agroindustrial-sie"); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition">Voltar</button>
+              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-estabelecimento-poa", montarRegistro()); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
             </div>
           </div>
         </div>
@@ -866,8 +1043,8 @@ function EspeciesAbatidas({ titulo, especiesData, unidadesData, items, setItems 
   );
 }
 
-function FonteProducao({ titulo, fonte, setFonte, fornecedores, setFornecedores, grupoFornecedor, prefixo }: {
-  titulo: string; fonte: string[]; setFonte: (v: string[]) => void;
+function FonteProducao({ titulo = "", fonte, setFonte, fornecedores, setFornecedores, grupoFornecedor, prefixo }: {
+  titulo?: string; fonte: string[]; setFonte: (v: string[]) => void;
   fornecedores: any[]; setFornecedores: (v: any[]) => void; grupoFornecedor: string; prefixo: string;
 }) {
   const mostraFornecedor = fonte.includes("Possui fornecedor");
@@ -904,10 +1081,14 @@ function CapacidadeLista({ titulo, classificacaoFiltro, areasAtuacao, produtosDa
     [produtosData, areasAtuacao, classificacaoFiltro]
   );
 
-  const escolherProduto = (uidItem: string) => {
-    const prod = produtosFiltrados[0];
-    if (!prod) { alert("Nenhum produto compatível com a área de atuação selecionada."); return; }
-    setItems(items.map((x) => x.uid === uidItem ? { ...x, produto: prod, unidade: prod.unidade } : x));
+  const selecionarProduto = (uidItem: string, produto: any) => {
+    setItems(items.map((item) => item.uid === uidItem
+      ? {
+          ...item,
+          produto,
+          unidade: produto.unidade,
+        }
+      : item));
   };
 
   return (
@@ -919,7 +1100,23 @@ function CapacidadeLista({ titulo, classificacaoFiltro, areasAtuacao, produtosDa
       >
         {(item) => (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center w-full">
-            <FloatInput label="Produto" required value={item.produto ? item.produto.nome : ""} icon={<ShoppingCart size={16} />} onClick={() => escolherProduto(item.uid)} readOnly />
+            <EntitySearchInput
+              label="Produto"
+              placeholder="Buscar pelo nome ou unidade de medida"
+              required
+              value={item.produto?.nome ?? ""}
+              data={produtosFiltrados}
+              searchKeys={["nome", "unidade"]}
+              columns={[
+                { label: "Nome", key: "nome" },
+                { label: "Unidade de Medida", key: "unidade" },
+              ]}
+              icon={<ShoppingCart size={18} />}
+              title="Buscar Produto"
+              subtitle="Busque e selecione um produto cadastrado:"
+              confirmLabel="Confirmar"
+              onChange={(produto) => selecionarProduto(item.uid, produto)}
+            />
             {item.produto && (
               <>
                 <FloatInput label="Quantidade Máxima" required value={item.quantidade} onChange={(v) => setItems(items.map((x) => x.uid === item.uid ? { ...x, quantidade: v.replace(/\D/g, "") } : x))} />
@@ -933,22 +1130,73 @@ function CapacidadeLista({ titulo, classificacaoFiltro, areasAtuacao, produtosDa
   );
 }
 
-function SeloProdutos({ opcoes, selecionados, setSelecionados, numeros, setNumeros }: {
+function SeloProdutos({ tituloModal, opcoes, selecionados, setSelecionados, numeros, setNumeros }: {
+  tituloModal: string;
   opcoes: string[]; selecionados: string[]; setSelecionados: (v: string[]) => void;
   numeros: Record<string, string>; setNumeros: (v: Record<string, string>) => void;
 }) {
-  if (opcoes.length === 0) {
-    return <p className="text-sm text-gray-400">Informe produtos na seção "Produção Diária" para habilitar a seleção de selos.</p>;
-  }
+  const [modalAberto, setModalAberto] = useState(false);
+  const produtosDisponiveis = opcoes.map((nome) => ({ id: nome, nome }));
+  const produtosSelecionados = produtosDisponiveis.filter((produto) => selecionados.includes(produto.nome));
+
   return (
-    <div className="flex flex-col gap-4">
-      <FloatMultiSelect label="Produtos" value={selecionados} onChange={setSelecionados} options={opcoes} />
-      {selecionados.map((prod) => (
-        <div key={prod} className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-          <FloatInput label="Produto" disabled value={prod} onChange={() => {}} />
-          <FloatInput label={`Número do Selo`} required value={numeros[prod] || ""} onChange={(v) => setNumeros({ ...numeros, [prod]: v.slice(0, 30) })} maxLength={30} />
-        </div>
-      ))}
-    </div>
+    <>
+      <div className="flex flex-col gap-4">
+        <button
+          type="button"
+          onClick={() => setModalAberto(true)}
+          disabled={produtosDisponiveis.length === 0}
+          className="flex items-center gap-2 text-sm font-semibold px-4 py-2.5 rounded-md border border-[#1A7A3C] text-[#1A7A3C] hover:bg-green-50 self-start transition disabled:border-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+        >
+          <PlusCircle size={16} /> Adicionar Selos
+        </button>
+
+        {produtosDisponiveis.length === 0 && (
+          <p className="text-sm text-gray-400">Informe produtos na seção "Produção Diária" para habilitar a seleção de selos.</p>
+        )}
+
+        {selecionados.map((produto, index) => (
+          <div key={produto} className="flex items-center gap-4 w-full">
+            <div className="flex-shrink-0 w-7 h-7 rounded-full bg-[#1A7A3C] text-white flex items-center justify-center text-xs font-semibold">
+              {index + 1}
+            </div>
+            <div className="flex-1">
+              <FloatInput label="Produto" disabled value={produto} onChange={() => {}} />
+            </div>
+            <div className="flex-1">
+              <FloatInput
+                label="Número do Selo"
+                required
+                value={numeros[produto] || ""}
+                onChange={(valor) => setNumeros({ ...numeros, [produto]: valor.slice(0, 30) })}
+                maxLength={30}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <MultiSearchModal
+        open={modalAberto}
+        onClose={() => setModalAberto(false)}
+        title={tituloModal}
+        subtitle="Selecione um ou mais produtos informados na Produção Diária."
+        icon={<CircleCheck size={26} className="text-[#1A7A3C]" />}
+        data={produtosDisponiveis}
+        columns={[{ label: "Produto", key: "nome" }]}
+        searchKeys={["nome"]}
+        searchPlaceholder="Buscar pelo nome do produto"
+        selectedItems={produtosSelecionados}
+        confirmLabel="Adicionar Selecionados"
+        onConfirm={(produtos) => {
+          const nomesSelecionados = produtos.map((produto: any) => produto.nome);
+          setSelecionados(nomesSelecionados);
+          setNumeros(Object.fromEntries(
+            nomesSelecionados.map((nome: string) => [nome, numeros[nome] || ""]),
+          ));
+          setModalAberto(false);
+        }}
+      />
+    </>
   );
 }

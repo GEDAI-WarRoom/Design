@@ -255,7 +255,7 @@ export function EstabelecimentoAgroindustrialSIEMGPage({ onLogout, onNavigate }:
                   <FloatInput 
                     label="Código SIE/MG" 
                     value={codigoSie} 
-                    onChange={(e) => setCodigoSie(e.target.value)} 
+                    onChange={(value) => setCodigoSie(value.slice(0, 30))}
                     placeholder="Ex: 17126" 
                   />
                 </div>
