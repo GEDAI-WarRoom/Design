@@ -976,6 +976,43 @@ function DestinoForaEstado({
     onChange({ ...destino, ...patch });
   const municipios = MUNICIPIOS_POR_ESTADO[destino.estado] ?? [];
   const somenteNumeros = (valor: string) => valor.replace(/\D/g, "");
+  const documentoCompleto = [11, 14].includes(
+    destino.documentoResponsavelExterno.length,
+  );
+  const responsavelEncontrado = documentoCompleto
+    ? PESSOAS_GTA.some(
+        (item) =>
+          somenteNumeros(item.documento ?? "") ===
+          destino.documentoResponsavelExterno,
+      )
+    : undefined;
+  const codigoEstabelecimentoCompleto =
+    destino.codigoEstabelecimentoExterno.length === 11;
+  const estabelecimentoEncontrado = codigoEstabelecimentoCompleto
+    ? ESTABELECIMENTOS_GTA.some(
+        (item) => item.codigo === destino.codigoEstabelecimentoExterno,
+      )
+    : undefined;
+  const codigoNucleoCompleto = destino.codigoNucleoExterno.length === 17;
+  const nucleoEncontrado = codigoNucleoCompleto
+    ? Boolean(NUCLEOS_EXTERNOS_GTA[destino.codigoNucleoExterno])
+    : undefined;
+
+  const LookupStatus = ({ found }: { found?: boolean }) => {
+    if (found === undefined) return null;
+    return (
+      <p
+        className={`mt-1.5 flex items-center gap-1.5 px-1 text-xs font-medium ${
+          found ? "text-[#1A7A3C]" : "text-amber-700"
+        }`}
+      >
+        {found ? <CheckCircle2 size={14} /> : <Info size={14} />}
+        {found
+          ? "Cadastro localizado na Plataforma de Gestão Agropecuária (PGA)."
+          : "Cadastro não localizado na PGA. Preencha o campo ao lado manualmente."}
+      </p>
+    );
+  };
   return (
     <div className="flex flex-col gap-5">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -1001,59 +1038,67 @@ function DestinoForaEstado({
             label: municipio,
           }))}
         />
-        <WithDevHint value="05514598699">
-          <FloatInput
-            label="CPF/CNPJ do Responsável de Destino"
-            required
-            value={destino.documentoResponsavelExterno}
-            maxLength={14}
-            onChange={(documentoResponsavelExterno) => {
-              const documento = somenteNumeros(documentoResponsavelExterno).slice(0, 14);
-              const pessoa = PESSOAS_GTA.find(
-                (item) => somenteNumeros(item.documento ?? "") === documento,
-              );
-              update({
-                documentoResponsavelExterno: documento,
-                responsavelExterno: pessoa?.nome ?? "",
-              });
-            }}
-            disabled={disabled}
-          />
-        </WithDevHint>
-        <FloatInput
-          label="Responsável de Destino"
-          required
-          value={destino.responsavelExterno}
-          disabled
-        />
-      </div>
-
-      {destino.tipo === "Estabelecimento Agropecuário" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <WithDevHint value="31002030039">
+        <div>
+          <WithDevHint value="05514598699">
             <FloatInput
-              label="Código do Estabelecimento Agropecuário"
+              label="CPF/CNPJ do Responsável de Destino"
               required
-              value={destino.codigoEstabelecimentoExterno}
-              maxLength={11}
-              onChange={(codigoEstabelecimentoExterno) => {
-                const codigo = codigoEstabelecimentoExterno.replace(/\D/g, "").slice(0, 11);
-                const estabelecimento = ESTABELECIMENTOS_GTA.find(
-                  (item) => item.codigo === codigo,
+              value={destino.documentoResponsavelExterno}
+              maxLength={14}
+              onChange={(documentoResponsavelExterno) => {
+                const documento = somenteNumeros(documentoResponsavelExterno).slice(0, 14);
+                const pessoa = PESSOAS_GTA.find(
+                  (item) => somenteNumeros(item.documento ?? "") === documento,
                 );
                 update({
-                  codigoEstabelecimentoExterno: codigo,
-                  estabelecimentoExterno: estabelecimento?.nome ?? "",
+                  documentoResponsavelExterno: documento,
+                  responsavelExterno: pessoa?.nome ?? "",
                 });
               }}
               disabled={disabled}
             />
           </WithDevHint>
+          <LookupStatus found={responsavelEncontrado} />
+        </div>
+        <FloatInput
+          label="Responsável de Destino"
+          required
+          value={destino.responsavelExterno}
+          onChange={(responsavelExterno) => update({ responsavelExterno })}
+          disabled={disabled || !documentoCompleto || responsavelEncontrado}
+        />
+      </div>
+
+      {destino.tipo === "Estabelecimento Agropecuário" && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div>
+            <WithDevHint value="31002030039">
+              <FloatInput
+                label="Código do Estabelecimento Agropecuário"
+                required
+                value={destino.codigoEstabelecimentoExterno}
+                maxLength={11}
+                onChange={(codigoEstabelecimentoExterno) => {
+                  const codigo = codigoEstabelecimentoExterno.replace(/\D/g, "").slice(0, 11);
+                  const estabelecimento = ESTABELECIMENTOS_GTA.find(
+                    (item) => item.codigo === codigo,
+                  );
+                  update({
+                    codigoEstabelecimentoExterno: codigo,
+                    estabelecimentoExterno: estabelecimento?.nome ?? "",
+                  });
+                }}
+                disabled={disabled}
+              />
+            </WithDevHint>
+            <LookupStatus found={estabelecimentoEncontrado} />
+          </div>
           <FloatInput
             label="Estabelecimento Agropecuário de Destino"
             required
             value={destino.estabelecimentoExterno}
-            disabled
+            onChange={(estabelecimentoExterno) => update({ estabelecimentoExterno })}
+            disabled={disabled || !codigoEstabelecimentoCompleto || estabelecimentoEncontrado}
           />
         </div>
       )}
@@ -1072,27 +1117,31 @@ function DestinoForaEstado({
             />
           </WithDevHint>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <WithDevHint value="33009457901392301">
-              <FloatInput
-                label="Código do Núcleo de Produção"
-                required
-                value={destino.codigoNucleoExterno}
-                maxLength={17}
-                onChange={(codigoNucleoExterno) => {
-                  const codigo = codigoNucleoExterno.replace(/\D/g, "").slice(0, 17);
-                  update({
-                    codigoNucleoExterno: codigo,
-                    nucleoExterno: NUCLEOS_EXTERNOS_GTA[codigo] ?? "",
-                  });
-                }}
-                disabled={disabled}
-              />
-            </WithDevHint>
+            <div>
+              <WithDevHint value="33009457901392301">
+                <FloatInput
+                  label="Código do Núcleo de Produção"
+                  required
+                  value={destino.codigoNucleoExterno}
+                  maxLength={17}
+                  onChange={(codigoNucleoExterno) => {
+                    const codigo = codigoNucleoExterno.replace(/\D/g, "").slice(0, 17);
+                    update({
+                      codigoNucleoExterno: codigo,
+                      nucleoExterno: NUCLEOS_EXTERNOS_GTA[codigo] ?? "",
+                    });
+                  }}
+                  disabled={disabled}
+                />
+              </WithDevHint>
+              <LookupStatus found={nucleoEncontrado} />
+            </div>
             <FloatInput
               label="Núcleo de Produção"
               required
               value={destino.nucleoExterno}
-              disabled
+              onChange={(nucleoExterno) => update({ nucleoExterno })}
+              disabled={disabled || !codigoNucleoCompleto || nucleoEncontrado}
             />
           </div>
         </div>
