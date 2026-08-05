@@ -989,16 +989,18 @@ export function ProprietarioInput({
 	onChange,
 	onEyeClick,
 	required = false,
+	disabled = false,
+	data = PRODUTORES_MOCK,
 }: DomainInputProps) {
 	const [tipoPessoa, setTipoPessoa] = useState<string>("");
 
-	const entidadeSelecionada = PRODUTORES_MOCK.find(
+	const entidadeSelecionada = data.find(
 		(x) => x.nome === value || x.documento === value,
 	);
 
 	const databaseFiltrada = tipoPessoa
-		? PRODUTORES_MOCK.filter((p) => p.tipo === tipoPessoa)
-		: PRODUTORES_MOCK;
+		? data.filter((p: any) => p.tipo === tipoPessoa)
+		: data;
 
 	// Definição estrita das colunas baseada no estado atual
 	const colunasModal = [
@@ -1034,6 +1036,7 @@ export function ProprietarioInput({
 					label="Proprietário"
 					placeholder="Buscar pelo nome do proprietário."
 					required={required}
+					disabled={disabled}
 					value={entidadeSelecionada?.nome || ""}
 					data={databaseFiltrada}
 					title="Buscar Proprietário"
@@ -1093,6 +1096,8 @@ interface DomainInputProps {
 	value: string; // Nome selecionado
 	documento?: string; // Documento selecionado (CPF/CNPJ)
 	required?: boolean;
+	disabled?: boolean;
+	data?: any[];
 	onChange: (selectedEntity: any) => void;
 	onEyeClick?: () => void;
 }
