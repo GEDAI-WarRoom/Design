@@ -5,6 +5,14 @@ import { SelecionarUsuarioPage } from "./pages/SelecionarUsuario";
 import { isRouteAllowed, useDemoUser } from "./contexts/DemoUserContext";
 
 // GERAL
+import { VisualizarUnidadeAdministrativaPage } from "./pages/Geral/UnidadeAdministrativa/VisualizarUnidadeAdministrativa";
+import { EditarUnidadeAdministrativaPage } from "./pages/Geral/UnidadeAdministrativa/EditarUnidadeAdministrativa";
+
+import { VisualizarUnidadeMedidaPage } from "./pages/Geral/UnidadeMedida/VisualizarUnidadeMedida";
+import { EditarUnidadeMedidaPage } from "./pages/Geral/UnidadeMedida/EditarUnidadeMedida";
+
+import { VisualizarTipoVeiculoPage } from "./pages/Geral/TipoVeiculo/VisualizarTipoVeiculo";
+import { EditarTipoVeiculoPage } from "./pages/Geral/TipoVeiculo/EditarTipoVeiculo";
 import { VisualizarProdutoPage } from "./pages/Geral/Produto/VisualizarProduto";
 import { EditarProdutoPage } from "./pages/Geral/Produto/EditarProduto";
 
@@ -110,8 +118,8 @@ import { AdicionarStatusAnimalPage } from "./pages/Animal/StatusAnimal/Adicionar
 import { EditarStatusAnimalPage } from "./pages/Animal/StatusAnimal/EditarStatusAnimal";
 import { StatusAnimalPage } from "./pages/Animal/StatusAnimal/StatusAnimal";
 import { VisualizarStatusAnimalPage } from "./pages/Animal/StatusAnimal/VisualizarStatusAnimal";
-import { AdicionarTipoVeiculoPage } from "./pages/Animal/TipoVeiculo/AdicionarTipoVeiculo";
-import { TipoVeiculoPage } from "./pages/Animal/TipoVeiculo/TipoVeiculo";
+import { AdicionarTipoVeiculoPage } from "./pages/Geral/TipoVeiculo/AdicionarTipoVeiculo";
+import { TipoVeiculoPage } from "./pages/Geral/TipoVeiculo/TipoVeiculo";
 import { AtualizacaoCadastralRebanhoPage } from "./pages/Rebanho/AtualizacaoCadastralRebanho/AtualizacaoCadastralRebanho";
 import { AtualizarCadastroRebanhoPage } from "./pages/Rebanho/AtualizacaoCadastralRebanho/AtualizarCadastroRebanho";
 import { ConfirmarDadosProdutorRebanhoPage } from "./pages/Rebanho/AtualizacaoCadastralRebanho/ConfirmarDadosProdutorRebanho";
@@ -253,6 +261,12 @@ import { ParametrosSistemaPage } from "./pages/Controle/ParametrosSistema/Parame
 
 // 1. Adicionamos as novas rotas de Pessoa Jurídica no tipo Screen
 export type Screen =
+| "editar-unidade-administrativa"
+  | "visualizar-unidade-administrativa"
+  | "editar-unidade-medida"
+  | "visualizar-unidade-medida"
+  | "editar-tipo-veiculo"
+  | "visualizar-tipo-veiculo"
 | "editar-produto"
   | "visualizar-produto"
   | "editar-profissional-oficial"
@@ -507,6 +521,32 @@ export default function App() {
 	};
 
 	switch (screen) {
+		case "unidade-administrativa":
+      return <UnidadeAdministrativaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-unidade-administrativa":
+      return <AdicionarUnidadeAdministrativaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-unidade-administrativa":
+      return <EditarUnidadeAdministrativaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-unidade-administrativa":
+      return <VisualizarUnidadeAdministrativaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+
+    case "unidade-medida":
+      return <UnidadeMedidaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-unidade-medida":
+      return <AdicionarUnidadeMedidaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-unidade-medida":
+      return <EditarUnidadeMedidaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-unidade-medida":
+      return <VisualizarUnidadeMedidaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+
+    case "tipo-veiculo":
+      return <TipoVeiculoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-tipo-veiculo":
+      return <AdicionarTipoVeiculoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-tipo-veiculo":
+      return <EditarTipoVeiculoPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-tipo-veiculo":
+      return <VisualizarTipoVeiculoPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
 		case "produto":
       return <ProdutoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-produto":

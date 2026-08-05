@@ -10,6 +10,7 @@ import { Navbar } from "../../../components/Navbar";
 import {
   FloatInput,
   FloatSelect,
+  LargeTextArea,
 } from "../../../components/ui/FormKit";
 
 const GREEN = "#1A7A3C";
@@ -96,13 +97,13 @@ export function AdicionarTipoVeiculoPage({
   const [situacao, setSituacao] = useState<string>(
     data?.situacao ?? "Ativo",
   );
+  const [observacao, setObservacao] = useState("");
 
   const [isSucesso, setIsSucesso] = useState(false);
 
-  const formularioValido =
-    tipoVeiculo.trim() !== "" &&
-    meioTransporte !== "" &&
-    (!isEdicao || situacao !== "");
+  // Fluxo demonstrativo: a confirmação pode ser aberta mesmo sem preencher
+  // todos os campos, mantendo o mesmo comportamento dos demais cadastros.
+  const handleAdicionar = () => setIsSucesso(true);
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
@@ -132,8 +133,7 @@ export function AdicionarTipoVeiculoPage({
             </h1>
             <button
               type="button"
-              disabled={!formularioValido}
-              onClick={() => setIsSucesso(true)}
+              onClick={handleAdicionar}
               className="px-5 py-3 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-bold rounded-md transition shadow-sm"
             >
               {isEdicao ? "Salvar" : "Adicionar"}
@@ -183,17 +183,17 @@ export function AdicionarTipoVeiculoPage({
             )}
           </div>
         </Section>
+
+        <Section title="Observações">
+          <LargeTextArea label="Observações" value={observacao} onChange={setObservacao} />
+        </Section>
       </main>
 
       {isSucesso && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
             <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4">
-              <Check
-                size={28}
-                className="text-[#1A7A3C]"
-                strokeWidth={3}
-              />
+
             </div>
             <h3 className="text-lg font-bold text-gray-900">
               {isEdicao
@@ -224,6 +224,7 @@ export function AdicionarTipoVeiculoPage({
                     tipoVeiculo,
                     meioTransporte,
                     situacao,
+                    observacao,
                   });
                 }}
                 className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition"
