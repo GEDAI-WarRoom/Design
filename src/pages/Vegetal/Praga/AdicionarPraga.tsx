@@ -70,7 +70,7 @@ export function AdicionarPragaPage({ onLogout, onNavigate }: PageProps) {
               value={nomeCientifico}
               onChange={setNomeCientifico}
               maxLength={255}
-             
+
             />
             <FloatInput
               label="Nome Popular"
