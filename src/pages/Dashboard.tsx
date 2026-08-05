@@ -594,6 +594,22 @@ export const thirdCategories: MenuCategory[] = [
         route: "lote-pagamento",
         icon: <Layers3 size={16} />,
       },
+      {
+        label: "Taxa de Emissão de Documento Sanitário",
+        route: "taxa-emissao-gta",
+        icon: <BadgePercent size={16} />,
+      },
+      {
+        label: "Isenção de Taxa de Documento Sanitário",
+        route: "isencao-taxa-gta",
+        icon: (
+          <img
+            src={Icons.iconeIsencaoTaxaUrl}
+            alt="Isenção de Taxa de Documento Sanitário"
+            className="w-4 h-4 object-contain"
+          />
+        ),
+      },
     ],
   },
   {
@@ -639,22 +655,6 @@ export const thirdCategories: MenuCategory[] = [
           <img
             src={Icons.iconeGTAFisicaUrl}
             alt="GTA Digital"
-            className="w-4 h-4 object-contain"
-          />
-        ),
-      },
-      {
-        label: "Taxa de Emissão de Documento Sanitário",
-        route: "taxa-emissao-gta",
-        icon: <BadgePercent size={16} />,
-      },
-      {
-        label: "Isenção de Taxa de GTA",
-        route: "isencao-taxa-gta",
-        icon: (
-          <img
-            src={Icons.iconeIsencaoTaxaUrl}
-            alt="Isenção de Taxa"
             className="w-4 h-4 object-contain"
           />
         ),

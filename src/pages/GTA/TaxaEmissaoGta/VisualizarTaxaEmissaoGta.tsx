@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Pencil } from "lucide-react";
+import { ArrowLeft, FileText, Pencil, Percent } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import {
   CLASSE_CAMPO_ALTERADO_HISTORICO,
@@ -181,6 +181,7 @@ export function VisualizarTaxaEmissaoGtaPage({
 
       <HistoricoCadastroLayout<TaxaEmissaoGta>
         itens={historico}
+        ativo={aba === "taxa"}
         resetKey={taxaAtual.id}
         conteudoClassName="flex flex-col gap-4 px-4 py-6 md:px-6"
       >
@@ -238,23 +239,25 @@ export function VisualizarTaxaEmissaoGtaPage({
                 <button
                   type="button"
                   onClick={() => setAba("taxa")}
-                  className={`border-b-2 px-1 py-3 text-sm font-semibold transition ${
+                  className={`flex items-center gap-2 border-b-2 px-1 py-3 text-sm font-semibold transition ${
                     aba === "taxa"
                       ? "border-[#1A7A3C] text-[#1A7A3C]"
                       : "border-transparent text-gray-500 hover:text-gray-800"
                   }`}
                 >
-                  Informações da Taxa
+                  <FileText size={16} />
+                  Cadastro
                 </button>
                 <button
                   type="button"
                   onClick={() => setAba("finalidade")}
-                  className={`border-b-2 px-1 py-3 text-sm font-semibold transition ${
+                  className={`flex items-center gap-2 border-b-2 px-1 py-3 text-sm font-semibold transition ${
                     aba === "finalidade"
                       ? "border-[#1A7A3C] text-[#1A7A3C]"
                       : "border-transparent text-gray-500 hover:text-gray-800"
                   }`}
                 >
+                  <Percent size={16} />
                   Taxas por Finalidade
                 </button>
               </div>
