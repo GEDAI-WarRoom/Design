@@ -214,7 +214,7 @@ export function PendenciasConfirmacaoGta({
 						{pendencias.slice(0, 2).map((pendencia, index) => (
 							<article
 								key={pendencia.id}
-								className={`flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm ${index === 0 ? "order-1" : "order-3"}`}
+								className={`relative flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition duration-200 ease-out hover:z-10 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-lg focus-within:z-10 focus-within:-translate-y-1 focus-within:scale-[1.02] focus-within:shadow-lg ${index === 0 ? "order-1" : "order-3"}`}
 							>
 								<div className="flex flex-col p-4">
 									<div className="flex items-center gap-3">
@@ -223,6 +223,9 @@ export function PendenciasConfirmacaoGta({
 										</span>
 										<div className="min-w-0 flex-1">
 											<h3 className="truncate text-sm font-semibold text-gray-900">GTA NR - {pendencia.numero}</h3>
+											<p className="mt-1 text-xs leading-4 text-gray-500">
+												Confirmação de recebimento dos animais
+											</p>
 										</div>
 									</div>
 									<p className="mt-4 truncate text-xs text-gray-500">
@@ -240,17 +243,20 @@ export function PendenciasConfirmacaoGta({
 						{pendenciasRebanho.slice(0, Math.max(1, 3 - pendencias.slice(0, 2).length)).map((atualizacao) => (
 							<article
 								key={atualizacao.id}
-								className="order-2 flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm"
+								className="relative order-2 flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition duration-200 ease-out hover:z-10 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-lg focus-within:z-10 focus-within:-translate-y-1 focus-within:scale-[1.02] focus-within:shadow-lg"
 							>
 								<div className="flex flex-col p-4">
 									<div className="flex items-center gap-3">
 										<span className="flex h-9 w-9 items-center justify-center rounded-lg bg-green-50 text-[#1A7A3C]"><RefreshCw size={18} /></span>
 										<div className="min-w-0 flex-1">
 											<h3 className="text-sm font-semibold text-gray-900">Atualização Cadastral</h3>
+											<p className="mt-1 text-xs leading-4 text-gray-500">
+												Revisão periódica dos dados da propriedade
+											</p>
 										</div>
 									</div>
 									<div className="mt-4 space-y-2 text-xs text-gray-500">
-										<p>Etapa {atualizacao.etapa}</p>
+										<p>Referência: {atualizacao.etapa}</p>
 										<p>Prazo: {formatarData(atualizacao.dataFimEtapa)}</p>
 									</div>
 								</div>

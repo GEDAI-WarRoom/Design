@@ -50,6 +50,46 @@ interface ProprietarioEntidade {
   tipo: "Pessoa física" | "Pessoa jurídica"; // Corrigido para bater com os valores do Mock e da US051
 }
 
+interface EstabelecimentoAgropecuario {
+  id: number;
+  codigo: string;
+  nome: string;
+  proprietarios: string; // Exibe "Nome - CPF" conforme especificado
+  zona: "Rural" | "Urbana";
+  municipioUf: string; // "Lavras - MG"
+  situacao: "Ativo" | "Inativo" | "Suspenso";
+}
+
+const ESTABELECIMENTOS_MOCK: EstabelecimentoAgropecuario[] = [
+  {
+    id: 1,
+    codigo: "51080590041",
+    nome: "Fazenda Rio Verde",
+    proprietarios: "José Aarão Neto - 555.009.956-40",
+    zona: "Rural",
+    municipioUf: "Lavras - MG",
+    situacao: "Ativo"
+  },
+  {
+    id: 2,
+    codigo: "31001040082",
+    nome: "Haras Vale Verde",
+    proprietarios: "José Aarão Neto - 555.009.956-40",
+    zona: "Rural",
+    municipioUf: "Belo Horizonte - MG",
+    situacao: "Ativo"
+  },
+  {
+    id: 3,
+    codigo: "31001040090",
+    nome: "Granja Alvorada",
+    proprietarios: "Agro Cooperativa IMA - 12.345.678/0001-90",
+    zona: "Urbana",
+    municipioUf: "Varginha - MG",
+    situacao: "Suspenso"
+  },
+];
+
 const perPageDefault = 10;
 
 // ==========================================================
@@ -75,10 +115,10 @@ export function EstabelecimentoAgropecuarioPage({ onLogout, onNavigate }: PagePr
   // ==========================================================
   // ESTADOS DA PÁGINA
   // ==========================================================
-  const [busca, setBusca] = useState(""); 
-  const [tipoPessoa, setTipoPessoa] = useState("Pessoa física"); 
-  const [proprietario, setProprietario] = useState<ProprietarioEntidade | null>(null); 
-  const [modalProprietario, setModalProprietario] = useState(false); 
+  const [busca, setBusca] = useState("");
+  const [tipoPessoa, setTipoPessoa] = useState("Pessoa física");
+  const [proprietario, setProprietario] = useState<ProprietarioEntidade | null>(null);
+  const [modalProprietario, setModalProprietario] = useState(false);
 
   const [zona, setZona] = useState("");
   const [municipio, setMunicipio] = useState("");
@@ -93,6 +133,7 @@ export function EstabelecimentoAgropecuarioPage({ onLogout, onNavigate }: PagePr
 
   const [sortKey, setSortKey] = useState<SortKey>("nome");
   const [sortAsc, setSortAsc] = useState(true);
+
   const [estabelecimentos] = useState(() => listarEstabelecimentosAgropecuarios());
     
   // Filtra os proprietários passados para o modal com base no tipo selecionado
@@ -100,14 +141,14 @@ export function EstabelecimentoAgropecuarioPage({ onLogout, onNavigate }: PagePr
     (p) => p.tipo === tipoPessoa
   );
 
-    const colunasModal = [
-    { 
-      label: tipoPessoa === "PF" ? "Nome" : tipoPessoa === "PJ" ? "Razão Social" : "Nome / Razão Social", 
-      key: "nome" 
+  const colunasModal = [
+    {
+      label: tipoPessoa === "PF" ? "Nome" : tipoPessoa === "PJ" ? "Razão Social" : "Nome / Razão Social",
+      key: "nome"
     },
-    { 
-      label: tipoPessoa === "PJ" ? "CNPJ" : tipoPessoa === "PF" ? "CPF" : "CPF / CNPJ", 
-      key: "documento" 
+    {
+      label: tipoPessoa === "PJ" ? "CNPJ" : tipoPessoa === "PF" ? "CPF" : "CPF / CNPJ",
+      key: "documento"
     }
   ];
   const handlePesquisar = () => {
@@ -130,7 +171,7 @@ export function EstabelecimentoAgropecuarioPage({ onLogout, onNavigate }: PagePr
   const filtrados = estabelecimentos.filter((d) => {
     const termo = busca.trim();
     const matchBusca = termo === "" || (d.nome ?? "").includes(termo) || (d.codigo ?? "").includes(termo);
-    
+
     // CORRIGIDO: Validação correta usando as propriedades do objeto 'proprietario' selecionado
     const matchProprietario = !proprietario || d.proprietarios.includes(proprietario.nome);
     const matchZona = zona === "" || d.zona === zona;
@@ -175,7 +216,7 @@ export function EstabelecimentoAgropecuarioPage({ onLogout, onNavigate }: PagePr
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-semibold text-gray-900">Estabelecimento Agropecuário</h1>
             <button onClick={() => onNavigate("adicionar-estabelecimento-agropecuario")} className="px-5 py-3 rounded-md text-white text-sm font-semibold transition hover:opacity-90 active:scale-[0.98]" style={{ backgroundColor: GREEN }}>
-              Adicionar Nova
+              Adicionar Novo
             </button>
           </div>
         </div>
@@ -216,11 +257,11 @@ export function EstabelecimentoAgropecuarioPage({ onLogout, onNavigate }: PagePr
                 label="Proprietário"
                 value={proprietario ? `${proprietario.nome} ` : ""}
                 required
-                icon={<img src={Icons.iconeProdutorUrl} alt="Proprietário" className="w-5 h-5 object-contain" />} 
+                icon={<img src={Icons.iconeProdutorUrl} alt="Proprietário" className="w-5 h-5 object-contain" />}
                 onClick={() => setModalProprietario(true)}
                 readOnly
-              />  
-                          
+              />
+
               <FloatSelect label="Zona" value={zona} onChange={setZona} options={ZONAS} />
               <FloatCombobox label="Município" value={municipio} onChange={setMunicipio} options={MUNICIPIOS_MG} />
               <FloatSelect label="Situação" value={situacao} onChange={setSituacao} options={SITUACOES} />
@@ -302,7 +343,7 @@ export function EstabelecimentoAgropecuarioPage({ onLogout, onNavigate }: PagePr
                         </td>
                         <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">{d.zona}</td>
                         <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">{d.municipioUf}</td>
-                        <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">{d.situacao} 
+                        <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">{d.situacao}
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-1 justify-end">
@@ -341,7 +382,7 @@ export function EstabelecimentoAgropecuarioPage({ onLogout, onNavigate }: PagePr
         }}
         title="Buscar Proprietário"
         subtitle="Busque por um proprietário cadastrado no sistema:"
-        icon={<img src={Icons.iconeProdutorUrl || Icons.iconeProdutorUrl} alt="Proprietário" className="w-8 h-8 object-contain" />} 
+        icon={<img src={Icons.iconeProdutorUrl || Icons.iconeProdutorUrl} alt="Proprietário" className="w-8 h-8 object-contain" />}
         data={proprietariosFiltradosModal}
         columns={colunasModal} // INSERIDO AQUI CONFORME SOLICITADO
         searchKeys={["nome", "documento"]}

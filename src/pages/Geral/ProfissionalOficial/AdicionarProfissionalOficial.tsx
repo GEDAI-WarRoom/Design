@@ -95,7 +95,7 @@ export function AdicionarProfissionalOficialPage({ onLogout, onNavigate }: PageP
       <main className="max-w-[1088px] mx-auto px-4 md:px-6 py-6 flex flex-col gap-4">
         {/* Cabeçalho */}
         <div>
-          <button type="button" onClick={() => onNavigate("profissional-servico-oficial")} className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70" style={{ color: GREEN }}>
+          <button type="button" onClick={() => onNavigate("profissional-oficial")} className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70" style={{ color: GREEN }}>
             <ArrowLeft size={15} />
             Todos os Profissionais de Serviço Oficial
           </button>
@@ -117,51 +117,51 @@ export function AdicionarProfissionalOficialPage({ onLogout, onNavigate }: PageP
 
         {/* 1. Informações Básicas */}
         <Section title="Informações Básicas">
-            <PessoaFisicaInput
-              label="Pessoa Física"
-              required
-              value={pessoa ? pessoa.nome : ""}
-              onChange={(ent: any) => setPessoa(ent)}
-              onEyeClick={() => pessoa && onNavigate("visualizar-pessoa", pessoa)}
-            />
+          <PessoaFisicaInput
+            label="Pessoa Física"
+            required
+            value={pessoa ? pessoa.nome : ""}
+            onChange={(ent: any) => setPessoa(ent)}
+            onEyeClick={() => pessoa && onNavigate("visualizar-pessoa", pessoa)}
+          />
 
-          
-        {/* 2. Serviço Oficial */}
-        <SubGrupo title="Serviço Oficial">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <FloatSelect label="Esfera do Serviço Oficial" required value={esfera} onChange={handleEsfera} options={ESFERAS} />
-            {/* MASP — só se a Esfera for "Estadual" */}
-            {mostrarMasp && (
-              <FloatInput
-                label="MASP"
-                required
-                value={masp}
-                onChange={(v: string) => setMasp(aplicarMascaraMasp(v))}
-                placeholder="XXXXXXX-X"
-                hasTooltip
-                tooltipText="Módulo de Autorização de Serviços Profissionais. Gerencia as habilitações, extensões e autorizações do profissional habilitado."
-              />
-            )}
-          </div>
-        </SubGrupo>
-           
+
+          {/* 2. Serviço Oficial */}
+          <SubGrupo title="Serviço Oficial">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <FloatSelect label="Esfera do Serviço Oficial" required value={esfera} onChange={handleEsfera} options={ESFERAS} />
+              {/* MASP — só se a Esfera for "Estadual" */}
+              {mostrarMasp && (
+                <FloatInput
+                  label="MASP"
+                  required
+                  value={masp}
+                  onChange={(v: string) => setMasp(aplicarMascaraMasp(v))}
+                  placeholder="XXXXXXX-X"
+                  hasTooltip
+                  tooltipText="Módulo de Autorização de Serviços Profissionais. Gerencia as habilitações, extensões e autorizações do profissional habilitado."
+                />
+              )}
+            </div>
+          </SubGrupo>
+
         </Section>
 
-        
+
 
         {/* 3. Unidade Administrativa de Vinculação */}
-<Section title="Unidade Administrativa de Vinculação">
+        <Section title="Unidade Administrativa de Vinculação">
 
-    <UnidadeAdministrativaInput
-      label="Unidade Administrativa"
-      required
-      value={unidade?.nome || ""} // 💡 Garante o envio do texto amigável para o input principal
-      onChange={(ent: any) => setUnidade(ent)} // 💡 Salva o objeto selecionado completo no estado
-      onEyeClick={() => unidade && onNavigate("visualizar-unidade-administrativa", unidade)}
-    />
+          <UnidadeAdministrativaInput
+            label="Unidade Administrativa"
+            required
+            value={unidade?.nome || ""} // 💡 Garante o envio do texto amigável para o input principal
+            onChange={(ent: any) => setUnidade(ent)} // 💡 Salva o objeto selecionado completo no estado
+            onEyeClick={() => unidade && onNavigate("visualizar-unidade-administrativa", unidade)}
+          />
 
-</Section>
-{/* Seção Anexo Geral Dinâmica com Numeração */}
+        </Section>
+        {/* Seção Anexo Geral Dinâmica com Numeração */}
         <Section title="Anexo">
           <div className="flex flex-col gap-6">
             {anexos.map((anexo, index) => (
@@ -239,7 +239,7 @@ export function AdicionarProfissionalOficialPage({ onLogout, onNavigate }: PageP
           </div>
         </Section>
 
-         {/* 5. Observações */}
+        {/* 5. Observações */}
         <Section title="Observações">
           <LargeTextArea
             label="Observação"
@@ -256,17 +256,19 @@ export function AdicionarProfissionalOficialPage({ onLogout, onNavigate }: PageP
       {isSucesso && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
-            <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4"><Check size={28} className="text-[#1A7A3C]" strokeWidth={3} /></div>
             <h3 className="text-lg font-bold text-gray-900">Profissional adicionado com sucesso!</h3>
             <p className="text-sm text-gray-500 mt-1">{pessoa?.nome ? `"${pessoa.nome}"` : "O profissional"} foi cadastrado como profissional de serviço oficial.</p>
             <div className="flex gap-3 justify-center mt-6">
-              <button onClick={() => { setIsSucesso(false); onNavigate("profissional-servico-oficial"); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition">Voltar</button>
-              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-profissional-servico-oficial", {
-                nome: pessoa?.nome, cpf: pessoa?.cpf,
-                esfera, masp,
-                unidade: unidade?.nome,
-                situacao: "Ativo",
-              }); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
+              <button onClick={() => { setIsSucesso(false); onNavigate("profissional-oficial"); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition">Voltar</button>
+              <button onClick={() => {
+                setIsSucesso(false); onNavigate("visualizar-profissional-oficial", {
+                  pessoa: pessoa ? { ...pessoa, documento: pessoa.documento ?? pessoa.cpf } : undefined,
+                  esfera, masp,
+                  unidade,
+                  anexos,
+                  observacao,
+                });
+              }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
             </div>
           </div>
         </div>
