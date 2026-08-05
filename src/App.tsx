@@ -5,6 +5,11 @@ import { SelecionarUsuarioPage } from "./pages/SelecionarUsuario";
 import { isRouteAllowed, useDemoUser } from "./contexts/DemoUserContext";
 
 // GERAL
+import { VisualizarProdutoPage } from "./pages/Geral/Produto/VisualizarProduto";
+import { EditarProdutoPage } from "./pages/Geral/Produto/EditarProduto";
+
+import { VisualizarProfissionalOficialPage } from "./pages/Geral/ProfissionalOficial/VisualizarProfissionalOficial";
+import { EditarProfissionalOficialPage } from "./pages/Geral/ProfissionalOficial/EditarProfissionalOficial";
 import { EditarVendaPropriedadePage } from "./pages/Geral/VendaPropriedade/EditarVendaPropriedade";
 import { VisualizarDivisaoMunicipalPage } from "./pages/Geral/DivisaoMunicipal/VisualizarDivisaoMunicipal";
 import { EditarDivisaoMunicipalPage } from "./pages/Geral/DivisaoMunicipal/EditarDivisaoMunicipal";
@@ -248,6 +253,10 @@ import { ParametrosSistemaPage } from "./pages/Controle/ParametrosSistema/Parame
 
 // 1. Adicionamos as novas rotas de Pessoa Jurídica no tipo Screen
 export type Screen =
+| "editar-produto"
+  | "visualizar-produto"
+  | "editar-profissional-oficial"
+  | "visualizar-profissional-oficial"
 | "editar-estabelecimento-agropecuario"
   | "editar-venda-propriedade"
 | "editar-divisao-municipal"
@@ -498,6 +507,22 @@ export default function App() {
 	};
 
 	switch (screen) {
+		case "produto":
+      return <ProdutoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-produto":
+      return <AdicionarProdutoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-produto":
+      return <EditarProdutoPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-produto":
+      return <VisualizarProdutoPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+	  case "profissional-oficial":
+      return <ProfissionalOficialPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-profissional-oficial":
+      return <AdicionarProfissionalOficialPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-profissional-oficial":
+      return <EditarProfissionalOficialPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-profissional-oficial":
+      return <VisualizarProfissionalOficialPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
 		case "estabelecimento-agropecuario":
       return <EstabelecimentoAgropecuarioPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-estabelecimento-agropecuario":
