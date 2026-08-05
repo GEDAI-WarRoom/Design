@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
-  ArrowLeft, ChevronUp, ChevronDown, Check, Info, Trash2, PlusCircle,
+  ArrowLeft, ChevronUp, ChevronDown, Info, Trash2, PlusCircle,
   Download, Calendar, UserRound, Bug, Eye,
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
@@ -137,14 +137,14 @@ export function AdicionarProfissionalVegetalPage({ onLogout, onNavigate }: PageP
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
-      <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="profissional-area-vegetal" hideSearch />
+      <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="profissional-vegetal" hideSearch />
 
       <main className="max-w-[1088px] mx-auto px-4 md:px-6 py-6 flex flex-col gap-4">
         {/* Cabeçalho */}
         <div>
           <button
             type="button"
-            onClick={() => onNavigate("profissional-area-vegetal")}
+            onClick={() => onNavigate("profissional-vegetal")}
             className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A7A3C]/30"
             style={{ color: GREEN }}
           >
@@ -520,7 +520,7 @@ export function AdicionarProfissionalVegetalPage({ onLogout, onNavigate }: PageP
 
         {/* Rodapé de ações */}
         <div className="flex justify-end gap-3 pb-4">
-          <CustomButton variant="outlined" onClick={() => onNavigate("profissional-area-vegetal")}>
+          <CustomButton variant="outlined" onClick={() => onNavigate("profissional-vegetal")}>
             Cancelar
           </CustomButton>
           <CustomButton variant="filled" onClick={() => setIsSucesso(true)}>
@@ -538,9 +538,6 @@ export function AdicionarProfissionalVegetalPage({ onLogout, onNavigate }: PageP
           className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4"
         >
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
-            <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4">
-              <Check size={28} className="text-[#1A7A3C]" strokeWidth={3} aria-hidden />
-            </div>
             <h3 id="titulo-sucesso" className="text-lg font-bold text-gray-900">
               Profissional cadastrado com sucesso!
             </h3>
@@ -550,14 +547,32 @@ export function AdicionarProfissionalVegetalPage({ onLogout, onNavigate }: PageP
             <div className="flex gap-3 justify-center mt-6">
               <button
                 type="button"
-                onClick={() => { setIsSucesso(false); onNavigate("profissional-area-vegetal"); }}
+                onClick={() => { setIsSucesso(false); onNavigate("profissional-vegetal"); }}
                 className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition"
               >
                 Voltar
               </button>
               <button
                 type="button"
-                onClick={() => { setIsSucesso(false); onNavigate("visualizar-profissional-area-vegetal"); }}
+                onClick={() => { setIsSucesso(false); onNavigate("visualizar-profissional-vegetal", {
+                  nome: pessoaFisica?.nome,
+                  documento: cpf,
+                  cpf,
+                  servicoOficial: pessoaFisica?.servicoOficial,
+                  esfera: pessoaFisica?.esfera,
+                  masp: pessoaFisica?.masp,
+                  formacao,
+                  crea,
+                  registro: crea,
+                  coordenadoria: coordenadoria?.nome,
+                  habilitacao: habilitadoPtv ? "Habilitado para emissão de PTV" : habilitadoCfo ? "Habilitado para emissão de CFO/CFOC" : "Não habilitado",
+                  numeroHabilitacao: habilitacoesPraga[0]?.numeroHabilitacao || "31250001",
+                  estabelecimentos,
+                  habilitacoesPraga,
+                  anexos,
+                  observacao,
+                  situacao: "Ativo",
+                }); }}
                 className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition"
               >
                 Visualizar

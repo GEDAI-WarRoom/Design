@@ -75,12 +75,9 @@ export function AdicionarProdutoPage({ onLogout, onNavigate }: any) {
     }
   }, [tipoProduto]);
 
-  const handleSalvar = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (nome && tipoProduto && unidadeMedida && classificacoes.length > 0) {
-      if (tipoProduto === "Animal" && areasAtuacao.length === 0) return;
-      setIsSucesso(true);
-    }
+  const handleSalvar = (e?: React.SyntheticEvent) => {
+    e?.preventDefault();
+    setIsSucesso(true);
   };
 
   return (
@@ -94,7 +91,7 @@ export function AdicionarProdutoPage({ onLogout, onNavigate }: any) {
           <div>
             <button 
               type="button" 
-              onClick={() => onNavigate("buscar-produto")} 
+              onClick={() => onNavigate("produto")} 
               className="flex items-center gap-1 text-sm mb-2 transition hover:opacity-70 font-semibold" 
               style={{ color: GREEN }}
             >
@@ -203,16 +200,27 @@ export function AdicionarProdutoPage({ onLogout, onNavigate }: any) {
               <Check size={28} className="text-[#1A7A3C]" strokeWidth={3} />
             </div>
             <h3 className="text-lg font-bold text-gray-900">Produto adicionado!</h3>
-            <p className="text-sm text-gray-500 mt-1">O cadastro do produto "{nome}" foi realizado com sucesso.</p>
+            <p className="text-sm text-gray-500 mt-1">
+              O cadastro do produto "{nome || "Produto de exemplo"}" foi realizado com sucesso.
+            </p>
             <div className="flex gap-3 justify-center mt-6">
               <button 
-                onClick={() => onNavigate("buscar-produto")} 
+                onClick={() => onNavigate("produto")} 
                 className="px-5 h-11 rounded-md border border-gray-200 text-gray-600 text-sm font-semibold hover:bg-gray-50 transition"
               >
                 Voltar
               </button>
               <button 
-                onClick={() => onNavigate("visualizar-produto", { nome, tipoProduto, unidadeMedida })} 
+                onClick={() => onNavigate("visualizar-produto", {
+                  codigo: "PRD-0004",
+                  nome,
+                  tipoProduto,
+                  unidadeMedida,
+                  areasAtuacao,
+                  classificacoes,
+                  situacao: "Ativo",
+                  observacao: "Produto cadastrado para comercialização no estabelecimento agropecuário.",
+                })} 
                 className="px-5 h-11 rounded-md bg-[#1A7A3C] text-white text-sm font-semibold transition hover:bg-[#15612F]"
               >
                 Visualizar

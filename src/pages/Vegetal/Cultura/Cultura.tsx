@@ -29,14 +29,17 @@ interface Cultura {
   codigo: string;
   nome: string;
   tipo: "Anual" | "Perene";
+  variedades: Array<{ uid: string; nome: string }>;
+  pragas: Array<{ uid: string; praga: { id: number; nomeCientifico: string; nomePopular: string } }>;
+  observacao: string;
   situacao: "Ativo" | "Inativo";
 }
 
 const CULTURAS_MOCK: Cultura[] = [
-  { id: 1, codigo: "343", nome: "Abóbora", tipo: "Anual", situacao: "Ativo" },
-  { id: 2, codigo: "344", nome: "Café", tipo: "Perene", situacao: "Ativo" },
-  { id: 3, codigo: "345", nome: "Milho", tipo: "Anual", situacao: "Inativo" },
-  { id: 4, codigo: "346", nome: "Laranja", tipo: "Perene", situacao: "Ativo" },
+  { id: 1, codigo: "343", nome: "Abóbora", tipo: "Anual", variedades: [{ uid: "v1", nome: "Abóbora Menina Brasileira" }], pragas: [{ uid: "p1", praga: { id: 1, nomeCientifico: "Diaphania nitidalis", nomePopular: "Broca-das-cucurbitáceas" } }], observacao: "Cultura anual cadastrada para acompanhamento fitossanitário.", situacao: "Ativo" },
+  { id: 2, codigo: "344", nome: "Café", tipo: "Perene", variedades: [{ uid: "v2", nome: "Catuaí Vermelho" }], pragas: [{ uid: "p2", praga: { id: 2, nomeCientifico: "Hypothenemus hampei", nomePopular: "Broca-do-café" } }], observacao: "Cultura perene de relevância econômica para Minas Gerais.", situacao: "Ativo" },
+  { id: 3, codigo: "345", nome: "Milho", tipo: "Anual", variedades: [{ uid: "v3", nome: "Milho Híbrido" }], pragas: [{ uid: "p3", praga: { id: 3, nomeCientifico: "Spodoptera frugiperda", nomePopular: "Lagarta-do-cartucho" } }], observacao: "Cadastro inativo mantido para consulta histórica.", situacao: "Inativo" },
+  { id: 4, codigo: "346", nome: "Laranja", tipo: "Perene", variedades: [{ uid: "v4", nome: "Pera Rio" }], pragas: [{ uid: "p4", praga: { id: 4, nomeCientifico: "Diaphorina citri", nomePopular: "Psilídeo-dos-citros" } }], observacao: "Cultura perene acompanhada pelo programa de sanidade dos citros.", situacao: "Ativo" },
 ];
 
 // ==========================================================

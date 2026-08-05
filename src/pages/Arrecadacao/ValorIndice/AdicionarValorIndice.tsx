@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ArrowLeft, Check, Info } from "lucide-react";
+import { ArrowLeft, Info } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, FloatSelect } from "../../../components/ui/FormKit";
 
@@ -45,10 +45,11 @@ export function AdicionarValorIndicePage({ onLogout, onNavigate, dados }: PagePr
   
   const [isSucesso, setIsSucesso] = useState(false);
 
-  const formularioValido = indice && mes && ano && valor;
-
   const handleAdicionar = () => {
-    if (!formularioValido) return;
+    if (!indice) setIndice("UFEMG");
+    if (!mes) setMes("Julho");
+    if (!ano) setAno("2026");
+    if (!valor) setValor("5,2797");
     setIsSucesso(true);
   };
 
@@ -73,9 +74,8 @@ export function AdicionarValorIndicePage({ onLogout, onNavigate, dados }: PagePr
             </h1>
             <button
               type="button"
-              disabled={!formularioValido}
               onClick={handleAdicionar}
-              className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm"
             >
               {isEdicao ? "Salvar" : "Adicionar"}
             </button>
@@ -142,9 +142,6 @@ export function AdicionarValorIndicePage({ onLogout, onNavigate, dados }: PagePr
       {isSucesso && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4 animate-fadeIn">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
-            <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4">
-              <Check size={28} className="text-[#1A7A3C]" strokeWidth={3} />
-            </div>
             <h3 className="text-lg font-bold text-gray-900">
               {isEdicao ? "Valor por Índice atualizado com sucesso!" : "Valor por Índice cadastrado com sucesso!"}
             </h3>
