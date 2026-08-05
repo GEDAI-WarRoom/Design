@@ -1,27 +1,27 @@
 import React, { useState } from "react";
-import { ArrowLeft, Check } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, FloatSelect } from "../../../components/ui/FormKit";
 import { registrarVersaoCadastro } from "../../../components/ui/historicoCadastroStorage";
+import { salvarRegistroMock } from "../../../components/ui/mockCollectionStorage";
 
 const GREEN = "#1A7A3C";
 
 export function EditarLaboratorioPage({ dados, onLogout, onNavigate }: any) {
-  const laboratorioFallback = { id: 1, cnpj: "12.345.678/0001-90", razaoSocial: "Laboratório Central BioVet", municipio: "Belo Horizonte - MG", situacao: "Ativo" };
-  const registroAtual = dados?.cnpj ? dados : laboratorioFallback;
+  const laboratorioFallback = { id: 1, nome: "Laboratório Agener", municipio: "Lavras", uf: "MG", situacao: "Ativo" };
+  const registroAtual = dados?.id ? dados : laboratorioFallback;
   
-  const [cnpj, setCnpj] = useState(registroAtual.cnpj || "");
-  const [razaoSocial, setRazaoSocial] = useState(registroAtual.razaoSocial || "");
+  const [nome, setNome] = useState(registroAtual.nome || "");
   const [municipio, setMunicipio] = useState(registroAtual.municipio || "");
   const [situacao, setSituacao] = useState(registroAtual.situacao || "Ativo");
-  const [isSucesso, setIsSucesso] = useState(false);
 
   const handleSalvar = () => {
-    const dadosAtuais = { ...registroAtual, cnpj, razaoSocial, municipio, situacao };
+    const dadosAtuais = { ...registroAtual, nome, municipio, situacao };
     if (JSON.stringify(registroAtual) !== JSON.stringify(dadosAtuais)) {
-      registrarVersaoCadastro({ chaveCadastro: `laboratorio:${registroAtual.cnpj}`, dadosAnteriores: registroAtual, dadosAtuais, alteradoPor: "Administrador" });
+      registrarVersaoCadastro({ chaveCadastro: `laboratorio:${registroAtual.id}`, dadosAnteriores: registroAtual, dadosAtuais, alteradoPor: "Administrador" });
+      salvarRegistroMock("laboratorios", dadosAtuais);
     }
-    setIsSucesso(true);
+    onNavigate("visualizar-laboratorio", dadosAtuais);
   };
 
   return (
@@ -36,21 +36,11 @@ export function EditarLaboratorioPage({ dados, onLogout, onNavigate }: any) {
           </div>
         </div>
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 grid grid-cols-1 md:grid-cols-2 gap-5 mt-4">
-          <FloatInput label="CNPJ" required value={cnpj} onChange={setCnpj} />
-          <FloatInput label="Razão Social" required value={razaoSocial} onChange={setRazaoSocial} />
+          <FloatInput label="Nome do Laboratório" required value={nome} onChange={setNome} />
           <FloatInput label="Município" value={municipio} onChange={setMunicipio} />
           <FloatSelect label="Situação" value={situacao} onChange={setSituacao} options={[{value:"Ativo", label:"Ativo"}, {value:"Inativo", label:"Inativo"}]} />
         </div>
       </main>
-      {isSucesso && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8 flex flex-col items-center text-center">
-            <Check size={32} className="text-[#1A7A3C] stroke-[3] mb-5" />
-            <h3 className="text-lg font-bold text-gray-900">Alterações salvas!</h3>
-            <button onClick={() => { setIsSucesso(false); onNavigate("laboratorio"); }} className="px-8 h-11 mt-6 rounded-md bg-[#1A7A3C] text-white text-sm font-semibold w-full">Voltar para Listagem</button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

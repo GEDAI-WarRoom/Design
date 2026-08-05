@@ -4,12 +4,14 @@ import { Navbar } from "../../../components/Navbar";
 import { FloatInput } from "../../../components/ui/FormKit";
 import { HistoricoCadastroLayout, type HistoricoCadastroItem, CLASSE_CAMPO_ALTERADO_HISTORICO, campoHistoricoFoiAlterado } from "../../../components/ui/HistoricoCadastroLayout";
 import { carregarHistoricoCadastro } from "../../../components/ui/historicoCadastroStorage";
+import { obterRegistroMock } from "../../../components/ui/mockCollectionStorage";
 
 const GREEN = "#1A7A3C";
 
 export function VisualizarLancamentoDosesVacinaPage({ dados, onLogout, onNavigate }: any) {
   // Recebe os dados reais passados pelo botão da listagem.
-  const registro = dados || { id: "novo", revendedoraCodigo: "", revendedoraNome: "", numeroNotaFiscal: "", numeroPartida: "", doenca: "", tipoVacina: "", tipoLancamento: "", situacao: "Gravada" };
+  const registroInformado = dados || { id: "novo", revendedoraCodigo: "", revendedoraNome: "", numeroNotaFiscal: "", numeroPartida: "", doenca: "", tipoVacina: "", tipoLancamento: "", situacao: "Gravada" };
+  const registro = obterRegistroMock("lancamentos-doses-vacina", registroInformado);
   
   const chaveCadastro = `lancamento-doses-vacina:${registro.id || registro.numeroNotaFiscal}`;
 

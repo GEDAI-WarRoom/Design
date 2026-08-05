@@ -4,13 +4,15 @@ import { Navbar } from "../../../components/Navbar";
 import { FloatInput } from "../../../components/ui/FormKit";
 import { HistoricoCadastroLayout, type HistoricoCadastroItem, CLASSE_CAMPO_ALTERADO_HISTORICO, campoHistoricoFoiAlterado } from "../../../components/ui/HistoricoCadastroLayout";
 import { carregarHistoricoCadastro } from "../../../components/ui/historicoCadastroStorage";
+import { obterRegistroMock } from "../../../components/ui/mockCollectionStorage";
 
 const GREEN = "#1A7A3C";
 
 export function VisualizarVendaComEntradaVacinaPage({ dados, onLogout, onNavigate }: any) {
-  const vendaEntradaFallback = { id: 1, notaFiscal: "1234567", fornecedor: "Laboratório BioMed", revendedora: "Comercial AgroVat", vacina: "Brucelose (B19)", partida: "0013225/24", situacao: "Gravada" };
-  const registro = dados?.notaFiscal ? dados : vendaEntradaFallback;
-  const chaveCadastro = `venda-entrada-vacina:${registro.notaFiscal}`;
+  const vendaEntradaFallback = { id: 1, numeroNotaFiscal: "1234567", fornecedor: "Laboratório BioMed", revendedoraCodigo: "3120938028", revendedoraNome: "Comercial AgroVat", doenca: "Brucelose", tipoVacina: "B19", numeroPartida: "0013225/24", situacao: "Gravada" };
+  const registroInformado = dados?.id ? dados : vendaEntradaFallback;
+  const registro = obterRegistroMock("vendas-entrada-vacina", registroInformado);
+  const chaveCadastro = `venda-entrada-vacina:${registro.id}`;
 
   const historicoInicial: HistoricoCadastroItem<any>[] = [{ id: "v1", data: "19/05/2026", hora: "11:00", alteradoPor: "Sistema", atual: true, dados: registro }];
   const historico = carregarHistoricoCadastro<any>(chaveCadastro, historicoInicial);
@@ -37,11 +39,12 @@ export function VisualizarVendaComEntradaVacinaPage({ dados, onLogout, onNavigat
               </div>
               {avisoVersao}
               <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 grid grid-cols-1 md:grid-cols-3 gap-5">
-                <FloatInput label="Nota Fiscal" value={d.notaFiscal || ""} disabled onChange={() => {}} className={getClasse("notaFiscal")} />
+                <FloatInput label="Nota Fiscal" value={d.numeroNotaFiscal || ""} disabled onChange={() => {}} className={getClasse("numeroNotaFiscal")} />
                 <FloatInput label="Fornecedor Origem" value={d.fornecedor || ""} disabled onChange={() => {}} className={getClasse("fornecedor")} />
-                <FloatInput label="Revendedora Destino" value={d.revendedora || ""} disabled onChange={() => {}} className={getClasse("revendedora")} />
-                <FloatInput label="Vacina" value={d.vacina || ""} disabled onChange={() => {}} className={getClasse("vacina")} />
-                <FloatInput label="Partida" value={d.partida || ""} disabled onChange={() => {}} className={getClasse("partida")} />
+                <FloatInput label="Revendedora Destino" value={d.revendedoraNome || ""} disabled onChange={() => {}} className={getClasse("revendedoraNome")} />
+                <FloatInput label="Doença" value={d.doenca || ""} disabled onChange={() => {}} className={getClasse("doenca")} />
+                <FloatInput label="Tipo de Vacina" value={d.tipoVacina || "-"} disabled onChange={() => {}} className={getClasse("tipoVacina")} />
+                <FloatInput label="Partida" value={d.numeroPartida || ""} disabled onChange={() => {}} className={getClasse("numeroPartida")} />
                 <FloatInput label="Situação" value={d.situacao || ""} disabled onChange={() => {}} className={getClasse("situacao")} />
               </div>
             </main>

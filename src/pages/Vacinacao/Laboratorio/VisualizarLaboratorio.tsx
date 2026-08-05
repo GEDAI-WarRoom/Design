@@ -4,13 +4,15 @@ import { Navbar } from "../../../components/Navbar";
 import { FloatInput } from "../../../components/ui/FormKit";
 import { HistoricoCadastroLayout, type HistoricoCadastroItem, CLASSE_CAMPO_ALTERADO_HISTORICO, campoHistoricoFoiAlterado } from "../../../components/ui/HistoricoCadastroLayout";
 import { carregarHistoricoCadastro } from "../../../components/ui/historicoCadastroStorage";
+import { obterRegistroMock } from "../../../components/ui/mockCollectionStorage";
 
 const GREEN = "#1A7A3C";
 
 export function VisualizarLaboratorioPage({ dados, onLogout, onNavigate }: any) {
-  const laboratorioFallback = { id: 1, cnpj: "12.345.678/0001-90", razaoSocial: "Laboratório Central BioVet", municipio: "Belo Horizonte - MG", situacao: "Ativo" };
-  const registro = dados?.cnpj ? dados : laboratorioFallback;
-  const chaveCadastro = `laboratorio:${registro.cnpj}`;
+  const laboratorioFallback = { id: 1, nome: "Laboratório Agener", municipio: "Lavras", uf: "MG", situacao: "Ativo" };
+  const registroInformado = dados?.id ? dados : laboratorioFallback;
+  const registro = obterRegistroMock("laboratorios", registroInformado);
+  const chaveCadastro = `laboratorio:${registro.id}`;
 
   const historicoInicial: HistoricoCadastroItem<any>[] = [{ id: "v1", data: "15/05/2026", hora: "08:30", alteradoPor: "Sistema", atual: true, dados: registro }];
   const historico = carregarHistoricoCadastro<any>(chaveCadastro, historicoInicial);
@@ -41,9 +43,9 @@ export function VisualizarLaboratorioPage({ dados, onLogout, onNavigate }: any) 
               </div>
               {avisoVersao}
               <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 grid grid-cols-1 md:grid-cols-2 gap-5">
-                <FloatInput label="CNPJ" value={d.cnpj || ""} disabled onChange={() => {}} className={getClasse("cnpj")} />
-                <FloatInput label="Razão Social" value={d.razaoSocial || ""} disabled onChange={() => {}} className={getClasse("razaoSocial")} />
+                <FloatInput label="Nome do Laboratório" value={d.nome || ""} disabled onChange={() => {}} className={getClasse("nome")} />
                 <FloatInput label="Município" value={d.municipio || ""} disabled onChange={() => {}} className={getClasse("municipio")} />
+                <FloatInput label="UF" value={d.uf || ""} disabled onChange={() => {}} className={getClasse("uf")} />
                 <FloatInput label="Situação" value={d.situacao || ""} disabled onChange={() => {}} className={getClasse("situacao")} />
               </div>
             </main>

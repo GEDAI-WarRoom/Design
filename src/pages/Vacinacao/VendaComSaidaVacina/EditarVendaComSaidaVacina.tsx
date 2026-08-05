@@ -1,27 +1,27 @@
 import React, { useState } from "react";
-import { ArrowLeft, Check } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, FloatSelect } from "../../../components/ui/FormKit";
 import { registrarVersaoCadastro } from "../../../components/ui/historicoCadastroStorage";
+import { salvarRegistroMock } from "../../../components/ui/mockCollectionStorage";
 
 const GREEN = "#1A7A3C";
 
 export function EditarVendaComSaidaVacinaPage({ dados, onLogout, onNavigate }: any) {
-  const vendaSaidaFallback = { id: 1, notaFiscal: "882310", revendedora: "Comercial AgroVat", comprador: "José Aarão Neto", qtdeDoses: "150", situacao: "Gravada" };
-  const registroAtual = dados?.notaFiscal ? dados : vendaSaidaFallback;
+  const vendaSaidaFallback = { id: "1", notaFiscal: "15420", fornecedor: "Distribuidora de Vacinas Alfa LTDA", destinatario: "João da Silva Sauro", partida: "0013225/24", laboratorio: "Laboratório Biovet", doenca: "Febre Aftosa", situacao: "Ativo" };
+  const registroAtual = dados?.id ? dados : vendaSaidaFallback;
   
   const [notaFiscal, setNotaFiscal] = useState(registroAtual.notaFiscal || "");
-  const [comprador, setComprador] = useState(registroAtual.comprador || "");
-  const [qtdeDoses, setQtdeDoses] = useState(registroAtual.qtdeDoses || "");
-  const [situacao, setSituacao] = useState(registroAtual.situacao || "Gravada");
-  const [isSucesso, setIsSucesso] = useState(false);
+  const [destinatario, setDestinatario] = useState(registroAtual.destinatario || "");
+  const [situacao, setSituacao] = useState(registroAtual.situacao || "Ativo");
 
   const handleSalvar = () => {
-    const dadosAtuais = { ...registroAtual, notaFiscal, comprador, qtdeDoses, situacao };
+    const dadosAtuais = { ...registroAtual, notaFiscal, destinatario, situacao };
     if (JSON.stringify(registroAtual) !== JSON.stringify(dadosAtuais)) {
-      registrarVersaoCadastro({ chaveCadastro: `venda-saida-vacina:${registroAtual.notaFiscal}`, dadosAnteriores: registroAtual, dadosAtuais, alteradoPor: "Administrador" });
+      registrarVersaoCadastro({ chaveCadastro: `venda-saida-vacina:${registroAtual.id}`, dadosAnteriores: registroAtual, dadosAtuais, alteradoPor: "Administrador" });
+      salvarRegistroMock("vendas-saida-vacina", dadosAtuais);
     }
-    setIsSucesso(true);
+    onNavigate("visualizar-venda-saida-vacina", dadosAtuais);
   };
 
   return (
@@ -37,21 +37,14 @@ export function EditarVendaComSaidaVacinaPage({ dados, onLogout, onNavigate }: a
         </div>
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 grid grid-cols-1 md:grid-cols-3 gap-5 mt-4">
           <FloatInput label="Nota Fiscal" required value={notaFiscal} onChange={setNotaFiscal} />
-          <FloatInput label="Revendedora Origem" value={registroAtual.revendedora || ""} disabled onChange={() => {}} />
-          <FloatInput label="Comprador" required value={comprador} onChange={setComprador} />
-          <FloatInput label="Qtde de Doses" required value={qtdeDoses} onChange={(v) => setQtdeDoses(v.replace(/\D/g, ""))} />
-          <FloatSelect label="Situação" required value={situacao} onChange={setSituacao} options={[{value:"Gravada", label:"Gravada"}, {value:"Cancelada", label:"Cancelada"}]} />
+          <FloatInput label="Fornecedor" value={registroAtual.fornecedor || ""} disabled onChange={() => {}} />
+          <FloatInput label="Destinatário" required value={destinatario} onChange={setDestinatario} />
+          <FloatInput label="Número da Partida" value={registroAtual.partida || ""} disabled onChange={() => {}} />
+          <FloatInput label="Laboratório" value={registroAtual.laboratorio || ""} disabled onChange={() => {}} />
+          <FloatInput label="Doença" value={registroAtual.doenca || ""} disabled onChange={() => {}} />
+          <FloatSelect label="Situação" required value={situacao} onChange={setSituacao} options={[{value:"Ativo", label:"Ativo"}, {value:"Inativo", label:"Inativo"}]} />
         </div>
       </main>
-      {isSucesso && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8 flex flex-col items-center text-center">
-            <Check size={32} className="text-[#1A7A3C] stroke-[3] mb-5" />
-            <h3 className="text-lg font-bold text-gray-900">Alterações salvas!</h3>
-            <button onClick={() => { setIsSucesso(false); onNavigate("venda-saida-vacina"); }} className="px-8 h-11 mt-6 rounded-md bg-[#1A7A3C] text-white text-sm font-semibold w-full">Voltar para Listagem</button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

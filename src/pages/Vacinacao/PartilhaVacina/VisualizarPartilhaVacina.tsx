@@ -4,12 +4,14 @@ import { Navbar } from "../../../components/Navbar";
 import { FloatInput } from "../../../components/ui/FormKit";
 import { HistoricoCadastroLayout, type HistoricoCadastroItem, CLASSE_CAMPO_ALTERADO_HISTORICO, campoHistoricoFoiAlterado } from "../../../components/ui/HistoricoCadastroLayout";
 import { carregarHistoricoCadastro } from "../../../components/ui/historicoCadastroStorage";
+import { obterRegistroMock } from "../../../components/ui/mockCollectionStorage";
 
 const GREEN = "#1A7A3C";
 
 export function VisualizarPartilhaVacinaPage({ dados, onLogout, onNavigate }: any) {
   // Recebe os dados reais preenchidos pela tabela da listagem
-  const registro = dados || { id: "novo", codigo: "", origemNome: "", origemDoc: "", destinoNome: "", destinoDoc: "", numeroNotaFiscal: "", situacao: "Gravada" };
+  const registroInformado = dados || { id: "novo", codigo: "", origemNome: "", origemDoc: "", destinoNome: "", destinoDoc: "", numeroNotaFiscal: "", situacao: "Gravada" };
+  const registro = obterRegistroMock("partilhas-vacina", registroInformado);
   const chaveCadastro = `partilha-vacina:${registro.id || registro.codigo}`;
 
   const historicoInicial: HistoricoCadastroItem<any>[] = [{

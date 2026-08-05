@@ -15,6 +15,7 @@ import {
 import { Navbar } from "../../../components/Navbar";
 import { FloatSelect, FloatInput } from "../../../components/ui/FormKit";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
+import { listarRegistrosMock } from "../../../components/ui/mockCollectionStorage";
 import * as Icons from "../../../imports/icons";
 
 const GREEN = "#1A7A3C";
@@ -111,7 +112,7 @@ export function LancamentoDosesVacinaPage({ onLogout, onNavigate }: PageProps) {
     setPage(1);
   };
 
-  const filtrados = LANCAMENTOS_MOCK.filter((l) => {
+  const filtrados = listarRegistrosMock("lancamentos-doses-vacina", LANCAMENTOS_MOCK).filter((l) => {
     const matchRev = !revendedora || l.revendedoraCodigo === revendedora.codigo;
     const matchNF = numeroNotaFiscal === "" || l.numeroNotaFiscal.includes(numeroNotaFiscal);
     const matchPartida = numeroPartida === "" || l.numeroPartida.includes(numeroPartida);

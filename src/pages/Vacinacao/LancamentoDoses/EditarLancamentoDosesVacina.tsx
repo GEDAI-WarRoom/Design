@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { ArrowLeft, Check } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, FloatSelect } from "../../../components/ui/FormKit";
 import { registrarVersaoCadastro } from "../../../components/ui/historicoCadastroStorage";
+import { salvarRegistroMock } from "../../../components/ui/mockCollectionStorage";
 
 const GREEN = "#1A7A3C";
 
@@ -12,7 +13,6 @@ export function EditarLancamentoDosesVacinaPage({ dados, onLogout, onNavigate }:
   
   const [tipoLancamento, setTipoLancamento] = useState(registroAtual.tipoLancamento || "");
   const [situacao, setSituacao] = useState(registroAtual.situacao || "Gravada");
-  const [isSucesso, setIsSucesso] = useState(false);
 
   const handleSalvar = () => {
     const dadosAtuais = { ...registroAtual, tipoLancamento, situacao };
@@ -23,8 +23,9 @@ export function EditarLancamentoDosesVacinaPage({ dados, onLogout, onNavigate }:
         dadosAtuais, 
         alteradoPor: "Administrador do Sistema" 
       });
+      salvarRegistroMock("lancamentos-doses-vacina", dadosAtuais);
     }
-    setIsSucesso(true);
+    onNavigate("visualizar-lancamento-doses-vacina", dadosAtuais);
   };
 
   return (
@@ -75,17 +76,6 @@ export function EditarLancamentoDosesVacinaPage({ dados, onLogout, onNavigate }:
         </div>
       </main>
 
-      {isSucesso && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8 flex flex-col items-center text-center">
-            <Check size={32} className="text-[#1A7A3C] stroke-[3] mb-5" />
-            <h3 className="text-lg font-bold text-gray-900">Alterações salvas!</h3>
-            <button onClick={() => { setIsSucesso(false); onNavigate("lancamento-doses-vacina"); }} className="px-8 h-11 mt-6 rounded-md bg-[#1A7A3C] text-white text-sm font-semibold w-full">
-              Voltar para Listagem
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

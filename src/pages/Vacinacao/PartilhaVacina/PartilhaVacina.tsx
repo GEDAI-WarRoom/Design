@@ -14,6 +14,7 @@ import {
 import { Navbar } from "../../../components/Navbar";
 import { SearchModal } from "../../../components/ui/FormKit";
 import * as Icons from "../../../imports/icons";
+import { listarRegistrosMock } from "../../../components/ui/mockCollectionStorage";
 
 const GREEN = "#1A7A3C";
 
@@ -141,7 +142,7 @@ export function PartilhaVacinaPage({ onLogout, onNavigate }: PageProps) {
     setPage(1);
   };
 
-  const filtrados = DOACOES_MOCK.filter((d) => {
+  const filtrados = listarRegistrosMock("partilhas-vacina", DOACOES_MOCK).filter((d) => {
     const matchCodigo = codigo === "" || d.codigo.includes(codigo);
     const matchOrigem = !produtorOrigem || d.origemDoc === produtorOrigem.documento;
     const matchDestino = !produtorDestino || d.destinoDoc === produtorDestino.documento;
