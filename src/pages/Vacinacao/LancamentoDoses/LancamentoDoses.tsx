@@ -10,12 +10,12 @@ import {
   Check,
   Minus,
   Store,
-  FlaskConical,
   Calendar
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatSelect, FloatInput } from "../../../components/ui/FormKit";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
+import { listarRegistrosMock } from "../../../components/ui/mockCollectionStorage";
 import * as Icons from "../../../imports/icons";
 
 const GREEN = "#1A7A3C";
@@ -65,20 +65,6 @@ const LANCAMENTOS_MOCK: Lancamento[] = [
   { id: 3, revendedoraCodigo: "3120938090", revendedoraNome: "Casa do Produtor Lavras", numeroNotaFiscal: "9080706", numeroPartida: "100/24", doenca: "Raiva", tipoVacina: "", tipoLancamento: "Compra de Vacina Pessoa", situacao: "Gravada" },
 ];
 
-function SituacaoBadge({ situacao }: { situacao: Lancamento["situacao"] }) {
-  const map = {
-    Gravada: { bg: "#E6F4EA", border: "#A3E2B8", text: "#1A7A3C", Icon: Check },
-    Cancelada: { bg: "#F3F4F6", border: "#E5E7EB", text: "#6B7280", Icon: Minus },
-  } as const;
-  const { bg, border, text, Icon } = map[situacao];
-  return (
-    <span className="inline-flex items-center gap-1.5 px-3 h-7 rounded-full text-xs font-semibold whitespace-nowrap" style={{ backgroundColor: bg, border: `1px solid ${border}`, color: text }}>
-      <Icon size={13} strokeWidth={3} />
-      {situacao}
-    </span>
-  );
-}
-
 function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
     <div className="flex items-center gap-2 bg-[#1A7A3C] text-white text-xs font-medium px-3 py-1.5 rounded-md shadow-sm max-w-full">
@@ -106,11 +92,13 @@ export function LancamentoDosesVacinaPage({ onLogout, onNavigate }: PageProps) {
 
   const [hasSearched, setHasSearched] = useState(false);
   const [erroRevendedora, setErroRevendedora] = useState(false);
+
   const [page, setPage] = useState(1);
   const perPage = 10;
 
   const tiposVacinaDisponiveis = (doenca?.tiposVacina ?? []).map((t: string) => ({ value: t, label: t }));
   const doencaTemTipoVacina = (doenca?.tiposVacina?.length ?? 0) > 0;
+
   const periodoInvalido = periodoDe && periodoAte && periodoAte < periodoDe;
 
   const handlePesquisar = () => {
@@ -124,7 +112,7 @@ export function LancamentoDosesVacinaPage({ onLogout, onNavigate }: PageProps) {
     setPage(1);
   };
 
-  const filtrados = LANCAMENTOS_MOCK.filter((l) => {
+  const filtrados = listarRegistrosMock("lancamentos-doses-vacina", LANCAMENTOS_MOCK).filter((l) => {
     const matchRev = !revendedora || l.revendedoraCodigo === revendedora.codigo;
     const matchNF = numeroNotaFiscal === "" || l.numeroNotaFiscal.includes(numeroNotaFiscal);
     const matchPartida = numeroPartida === "" || l.numeroPartida.includes(numeroPartida);
@@ -148,7 +136,6 @@ export function LancamentoDosesVacinaPage({ onLogout, onNavigate }: PageProps) {
       <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="lancamento-doses-vacina" hideSearch />
 
       <main className="max-w-[1088px] mx-auto px-4 md:px-6 py-6">
-        {/* Cabeçalho */}
         <div className="mb-1">
           <button onClick={() => onNavigate("dashboard")} className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70" style={{ color: GREEN }}>
             <ArrowLeft size={15} />
@@ -162,10 +149,7 @@ export function LancamentoDosesVacinaPage({ onLogout, onNavigate }: PageProps) {
           </div>
         </div>
 
-        {/* ÚNICO CARD BRANCO PARA FILTROS E TABELA */}
         <div className="bg-white rounded-xl shadow-sm mt-5 overflow-hidden">
-
-          {/* Sessão interna de Filtros */}
           <div className="p-6 border-b border-gray-100">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               <EntitySearchInput
@@ -181,12 +165,10 @@ export function LancamentoDosesVacinaPage({ onLogout, onNavigate }: PageProps) {
                 subtitle="Busque por uma revendedora de produtos agropecuários cadastrada:"
                 onChange={(ent) => { setRevendedora(ent); setErroRevendedora(false); }}
               />
-
               <div className="relative border border-gray-300 rounded-md h-12 flex items-end px-3 pb-1.5 bg-white focus-within:border-[#1A7A3C] focus-within:ring-1 focus-within:ring-[#1A7A3C]">
                 <label className={`absolute left-3 transition-all ${numeroNotaFiscal ? "top-1 text-[10px] text-gray-400 font-medium" : "top-1/2 -translate-y-1/2 text-sm text-gray-400"}`}>Número da Nota Fiscal</label>
                 <input type="text" inputMode="numeric" maxLength={30} value={numeroNotaFiscal} onChange={(e) => setNumeroNotaFiscal(e.target.value.replace(/\D/g, ""))} className="w-full bg-transparent text-sm text-gray-800 outline-none h-6" />
               </div>
-
               <button onClick={handlePesquisar} className="h-11 px-8 rounded-md text-white text-sm font-semibold transition hover:opacity-90 lg:row-span-1" style={{ backgroundColor: GREEN }}>
                 Pesquisar
               </button>
@@ -198,34 +180,28 @@ export function LancamentoDosesVacinaPage({ onLogout, onNavigate }: PageProps) {
 
               <EntitySearchInput
                 label="Doença"
-                placeholder="Buscar pelo nome da doença."
+                placeholder="Buscar pelo nome da doença"
                 value={doenca ? doenca.nome : ""}
                 data={DOENCAS_MOCK}
                 searchKeys={["nome"]}
                 columns={[{ label: "Doença", key: "nome" }]}
-                icon={<img src={Icons.iconeDoencaUrl || (Icons as any).iconedoencaurl} alt="Doença" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}
-
+                icon={<img src={Icons.iconeDoencaUrl} alt="Doença" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}
                 title="Buscar Doença"
                 subtitle="Busque por uma doença cadastrada:"
                 onChange={(ent) => { setDoenca(ent); setTipoVacina(""); }}
               />
 
-              {/* Tipo de Vacina — disponível apenas se a doença possuir tipos */}
               {doencaTemTipoVacina && (
                 <FloatSelect label="Tipo de Vacina" value={tipoVacina} onChange={setTipoVacina} options={tiposVacinaDisponiveis} />
               )}
-
-
               <FloatInput label="Período - De" type="date" value={periodoDe} icon={<Calendar size={18} color={GREEN} />} onChange={setPeriodoDe} />
               <FloatInput label="Período - Até" type="date" value={periodoAte} icon={<Calendar size={18} color={GREEN} />} onChange={setPeriodoAte} />
-
               <FloatSelect label="Situação" value={situacao} onChange={setSituacao} options={SITUACOES} />
             </div>
 
             {periodoInvalido && (
               <p className="text-sm text-red-500 mt-3">A data "Até" deve ser maior ou igual à data "De".</p>
             )}
-
             {erroRevendedora && (
               <p className="text-sm text-red-500 mt-3">A revendedora de produtos agropecuários é obrigatória para realizar a busca.</p>
             )}
@@ -245,7 +221,6 @@ export function LancamentoDosesVacinaPage({ onLogout, onNavigate }: PageProps) {
             )}
           </div>
 
-          {/* Sessão interna de Tabela e Resultados */}
           <div>
             {!hasSearched ? (
               <div className="p-12 text-center">
@@ -261,39 +236,27 @@ export function LancamentoDosesVacinaPage({ onLogout, onNavigate }: PageProps) {
                   <table className="w-full text-sm border-collapse">
                     <thead>
                       <tr className=" border-b border-gray-100">
-                        {/* Coluna Longa: Definida com largura fixa para não quebrar linha de forma feia */}
                         <th className="text-left px-4 py-3 uppercase font-semibold text-gray-600 w-80">
                           Revendedora de Produtos Agropecuários
                         </th>
-
-                        {/* Nota Fiscal: Espaço fixo ideal para números */}
                         <th className="text-left px-4 py-3 uppercase font-semibold text-gray-600 whitespace-nowrap w-48">
                           Número da Nota Fiscal
                         </th>
-
-                        {/* Número da Partida: Espaço fixo ideal */}
                         <th className="text-left px-4 py-3 uppercase font-semibold text-gray-600 whitespace-nowrap w-44">
                           Número da Partida
                         </th>
-
-                        {/* Coluna "Doença": Agora ela vai ocupar de forma fluida todo o resto do espaço disponível da tabela */}
                         <th className="text-left px-4 py-3 uppercase font-semibold text-gray-600">
                           Doença
                         </th>
-
-                        {/* Coluna "Situação": Tamanho fixo controlado */}
                         <th className="text-left px-4 py-3 uppercase font-semibold text-gray-600 whitespace-nowrap w-40">
                           Situação
                         </th>
-
-                        {/* Coluna de Ações (Botão excluir/editar se houver) */}
                         <th className="px-4 py-3 w-16" />
                       </tr>
                     </thead>
                     <tbody>
                       {pagina.map((l) => (
                         <tr key={l.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/60 transition text-sm text-gray-700">
-                          {/* Coluna com quebra de linha correta usando quebra textual real */}
                           <td className="px-4 py-3 whitespace-pre-line max-w-[220px] leading-relaxed font-normal">
                             {l.revendedoraCodigo} - <br /> {l.revendedoraNome}
                           </td>
@@ -303,8 +266,13 @@ export function LancamentoDosesVacinaPage({ onLogout, onNavigate }: PageProps) {
                           <td className="px-4 py-3 font-normal text-gray-700 whitespace-nowrap">{l.situacao}</td>
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-1 justify-end">
-                              <button onClick={() => onNavigate("visualizar-lancamento-doses-vacina", l)} className="p-2 rounded-md hover:bg-green-50 transition" style={{ color: GREEN }} title="Visualizar"><ViewIcon size={18} /></button>
-                              <button onClick={() => onNavigate("editar-lancamento-doses-vacina", l)} className="p-2 rounded-md hover:bg-green-50 transition" style={{ color: GREEN }} title="Editar"><Pencil size={17} /></button>
+              
+                              <button onClick={() => onNavigate("visualizar-lancamento-doses-vacina", l)} className="p-2 rounded-md hover:bg-green-50 transition" style={{ color: GREEN }} title="Visualizar">
+                                <ViewIcon size={18} />
+                              </button>
+                              <button onClick={() => onNavigate("editar-lancamento-doses-vacina", l)} className="p-2 rounded-md hover:bg-green-50 transition" style={{ color: GREEN }} title="Editar">
+                                <Pencil size={17} />
+                              </button>
                             </div>
                           </td>
                         </tr>
@@ -313,7 +281,6 @@ export function LancamentoDosesVacinaPage({ onLogout, onNavigate }: PageProps) {
                   </table>
                 </div>
 
-                {/* Paginação Interna */}
                 <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 text-sm text-gray-500 bg-gray-50/30">
                   <span>Itens por página: {perPage}</span>
                   <div className="flex items-center gap-4">
@@ -327,7 +294,6 @@ export function LancamentoDosesVacinaPage({ onLogout, onNavigate }: PageProps) {
               </>
             )}
           </div>
-
         </div>
       </main>
     </div>

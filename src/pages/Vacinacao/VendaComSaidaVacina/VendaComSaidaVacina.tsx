@@ -14,6 +14,7 @@ import {
   Store
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
+import { listarRegistrosMock } from "../../../components/ui/mockCollectionStorage";
 import { 
   FloatInput, 
   FloatSelect, 
@@ -98,7 +99,7 @@ const VENDAS_MOCK = [
 
 interface VendaComSaidaVacinaProps {
   onLogout: () => void;
-  onNavigate: (screen: any) => void;
+  onNavigate: (screen: any, data?: any) => void;
 }
 
 export function VendaComSaidaVacinaPage({ onLogout, onNavigate }: VendaComSaidaVacinaProps) {
@@ -143,7 +144,7 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate }: VendaComSaidaV
   };
 
   // Filtragem dos dados baseando-se no clique do botão
-  const dadosFiltrados = VENDAS_MOCK.filter((venda) => {
+  const dadosFiltrados = listarRegistrosMock("vendas-saida-vacina", VENDAS_MOCK).filter((venda) => {
     if (!filtrosAplicados) return true;
 
     const f = filtrosAplicados;
@@ -385,16 +386,16 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate }: VendaComSaidaV
           <td className="py-3 pr-4 text-gray-500 vertical-inherit">{row.doenca}</td>
           <td className="py-3 pr-4 text-gray-500 vertical-inherit">{row.situacao}</td>
           
-          <td className="py-3 vertical-inherit">
-            <div className="flex items-center gap-3">
-              <button className="hover:opacity-70 transition text-[#1A7A3C] cursor-pointer">
-                <ViewIcon size={16} />
-              </button>
-              <button className="hover:opacity-70 transition text-[#1A7A3C] cursor-pointer">
-                <Pencil size={15} />
-              </button>
-            </div>
-          </td>
+          <td className="px-4 py-3">
+                                     <div className="flex items-center gap-1 justify-end">
+                                       <button onClick={() => onNavigate("visualizar-venda-saida-vacina", row)} className="p-2 rounded-md hover:bg-green-50 transition" style={{ color: GREEN }} title="Visualizar">
+                                         <ViewIcon size={18} />
+                                       </button>
+                                       <button onClick={() => onNavigate("editar-venda-saida-vacina", row)} className="p-2 rounded-md hover:bg-green-50 transition" style={{ color: GREEN }} title="Editar">
+                                         <Pencil size={17} />
+                                       </button>
+                                     </div>
+                                   </td>
         </tr>
       );
     })

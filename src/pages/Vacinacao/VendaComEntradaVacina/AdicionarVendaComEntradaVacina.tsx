@@ -5,6 +5,7 @@ import { FloatInput, FloatSelect, FloatCombobox } from "../../../components/ui/F
 import { EntitySearchInput, DynamicListWrapper, RevendedoraInput, FornecedorVacinaInput } from "../../../components/ui/EntitySearch";
 
 import * as Icons from "../../../imports/icons";
+import { CadastroVacinacaoHeader, cadastroVacinacaoPageClass, mensagemSucessoCadastro, preencherComExemplo, type CadastroVacinacaoModeProps } from "../shared/CadastroVacinacaoMode";
 
 const GREEN = "#1A7A3C";
 
@@ -158,7 +159,7 @@ export function LoteCardItem({
           data={DOENCAS_MOCK}
           searchKeys={["nome"]}
           columns={[{ label: "Nome da Doença", key: "nome" }]}
-          icon={<img src={Icons.iconeDoencaUrl || (Icons as any).iconedoencaurl} alt="Doença" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}
+          icon={<img src={Icons.iconeDoencaUrl} alt="Doença" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}
           title="Buscar Doença"
           subtitle="Busque por uma doença cadastrada:"
           onChange={(ent) => updateLote(lote.uid, { doenca: ent, tipoVacina: "" })}
@@ -231,17 +232,30 @@ export function LoteCardItem({
 // ==========================================================
 // PÁGINA PRINCIPAL
 // ==========================================================
-interface PageProps {
+interface PageProps extends CadastroVacinacaoModeProps {
   onLogout: () => void;
   onNavigate: (screen: any, data?: any) => void;
 }
 
-export function AdicionarVendaComEntradaVacinaPage({ onLogout, onNavigate }: PageProps) {
-  const [revendedora, setRevendedora] = useState<any | null>(null);
-  const [fornecedor, setFornecedor] = useState<any | null>(null);
-  const [numeroNotaFiscal, setNumeroNotaFiscal] = useState("");
-  const [ufNotaFiscal, setUfNotaFiscal] = useState("");
-  const [lotes, setLotes] = useState<any[]>([novoLote()]);
+export function AdicionarVendaComEntradaVacinaPage({ onLogout, onNavigate, mode = "create", dados }: PageProps) {
+  const preenchendoRegistro = mode !== "create";
+  const [revendedora, setRevendedora] = useState<any | null>(dados?.revendedora ?? (dados?.revendedoraNome ? { codigo: dados.revendedoraCodigo, nome: dados.revendedoraNome } : preenchendoRegistro ? { codigo: "3120938028", nome: "Comercial AgroVat" } : null));
+  const [fornecedor, setFornecedor] = useState<any | null>(dados?.fornecedorEntidade ?? (dados?.fornecedor ? { codigo: `FOR-${dados.id ?? "001"}`, nome: dados.fornecedor, tipo: "Laboratório" } : preenchendoRegistro ? { codigo: "FOR-001", nome: "Laboratório BioMed", tipo: "Laboratório" } : null));
+  const [numeroNotaFiscal, setNumeroNotaFiscal] = useState(dados?.numeroNotaFiscal ?? "");
+  const [ufNotaFiscal, setUfNotaFiscal] = useState(dados?.ufNotaFiscal ?? (preenchendoRegistro ? "MG" : ""));
+  const [lotes, setLotes] = useState<any[]>(dados?.lotes?.length
+    ? dados.lotes
+    : dados?.numeroPartida
+      ? [{
+          ...novoLote(),
+          numeroPartida: dados.numeroPartida,
+          laboratorio: dados.laboratorio ? { nome: dados.laboratorio } : null,
+          doenca: dados.doenca ? { nome: dados.doenca } : null,
+          tipoVacina: dados.tipoVacina ?? "",
+          validade: dados.validade ?? "2026-12",
+          apresentacoes: dados.apresentacoes?.length ? dados.apresentacoes : [{ uid: uid("ap"), dosesPorFrasco: "20", frascos: "5" }],
+        }]
+      : [novoLote()]);
   const [isSucesso, setIsSucesso] = useState(false);
 
   const fornecedorEhLaboratorio = fornecedor?.tipo === "Laboratório";
@@ -273,8 +287,35 @@ export function AdicionarVendaComEntradaVacinaPage({ onLogout, onNavigate }: Pag
     return Array.from(map, ([doenca, total]) => ({ doenca, total }));
   }, [lotes]);
 
+  const registroAtual = preencherComExemplo({
+    ...(dados ?? {}),
+    id: dados?.id ?? `venda-entrada-${Date.now()}`,
+    revendedora,
+    revendedoraCodigo: revendedora?.codigo,
+    revendedoraNome: revendedora?.nome,
+    fornecedorEntidade: fornecedor,
+    fornecedor: fornecedor?.nome,
+    numeroNotaFiscal,
+    ufNotaFiscal,
+    lotes,
+  }, {
+    id: "venda-entrada-exemplo",
+    revendedora: { id: 1, codigo: "3120938028", nome: "Comercial AgroVat", uf: "MG" },
+    revendedoraCodigo: "3120938028",
+    revendedoraNome: "Comercial AgroVat",
+    fornecedorEntidade: { id: 1, codigo: "FOR-001", nome: "Laboratório BioMed", tipo: "Laboratório", uf: "SP" },
+    fornecedor: "Laboratório BioMed",
+    numeroNotaFiscal: "1234567",
+    ufNotaFiscal: "MG",
+    lotes: [{
+      uid: "lote-exemplo", numeroPartida: "0013225/24", laboratorio: { id: 1, nome: "Laboratório Biovet" },
+      doenca: { id: 1, nome: "Brucelose", tiposVacina: ["B19", "RB51"] }, tipoVacina: "B19", validade: "2026-12",
+      apresentacoes: [{ uid: "apresentacao-exemplo", dosesPorFrasco: "20", frascos: "5", validade: "2026-12" }],
+    }],
+  });
+
   return (
-    <div className="min-h-screen bg-[#f2f3f5]">
+    <div className={cadastroVacinacaoPageClass(mode, "min-h-screen bg-[#f2f3f5]")}>
       <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="venda-entrada-vacina" hideSearch />
 
       <main className="max-w-[1088px] mx-auto px-4 md:px-6 py-6 flex flex-col gap-4">
@@ -284,12 +325,7 @@ export function AdicionarVendaComEntradaVacinaPage({ onLogout, onNavigate }: Pag
             <ArrowLeft size={15} />
             Todas Vendas com Entrada de Vacina
           </button>
-          <div className="flex justify-between items-center w-full">
-            <h1 className="text-2xl font-semibold text-gray-900">Adicionar Venda com Entrada de Vacina</h1>
-            <button type="button" onClick={() => setIsSucesso(true)} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm cursor-pointer">
-              Adicionar
-            </button>
-          </div>
+          <CadastroVacinacaoHeader mode={mode} nomeCadastro="Venda com Entrada de Vacina" rotaEditar="editar-venda-entrada-vacina" dados={dados} onNavigate={onNavigate} onSubmit={() => setIsSucesso(true)} />
         </div>
 
         <div className="flex flex-col gap-6">
@@ -394,7 +430,7 @@ export function AdicionarVendaComEntradaVacinaPage({ onLogout, onNavigate }: Pag
             <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4">
               <Check size={28} className="text-[#1A7A3C]" strokeWidth={3} />
             </div>
-            <h3 className="text-lg font-bold text-gray-900">Venda com entrada de vacina adicionada com sucesso!</h3>
+            <h3 className="text-lg font-bold text-gray-900">{mensagemSucessoCadastro(mode, "Venda com Entrada de Vacina")}</h3>
             <p className="text-sm text-gray-500 mt-1">
               {numeroNotaFiscal ? `Nota Fiscal nº ${numeroNotaFiscal}` : "A venda"} foi registrada.
             </p>
@@ -402,7 +438,7 @@ export function AdicionarVendaComEntradaVacinaPage({ onLogout, onNavigate }: Pag
               <button onClick={() => { setIsSucesso(false); onNavigate("venda-entrada-vacina"); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition cursor-pointer">
                 Voltar
               </button>
-              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-venda-entrada-vacina"); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition cursor-pointer">
+              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-venda-entrada-vacina", registroAtual); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition cursor-pointer">
                 Visualizar
               </button>
             </div>

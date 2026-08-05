@@ -26,6 +26,7 @@ import iconeNotaFiscalUrl from "../../../imports/icons/Ícone=Nota Fiscal.png";
 
 
 import * as Icons from "../../../imports/icons";
+import { CadastroVacinacaoHeader, cadastroVacinacaoPageClass, mensagemSucessoCadastro, preencherComExemplo, type CadastroVacinacaoModeProps } from "../shared/CadastroVacinacaoMode";
 
 const GREEN = "#1A7A3C";
 
@@ -864,45 +865,97 @@ export function LoteCardItem({
 }
 
 
-interface PageProps {
+interface PageProps extends CadastroVacinacaoModeProps {
   onLogout: () => void;
   onNavigate: (screen: any, data?: any) => void;
 }
 
-export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
+export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = "create", dados }: PageProps) {
+  const preenchendoRegistro = mode !== "create";
+  const nomeDoencaInicial = dados?.doencaEntidade?.nome ?? dados?.doenca ?? "";
+  const dataVacinacaoInicial = dados?.dataVacinacao ?? "";
+  const produtorInicial = dados?.produtor ?? (dados?.produtorNome
+    ? PRODUTORES_MOCK.find((item) => item.documento === dados.produtorDoc) ?? {
+        id: `produtor-${dados?.id ?? "registro"}`,
+        nome: dados.produtorNome,
+        documento: dados.produtorDoc,
+        tipo: dados.produtorDoc?.includes("/") ? "PJ" : "PF",
+      }
+    : null);
+  const estabelecimentoInicial = dados?.estabelecimento ?? (dados?.estabNome
+    ? ESTABELECIMENTOS_MOCK.find((item) => item.codigo === dados.estabCodigo) ?? {
+        id: `estabelecimento-${dados?.id ?? "registro"}`,
+        produtorId: produtorInicial?.id,
+        codigo: dados.estabCodigo,
+        nome: dados.estabNome,
+        municipio: dados.municipio,
+      }
+    : null);
+  const exploracaoInicial = dados?.exploracao ?? (dados?.especie
+    ? {
+        id: `exploracao-${dados?.id ?? "registro"}`,
+        codigo: dados?.exploracaoCodigo ?? `${dados?.estabCodigo ?? "31001040005"}0001`,
+        estabId: estabelecimentoInicial?.id,
+        produtorId: produtorInicial?.id,
+        especie: dados.especie,
+        grupoEspecieFormatado: `Grupo da espécie - ${dados.especie}`,
+      }
+    : null);
+  const doencaInicial = dados?.doencaEntidade ?? (nomeDoencaInicial
+    ? DOENCAS_MOCK.find((item) => item.nome === nomeDoencaInicial) ?? {
+        id: `doenca-${dados?.id ?? "registro"}`,
+        nome: nomeDoencaInicial,
+        tiposVacina: [],
+      }
+    : null);
+
   // ---- Informações Básicas ----
-  const [produtor, setProdutor] = useState<any | null>(null);
-  const [estabelecimento, setEstabelecimento] = useState<any | null>(null);
-  const [exploracao, setExploracao] = useState<any | null>(null);
-  const [nucleo, setNucleo] = useState<any | null>(null);
+  const [produtor, setProdutor] = useState<any | null>(produtorInicial);
+  const [estabelecimento, setEstabelecimento] = useState<any | null>(estabelecimentoInicial);
+  const [exploracao, setExploracao] = useState<any | null>(exploracaoInicial);
+  const [nucleo, setNucleo] = useState<any | null>(dados?.nucleo ?? null);
 
   // ---- Informações de Vacinação ----
-  const [doenca, setDoenca] = useState<any | null>(null);
-  const [tipoVacina, setTipoVacina] = useState("");
-  const [dataVacinacao, setDataVacinacao] = useState("");
-  const [dataAtestado, setDataAtestado] = useState("");
-  const [veterinario, setVeterinario] = useState<any | null>(null);
-  const [vacinadorBrucelose, setVacinadorBrucelose] = useState<any | null>(null);
-  const [mordidaMorcego, setMordidaMorcego] = useState("");
+  const [doenca, setDoenca] = useState<any | null>(doencaInicial);
+  const [tipoVacina, setTipoVacina] = useState(dados?.tipoVacina ?? (nomeDoencaInicial === "Brucelose" && preenchendoRegistro ? "B19" : ""));
+  const [dataVacinacao, setDataVacinacao] = useState(dados?.dataVacinacao ?? "");
+  const [dataAtestado, setDataAtestado] = useState(dados?.dataAtestado ?? (preenchendoRegistro ? dataVacinacaoInicial : ""));
+  const [veterinario, setVeterinario] = useState<any | null>(dados?.veterinario ?? (preenchendoRegistro ? { id: 1, nome: "Dr. Roberto Silva", cpf: "123.456.789-00" } : null));
+  const [vacinadorBrucelose, setVacinadorBrucelose] = useState<any | null>(dados?.vacinadorBrucelose ?? (preenchendoRegistro && nomeDoencaInicial === "Brucelose" ? { id: 1, vetId: 1, nome: "Josephina Arantes", documento: "444.009.956-40" } : null));
+  const [mordidaMorcego, setMordidaMorcego] = useState(dados?.mordidaMorcego ?? (preenchendoRegistro ? "Não" : ""));
 
   // ---- Regime + faixas por gênero ----
-  const [regime, setRegime] = useState("");
-  const [vacMacho, setVacMacho] = useState<Record<string, string>>({});
-  const [vacFemea, setVacFemea] = useState<Record<string, string>>({});
+  const [regime, setRegime] = useState(dados?.regime ?? (preenchendoRegistro ? (nomeDoencaInicial === "Brucelose" ? "Vacina Oficial" : "Primeira Dose") : ""));
+  const [vacMacho, setVacMacho] = useState<Record<string, string>>(dados?.vacMacho ?? {});
+  const [vacFemea, setVacFemea] = useState<Record<string, string>>(dados?.vacFemea ?? {});
 
   // ---- Nota Fiscal ----
-  const [numeroNotaFiscal, setNumeroNotaFiscal] = useState("");
-  const [ufNotaFiscal, setUfNotaFiscal] = useState("");
+  const [numeroNotaFiscal, setNumeroNotaFiscal] = useState(dados?.numeroNotaFiscal ?? (preenchendoRegistro ? "1234567" : ""));
+  const [ufNotaFiscal, setUfNotaFiscal] = useState(dados?.ufNotaFiscal ?? (preenchendoRegistro ? "MG" : ""));
   const [modalNotaOrigemOpen, setModalNotaOrigemOpen] = useState(false);
-  const [notasFiscaisOrigem, setNotasFiscaisOrigem] = useState<any[]>([]);
+  const [notasFiscaisOrigem, setNotasFiscaisOrigem] = useState<any[]>(dados?.notasFiscaisOrigem ?? (preenchendoRegistro ? [{
+    id: `lote-${dados?.id ?? "registro"}`,
+    nome: dados?.numeroPartida ?? "0013225/24",
+    partida: "1",
+    uf: dados?.ufNotaFiscal ?? "MG",
+    dosesDisponiveisTotais: 120,
+    quantidadeDoses: 10,
+    quantidadeFrascos: 1,
+    dosesPerFrasco: 10,
+    fornecedor: "Distribuidora de Vacinas Alfa LTDA",
+    doenca: nomeDoencaInicial || "Brucelose",
+    tipoVacina: dados?.tipoVacina ?? (nomeDoencaInicial === "Brucelose" ? "B19" : ""),
+    laboratorio: "BioMed/MG",
+    validade: "20/12/2026",
+  }] : []));
   const [modalNotaOpen, setModalNotaOpen] = useState(false);
   const [notasFiscais, setNotasFiscais] = useState<any[]>([]);
   const [graficoAtivo, setGraficoAtivo] = useState<{ loteId: string; index: number } | null>(null);
   const [notasListasMinimizadas, setNotasListasMinimizadas] = useState<Record<string, boolean>>({});
   const [lotesMinimizados, setLotesMinimizados] = useState<Record<string, boolean>>({});
-  const [vacinados, setVacinados] = useState<VacinadosRow[]>(INITIAL_VACINADOS);
-  const [origemNota, setOrigemNota] = useState("");
-  const [revendedora, setRevendedora] = useState<any | null>(null);
+  const [vacinados, setVacinados] = useState<VacinadosRow[]>(dados?.vacinados ?? (preenchendoRegistro ? INITIAL_VACINADOS.map((linha, index) => ({ ...linha, machos: index === 0 ? 4 : 0, femeas: index === 0 ? 6 : 0 })) : INITIAL_VACINADOS));
+  const [origemNota, setOrigemNota] = useState(dados?.origemNota ?? (preenchendoRegistro ? "Revendedora" : ""));
+  const [revendedora, setRevendedora] = useState<any | null>(dados?.revendedora ?? (preenchendoRegistro ? { codigo: "3120938028", nome: "Comercial AgroVat" } : null));
   const DOSES_DISPONIVEIS = 70;
 
   const [modalProdutor, setModalProdutor] = useState(false);
@@ -1023,6 +1076,10 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageP
     })));
 
   const handleSalvar = () => {
+    if (mode === "create") {
+      setSucesso(true);
+      return;
+    }
     setTentouSalvar(true);
     if (!formValido) return;
     setSucesso(true);
@@ -1045,8 +1102,8 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageP
   };
 
   // 7. ESTADOS DINÂMICOS DE LOTES E SUAS FUNÇÕES
-  const [lotes, setLotes] = useState<any[]>([
-    { uid: uid("lt"), numeroPartida: "", laboratorio: null, doenca: null, tipoVacina: "", apresentacoes: [novaApresentacao()] }
+  const [lotes, setLotes] = useState<any[]>(dados?.lotes?.length ? dados.lotes : [
+    { uid: uid("lt"), numeroPartida: preenchendoRegistro ? "0013225/24" : "", laboratorio: preenchendoRegistro ? { nome: "BioMed/MG" } : null, doenca: preenchendoRegistro ? { nome: nomeDoencaInicial || "Brucelose", tiposVacina: ["B19"] } : null, tipoVacina: preenchendoRegistro && nomeDoencaInicial === "Brucelose" ? "B19" : "", apresentacoes: [{ ...novaApresentacao(), dosesPorFrasco: preenchendoRegistro ? "10" : "", frascos: preenchendoRegistro ? "1" : "", validade: preenchendoRegistro ? "2026-12" : "" }] }
   ]);
 
   const addLote = () => {
@@ -1071,8 +1128,82 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageP
     setLotes((ls) => ls.map((l) => (l.uid === loteUid
       ? { ...l, apresentacoes: l.apresentacoes.map((a: any) => (a.uid === apUid ? { ...a, ...patch } : a)) }
       : l)));
+
+  const registroAtual = preencherComExemplo({
+    ...(dados ?? {}),
+    id: dados?.id ?? `declaracao-${Date.now()}`,
+    produtor,
+    estabelecimento,
+    exploracao,
+    nucleo,
+    doencaEntidade: doenca,
+    tipoVacina,
+    dataVacinacao,
+    dataAtestado,
+    veterinario,
+    vacinadorBrucelose,
+    mordidaMorcego,
+    regime,
+    vacMacho,
+    vacFemea,
+    numeroNotaFiscal,
+    ufNotaFiscal,
+    notasFiscaisOrigem,
+    vacinados,
+    origemNota,
+    revendedora,
+    lotes,
+    produtorNome: produtor?.nome,
+    produtorDoc: produtor?.documento,
+    estabCodigo: estabelecimento?.codigo,
+    estabNome: estabelecimento?.nome,
+    municipio: estabelecimento?.municipio,
+    especie: exploracao?.especie,
+    doenca: doenca?.nome,
+    situacao: "Finalizada",
+  }, {
+    id: "declaracao-exemplo",
+    produtor: { id: 1, nome: "José Aarão Neto", documento: "555.009.956-40", tipo: "PF" },
+    estabelecimento: { id: 1, produtorId: 1, codigo: "31234567891", nome: "Fazenda do Rio", municipio: "Lavras" },
+    exploracao: { id: 1, codigo: "312345678910001", especie: "Bovino", grupoEspecieFormatado: "Bovídeos - Bovino" },
+    nucleo: null,
+    doencaEntidade: { id: 1, nome: "Brucelose", tiposVacina: ["B19", "RB51"] },
+    tipoVacina: "B19",
+    dataVacinacao: "2026-02-01",
+    dataAtestado: "2026-02-01",
+    veterinario: { id: 1, nome: "Dr. Roberto Silva", cpf: "123.456.789-00" },
+    vacinadorBrucelose: { id: 1, vetId: 1, nome: "Josephina Arantes", documento: "444.009.956-40" },
+    mordidaMorcego: "Não",
+    regime: "Vacina Oficial",
+    vacMacho: {},
+    vacFemea: { "De 3 a 8 meses": "10" },
+    numeroNotaFiscal: "1234567",
+    ufNotaFiscal: "MG",
+    notasFiscaisOrigem: [{
+      id: "lote-exemplo", nome: "0013225/24", partida: "1", uf: "MG", dosesDisponiveisTotais: 120,
+      quantidadeDoses: 10, quantidadeFrascos: 1, dosesPerFrasco: 10, fornecedor: "Distribuidora de Vacinas Alfa LTDA",
+      doenca: "Brucelose", tipoVacina: "B19", laboratorio: "BioMed/MG", validade: "20/12/2026",
+    }],
+    vacinados: [{ machos: 0, femeas: 10 }],
+    origemNota: "Revendedora",
+    revendedora: { id: 1, codigo: "3120938028", nome: "Comercial AgroVat" },
+    lotes: [{
+      uid: "lote-dinamico-exemplo", numeroPartida: "0013225/24", laboratorio: { id: 1, nome: "BioMed/MG" },
+      doenca: { id: 1, nome: "Brucelose", tiposVacina: ["B19"] }, tipoVacina: "B19",
+      apresentacoes: [{ uid: "apresentacao-exemplo", dosesPorFrasco: "10", frascos: "1", validade: "2026-12" }],
+    }],
+    produtorNome: "José Aarão Neto",
+    produtorDoc: "555.009.956-40",
+    estabCodigo: "31234567891",
+    estabNome: "Fazenda do Rio",
+    municipio: "Lavras",
+    especie: "Bovino",
+    doenca: "Brucelose",
+    situacao: "Finalizada",
+  });
+
   return (
-    <div className="min-h-screen bg-[#f2f3f5] pb-24">
+    <div className={cadastroVacinacaoPageClass(mode, "min-h-screen bg-[#f2f3f5] pb-24")}>
       <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="declaracao-vacinacao" hideSearch />
 
       <main className="max-w-[1088px] mx-auto px-4 md:px-6 py-6 flex flex-col gap-4">
@@ -1081,7 +1212,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageP
             <ArrowLeft size={15} />
             Todas Declarações de Vacinação
           </button>
-          <h1 className="text-2xl font-semibold text-gray-900">Declaração de Vacinação</h1>
+          <CadastroVacinacaoHeader mode={mode} nomeCadastro="Declaração de Vacinação" rotaEditar="editar-declaracao-vacinacao" dados={dados} onNavigate={onNavigate} onSubmit={handleSalvar} />
         </div>
 
         <div className="w-full bg-white border border-gray-100 rounded-lg p-5 shadow-sm flex items-center gap-3 mt-4 mb-6">
@@ -1858,7 +1989,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageP
               <CheckCircle2 size={48} style={{ color: GREEN }} />
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-1">
-              Declaração de vacinação registrada com sucesso!
+              {mensagemSucessoCadastro(mode, "Declaração de Vacinação")}
             </h3>
             <p className="text-sm text-gray-500 mb-6">
               A vacinação foi declarada e o rebanho da exploração foi atualizado.
@@ -1871,12 +2002,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageP
                 Voltar
               </button>
               <button
-                onClick={() => onNavigate("visualizar-declaracao-vacinacao", {
-                  produtorNome: produtor?.nome, produtorDoc: produtor?.documento,
-                  estabCodigo: estabelecimento?.codigo, estabNome: estabelecimento?.nome,
-                  municipio: estabelecimento?.municipio, especie: exploracao?.especie,
-                  doenca: doenca?.nome, dataVacinacao, situacao: "Finalizada",
-                })}
+                onClick={() => onNavigate("visualizar-declaracao-vacinacao", registroAtual)}
                 className="px-5 py-2.5 rounded-md text-white text-sm font-semibold transition hover:opacity-90"
                 style={{ backgroundColor: GREEN }}
               >

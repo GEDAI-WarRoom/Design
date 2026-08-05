@@ -78,16 +78,27 @@ export function registrarVersaoCadastro<TDados>({
   dadosAtuais,
   historicoInicial = [],
 }: RegistrarVersaoCadastroParams<TDados>) {
-  const historicoAnterior = carregarHistoricoCadastro(
+  const historicoCarregado = carregarHistoricoCadastro(
     chaveCadastro,
     historicoInicial,
   );
+  const instanteAlteracao = agoraFormatado();
+  const historicoAnterior = historicoCarregado.length > 0
+    ? historicoCarregado
+    : [{
+        id: `inicial-${criarIdVersao()}`,
+        data: instanteAlteracao.data,
+        hora: instanteAlteracao.hora,
+        alteradoPor: "Sistema",
+        atual: true,
+        dados: dadosAnteriores,
+      }];
   const versoesAnteriores = historicoAnterior.map((item) =>
     item.atual
       ? { ...item, atual: false, dados: item.dados ?? dadosAnteriores }
       : item,
   );
-  const { data, hora } = agoraFormatado();
+  const { data, hora } = instanteAlteracao;
   const novaVersao: HistoricoCadastroItem<TDados> = {
     id: criarIdVersao(),
     data,
