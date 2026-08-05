@@ -76,6 +76,7 @@ import { AdicionarEstabelecimentoEventoPecuarioPage } from "./pages/Animal/Estab
 import { EstabelecimentoEventoPecuarioPage } from "./pages/Animal/EstabelecimentoEventoPecuario/EstabelecimentoEventoPecuario";
 import { AdicionarEventoPecuarioPage } from "./pages/Animal/EventoPecuario/AdicionarEventoPecuario";
 import { EventoPecuarioPage } from "./pages/Animal/EventoPecuario/EventoPecuario";
+import { EditarEventoPecuarioPage } from "./pages/Animal/EventoPecuario/EditarEventoPecuario";
 import { VisualizarEventoPecuarioPage } from "./pages/Animal/EventoPecuario/VisualizarEventoPecuario";
 import { AdicionarExploracaoPecuariaPage } from "./pages/Animal/ExploracaoPecuaria/AdicionarExploracaoPecuaria";
 import { ExploracaoPecuariaPage } from "./pages/Animal/ExploracaoPecuaria/ExploracaoPecuaria";
@@ -465,6 +466,7 @@ export type Screen =
   | "evento-pecuario"
   | "adicionar-evento-pecuario"
   | "visualizar-evento-pecuario"
+  | "editar-evento-pecuario"
 	| "editar-aeroporto-porto"
   | "visualizar-aeroporto-porto";
 
@@ -1527,7 +1529,9 @@ export default function App() {
     case "adicionar-evento-pecuario":
       return <AdicionarEventoPecuarioPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "visualizar-evento-pecuario":
-      return <VisualizarEventoPecuarioPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+      return <VisualizarEventoPecuarioPage onLogout={handleLogout} onNavigate={handleNavigate} dados={screenData} />;
+    case "editar-evento-pecuario":
+      return <EditarEventoPecuarioPage onLogout={handleLogout} onNavigate={handleNavigate} dados={screenData} />;
 
     default:
       return <DashboardPage onLogout={handleLogout} onNavigate={handleNavigate} />;

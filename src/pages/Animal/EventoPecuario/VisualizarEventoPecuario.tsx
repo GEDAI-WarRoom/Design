@@ -277,7 +277,7 @@ export function VisualizarEventoPecuarioPage({
         return (
           <button
             type="button"
-            onClick={() => onNavigate("evento-pecuario")}
+            onClick={() => onNavigate("editar-evento-pecuario", dados || eventoPecuarioMock)}
             className="px-5 py-3 rounded-md text-white text-sm font-semibold transition hover:opacity-90 active:scale-[0.98]"
             style={{ backgroundColor: GREEN }}
           >

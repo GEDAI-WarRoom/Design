@@ -26,7 +26,7 @@ import {
 const GREEN = "#1A7A3C";
 
 // --- mocks ---
-const TIPOS_EVENTO = [
+export const TIPOS_EVENTO = [
   { value: "Com finalidade comercial", label: "Com finalidade comercial" },
   { value: "Sem finalidade comercial", label: "Sem finalidade comercial" },
 ];
@@ -59,7 +59,7 @@ const EMITIDO = [
   { value: "Não", label: "Não" },
 ];
 
-const ESPECIES_MOCK = [
+export const ESPECIES_EVENTO_MOCK = [
   { id: 1, codigo: "ESP-001", nome: "Bovino", grupo: "Bovídeos" },
   { id: 2, codigo: "ESP-002", nome: "Bubalino", grupo: "Bovídeos" },
   { id: 3, codigo: "ESP-003", nome: "Equino", grupo: "Equídeos" },
@@ -68,7 +68,7 @@ const ESPECIES_MOCK = [
   { id: 6, codigo: "ESP-006", nome: "Galinha", grupo: "Aves" },
 ];
 
-const PROMOTORAS_MOCK = [
+export const PROMOTORAS_EVENTO_MOCK = [
   {
     id: 1,
     nome: "PH Leilões LTDA",
@@ -92,7 +92,7 @@ const PROMOTORAS_MOCK = [
   },
 ];
 
-const RECINTOS_MOCK = [
+export const RECINTOS_EVENTO_MOCK = [
   {
     id: 1,
     nome: "Fazenda Japecanga",
@@ -116,7 +116,7 @@ const RECINTOS_MOCK = [
   },
 ];
 
-const RESPONSAVEIS_TECNICOS_MOCK = [
+export const RESPONSAVEIS_EVENTO_MOCK = [
   {
     id: 1,
     nome: "José Teixeira Sabino",
@@ -144,15 +144,15 @@ const EVENTOS_PECUARIOS_MOCK = [
     nomeEvento: "Torneio de Pássaros de São João del Rei",
     periodoDe: "2026-06-01",
     periodoAte: "2026-06-03",
-    especies: [ESPECIES_MOCK[5]],
+    especies: [ESPECIES_EVENTO_MOCK[5]],
     tipoEventoPecuario: "Sem finalidade comercial",
     atividadeEvento: "Torneio de Canto",
     isencaoBrucelose: "",
-    promotora: PROMOTORAS_MOCK[0],
-    recinto: RECINTOS_MOCK[0],
+    promotora: PROMOTORAS_EVENTO_MOCK[0],
+    recinto: RECINTOS_EVENTO_MOCK[0],
     possuiAuxilioEstabelecimento: "Não",
     estabelecimentoAgropecuario: null,
-    responsaveisTecnicos: [RESPONSAVEIS_TECNICOS_MOCK[0]],
+    responsaveisTecnicos: [RESPONSAVEIS_EVENTO_MOCK[0]],
     anexos: [
       {
         uid: "a1",
@@ -171,19 +171,19 @@ const EVENTOS_PECUARIOS_MOCK = [
     nomeEvento: "Leilão Genética Premium",
     periodoDe: "2026-07-10",
     periodoAte: "2026-07-10",
-    especies: [ESPECIES_MOCK[0], ESPECIES_MOCK[1]],
+    especies: [ESPECIES_EVENTO_MOCK[0], ESPECIES_EVENTO_MOCK[1]],
     tipoEventoPecuario: "Com finalidade comercial",
     atividadeEvento: "Leilão",
     tipoLeilao:
       "Animais com registro genealógico ou com finalidade de reprodução ou produção leiteira",
-    promotora: PROMOTORAS_MOCK[1],
-    recinto: RECINTOS_MOCK[1],
+    promotora: PROMOTORAS_EVENTO_MOCK[1],
+    recinto: RECINTOS_EVENTO_MOCK[1],
     possuiAuxilioEstabelecimento: "Sim",
     estabelecimentoAgropecuario: {
       nome: "Fazenda Rio Preto",
       codigo: "34523423567",
     },
-    responsaveisTecnicos: [RESPONSAVEIS_TECNICOS_MOCK[0], RESPONSAVEIS_TECNICOS_MOCK[1]],
+    responsaveisTecnicos: [RESPONSAVEIS_EVENTO_MOCK[0], RESPONSAVEIS_EVENTO_MOCK[1]],
     anexos: [],
     observacoes: "",
     situacao: "Ativo",
@@ -196,12 +196,12 @@ const EVENTOS_PECUARIOS_MOCK = [
     nomeEvento: "Feira Agropecuária de Três Pontas",
     periodoDe: "2026-03-12",
     periodoAte: "2026-03-15",
-    especies: [ESPECIES_MOCK[0], ESPECIES_MOCK[3]],
+    especies: [ESPECIES_EVENTO_MOCK[0], ESPECIES_EVENTO_MOCK[3]],
     tipoEventoPecuario: "Com finalidade comercial",
     atividadeEvento: "Feira",
     isencaoBrucelose: "Não",
-    promotora: PROMOTORAS_MOCK[2],
-    recinto: RECINTOS_MOCK[2],
+    promotora: PROMOTORAS_EVENTO_MOCK[2],
+    recinto: RECINTOS_EVENTO_MOCK[2],
     possuiAuxilioEstabelecimento: "Não",
     estabelecimentoAgropecuario: null,
     responsaveisTecnicos: [],
@@ -217,15 +217,15 @@ const EVENTOS_PECUARIOS_MOCK = [
     nomeEvento: "Exposição Equina Regional",
     periodoDe: "2025-11-01",
     periodoAte: "2025-11-05",
-    especies: [ESPECIES_MOCK[2]],
+    especies: [ESPECIES_EVENTO_MOCK[2]],
     tipoEventoPecuario: "Sem finalidade comercial",
     atividadeEvento: "Exposição",
     isencaoBrucelose: "Sim",
-    promotora: PROMOTORAS_MOCK[0],
-    recinto: RECINTOS_MOCK[0],
+    promotora: PROMOTORAS_EVENTO_MOCK[0],
+    recinto: RECINTOS_EVENTO_MOCK[0],
     possuiAuxilioEstabelecimento: "Não",
     estabelecimentoAgropecuario: null,
-    responsaveisTecnicos: [RESPONSAVEIS_TECNICOS_MOCK[2]],
+    responsaveisTecnicos: [RESPONSAVEIS_EVENTO_MOCK[2]],
     anexos: [],
     observacoes: "",
     situacao: "Inativo",
@@ -466,7 +466,7 @@ export function AdicionarEventoPecuarioPage({ onLogout, onNavigate }: PageProps)
                     label="Espécie"
                     placeholder="Buscar espécie"
                     value={item.especie?.nome ?? ""}
-                    data={ESPECIES_MOCK}
+                    data={ESPECIES_EVENTO_MOCK}
                     searchKeys={["nome", "grupo"]}
                     columns={[
                       { label: "Nome", key: "nome" },
@@ -501,7 +501,7 @@ export function AdicionarEventoPecuarioPage({ onLogout, onNavigate }: PageProps)
                 label="Promotora de Evento"
                 placeholder="Buscar por nome da promotora"
                 value={promotora ? promotora.nome : ""}
-                data={PROMOTORAS_MOCK}
+                data={PROMOTORAS_EVENTO_MOCK}
                 searchKeys={["nome", "grupo"]}
                 columns={[
                   { label: "Promotora de Evento", key: "nome" },
@@ -523,7 +523,7 @@ export function AdicionarEventoPecuarioPage({ onLogout, onNavigate }: PageProps)
                 label="Estabelecimento de Evento"
                 placeholder="Buscar por nome do estabelecimento"
                 value={estabelecimento ? estabelecimento.nome : ""}
-                data={RECINTOS_MOCK}
+                data={RECINTOS_EVENTO_MOCK}
                 searchKeys={["nome", "municipio"]}
                 columns={[
                   { label: "Nome", key: "nome" },
@@ -569,7 +569,7 @@ export function AdicionarEventoPecuarioPage({ onLogout, onNavigate }: PageProps)
                   label="Responsável Técnico"
                   placeholder="Buscar por um responsável técnico"
                   value={responsavelTecnico ? responsavelTecnico.nome : ""}
-                  data={RESPONSAVEIS_TECNICOS_MOCK}
+                  data={RESPONSAVEIS_EVENTO_MOCK}
                   searchKeys={["nome", "municipio"]}
                   columns={[
                     { label: "Nome", key: "nome" },
