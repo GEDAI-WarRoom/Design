@@ -82,7 +82,7 @@ export function EditarVendaPropriedadePage({ dados, onLogout, onNavigate }: Page
               onClick={salvar}
               className="px-5 h-10 rounded-md text-white text-sm font-semibold bg-[#1A7A3C] hover:bg-[#15612F] transition"
             >
-              Salvar Alterações
+              Salvar
             </button>
           </div>
         </div>

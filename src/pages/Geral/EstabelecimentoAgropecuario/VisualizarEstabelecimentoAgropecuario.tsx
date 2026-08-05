@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { EntityProfessionalsView } from "../../../components/ui/EntityProfessionalsView";
-import { FloatInput, FloatSelect, LargeTextArea, SimNao } from "../../../components/ui/FormKit";
+import { FloatInput, FloatSelect, LargeTextArea, SimNao, UploadField } from "../../../components/ui/FormKit";
 import { BlocoEnderecoFields } from "../../../components/ui/EntitySearch";
 
 function CadastroSection({ title, children }: { title: string; children: ReactNode }) {
@@ -27,7 +27,7 @@ interface PageProps {
 }
 
 export function VisualizarEstabelecimentoAgropecuarioPage({ onLogout, onNavigate, dados }: PageProps) {
-  const registro = {
+  const registroExemplo = {
     id: 1,
     codigo: "51080590041",
     nome: "Fazenda Rio Verde",
@@ -57,8 +57,13 @@ export function VisualizarEstabelecimentoAgropecuarioPage({ onLogout, onNavigate
     documento: "registro_estabelecimento.pdf",
     descricaoDocumento: "Registro e memorial descritivo do imóvel.",
     observacao: "Estabelecimento rural destinado à criação de bovinos e produção agrícola.",
-    ...(dados || {}),
   };
+  const registroInformado = dados ?? ESTABELECIMENTOS_INICIAIS[0];
+  const registroPersistido =
+    obterEstabelecimentoAgropecuario(
+      registroInformado.id ?? registroInformado.codigo,
+    ) ?? registroInformado;
+  const registro = { ...registroExemplo, ...registroPersistido };
   const partesProprietario = String(registro.proprietarios || "").split(" - ");
   const proprietarioNome = registro.proprietarioNome || partesProprietario[0] || "José Aarão Neto";
   const proprietarioDocumento = registro.proprietarioDocumento || partesProprietario.slice(1).join(" - ") || "555.009.956-40";
@@ -76,11 +81,6 @@ export function VisualizarEstabelecimentoAgropecuarioPage({ onLogout, onNavigate
     latitude: registro.latitude || "-21.2453",
     longitude: registro.longitude || "-44.9997",
   };
-  const registroInformado = dados ?? ESTABELECIMENTOS_INICIAIS[0];
-  const registro =
-    obterEstabelecimentoAgropecuario(
-      registroInformado.id ?? registroInformado.codigo,
-    ) ?? registroInformado;
   const historico = obterHistoricoEstabelecimentoAgropecuario(registro);
 
   const cadastroContent = (
@@ -158,7 +158,12 @@ export function VisualizarEstabelecimentoAgropecuarioPage({ onLogout, onNavigate
 
       <CadastroSection title="Anexo">
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-          <FloatInput label="Documento" value={registro.documento || "registro_estabelecimento.pdf"} disabled />
+          <UploadField
+            label="Documento"
+            fileName={registro.documento || "registro_estabelecimento.pdf"}
+            onSelectFile={() => {}}
+            disabled
+          />
           <FloatInput label="Descrição" value={registro.descricaoDocumento || ""} disabled />
         </div>
       </CadastroSection>

@@ -5,7 +5,6 @@ import { SelecionarUsuarioPage } from "./pages/SelecionarUsuario";
 import { isRouteAllowed, useDemoUser } from "./contexts/DemoUserContext";
 
 // GERAL
-import { EditarEstabelecimentoAgropecuarioPage } from "./pages/Geral/EstabelecimentoAgropecuario/EditarEstabelecimentoAgropecuario";
 import { EditarVendaPropriedadePage } from "./pages/Geral/VendaPropriedade/EditarVendaPropriedade";
 import { VisualizarDivisaoMunicipalPage } from "./pages/Geral/DivisaoMunicipal/VisualizarDivisaoMunicipal";
 import { EditarDivisaoMunicipalPage } from "./pages/Geral/DivisaoMunicipal/EditarDivisaoMunicipal";
@@ -658,58 +657,6 @@ export default function App() {
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
 					dadosIniciais={screenData}
-				/>
-			);
-		case "estabelecimento-agropecuario":
-			return (
-				<EstabelecimentoAgropecuarioPage
-					onLogout={handleLogout}
-					onNavigate={handleNavigate}
-				/>
-			);
-		case "adicionar-estabelecimento-agropecuario":
-			return (
-				<AdicionarEstabelecimentoAgropecuarioPage
-					onLogout={handleLogout}
-					onNavigate={handleNavigate}
-				/>
-			);
-		case "editar-estabelecimento-agropecuario":
-			return (
-				<EditarEstabelecimentoAgropecuarioPage
-					onLogout={handleLogout}
-					onNavigate={handleNavigate}
-					dados={screenData}
-				/>
-			);
-		case "visualizar-estabelecimento-agropecuario":
-			return (
-				<VisualizarEstabelecimentoAgropecuarioPage
-					onLogout={handleLogout}
-					onNavigate={handleNavigate}
-					dados={screenData}
-				/>
-			);
-		case "venda-propriedade":
-			return (
-				<VendaPropriedadePage
-					onLogout={handleLogout}
-					onNavigate={handleNavigate}
-				/>
-			);
-		case "adicionar-venda-propriedade":
-			return (
-				<AdicionarVendaPropriedadePage
-					onLogout={handleLogout}
-					onNavigate={handleNavigate}
-				/>
-			);
-		case "visualizar-venda-propriedade":
-			return (
-				<VisualizarVendaPropriedadePage
-					onLogout={handleLogout}
-					onNavigate={handleNavigate}
-					dados={screenData}
 				/>
 			);
 		case "produto":
