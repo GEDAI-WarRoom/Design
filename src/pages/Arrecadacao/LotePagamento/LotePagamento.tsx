@@ -6,6 +6,7 @@ import {
   ChevronRight,
   ChevronUp,
   Eye,
+  Pencil,
   Search,
   SlidersHorizontal,
   X, Calendar
@@ -217,8 +218,9 @@ export function LotePagamentoPage({ onLogout, onNavigate }: PageProps) {
                       <td className="px-4 py-3 text-gray-700">{item.situacao}</td>
                       <td className="px-4 py-3 text-gray-700">{item.statusPagamento}</td>
                       <td className="px-4 py-3">
-                        <div className="flex justify-end">
+                        <div className="flex justify-end gap-1">
                           <button type="button" onClick={() => onNavigate("visualizar-lote-pagamento", item)} className="rounded-md p-2 text-[#1A7A3C] hover:bg-green-50" title="Visualizar"><Eye size={18} /></button>
+                          <button type="button" onClick={() => onNavigate("editar-lote-pagamento", item)} className="rounded-md p-2 text-[#1A7A3C] hover:bg-green-50" title="Editar"><Pencil size={18} /></button>
                         </div>
                       </td>
                     </tr>

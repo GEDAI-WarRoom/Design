@@ -443,6 +443,79 @@ export function FinalidadeTransitoPage({ onLogout, onNavigate }: PageProps) {
                   </tbody>
                 </table>
               </div>
+					{/* --- area de resultados (dentro do mesmo card branco) --- */}
+					{!hasSearched ? (
+						<div className="py-5 text-center">
+							<p className="text-sm text-gray-500">
+								Busque por finalidade de trânsito utilizando o campo de busca e
+								os filtros acima.
+							</p>
+						</div>
+					) : total === 0 ? (
+						<div className="py-5 text-center">
+							<p className="text-sm text-gray-500">
+								Nenhum resultado foi encontrado.
+							</p>
+						</div>
+					) : (
+						<div className="w-full">
+							<div className="overflow-x-auto rounded-lg">
+								<table className="w-full text-sm border-collapse">
+									<thead>
+										<tr className="border-b border-gray-100">
+											<th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-normal uppercase">
+												Finalidade de Trânsito
+											</th>
+											<th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-normal uppercase">
+												Tipo de Procedência
+											</th>
+											<th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-normal uppercase">
+												Tipo de Destino
+											</th>
+											<th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-normal uppercase">
+												Espécie
+											</th>
+											<th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-normal uppercase">
+												Situação
+											</th>
+											<th className="px-4 py-3 w-[80px]" />
+										</tr>
+									</thead>
+									<tbody>
+										{pagina.map((f) => (
+											<tr
+												key={f.id}
+												className="border-b border-gray-100 last:border-0 hover:bg-gray-50/60 transition">
+												<td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">
+													{f.finalidade}
+												</td>
+												<td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">
+													{f.tipoProcedencia}
+												</td>
+												<td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">
+													{f.tipoDestino}
+												</td>
+												<td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">
+													{f.especies.at(0)?.nome || "N/A"}
+												</td>
+												<td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">
+													{f.situacao}
+												</td>
+												<td className="px-4 py-3 text-right whitespace-nowrap">
+  <div className="flex items-center justify-end gap-1">
+    <button onClick={() => onNavigate("visualizar-finalidade-transito", f)} className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md transition" title="Visualizar">
+      <ViewIcon size={18} />
+    </button>
+    <button onClick={() => onNavigate("editar-finalidade-transito", f)} className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md transition" title="Editar">
+      <Pencil size={17} />
+    </button>
+  </div>
+</td>
+											</tr>
+										))}
+									</tbody>
+								</table>
+							</div>
 
               {/* --- paginacao --- */}
               <div className="flex items-center justify-between pt-4 text-sm text-gray-500">

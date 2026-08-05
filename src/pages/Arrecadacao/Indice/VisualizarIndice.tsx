@@ -18,7 +18,7 @@ export function VisualizarIndice({ dados, onLogout, onNavigate }: VisualizarIndi
   // Controle de abertura do modal da aba de Valor do Índice
   const [isModalValorOpen, setIsModalValorOpen] = useState(false);
 
-  const indice = dados || { nome: "", situacao: "" };
+  const indice = { id: "1", nome: "UFEMG", situacao: "Ativo", ...(dados || {}) };
 
   const tabs = [
     {

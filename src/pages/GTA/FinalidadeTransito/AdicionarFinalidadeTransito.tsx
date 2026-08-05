@@ -7,6 +7,13 @@ import {
   Info,
   PlusCircle,
   X,
+	ArrowLeft,
+	ChevronDown,
+	ChevronUp,
+	Dna,
+	Info,
+	PlusCircle,
+	X,
 } from "lucide-react";
 import React, { useState } from "react";
 import { Navbar } from "../../../components/Navbar";
@@ -154,6 +161,29 @@ export function AdicionarFinalidadeTransitoPage({
         currentScreen="adicionar-finalidade-trasito"
         hideSearch
       />
+	const finalidadeCadastrada = {
+		id: Date.now(),
+		finalidade: finalidadeTransito || "Abate",
+		codigoMapa: codigoMapa || "01",
+		tipoProcedencia: tiposProcedencia[0] || "Frigorífico",
+		tiposProcedencia: tiposProcedencia.length ? tiposProcedencia : ["Frigorífico"],
+		tipoDestino: tiposDestino[0] || "Frigorífico",
+		tiposDestino: tiposDestino.length ? tiposDestino : ["Frigorífico"],
+		especies: especies.length ? especies : [ESPECIES_MOCK[0]],
+		emiteAcessoExterno,
+		taxasCobrar,
+		procedencias,
+		situacao: "Ativo",
+	};
+
+	return (
+		<div className="min-h-screen bg-[#f2f3f5]">
+			<Navbar
+				onLogout={onLogout}
+				onNavigate={onNavigate}
+				currentScreen="adicionar-finalidade-trasito"
+				hideSearch
+			/>
 
       <main className="max-w-5xl mx-auto px-4 md:px-6 py-6 flex flex-col gap-4">
         {/* --- cabecalho --- */}
@@ -405,4 +435,89 @@ export function AdicionarFinalidadeTransitoPage({
       )}
     </div>
   );
+							{tiposProcedencia.includes("Estabelecimento Agropecuário") && (
+								<div className="w-full">
+									<CheckboxGroup
+										title="Emite GTA por Acesso Externo"
+										options={EMITE_GTA_ACESSO_EXTERNO.map((item) => ({
+											value: item,
+											label: item,
+										}))}
+										defaultValue={emiteAcessoExterno}
+										onChange={setEmiteAcessoExterno}
+									/>
+								</div>
+							)}
+
+						</div>
+					</div>
+				</Section>
+
+				{/* --- [3] informacoes de destino --- */}
+				<Section title="Informações de Destino">
+					<div className="pt-5 flex flex-col gap-4">
+						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+							<CheckboxGroup
+								title="Tipo de Destino"
+								required
+								options={TIPOS_DESTINO.map((item) => ({
+									value: item,
+									label: item,
+								}))}
+								defaultValue={tiposDestino}
+								onChange={setTiposDestino}
+							/>
+							<CheckboxGroup
+								title="Taxas a Cobrar"
+								options={TAXAS_COBRAR.map((item) => ({
+									value: item,
+									label: item,
+								}))}
+								defaultValue={taxasCobrar}
+								onChange={setTaxasCobrar}
+							/>
+						</div>
+					</div>
+				</Section>
+			</main>
+
+			{/* --- modal de sucesso --- */}
+			{
+				isSucesso && (
+					<div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
+						<div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
+							<h3 className="text-lg font-bold text-gray-900">
+								Finalidade de Trânsito cadastrada com sucesso!
+							</h3>
+							<p className="text-sm text-gray-500 mt-1">
+								{finalidadeTransito
+									? `A finalidade "${finalidadeTransito}"`
+									: "A finalidade"}{" "}
+								foi cadastrada.
+							</p>
+							<div className="flex gap-3 justify-center mt-6">
+								<button
+									onClick={() => {
+										setIsSucesso(false);
+										onNavigate("finalidade-transito");
+									}}
+									className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition">
+									Voltar
+								</button>
+								<button
+									type="button"
+									onClick={() => {
+										setIsSucesso(false);
+										onNavigate("visualizar-finalidade-transito", finalidadeCadastrada);
+									}}
+									className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">
+									Visualizar
+								</button>
+							</div>
+						</div>
+					</div>
+				)
+			}
+		</div >
+	);
 }

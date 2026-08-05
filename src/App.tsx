@@ -5,6 +5,41 @@ import { LoginPage } from "./pages/Login";
 import { SelecionarUsuarioPage } from "./pages/SelecionarUsuario";
 
 // GERAL
+import { VisualizarFinalidadeTransitoPage } from "./pages/GTA/FinalidadeTransito/VisualizarFinalidadeTransito";
+import { EditarFinalidadeTransitoPage } from "./pages/GTA/FinalidadeTransito/EditarFinalidadeTransito";
+
+import { VisualizarDistribuicaoFormulariosGtaPage } from "./pages/GTA/DistribuicaoFormulariosGta/VisualizarDistribuicaoFormulariosGta";
+import { EditarDistribuicaoFormulariosGtaPage } from "./pages/GTA/DistribuicaoFormulariosGta/EditarDistribuicaoFormulariosGta";
+
+import { EditarRegistroVendaGtaFisicaPage } from "./pages/GTA/RegistroVendaGTAFisica/EditarRegistroVendaGTAFisica";
+
+import { VisualizarIsencaoTaxaGtaPage } from "./pages/GTA/IsencaoTaxaGTA/VisualizarIsencaoTaxaGTA";
+import { EditarIsencaoTaxaGtaPage } from "./pages/GTA/IsencaoTaxaGTA/EditarIsencaoTaxaGTA";
+import { VisualizarUnidadeConsolidacaoPage } from "./pages/Vegetal/UnidadeConsolidacao/VisualizarUnidadeConsolidacao";
+import { EditarUnidadeConsolidacaoPage } from "./pages/Vegetal/UnidadeConsolidacao/EditarUnidadeConsolidacao";
+
+import { VisualizarCulturaPage } from "./pages/Vegetal/Cultura/VisualizarCultura";
+import { EditarCulturaPage } from "./pages/Vegetal/Cultura/EditarCultura";
+
+import { VisualizarPragaPage } from "./pages/Vegetal/Praga/VisualizarPraga";
+import { EditarPragaPage } from "./pages/Vegetal/Praga/EditarPraga";
+
+import { VisualizarProfissionalVegetalPage } from "./pages/Vegetal/ProfissionalVegetal/VisualizarProfissionalVegetal";
+import { EditarProfissionalVegetalPage } from "./pages/Vegetal/ProfissionalVegetal/EditarProfissionalVegetal";
+import { VisualizarUnidadeAdministrativaPage } from "./pages/Geral/UnidadeAdministrativa/VisualizarUnidadeAdministrativa";
+import { EditarUnidadeAdministrativaPage } from "./pages/Geral/UnidadeAdministrativa/EditarUnidadeAdministrativa";
+
+import { VisualizarUnidadeMedidaPage } from "./pages/Geral/UnidadeMedida/VisualizarUnidadeMedida";
+import { EditarUnidadeMedidaPage } from "./pages/Geral/UnidadeMedida/EditarUnidadeMedida";
+
+import { VisualizarTipoVeiculoPage } from "./pages/Geral/TipoVeiculo/VisualizarTipoVeiculo";
+import { EditarTipoVeiculoPage } from "./pages/Geral/TipoVeiculo/EditarTipoVeiculo";
+import { VisualizarProdutoPage } from "./pages/Geral/Produto/VisualizarProduto";
+import { EditarProdutoPage } from "./pages/Geral/Produto/EditarProduto";
+
+import { VisualizarProfissionalOficialPage } from "./pages/Geral/ProfissionalOficial/VisualizarProfissionalOficial";
+import { EditarProfissionalOficialPage } from "./pages/Geral/ProfissionalOficial/EditarProfissionalOficial";
+import { EditarVendaPropriedadePage } from "./pages/Geral/VendaPropriedade/EditarVendaPropriedade";
 import { VisualizarDivisaoMunicipalPage } from "./pages/Geral/DivisaoMunicipal/VisualizarDivisaoMunicipal";
 import { EditarDivisaoMunicipalPage } from "./pages/Geral/DivisaoMunicipal/EditarDivisaoMunicipal";
 import { VisualizarAeroportoPortoPage } from "./pages/Geral/AeroportoPorto/VisualizarAeroportoPorto";
@@ -65,6 +100,8 @@ import { VisualizarEmissaoATAPage } from "./pages/GTA/EmissaoATA/VisualizarEmiss
 // ANIMAL
 import { AdicionarCertificadoraSISBOVPage } from "./pages/Animal/CertificadoraSISBOV/AdicionarCertificadoraSISBOV";
 import { CertificadoraSISBOVPage } from "./pages/Animal/CertificadoraSISBOV/CertificadoraSISBOV";
+import { EditarCertificadoraSISBOVPage } from "./pages/Animal/CertificadoraSISBOV/EditarCertificadoraSISBOV";
+import { VisualizarCertificadoraSISBOVPage } from "./pages/Animal/CertificadoraSISBOV/VisualizarCertificadoraSISBOV";
 import { AdicionarEspeciePage } from "./pages/Animal/Especie/AdicionarEspecie";
 import { EspeciePage } from "./pages/Animal/Especie/Especie";
 import { VisualizarEspeciePage } from "./pages/Animal/Especie/VisualizarEspecie";
@@ -84,6 +121,7 @@ import { VisualizarExploracaoPecuariaPage } from "./pages/Animal/ExploracaoPecua
 import { AdicionarIntegradoraCooperativaPage } from "./pages/Animal/IntegradoraCooperativa/AdicionarIntegradoraCooperativa";
 import { IntegradoraCooperativaPage } from "./pages/Animal/IntegradoraCooperativa/IntegradoraCooperativa";
 import { VisualizarIntegradoraCooperativaPage } from "./pages/Animal/IntegradoraCooperativa/VisualizarIntegradoraCooperativa";
+import { EditarIntegradoraCooperativaPage } from "./pages/Animal/IntegradoraCooperativa/EditarIntegradoraCooperativa";
 import { AdicionarLocalRealizacaoExamePage } from "./pages/Animal/LocalRealizacaoExame/AdicionarLocalRealizacaoExame";
 import { EditarLocalRealizacaoExamePage } from "./pages/Animal/LocalRealizacaoExame/EditarLocalRealizacaoExame";
 import { LocalRealizacaoExamePage } from "./pages/Animal/LocalRealizacaoExame/LocalRealizacaoExame";
@@ -107,8 +145,8 @@ import { AdicionarStatusAnimalPage } from "./pages/Animal/StatusAnimal/Adicionar
 import { EditarStatusAnimalPage } from "./pages/Animal/StatusAnimal/EditarStatusAnimal";
 import { StatusAnimalPage } from "./pages/Animal/StatusAnimal/StatusAnimal";
 import { VisualizarStatusAnimalPage } from "./pages/Animal/StatusAnimal/VisualizarStatusAnimal";
-import { AdicionarTipoVeiculoPage } from "./pages/Animal/TipoVeiculo/AdicionarTipoVeiculo";
-import { TipoVeiculoPage } from "./pages/Animal/TipoVeiculo/TipoVeiculo";
+import { AdicionarTipoVeiculoPage } from "./pages/Geral/TipoVeiculo/AdicionarTipoVeiculo";
+import { TipoVeiculoPage } from "./pages/Geral/TipoVeiculo/TipoVeiculo";
 import { AtualizacaoCadastralRebanhoPage } from "./pages/Rebanho/AtualizacaoCadastralRebanho/AtualizacaoCadastralRebanho";
 import { AtualizarCadastroRebanhoPage } from "./pages/Rebanho/AtualizacaoCadastralRebanho/AtualizarCadastroRebanho";
 import { ConfirmarDadosProdutorRebanhoPage } from "./pages/Rebanho/AtualizacaoCadastralRebanho/ConfirmarDadosProdutorRebanho";
@@ -133,9 +171,9 @@ import { VisualizarLancamentoRebanhoPage } from "./pages/Rebanho/LancamentoReban
 import { AdicionarCulturaPage } from "./pages/Vegetal/Cultura/AdicionarCultura";
 import { CulturaPage } from "./pages/Vegetal/Cultura/Cultura";
 import { VisualizarEstabelecimentoAgroindustrialPOVPage } from "./pages/Vegetal/EstabelecimentoAgroindustrialPOV/VisualizarEstabelecimentoAgroindustrialPOV";
-import { AdicionarPragaPage } from "./pages/Vegetal/Praga/AdicionarPraga";
-import { PragaPage } from "./pages/Vegetal/Praga/Praga";
-import { AdicionarProfissionalVegetalPage } from "./pages/Vegetal/ProfissionalVegetal/AdicionarProfissionalVegetal";
+	import { AdicionarPragaPage } from "./pages/Vegetal/Praga/AdicionarPraga";
+	import { PragaPage } from "./pages/Vegetal/Praga/Praga";
+	import { AdicionarProfissionalVegetalPage } from "./pages/Vegetal/ProfissionalVegetal/AdicionarProfissionalVegetal";
 import { ProfissionalVegetalPage } from "./pages/Vegetal/ProfissionalVegetal/ProfissionalVegetal";
 import { AdicionarUnidadeConsolidacaoPage } from "./pages/Vegetal/UnidadeConsolidacao/AdicionarUnidadeConsolidacao";
 import { UnidadeConsolidacaoPage } from "./pages/Vegetal/UnidadeConsolidacao/UnidadeConsolidacao";
@@ -248,6 +286,33 @@ import { VisualizarUsuariosPage } from "./pages/Controle/Usuarios/VisualizarUsua
 
 // 1. Adicionamos as novas rotas de Pessoa Jurídica no tipo Screen
 export type Screen =
+| "editar-finalidade-transito"
+  | "visualizar-finalidade-transito"
+  | "editar-distribuicao-formularios-gta"
+  | "visualizar-distribuicao-formularios-gta"
+  | "editar-registro-venda-gta-fisica"
+  | "editar-isencao-taxa-gta"
+  | "visualizar-isencao-taxa-gta"
+| "editar-unidade-consolidacao"
+  | "visualizar-unidade-consolidacao"
+  | "editar-cultura"
+  | "visualizar-cultura"
+  | "editar-praga"
+  | "visualizar-praga"
+  | "editar-profissional-vegetal"
+  | "visualizar-profissional-vegetal"
+| "editar-unidade-administrativa"
+  | "visualizar-unidade-administrativa"
+  | "editar-unidade-medida"
+  | "visualizar-unidade-medida"
+  | "editar-tipo-veiculo"
+  | "visualizar-tipo-veiculo"
+| "editar-produto"
+  | "visualizar-produto"
+  | "editar-profissional-oficial"
+  | "visualizar-profissional-oficial"
+| "editar-estabelecimento-agropecuario"
+  | "editar-venda-propriedade"
 | "editar-divisao-municipal"
   | "visualizar-divisao-municipal"
   | "emissao-ata"
@@ -467,6 +532,201 @@ export type Screen =
   | "adicionar-evento-pecuario"
   | "visualizar-evento-pecuario"
   | "editar-evento-pecuario"
+	| "visualizar-estabelecimento-agropecuario"
+	| "venda-propriedade"
+	| "adicionar-venda-propriedade"
+	| "visualizar-venda-propriedade"
+	| "venda-saida-vacina"
+	| "adicionar-venda-saida-vacina"
+	| "venda-entrada-vacina"
+	| "adicionar-venda-entrada-vacina"
+	| "nucleo-producao" // 🚀 Adicionado
+	| "adicionar-nucleo-producao" // 🚀 Adicionado
+	| "visualizar-nucleo-producao" // 🚀 Adicionado
+	| "editar-nucleo-producao" // 🚀 Adicionado
+	| "visualizar-previsao-migracao"
+	| "editar-previsao-migracao"
+	| "exploracao-pecuaria" // 🚀 Adicionado
+	| "adicionar-exploracao-pecuaria" // 🚀 Adicionado
+	| "visualizar-exploracao-pecuaria" // 🚀 Adicionado
+	| "atualizacao-cadastral-rebanho"
+	| "confirmar-dados-produtor-rebanho"
+	| "visualizar-atualizacao-cadastral-rebanho"
+	| "atualizar-cadastro-rebanho"
+	| "visualizar-rebanho-atualizado"
+	| "ajuste-rebanho"
+	| "adicionar-ajuste-rebanho"
+	| "visualizar-ajuste-rebanho"
+	| "editar-ajuste-rebanho"
+	| "lancamento-rebanho"
+	| "adicionar-lancamento-rebanho"
+	| "visualizar-lancamento-rebanho"
+	| "editar-lancamento-rebanho"
+	| "passaporte-equestre"
+	| "adicionar-passaporte-equestre"
+	| "visualizar-passaporte-equestre"
+	| "editar-passaporte-equestre"
+	| "laboratorio"
+	| "adicionar-laboratorio"
+	| "partilha-vacina"
+	| "adicionar-partilha-vacina"
+	| "lancamento-doses-vacina"
+	| "adicionar-lancamento-doses-vacina"
+	| "etapa-vacinacao"
+	| "adicionar-etapa-vacinacao"
+	| "autorizacao-vacinacao"
+	| "adicionar-autorizacao-vacinacao"
+	| "declaracao-vacinacao"
+	| "adicionar-declaracao-vacinacao"
+	| "doenca"
+	| "adicionar-doenca"
+	| "tipo-insumo-exame"
+	| "adicionar-tipo-insumo-exame"
+	| "visualizar-tipo-insumo-exame"
+	| "editar-tipo-insumo-exame"
+	| "ajuste-doses-insumo"
+	| "adicionar-ajuste-doses-insumo"
+	| "visualizar-ajuste-doses-insumo"
+	| "editar-ajuste-doses-insumo"
+	| "registro-venda-gta-digital"
+	| "adicionar-registro-venda-gta-digital"
+	| "visualizar-registro-venda-gta-digital"
+	| "editar-registro-venda-gta-digital"
+	| "visualizar-dae-registro-venda-gta"
+	| "emissao-gta"
+	| "pendencias-confirmacao-gta"
+	| "adicionar-emissao-gta"
+	| "visualizar-emissao-gta"
+	| "emitir-emissao-gta"
+	| "cancelar-emissao-gta"
+	| "pagar-emissao-gta"
+	| "vacinador"
+	| "adicionar-vacinador"
+	| "produto"
+	| "adicionar-produto"
+	| "profissional-oficial"
+	| "adicionar-profissional-oficial"
+	| "unidade-administrativa"
+	| "adicionar-unidade-administrativa"
+	| "unidade-medida"
+	| "adicionar-unidade-medida"
+	| "revendedora-agropecuario"
+	| "adicionar-revendedora-agropecuario"
+	| "visualizar-revendedora-agropecuario"
+	| "editar-revendedora-agropecuario"
+	| "certificadora-sisbov"
+	| "adicionar-certificadora-sisbov"
+	| "visualizar-certificadora-sisbov"
+	| "editar-certificadora-sisbov"
+	| "especie"
+	| "adicionar-especie"
+	| "visualizar-especie"
+	| "agroindustrial-sie"
+	| "adicionar-agroindustrial-sie"
+	| "visualizar-estabelecimento-poa"
+	| "visualizar-agroindustrial-outras-inspecoes"
+	| "visualizar-agroindustrial-pov"
+	| "distribuicao-formularios-gta"
+	| "adicionar-distribuicao-formularios-gta"
+	| "valor-indice"
+	| "adicionar-valor-indice"
+	| "aeroporto-porto"
+	| "adicionar-aeroporto-porto"
+	| "registro-venda-gta-fisica"
+	| "adicionar-registro-venda-gta-fisica"
+	| "visualizar-registro-venda-gta-fisica"
+	| "estabelecimento-evento-pecuario"
+	| "adicionar-estabelecimento-evento-pecuario"
+	| "local-realizacao-exame"
+	| "adicionar-local-realizacao-exame"
+	| "visualizar-local-realizacao-exame"
+	| "editar-local-realizacao-exame"
+	| "integradora-cooperativa"
+	| "adicionar-integradora-cooperativa"
+	| "visualizar-integradora-cooperativa"
+	| "editar-integradora-cooperativa"
+	| "profissional-animal"
+	| "adicionar-profissional-animal"
+	| "promotora-eventos"
+	| "adicionar-promotora-eventos"
+	| "revendedora-animais"
+	| "adicionar-revendedora-animais"
+	| "visualizar-revendedora-animais-vivos"
+	| "editar-revendedora-animais"
+	| "unidade-consolidacao"
+	| "adicionar-unidade-consolidacao"
+	| "cultura"
+	| "adicionar-cultura"
+	| "praga"
+	| "adicionar-praga"
+	| "editar-praga"
+	| "visualizar-praga"
+	| "profissional-vegetal"
+	| "adicionar-profissional-vegetal"
+	| "finalidade-transito"
+	| "adicionar-finalidade-transito"
+	| "usuarios"
+	| "adicionar-usuario"
+	| "visualizar-usuario"
+	| "papeis"
+	| "adicionar-papeis"
+	| "visualizar-papel"
+	| "editar-papel"
+	| "instituicao-ensino-pesquisa"
+	| "adicionar-instituicao-ensino-pesquisa"
+	| "visualizar-instituicao-ensino-pesquisa"
+	| "editar-instituicao-ensino-pesquisa"
+	| "isencao-taxa-gta"
+	| "adicionar-isencao-taxa-gta"
+	| "recolhimento-mensal-gta"
+	| "adicionar-recolhimento-mensal-gta"
+	| "visualizar-recolhimento-mensal-gta"
+	| "editar-recolhimento-mensal-gta"
+	| "visualizar-boleto-recolhimento-gta"
+	| "visualizar-dae-recolhimento-gta"
+	| "taxa-emissao-gta"
+	| "adicionar-taxa-emissao-gta"
+	| "visualizar-taxa-emissao-gta"
+	| "editar-taxa-emissao-gta"
+	| "fundo-arrecadacao"
+	| "adicionar-fundo-arrecadacao"
+	| "visualizar-fundo-arrecadacao"
+	| "editar-fundo-arrecadacao"
+	| "item-receita"
+	| "adicionar-item-receita"
+	| "notificacoes-estabelecimentos"
+	| "lote-pagamento"
+	| "adicionar-lote-pagamento"
+	| "visualizar-lote-pagamento"
+	| "editar-lote-pagamento"
+	| "visualizar-documento-lote-pagamento"
+	| "visualizar-dae-lote-pagamento"
+	| "tipo-veiculo"
+	| "adicionar-tipo-veiculo"
+	| "atestado-exame"
+	| "adicionar-atestado-exame"
+	| "visualizar-atestado-exame"
+	| "editar-atestado-exame"
+	| "venda-entrada-insumos-exames"
+	| "adicionar-venda-entrada-insumos-exames"
+	| "status-animal"
+	| "adicionar-status-animal"
+	| "visualizar-status-animal"
+	| "editar-status-animal"
+	| "etapa-atualizacao-cadastral"
+	| "adicionar-etapa-atualizacao-cadastral"
+	| "visualizar-etapa-atualizacao-cadastral"
+	| "editar-etapa-atualizacao-cadastral"
+	| "dae"
+	| "adicionar-dae"
+	| "visualizar-dae"
+	| "indice"
+	| "adicionar-indice"
+	| "visualizar-indice"
+	| "acougue"
+	| "adicionar-acougue"
+	| "editar-acougue"
+	| "visualizar-acougue"
 	| "editar-aeroporto-porto"
   | "visualizar-aeroporto-porto";
 
@@ -495,6 +755,135 @@ export default function App() {
   };
 
   switch (screen) {
+	switch (screen) {
+		case "finalidade-transito":
+      return <FinalidadeTransitoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-finalidade-transito":
+      return <AdicionarFinalidadeTransitoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-finalidade-transito":
+      return <EditarFinalidadeTransitoPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-finalidade-transito":
+      return <VisualizarFinalidadeTransitoPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+
+    case "distribuicao-formularios-gta":
+      return <DistribuicaoFormulariosGta onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-distribuicao-formularios-gta":
+      return <AdicionarDistribuicaoFormulariosGta onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-distribuicao-formularios-gta":
+      return <EditarDistribuicaoFormulariosGtaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-distribuicao-formularios-gta":
+      return <VisualizarDistribuicaoFormulariosGtaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+
+    case "registro-venda-gta-fisica":
+      return <RegistroVendaGtaFisicaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-registro-venda-gta-fisica":
+      return <AdicionarRegistroVendaGtaFisicaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-registro-venda-gta-fisica":
+      return <EditarRegistroVendaGtaFisicaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-registro-venda-gta-fisica":
+      return <VisualizarRegistroVendaGtaFisicaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+
+    case "isencao-taxa-gta":
+      return <IsencaoTaxaGtaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-isencao-taxa-gta":
+      return <AdicionarIsencaoTaxaGtaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-isencao-taxa-gta":
+      return <EditarIsencaoTaxaGtaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-isencao-taxa-gta":
+      return <VisualizarIsencaoTaxaGtaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+		case "unidade-consolidacao":
+      return <UnidadeConsolidacaoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-unidade-consolidacao":
+      return <AdicionarUnidadeConsolidacaoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-unidade-consolidacao":
+      return <EditarUnidadeConsolidacaoPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-unidade-consolidacao":
+      return <VisualizarUnidadeConsolidacaoPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+
+    case "cultura":
+      return <CulturaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-cultura":
+      return <AdicionarCulturaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-cultura":
+      return <EditarCulturaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-cultura":
+      return <VisualizarCulturaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+
+    case "praga":
+      return <PragaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-praga":
+      return <AdicionarPragaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-praga":
+      return <EditarPragaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-praga":
+      return <VisualizarPragaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+
+  case "profissional-vegetal":
+      return <ProfissionalVegetalPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-profissional-vegetal":
+      return <AdicionarProfissionalVegetalPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-profissional-vegetal":
+      return <EditarProfissionalVegetalPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-profissional-vegetal":
+      return <VisualizarProfissionalVegetalPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+		case "unidade-administrativa":
+      return <UnidadeAdministrativaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-unidade-administrativa":
+      return <AdicionarUnidadeAdministrativaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-unidade-administrativa":
+      return <EditarUnidadeAdministrativaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-unidade-administrativa":
+      return <VisualizarUnidadeAdministrativaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+
+    case "unidade-medida":
+      return <UnidadeMedidaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-unidade-medida":
+      return <AdicionarUnidadeMedidaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-unidade-medida":
+      return <EditarUnidadeMedidaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-unidade-medida":
+      return <VisualizarUnidadeMedidaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+
+    case "tipo-veiculo":
+      return <TipoVeiculoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-tipo-veiculo":
+      return <AdicionarTipoVeiculoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-tipo-veiculo":
+      return <EditarTipoVeiculoPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-tipo-veiculo":
+      return <VisualizarTipoVeiculoPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+		case "produto":
+      return <ProdutoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-produto":
+      return <AdicionarProdutoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-produto":
+      return <EditarProdutoPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-produto":
+      return <VisualizarProdutoPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+	  case "profissional-oficial":
+      return <ProfissionalOficialPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-profissional-oficial":
+      return <AdicionarProfissionalOficialPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-profissional-oficial":
+      return <EditarProfissionalOficialPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-profissional-oficial":
+      return <VisualizarProfissionalOficialPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+		case "estabelecimento-agropecuario":
+      return <EstabelecimentoAgropecuarioPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-estabelecimento-agropecuario":
+      return <AdicionarEstabelecimentoAgropecuarioPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-estabelecimento-agropecuario":
+      return <EditarEstabelecimentoAgropecuarioPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-estabelecimento-agropecuario":
+      return <VisualizarEstabelecimentoAgropecuarioPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+	  case "venda-propriedade":
+      return <VendaPropriedadePage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-venda-propriedade":
+      return <AdicionarVendaPropriedadePage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-venda-propriedade":
+      return <EditarVendaPropriedadePage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-venda-propriedade":
+      return <VisualizarVendaPropriedadePage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
 		case "divisao-municipal":
       return (
         <DivisaoMunicipalPage onLogout={handleLogout} onNavigate={handleNavigate} />
@@ -713,6 +1102,904 @@ export default function App() {
           dados={screenData}
         />
       );
+		case "pessoa-fisica":
+			return (
+				<PessoaFisicaPage onLogout={handleLogout} onNavigate={handleNavigate} />
+			);
+		case "adicionar-pessoa-fisica":
+			return (
+				<AdicionarPessoaFisicaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-pessoa-fisica":
+			return (
+				<VisualizarPessoaFisica
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "editar-pessoa-fisica":
+			return (
+				<EditarPessoaFisica
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dadosIniciais={screenData}
+				/>
+			);
+		case "produto":
+			return (
+				<ProdutoPage onLogout={handleLogout} onNavigate={handleNavigate} />
+			);
+		case "adicionar-produto":
+			return (
+				<AdicionarProdutoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "profissional-oficial":
+			return (
+				<ProfissionalOficialPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-profissional-oficial":
+			return (
+				<AdicionarProfissionalOficialPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "unidade-administrativa":
+			return (
+				<UnidadeAdministrativaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-unidade-administrativa":
+			return (
+				<AdicionarUnidadeAdministrativaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "unidade-medida":
+			return (
+				<UnidadeMedidaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-unidade-medida":
+			return (
+				<AdicionarUnidadeMedidaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "receita":
+			return (
+				<ReceitaPage onLogout={handleLogout} onNavigate={handleNavigate} />
+			);
+		case "adicionar-receita":
+			return (
+				<AdicionarReceitaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "editar-receita":
+			return (
+				<EditarReceitaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "visualizar-receita":
+			return (
+				<VisualizarReceitaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+
+		case "pessoa-juridica":
+			return (
+				<PessoaJuridicaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-pessoa-juridica":
+			return (
+				<AdicionarPessoaJuridicaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-pessoa-juridica":
+			return (
+				<VisualizarPessoaJuridicaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "editar-pessoa-juridica":
+			return (
+				<EditarPessoaJuridicaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+
+		case "laboratorio":
+			return (
+				<LaboratorioPage onLogout={handleLogout} onNavigate={handleNavigate} />
+			);
+		case "adicionar-laboratorio":
+			return (
+				<AdicionarLaboratorioPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+
+		case "venda-saida-vacina":
+			return (
+				<VendaComSaidaVacinaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-venda-saida-vacina":
+			return (
+				<AdicionarVendaComSaidaVacinaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+
+		case "venda-entrada-vacina":
+			return (
+				<VendaComEntradaVacinaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-venda-entrada-vacina":
+			return (
+				<AdicionarVendaComEntradaVacinaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+
+		case "partilha-vacina":
+			return (
+				<PartilhaVacinaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-partilha-vacina":
+			return (
+				<AdicionarPartilhaVacinaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "lancamento-doses-vacina":
+			return (
+				<LancamentoDosesVacinaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-lancamento-doses-vacina":
+			return (
+				<AdicionarLancamentoDosesVacinaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "etapa-vacinacao":
+			return (
+				<EtapaVacinacaoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-etapa-vacinacao":
+			return (
+				<AdicionarEtapaVacinacaoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "autorizacao-vacinacao":
+			return (
+				<AutorizacaoVacinacaoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-autorizacao-vacinacao":
+			return (
+				<AdicionarAutorizacaoVacinacaoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "declaracao-vacinacao":
+			return (
+				<DeclaracaoVacinacaoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-declaracao-vacinacao":
+			return (
+				<AdicionarDeclaracaoVacinacaoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "doenca":
+			return <DoencaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+		case "adicionar-doenca":
+			return (
+				<AdicionarDoencaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "tipo-insumo-exame":
+			return (
+				<TipoInsumoExamePage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-tipo-insumo-exame":
+			return (
+				<AdicionarTipoInsumoExamePage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-tipo-insumo-exame":
+			return (
+				<VisualizarTipoInsumoExamePage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "editar-tipo-insumo-exame":
+			return (
+				<EditarTipoInsumoExamePage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "ajuste-doses-insumo":
+			return (
+				<AjusteDosesInsumoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-ajuste-doses-insumo":
+			return (
+				<AdicionarAjusteDosesInsumoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-ajuste-doses-insumo":
+			return (
+				<VisualizarAjusteDosesInsumoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "editar-ajuste-doses-insumo":
+			return (
+				<EditarAjusteDosesInsumoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+
+		case "registro-venda-gta-digital":
+			return (
+				<RegistroVendaGTADigitalPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-registro-venda-gta-digital":
+			return (
+				<AdicionarRegistroVendaGTADigitalPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-registro-venda-gta-digital":
+			return (
+				<VisualizarRegistroVendaGTADigitalPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "editar-registro-venda-gta-digital":
+			return (
+				<EditarRegistroVendaGTADigitalPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "visualizar-dae-registro-venda-gta":
+			return (
+				<VisualizarDAERegistroVendaGTAPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+
+		case "vacinador":
+			return (
+				<VacinadorPage onLogout={handleLogout} onNavigate={handleNavigate} />
+			);
+
+		case "adicionar-vacinador":
+			return (
+				<AdicionarVacinadorPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "revendedora-agropecuario":
+			return (
+				<RevendedoraAgropecuarioPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-revendedora-agropecuario":
+			return (
+				<AdicionarRevendedoraAgropecuarioPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-revendedora-agropecuario":
+			return (
+				<VisualizarRevendedoraAgropecuarioPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "editar-revendedora-agropecuario":
+			return (
+				<EditarRevendedoraAgropecuarioPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "usuarios":
+			return (
+				<UsuariosPage onLogout={handleLogout} onNavigate={handleNavigate} />
+			);
+		case "adicionar-usuario":
+			return (
+				<AdicionarUsuariosPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-usuario":
+			return (
+				<VisualizarUsuariosPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+
+		case "certificadora-sisbov":
+			return (
+				<CertificadoraSISBOVPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-certificadora-sisbov":
+			return (
+				<AdicionarCertificadoraSISBOVPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-certificadora-sisbov":
+			return (
+				<VisualizarCertificadoraSISBOVPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "editar-certificadora-sisbov":
+			return (
+				<EditarCertificadoraSISBOVPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "especie":
+			return (
+				<EspeciePage onLogout={handleLogout} onNavigate={handleNavigate} />
+			);
+		case "adicionar-especie":
+			return (
+				<AdicionarEspeciePage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-especie":
+			return (
+				<VisualizarEspeciePage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "nucleo-producao":
+			return (
+				<NucleoProducaoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-nucleo-producao":
+			return (
+				<AdicionarNucleoProducaoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-nucleo-producao":
+			return (
+				<VisualizarNucleoProducaoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "editar-nucleo-producao":
+			return (
+				<EditarNucleoProducaoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "visualizar-previsao-migracao":
+			return (
+				<PrevisaoMigracaoDetalhePage
+					mode="visualizar"
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+
+		case "editar-previsao-migracao":
+			return (
+				<PrevisaoMigracaoDetalhePage
+					mode="editar"
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "exploracao-pecuaria":
+			return (
+				<ExploracaoPecuariaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-exploracao-pecuaria":
+			return (
+				<AdicionarExploracaoPecuariaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-exploracao-pecuaria":
+			return (
+				<VisualizarExploracaoPecuariaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "atualizacao-cadastral-rebanho":
+			return (
+				<AtualizacaoCadastralRebanhoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "confirmar-dados-produtor-rebanho":
+			return (
+				<ConfirmarDadosProdutorRebanhoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "visualizar-atualizacao-cadastral-rebanho":
+			return (
+				<VisualizarAtualizacaoCadastralRebanhoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "atualizar-cadastro-rebanho":
+			return (
+				<AtualizarCadastroRebanhoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "ajuste-rebanho":
+			return (
+				<AjusteRebanhoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "lancamento-rebanho":
+			return (
+				<LancamentoRebanhoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-ajuste-rebanho":
+			return (
+				<AdicionarAjusteRebanhoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-lancamento-rebanho":
+			return (
+				<AdicionarLancamentoRebanhoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-ajuste-rebanho":
+			return (
+				<VisualizarAjusteRebanhoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-lancamento-rebanho":
+			return (
+				<VisualizarLancamentoRebanhoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "visualizar-rebanho-atualizado":
+			return (
+				<VisualizarRebanhoAtualizadoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "editar-ajuste-rebanho":
+			return (
+				<EditarAjusteRebanhoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "editar-lancamento-rebanho":
+			return (
+				<EditarLancamentoRebanhoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "agroindustrial-sie":
+			return (
+				<EstabelecimentoAgroindustrialSIEMGPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-agroindustrial-sie":
+			return (
+				<AdicionarEstabelecimentoAgroindustrialSIEMGPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-estabelecimento-poa":
+			return (
+				<VisualizarEstabelecimentoAgroindustrialSIEMGPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "visualizar-agroindustrial-outras-inspecoes":
+			return (
+				<VisualizarEstabelecimentoAgroindustrialOutrasInspecoesPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "visualizar-agroindustrial-pov":
+			return (
+				<VisualizarEstabelecimentoAgroindustrialPOVPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "passaporte-equestre":
+			return (
+				<PassaporteEquestrePage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-passaporte-equestre":
+			return (
+				<AdicionarPassaporteEquestrePage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-passaporte-equestre":
+			return (
+				<VisualizarPassaporteEquestrePage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "editar-passaporte-equestre":
+			return (
+				<AdicionarPassaporteEquestrePage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+					modo="editar"
+				/>
+			);
+		case "valor-indice":
+			return (
+				<ValorIndicePage onLogout={handleLogout} onNavigate={handleNavigate} />
+			);
+		case "adicionar-valor-indice":
+		case "editar-valor-indice": // <-- Mapeamos o editar aqui também
+			return (
+				<AdicionarValorIndicePage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData} // <-- ISSO GARANTE O PREENCHIMENTO NO LÁPIS E NO BOTÃO
+				/>
+			);
+		case "visualizar-valor-indice":
+			return (
+				<VisualizarValorIndicePage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+
+		case "fundo-arrecadacao":
+			return (
+				<FundoArrecadacaoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-fundo-arrecadacao":
+			return (
+				<AdicionarFundoArrecadacaoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-fundo-arrecadacao":
+			return (
+				<VisualizarFundoArrecadacaoPage
+					dados={screenData}
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "editar-fundo-arrecadacao":
+			return (
+				<EditarFundoArrecadacaoPage
+					dados={screenData}
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		//  case "adicionar-passaporte-equestre":
+		//  return <AdicionarPassaporteEquestrePage onLogout={handleLogout} onNavigate={handleNavigate} />;
+
+		case "emissao-gta":
+			return (
+				<EmissaoGtaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "pendencias-confirmacao-gta":
+			return (
+				<PendenciasConfirmacaoPage
+					dados={screenData}
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-emissao-gta":
+			return (
+				<AdicionarEmissaoGtaPage
+					dados={screenData}
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-emissao-gta":
+			return (
+				<VisualizarEmissaoGtaPage
+					dados={screenData}
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "emitir-emissao-gta":
+			return (
+				<EmitirEmissaoGtaPage
+					dados={screenData}
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "cancelar-emissao-gta":
+			return (
+				<CancelarEmissaoGtaPage
+					dados={screenData}
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "pagar-emissao-gta":
+			return (
+				<PagarEmissaoGtaPage
+					dados={screenData}
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "distribuicao-formularios-gta":
+			return (
+				<DistribuicaoFormulariosGta
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-distribuicao-formularios-gta":
+			return (
+				<AdicionarDistribuicaoFormulariosGta
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+
+      return <VisualizarAeroportoPortoPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+		case "registro-venda-gta-fisica":
+			return (
+				<RegistroVendaGtaFisicaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-registro-venda-gta-fisica":
+			return (
+				<AdicionarRegistroVendaGtaFisicaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+
+		case "visualizar-registro-venda-gta-fisica":
+			return (
+				<VisualizarRegistroVendaGtaFisicaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+
+		case "estabelecimento-evento-pecuario":
+			return (
+				<EstabelecimentoEventoPecuarioPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-estabelecimento-evento-pecuario":
+			return (
+				<AdicionarEstabelecimentoEventoPecuarioPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+
+		case "local-realizacao-exame":
+			return (
+				<LocalRealizacaoExamePage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-local-realizacao-exame":
+			return (
+				<AdicionarLocalRealizacaoExamePage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-local-realizacao-exame":
+			return (
+				<VisualizarLocalRealizacaoExamePage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "editar-local-realizacao-exame":
+			return (
+				<EditarLocalRealizacaoExamePage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
 
     case "pessoa-juridica":
       return <PessoaJuridicaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
@@ -746,6 +2033,39 @@ export default function App() {
       return (
         <AdicionarVendaComSaidaVacinaPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
+		case "adicionar-integradora-cooperativa":
+			return (
+				<AdicionarIntegradoraCooperativaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+
+		case "visualizar-integradora-cooperativa":
+			return (
+				<VisualizarIntegradoraCooperativaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+
+		case "editar-integradora-cooperativa":
+			return (
+				<EditarIntegradoraCooperativaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+
+		case "profissional-animal":
+			return (
+				<ProfissionalAnimalPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
 
     case "venda-entrada-vacina":
       return <VendaComEntradaVacinaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
@@ -1235,6 +2555,34 @@ export default function App() {
           dados={screenData}
         />
       );
+		case "praga":
+            return <PragaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+
+        case "adicionar-praga":
+            return (
+                <AdicionarPragaPage
+                    onLogout={handleLogout}
+                    onNavigate={handleNavigate}
+                />
+            );
+
+        case "editar-praga": 
+            return (
+                <EditarPragaPage
+                    onLogout={handleLogout}
+                    onNavigate={handleNavigate}
+                    dados={screenData}
+                />
+            );
+
+        case "visualizar-praga":
+            return (
+                <VisualizarPragaPage
+                    onLogout={handleLogout}
+                    onNavigate={handleNavigate}
+                    dados={screenData}
+                />
+            );
 
     case "profissional-animal":
       return <ProfissionalAnimalPage onLogout={handleLogout} onNavigate={handleNavigate} />;
@@ -1249,6 +2597,9 @@ export default function App() {
 
     case "adicionar-promotora-eventos":
       return <AdicionarPromotoraEventosPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+		
+		case "papeis":
+			return <PapeisPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 
     case "revendedora-animais":
       return <RevendedoraAnimaisPage onLogout={handleLogout} onNavigate={handleNavigate} />;
@@ -1268,6 +2619,118 @@ export default function App() {
 
     case "unidade-consolidacao":
       return <UnidadeConsolidacaoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+		case "recolhimento-mensal-gta":
+			return (
+				<RecolhimentoMensalGTAPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-recolhimento-mensal-gta":
+			return (
+				<AdicionarRecolhimentoMensalGTAPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-recolhimento-mensal-gta":
+			return (
+				<VisualizarRecolhimentoMensalGTAPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "editar-recolhimento-mensal-gta":
+			return (
+				<EditarRecolhimentoMensalGTAPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "visualizar-boleto-recolhimento-gta":
+			return (
+				<VisualizarBoletoRecolhimentoGTAPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "visualizar-dae-recolhimento-gta":
+			return (
+				<VisualizarDAERecolhimentoGTAPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "item-receita":
+			return (
+				<ItemReceitaPage onLogout={handleLogout} onNavigate={handleNavigate} />
+			);
+		case "notificacoes-estabelecimentos":
+			return (
+				<NotificacoesEstabelecimentosPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "tipo-veiculo":
+			return (
+				<TipoVeiculoPage onLogout={handleLogout} onNavigate={handleNavigate} />
+			);
+		case "adicionar-item-receita":
+			return (
+				<AdicionarItemReceitaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "lote-pagamento":
+			return (
+				<LotePagamentoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-lote-pagamento":
+			return (
+				<AdicionarLotePagamentoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "editar-lote-pagamento":
+			return (
+				<AdicionarLotePagamentoPage
+					dados={screenData}
+					modoEdicao
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-lote-pagamento":
+			return (
+				<VisualizarLotePagamentoPage
+					dados={screenData}
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "indice":
+			return (
+				<Indice onLogout={handleLogout} onNavigate={handleNavigate} />
+			);
+		case "adicionar-indice":
+		case "editar-indice": // <-- Mapeamos o editar aqui também
+			return (
+				<AdicionarIndice
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					data={screenData} // <-- ISSO GARANTE O PREENCHIMENTO NO LÁPIS E NO BOTÃO
+				/>
+			);
 
     case "adicionar-unidade-consolidacao":
       return (
@@ -1276,6 +2739,108 @@ export default function App() {
 
     case "cultura":
       return <CulturaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+		case "dae":
+			return (
+				<DAEBuscaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-dae":
+			return (
+				<AdicionarDAEPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-dae":
+			return (
+				<VisualizarDAEPage
+					dae={screenData}
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-documento-lote-pagamento":
+			return (
+				<VisualizarDocumentoLotePagamentoPage
+					dados={screenData}
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-dae-lote-pagamento":
+			return (
+				<VisualizarDaeLotePagamentoPage
+					dados={screenData}
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-tipo-veiculo":
+			return (
+				<AdicionarTipoVeiculoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "status-animal":
+			return (
+				<StatusAnimalPage onLogout={handleLogout} onNavigate={handleNavigate} />
+			);
+		case "adicionar-status-animal":
+			return (
+				<AdicionarStatusAnimalPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-status-animal":
+			return (
+				<VisualizarStatusAnimalPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "editar-status-animal":
+			return (
+				<EditarStatusAnimalPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "etapa-atualizacao-cadastral":
+			return (
+				<EtapaAtualizacaoCadastralPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-etapa-atualizacao-cadastral":
+			return (
+				<AdicionarEtapaAtualizacaoCadastralPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-etapa-atualizacao-cadastral":
+			return (
+				<VisualizarEtapaAtualizacaoCadastralPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "editar-etapa-atualizacao-cadastral":
+			return (
+				<EditarEtapaAtualizacaoCadastralPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
 
     case "adicionar-cultura":
       return <AdicionarCulturaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
@@ -1536,4 +3101,39 @@ export default function App() {
     default:
       return <DashboardPage onLogout={handleLogout} onNavigate={handleNavigate} />;
   }
+		case "atestado-exame":
+			return (
+				<AtestadoExamePage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "adicionar-atestado-exame":
+			return (
+				<AdicionarAtestadoExamePage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-atestado-exame":
+			return (
+				<VisualizarAtestadoExamePage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		case "editar-atestado-exame":
+			return (
+				<EditarAtestadoExamePage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+		default:
+			return (
+				<DashboardPage onLogout={handleLogout} onNavigate={handleNavigate} />
+			);
+	}
 }

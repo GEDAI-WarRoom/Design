@@ -4,11 +4,14 @@ import {
   carregarHistoricoCadastro,
   registrarVersaoCadastro,
 } from "../../../components/ui/historicoCadastroStorage";
+import propriedadeSantaHelenaUrl from "../../../imports/images/propriedade-santa-helena.png";
+import propriedadeSaoJoseUrl from "../../../imports/images/propriedade-sao-jose.png";
 
 export interface EstabelecimentoAgropecuario {
   id: number;
   codigo: string;
   nome: string;
+  imagem?: string;
   proprietarios: string;
   zona: "Rural" | "Urbana";
   municipioUf: string;
@@ -22,6 +25,7 @@ export const ESTABELECIMENTOS_INICIAIS: EstabelecimentoAgropecuario[] = [
     id: 1,
     codigo: "51080590041",
     nome: "Fazenda Rio Verde",
+    imagem: propriedadeSantaHelenaUrl,
     proprietarios: "José Aarão Neto - 555.009.956-40",
     zona: "Rural",
     municipioUf: "Lavras - MG",
@@ -31,6 +35,7 @@ export const ESTABELECIMENTOS_INICIAIS: EstabelecimentoAgropecuario[] = [
     id: 2,
     codigo: "31001040082",
     nome: "Haras Vale Verde",
+    imagem: propriedadeSaoJoseUrl,
     proprietarios: "José Aarão Neto - 555.009.956-40",
     zona: "Rural",
     municipioUf: "Belo Horizonte - MG",

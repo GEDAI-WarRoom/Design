@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ArrowLeft, Check, ChevronDown, ChevronUp, Eye, Info, User } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronUp, Eye, Info, User } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, FloatSelect } from "../../../components/ui/FormKit";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
@@ -23,7 +23,6 @@ export function AdicionarRecolhimentoMensalGTAPage({ onLogout, onNavigate, onVie
   const [ano, setAno] = useState("");
   const [mes, setMes] = useState("");
   const [secaoAberta, setSecaoAberta] = useState(true);
-  const [tentouSalvar, setTentouSalvar] = useState(false);
   const [registroSalvo, setRegistroSalvo] = useState<RecolhimentoMensalGTA | null>(null);
 
   // 🌟 Filtro dinâmico de contribuintes para o modal (Física vs Jurídica)
@@ -39,16 +38,11 @@ export function AdicionarRecolhimentoMensalGTAPage({ onLogout, onNavigate, onVie
   // 🌟 Rótulo dinâmico baseado no tipo de pessoa
   const labelDocumento = tipoPessoaContribuinte === "Pessoa física" ? "CPF" : "CNPJ";
 
-  const anoValido = /^\d{4}$/.test(ano);
-  const formularioValido = Boolean(contribuinte && anoValido && mes);
-
   const adicionar = () => {
-    setTentouSalvar(true);
-    if (!formularioValido || !contribuinte) return;
     setRegistroSalvo(criarRecolhimento({
-      contribuinte,
-      anoReferencia: Number(ano),
-      mesReferencia: Number(mes),
+      contribuinte: contribuinte || CONTRIBUINTES_RECOLHIMENTO[0],
+      anoReferencia: /^\d{4}$/.test(ano) ? Number(ano) : 2026,
+      mesReferencia: Number(mes) || 6,
     }));
   };
 
@@ -149,12 +143,6 @@ export function AdicionarRecolhimentoMensalGTAPage({ onLogout, onNavigate, onVie
                 />
                 <FloatSelect label="Mês para referência" required value={mes} onChange={setMes} options={MESES_OPTIONS} />
               </div>
-              {tentouSalvar && !formularioValido && (
-                <p className="mt-4 text-sm font-medium text-red-500">
-                  {!anoValido && ano ? "O ano para referência deve possuir 4 caracteres. " : ""}
-                  Preencha os campos obrigatórios para continuar.
-                </p>
-              )}
             </div>
           )}
         </section>
@@ -163,9 +151,6 @@ export function AdicionarRecolhimentoMensalGTAPage({ onLogout, onNavigate, onVie
       {registroSalvo && (
         <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/40 p-4">
           <div className="w-full max-w-md rounded-2xl bg-white p-6 text-center shadow-xl">
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#E6F4EA]">
-              <Check size={28} className="text-[#1A7A3C]" strokeWidth={3} />
-            </div>
             <h2 className="text-lg font-bold text-gray-900">Recolhimento mensal de GTAs cadastrado com sucesso!</h2>
             <p className="mt-1 text-sm text-gray-500">O recolhimento de {registroSalvo.contribuinte.nome} foi cadastrado.</p>
             <div className="mt-6 flex justify-center gap-3">

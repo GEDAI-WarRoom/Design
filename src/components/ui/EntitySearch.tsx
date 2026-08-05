@@ -989,16 +989,18 @@ export function ProprietarioInput({
 	onChange,
 	onEyeClick,
 	required = false,
+	disabled = false,
+	data = PRODUTORES_MOCK,
 }: DomainInputProps) {
 	const [tipoPessoa, setTipoPessoa] = useState<string>("");
 
-	const entidadeSelecionada = PRODUTORES_MOCK.find(
+	const entidadeSelecionada = data.find(
 		(x) => x.nome === value || x.documento === value,
 	);
 
 	const databaseFiltrada = tipoPessoa
-		? PRODUTORES_MOCK.filter((p) => p.tipo === tipoPessoa)
-		: PRODUTORES_MOCK;
+		? data.filter((p: any) => p.tipo === tipoPessoa)
+		: data;
 
 	// Definição estrita das colunas baseada no estado atual
 	const colunasModal = [
@@ -1034,6 +1036,7 @@ export function ProprietarioInput({
 					label="Proprietário"
 					placeholder="Buscar pelo nome do proprietário."
 					required={required}
+					disabled={disabled}
 					value={entidadeSelecionada?.nome || ""}
 					data={databaseFiltrada}
 					title="Buscar Proprietário"
@@ -1093,6 +1096,8 @@ interface DomainInputProps {
 	value: string; // Nome selecionado
 	documento?: string; // Documento selecionado (CPF/CNPJ)
 	required?: boolean;
+	disabled?: boolean;
+	data?: any[];
 	onChange: (selectedEntity: any) => void;
 	onEyeClick?: () => void;
 }
@@ -1540,6 +1545,7 @@ interface BlocoEnderecoFieldsProps {
 	tipoEstado: "travado" | "normal";
 	onChange: (key: keyof EnderecoState, value: string) => void;
 	onSetMultipleFields: (fields: Partial<EnderecoState>) => void;
+	disabled?: boolean;
 }
 
 export function BlocoEnderecoFields({
@@ -1548,6 +1554,7 @@ export function BlocoEnderecoFields({
 	tipoEstado,
 	onChange,
 	onSetMultipleFields,
+	disabled = false,
 }: BlocoEnderecoFieldsProps) {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -1555,6 +1562,7 @@ export function BlocoEnderecoFields({
 	const [mesmaGeoEstab, setMesmaGeoEstab] = useState<boolean | "">("");
 
 	const isGlobalDisabled = tipoEstado === "travado";
+	const fieldsDisabled = disabled || isGlobalDisabled;
 	const isRural = data.zona === "Rural";
 
 	// Efeito para tratar o preenchimento automático das coordenadas se marcar "Sim"
@@ -1580,7 +1588,7 @@ export function BlocoEnderecoFields({
 	};
 
 	const handleZonaChange = (novaZona: string) => {
-		if (isGlobalDisabled) return;
+		if (fieldsDisabled) return;
 		if (novaZona === "Rural") {
 			onSetMultipleFields({
 				zona: "Rural",
@@ -1599,7 +1607,7 @@ export function BlocoEnderecoFields({
 	};
 
 	const handleCepChange = async (val: string) => {
-		if (isGlobalDisabled) return;
+		if (fieldsDisabled) return;
 		const formatado = aplicarMascaraCEP(val);
 		onChange("cep", formatado);
 		const apenasNumeros = formatado.replace(/\D/g, "");
@@ -1655,7 +1663,7 @@ export function BlocoEnderecoFields({
 					required
 					value={data.zona}
 					onChange={handleZonaChange}
-					disabled={isGlobalDisabled}
+					disabled={fieldsDisabled}
 					options={[
 						{ value: "Urbana", label: "Urbana" },
 						{ value: "Rural", label: "Rural" },
@@ -1668,14 +1676,14 @@ export function BlocoEnderecoFields({
 						value={data.cep}
 						onChange={handleCepChange}
 						maxLength={9}
-						disabled={isGlobalDisabled}
+						disabled={fieldsDisabled}
 					/>
 				)}
 				<FloatSelect
 					label="Estado"
 					required
 					value={data.estado}
-					disabled={isGlobalDisabled}
+					disabled={fieldsDisabled}
 					onChange={(v) => onChange("estado", v)}
 					options={[
 						{ value: "Minas Gerais", label: "Minas Gerais" },
@@ -1689,7 +1697,7 @@ export function BlocoEnderecoFields({
 					value={data.municipio}
 					onChange={(v) => onChange("municipio", v)}
 					options={MUNICIPIOS_MOCK}
-					disabled={isGlobalDisabled}
+					disabled={fieldsDisabled}
 				/>
 				{!isRural && (
 					<FloatInput
@@ -1697,7 +1705,7 @@ export function BlocoEnderecoFields({
 						required
 						value={data.bairro}
 						onChange={(v) => onChange("bairro", v)}
-						disabled={isGlobalDisabled}
+						disabled={fieldsDisabled}
 					/>
 				)}
 			</div>
@@ -1713,7 +1721,7 @@ export function BlocoEnderecoFields({
 						className="w-full"
 						hasTooltip={isRural}
 						tooltipText="Nome da estrada e o quilômetro de referência."
-						disabled={isGlobalDisabled}
+						disabled={fieldsDisabled}
 					/>
 				</div>
 				{!isRural && (
@@ -1724,14 +1732,14 @@ export function BlocoEnderecoFields({
 							value={data.numero}
 							onChange={(v) => onChange("numero", v)}
 							className="md:col-span-2"
-							disabled={isGlobalDisabled}
+							disabled={fieldsDisabled}
 						/>
 						<FloatInput
 							label="Complemento"
 							value={data.complemento}
 							onChange={(v) => onChange("complemento", v)}
 							className="md:col-span-3"
-							disabled={isGlobalDisabled}
+							disabled={fieldsDisabled}
 						/>
 					</>
 				)}
@@ -1743,14 +1751,14 @@ export function BlocoEnderecoFields({
 					value={data.localidade}
 					onChange={(v) => onChange("localidade", v)}
 					options={LOCALIDADES_MOCK}
-					disabled={isGlobalDisabled}
+					disabled={fieldsDisabled}
 				/>
 				<FloatCombobox
 					label="Distrito"
 					value={data.distrito}
 					onChange={(v) => onChange("distrito", v)}
 					options={DISTRITOS_MOCK}
-					disabled={isGlobalDisabled}
+					disabled={fieldsDisabled}
 				/>
 			</div>
 
@@ -1797,11 +1805,13 @@ export function BlocoEnderecoFields({
 					{!(data.latitude && data.longitude) ? (
 						<button
 							type="button"
+							disabled={fieldsDisabled}
 							onClick={(e) => {
 								e.preventDefault();
+								if (fieldsDisabled) return;
 								setIsModalOpen(true);
 							}}
-							className="w-full flex items-center justify-center gap-2 border border-[#1A7A3C] rounded-md h-11 text-sm font-semibold text-[#1A7A3C] hover:bg-green-50 transition shadow-sm cursor-pointer">
+							className="w-full flex items-center justify-center gap-2 border border-[#1A7A3C] rounded-md h-11 text-sm font-semibold text-[#1A7A3C] hover:bg-green-50 transition shadow-sm cursor-pointer disabled:cursor-not-allowed disabled:opacity-60">
 							<Map size={16} /> Adicionar Coordenadas
 						</button>
 					) : (
@@ -1809,11 +1819,13 @@ export function BlocoEnderecoFields({
 							<div className="md:col-span-2">
 								<button
 									type="button"
+									disabled={fieldsDisabled}
 									onClick={(e) => {
 										e.preventDefault();
+										if (fieldsDisabled) return;
 										setIsModalOpen(true);
 									}}
-									className="w-full flex items-center justify-center border border-[#1A7A3C] rounded-md h-11 bg-white hover:bg-green-50/30 text-[#1A7A3C] transition cursor-pointer">
+									className="w-full flex items-center justify-center border border-[#1A7A3C] rounded-md h-11 bg-white hover:bg-green-50/30 text-[#1A7A3C] transition cursor-pointer disabled:cursor-not-allowed disabled:opacity-60">
 									<Map size={18} />
 								</button>
 							</div>
@@ -1838,7 +1850,7 @@ export function BlocoEnderecoFields({
 				</div>
 			)}
 
-			{isModalOpen && !isGlobalDisabled && (
+			{isModalOpen && !fieldsDisabled && (
 				<MapModal
 					onClose={() => setIsModalOpen(false)}
 					onConfirm={(lat, lng) => {

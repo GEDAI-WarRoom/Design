@@ -3,7 +3,6 @@ import {
   ArrowLeft,
   ChevronUp,
   ChevronDown,
-  Check,
   Info,
   Ruler,
   FileText,
@@ -203,10 +202,10 @@ export function AdicionarItemReceitaPage({
   const [itemReceita, setItemReceita] = useState(
     data?.itemReceita ?? "",
   );
-  const [unidadeMedida, setUnidadeMedida] = useState("");
+  const [unidadeMedida, setUnidadeMedida] = useState(data?.unidadeMedida ?? "");
   const [receita, setReceita] = useState(data?.receita ?? "");
   const [indice, setIndice] = useState(data?.indice ?? "");
-  const [quantidadeIndice, setQuantidadeIndice] = useState("");
+  const [quantidadeIndice, setQuantidadeIndice] = useState(data?.quantidadeIndice ? String(data.quantidadeIndice) : "");
   const [contribuicaoFundo, setContribuicaoFundo] = useState(
     data?.contribuicaoFundo ? "Sim" : "Sim",
   );
@@ -216,14 +215,16 @@ export function AdicionarItemReceitaPage({
 
   const [isSucesso, setIsSucesso] = useState(false);
 
-  const formularioValido =
-    itemReceita.trim() !== "" &&
-    unidadeMedida !== "" &&
-    receita !== "" &&
-    indice !== "" &&
-    Number(quantidadeIndice) !== 0 &&
-    contribuicaoFundo !== "" &&
-    situacao !== "";
+  const salvar = () => {
+    if (!itemReceita) setItemReceita("Taxa de Expediente Geral");
+    if (!unidadeMedida) setUnidadeMedida("Unidade");
+    if (!receita) setReceita("Vacinação Contra Brucelose");
+    if (!indice) setIndice("UFEMG");
+    if (!quantidadeIndice) setQuantidadeIndice("1,50");
+    if (!contribuicaoFundo) setContribuicaoFundo("Sim");
+    if (!situacao) setSituacao("Ativo");
+    setIsSucesso(true);
+  };
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
@@ -253,9 +254,8 @@ export function AdicionarItemReceitaPage({
             </h1>
             <button
               type="button"
-              disabled={!formularioValido}
-              onClick={() => setIsSucesso(true)}
-              className="px-6 py-3 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-bold rounded-md transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={salvar}
+              className="px-6 py-3 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-bold rounded-md transition shadow-sm"
             >
               {isEdicao ? "Salvar" : "Adicionar"}
             </button>
@@ -363,13 +363,6 @@ export function AdicionarItemReceitaPage({
       {isSucesso && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl p-8 text-center animate-fadeIn">
-            <div className="w-16 h-16 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4">
-              <Check
-                size={32}
-                className="text-[#1A7A3C]"
-                strokeWidth={3}
-              />
-            </div>
             <h3 className="text-xl font-bold text-gray-900">
               {isEdicao
                 ? "Item de receita atualizado com sucesso!"
