@@ -96,7 +96,7 @@ export function EditarLocalRealizacaoExamePage({ onLogout, onNavigate, dados }: 
               onClick={salvar}
               className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold rounded-md transition shadow-sm"
             >
-              Salvar
+              Salvar Alterações
             </button>
           </div>
         </div>
