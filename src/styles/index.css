@@ -1,6 +1,7 @@
 @import './fonts.css';
 @import './tailwind.css';
 @import './theme.css';
+@import './globals.css';
 
 /* Visualização somente leitura do estabelecimento POA: mantém os campos
    brancos e troca apenas os marcadores de ação/seleção por cinza claro. */
@@ -27,7 +28,7 @@
   color: #1f2937 !important;
   -webkit-text-fill-color: #1f2937;
   opacity: 1;
-@import './globals.css';
+}
 
 @keyframes progresso-slide-aviso {
   from {

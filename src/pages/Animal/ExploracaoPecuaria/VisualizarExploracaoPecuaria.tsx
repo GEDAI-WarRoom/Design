@@ -997,11 +997,6 @@ export function VisualizarExploracaoPecuariaPage({
   };
   const isOrnamental =
     r.aptidao === "Ornamental" || r.especie.nome === "Peixe Ornamental";
-  const opcoesCertificado = gruposCertificados.map((g) => ({
-    value: g.titulo,
-    label: g.titulo,
-  }));
-  const isOrnamental = r.especie.nome === "Peixe Ornamental";
 
   const showRepro =
     r.finalidadeProducao === "Ciclo Completo" ||

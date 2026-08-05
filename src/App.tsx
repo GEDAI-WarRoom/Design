@@ -3095,12 +3095,7 @@ export default function App() {
     case "adicionar-praga":
       return <AdicionarPragaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 
-		default:
-			return (
-				<DashboardPage onLogout={handleLogout} onNavigate={handleNavigate} />
-			);
-	}
-    case "profissional-vegetal":
+	    case "profissional-vegetal":
       return <ProfissionalVegetalPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 
     case "adicionar-profissional-vegetal":

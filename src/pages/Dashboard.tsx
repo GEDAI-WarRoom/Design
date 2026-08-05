@@ -75,7 +75,7 @@ export interface MenuCategory {
 }
 
 // Exportamos os dados para que a Navbar consiga importá-los e usá-los na busca
-export const cadastrosCategories: MenuCategory[] = [
+const cadastrosCategoriesMescladas: any[] = [
 	{
 		title: "Geral",
 		icon: <Globe size={32} color={GREEN} />,
@@ -670,6 +670,39 @@ export const cadastrosCategories: MenuCategory[] = [
       },
     ],
   },
+];
+
+// O merge anterior deixou as categorias completas repetidas dentro de
+// `items` da categoria Animal. Selecionamos somente as categorias válidas
+// para que objetos de categoria não sejam renderizados como links/ícones.
+const categoriasValidasDoMerge = cadastrosCategoriesMescladas[1].items.filter(
+  (item: any) => item.title && Array.isArray(item.items),
+) as MenuCategory[];
+
+const categoriaGeral = categoriasValidasDoMerge.find(
+  (categoria) => categoria.title === "Geral",
+)!;
+const categoriaAnimal = categoriasValidasDoMerge.find(
+  (categoria) => categoria.title === "Animal",
+)!;
+const categoriaVegetal = categoriasValidasDoMerge.find(
+  (categoria) => categoria.title === "Vegetal",
+)!;
+const itemOutrasInspecoes = cadastrosCategoriesMescladas[1].items.find(
+  (item: any) => item.route === "agroindustrial-outras-inspecoes",
+) as MenuItem | undefined;
+
+export const cadastrosCategories: MenuCategory[] = [
+  categoriaGeral,
+  {
+    ...categoriaAnimal,
+    items: categoriaAnimal.items.flatMap((item) =>
+      item.route === "agroindustrial-sie" && itemOutrasInspecoes
+        ? [item, itemOutrasInspecoes]
+        : [item],
+    ),
+  },
+  categoriaVegetal,
 ];
 
 export const secondaryCategories: MenuCategory[] = [
