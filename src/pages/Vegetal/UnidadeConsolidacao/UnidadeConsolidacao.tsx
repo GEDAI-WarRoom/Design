@@ -62,6 +62,12 @@ interface Unidade {
   engenheiroCpf: string;
   responsavelPtvNome: string;
   responsavelPtvCpf: string;
+  localizacaoLivro: string;
+  proprietarios: Array<{ nome: string; documento: string }>;
+  endereco: { zona: string; cep: string; estado: string; municipio: string; bairro: string; endereco: string; numero: string; complemento: string; localidade: string; distrito: string };
+  contato: { emailFixo: string; emailFixoObs: string; telefoneFixo: string; telefoneFixoObs: string };
+  anexos: Array<{ nome: string; descricao: string }>;
+  observacao: string;
   situacao: "Ativo" | "Inativo";
 }
 
@@ -71,6 +77,12 @@ const UNIDADES_MOCK: Unidade[] = [
     municipio: "Abadia dos Dourados", uf: "MG",
     engenheiroNome: "Flávio Silva", engenheiroCpf: "111.222.333-44",
     responsavelPtvNome: "Divino de Souza Sobrinho", responsavelPtvCpf: "444.009.956-40",
+    localizacaoLivro: "Armário 2, prateleira A",
+    proprietarios: [{ nome: "José Aarão Neto", documento: "555.009.956-40" }],
+    endereco: { zona: "Urbana", cep: "38540-000", estado: "Minas Gerais", municipio: "Abadia dos Dourados", bairro: "Centro", endereco: "Rua das Palmeiras", numero: "125", complemento: "Galpão 2", localidade: "Centro", distrito: "" },
+    contato: { emailFixo: "contato@unidadesaojose.com.br", emailFixoObs: "Contato administrativo", telefoneFixo: "(34) 3847-1200", telefoneFixoObs: "Atendimento comercial" },
+    anexos: [{ nome: "registro_unidade.pdf", descricao: "Registro da unidade de consolidação" }],
+    observacao: "Unidade habilitada para consolidação e emissão de documentos fitossanitários.",
     situacao: "Ativo",
   },
   {
@@ -78,6 +90,12 @@ const UNIDADES_MOCK: Unidade[] = [
     municipio: "Lavras", uf: "MG",
     engenheiroNome: "Renata Braga", engenheiroCpf: "222.333.444-55",
     responsavelPtvNome: "Carla Menezes Rocha", responsavelPtvCpf: "111.998.775-30",
+    localizacaoLivro: "Arquivo central, gaveta 4",
+    proprietarios: [{ nome: "Agropecuária Vale Verde Ltda.", documento: "56.338.814/0001-95" }],
+    endereco: { zona: "Urbana", cep: "37200-000", estado: "Minas Gerais", municipio: "Lavras", bairro: "Distrito Industrial", endereco: "Avenida Perimetral", numero: "850", complemento: "Bloco B", localidade: "Distrito Industrial", distrito: "" },
+    contato: { emailFixo: "administrativo@valeverde.com.br", emailFixoObs: "Setor administrativo", telefoneFixo: "(35) 3822-4400", telefoneFixoObs: "Telefone fixo" },
+    anexos: [{ nome: "cadastro_vale_verde.pdf", descricao: "Comprovante cadastral" }],
+    observacao: "Cadastro inativo mantido para consulta histórica.",
     situacao: "Inativo",
   },
 ];

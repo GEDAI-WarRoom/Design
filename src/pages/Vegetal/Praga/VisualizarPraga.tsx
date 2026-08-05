@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { ArrowLeft, Pencil, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronUp } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, LargeTextArea } from "../../../components/ui/FormKit";
 
 const GREEN = "#1A7A3C";
+
+const EXEMPLO_PRAGA = { nomeCientifico: "Spodoptera frugiperda", nomePopular: "Lagarta-do-cartucho", situacao: "Ativo", observacao: "Praga de importância econômica para a cultura do milho." };
 
 function Section({ title, children }: { title: string; children: React.ReactNode; }) {
   const [open, setOpen] = useState(true);
@@ -19,7 +21,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 export function VisualizarPragaPage({ dados, onLogout, onNavigate }: { dados?: any; onLogout: () => void; onNavigate: (s: string, d?: any) => void; }) {
-  const praga = dados || {};
+  const praga = { ...(dados || {}), nomeCientifico: dados?.nomeCientifico || EXEMPLO_PRAGA.nomeCientifico, nomePopular: dados?.nomePopular || dados?.nome || EXEMPLO_PRAGA.nomePopular, situacao: dados?.situacao || EXEMPLO_PRAGA.situacao, observacao: dados?.observacao || EXEMPLO_PRAGA.observacao };
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
@@ -32,21 +34,20 @@ export function VisualizarPragaPage({ dados, onLogout, onNavigate }: { dados?: a
           <div className="flex justify-between items-center w-full">
             <h1 className="text-2xl font-semibold text-gray-900">Visualizar Praga</h1>
             <button type="button" onClick={() => onNavigate("editar-praga", praga)} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2">
-              <Pencil size={14} /> Editar
+              Editar
             </button>
           </div>
         </div>
 
         <Section title="Informações Básicas">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <FloatInput label="Nome Comum" value={praga.nome || "-"} disabled onChange={() => {}} />
-            <FloatInput label="Nome Científico" value={praga.nomeCientifico || "-"} disabled onChange={() => {}} />
-            <FloatInput label="Situação" value={praga.situacao || "Ativo"} disabled onChange={() => {}} />
+            <FloatInput label="Nome Científico" value={praga.nomeCientifico} disabled onChange={() => {}} />
+            <FloatInput label="Nome Popular" value={praga.nomePopular} disabled onChange={() => {}} />
           </div>
         </Section>
 
         <Section title="Observações">
-          <LargeTextArea label="Observações" value={praga.observacao || "Nenhuma observação registrada."} disabled onChange={() => {}} />
+          <LargeTextArea label="Observações" value={praga.observacao} disabled onChange={() => {}} />
         </Section>
       </main>
     </div>

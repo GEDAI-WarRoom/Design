@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { ArrowLeft, Info, Check, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowLeft, Info, ChevronDown, ChevronUp } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
-import { FloatInput, FloatSelect, LargeTextArea } from "../../../components/ui/FormKit";
+import { FloatInput, LargeTextArea } from "../../../components/ui/FormKit";
 
 const GREEN = "#1A7A3C";
+
+const EXEMPLO_PRAGA = { nomeCientifico: "Spodoptera frugiperda", nomePopular: "Lagarta-do-cartucho", situacao: "Ativo", observacao: "Praga de importância econômica para a cultura do milho." };
 
 function Section({ title, children }: { title: string; children: React.ReactNode; }) {
   const [open, setOpen] = useState(true);
@@ -20,10 +22,12 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 export function EditarPragaPage({ dados, onLogout, onNavigate }: { dados?: any; onLogout: () => void; onNavigate: (screen: string, data?: any) => void; }) {
   const [isSucesso, setIsSucesso] = useState(false);
-  const [nome, setNome] = useState(dados?.nome || "");
-  const [nomeCientifico, setNomeCientifico] = useState(dados?.nomeCientifico || "");
-  const [situacao, setSituacao] = useState(dados?.situacao || "Ativo");
-  const [observacao, setObservacao] = useState(dados?.observacao || "");
+  const [nomePopular, setNomePopular] = useState(dados?.nomePopular || dados?.nome || EXEMPLO_PRAGA.nomePopular);
+  const [nomeCientifico, setNomeCientifico] = useState(dados?.nomeCientifico || EXEMPLO_PRAGA.nomeCientifico);
+  const [situacao, setSituacao] = useState(dados?.situacao || EXEMPLO_PRAGA.situacao);
+  const [observacao, setObservacao] = useState(dados?.observacao || EXEMPLO_PRAGA.observacao);
+
+  const dadosAtualizados = { ...dados, nomeCientifico, nomePopular, situacao, observacao };
 
   const handleSalvar = () => setIsSucesso(true);
 
@@ -38,7 +42,7 @@ export function EditarPragaPage({ dados, onLogout, onNavigate }: { dados?: any; 
           <div className="flex justify-between items-center w-full">
             <h1 className="text-2xl font-semibold text-gray-900">Editar Praga</h1>
             <button type="button" onClick={handleSalvar} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm">
-              Salvar Alterações
+              Salvar
             </button>
           </div>
         </div>
@@ -50,9 +54,8 @@ export function EditarPragaPage({ dados, onLogout, onNavigate }: { dados?: any; 
 
         <Section title="Informações Básicas">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <FloatInput label="Nome Comum" required value={nome} onChange={setNome} maxLength={255} />
             <FloatInput label="Nome Científico" required value={nomeCientifico} onChange={setNomeCientifico} maxLength={255} />
-            <FloatSelect label="Situação" required value={situacao} onChange={setSituacao} options={[ { value: "Ativo", label: "Ativo" }, { value: "Inativo", label: "Inativo" } ]} />
+            <FloatInput label="Nome Popular" required value={nomePopular} onChange={setNomePopular} maxLength={255} />
           </div>
         </Section>
 
@@ -64,12 +67,11 @@ export function EditarPragaPage({ dados, onLogout, onNavigate }: { dados?: any; 
       {isSucesso && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4 animate-fadeIn">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
-            <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4"><Check size={28} className="text-[#1A7A3C]" strokeWidth={3} /></div>
             <h3 className="text-lg font-bold text-gray-900">Alterações salvas!</h3>
-            <p className="text-sm text-gray-500 mt-1">A praga "{nome}" foi atualizada.</p>
+            <p className="text-sm text-gray-500 mt-1">A praga "{nomePopular}" foi atualizada.</p>
             <div className="flex gap-3 justify-center mt-6">
               <button onClick={() => { setIsSucesso(false); onNavigate("praga"); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50 transition">Voltar</button>
-              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-praga", dados); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
+              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-praga", dadosAtualizados); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
             </div>
           </div>
         </div>
