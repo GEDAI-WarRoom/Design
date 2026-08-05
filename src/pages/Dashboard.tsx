@@ -76,6 +76,201 @@ export interface MenuCategory {
 
 // Exportamos os dados para que a Navbar consiga importá-los e usá-los na busca
 export const cadastrosCategories: MenuCategory[] = [
+	{
+		title: "Geral",
+		icon: <Globe size={32} color={GREEN} />,
+		items: [
+
+			{
+				label: "Aeroporto/Porto",
+				route: "aeroporto-porto",
+				icon: <TowerControl size={16} />,
+			},
+			{ label: "Açougue", route: "acougue", icon: <Store size={16} /> },
+			{
+				label: "Divisão Municipal",
+				route: "divisao-municipal",
+				icon: <Map size={16} />,
+			},
+			{
+				label: "Classificação Sanitária por Estado",
+				route: "classificacao-sanitaria-estado",
+				icon: <ShieldCheck size={16} />,
+			},
+			{
+				label: "Estabelecimento Agropecuário",
+				route: "estabelecimento-agropecuario",
+				icon: (
+					<img
+						src={Icons.iconeEstabelecimentoUrl}
+						alt="Estabelecimento Agropecuário"
+						className="w-4 h-4"
+					/>
+				),
+			},
+
+			{
+				label: "Venda de Propriedade",
+				route: "venda-propriedade",
+				icon: (
+					<img
+						src={Icons.iconeVendaPropriedadeUrl}
+						alt="Venda Propriedade"
+						className="w-4 h-4"
+					/>
+				),
+			},
+			{
+				label: "Pessoa Física",
+				route: "pessoa-fisica",
+				icon: <User size={16} />,
+			},
+			{
+				label: "Pessoa Jurídica",
+				route: "pessoa-juridica",
+				icon: (
+					<img
+						src={Icons.iconePessoaJuridicaUrl}
+						alt="Pessoa JurídicA"
+						className="w-4 h-4"
+					/>
+				),
+			},
+			{
+				label: "Produto",
+				route: "produto",
+				icon: <ShoppingCart size={16} />,
+			},
+			{
+				label: "Profissional de Serviço Oficial",
+				route: "profissional-oficial",
+				icon: (
+					<img
+						src={Icons.iconeProfissionalUrl}
+						alt="Profissional"
+						className="w-4 h-4"
+					/>
+				),
+			},
+			{
+				label: "Unidade Administrativa",
+				route: "unidade-administrativa",
+				icon: (
+					<img
+						src={Icons.iconeUnidadeAdministrativaUrl}
+						alt="Unidade Administrativa"
+						className="w-4 h-4"
+					/>
+				),
+			},
+			{
+				label: "Unidade de Medida",
+				route: "unidade-medida",
+				icon: <Ruler size={16} />,
+			},
+			{
+				label: "Revendedora de Produtos Agropecuários",
+				route: "revendedora-agropecuario",
+				icon: <Store size={16} />,
+			},
+			{
+				label: "Instituição de Ensino e Pesquisa",
+				route: "instituicao-ensino-pesquisa",
+				icon: <Landmark size={16} />,
+			},
+			{
+				label: "Tipo de Veículo",
+				route: "tipo-veiculo",
+				icon: <Truck size={16} />,
+			},
+		],
+	},
+	{
+		title: "Animal",
+		icon: (
+			<img
+				src={Icons.iconeAnimalUrl}
+				alt="Animal"
+				className="w-9 h-9 object-contain"
+			/>
+		),
+		items: [
+			{
+				label: "Certificadora SISBOV",
+				route: "certificadora-sisbov",
+				icon: (
+					<img
+						src={Icons.iconeCertificadoraUrl}
+						alt="Certificadora"
+						className="w-4 h-4"
+					/>
+				),
+			},
+			{
+				label: "Espécie",
+				route: "especie",
+				icon: <Dna size={16} />,
+			},
+			{
+				label: "Núcleo de Produção",
+				route: "nucleo-producao",
+				icon: (
+					<img
+						src={Icons.iconeNucleoProducaoUrl}
+						alt="Núcleo de Produção"
+						className="w-4 h-4"
+					/>
+				),
+			},
+			{
+				label: "Exploração Pecuária",
+				route: "exploracao-pecuaria",
+				icon: (
+					<img
+						src={Icons.iconeExploracaoUrl}
+						alt="Exploração Pecuária"
+						className="w-4 h-4"
+					/>
+				),
+			},
+				{
+					label: "Estabelecimento Agroindustrial POA - SIE/MG",
+				route: "agroindustrial-sie",
+				icon: (
+					<img
+						src={Icons.iconeEstabelecimentoAgroindustrialUrl}
+						alt="Estabelecimento Agroindustrial"
+						className="w-4 h-4"
+					/>
+					),
+				},
+				{
+					label: "Estabelecimento Agroindustrial POA - Outras Inspeções",
+					route: "agroindustrial-outras-inspecoes",
+					icon: (
+						<img
+							src={Icons.iconeEstabelecimentoAgroindustrialUrl}
+							alt="Estabelecimento Agroindustrial"
+							className="w-4 h-4"
+						/>
+					),
+				},
+			{
+				label: "Passaporte Equestre",
+				route: "passaporte-equestre",
+				icon: (
+					<img
+						src={Icons.iconeEquestreUrl}
+						alt="Equestre"
+						className="w-4 h-4"
+					/>
+				),
+			},
+			{
+				label: "Estabelecimento/Recinto de Eventos Pecuários",
+				route: "estabelecimento-evento-pecuario",
+				icon: <Calendar size={16} />,
+			},
   {
     title: "Geral",
     icon: <Globe size={32} color={GREEN} />,
@@ -280,6 +475,109 @@ export const cadastrosCategories: MenuCategory[] = [
         ),
       },
 
+			{
+				label: "Profissional da Área Animal",
+				route: "profissional-animal",
+				icon: (
+					<img
+						src={Icons.iconeProfissionalAnimalUrl}
+						alt="Profissional da Área Animal"
+						className="w-4 h-4"
+					/>
+				),
+			},
+			{
+				label: "Promotora de Eventos Pecuários",
+				route: "promotora-eventos",
+				icon: (
+					<img
+						src={Icons.iconePromotoraUrl}
+						alt="Promotora de Eventos Pecuários"
+						className="w-4 h-4"
+					/>
+				),
+			},
+			{
+				label: "Revendedora de Animais Vivos",
+				route: "revendedora-animais",
+				icon: <Store size={16} />,
+			},
+			{
+				label: "Status Animal",
+				route: "status-animal",
+				icon: (
+					<img src={Icons.iconeStatusUrl} alt="Status" className="w-4 h-4" />
+				),
+			},
+		],
+	},
+	{
+		title: "Vegetal",
+		icon: (
+			<img
+				src={Icons.iconeVegetalUrl}
+				alt="Vegetal"
+				className="w-9 h-9 object-contain"
+			/>
+		),
+		items: [
+			{
+				label: "Estabelecimento Agroindustrial POV",
+				route: "agroindustrial-pov",
+				icon: (
+					<img
+						src={Icons.iconeEstabelecimentoAgroindustrialUrl}
+						alt="Estabelecimento Agroindustrial POV"
+						className="w-4 h-4 object-contain"
+					/>
+				),
+			},
+			{
+				label: "Unidade de Consolidação",
+				route: "unidade-consolidacao",
+				icon: (
+					<img
+						src={Icons.iconeUnidadeConsolidacaoUrl}
+						alt="Unidade de Consolidação"
+						className="w-4 h-4 object-contain"
+					/>
+				),
+			},
+			{
+				label: "Cultura",
+				route: "cultura",
+				icon: (
+					<img
+						src={Icons.iconeCulturaUrl}
+						alt="Cultura"
+						className="w-4 h-4 object-contain"
+					/>
+				),
+			},
+			{
+				label: "Praga",
+				route: "praga",
+				icon: (
+					<img
+						src={Icons.iconePragaUrl}
+						alt="Praga"
+						className="w-4 h-4 object-contain"
+					/>
+				),
+			},
+			{
+				label: "Profissional Vegetal",
+				route: "profissional-vegetal",
+				icon: (
+					<img
+						src={Icons.iconeProfissionalVegetalUrl}
+						alt="Profissional Vegetal"
+						className="w-4 h-4 object-contain"
+					/>
+				),
+			},
+		],
+	},
       {
         label: "Profissional da Área Animal",
         route: "profissional-animal",

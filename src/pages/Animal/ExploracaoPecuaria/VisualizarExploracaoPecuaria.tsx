@@ -587,28 +587,19 @@ const GRUPOS_CERTIFICADOS_AVES: GrupoCertificado[] = [
   },
 ];
 
-// Certificados de BOVINOS (Brucelose, Tuberculose, Brucelose e Tuberculose)
+const TIPOS_CERTIFICADOS_BOVINOS = [
+  "Brucelose",
+  "Tuberculose",
+  "Tuberculose e Brucelose",
+];
+
+// Para bovinos somente um certificado fica ativo e visível por vez.
 const GRUPOS_CERTIFICADOS_BOVINOS: GrupoCertificado[] = [
   {
     id: 1,
-    titulo: "Brucelose",
+    titulo: "Tuberculose e Brucelose",
     certificados: [
-      { id: "bv1", atualizadoEm: "14/04/2012", numero: "213456", validade: "14/06/2025", situacao: "Ativa", nucleos: ["Núcleo Setor A"] },
-    ],
-
-  },
-  {
-    id: 2,
-    titulo: "Tuberculose",
-    certificados: [
-      { id: "bv2", atualizadoEm: "14/04/2012", numero: "213478", validade: "18/07/2025", situacao: "Ativa", nucleos: ["Núcleo Setor A", "Núcleo Setor B"] },
-    ],
-  },
-  {
-    id: 3,
-    titulo: "Brucelose e Tuberculose",
-    certificados: [
-      { id: "bv3", atualizadoEm: "14/04/2012", numero: "213465", validade: "20/04/2025", situacao: "Ativa", nucleos: ["Núcleo Setor A", "Núcleo Setor B", "Núcleo Setor C"] },
+      { id: "bv1", atualizadoEm: "14/04/2012", numero: "213465", validade: "20/04/2025", situacao: "Ativa", nucleos: ["Núcleo Setor A", "Núcleo Setor B", "Núcleo Setor C"] },
     ],
   },
 ];
@@ -902,6 +893,8 @@ export function VisualizarExploracaoPecuariaPage({
     useState(false);
   const [modalCicloAberto, setModalCicloAberto] = useState(false);
   const [modalCertificadoAberto, setModalCertificadoAberto] = useState(false);
+  const [grupoCertificadoBovino, setGrupoCertificadoBovino] =
+    useState<GrupoCertificado>(GRUPOS_CERTIFICADOS_BOVINOS[0]);
   const [certTipo, setCertTipo] = useState("");
   const [certValidade, setCertValidade] = useState("");
   const [certNumero, setCertNumero] = useState("");
@@ -966,8 +959,44 @@ export function VisualizarExploracaoPecuariaPage({
   const gruposCertificados = isAves
     ? GRUPOS_CERTIFICADOS_AVES
     : isBovinos
-      ? GRUPOS_CERTIFICADOS_BOVINOS
+      ? [grupoCertificadoBovino]
       : GRUPOS_CERTIFICADOS_SUIDEOS;
+  const opcoesCertificado = (isBovinos
+    ? TIPOS_CERTIFICADOS_BOVINOS
+    : gruposCertificados.map((grupo) => grupo.titulo)
+  ).map((titulo) => ({ value: titulo, label: titulo }));
+  const abrirModalCertificado = () => {
+    setCertTipo(isBovinos ? grupoCertificadoBovino.titulo : "");
+    setModalCertificadoAberto(true);
+  };
+  const salvarCertificado = () => {
+    if (isBovinos && certTipo) {
+      const certificadoAtual = grupoCertificadoBovino.certificados[0];
+      const nucleosSelecionados = certNucleos
+        .filter(Boolean)
+        .map((nucleo) => nucleo.nome);
+      const validadeFormatada = certValidade
+        ? certValidade.split("-").reverse().join("/")
+        : certificadoAtual.validade;
+
+      setGrupoCertificadoBovino({
+        id: 1,
+        titulo: certTipo,
+        certificados: [{
+          ...certificadoAtual,
+          atualizadoEm: new Date().toLocaleDateString("pt-BR"),
+          numero: certNumero || certificadoAtual.numero,
+          validade: validadeFormatada,
+          nucleos: nucleosSelecionados.length
+            ? nucleosSelecionados
+            : certificadoAtual.nucleos,
+        }],
+      });
+    }
+    setModalCertificadoAberto(false);
+  };
+  const isOrnamental =
+    r.aptidao === "Ornamental" || r.especie.nome === "Peixe Ornamental";
   const opcoesCertificado = gruposCertificados.map((g) => ({
     value: g.titulo,
     label: g.titulo,
@@ -1074,7 +1103,7 @@ export function VisualizarExploracaoPecuariaPage({
         return (
           <button
             type="button"
-            onClick={() => setModalCertificadoAberto(true)}
+            onClick={abrirModalCertificado}
             className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2"
           >
             Adicionar Certificado
@@ -1674,7 +1703,7 @@ export function VisualizarExploracaoPecuariaPage({
                 title={grupo.titulo}
                 activeCountText={`${grupo.certificados.length} Certificados Ativos`}
                 icon={<BadgeCheck className="w-5 h-5" />}
-                onAddClick={() => setModalCertificadoAberto(true)}
+                onAddClick={abrirModalCertificado}
                 variant="sem-vinculacao"
                 grid="triplo"
                 historicoTitle="Histórico de Inativos"
@@ -2374,10 +2403,7 @@ export function VisualizarExploracaoPecuariaPage({
         icon={<BadgeCheck size={24} />}
         saveText="Salvar"
         cancelText="Cancelar"
-        onSave={() => {
-          // protótipo: apenas fecha
-          setModalCertificadoAberto(false);
-        }}
+        onSave={salvarCertificado}
       >
         <div className="w-full flex flex-col gap-6">
           {/* Informações Gerais */}

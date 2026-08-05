@@ -6,13 +6,13 @@ interface PageProps {
   dados?: any;
 }
 
-export function VisualizarEstabelecimentoAgroindustrialPOVPage({ onLogout, onNavigate, dados }: PageProps) {
+export function EditarEstabelecimentoAgroindustrialPOVPage({ onLogout, onNavigate, dados }: PageProps) {
   return (
     <AdicionarEstabelecimentoAgroindustrialPOVPage
       onLogout={onLogout}
       onNavigate={onNavigate}
       dados={dados}
-      modo="visualizar"
+      modo="editar"
     />
   );
 }
