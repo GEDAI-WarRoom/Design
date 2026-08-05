@@ -37,7 +37,7 @@ export function EditarUsuarioPage({ dados, onLogout, onNavigate }: { dados?: any
           <div className="flex justify-between items-center w-full">
             <h1 className="text-2xl font-semibold text-gray-900">Editar Usuário</h1>
             <button type="button" onClick={() => setIsSucesso(true)} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm">
-              Salvar Alterações
+              Salvar
             </button>
           </div>
         </div>
@@ -55,12 +55,7 @@ export function EditarUsuarioPage({ dados, onLogout, onNavigate }: { dados?: any
           </div>
         </Section>
 
-        <Section title="Acesso e Permissões">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <FloatSelect label="Perfil de Acesso" required value={perfil} onChange={setPerfil} options={[{ value: "Administrador", label: "Administrador" }, { value: "Operador", label: "Operador" }, { value: "Visualizador", label: "Visualizador" }]} />
-            <FloatSelect label="Situação" required value={situacao} onChange={setSituacao} options={[ { value: "Ativo", label: "Ativo" }, { value: "Inativo", label: "Inativo" } ]} />
-          </div>
-        </Section>
+
       </main>
 
       {isSucesso && (
