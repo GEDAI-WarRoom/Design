@@ -15,6 +15,11 @@ import {
   FloatInput,
   MultiSearchModal,
 } from "../../../components/ui/FormKit";
+import { listarEspecies, type Especie } from "../../Animal/Especie/especieData";
+import {
+  salvarFinalidadeTransito,
+  type FinalidadeTransitoVisual,
+} from "./finalidadeTransitoData";
 
 const GREEN = "#1A7A3C";
 
@@ -33,15 +38,6 @@ const TIPOS_LOCAL = [
 const EMITE_GTA_ACESSO_EXTERNO = [
   "Emite para dentro do Estado",
   "Emite para fora do Estado",
-];
-
-// --- mock da entidade ---
-const ESPECIES_MOCK = [
-  { id: 1, codigo: "ESP-001", nome: "Bovino" },
-  { id: 2, codigo: "ESP-002", nome: "Bubalino" },
-  { id: 3, codigo: "ESP-003", nome: "Suíno" },
-  { id: 4, codigo: "ESP-004", nome: "Equino" },
-  { id: 5, codigo: "ESP-005", nome: "Ave" },
 ];
 
 // --- helpers ---
@@ -122,13 +118,14 @@ export function AdicionarFinalidadeTransitoPage({
   const [codigoMapa, setCodigoMapa] = useState("");
   const [emiteAcessoExterno, setEmiteAcessoExterno] = useState<string[]>([]);
   const [tiposDestino, setTiposDestino] = useState<string[]>([]);
-  const [especies, setEspecies] = useState<typeof ESPECIES_MOCK>([]);
+  const [especies, setEspecies] = useState<Especie[]>([]);
   const [modalEspecieAberto, setModalEspecieAberto] = useState(false);
 
   // --- procedencia/especie (RNE001 para zero ou mais instâncias) ---
   const [procedencias, setProcedencias] = useState<any[]>([]);
 
   const [isSucesso, setIsSucesso] = useState(false);
+  const [registroSalvo, setRegistroSalvo] = useState<FinalidadeTransitoVisual | null>(null);
 
   const handleCodigoMapaChange = (v: string) => {
     let apenasNumeros = v.replace(/\D/g, "").slice(0, 2);
@@ -142,19 +139,23 @@ export function AdicionarFinalidadeTransitoPage({
     );
   };
 
-	const finalidadeCadastrada = {
-		id: Date.now(),
-		finalidade: finalidadeTransito || "Abate",
-		codigoMapa: codigoMapa || "01",
-		tipoProcedencia: tiposProcedencia[0] || "Abatedouro Frigorífico",
-		tiposProcedencia: tiposProcedencia.length ? tiposProcedencia : ["Abatedouro Frigorífico"],
-		tipoDestino: tiposDestino[0] || "Abatedouro Frigorífico",
-		tiposDestino: tiposDestino.length ? tiposDestino : ["Abatedouro Frigorífico"],
-		especies: especies.length ? especies : [ESPECIES_MOCK[0]],
-		emiteAcessoExterno,
-		procedencias,
-		situacao: "Ativo",
-	};
+  const salvar = () => {
+    const especiesSelecionadas = especies.length
+      ? especies
+      : listarEspecies().filter((item) => item.situacao === "Ativo").slice(0, 1);
+    const salvo = salvarFinalidadeTransito({
+      finalidade: finalidadeTransito.trim() || "Abate",
+      codigoMapa: codigoMapa || "01",
+      tiposProcedencia: tiposProcedencia.length ? tiposProcedencia : ["Estabelecimento Agropecuário"],
+      emiteAcessoExterno,
+      tiposDestino: tiposDestino.length ? tiposDestino : ["Abatedouro Frigorífico"],
+      especieIds: especiesSelecionadas.map((item) => item.id),
+      procedencias,
+      situacao: "Ativo",
+    });
+    setRegistroSalvo(salvo);
+    setIsSucesso(true);
+  };
 
 	return (
 		<div className="min-h-screen bg-[#f2f3f5]">
@@ -183,7 +184,7 @@ export function AdicionarFinalidadeTransitoPage({
             </h1>
             <button
               type="button"
-              onClick={() => setIsSucesso(true)}
+              onClick={salvar}
               className="px-5 py-3 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-bold rounded-md transition shadow-sm"
             >
               Adicionar
@@ -300,7 +301,7 @@ export function AdicionarFinalidadeTransitoPage({
               title="Buscar Espécies"
               subtitle="Busque por uma ou mais espécies cadastradas no sistema:"
               icon={<Dna size={18} color={GREEN} />}
-              data={ESPECIES_MOCK}
+              data={listarEspecies().filter((item) => item.situacao === "Ativo")}
               columns={[
                 {
                   label: "Nome da Espécie",
@@ -401,7 +402,7 @@ export function AdicionarFinalidadeTransitoPage({
                 type="button"
                 onClick={() => {
                   setIsSucesso(false);
-                  onNavigate("visualizar-finalidade-transito", finalidadeCadastrada);
+                  onNavigate("visualizar-finalidade-transito", registroSalvo);
                 }}
                 className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition"
               >

@@ -2,6 +2,12 @@ import React, { useState } from "react";
 import { ArrowLeft, Info, Check, ChevronDown, ChevronUp } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { CheckboxGroup, FloatInput, FloatSelect, LargeTextArea } from "../../../components/ui/FormKit";
+import {
+  atualizarUnidadeMedida,
+  obterUnidadeMedida,
+  type TipoUnidadeMedida,
+  type UnidadeMedida,
+} from "./unidadeMedidaData";
 
 const GREEN = "#1A7A3C";
 
@@ -33,16 +39,20 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 export function EditarUnidadeMedidaPage({ dados, onLogout, onNavigate }: { dados?: any; onLogout: () => void; onNavigate: (screen: string, data?: any) => void; }) {
+  const registroInicial = obterUnidadeMedida(dados?.id) ?? { id: 1, ...EXEMPLO_UNIDADE, tipo: "Animal" as const, tipos: ["Animal" as const], situacao: "Ativo" as const };
   const [isSucesso, setIsSucesso] = useState(false);
-  const [nome, setNome] = useState(dados?.nome || EXEMPLO_UNIDADE.nome);
-  const [sigla, setSigla] = useState(dados?.sigla || EXEMPLO_UNIDADE.sigla);
-  const [tipos, setTipos] = useState<string[]>(dados?.tipos?.length ? dados.tipos : dados?.tipo ? [dados.tipo] : EXEMPLO_UNIDADE.tipos);
-  const [situacao, setSituacao] = useState(dados?.situacao || EXEMPLO_UNIDADE.situacao);
-  const [observacao, setObservacao] = useState(dados?.observacao || EXEMPLO_UNIDADE.observacao);
+  const [nome, setNome] = useState(dados?.nome || registroInicial.nome);
+  const [sigla, setSigla] = useState(dados?.sigla || registroInicial.sigla);
+  const [tipos, setTipos] = useState<string[]>(dados?.tipos?.length ? dados.tipos : dados?.tipo ? [dados.tipo] : registroInicial.tipos);
+  const [situacao, setSituacao] = useState(dados?.situacao || registroInicial.situacao);
+  const [observacao, setObservacao] = useState(dados?.observacao || registroInicial.observacao);
 
-  const dadosAtualizados = { ...dados, nome, sigla, tipo: tipos[0] || "Animal", tipos, situacao, observacao };
+  const dadosAtualizados: UnidadeMedida = { ...registroInicial, ...dados, nome, sigla, tipo: (tipos[0] || "Animal") as TipoUnidadeMedida, tipos: tipos as TipoUnidadeMedida[], situacao, observacao };
 
-  const handleSalvar = () => setIsSucesso(true);
+  const handleSalvar = () => {
+    atualizarUnidadeMedida(dadosAtualizados);
+    setIsSucesso(true);
+  };
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">

@@ -3,6 +3,13 @@ import {
   carregarHistoricoCadastro,
   registrarVersaoCadastro,
 } from "../../../components/ui/historicoCadastroStorage";
+import {
+  listarColecaoMock,
+  proximoIdNumerico,
+  salvarColecaoMock,
+} from "../../../mocks/mockDatabase";
+import { listarEspecies } from "../../Animal/Especie/especieData";
+import { listarItensReceita, obterItemReceita } from "../../Arrecadacao/ItemReceita/itemReceitaData";
 
 export type TipoCobranca =
   | "Por Cabeça"
@@ -117,27 +124,52 @@ const CLASSIFICACAO_RECEITA =
 
 export const ITENS_RECEITA_TAXA_MOCK: ItemReceitaTaxa[] = [
   {
-    id: "1",
-    codigo: "11226600-01",
+    id: "4",
+    codigo: "ITR-004",
     nome: "Taxa de Emissão GTA - Bovinos",
     classificacao: CLASSIFICACAO_RECEITA,
     quantidadeIndice: "0,20 UFEMG",
   },
   {
-    id: "2",
-    codigo: "11226600-02",
+    id: "5",
+    codigo: "ITR-005",
     nome: "Taxa de Emissão GTA - Aves",
     classificacao: CLASSIFICACAO_RECEITA,
     quantidadeIndice: "1,00 UFEMG",
   },
   {
-    id: "3",
-    codigo: "11226600-03",
+    id: "7",
+    codigo: "ITR-007",
     nome: "Taxa de Emissão GTA - Suínos",
     classificacao: CLASSIFICACAO_RECEITA,
-    quantidadeIndice: "2,00 UFEMG",
+    quantidadeIndice: "1 UFEMG",
+  },
+  {
+    id: "6",
+    codigo: "ITR-006",
+    nome: "Taxa de Emissão GTA - Equídeos",
+    classificacao: CLASSIFICACAO_RECEITA,
+    quantidadeIndice: "3 UFEMG",
   },
 ];
+
+export function listarEspeciesTaxa() {
+  return listarEspecies()
+    .filter((item) => item.situacao === "Ativo")
+    .map(({ id, codigo, nome, grupo }) => ({ id, codigo, nome, grupo }));
+}
+
+export function listarItensReceitaTaxa() {
+  return listarItensReceita()
+    .filter((item) => item.situacao === "Ativo")
+    .map((item) => ({
+      id: String(item.id),
+      codigo: item.codigo,
+      nome: item.descricao,
+      classificacao: item.receita,
+      quantidadeIndice: item.quantidadeIndiceFormatada,
+    }));
+}
 
 export const TIPOS_COBRANCA = [
   { value: "Por Cabeça", label: "Por Cabeça" },
@@ -219,7 +251,7 @@ export const TAXAS_EMISSAO_GTA_MOCK: TaxaEmissaoGta[] = [
   },
 ];
 
-let nextId = TAXAS_EMISSAO_GTA_MOCK.length + 1;
+const COLECAO = "taxas-emissao-documento-sanitario";
 
 export const criarTaxaVazia = (): TaxaEmissaoGtaDraft => ({
   tipoDocumentoSanitario: "" as TipoDocumentoSanitario,
@@ -239,14 +271,40 @@ export function modalidadeOposta(modalidade: ModalidadeFaixa) {
 }
 
 export function listarTaxasEmissaoDocumentoSanitario() {
-  return TAXAS_EMISSAO_GTA_MOCK;
+  return listarColecaoMock(COLECAO, TAXAS_EMISSAO_GTA_MOCK).map((taxa) => {
+    const especiesAtuais = listarEspeciesTaxa();
+    const atualizarItem = (item: ItemReceitaTaxa | null) => {
+      if (!item) return null;
+      const atual = obterItemReceita(Number(item.id));
+      return atual
+        ? {
+            id: String(atual.id),
+            codigo: atual.codigo,
+            nome: atual.descricao,
+            classificacao: atual.receita,
+            quantidadeIndice: atual.quantidadeIndiceFormatada,
+          }
+        : item;
+    };
+    return {
+      ...taxa,
+      especies: taxa.especies.map(
+        (especie) =>
+          especiesAtuais.find((item) => item.id === especie.id) ?? especie,
+      ),
+      itemReceita: atualizarItem(taxa.itemReceita),
+      itemReceitaLote: atualizarItem(taxa.itemReceitaLote),
+      itemReceitaAteLimite: atualizarItem(taxa.itemReceitaAteLimite),
+      itemReceitaAcimaLimite: atualizarItem(taxa.itemReceitaAcimaLimite),
+    };
+  });
 }
 
 function especiesEmConflito(
   taxa: Pick<TaxaEmissaoGta, "tipoDocumentoSanitario" | "especies">,
   ignorarId?: number,
 ) {
-  return TAXAS_EMISSAO_GTA_MOCK.find(
+  return listarTaxasEmissaoDocumentoSanitario().find(
     (cadastrada) =>
       cadastrada.id !== ignorarId &&
       cadastrada.tipoDocumentoSanitario === taxa.tipoDocumentoSanitario &&
@@ -257,6 +315,7 @@ function especiesEmConflito(
 }
 
 export function adicionarTaxaEmissaoGta(draft: TaxaEmissaoGtaDraft) {
+  const taxas = listarTaxasEmissaoDocumentoSanitario();
   const conflito = especiesEmConflito(draft);
   if (conflito) {
     const nomes = conflito.especies
@@ -270,27 +329,14 @@ export function adicionarTaxaEmissaoGta(draft: TaxaEmissaoGtaDraft) {
     };
   }
 
-  const novaTaxa: TaxaEmissaoGta = { ...draft, id: nextId++ };
-  TAXAS_EMISSAO_GTA_MOCK.push(novaTaxa);
-  salvarRegistroTaxa(novaTaxa);
+  const novaTaxa: TaxaEmissaoGta = { ...draft, id: proximoIdNumerico(taxas) };
+  salvarColecaoMock(COLECAO, [novaTaxa, ...taxas]);
   return { taxa: novaTaxa };
-}
-
-const PREFIXO_REGISTRO = "sidagro:taxa-emissao-documento-sanitario:";
-
-function chaveRegistroTaxa(id: number) {
-  return `${PREFIXO_REGISTRO}${id}`;
 }
 
 function chaveHistoricoTaxa(id: number) {
   return `taxa-emissao-documento-sanitario:${id}`;
 }
-
-function salvarRegistroTaxa(taxa: TaxaEmissaoGta) {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(chaveRegistroTaxa(taxa.id), JSON.stringify(taxa));
-}
-
 function normalizarTaxa(
   dados: Partial<TaxaEmissaoGta> & { especie?: EspecieTaxa },
   referencia: TaxaEmissaoGta,
@@ -317,21 +363,10 @@ function normalizarTaxa(
 export function obterTaxaEmissaoGta(
   dados?: (Partial<TaxaEmissaoGta> & { especie?: EspecieTaxa }) | null,
 ): TaxaEmissaoGta {
-  const referencia =
-    TAXAS_EMISSAO_GTA_MOCK.find((taxa) => taxa.id === dados?.id) ??
-    TAXAS_EMISSAO_GTA_MOCK[0];
-  const normalizada = normalizarTaxa(dados ?? {}, referencia);
-
-  if (typeof window === "undefined") return normalizada;
-
-  try {
-    const salva = window.localStorage.getItem(chaveRegistroTaxa(normalizada.id));
-    return salva
-      ? normalizarTaxa(JSON.parse(salva), normalizada)
-      : normalizada;
-  } catch {
-    return normalizada;
-  }
+  const taxas = listarTaxasEmissaoDocumentoSanitario();
+  const persistida = taxas.find((taxa) => taxa.id === dados?.id);
+  const referencia = persistida ?? taxas[0];
+  return normalizarTaxa(persistida ?? dados ?? {}, referencia);
 }
 
 function agoraFormatado() {
@@ -379,6 +414,7 @@ export function obterHistoricoTaxaEmissaoGta(taxa: TaxaEmissaoGta) {
 }
 
 export function atualizarTaxaEmissaoGta(taxaAtualizada: TaxaEmissaoGta) {
+  const taxas = listarTaxasEmissaoDocumentoSanitario();
   const conflito = especiesEmConflito(taxaAtualizada, taxaAtualizada.id);
   if (conflito) {
     const nomes = conflito.especies
@@ -398,11 +434,10 @@ export function atualizarTaxaEmissaoGta(taxaAtualizada: TaxaEmissaoGta) {
   const houveAlteracao =
     JSON.stringify(taxaAnterior) !== JSON.stringify(taxaAtualizada);
 
-  const index = TAXAS_EMISSAO_GTA_MOCK.findIndex(
-    (taxa) => taxa.id === taxaAtualizada.id,
+  salvarColecaoMock(
+    COLECAO,
+    taxas.map((taxa) => (taxa.id === taxaAtualizada.id ? taxaAtualizada : taxa)),
   );
-  if (index >= 0) TAXAS_EMISSAO_GTA_MOCK[index] = taxaAtualizada;
-  salvarRegistroTaxa(taxaAtualizada);
 
   if (houveAlteracao) {
     registrarVersaoCadastro({

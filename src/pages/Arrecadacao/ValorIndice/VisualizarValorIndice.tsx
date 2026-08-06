@@ -3,6 +3,7 @@ import { ArrowLeft, FileText, Hash, PlusCircle } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, Tabs } from "../../../components/ui/FormKit";
 import { IndiceTab } from "../Indice/IndiceTab";
+import { obterValorIndice } from "./valorIndiceData";
 
 interface VisualizarValorIndiceProps {
   dados: any; 
@@ -18,7 +19,7 @@ export function VisualizarValorIndicePage({ dados, onLogout, onNavigate }: Visua
   const [isModalIndiceOpen, setIsModalIndiceOpen] = useState(false);
 
   // Fallback de dados
-  const valorIndice = dados || {
+  const valorIndice = obterValorIndice(dados?.id) || dados || {
     id: 1,
     indice: "UFEMG",
     ano: "2026",

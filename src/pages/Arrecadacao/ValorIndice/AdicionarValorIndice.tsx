@@ -2,11 +2,16 @@ import React, { useState } from "react";
 import { ArrowLeft, Info } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, FloatSelect } from "../../../components/ui/FormKit";
+import { listarIndices } from "../Indice/indiceIndice";
+import { salvarValorIndice, type ValorIndiceVisual } from "./valorIndiceData";
 
 const GREEN = "#1A7A3C";
 
 // Listas de Opções
-const INDICES = [{ value: "UFEMG", label: "UFEMG" }];
+const indicesOptions = () =>
+  listarIndices()
+    .filter((item) => item.situacao === "Ativo")
+    .map((item) => ({ value: item.id, label: item.nome }));
 const MESES = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
   "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
@@ -36,7 +41,8 @@ export function AdicionarValorIndicePage({ onLogout, onNavigate, dados }: PagePr
   const isEdicao = !!dados; // Verifica se é modo edição
   
   // Estados preenchidos com os dados recebidos (se existirem)
-  const [indice, setIndice] = useState(dados?.indice ?? "");
+  const indiceInicial = dados?.indiceId ?? listarIndices().find((item) => item.nome === dados?.indice)?.id ?? "";
+  const [indice, setIndice] = useState(indiceInicial);
   const [mes, setMes] = useState(dados?.mes ?? "");
   const [ano, setAno] = useState(dados?.ano ?? "");
   // Formata o valor numérico para texto caso venha do mock
@@ -44,12 +50,23 @@ export function AdicionarValorIndicePage({ onLogout, onNavigate, dados }: PagePr
   const [situacao, setSituacao] = useState(dados?.situacao ?? "Ativo");
   
   const [isSucesso, setIsSucesso] = useState(false);
+  const [registroSalvo, setRegistroSalvo] = useState<ValorIndiceVisual | null>(null);
 
   const handleAdicionar = () => {
-    if (!indice) setIndice("UFEMG");
-    if (!mes) setMes("Julho");
-    if (!ano) setAno("2026");
-    if (!valor) setValor("5,2797");
+    const indiceId = indice || listarIndices().find((item) => item.situacao === "Ativo")?.id || "1";
+    const salvo = salvarValorIndice({
+      id: dados?.id,
+      indiceId,
+      mes: mes || "Janeiro",
+      ano: ano || "2026",
+      valor: Number((valor || "5,2797").replace(",", ".")),
+      situacao,
+    });
+    setIndice(salvo.indiceId);
+    setMes(salvo.mes);
+    setAno(salvo.ano);
+    setValor(String(salvo.valor).replace(".", ","));
+    setRegistroSalvo(salvo);
     setIsSucesso(true);
   };
 
@@ -107,7 +124,7 @@ export function AdicionarValorIndicePage({ onLogout, onNavigate, dados }: PagePr
               required
               value={indice}
               onChange={setIndice}
-              options={INDICES}
+              options={indicesOptions()}
             />
             <FloatInput
               label="Ano"
@@ -146,7 +163,7 @@ export function AdicionarValorIndicePage({ onLogout, onNavigate, dados }: PagePr
               {isEdicao ? "Valor por Índice atualizado com sucesso!" : "Valor por Índice cadastrado com sucesso!"}
             </h3>
             <p className="text-sm text-gray-500 mt-1">
-              O valor do índice {indice} referente a {mes}/{ano} foi {isEdicao ? "atualizado" : "cadastrado"}.
+              O valor do índice {registroSalvo?.indice} referente a {mes}/{ano} foi {isEdicao ? "atualizado" : "cadastrado"}.
             </p>
             <div className="flex gap-3 justify-center mt-6">
               <button
@@ -161,7 +178,7 @@ export function AdicionarValorIndicePage({ onLogout, onNavigate, dados }: PagePr
               <button
                 onClick={() => {
                   setIsSucesso(false);
-                  onNavigate("visualizar-valor-indice", { indice, mes, ano, valor, situacao });
+                  onNavigate("visualizar-valor-indice", registroSalvo);
                 }}
                 className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition"
               >

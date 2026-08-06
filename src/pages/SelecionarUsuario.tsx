@@ -1,6 +1,7 @@
-import { ArrowLeft, ChevronRight, ShieldCheck, Tractor } from "lucide-react";
+import { ArrowLeft, ChevronRight, RotateCcw, ShieldCheck, Tractor } from "lucide-react";
 import logo from "../imports/logo.png";
 import type { DemoUserRole } from "../contexts/DemoUserContext";
+import { restaurarDadosDemonstracao } from "../mocks/mockDatabase";
 
 const GREEN = "#1A7A3C";
 
@@ -25,6 +26,12 @@ const perfis = [
 ];
 
 export function SelecionarUsuarioPage({ onSelect, onBack }: SelecionarUsuarioProps) {
+	const restaurar = () => {
+		if (!window.confirm("Deseja restaurar todos os dados originais da demonstração?")) return;
+		restaurarDadosDemonstracao();
+		window.alert("Dados de demonstração restaurados com sucesso.");
+	};
+
 	return (
 		<div className="min-h-screen flex items-center justify-center bg-[#eaebee] px-4 py-8">
 			<div className="w-full max-w-[680px] bg-white rounded-2xl shadow-md px-6 sm:px-10 py-9">
@@ -68,7 +75,15 @@ export function SelecionarUsuarioPage({ onSelect, onBack }: SelecionarUsuarioPro
 					Esta tela é apenas demonstrativa. Desenvolvedores: não incluí-la na versão final do sistema.
 				</p>
 
-				<div className="mt-5 flex justify-center">
+				<div className="mt-5 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-6">
+					<button
+						type="button"
+						onClick={restaurar}
+						className="flex items-center gap-2 text-sm font-semibold text-gray-500 transition hover:text-[#1A7A3C]"
+					>
+						<RotateCcw size={16} />
+						Restaurar dados da demonstração
+					</button>
 					<button
 						type="button"
 						onClick={onBack}

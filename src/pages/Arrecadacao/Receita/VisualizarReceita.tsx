@@ -2,13 +2,13 @@ import { useState } from "react";
 import { ArrowLeft, Pencil, FileText, Layers, PlusCircle, ListTree } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, Tabs } from "../../../components/ui/FormKit";
-import { classificacaoLabel, Receita, RECEITAS_MOCK } from "./receitaData";
+import { classificacaoLabel, obterReceita, Receita } from "./receitaData";
 import { ItemReceitaTab } from "../ItemReceita/ItemReceitaTab";
 
 export function VisualizarReceitaPage({ dados, onLogout, onNavigate }: { dados?: Receita; onLogout: () => void; onNavigate: (screen: any, data?: any) => void }) {
   const [activeTab, setActiveTab] = useState("cadastro");
   const [isModalItemOpen, setIsModalItemOpen] = useState(false);
-  const receita = { ...RECEITAS_MOCK[0], ...(dados || {}) };
+  const receita = { ...(obterReceita(dados?.id) ?? obterReceita(null)!), ...(dados || {}) };
 
   const tabs = [
     { id: "cadastro", label: "Cadastro", icon: (active: boolean) => <FileText size={18} className={active ? "text-[#1A7A3C]" : "text-gray-400"} /> },

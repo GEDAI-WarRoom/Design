@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { ArrowLeft, ChevronDown, ChevronUp } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { CheckboxGroup, FloatInput } from "../../../components/ui/FormKit";
+import { obterFinalidadeTransito } from "./finalidadeTransitoData";
 
 const GREEN = "#1A7A3C";
 const TIPOS_LOCAL = ["Estabelecimento Agropecuário", "Evento Pecuário", "Abatedouro Frigorífico", "Revendedora de Animais Vivos", "Unidade de Vigilância Agropecuária", "Instituição de Ensino e Pesquisa", "Local de Pesagem", "Local de Realização de Exame", "Estabelecimento Genérico"];
@@ -22,7 +23,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 export function VisualizarFinalidadeTransitoPage({ dados, onLogout, onNavigate }: { dados?: any; onLogout: () => void; onNavigate: (screen: string, data?: any) => void }) {
-  const finalidade = {
+  const finalidade = obterFinalidadeTransito(dados?.id) ?? dados ?? {
     id: 1,
     finalidade: "Abate",
     codigoMapa: "01",
@@ -30,7 +31,6 @@ export function VisualizarFinalidadeTransitoPage({ dados, onLogout, onNavigate }
     tipoDestino: "Abatedouro Frigorífico",
     especies: [{ id: 1, codigo: "ESP-001", nome: "Bovino" }],
     situacao: "Ativo",
-    ...(dados || {}),
   };
   const tiposProcedencia = finalidade.tiposProcedencia?.length ? finalidade.tiposProcedencia : [finalidade.tipoProcedencia || "Abatedouro Frigorífico"];
   const tiposDestino = finalidade.tiposDestino?.length ? finalidade.tiposDestino : [finalidade.tipoDestino || "Abatedouro Frigorífico"];

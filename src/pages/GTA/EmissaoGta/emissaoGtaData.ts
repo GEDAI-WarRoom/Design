@@ -1,3 +1,17 @@
+import {
+  listarColecaoMock,
+  proximoIdNumerico,
+  salvarColecaoMock,
+} from "../../../mocks/mockDatabase";
+import { listarEspeciesParaGta } from "../../Animal/Especie/especieData";
+import { obterItemReceita } from "../../Arrecadacao/ItemReceita/itemReceitaData";
+import { obterValorVigenteIndice } from "../../Arrecadacao/ValorIndice/valorIndiceData";
+import { listarFinalidadesParaGta } from "../FinalidadeTransito/finalidadeTransitoData";
+import {
+  listarTaxasEmissaoDocumentoSanitario,
+  type ItemReceitaTaxa,
+} from "../TaxaEmissaoGta/taxaEmissaoGtaData";
+
 export type TipoFormularioGta = "Manual" | "Digital";
 export type TipoLocalGta =
   | "Estabelecimento Agropecuário"
@@ -18,7 +32,7 @@ export interface EntidadeGta {
 }
 
 export interface EspecieGta extends EntidadeGta {
-  grupo: "Bovídeos" | "Equídeos" | "Aves" | "Suídeos" | "Abelhas";
+  grupo: string;
   possuiSexoDefinido: boolean;
   possuiNucleo: boolean;
   faixasEtarias: string[];
@@ -152,6 +166,8 @@ export interface EmissaoGta extends EmissaoGtaFormValue {
   justificativaValidade: string;
   motivoCancelamento: EntidadeGta | null;
   observacaoCancelamento: string;
+  horaEmissao?: string;
+  codigoAutenticidade?: string;
 }
 
 export const TIPOS_FORMULARIO_GTA = ["Manual", "Digital"].map((valor) => ({
@@ -192,8 +208,8 @@ export const ESPECIES_GTA: EspecieGta[] = [
   {
     id: 2,
     codigo: "ESP-002",
-    nome: "Equino",
-    grupo: "Equídeos",
+    nome: "Bubalino",
+    grupo: "Bovídeos",
     possuiSexoDefinido: true,
     possuiNucleo: false,
     faixasEtarias: ["De 0 a 12 meses", "Acima de 12 meses"],
@@ -201,11 +217,11 @@ export const ESPECIES_GTA: EspecieGta[] = [
   {
     id: 3,
     codigo: "ESP-003",
-    nome: "Aves",
-    grupo: "Aves",
+    nome: "Equino",
+    grupo: "Equídeos",
     possuiSexoDefinido: true,
-    possuiNucleo: true,
-    faixasEtarias: ["Pintos de 1 dia", "Jovens", "Adultas"],
+    possuiNucleo: false,
+    faixasEtarias: ["De 0 a 12 meses", "Acima de 12 meses"],
   },
   {
     id: 4,
@@ -219,6 +235,15 @@ export const ESPECIES_GTA: EspecieGta[] = [
   {
     id: 5,
     codigo: "ESP-005",
+    nome: "Galinha",
+    grupo: "Aves",
+    possuiSexoDefinido: true,
+    possuiNucleo: true,
+    faixasEtarias: ["Pintos de 1 dia", "Jovens", "Adultas"],
+  },
+  {
+    id: 6,
+    codigo: "ESP-006",
     nome: "Abelha com Ferrão",
     grupo: "Abelhas",
     possuiSexoDefinido: false,
@@ -233,6 +258,14 @@ export const FINALIDADES_GTA: EntidadeGta[] = [
   { id: 3, codigo: "FIN-003", nome: "Reprodução" },
   { id: 4, codigo: "FIN-004", nome: "Evento" },
 ];
+
+export function listarEspeciesGta(): EspecieGta[] {
+  return listarEspeciesParaGta();
+}
+
+export function listarFinalidadesGta(especieId?: number): EntidadeGta[] {
+  return listarFinalidadesParaGta(especieId);
+}
 
 export const PESSOAS_GTA: EntidadeGta[] = [
   { id: 1, nome: "José Aarão Neto", documento: "055.145.986-99" },
@@ -598,41 +631,100 @@ function criarRegistroInicial(
     justificativaValidade: "",
     motivoCancelamento: null,
     observacaoCancelamento: "",
+    horaEmissao: situacao === "Emitida" ? "14:30" : "",
+    codigoAutenticidade: `31${String(184526 + id - 1).padStart(18, "0")}`,
   };
 }
 
 export const EMISSOES_GTA_MOCK: EmissaoGta[] = [
   criarRegistroInicial(1, "MG - 184526", ESPECIES_GTA[0], FINALIDADES_GTA[0], "Gravada"),
-  criarRegistroInicial(2, "MG - 184527", ESPECIES_GTA[1], FINALIDADES_GTA[3], "Emitida"),
+  criarRegistroInicial(2, "MG - 184527", ESPECIES_GTA[2], FINALIDADES_GTA[3], "Emitida"),
   criarRegistroInicial(3, "MG - 184528", ESPECIES_GTA[3], FINALIDADES_GTA[0], "Gravada"),
-  criarRegistroInicial(4, "MG - 184529", ESPECIES_GTA[2], FINALIDADES_GTA[1], "Gravada"),
+  criarRegistroInicial(4, "MG - 184529", ESPECIES_GTA[4], FINALIDADES_GTA[1], "Gravada"),
   criarRegistroInicial(5, "MG - 184530", ESPECIES_GTA[0], FINALIDADES_GTA[2], "Emitida"),
 ];
 
-let proximoId = 6;
-let proximoNumero = 184531;
+const COLECAO = "emissoes-gta";
+
+export function listarEmissoesGta() {
+  return listarColecaoMock(COLECAO, EMISSOES_GTA_MOCK);
+}
+
+function salvarEmissaoGta(registro: EmissaoGta) {
+  const emissoes = listarEmissoesGta();
+  salvarColecaoMock(
+    COLECAO,
+    emissoes.some((item) => item.id === registro.id)
+      ? emissoes.map((item) => (item.id === registro.id ? registro : item))
+      : [registro, ...emissoes],
+  );
+  return registro;
+}
+
+function valorUnitarioItemTaxa(itemTaxa: ItemReceitaTaxa | null) {
+  if (!itemTaxa) return 0;
+  const item = obterItemReceita(Number(itemTaxa.id));
+  if (!item) return 0;
+  const vigente = obterValorVigenteIndice(item.indiceId, new Date().toISOString().slice(0, 10));
+  return item.quantidadeIndice * (vigente?.valor ?? 0);
+}
+
+export function calcularValorGta(form: EmissaoGtaFormValue) {
+  if (form.motivoIsencaoTaxa || !form.especie) return 0;
+  const animais = totalAnimaisGta(form);
+  const hoje = new Date().toISOString().slice(0, 10);
+  const taxa = listarTaxasEmissaoDocumentoSanitario()
+    .filter((item) => item.situacao === "Ativo" && item.tipoDocumentoSanitario === "GTA" && item.especie.id === form.especie?.id && item.dataInicioVigencia <= hoje)
+    .sort((a, b) => b.dataInicioVigencia.localeCompare(a.dataInicioVigencia))[0];
+  if (!taxa) return 0;
+
+  if (taxa.tipoCobranca === "Por Cabeça") return animais * valorUnitarioItemTaxa(taxa.itemReceita);
+  if (taxa.tipoCobranca === "Por Documento") return valorUnitarioItemTaxa(taxa.itemReceita);
+  if (taxa.tipoCobranca === "Por Lotes") {
+    const tamanho = Math.max(1, Number(taxa.tamanhoLote));
+    return Math.ceil(animais / tamanho) * valorUnitarioItemTaxa(taxa.itemReceitaLote);
+  }
+
+  const limite = Math.max(0, Number(taxa.limiteFaixa));
+  const ate = Math.min(animais, limite);
+  const acima = Math.max(0, animais - limite);
+  const multiplicador = (quantidade: number, modalidade: string) =>
+    modalidade === "Cobrar por Documento" ? (quantidade > 0 ? 1 : 0) : quantidade;
+  return (
+    multiplicador(ate, taxa.cobrancaAteLimite) * valorUnitarioItemTaxa(taxa.itemReceitaAteLimite) +
+    multiplicador(acima, taxa.cobrancaAcimaLimite) * valorUnitarioItemTaxa(taxa.itemReceitaAcimaLimite)
+  );
+}
 
 export function adicionarEmissaoGta(form: EmissaoGtaFormValue): EmissaoGta {
+  const emissoes = listarEmissoesGta();
+  const proximoNumero = Math.max(
+    184530,
+    ...emissoes.map((item) => Number(item.serieNumero.match(/\d+/g)?.at(-1) ?? 0)),
+  ) + 1;
+  const valorCalculado = calcularValorGta(form);
   const nova: EmissaoGta = {
     ...form,
-    id: proximoId++,
-    serieNumero: `MG - ${String(proximoNumero++).padStart(6, "0")}`,
+    id: proximoIdNumerico(emissoes),
+    serieNumero: `MG - ${String(proximoNumero).padStart(6, "0")}`,
     dataEmissao: new Date().toISOString().slice(0, 10),
     situacao: "Gravada",
-    necessitaPagamento: !form.motivoIsencaoTaxa,
-    valorGta: form.motivoIsencaoTaxa ? 0 : form.valorGta || 8.56,
+    necessitaPagamento: !form.motivoIsencaoTaxa && valorCalculado > 0,
+    valorGta: valorCalculado,
     dataValidade: "",
     justificativaValidade: "",
     motivoCancelamento: null,
     observacaoCancelamento: "",
+    horaEmissao: "",
+    codigoAutenticidade: "",
   };
-  EMISSOES_GTA_MOCK.unshift(nova);
-  return nova;
+  return salvarEmissaoGta(nova);
 }
 
 export function obterEmissaoGta(id?: number | null) {
-  if (id == null) return EMISSOES_GTA_MOCK[0] ?? null;
-  return EMISSOES_GTA_MOCK.find((item) => item.id === id) ?? null;
+  const emissoes = listarEmissoesGta();
+  if (id == null) return emissoes[0] ?? null;
+  return emissoes.find((item) => item.id === id) ?? null;
 }
 
 export function copiarEmissaoGta(registro: EmissaoGta): EmissaoGtaFormValue {
@@ -646,6 +738,8 @@ export function copiarEmissaoGta(registro: EmissaoGta): EmissaoGtaFormValue {
     justificativaValidade: _justificativaValidade,
     motivoCancelamento: _motivoCancelamento,
     observacaoCancelamento: _observacaoCancelamento,
+    horaEmissao: _horaEmissao,
+    codigoAutenticidade: _codigoAutenticidade,
     ...form
   } = registro;
   return {
@@ -661,9 +755,7 @@ export function pagarEmissaoGta(id: number) {
   const registro = obterEmissaoGta(id);
   if (!registro || registro.situacao !== "Gravada" || !registro.necessitaPagamento)
     return registro;
-  registro.situacao = "Paga";
-  registro.necessitaPagamento = false;
-  return registro;
+  return salvarEmissaoGta({ ...registro, situacao: "Paga", necessitaPagamento: false });
 }
 
 export function emitirEmissaoGta(
@@ -673,11 +765,31 @@ export function emitirEmissaoGta(
 ) {
   const registro = obterEmissaoGta(id);
   if (!registro || registro.situacao === "Cancelada") return null;
-  registro.situacao = "Emitida";
-  registro.dataValidade = dataValidade;
-  registro.justificativaValidade = justificativaValidade;
-  registro.necessitaPagamento = false;
-  return registro;
+  const agora = new Date();
+  const horaEmissao = new Intl.DateTimeFormat("pt-BR", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(agora);
+  const codigoAutenticidade = [
+    "31",
+    String(registro.id).padStart(8, "0"),
+    agora.getFullYear(),
+    String(agora.getMonth() + 1).padStart(2, "0"),
+    String(agora.getDate()).padStart(2, "0"),
+    String(agora.getHours()).padStart(2, "0"),
+    String(agora.getMinutes()).padStart(2, "0"),
+  ].join("");
+  return salvarEmissaoGta({
+    ...registro,
+    situacao: "Emitida",
+    dataEmissao: agora.toISOString().slice(0, 10),
+    dataValidade,
+    justificativaValidade,
+    necessitaPagamento: false,
+    horaEmissao,
+    codigoAutenticidade,
+  });
 }
 
 export function cancelarEmissaoGta(
@@ -687,11 +799,7 @@ export function cancelarEmissaoGta(
 ) {
   const registro = obterEmissaoGta(id);
   if (!registro || registro.situacao === "Cancelada") return null;
-  registro.situacao = "Cancelada";
-  registro.motivoCancelamento = motivo;
-  registro.observacaoCancelamento = observacao;
-  registro.necessitaPagamento = false;
-  return registro;
+  return salvarEmissaoGta({ ...registro, situacao: "Cancelada", motivoCancelamento: motivo, observacaoCancelamento: observacao, necessitaPagamento: false });
 }
 
 export function formatarDataGta(data: string) {

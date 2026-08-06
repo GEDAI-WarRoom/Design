@@ -15,30 +15,13 @@ import {
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatSelect } from "../../../components/ui/FormKit";
+import { listarUnidadesMedida, type UnidadeMedida } from "./unidadeMedidaData";
 
 const GREEN = "#1A7A3C";
 
 // ==========================================================
 // DADOS DA LISTAGEM (substituir por API)
 // ==========================================================
-interface UnidadeMedida {
-  id: number;
-  nome: string;
-  sigla: string;
-  tipo: "Animal" | "Vegetal" | "Agrotóxico"; // 💡 Adicionado Tipo
-  tipos: Array<"Animal" | "Vegetal" | "Agrotóxico">;
-  observacao: string;
-  situacao: "Ativo" | "Inativo";
-}
-
-const UNIDADES_MOCK: UnidadeMedida[] = [
-  { id: 1, nome: "Quilograma", sigla: "kg", tipo: "Animal", tipos: ["Animal", "Vegetal"], observacao: "Unidade utilizada para registrar peso em cadastros e movimentações.", situacao: "Ativo" },
-  { id: 2, nome: "Grama", sigla: "g", tipo: "Vegetal", tipos: ["Vegetal"], observacao: "Unidade utilizada para pequenas quantidades de produtos vegetais.", situacao: "Ativo" },
-  { id: 3, nome: "Litro", sigla: "L", tipo: "Agrotóxico", tipos: ["Agrotóxico"], observacao: "Unidade de volume aplicada ao controle de produtos líquidos.", situacao: "Ativo" },
-  { id: 4, nome: "Mililitro", sigla: "mL", tipo: "Animal", tipos: ["Animal"], observacao: "Unidade utilizada para dosagens de baixo volume.", situacao: "Ativo" },
-  { id: 5, nome: "Dose", sigla: "ds", tipo: "Animal", tipos: ["Animal"], observacao: "Unidade aplicada ao registro de vacinas e outros insumos.", situacao: "Ativo" },
-  { id: 6, nome: "Unidade", sigla: "un", tipo: "Vegetal", tipos: ["Vegetal"], observacao: "Cadastro inativo mantido para consulta ao histórico.", situacao: "Inativo" },
-];
 
 const TIPOS_UNIDADE = [
   { value: "Animal", label: "Animal" },
@@ -120,7 +103,7 @@ export function UnidadeMedidaPage({ onLogout, onNavigate }: PageProps) {
     else { setSortKey(key); setSortAsc(true); }
   }
 
-  const filtrados = UNIDADES_MOCK.filter((u) => {
+  const filtrados = listarUnidadesMedida().filter((u) => {
     const termo = busca.trim().toLowerCase();
     const matchBusca = termo === "" || (u.nome ?? "").toLowerCase().includes(termo) || (u.sigla ?? "").toLowerCase().includes(termo);
     const matchTipo = tipo === "" || u.tipo === tipo; // 💡 Lógica de filtro do tipo

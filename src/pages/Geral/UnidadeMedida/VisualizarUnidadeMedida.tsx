@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { ArrowLeft, Pencil, ChevronDown, ChevronUp } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { CheckboxGroup, FloatInput, LargeTextArea } from "../../../components/ui/FormKit";
+import { obterUnidadeMedida } from "./unidadeMedidaData";
 
 const GREEN = "#1A7A3C";
 
@@ -27,13 +28,15 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 export function VisualizarUnidadeMedidaPage({ dados, onLogout, onNavigate }: { dados?: any; onLogout: () => void; onNavigate: (s: string, d?: any) => void; }) {
+  const persistida = obterUnidadeMedida(dados?.id);
   const unidade = {
+    ...(persistida || {}),
     ...(dados || {}),
-    nome: dados?.nome || EXEMPLO_UNIDADE.nome,
-    sigla: dados?.sigla || EXEMPLO_UNIDADE.sigla,
-    tipos: dados?.tipos?.length ? dados.tipos : dados?.tipo ? [dados.tipo] : EXEMPLO_UNIDADE.tipos,
-    situacao: dados?.situacao || EXEMPLO_UNIDADE.situacao,
-    observacao: dados?.observacao || EXEMPLO_UNIDADE.observacao,
+    nome: dados?.nome || persistida?.nome || EXEMPLO_UNIDADE.nome,
+    sigla: dados?.sigla || persistida?.sigla || EXEMPLO_UNIDADE.sigla,
+    tipos: dados?.tipos?.length ? dados.tipos : dados?.tipo ? [dados.tipo] : persistida?.tipos || EXEMPLO_UNIDADE.tipos,
+    situacao: dados?.situacao || persistida?.situacao || EXEMPLO_UNIDADE.situacao,
+    observacao: dados?.observacao || persistida?.observacao || EXEMPLO_UNIDADE.observacao,
   };
 
   return (

@@ -216,7 +216,7 @@ export function VisualizarEmissaoGtaPage({
       window.alert("A GTA estará disponível para download após a emissão.");
       return;
     }
-    downloadMock("GTA");
+    onNavigate("documento-emissao-gta", emissao);
   };
 
   return (

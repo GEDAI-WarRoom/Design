@@ -4,7 +4,7 @@ import { Navbar } from "../../../components/Navbar";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
 import { FloatSelect } from "../../../components/ui/FormKit";
 import {
-  ESPECIES_TAXA_MOCK,
+  listarEspeciesTaxa,
   TIPOS_COBRANCA,
   formatarData,
   listarTaxasEmissaoDocumentoSanitario,
@@ -144,7 +144,7 @@ export function TaxaEmissaoGtaPage({ onLogout, onNavigate }: { onLogout: () => v
                 label="Espécie"
                 placeholder="Busque por espécie ou grupo"
                 value={especie ? `${especie.nome}` : ""}
-                data={ESPECIES_TAXA_MOCK}
+                data={listarEspeciesTaxa()}
                 searchKeys={["codigo", "nome", "grupo"]}
                 columns={[
                   { label: "Espécie", key: "nome" },

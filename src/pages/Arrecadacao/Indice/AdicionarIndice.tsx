@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { ArrowLeft, ChevronUp, ChevronDown, Info } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, FloatSelect } from "../../../components/ui/FormKit";
-import { Indice, SITUACOES_OPCOES } from "./indiceIndice";
+import { Indice, salvarIndice } from "./indiceIndice";
 
 const GREEN = "#1A7A3C";
 
@@ -30,10 +30,17 @@ export function AdicionarIndice({ onLogout, onNavigate, data }: AdicionarIndiceP
   const [nome, setNome] = useState(data?.nome ?? "");
   const [situacao, setSituacao] = useState<string>(data?.situacao ?? "Ativo");
   const [isSucesso, setIsSucesso] = useState(false);
+  const [registroSalvo, setRegistroSalvo] = useState<Indice | null>(null);
 
   const salvar = () => {
-    if (!nome.trim()) setNome("UFEMG");
-    if (!situacao) setSituacao("Ativo");
+    const registro = salvarIndice({
+      id: data?.id,
+      nome: nome.trim() || "UFEMG",
+      situacao: (situacao || "Ativo") as Indice["situacao"],
+    });
+    setNome(registro.nome);
+    setSituacao(registro.situacao);
+    setRegistroSalvo(registro);
     setIsSucesso(true);
   };
 
@@ -78,7 +85,7 @@ export function AdicionarIndice({ onLogout, onNavigate, data }: AdicionarIndiceP
               <button type="button" onClick={() => onNavigate("indice")} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition">
                 Voltar
               </button>
-              <button type="button" onClick={() => onNavigate("visualizar-indice", { nome, situacao })} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">
+              <button type="button" onClick={() => onNavigate("visualizar-indice", registroSalvo)} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">
                 Visualizar
               </button>
             </div>

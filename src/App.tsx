@@ -3,6 +3,7 @@ import { isRouteAllowed, useDemoUser } from "./contexts/DemoUserContext";
 import { DashboardPage } from "./pages/Dashboard";
 import { LoginPage } from "./pages/Login";
 import { SelecionarUsuarioPage } from "./pages/SelecionarUsuario";
+import { useMockDatabaseRevision } from "./mocks/useMockDatabase";
 
 // GERAL
 import { VisualizarFinalidadeTransitoPage } from "./pages/GTA/FinalidadeTransito/VisualizarFinalidadeTransito";
@@ -262,6 +263,7 @@ import { AdicionarIndice } from "./pages/Arrecadacao/Indice/AdicionarIndice";
 import { Indice } from "./pages/Arrecadacao/Indice/Indice";
 import { AdicionarItemReceitaPage } from "./pages/Arrecadacao/ItemReceita/AdicionarItemReceita";
 import { ItemReceitaPage } from "./pages/Arrecadacao/ItemReceita/ItemReceita";
+import { VisualizarItemReceitaPage } from "./pages/Arrecadacao/ItemReceita/VisualizarItemReceita";
 import { AdicionarLotePagamentoPage } from "./pages/Arrecadacao/LotePagamento/AdicionarLotePagamento";
 import { LotePagamentoPage } from "./pages/Arrecadacao/LotePagamento/LotePagamento";
 import { VisualizarDaeLotePagamentoPage } from "./pages/Arrecadacao/LotePagamento/VisualizarDaeLotePagamento";
@@ -276,6 +278,7 @@ import { AdicionarDistribuicaoFormulariosGta } from "./pages/GTA/DistribuicaoFor
 import { DistribuicaoFormulariosGta } from "./pages/GTA/DistribuicaoFormulariosGta/DistribuicaoFormulariosGta";
 import { AdicionarEmissaoGtaPage } from "./pages/GTA/EmissaoGta/AdicionarEmissaoGta";
 import { CancelarEmissaoGtaPage } from "./pages/GTA/EmissaoGta/CancelarEmissaoGta";
+import { DocumentoEmissaoGtaPage } from "./pages/GTA/EmissaoGta/DocumentoEmissaoGta";
 import { EmissaoGtaPage } from "./pages/GTA/EmissaoGta/EmissaoGta";
 import { EmitirEmissaoGtaPage } from "./pages/GTA/EmissaoGta/EmitirEmissaoGta";
 import { PagarEmissaoGtaPage } from "./pages/GTA/EmissaoGta/PagarEmissaoGta";
@@ -374,6 +377,7 @@ export type Screen =
   | "adicionar-emissao-ata"
   | "editar-emissao-ata"
   | "visualizar-emissao-ata"
+  | "documento-emissao-gta"
   | "visualizar-valor-indice"
   | "login"
   | "selecionar-usuario"
@@ -553,6 +557,8 @@ export type Screen =
   | "editar-fundo-arrecadacao"
   | "item-receita"
   | "adicionar-item-receita"
+  | "visualizar-item-receita"
+  | "editar-item-receita"
   | "notificacoes-estabelecimentos"
   | "lote-pagamento"
   | "adicionar-lote-pagamento"
@@ -798,6 +804,7 @@ export type Screen =
   | "visualizar-aeroporto-porto";
 
 export default function App() {
+	useMockDatabaseRevision();
 	const [screen, setScreen] = useState<Screen>("login");
 	const [screenData, setScreenData] = useState<any>(null);
 	const { role, selectRole, clearRole } = useDemoUser();
@@ -1519,6 +1526,7 @@ export default function App() {
 				<VisualizarEspeciePage
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
+					data={screenData}
 				/>
 			);
 		case "editar-especie":
@@ -1526,6 +1534,7 @@ export default function App() {
 				<EditarEspeciePage
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
+					data={screenData}
 				/>
 			);
 		case "nucleo-producao":
@@ -1901,6 +1910,14 @@ export default function App() {
 					onNavigate={handleNavigate}
 				/>
 			);
+		case "documento-emissao-gta":
+			return (
+				<DocumentoEmissaoGtaPage
+					dados={screenData}
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
 		case "emitir-emissao-gta":
 			return (
 				<EmitirEmissaoGtaPage
@@ -2146,6 +2163,22 @@ export default function App() {
 				<AdicionarItemReceitaPage
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
+				/>
+			);
+		case "editar-item-receita":
+			return (
+				<AdicionarItemReceitaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					data={screenData}
+				/>
+			);
+		case "visualizar-item-receita":
+			return (
+				<VisualizarItemReceitaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					data={screenData}
 				/>
 			);
 		case "lote-pagamento":

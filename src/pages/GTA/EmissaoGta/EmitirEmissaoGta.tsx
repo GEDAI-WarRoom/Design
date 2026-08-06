@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Check, FileInput } from "lucide-react";
+import { ArrowLeft, FileInput } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, LargeTextArea } from "../../../components/ui/FormKit";
 import { EmissaoGtaForm } from "./EmissaoGtaForm";
@@ -21,7 +21,7 @@ export function EmitirEmissaoGtaPage({
   onNavigate: (screen: any, data?: any) => void;
 }) {
   const registroInicial = dados ?? obterEmissaoGta(null);
-  const [emissao, setEmissao] = useState<EmissaoGta | null>(registroInicial);
+  const [emissao] = useState<EmissaoGta | null>(registroInicial);
   const [dataValidade, setDataValidade] = useState(
     registroInicial?.dataValidade || dataPadraoValidade(),
   );
@@ -29,7 +29,6 @@ export function EmitirEmissaoGtaPage({
     registroInicial?.justificativaValidade ?? "",
   );
   const [tentouEmitir, setTentouEmitir] = useState(false);
-  const [sucesso, setSucesso] = useState(false);
 
   if (!emissao) return null;
 
@@ -49,8 +48,7 @@ export function EmitirEmissaoGtaPage({
       justificativa,
     );
     if (!atualizada) return;
-    setEmissao({ ...atualizada });
-    setSucesso(true);
+    onNavigate("documento-emissao-gta", atualizada);
   };
 
   return (
@@ -149,29 +147,6 @@ export function EmitirEmissaoGtaPage({
         </section>
       </main>
 
-      {sucesso && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
-            <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4">
-              <Check size={28} className="text-[#1A7A3C]" strokeWidth={3} />
-            </div>
-            <h2 className="text-lg font-bold text-gray-900">
-              GTA emitida com sucesso!
-            </h2>
-            <p className="text-sm text-gray-500 mt-1">
-              A situação da GTA {emissao.serieNumero} foi alterada para
-              Emitida.
-            </p>
-            <button
-              type="button"
-              onClick={() => onNavigate("visualizar-emissao-gta", emissao)}
-              className="px-5 h-11 rounded-md bg-[#1A7A3C] text-white text-sm font-semibold mt-6"
-            >
-              Visualizar
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

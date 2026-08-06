@@ -18,9 +18,9 @@ import {
   MultiSearchModal,
 } from "../../../components/ui/FormKit";
 import {
-  ESPECIES_TAXA_MOCK,
   FINALIDADES_TAXA_MOCK,
-  ITENS_RECEITA_TAXA_MOCK,
+  listarEspeciesTaxa,
+  listarItensReceitaTaxa,
   MODALIDADES_FAIXA,
   OPCOES_COBRANCA_TAXA,
   TIPOS_COBRANCA,
@@ -97,8 +97,8 @@ function ItemReceitaField({
           label={label}
           placeholder="Buscar item de receita"
           value={item?.nome ?? ""}
-          data={ITENS_RECEITA_TAXA_MOCK}
-          searchKeys={["codigo", "nome", "classificacao"]}
+          data={listarItensReceitaTaxa()}
+          searchKeys={["codigo", "nome", "classificacao", "quantidadeIndice"]}
           columns={[
             { label: "Item de Receita", key: "nome" },
             { label: "Tipo", key: "classificacao" },
@@ -480,7 +480,7 @@ export function TaxaEmissaoGtaForm({
         title="Buscar Espécies"
         subtitle="Busque e selecione uma ou mais espécies aplicáveis:"
         icon={<Dna size={18} className="text-[#1A7A3C]" />}
-        data={ESPECIES_TAXA_MOCK}
+        data={listarEspeciesTaxa()}
         columns={[
           { label: "Espécie", key: "nome" },
           { label: "Grupo", key: "grupo" },

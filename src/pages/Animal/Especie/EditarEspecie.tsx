@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { ArrowLeft, Info, Check } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, FloatSelect, SimNao } from "../../../components/ui/FormKit";
+import { obterEspecie, salvarEspecie, type RespostaSimNao } from "./especieData";
 
 const GREEN = "#1A7A3C";
 
@@ -63,7 +64,8 @@ export function EditarEspeciePage({
   data,
 }: PageProps) {
   // Suporte a props de dados recebidas por parâmetro
-  const initialData = dados || data || {
+  const recebido = dados || data;
+  const initialData = obterEspecie(recebido?.id) || recebido || {
     grupo: "Bovídeos",
     nome: "Bovino",
     nomeCientifico: "Bos taurus",
@@ -99,6 +101,7 @@ export function EditarEspeciePage({
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const handleSalvarConfirmado = () => {
+    salvarEspecie(getDadosAtualizados());
     setShowConfirmModal(false);
     setShowSuccessModal(true);
   };
@@ -110,10 +113,11 @@ export function EditarEspeciePage({
     nomeCientifico,
     codigoMapa,
     maxAnimaisGta,
-    controleRebanhoNucleo,
-    sexoDefinido,
-    emissaoGtaHabilitado,
-    utilizaFormularioGta,
+    controleRebanhoNucleo: controleRebanhoNucleo as RespostaSimNao,
+    sexoDefinido: sexoDefinido as RespostaSimNao,
+    emissaoGtaHabilitado: emissaoGtaHabilitado as RespostaSimNao,
+    utilizaFormularioGta: utilizaFormularioGta as RespostaSimNao,
+    faixasEtarias: initialData.faixasEtarias ?? ["Animais"],
     situacao: isCadastroAtivo ? "Ativo" : "Inativo",
   });
 

@@ -3,6 +3,11 @@ import {
   carregarHistoricoCadastro,
   registrarVersaoCadastro,
 } from "../../../components/ui/historicoCadastroStorage";
+import {
+  listarColecaoMock,
+  proximoIdNumerico,
+  salvarColecaoMock,
+} from "../../../mocks/mockDatabase";
 
 export interface IsencaoTaxaDocumentoSanitario {
   id: number;
@@ -18,28 +23,20 @@ const ISENCOES_INICIAIS: IsencaoTaxaDocumentoSanitario[] = [
   { id: 5, motivo: "Uso científico/laboratorial", situacao: "Inativo" },
 ];
 
-const CHAVE_REGISTROS = "sidagro:isencoes-taxa-documento-sanitario";
+const COLECAO = "isencoes-taxa-documento-sanitario";
 
 function chaveHistorico(id: number) {
   return `isencao-taxa-documento-sanitario:${id}`;
 }
 
-function salvarRegistros(registros: IsencaoTaxaDocumentoSanitario[]) {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(CHAVE_REGISTROS, JSON.stringify(registros));
+export function listarIsencoesTaxaDocumentoSanitario() {
+  return listarColecaoMock(COLECAO, ISENCOES_INICIAIS);
 }
 
-export function listarIsencoesTaxaDocumentoSanitario() {
-  if (typeof window === "undefined") return ISENCOES_INICIAIS;
-
-  try {
-    const registros = window.localStorage.getItem(CHAVE_REGISTROS);
-    return registros
-      ? (JSON.parse(registros) as IsencaoTaxaDocumentoSanitario[])
-      : ISENCOES_INICIAIS;
-  } catch {
-    return ISENCOES_INICIAIS;
-  }
+export function listarIsencoesParaGta() {
+  return listarIsencoesTaxaDocumentoSanitario()
+    .filter((item) => item.situacao === "Ativo")
+    .map((item) => ({ id: item.id, nome: item.motivo }));
 }
 
 export function obterIsencaoTaxaDocumentoSanitario(
@@ -64,17 +61,13 @@ export function adicionarIsencaoTaxaDocumentoSanitario(
   motivo: string,
 ): IsencaoTaxaDocumentoSanitario {
   const registros = listarIsencoesTaxaDocumentoSanitario();
-  const proximoId = registros.reduce(
-    (maiorId, registro) => Math.max(maiorId, registro.id),
-    0,
-  ) + 1;
   const novaIsencao: IsencaoTaxaDocumentoSanitario = {
-    id: proximoId,
+    id: proximoIdNumerico(registros),
     motivo: motivo.trim(),
     situacao: "Ativo",
   };
 
-  salvarRegistros([novaIsencao, ...registros]);
+  salvarColecaoMock(COLECAO, [novaIsencao, ...registros]);
   return novaIsencao;
 }
 
@@ -143,7 +136,7 @@ export function atualizarIsencaoTaxaDocumentoSanitario(
       )
     : [dadosAtuais, ...registros];
 
-  salvarRegistros(registrosAtualizados);
+  salvarColecaoMock(COLECAO, registrosAtualizados);
   registrarVersaoCadastro({
     chaveCadastro: chaveHistorico(dadosAtuais.id),
     historicoInicial: criarHistoricoInicial(dadosAnteriores),
