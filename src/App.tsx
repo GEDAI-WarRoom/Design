@@ -219,6 +219,12 @@ import { AdicionarVendaComEntradaInsumosExamesPage } from "./pages/Exame/VendaCo
 import { EditarVendaComEntradaInsumosExamesPage } from "./pages/Exame/VendaComEntradaInsumosExames/EditarVendaComEntradaInsumosExames";
 import { VendaComEntradaInsumosExamesPage } from "./pages/Exame/VendaComEntradaInsumosExames/VendaComEntradaInsumosExames";
 import { VisualizarVendaComEntradaInsumosExamesPage } from "./pages/Exame/VendaComEntradaInsumosExames/VisualizarVendaComEntradaInsumosExames";
+import {
+  AdicionarVendaComSaidaInsumoPage,
+  EditarVendaComSaidaInsumoPage,
+  VendaComSaidaInsumoPage,
+  VisualizarVendaComSaidaInsumoPage,
+} from "./pages/Exame/VendaComSaidaInsumo/VendaComSaidaInsumo";
 import { AdicionarVendaComEntradaVacinaPage } from "./pages/Vacinacao/VendaComEntradaVacina/AdicionarVendaComEntradaVacina";
 import { VendaComEntradaVacinaPage } from "./pages/Vacinacao/VendaComEntradaVacina/VendaComEntradaVacina";
 import { AdicionarVendaComSaidaVacinaPage } from "./pages/Vacinacao/VendaComSaidaVacina/AdicionarVendaComSaidaVacina";
@@ -332,6 +338,10 @@ export type Screen =
   | "editar-laboratorio"
   | "visualizar-venda-saida-vacina"
   | "editar-venda-saida-vacina"
+  | "venda-saida-insumo"
+  | "adicionar-venda-saida-insumo"
+  | "visualizar-venda-saida-insumo"
+  | "editar-venda-saida-insumo"
   | "visualizar-venda-entrada-vacina"
   | "editar-venda-entrada-vacina"
   | "visualizar-partilha-vacina"
@@ -855,6 +865,12 @@ export default function App() {
       return <VisualizarVendaComSaidaVacinaPage key={`visualizar-venda-saida-vacina-${screenData?.id ?? "novo"}`} dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "editar-venda-saida-vacina":
       return <EditarVendaComSaidaVacinaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+
+    // VENDA COM SAÍDA DE INSUMO
+    case "visualizar-venda-saida-insumo":
+      return <VisualizarVendaComSaidaInsumoPage key={`visualizar-venda-saida-insumo-${screenData?.id ?? "novo"}`} dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-venda-saida-insumo":
+      return <EditarVendaComSaidaInsumoPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
 
     // VENDA COM ENTRADA DE VACINA
     case "visualizar-venda-entrada-vacina":
@@ -2394,6 +2410,10 @@ export default function App() {
       return (
         <VendaComEntradaInsumosExamesPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
+    case "venda-saida-insumo":
+      return <VendaComSaidaInsumoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-venda-saida-insumo":
+      return <AdicionarVendaComSaidaInsumoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-venda-entrada-insumos-exames":
       return (
         <AdicionarVendaComEntradaInsumosExamesPage

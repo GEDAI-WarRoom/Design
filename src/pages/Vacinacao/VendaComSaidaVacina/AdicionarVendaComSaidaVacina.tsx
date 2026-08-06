@@ -132,6 +132,7 @@ function SubGrupo({ titulo, children, comDivisor = false }) {
 interface AdicionarVendaVacinaProps extends CadastroVacinacaoModeProps {
   onLogout: () => void;
   onNavigate: (screen: any, data?: any) => void;
+  tipoProduto?: "vacina" | "insumo";
 }
 
 
@@ -326,7 +327,15 @@ interface ContatoAdicional {
   observacao: string;
 }
 
-export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = "create", dados }: AdicionarVendaVacinaProps) {
+export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = "create", dados, tipoProduto = "vacina" }: AdicionarVendaVacinaProps) {
+  const isInsumo = tipoProduto === "insumo";
+  const rotaLista = isInsumo ? "venda-saida-insumo" : "venda-saida-vacina";
+  const rotaEditar = isInsumo ? "editar-venda-saida-insumo" : "editar-venda-saida-vacina";
+  const nomeCadastro = `Venda com Saída de ${isInsumo ? "Insumo" : "Vacina"}`;
+  const laboratoriosDisponiveis = isInsumo ? [
+    { id: 101, nome: "Tecpar Diagnósticos", codigo: "LAB-101" },
+    { id: 102, nome: "Laboratório Biovet", codigo: "LAB-102" },
+  ] : LABORATORIOS_MOCK;
   const preenchendoRegistro = mode !== "create";
   // Estados da Seção 1: Informações Básicas
   const [notaFiscal, setNotaFiscal] = useState(dados?.notaFiscal ?? dados?.numeroNotaFiscal ?? "");
@@ -418,8 +427,8 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
       quantidadeDoses,
       situacao
     };
-    console.log("Salvando venda de vacina:", payload);
-    onNavigate("venda-saida-vacina");
+    console.log(`Salvando venda de ${isInsumo ? "insumo" : "vacina"}:`, payload);
+    onNavigate(rotaLista);
   };
 
   const registroAtual = preencherComExemplo({
@@ -469,21 +478,21 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
 
   return (
     <div className={cadastroVacinacaoPageClass(mode, "min-h-screen bg-[#f2f3f5]")}>
-      <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="venda-saida-vacina" hideSearch={true} />
+      <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen={rotaLista} hideSearch={true} />
 
       <main className="max-w-[1088px] mx-auto px-4 md:px-6 py-6">
         {/* Cabeçalho */}
         <div>
           <button
             type="button"
-            onClick={() => onNavigate("venda-saida-vacina")}
+            onClick={() => onNavigate(rotaLista)}
             className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70"
             style={{ color: GREEN }}
           >
             <ArrowLeft size={15} />
-            Todas Vendas com Saídas de Vacina
+            Todas Vendas com Saídas de {isInsumo ? "Insumo" : "Vacina"}
           </button>
-          <CadastroVacinacaoHeader mode={mode} nomeCadastro="Venda com Saída de Vacina" rotaEditar="editar-venda-saida-vacina" dados={dados} onNavigate={onNavigate} onSubmit={() => setIsSucesso(true)} />
+          <CadastroVacinacaoHeader mode={mode} nomeCadastro={nomeCadastro} rotaEditar={rotaEditar} dados={dados} onNavigate={onNavigate} onSubmit={() => setIsSucesso(true)} />
         </div>
 
         {/* 🔥 ALERTA CORRIGIDO: Adicionado mb-6 para dar respiro até a próxima seção */}
@@ -773,7 +782,7 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
             <div className="flex items-center justify-between border-b border-gray-100 pb-3">
               <div className="flex items-center gap-3">
                 <div className="flex flex-col">
-                  <span className="text-xs text-gray-500 font-medium">Saldo de Vacinas</span>
+                  <span className="text-xs text-gray-500 font-medium">Saldo de {isInsumo ? "Insumos" : "Vacinas"}</span>
                 </div>
 
                 {/* Badge do Total de Doses Adquiridas (SÓ APARECE SE HOUVER DOSES) */}
@@ -880,7 +889,7 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
                                     </span>
                                   </div>
                                   <div className="flex justify-between items-center gap-3">
-                                    <span>Tipo de Vacina:</span>
+                                    <span>Tipo de {isInsumo ? "Insumo" : "Vacina"}:</span>
                                     <span className="font-bold text-gray-700 text-right">
                                       {[...new Set(grupo.partidas.map((p: any) => p.tipoVacina).filter(Boolean))].join(", ") || "—"}
                                     </span>
@@ -1226,7 +1235,7 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
             {/* 1. Receituário — um para cada Doença das partidas que exigem receituário */}
             {doencasQueExigemReceituario.length === 0 ? (
               <p className="text-sm text-gray-500">
-                Nenhuma das partidas selecionadas exige receituário para venda de vacina.
+                Nenhuma das partidas selecionadas exige receituário para venda de {isInsumo ? "insumo" : "vacina"}.
               </p>
             ) : (
               <div className="flex flex-col gap-6">
@@ -1317,7 +1326,7 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
 
             {/* 2. Pergunta de Previsão de Uso */}
             <SimNao
-              label="Possui previsão de uso das vacinas em explorações pecuárias específicas?"
+              label={`Possui previsão de uso ${isInsumo ? "dos insumos" : "das vacinas"} em explorações pecuárias específicas?`}
               name="previsao-uso"
               required
               value={previsaoUso}
@@ -1396,7 +1405,7 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
         title="Buscar Laboratório"
         subtitle="Busque por um laboratório para o cadastro:"
         icon={<FlaskConical size={26} color={GREEN} />}
-        data={LABORATORIOS_MOCK}
+        data={laboratoriosDisponiveis}
         searchKeys={["nome", "codigo"]}
         searchPlaceholder="Busque por nome do laboratório..."
         columns={[{ label: "Nome", key: "nome" }, { label: "Código", key: "codigo" }]}
@@ -1479,15 +1488,19 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
       <MultiSearchModal
         open={modalNotaOrigemOpen}
         onClose={() => setModalNotaOrigemOpen(false)}
-        title="Buscar Lotes de Vacinas"
-        subtitle="Selecione os lotes de vacina desejados para vincular a este ajuste:"
+        title={`Buscar Lotes de ${isInsumo ? "Insumos" : "Vacinas"}`}
+        subtitle={`Selecione os lotes de ${isInsumo ? "insumo" : "vacina"} desejados para vincular a esta venda:`}
         icon={<Package size={24} color={GREEN} />}
-        data={[
+        data={(isInsumo ? [
+          { id: 101, nome: "INS-00482/26", partida: "1", uf: "MG", dosesDisponiveisTotais: 120, fornecedor: "Laboratório BioDiagnóstico MG", doenca: "Brucelose", tipoVacina: "Antígeno Acidificado Tamponado", laboratorio: "Tecpar Diagnósticos", validade: "20/12/2027" },
+          { id: 102, nome: "INS-00517/26", partida: "1", uf: "MG", dosesDisponiveisTotais: 80, fornecedor: "Distribuidora VetTest S/A", doenca: "Tuberculose", tipoVacina: "Tuberculina PPD Bovina", laboratorio: "Laboratório Biovet", validade: "15/08/2027" },
+          { id: 103, nome: "INS-00518/26", partida: "2", uf: "SP", dosesDisponiveisTotais: 250, fornecedor: "Distribuidora VetTest S/A", doenca: "Tuberculose", tipoVacina: "Tuberculina PPD Aviária", laboratorio: "Laboratório Biovet", validade: "30/09/2027" },
+        ] : [
           { id: 1, nome: "0013225/24", partida: "1", uf: "MG", dosesDisponiveisTotais: 120, fornecedor: "Distribuidora de Vacinas Alfa LTDA", doenca: "Brucelose", tipoVacina: "B19", laboratorio: "BioMed/MG", validade: "20/12/2026" },
           { id: 2, nome: "0013225/24", partida: "2", uf: "MG", dosesDisponiveisTotais: 80, fornecedor: "Distribuidora de Vacinas Alfa LTDA", doenca: "Brucelose", tipoVacina: "Oleosa", laboratorio: "BioMed/MG", validade: "20/12/2026" },
           { id: 3, nome: "0014589/24", partida: "1", uf: "SP", dosesDisponiveisTotais: 250, fornecedor: "Comercial Agropecuária Beta S/A", doenca: "Raiva dos Herbívoros", tipoVacina: "", laboratorio: "Zoetis", validade: "15/08/2027" },
           { id: 4, nome: "0014589/24", partida: "1", uf: "GO", dosesDisponiveisTotais: 50, fornecedor: "Laboratório Biovet Saúde Animal", doenca: "Raiva dos Herbívoros", tipoVacina: "", laboratorio: "Biovet", validade: "15/08/2027" }
-        ].map((item) => ({
+        ]).map((item) => ({
           ...item,
           // Cria um campo combinado para a coluna exibir
           doencaComTipo: `${item.doenca} - ${item.tipoVacina}`,
@@ -1496,7 +1509,7 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
         searchPlaceholder="Busque por lote ou doença."
         columns={[
           { label: "Lote/ Nº de Partida", key: "nome" },
-          { label: "Vacina", key: "doencaComTipo" }, // <-- Usando a chave combinada aqui
+          { label: isInsumo ? "Insumo" : "Vacina", key: "doencaComTipo" }, // <-- Usando a chave combinada aqui
           { label: "Saldo da Apresentação", key: "dosesDisponiveisTotais" },
           { label: "UF", key: "uf" }
         ]}
@@ -1512,18 +1525,22 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
       {isSucesso && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
-            <h3 className="text-lg font-bold text-gray-900">{mensagemSucessoCadastro(mode, "Venda com Saída de Vacina")}</h3>
+            <h3 className="text-lg font-bold text-gray-900">{mensagemSucessoCadastro(mode, nomeCadastro)}</h3>
             <p className="text-sm text-gray-500 mt-1">
-              Os dados da venda com saída de vacina foram gravados.
+              Os dados da venda com saída de {isInsumo ? "insumo" : "vacina"} foram gravados.
             </p>
             <div className="flex gap-3 justify-center mt-6">
-              <button onClick={() => { setIsSucesso(false); onNavigate("venda-saida-vacina"); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition">
+              <button onClick={() => { setIsSucesso(false); onNavigate(rotaLista); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition">
                 Voltar
               </button>
               <button
                 onClick={() => {
                   setIsSucesso(false);
-                  onNavigate("visualizar-venda-saida-vacina", registroAtual);
+                  if (isInsumo) {
+                    onNavigate("visualizar-venda-saida-insumo", registroAtual);
+                  } else {
+                    onNavigate("visualizar-venda-saida-vacina", registroAtual);
+                  }
                 }}
                 className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition"
               >

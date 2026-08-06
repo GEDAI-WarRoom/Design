@@ -806,6 +806,12 @@ export const secondaryCategories: MenuCategory[] = [
     icon: <BriefcaseMedical size={28} color={GREEN} />,
     items: [
       {
+        label: "Venda com Saída de Insumo",
+        route: "venda-saida-insumo",
+        icon: <PackageMinus size={16} />,
+      },
+
+      {
         label: "Venda com Entrada de Insumos para Exames",
         route: "venda-entrada-insumos-exames",
         icon: <PackagePlus size={16} />,
