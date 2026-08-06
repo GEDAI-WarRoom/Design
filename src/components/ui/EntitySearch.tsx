@@ -30,6 +30,7 @@ import {
 // Importação dos Ícones Padrão do Projeto
 
 import * as Icons from "../../imports/icons";
+import { listarProfissionaisAnimal } from "../../pages/Animal/ProfissionalAnimal/profissionalAnimalData";
 
 const GREEN = "#1A7A3C";
 
@@ -2596,11 +2597,14 @@ export function NucleoInput({
 // ==========================================================
 // MOCK DE MÉDICOS VETERINÁRIOS (Global)
 // ==========================================================
-export const VETERINARIOS_MOCK = [
-	{ id: 1, nome: "Dr. Carlos Eduardo Silva", cpf: "123.456.789-00" },
-	{ id: 2, nome: "Dra. Mariana Costa Alencar", cpf: "987.654.321-11" },
-	{ id: 3, nome: "Dr. Roberto Antunes Vieira", cpf: "456.789.123-22" },
-];
+export const VETERINARIOS_MOCK = listarProfissionaisAnimal()
+	.filter((profissional) => profissional.formacao === "Médico Veterinário")
+	.map(({ id, nome, cpf, numeroConselho }) => ({
+		id,
+		nome,
+		cpf,
+		numeroConselho,
+	}));
 
 interface MedicoVeterinarioInputProps {
 	value: any; // Aceita string ou objeto
@@ -2879,7 +2883,7 @@ export const ProfissionalAnimalInput: React.FC<
 // MOCK DE EXEMPLO (Substituir pela sua lista global se necessário)
 // ==========================================================
 export const PESSOAS_FISICAS_MOCK = [
-	{ id: 1, nome: "Josephina Arantes", documento: "444.009.956-40" },
+	{ id: 1, nome: "Eloiza Silva", documento: "444.009.956-40" },
 	{ id: 2, nome: "Pedro Alves Moraes", documento: "222.114.558-70" },
 	{ id: 3, nome: "Carla Menezes Rocha", documento: "111.998.775-30" },
 ];

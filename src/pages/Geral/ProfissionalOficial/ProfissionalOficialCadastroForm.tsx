@@ -43,7 +43,7 @@ export function normalizarProfissionalOficial(dados?: any): ProfissionalOficialV
     id: typeof dados?.id === "number" ? dados.id : undefined,
     pessoa: {
       id: dados?.pessoa?.id,
-      nome: textoOuPadrao(dados?.pessoa?.nome ?? dados?.nome, "Josephina Arantes"),
+      nome: textoOuPadrao(dados?.pessoa?.nome ?? dados?.nome, "Eloiza Silva"),
       documento: textoOuPadrao(
         dados?.pessoa?.documento ?? dados?.pessoa?.cpf ?? dados?.cpf,
         "444.009.956-40",

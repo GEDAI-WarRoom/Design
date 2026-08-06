@@ -116,7 +116,7 @@ export function VisualizarUsuariosPage({
   const [papeisSelecionadosForm, setPapeisSelecionadosForm] = useState<any[]>([]);
 
   const renderIconePapeis = (isActive: boolean, size = 19, forceWhite = false) => {
-    const iconSource = Icons.iconePapéisUrl || (Icons as any).iconepapeisurl;
+    const iconSource = Icons.iconePapeisUrl;
 
     if (!iconSource) {
       const colorClass = forceWhite ? "text-white" : (isActive ? "text-[#1A7A3C]" : "text-gray-400");

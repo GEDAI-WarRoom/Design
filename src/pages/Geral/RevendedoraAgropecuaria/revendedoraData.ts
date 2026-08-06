@@ -106,7 +106,7 @@ let revendedoras: Revendedora[] = [
     codigo: "3100000001",
     nome: "Revendedora São José",
     proprietarios: ["555.009.956-40 - José Aarão Neto"],
-    responsaveis: ["129.555.656-99 - Messias Araujo", "444.009.956-40 - Josephina Arantes"],
+    responsaveis: ["129.555.656-99 - Messias Araujo", "444.009.956-40 - Eloiza Silva"],
     funcionarios: ["222.114.558-70 - Pedro Alves Moraes"],
     areaAtuacao: ["Animal", "Vegetal"],
     atuacoes: ["Revendedora de Vacinas sob Controle Oficial", "Revendedora de Sementes"],
@@ -133,7 +133,7 @@ let revendedoras: Revendedora[] = [
     observacao: "Cadastro de demonstração para validação do fluxo.",
     profissionais: [
       { id: "prof-1", tipo: "Responsável Técnico Animal", nome: "Messias Araujo", documento: "129.555.656-99", dataArt: "2025-11-15", arquivoArt: "art-messias.pdf", situacao: "Ativo", atualizadoEm: "2026-07-10" },
-      { id: "prof-2", tipo: "Responsável Técnico Vegetal", nome: "Josephina Arantes", documento: "444.009.956-40", dataArt: "2025-06-20", arquivoArt: "art-josephina.pdf", situacao: "Ativo", atualizadoEm: "2026-06-28" },
+      { id: "prof-2", tipo: "Responsável Técnico Vegetal", nome: "Eloiza Silva", documento: "444.009.956-40", dataArt: "2025-06-20", arquivoArt: "art-eloiza-silva.pdf", situacao: "Ativo", atualizadoEm: "2026-06-28" },
       { id: "prof-3", tipo: "Habilitado para Emissão de GTA", nome: "José Aarão Neto", documento: "555.009.956-40", situacao: "Ativo", atualizadoEm: "2026-05-19" },
       { id: "prof-4", tipo: "Funcionário", nome: "Pedro Alves Moraes", documento: "222.114.558-70", situacao: "Ativo", atualizadoEm: "2026-05-02" },
     ],
