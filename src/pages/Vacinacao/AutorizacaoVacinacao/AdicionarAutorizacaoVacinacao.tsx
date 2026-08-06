@@ -8,16 +8,14 @@ import {
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, FloatSelect, SearchModal, LargeTextArea } from "../../../components/ui/FormKit";
-import { EntitySearchInput, ProdutorInput, EstabelecimentoAgropecuarioInput, ExploracaoPecuariaInput } from "../../../components/ui/EntitySearch";
+import { EntitySearchInput, ProdutorInput, EstabelecimentoAgropecuarioInput } from "../../../components/ui/EntitySearch";
 import * as Icons from "../../../imports/icons";
-import { CadastroVacinacaoHeader, cadastroVacinacaoPageClass, mensagemSucessoCadastro, preencherComExemplo, type CadastroVacinacaoModeProps } from "../shared/CadastroVacinacaoMode";
 
 const GREEN = "#1A7A3C";
+const MOCK_KEY = "AUTORIZACOES_VACINA_DB";
 
 // ==========================================================
 // MOCKS DE ENTIDADE (substituir por API)
-// A cascata da USV09 (AC3) filtra cada nível pelo anterior:
-//   Produtor → Estabelecimento → Espécie → Doença → Etapa
 // ==========================================================
 interface ProdutorEntidade {
   id: number;
@@ -32,14 +30,12 @@ const PRODUTORES_MOCK: ProdutorEntidade[] = [
   { id: 3, nome: "Agropecuária Vale Verde Ltda.", documento: "56.338.814/0001-95", tipo: "PJ" },
 ];
 
-// estabelecimentos onde o produtor tem vínculo de produção (filtra por produtorId)
 const ESTABELECIMENTOS_MOCK = [
   { id: 1, produtorId: 1, codigo: "31234567891", nome: "Fazenda do Rio", municipio: "Lavras - MG", proprietario: "555.009.956-40\n- José Aarão Neto" },
   { id: 2, produtorId: 2, codigo: "31001040005", nome: "Fazenda Rio Preto", municipio: "Lavras - MG", proprietario: "444.009.956-40\n- Divino de Souza Sobrinho" },
   { id: 3, produtorId: 3, codigo: "42001040005", nome: "Fazenda Vertentes", municipio: "Varginha - MG", proprietario: "56.338.814/0001-95\n- Agropecuária Vale Verde Ltda." },
 ];
 
-// espécies com exploração pecuária ativa no estabelecimento (filtra por estabId)
 const ESPECIES_MOCK = [
   { id: 1, estabId: 1, codigo: "ESP-001", nome: "Bovino", grupo: "Bovídeos" },
   { id: 2, estabId: 1, codigo: "ESP-002", nome: "Bubalino", grupo: "Bovídeos" },
@@ -47,7 +43,6 @@ const ESPECIES_MOCK = [
   { id: 4, estabId: 3, codigo: "ESP-003", nome: "Caprino", grupo: "Caprinos" },
 ];
 
-// doenças a que a espécie é suscetível (filtra por especieNome)
 const DOENCAS_MOCK = [
   { id: 1, especieNome: "Bovino", nome: "Brucelose" },
   { id: 2, especieNome: "Bovino", nome: "Febre Aftosa" },
@@ -55,13 +50,13 @@ const DOENCAS_MOCK = [
   { id: 4, especieNome: "Caprino", nome: "Raiva" },
 ];
 
-// etapas de vacinação que possuem a doença (filtra por doencaNome)
 const ETAPAS_MOCK = [
   { id: 1, doencaNome: "Brucelose", nome: "2026/01" },
   { id: 2, doencaNome: "Brucelose", nome: "2026/02" },
   { id: 3, doencaNome: "Febre Aftosa", nome: "2026/01" },
   { id: 4, doencaNome: "Raiva", nome: "2026/02" },
 ];
+
 function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col gap-5">
@@ -71,338 +66,130 @@ function SectionCard({ title, children }: { title: string; children: React.React
   );
 }
 
-interface PageProps extends CadastroVacinacaoModeProps {
-  onLogout: () => void;
-  onNavigate: (screen: any, data?: any) => void;
-}
+export function AdicionarAutorizacaoVacinacaoPage({ onLogout, onNavigate }: any) {
+  const [produtor, setProdutor] = useState<any | null>(null);
+  const [estabelecimento, setEstabelecimento] = useState<any | null>(null);
+  const [especie, setEspecie] = useState<any | null>(null);
+  const [doenca, setDoenca] = useState<any | null>(null);
+  const [etapa, setEtapa] = useState<any | null>(null);
+  const [quantidadeDoses, setQuantidadeDoses] = useState("");
+  const [observacaoResidencia, setObservacaoResidencia] = useState("");
+  const [idSalvo, setIdSalvo] = useState<number | null>(null);
 
-export function AdicionarAutorizacaoVacinacaoPage({ onLogout, onNavigate, mode = "create", dados }: PageProps) {
-  const preenchendoRegistro = mode !== "create";
-  const produtorInicial = dados?.produtor ?? (dados?.produtorNome
-    ? PRODUTORES_MOCK.find((item) => item.documento === dados.produtorDoc) ?? {
-        id: `produtor-${dados?.id ?? "registro"}`,
-        nome: dados.produtorNome,
-        documento: dados.produtorDoc,
-        tipo: dados.produtorDoc?.includes("/") ? "PJ" : "PF",
-      }
-    : null);
-  const estabelecimentoInicial = dados?.estabelecimento ?? (dados?.estabNome
-    ? ESTABELECIMENTOS_MOCK.find((item) => item.codigo === dados.estabCodigo) ?? {
-        id: `estabelecimento-${dados?.id ?? "registro"}`,
-        produtorId: produtorInicial?.id,
-        codigo: dados.estabCodigo,
-        nome: dados.estabNome,
-      }
-    : null);
-  const especieInicial = dados?.especieEntidade ?? (dados?.especie
-    ? ESPECIES_MOCK.find((item) => item.nome === dados.especie) ?? { id: `especie-${dados?.id ?? "registro"}`, nome: dados.especie }
-    : null);
-  const doencaInicial = dados?.doencaEntidade ?? (dados?.doenca
-    ? DOENCAS_MOCK.find((item) => item.nome === dados.doenca) ?? { id: `doenca-${dados?.id ?? "registro"}`, nome: dados.doenca }
-    : null);
-  const etapaInicial = dados?.etapaEntidade ?? (dados?.etapa
-    ? ETAPAS_MOCK.find((item) => item.nome === dados.etapa) ?? { id: `etapa-${dados?.id ?? "registro"}`, nome: dados.etapa }
-    : null);
-
-  // ---- Informações Básicas (AC3) ----
-  const [produtor, setProdutor] = useState<any | null>(produtorInicial);
-  const [estabelecimento, setEstabelecimento] = useState<any | null>(estabelecimentoInicial);
-  const [exploracao, setExploracao] = useState<any | null>(dados?.exploracao ?? null);
-  const [nucleo, setNucleo] = useState<any | null>(dados?.nucleo ?? null);
-  const [especie, setEspecie] = useState<any | null>(especieInicial);
-  const [doenca, setDoenca] = useState<any | null>(doencaInicial);
-  const [etapa, setEtapa] = useState<any | null>(etapaInicial);
-  const [quantidadeDoses, setQuantidadeDoses] = useState(dados?.quantidadeDoses ?? (preenchendoRegistro ? "50" : ""));
-   const [observacaoResidencia, setObservacaoResidencia] = useState(dados?.justificativa ?? (preenchendoRegistro ? "Autorização emitida conforme a etapa de vacinação vigente." : ""));
-
-
-  // ---- Modal do Produtor (seleção PF/PJ) ----
   const [modalProdutor, setModalProdutor] = useState(false);
   const [tipoPessoa, setTipoPessoa] = useState("");
-
-  // ---- Controle de submit/sucesso ----
   const [tentouSalvar, setTentouSalvar] = useState(false);
   const [sucesso, setSucesso] = useState(false);
 
-  // ==========================================================
-  // CASCATA — cada nível só habilita quando o anterior está preenchido
-  // e suas opções são filtradas pelo nível anterior (AC3)
-  // ==========================================================
-  const databaseProdutor = PRODUTORES_MOCK.filter((p) =>
-    !tipoPessoa ? true : p.tipo === tipoPessoa
-  );
+  const databaseProdutor = PRODUTORES_MOCK.filter((p) => !tipoPessoa ? true : p.tipo === tipoPessoa);
+  const estabelecimentosFiltrados = produtor ? ESTABELECIMENTOS_MOCK.filter((e) => e.produtorId === produtor.id) : [];
+  const especiesFiltradas = estabelecimento ? ESPECIES_MOCK.filter((e) => e.estabId === estabelecimento.id) : [];
+  const doencasFiltradas = especie ? DOENCAS_MOCK.filter((d) => d.especieNome === especie.nome) : [];
+  const etapasFiltradas = doenca ? ETAPAS_MOCK.filter((et) => et.doencaNome === doenca.nome) : [];
 
-  const estabelecimentosFiltrados = produtor
-    ? ESTABELECIMENTOS_MOCK.filter((e) => e.produtorId === produtor.id)
-    : [];
+  const onChangeProdutor = (ent: any) => { setProdutor(ent); setEstabelecimento(null); setEspecie(null); setDoenca(null); setEtapa(null); };
+  const onChangeEstabelecimento = (ent: any) => { setEstabelecimento(ent); setEspecie(null); setDoenca(null); setEtapa(null); };
+  const onChangeEspecie = (ent: any) => { setEspecie(ent); setDoenca(null); setEtapa(null); };
+  const onChangeDoenca = (ent: any) => { setDoenca(ent); setEtapa(null); };
 
-  const especiesFiltradas = estabelecimento
-    ? ESPECIES_MOCK.filter((e) => e.estabId === estabelecimento.id)
-    : [];
+  const err = (cond: boolean, customMessage?: string) => (tentouSalvar && cond ? (customMessage || "Campo obrigatório.") : undefined);
 
-  const doencasFiltradas = especie
-    ? DOENCAS_MOCK.filter((d) => d.especieNome === especie.nome)
-    : [];
-
-  const etapasFiltradas = doenca
-    ? ETAPAS_MOCK.filter((et) => et.doencaNome === doenca.nome)
-    : [];
-
-  // limpa os níveis seguintes ao trocar um nível anterior
-  const onChangeProdutor = (ent: any) => {
-    setProdutor(ent);
-    setEstabelecimento(null);
-    setEspecie(null);
-    setDoenca(null);
-    setEtapa(null);
-  };
-  const onChangeEstabelecimento = (ent: any) => {
-    setEstabelecimento(ent);
-    setEspecie(null);
-    setDoenca(null);
-    setEtapa(null);
-  };
-  const onChangeEspecie = (ent: any) => {
-    setEspecie(ent);
-    setDoenca(null);
-    setEtapa(null);
-  };
-  const onChangeDoenca = (ent: any) => {
-    setDoenca(ent);
-    setEtapa(null);
-  };
-
-  // ==========================================================
-  // FUNÇÃO HELPER DE ERRO (Faltava declarar esta função)
-  // ==========================================================
-  const err = (cond: boolean, customMessage?: string) => 
-    (tentouSalvar && cond ? (customMessage || "Campo obrigatório.") : undefined);
-
-  // ==========================================================
-  // VALIDAÇÃO — todos obrigatórios (AC3)
-  // ==========================================================
-  const formValido =
-    !!produtor &&
-    !!estabelecimento &&
-    !!especie &&
-    !!doenca &&
-    !!etapa &&
-    quantidadeDoses.trim() !== "";
-
-
+  const formValido = !!produtor && !!estabelecimento && !!especie && !!doenca && !!etapa && quantidadeDoses.trim() !== "";
 
   const handleSalvar = () => {
-    if (mode === "create") {
-      setSucesso(true);
-      return;
-    }
     setTentouSalvar(true);
     if (!formValido) return;
-    // TODO: chamada de API. Por ora, exibe o card de sucesso.
+
+    // 1. Recupera o que tem na base
+    const stored = localStorage.getItem(MOCK_KEY);
+    const db = stored ? JSON.parse(stored) : [];
+    const novoId = Date.now();
+
+    // 2. Monta o objeto pra inserir na listagem e na visualização
+    const novoRegistro = {
+      id: novoId,
+      produtorNome: produtor.nome,
+      produtorDoc: produtor.documento,
+      estabCodigo: estabelecimento.codigo,
+      estabNome: estabelecimento.nome,
+      especie: especie.nome,
+      doenca: doenca.nome,
+      tipoVacina: "Oficial", // Assumindo default para Mock
+      etapa: etapa.nome,
+      dataAutorizacao: new Date().toISOString().split("T")[0],
+      quantidadeDoses: quantidadeDoses,
+      justificativa: observacaoResidencia,
+      situacao: "Gravada"
+    };
+
+    // 3. Salva no localStorage
+    db.push(novoRegistro);
+    localStorage.setItem(MOCK_KEY, JSON.stringify(db));
+    
+    // 4. Grava o ID pra caso a pessoa clique em "Visualizar" no modal de sucesso
+    localStorage.setItem("CURRENT_AUTORIZACAO_ID", novoId.toString());
+    setIdSalvo(novoId);
     setSucesso(true);
   };
 
-  const colunasModalProdutor = [
-    { label: "Nome", key: "nome" },
-    { label: "Documento", key: "documento" },
-  ];
-
-  const registroAtual = preencherComExemplo({
-    ...(dados ?? {}),
-    id: dados?.id ?? `autorizacao-${Date.now()}`,
-    produtor,
-    estabelecimento,
-    exploracao,
-    nucleo,
-    especieEntidade: especie,
-    doencaEntidade: doenca,
-    etapaEntidade: etapa,
-    produtorNome: produtor?.nome,
-    produtorDoc: produtor?.documento,
-    estabCodigo: estabelecimento?.codigo,
-    estabNome: estabelecimento?.nome,
-    especie: especie?.nome,
-    doenca: doenca?.nome,
-    etapa: etapa?.nome,
-    quantidadeDoses,
-    justificativa: observacaoResidencia,
-    situacao: "Gravada",
-  }, {
-    id: "autorizacao-exemplo",
-    produtor: { id: 1, nome: "José Aarão Neto", documento: "555.009.956-40", tipo: "PF" },
-    estabelecimento: { id: 1, produtorId: 1, codigo: "31234567891", nome: "Fazenda do Rio" },
-    exploracao: { id: 1, codigo: "3100104050003", especie: "Bovino" },
-    nucleo: null,
-    especieEntidade: { id: 1, codigo: "ESP-001", nome: "Bovino", grupo: "Bovídeos" },
-    doencaEntidade: { id: 1, nome: "Brucelose" },
-    etapaEntidade: { id: 1, nome: "2026/02", doencaNome: "Brucelose" },
-    produtorNome: "José Aarão Neto",
-    produtorDoc: "555.009.956-40",
-    estabCodigo: "31234567891",
-    estabNome: "Fazenda do Rio",
-    especie: "Bovino",
-    doenca: "Brucelose",
-    etapa: "2026/02",
-    quantidadeDoses: "50",
-    justificativa: "Autorização de exemplo conforme a etapa de vacinação vigente.",
-    situacao: "Gravada",
-  });
-
   return (
-    <div className={cadastroVacinacaoPageClass(mode, "min-h-screen bg-[#f2f3f5] pb-24")}>
-      <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="autorizacao-vacinacao" hideSearch />
+    <div className="min-h-screen bg-[#f2f3f5] pb-24">
+      <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="autorizacao-vacina" hideSearch />
 
       <main className="max-w-[1300px] mx-auto px-4 md:px-6 py-6">
-        {/* Topo da Página */}
         <div className="mb-4">
           <button onClick={() => onNavigate("autorizacao-vacinacao")} className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70" style={{ color: GREEN }}>
-            <ArrowLeft size={15} />
-            Inicial
+            <ArrowLeft size={15} /> Inicial
           </button>
          
-          <CadastroVacinacaoHeader mode={mode} nomeCadastro="Autorização de Vacinação" rotaEditar="editar-autorizacao-vacinacao" dados={dados} onNavigate={onNavigate} onSubmit={handleSalvar} />
-          
+          <div className="flex justify-between items-center w-full">
+            <h1 className="text-2xl font-semibold text-gray-900">Adicionar Autorização de Vacina</h1>
+            <button type="button" onClick={handleSalvar} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm">Adicionar</button>
+          </div>
         </div>
 
-         {/* 🔥 ALERTA CORRIGIDO: Adicionado mb-6 para dar respiro até a próxima seção */}
-            <div className="w-full bg-white border border-gray-100 rounded-lg p-5 shadow-sm flex items-center gap-3 mt-4 mb-6">
-              {/* Ícone de Informação Azul/Cinza Discreto */}
-              <div className="text-gray-500 flex-shrink-0">
-                <Info size={20} className="stroke-[2.5]" />
-              </div>
-            
-              <p className="text-sm text-gray-600 font-medium leading-relaxed">
-                Campos indicados com <span className="text-red-500 font-bold">*</span> são obrigatórios e deverão ser preenchidos.
-              </p>
-            </div>
+        <div className="w-full bg-white border border-gray-100 rounded-lg p-5 shadow-sm flex items-center gap-3 mt-4 mb-6">
+          <div className="text-gray-500 flex-shrink-0">
+            <Info size={20} className="stroke-[2.5]" />
+          </div>
+          <p className="text-sm text-gray-600 font-medium leading-relaxed">
+            Campos indicados com <span className="text-red-500 font-bold">*</span> são obrigatórios e deverão ser preenchidos.
+          </p>
+        </div>
         
-<SectionCard title="Informações Básicas">
-  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-end">
-    
-    {/* 1. Produtor — Sempre Visível */}
-    <div className="col-span-full">
-      <ProdutorInput
-        value={produtor ? produtor.nome : ""}
-        required
-        onChange={onChangeProdutor}
-        error={err(!produtor)}
-        onEyeClick={() => {
-          if (produtor?.id) alert(`Visualizar detalhes do produtor ID: ${produtor.id}`);
-          else alert("Por favor, selecione um produtor primeiro.");
-        }}
-      />
-    </div>
+        <SectionCard title="Informações Básicas">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-end">
+            <div className="col-span-full">
+              <ProdutorInput value={produtor ? produtor.nome : ""} required onChange={onChangeProdutor} error={err(!produtor)} />
+            </div>
 
-    {/* 2. Estabelecimento Agropecuário — Só aparece se houver Produtor */}
-    {produtor && (
-      <div className="col-span-full">
-        <EstabelecimentoAgropecuarioInput
-          value={estabelecimento ? estabelecimento.nome : ""}
-          required
-          data={estabelecimentosFiltrados}
-          onChange={onChangeEstabelecimento}
-          error={err(!estabelecimento)}
-          onEyeClick={() => {
-            if (estabelecimento?.codigo) alert(`Visualizar detalhes: ${estabelecimento.codigo}`);
-            else alert("Por favor, selecione um estabelecimento primeiro.");
-          }}
-        />
-      </div>
-    )}
+            {produtor && (
+              <div className="col-span-full">
+                <EstabelecimentoAgropecuarioInput value={estabelecimento ? estabelecimento.nome : ""} required data={estabelecimentosFiltrados} onChange={onChangeEstabelecimento} error={err(!estabelecimento)} />
+              </div>
+            )}
 
-    {/* 3. Espécie — Só aparece se houver Estabelecimento */}
-    {estabelecimento && (
-      <EntitySearchInput
-        label="Espécie"
-        required
-        disabled={!estabelecimento}
-        placeholder="Buscar por nome da espécie"
-        value={especie ? especie.nome : ""}
-        data={especiesFiltradas}
-        searchKeys={["nome", "grupo"]}
-        columns={[
-          { label: "Espécie", key: "nome" },
-          { label: "Grupo", key: "grupo" },
-        ]}
-        icon={<Dna size={18} color={GREEN} />}
-        title="Buscar Espécie"
-        subtitle="Busque por uma espécie cadastrada:"
-        onChange={onChangeEspecie}
-        error={tentouSalvar && !especie ? "Campo obrigatório." : undefined}
-      />
-    )}
+            {estabelecimento && (
+              <EntitySearchInput label="Espécie" required disabled={!estabelecimento} placeholder="Buscar por nome" value={especie ? especie.nome : ""} data={especiesFiltradas} searchKeys={["nome", "grupo"]} columns={[{ label: "Espécie", key: "nome" }]} icon={<Dna size={18} color={GREEN} />} title="Buscar Espécie" onChange={onChangeEspecie} error={err(!especie)} />
+            )}
 
-    {/* 4. Doença — Só aparece se houver Espécie */}
-    {especie && (
-      <EntitySearchInput
-        label="Doença"
-        required
-        disabled={!especie}
-        placeholder="Buscar por doença"
-        value={doenca ? doenca.nome : ""}
-        data={doencasFiltradas}
-        searchKeys={["nome"]}
-        columns={[{ label: "Doença", key: "nome" }]}
-        icon={<Syringe size={18} color={GREEN} />}
-        title="Buscar Doença"
-        subtitle="Busque por uma doença cadastrada:"
-        onChange={onChangeDoenca}
-        error={tentouSalvar && !doenca ? "Campo obrigatório." : undefined}
-      />
-    )}
+            {especie && (
+              <EntitySearchInput label="Doença" required disabled={!especie} placeholder="Buscar por doença" value={doenca ? doenca.nome : ""} data={doencasFiltradas} searchKeys={["nome"]} columns={[{ label: "Doença", key: "nome" }]} icon={<Syringe size={18} color={GREEN} />} title="Buscar Doença" onChange={onChangeDoenca} error={err(!doenca)} />
+            )}
 
-    {/* 5. Etapa de Vacinação — Só aparece se houver Doença */}
-    {doenca && (
-      <EntitySearchInput
-        label="Etapa de Vacinação"
-        required
-        disabled={!doenca}
-        placeholder="Buscar por etapa de vacinação"
-        value={etapa ? etapa.nome : ""}
-        data={etapasFiltradas}
-        searchKeys={["nome"]}
-        columns={[{ label: "Etapa", key: "nome" }]}
-        icon={<CalendarClock size={18} color={GREEN} />}
-        title="Buscar Etapa de Vacinação"
-        subtitle="Busque por uma etapa cadastrada:"
-        onChange={(ent) => setEtapa(ent)}
-        error={tentouSalvar && !etapa ? "Campo obrigatório." : undefined}
-      />
-    )}
+            {doenca && (
+              <EntitySearchInput label="Etapa de Vacinação" required disabled={!doenca} placeholder="Buscar por etapa" value={etapa ? etapa.nome : ""} data={etapasFiltradas} searchKeys={["nome"]} columns={[{ label: "Etapa", key: "nome" }]} icon={<CalendarClock size={18} color={GREEN} />} title="Buscar Etapa" onChange={(ent) => setEtapa(ent)} error={err(!etapa)} />
+            )}
 
-    {/* 6. Quantidade de Doses — Só aparece se houver Etapa selecionada */}
-   
-    <FloatInput
-  label="Quantidade de Doses"
-  required
-  inputMode="numeric"
-  maxLength={10}
-  value={quantidadeDoses}
-  onChange={(v: string) => setQuantidadeDoses(v.replace(/\D/g, ""))}
-  error={tentouSalvar && quantidadeDoses.trim() === "" ? "Campo obrigatório." : undefined}
-/>
+            <FloatInput label="Quantidade de Doses" required inputMode="numeric" maxLength={10} value={quantidadeDoses} onChange={(v: string) => setQuantidadeDoses(v.replace(/\D/g, ""))} error={err(quantidadeDoses.trim() === "")} />
 
-<div className="col-span-full">
-  <LargeTextArea
-    label="Justificativa"
-    value={observacaoResidencia}
-    onChange={setObservacaoResidencia}
-     required
-
-  />
-</div>
-   
-
-  </div>
-</SectionCard>
-
-     
-
+            <div className="col-span-full">
+              <LargeTextArea label="Justificativa" value={observacaoResidencia} onChange={setObservacaoResidencia} required />
+            </div>
+          </div>
+        </SectionCard>
       </main>
 
-      
-
-      {/* ============ MODAL DO PRODUTOR ============ */}
       <SearchModal<ProdutorEntidade>
         open={modalProdutor}
         onClose={() => { setModalProdutor(false); setTipoPessoa(""); }}
@@ -410,47 +197,26 @@ export function AdicionarAutorizacaoVacinacaoPage({ onLogout, onNavigate, mode =
         subtitle="Busque por um produtor cadastrado no sistema:"
         icon={<img src={Icons.iconeProdutorUrl} alt="Produtor" className="w-8 h-8 object-contain" />}
         data={databaseProdutor}
-        columns={colunasModalProdutor}
+        columns={[{ label: "Nome", key: "nome" }, { label: "Documento", key: "documento" }]}
         searchKeys={["nome", "documento"]}
         searchPlaceholder="Buscar Produtor"
         confirmLabel="Confirmar"
         onConfirm={(p) => { onChangeProdutor(p); setModalProdutor(false); setTipoPessoa(""); }}
-        headerActions={
-          <FloatSelect
-            label="Tipo de Pessoa"
-            required
-            value={tipoPessoa}
-            onChange={(v) => setTipoPessoa(v)}
-            options={[
-              { value: "PF", label: "Pessoa Física" },
-              { value: "PJ", label: "Pessoa Jurídica" },
-            ]}
-          />
-        }
+        headerActions={<FloatSelect label="Tipo de Pessoa" required value={tipoPessoa} onChange={(v) => setTipoPessoa(v)} options={[{ value: "PF", label: "Pessoa Física" }, { value: "PJ", label: "Pessoa Jurídica" }]} />}
       />
 
-      {/* ============ CARD DE SUCESSO (padrão Estabelecimento) ============ */}
       {sucesso && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 text-center">
             <div className="flex justify-center mb-4">
               <CheckCircle2 size={48} style={{ color: GREEN }} />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-1">
-              {mensagemSucessoCadastro(mode, "Autorização de Vacinação")}
-            </h3>
-            <p className="text-sm text-gray-500 mb-6">
-              A autorização de vacina foi cadastrada e gravada no sistema.
-            </p>
+            <h3 className="text-lg font-semibold text-gray-900 mb-1">Autorização de Vacina adicionada!</h3>
+            <p className="text-sm text-gray-500 mb-6">A autorização de vacina foi cadastrada e gravada no sistema.</p>
             <div className="flex items-center justify-center gap-3">
+              <button onClick={() => onNavigate("autorizacao-vacina")} className="px-5 py-2.5 rounded-md text-sm font-semibold border border-gray-300 text-gray-700 transition hover:bg-gray-50">Voltar</button>
               <button
-                onClick={() => onNavigate("autorizacao-vacinacao")}
-                className="px-5 py-2.5 rounded-md text-sm font-semibold border border-gray-300 text-gray-700 transition hover:bg-gray-50"
-              >
-                Voltar
-              </button>
-              <button
-                onClick={() => onNavigate("visualizar-autorizacao-vacinacao", registroAtual)}
+                onClick={() => onNavigate("visualizar-autorizacao-vacinacao", { id: idSalvo })}
                 className="px-5 py-2.5 rounded-md text-white text-sm font-semibold transition hover:opacity-90"
                 style={{ backgroundColor: GREEN }}
               >
@@ -463,3 +229,5 @@ export function AdicionarAutorizacaoVacinacaoPage({ onLogout, onNavigate, mode =
     </div>
   );
 }
+
+export default AdicionarAutorizacaoVacinacaoPage;
