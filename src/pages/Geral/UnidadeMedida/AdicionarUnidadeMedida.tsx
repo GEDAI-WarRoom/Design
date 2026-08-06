@@ -2,6 +2,11 @@ import React, { useState } from "react";
 import { ArrowLeft, Info, Check } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, LargeTextArea, CheckboxGroup } from "../../../components/ui/FormKit"; // 💡 Importado CheckboxGroup
+import {
+  adicionarUnidadeMedida,
+  type TipoUnidadeMedida,
+  type UnidadeMedida,
+} from "./unidadeMedidaData";
 
 const GREEN = "#1A7A3C";
 
@@ -42,10 +47,21 @@ export function AdicionarUnidadeMedidaPage({ onLogout, onNavigate }: PageProps) 
   const [observacao, setObservacao] = useState("");
 
   const [isSucesso, setIsSucesso] = useState(false);
+  const [unidadeCriada, setUnidadeCriada] = useState<UnidadeMedida | null>(null);
 
-  // Fluxo demonstrativo: permite abrir a confirmação sem bloquear pelos
-  // campos obrigatórios, assim como em Unidade Administrativa.
-  const handleAdicionar = () => setIsSucesso(true);
+  const handleAdicionar = () => {
+    const tipos = (tiposSelecionados.length ? tiposSelecionados : ["Animal"]) as TipoUnidadeMedida[];
+    const criada = adicionarUnidadeMedida({
+      nome: nome.trim() || "Nova Unidade de Medida",
+      sigla: sigla.trim() || "un",
+      tipo: tipos[0],
+      tipos,
+      observacao,
+      situacao: "Ativo",
+    });
+    setUnidadeCriada(criada);
+    setIsSucesso(true);
+  };
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
@@ -110,7 +126,7 @@ export function AdicionarUnidadeMedidaPage({ onLogout, onNavigate }: PageProps) 
             <p className="text-sm text-gray-500 mt-1">{nome ? `"${nome}"` : "A unidade de medida"} foi adicionada.</p>
             <div className="flex gap-3 justify-center mt-6">
               <button onClick={() => { setIsSucesso(false); onNavigate("unidade-medida"); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition">Voltar</button>
-              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-unidade-medida", { nome, sigla, tipos: tiposSelecionados, observacao, situacao: "Ativo" }); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
+              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-unidade-medida", unidadeCriada); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
             </div>
           </div>
         </div>

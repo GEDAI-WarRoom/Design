@@ -14,131 +14,12 @@ import {
 import { Navbar } from "../../../components/Navbar";
 import { FloatSelect } from "../../../components/ui/FormKit";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
+import { listarReceitas } from "../Receita/receitaData";
+import { listarUnidadesMedida } from "../../Geral/UnidadeMedida/unidadeMedidaData";
+import { listarItensReceita } from "./itemReceitaData";
 
 const GREEN = "#1A7A3C";
 
-// --- dados ---
-
-export const UNIDADES_MEDIDA_ENTIDADE = [
-  {
-    id: 1,
-    codigo: "UND",
-    sigla: "un",
-    nome: "Unidade",
-    descricao: "Quantidade unitária",
-  },
-  {
-    id: 2,
-    codigo: "KG",
-    sigla: "kg",
-    nome: "Quilograma",
-    descricao: "Massa em quilogramas",
-  },
-  {
-    id: 3,
-    codigo: "G",
-    sigla: "g",
-    nome: "Grama",
-    descricao: "Massa em gramas",
-  },
-  {
-    id: 4,
-    codigo: "L",
-    sigla: "L",
-    nome: "Litro",
-    descricao: "Volume em litros",
-  },
-  {
-    id: 5,
-    codigo: "ML",
-    sigla: "mL",
-    nome: "Mililitro",
-    descricao: "Volume em mililitros",
-  },
-  {
-    id: 6,
-    codigo: "CX",
-    sigla: "cx",
-    nome: "Caixa",
-    descricao: "Quantidade por caixa",
-  },
-  {
-    id: 7,
-    codigo: "SC",
-    sigla: "sc",
-    nome: "Saca",
-    descricao: "Quantidade por saca",
-  },
-  {
-    id: 8,
-    codigo: "FR",
-    sigla: "fr",
-    nome: "Frasco",
-    descricao: "Quantidade por frasco",
-  },
-];
-const RECEITAS = [
-  { value: "100", label: "100" },
-  { value: "200", label: "200" },
-  { value: "300", label: "300" },
-  { value: "400", label: "400" },
-  { value: "500", label: "500" },
-  { value: "600", label: "600" },
-  { value: "700", label: "700" },
-  { value: "800", label: "800" },
-  { value: "900", label: "900" },
-];
-export const RECEITAS_ENTIDADE = [
-  {
-    id: 1,
-    codigo: "REC000001",
-    nome: "Vacinação Contra Brucelose",
-    descricao:
-      "Receita destinada à vacinação obrigatória contra Brucelose.",
-    unidadeMedida: "Dose",
-    quantidadePadrao: 1,
-    ativo: true,
-  },
-  {
-    id: 2,
-    codigo: "REC000002",
-    nome: "Tratamento Antiparasitário",
-    descricao:
-      "Receita para controle de endoparasitas e ectoparasitas.",
-    unidadeMedida: "mL",
-    quantidadePadrao: 50,
-    ativo: true,
-  },
-  {
-    id: 3,
-    codigo: "REC000003",
-    nome: "Suplementação Mineral",
-    descricao: "Receita para suplementação mineral do rebanho.",
-    unidadeMedida: "kg",
-    quantidadePadrao: 25,
-    ativo: true,
-  },
-  {
-    id: 4,
-    codigo: "REC000004",
-    nome: "Antibiótico Veterinário",
-    descricao:
-      "Receita para tratamento de infecções bacterianas.",
-    unidadeMedida: "Frasco",
-    quantidadePadrao: 1,
-    ativo: true,
-  },
-  {
-    id: 5,
-    codigo: "REC000005",
-    nome: "Anti-inflamatório Veterinário",
-    descricao:
-      "Receita para tratamento de processos inflamatórios.",
-    unidadeMedida: "mL",
-    quantidadePadrao: 20,
-    ativo: false,
-  },
-];
 const CONTRIBUICAO_FUNDO = [
   { value: "Sim", label: "Sim" },
   { value: "Não", label: "Não" },
@@ -146,75 +27,6 @@ const CONTRIBUICAO_FUNDO = [
 const SITUACOES = [
   { value: "Ativo", label: "Ativo" },
   { value: "Inativo", label: "Inativo" },
-];
-
-// --- mocks ---
-
-interface ItemReceita {
-  id: number;
-  itemReceita: string;
-  unidadeMedida: string;
-  receita: string;
-  contribuicaoFundo: "Sim" | "Não";
-  situacao: "Ativo" | "Inativo";
-}
-
-const RECEITAS_ENTIDADE_INPUT = RECEITAS_ENTIDADE.map(
-  (receita) => ({
-    value: receita.codigo,
-    label: receita.nome,
-  }),
-);
-
-const ITEM_RECEITA_MOCK: ItemReceita[] = [
-  {
-    id: 1,
-    itemReceita: "Vacina B19",
-    unidadeMedida: "Frasco",
-    receita: "Vacinação Contra Brucelose",
-    contribuicaoFundo: "Sim",
-    situacao: "Ativo",
-  },
-  {
-    id: 2,
-    itemReceita: "Ivermectina 1%",
-    unidadeMedida: "mL",
-    receita: "Tratamento Antiparasitário",
-    contribuicaoFundo: "Não",
-    situacao: "Ativo",
-  },
-  {
-    id: 3,
-    itemReceita: "Suplemento Mineral Bovino",
-    unidadeMedida: "kg",
-    receita: "Suplementação Mineral",
-    contribuicaoFundo: "Sim",
-    situacao: "Ativo",
-  },
-  {
-    id: 4,
-    itemReceita: "Oxitetraciclina",
-    unidadeMedida: "Frasco",
-    receita: "Antibiótico Veterinário",
-    contribuicaoFundo: "Não",
-    situacao: "Ativo",
-  },
-  {
-    id: 5,
-    itemReceita: "Flunixina Meglumina",
-    unidadeMedida: "mL",
-    receita: "Anti-inflamatório Veterinário",
-    contribuicaoFundo: "Sim",
-    situacao: "Inativo",
-  },
-  {
-    id: 6,
-    itemReceita: "Vitamina ADE",
-    unidadeMedida: "mL",
-    receita: "Suplementação Mineral",
-    contribuicaoFundo: "Não",
-    situacao: "Ativo",
-  },
 ];
 
 function Chip({
@@ -264,7 +76,7 @@ export function ItemReceitaPage({
     setPage(1);
   };
 
-  const filtrados = ITEM_RECEITA_MOCK.filter((t) => {
+  const filtrados = listarItensReceita().filter((t) => {
     const matchItemReceita =
       itemReceita.trim() === "" ||
       t.itemReceita
@@ -311,7 +123,7 @@ export function ItemReceitaPage({
       <Navbar
         onLogout={onLogout}
         onNavigate={onNavigate}
-        currentScreen="tipo-veiculo"
+        currentScreen="item-receita"
         hideSearch
       />
 
@@ -403,7 +215,7 @@ export function ItemReceitaPage({
                   label="Unidade de Medida"
                   placeholder="Buscar por unidade de medida"
                   value={unidadeMedida ? unidadeMedida : ""}
-                  data={UNIDADES_MEDIDA_ENTIDADE}
+                  data={listarUnidadesMedida().filter((item) => item.situacao === "Ativo")}
                   searchKeys={["nome", "sigla", "descricao"]}
                   columns={[
                     { label: "Unidade de Medida", key: "sigla" },
@@ -428,21 +240,17 @@ export function ItemReceitaPage({
                   label="Receitas"
                   placeholder="Buscar por receita"
                   value={receita ? receita : ""}
-                  data={RECEITAS_ENTIDADE}
-                  searchKeys={["nome", "sigla", "descricao"]}
+                  data={listarReceitas().filter((item) => item.situacao === "Ativo")}
+                  searchKeys={["codigo", "descricao"]}
                   columns={[
-                    { label: "Nome", key: "nome" },
-                    {
-                      label: "Unidade de Medida",
-                      key: "unidadeMedida",
-                    },
+                    { label: "Código", key: "codigo" },
                     { label: "Descrição", key: "descricao" },
                   ]}
                   icon={<FileText size={18} color={GREEN} />}
                   title="Buscar Receita"
                   subtitle="Busque por uma receita cadastrada:"
                   onChange={(ent) => {
-                    setReceita(ent.nome);
+                    setReceita(ent.descricao);
                   }}
 
                 />
@@ -567,6 +375,7 @@ export function ItemReceitaPage({
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-1 justify-end">
                             <button
+                              onClick={() => onNavigate("visualizar-item-receita", t)}
                               className="p-2 rounded-md hover:bg-green-50 transition"
                               style={{ color: GREEN }}
                               title="Visualizar"
@@ -574,6 +383,7 @@ export function ItemReceitaPage({
                               <ViewIcon size={18} />
                             </button>
                             <button
+                              onClick={() => onNavigate("editar-item-receita", t)}
                               className="p-2 rounded-md hover:bg-green-50 transition"
                               style={{ color: GREEN }}
                               title="Editar"

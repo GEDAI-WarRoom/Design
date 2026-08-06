@@ -14,123 +14,16 @@ import {
   SimNao,
 } from "../../../components/ui/FormKit";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
+import { listarIndices } from "../Indice/indiceIndice";
+import { listarReceitas } from "../Receita/receitaData";
+import { listarUnidadesMedida } from "../../Geral/UnidadeMedida/unidadeMedidaData";
+import {
+  salvarItemReceita,
+  type ItemReceitaVisual,
+} from "./itemReceitaData";
 
 const GREEN = "#1A7A3C";
 
-// --- dados ---
-
-export const UNIDADES_MEDIDA_ENTIDADE = [
-  {
-    id: 1,
-    codigo: "UND",
-    sigla: "un",
-    nome: "Unidade",
-    descricao: "Quantidade unitária",
-  },
-  {
-    id: 2,
-    codigo: "KG",
-    sigla: "kg",
-    nome: "Quilograma",
-    descricao: "Massa em quilogramas",
-  },
-  {
-    id: 3,
-    codigo: "G",
-    sigla: "g",
-    nome: "Grama",
-    descricao: "Massa em gramas",
-  },
-  {
-    id: 4,
-    codigo: "L",
-    sigla: "L",
-    nome: "Litro",
-    descricao: "Volume em litros",
-  },
-  {
-    id: 5,
-    codigo: "ML",
-    sigla: "mL",
-    nome: "Mililitro",
-    descricao: "Volume em mililitros",
-  },
-  {
-    id: 6,
-    codigo: "CX",
-    sigla: "cx",
-    nome: "Caixa",
-    descricao: "Quantidade por caixa",
-  },
-  {
-    id: 7,
-    codigo: "SC",
-    sigla: "sc",
-    nome: "Saca",
-    descricao: "Quantidade por saca",
-  },
-  {
-    id: 8,
-    codigo: "FR",
-    sigla: "fr",
-    nome: "Frasco",
-    descricao: "Quantidade por frasco",
-  },
-];
-
-export const RECEITAS_ENTIDADE = [
-  {
-    id: 1,
-    codigo: "REC000001",
-    nome: "Vacinação Contra Brucelose",
-    descricao:
-      "Receita destinada à vacinação obrigatória contra Brucelose.",
-    unidadeMedida: "Dose",
-    quantidadePadrao: 1,
-    ativo: true,
-  },
-  {
-    id: 2,
-    codigo: "REC000002",
-    nome: "Tratamento Antiparasitário",
-    descricao:
-      "Receita para controle de endoparasitas e ectoparasitas.",
-    unidadeMedida: "mL",
-    quantidadePadrao: 50,
-    ativo: true,
-  },
-  {
-    id: 3,
-    codigo: "REC000003",
-    nome: "Suplementação Mineral",
-    descricao: "Receita para suplementação mineral do rebanho.",
-    unidadeMedida: "kg",
-    quantidadePadrao: 25,
-    ativo: true,
-  },
-  {
-    id: 4,
-    codigo: "REC000004",
-    nome: "Antibiótico Veterinário",
-    descricao:
-      "Receita para tratamento de infecções bacterianas.",
-    unidadeMedida: "Frasco",
-    quantidadePadrao: 1,
-    ativo: true,
-  },
-  {
-    id: 5,
-    codigo: "REC000005",
-    nome: "Anti-inflamatório Veterinário",
-    descricao:
-      "Receita para tratamento de processos inflamatórios.",
-    unidadeMedida: "mL",
-    quantidadePadrao: 20,
-    ativo: false,
-  },
-];
-
-const INDICES = ["UFEMG"];
 const SITUACOES = ["Ativo", "Inativo"];
 
 const toOptions = (arr: string[]) =>
@@ -175,21 +68,10 @@ function Section({
 
 // --- tipos ---
 
-interface ItemReceitaData {
-  id: number;
-  itemReceita: string;
-  unidadeMedida: string;
-  receita: string;
-  indice: string;
-  quantidadeIndice: number;
-  contribuicaoFundo: boolean;
-  situacao: "Ativo" | "Inativo";
-}
-
 interface PageProps {
   onLogout: () => void;
   onNavigate: (screen: any, data?: any) => void;
-  data?: ItemReceitaData;
+  data?: ItemReceitaVisual;
 }
 
 export function AdicionarItemReceitaPage({
@@ -203,26 +85,42 @@ export function AdicionarItemReceitaPage({
     data?.itemReceita ?? "",
   );
   const [unidadeMedida, setUnidadeMedida] = useState(data?.unidadeMedida ?? "");
+  const [unidadeMedidaId, setUnidadeMedidaId] = useState(data?.unidadeMedidaId ?? 0);
   const [receita, setReceita] = useState(data?.receita ?? "");
+  const [receitaId, setReceitaId] = useState(data?.receitaId ?? 0);
   const [indice, setIndice] = useState(data?.indice ?? "");
+  const [indiceId, setIndiceId] = useState(data?.indiceId ?? "");
   const [quantidadeIndice, setQuantidadeIndice] = useState(data?.quantidadeIndice ? String(data.quantidadeIndice) : "");
   const [contribuicaoFundo, setContribuicaoFundo] = useState(
-    data?.contribuicaoFundo ? "Sim" : "Sim",
+    data ? data.contribuicaoFundo : "Sim",
   );
   const [situacao, setSituacao] = useState<string>(
     data?.situacao ?? "Ativo",
   );
 
   const [isSucesso, setIsSucesso] = useState(false);
+  const [registroSalvo, setRegistroSalvo] = useState<ItemReceitaVisual | null>(null);
 
   const salvar = () => {
-    if (!itemReceita) setItemReceita("Taxa de Expediente Geral");
-    if (!unidadeMedida) setUnidadeMedida("Unidade");
-    if (!receita) setReceita("Vacinação Contra Brucelose");
-    if (!indice) setIndice("UFEMG");
-    if (!quantidadeIndice) setQuantidadeIndice("1,50");
-    if (!contribuicaoFundo) setContribuicaoFundo("Sim");
-    if (!situacao) setSituacao("Ativo");
+    const unidade = listarUnidadesMedida().find((item) => item.id === unidadeMedidaId) ?? listarUnidadesMedida().find((item) => item.situacao === "Ativo")!;
+    const receitaSelecionada = listarReceitas().find((item) => item.id === receitaId) ?? listarReceitas().find((item) => item.situacao === "Ativo")!;
+    const indiceSelecionado = listarIndices().find((item) => item.id === indiceId) ?? listarIndices().find((item) => item.situacao === "Ativo")!;
+    const salvo = salvarItemReceita({
+      id: data?.id,
+      codigo: data?.codigo,
+      descricao: itemReceita.trim() || "Taxa de Expediente Geral",
+      unidadeMedidaId: unidade.id,
+      receitaId: receitaSelecionada.id,
+      indiceId: indiceSelecionado.id,
+      quantidadeIndice: Number((quantidadeIndice || "1,50").replace(",", ".")),
+      permiteContribuicaoFundo: contribuicaoFundo === "Sim",
+      situacao: situacao as "Ativo" | "Inativo",
+    });
+    setRegistroSalvo(salvo);
+    setItemReceita(salvo.descricao);
+    setUnidadeMedida(salvo.unidadeMedida);
+    setReceita(salvo.receita);
+    setIndice(salvo.indice);
     setIsSucesso(true);
   };
 
@@ -231,7 +129,7 @@ export function AdicionarItemReceitaPage({
       <Navbar
         onLogout={onLogout}
         onNavigate={onNavigate}
-        currentScreen="tipo-veiculo"
+        currentScreen="item-receita"
         hideSearch
       />
 
@@ -289,7 +187,7 @@ export function AdicionarItemReceitaPage({
               label="Unidade de Medida"
               placeholder="Buscar por unidade de medida"
               value={unidadeMedida}
-              data={UNIDADES_MEDIDA_ENTIDADE}
+              data={listarUnidadesMedida().filter((item) => item.situacao === "Ativo")}
               searchKeys={["nome", "sigla", "descricao"]}
               columns={[
                 { label: "Unidade de Medida", key: "sigla" },
@@ -300,6 +198,7 @@ export function AdicionarItemReceitaPage({
               subtitle="Busque por uma unidade de medida cadastrada:"
               onChange={(ent) => {
                 setUnidadeMedida(ent.nome);
+                setUnidadeMedidaId(ent.id);
               }}
               required
             />
@@ -307,37 +206,37 @@ export function AdicionarItemReceitaPage({
               label="Receitas"
               placeholder="Buscar por receita"
               value={receita}
-              data={RECEITAS_ENTIDADE}
-              searchKeys={["nome", "sigla", "descricao"]}
+              data={listarReceitas().filter((item) => item.situacao === "Ativo")}
+              searchKeys={["codigo", "descricao"]}
               columns={[
-                { label: "Nome", key: "nome" },
-                {
-                  label: "Unidade de Medida",
-                  key: "unidadeMedida",
-                },
+                { label: "Código", key: "codigo" },
                 { label: "Descrição", key: "descricao" },
               ]}
               icon={<FileText size={18} color={GREEN} />}
               title="Buscar Receita"
               subtitle="Busque por uma receita cadastrada:"
               onChange={(ent) => {
-                setReceita(ent.nome);
+                setReceita(ent.descricao);
+                setReceitaId(ent.id);
               }}
               required
             />
             <FloatSelect
               label="Índice"
               required
-              value={indice}
-              onChange={setIndice}
-              options={toOptions(INDICES)}
+              value={indiceId}
+              onChange={(value) => {
+                setIndiceId(value);
+                setIndice(listarIndices().find((item) => item.id === value)?.nome ?? "");
+              }}
+              options={listarIndices().filter((item) => item.situacao === "Ativo").map((item) => ({ value: item.id, label: item.nome }))}
             />
             <FloatInput
               label="Quantidade do Índice"
               required
               value={quantidadeIndice}
               onChange={setQuantidadeIndice}
-              maxLength={2}
+              maxLength={12}
             />
             <SimNao
               label="Possui Contribuição ao Fundo?"
@@ -389,7 +288,7 @@ export function AdicionarItemReceitaPage({
                 type="button"
                 onClick={() => {
                   setIsSucesso(false);
-                  onNavigate("item-receita");
+                  onNavigate("visualizar-item-receita", registroSalvo);
                 }}
                 className="px-8 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition shadow-sm"
               >

@@ -13,6 +13,8 @@ import { useState } from "react";
 import { Navbar } from "../../../components/Navbar";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
 import { FloatSelect } from "../../../components/ui/FormKit";
+import { listarEspecies } from "../../Animal/Especie/especieData";
+import { listarFinalidadesTransito } from "./finalidadeTransitoData";
 
 const GREEN = "#1A7A3C";
 
@@ -51,100 +53,6 @@ const SITUACOES = [
   { value: "Suspenso", label: "Suspenso" },
 ];
 
-const ESPECIES_MOCK = [
-  {
-    id: 1,
-    codigo: "ESP-001",
-    nome: "Bovino",
-    grupo: "Bovídeos",
-  },
-  {
-    id: 2,
-    codigo: "ESP-002",
-    nome: "Bubalino",
-    grupo: "Bovídeos",
-  },
-  {
-    id: 3,
-    codigo: "ESP-003",
-    nome: "Equino",
-    grupo: "Equídeos",
-  },
-  { id: 4, codigo: "ESP-004", nome: "Suíno", grupo: "Suídeos" },
-  {
-    id: 5,
-    codigo: "ESP-005",
-    nome: "Peixe Redondo",
-    grupo: "Peixes",
-  },
-  { id: 6, codigo: "ESP-006", nome: "Galinha", grupo: "Aves" },
-];
-
-interface FinalidadeTransito {
-  id: number;
-  finalidade: string;
-  tipoProcedencia: string;
-  tipoDestino: string;
-  especies: {
-    id: number;
-    codigo: string;
-    nome: string;
-    grupo: string;
-  }[];
-  situacao: "Ativo" | "Inativo" | "Suspenso";
-}
-
-const FINALIDADES_MOCK: FinalidadeTransito[] = [
-  {
-    id: 1,
-    finalidade: "Abate",
-    tipoProcedencia: "Abatedouro Frigorífico",
-    tipoDestino: "Abatedouro Frigorífico",
-    especies: [ESPECIES_MOCK[0]],
-    situacao: "Ativo",
-  },
-  {
-    id: 2,
-    finalidade: "Pesagem",
-    tipoProcedencia: "Local de Pesagem",
-    tipoDestino: "Local de Pesagem",
-    especies: [ESPECIES_MOCK[1]],
-    situacao: "Ativo",
-  },
-  {
-    id: 3,
-    finalidade: "Feira",
-    tipoProcedencia: "Evento Pecuário",
-    tipoDestino: "Evento Pecuário",
-    especies: [ESPECIES_MOCK[2]],
-    situacao: "Suspenso",
-  },
-  {
-    id: 4,
-    finalidade: "Leilão",
-    tipoProcedencia: "Revendedora de Animais Vivos",
-    tipoDestino: "Revendedora de Animais Vivos",
-    especies: [ESPECIES_MOCK[3]],
-    situacao: "Inativo",
-  },
-  {
-    id: 5,
-    finalidade: "Exposição",
-    tipoProcedencia: "Evento Pecuário",
-    tipoDestino: "Evento Pecuário",
-    especies: [ESPECIES_MOCK[4]],
-    situacao: "Ativo",
-  },
-  {
-    id: 6,
-    finalidade: "Recria",
-    tipoProcedencia: "Estabelecimento Agropecuário",
-    tipoDestino: "Estabelecimento Agropecuário",
-    especies: [ESPECIES_MOCK[5]],
-    situacao: "Ativo",
-  },
-];
-
 function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
     <div className="flex items-center gap-2 bg-[#1A7A3C] text-white text-xs font-medium px-3 py-1.5 rounded-md shadow-sm max-w-full">
@@ -167,6 +75,7 @@ interface PageProps {
 export function FinalidadeTransitoPage({ onLogout, onNavigate }: PageProps) {
   const [finalidade, setFinalidade] = useState("");
   const [tipoDestino, setTipoDestino] = useState("");
+  const [tipoProcedencia, setTipoProcedencia] = useState("");
   const [situacao, setSituacao] = useState("");
   const [especie, setEspecie] = useState<any | null>(null);
   const [showFilters, setShowFilters] = useState(false);
@@ -177,7 +86,7 @@ export function FinalidadeTransitoPage({ onLogout, onNavigate }: PageProps) {
   const perPage = 10;
 
   const temFiltroAtivo =
-    finalidade.trim() !== "" || tipoDestino !== "" || situacao !== "";
+    finalidade.trim() !== "" || tipoProcedencia !== "" || tipoDestino !== "" || !!especie || situacao !== "";
 
   const handlePesquisar = () => {
     if (!temFiltroAtivo) {
@@ -188,14 +97,17 @@ export function FinalidadeTransitoPage({ onLogout, onNavigate }: PageProps) {
     setPage(1);
   };
 
-  const filtrados = FINALIDADES_MOCK.filter((f) => {
+  const filtrados = listarFinalidadesTransito().filter((f) => {
     const matchFinalidade =
       finalidade.trim() === "" ||
       f.finalidade.toLowerCase().includes(finalidade.trim().toLowerCase());
     const matchTipoDestino =
       tipoDestino === "" || f.tipoDestino === tipoDestino;
+    const matchTipoProcedencia =
+      tipoProcedencia === "" || f.tiposProcedencia.includes(tipoProcedencia);
+    const matchEspecie = !especie || f.especieIds.includes(especie.id);
     const matchSituacao = situacao === "" || f.situacao === situacao;
-    return matchFinalidade && matchTipoDestino && matchSituacao;
+    return matchFinalidade && matchTipoProcedencia && matchTipoDestino && matchEspecie && matchSituacao;
   });
 
   const total = filtrados.length;
@@ -290,8 +202,8 @@ export function FinalidadeTransitoPage({ onLogout, onNavigate }: PageProps) {
                 <div className="w-full lg:flex-1">
                   <FloatSelect
                     label="Tipo de Procedência"
-                    value={tipoDestino}
-                    onChange={setTipoDestino}
+                    value={tipoProcedencia}
+                    onChange={setTipoProcedencia}
                     options={TIPOS_DESTINO}
                   />
                 </div>
@@ -310,7 +222,7 @@ export function FinalidadeTransitoPage({ onLogout, onNavigate }: PageProps) {
                     label="Espécie"
                     placeholder="Buscar por nome da espécie"
                     value={especie ? especie.nome : ""}
-                    data={ESPECIES_MOCK}
+                    data={listarEspecies().filter((item) => item.situacao === "Ativo")}
                     searchKeys={["nome", "grupo"]}
                     columns={[
                       { label: "Espécie", key: "nome" },
@@ -360,6 +272,18 @@ export function FinalidadeTransitoPage({ onLogout, onNavigate }: PageProps) {
                 <Chip
                   label={`Tipo de Destino: ${tipoDestino}`}
                   onRemove={() => setTipoDestino("")}
+                />
+              )}
+              {tipoProcedencia && (
+                <Chip
+                  label={`Tipo de Procedência: ${tipoProcedencia}`}
+                  onRemove={() => setTipoProcedencia("")}
+                />
+              )}
+              {especie && (
+                <Chip
+                  label={`Espécie: ${especie.nome}`}
+                  onRemove={() => setEspecie(null)}
                 />
               )}
               {situacao && (

@@ -32,12 +32,9 @@ import { EntitySearchInput } from "../../../components/ui/EntitySearch";
 import { FloatInput, FloatSelect } from "../../../components/ui/FormKit";
 import {
   AEROPORTOS_GTA,
-  EMISSOES_GTA_MOCK,
-  ESPECIES_GTA,
   ESTABELECIMENTOS_GTA,
   EVENTOS_GTA,
   EXPLORACOES_GTA,
-  FINALIDADES_GTA,
   FRIGORIFICOS_GTA,
   NUCLEOS_GTA,
   PESSOAS_GTA,
@@ -46,6 +43,9 @@ import {
   TIPOS_FORMULARIO_GTA,
   TIPOS_LOCAL_OPTIONS,
   copiarEmissaoGta,
+  listarEmissoesGta,
+  listarEspeciesGta,
+  listarFinalidadesGta,
   criarLocalVazio,
   formatarDataGta,
   type EmissaoGta,
@@ -320,7 +320,7 @@ export function EmissaoGtaPage({
 
   const resultados = useMemo(() => {
     const busca = serieNumero.replace(/\s/g, "").toLowerCase();
-    const filtrados = EMISSOES_GTA_MOCK.filter(
+    const filtrados = listarEmissoesGta().filter(
       (item) =>
         (!busca ||
           item.serieNumero.replace(/\s/g, "").toLowerCase().includes(busca)) &&
@@ -509,14 +509,14 @@ export function EmissaoGtaPage({
                   <SearchEntityField
                     label="Espécie"
                     value={especie}
-                    data={ESPECIES_GTA}
+                    data={listarEspeciesGta()}
                     icon={<Dna size={20} />}
                     onChange={setEspecie}
                   />
                   <SearchEntityField
                     label="Finalidade de Trânsito"
                     value={finalidade}
-                    data={FINALIDADES_GTA}
+                    data={listarFinalidadesGta(especie?.id)}
                     icon={<Truck size={20} />}
                     onChange={setFinalidade}
                   />
@@ -670,7 +670,7 @@ export function EmissaoGtaPage({
                             {item.situacao === "Emitida" && (
                               <ActionButton
                                 title="Baixar GTA"
-                                onClick={() => downloadMock("GTA", item)}
+                                onClick={() => onNavigate("documento-emissao-gta", item)}
                               >
                                 <FileCheck2 size={16} />
                               </ActionButton>

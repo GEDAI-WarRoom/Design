@@ -10,8 +10,8 @@ import {
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
 import { FloatInput, FloatSelect } from "../../../components/ui/FormKit";
 import {
-  ESPECIES_TAXA_MOCK,
-  ITENS_RECEITA_TAXA_MOCK,
+  listarEspeciesTaxa,
+  listarItensReceitaTaxa,
   MODALIDADES_FAIXA,
   TIPOS_COBRANCA,
   TIPOS_DOCUMENTO_SANITARIO,
@@ -87,7 +87,7 @@ function ItemReceitaField({
           label={label}
           placeholder="Buscar item de receita"
           value={item?.nome ?? ""}
-          data={ITENS_RECEITA_TAXA_MOCK}
+          data={listarItensReceitaTaxa()}
           searchKeys={["codigo", "nome", "quantidadeIndice"]}
           columns={[
             { label: "Item de Receita", key: "nome" },
@@ -174,7 +174,7 @@ export function TaxaEmissaoGtaForm({
               label="Espécie"
               placeholder="Buscar por espécie ou grupo"
               value={value.especie.nome}
-              data={ESPECIES_TAXA_MOCK}
+              data={listarEspeciesTaxa()}
               searchKeys={["codigo", "nome", "grupo"]}
               columns={[
                 { label: "Espécie", key: "nome" },

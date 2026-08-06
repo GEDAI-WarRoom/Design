@@ -5,27 +5,13 @@ import {
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatSelect } from "../../../components/ui/FormKit";
+import { listarEspecies, type Especie } from "./especieData";
 
 const GREEN = "#1A7A3C";
 
 // ==========================================================
 // DADOS DA LISTAGEM (substituir por API)
 // ==========================================================
-interface Especie {
-  id: number;
-  nome: string;
-  codigoMapa: string;
-  situacao: "Ativo" | "Inativo";
-}
-
-const ESPECIES_MOCK: Especie[] = [
-  { id: 1, nome: "Bovino", codigoMapa: "1.1", situacao: "Ativo" },
-  { id: 2, nome: "Bubalino", codigoMapa: "1.2", situacao: "Ativo" },
-  { id: 3, nome: "Suíno", codigoMapa: "2.1", situacao: "Ativo" },
-  { id: 4, nome: "Equino", codigoMapa: "3.1", situacao: "Ativo" },
-  { id: 5, nome: "Caprino", codigoMapa: "4.1", situacao: "Inativo" },
-];
-
 const SITUACOES = [
   { value: "Ativo", label: "Ativo" },
   { value: "Inativo", label: "Inativo" },
@@ -90,7 +76,7 @@ export function EspeciePage({ onLogout, onNavigate }: PageProps) {
     else { setSortKey(key); setSortAsc(true); }
   }
 
-  const filtrados = ESPECIES_MOCK.filter((e) => {
+  const filtrados = listarEspecies().filter((e) => {
     const termo = busca.trim().toLowerCase();
     const matchBusca = termo === "" || (e.nome ?? "").toLowerCase().includes(termo) || (e.codigoMapa ?? "").toLowerCase().includes(termo);
     const matchSituacao = situacao === "" || e.situacao === situacao;

@@ -8,6 +8,7 @@ import {
 } from "./EmissaoGtaForm";
 import {
   adicionarEmissaoGta,
+  calcularValorGta,
   criarEmissaoGtaVazia,
   type EmissaoGta,
   type EmissaoGtaFormValue,
@@ -76,7 +77,7 @@ export function AdicionarEmissaoGtaPage({
         <EmissaoGtaForm
           value={emissao}
           onChange={(valor) => {
-            setEmissao(valor);
+            setEmissao({ ...valor, valorGta: calcularValorGta(valor) });
             setTentouSalvar(false);
           }}
         />

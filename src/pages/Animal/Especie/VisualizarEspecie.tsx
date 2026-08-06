@@ -3,6 +3,7 @@ import { ArrowLeft, Pencil, Check, Minus, FileText, Calendar, Scale, Layers, Squ
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, FloatSelect, SimNao, AccordionCardGroup } from "../../../components/ui/FormKit";
 import * as Icons from "../../../imports/icons";
+import { obterEspecie } from "./especieData";
 
 
 const GREEN = "#1A7A3C";
@@ -142,7 +143,7 @@ interface PageProps {
 }
 
 export function VisualizarEspeciePage({ onLogout, onNavigate, data }: PageProps) {
-  const d = { ...DADOS_EXEMPLO, ...(data || {}) };
+  const d = { ...DADOS_EXEMPLO, ...(obterEspecie(data?.id) || data || {}) };
   const LAT = { fontFamily: "'Lato', sans-serif" } as const;
   
   const [activeTab, setActiveTab] = useState("cadastro");

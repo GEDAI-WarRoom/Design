@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { ArrowLeft, Info, Check } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, FloatSelect, SimNao } from "../../../components/ui/FormKit";
+import { salvarEspecie, type Especie, type RespostaSimNao } from "./especieData";
 
 const GREEN = "#1A7A3C";
 
@@ -55,6 +56,25 @@ export function AdicionarEspeciePage({ onLogout, onNavigate }: PageProps) {
   const [utilizaFormularioGta, setUtilizaFormularioGta] = useState("Não");
 
   const [isSucesso, setIsSucesso] = useState(false);
+  const [registroSalvo, setRegistroSalvo] = useState<Especie | null>(null);
+
+  const salvar = () => {
+    const salvo = salvarEspecie({
+      grupo: grupo || "Bovídeos",
+      nome: nome.trim() || "Nova Espécie",
+      nomeCientifico,
+      codigoMapa: codigoMapa || "0",
+      maxAnimaisGta,
+      controleRebanhoNucleo: controleRebanhoNucleo as RespostaSimNao,
+      sexoDefinido: sexoDefinido as RespostaSimNao,
+      emissaoGtaHabilitado: emissaoGtaHabilitado as RespostaSimNao,
+      utilizaFormularioGta: utilizaFormularioGta as RespostaSimNao,
+      faixasEtarias: ["Animais"],
+      situacao: "Ativo",
+    });
+    setRegistroSalvo(salvo);
+    setIsSucesso(true);
+  };
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
@@ -69,7 +89,7 @@ export function AdicionarEspeciePage({ onLogout, onNavigate }: PageProps) {
           </button>
           <div className="flex justify-between items-center w-full">
             <h1 className="text-2xl font-semibold text-gray-900">Adicionar Espécie</h1>
-            <button type="button" onClick={() => setIsSucesso(true)} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm">Adicionar</button>
+            <button type="button" onClick={salvar} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm">Adicionar</button>
           </div>
         </div>
 
@@ -167,12 +187,7 @@ export function AdicionarEspeciePage({ onLogout, onNavigate }: PageProps) {
             <p className="text-sm text-gray-500 mt-1">{nome ? `"${nome}"` : "A espécie"} foi adicionada.</p>
             <div className="flex gap-3 justify-center mt-6">
               <button onClick={() => { setIsSucesso(false); onNavigate("especie"); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition">Voltar</button>
-              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-especie", {
-                grupo, nome, nomeCientifico, codigoMapa,
-                maxAnimaisGta, controleRebanhoNucleo, sexoDefinido,
-                emissaoGtaHabilitado, utilizaFormularioGta,
-                situacao: "Ativo",
-              }); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
+              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-especie", registroSalvo); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
             </div>
           </div>
         </div>

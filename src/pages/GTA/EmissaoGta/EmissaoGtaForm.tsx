@@ -44,15 +44,12 @@ import {
   ACOUGUES_GTA,
   AEROPORTOS_GTA,
   DOENCAS_VACINA_GTA,
-  ESPECIES_GTA,
   ESTABELECIMENTOS_GTA,
   ESTADOS_BRASIL,
   EVENTOS_GTA,
   EXPLORACOES_GTA,
-  FINALIDADES_GTA,
   FRIGORIFICOS_GTA,
   getInterdicaoGta,
-  ISENCOES_TAXA_GTA,
   MEIOS_TRANSPORTE,
   MUNICIPIOS_POR_ESTADO,
   NUCLEOS_GTA,
@@ -68,6 +65,8 @@ import {
   formatarDataGta,
   formatarMoedaGta,
   totalAnimaisGta,
+  listarEspeciesGta,
+  listarFinalidadesGta,
   type DestinoGta,
   type EmissaoGtaFormValue,
   type EntidadeGta,
@@ -75,6 +74,7 @@ import {
   type TipoFormularioGta,
   type TipoLocalGta,
 } from "./emissaoGtaData";
+import { listarIsencoesParaGta } from "../IsencaoTaxaGTA/isencaoTaxaGtaData";
 
 type FormMode = "create" | "view";
 
@@ -1432,7 +1432,7 @@ export function EmissaoGtaForm({
             <EntityPicker
               label="Espécie"
               value={value.especie}
-              data={ESPECIES_GTA}
+              data={listarEspeciesGta()}
               icon={<Dna size={18} className="text-[#1A7A3C]" />}
               columns={[
                 { label: "Espécie", key: "nome" },
@@ -1442,28 +1442,34 @@ export function EmissaoGtaForm({
               semComplemento
               required
               disabled={disabled}
-              onChange={(especie) =>
+              onChange={(especie) => {
+                const finalidadeCompativel = listarFinalidadesGta(especie.id).some(
+                  (item) => item.id === value.finalidade?.id,
+                )
+                  ? value.finalidade
+                  : null;
                 onChange?.({
                   ...value,
                   especie,
+                  finalidade: finalidadeCompativel,
                   faixasAnimais: criarFaixasAnimais(especie),
                   procedencia: criarLocalVazio(),
                   destino: criarDestinoVazio(),
                   gtasRastreio:
                     especie.grupo === "Aves" &&
-                      value.finalidade?.nome === "Abate"
+                      finalidadeCompativel?.nome === "Abate"
                       ? value.gtasRastreio.length > 0
                         ? value.gtasRastreio
                         : [{ id: uid(), uf: "", serieNumero: "" }]
                       : [],
-                })
-              }
+                });
+              }}
             />
             <EntityPicker
               label="Finalidade de Trânsito"
               tooltipText="Selecione a finalidade para a qual os animais serão transportados."
               value={value.finalidade}
-              data={FINALIDADES_GTA}
+              data={listarFinalidadesGta(value.especie?.id)}
               icon={<Truck size={18} className="text-[#1A7A3C]" />}
               columns={[{ label: "Finalidade de Trânsito", key: "nome" }]}
               searchKeys={["nome"]}
@@ -2140,7 +2146,7 @@ export function EmissaoGtaForm({
                 label="Motivo de Isenção de Taxa"
                 placeholder="Buscar motivo de isenção"
                 value={value.motivoIsencaoTaxa?.nome ?? ""}
-                data={ISENCOES_TAXA_GTA}
+                data={listarIsencoesParaGta()}
                 searchKeys={["nome"]}
                 columns={[{ label: "Motivo", key: "nome" }]}
                 title="Buscar Motivo de Isenção de Taxa"

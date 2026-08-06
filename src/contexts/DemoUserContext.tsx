@@ -88,6 +88,7 @@ const produtorAllowedRoutes = new Set([
 	"visualizar-emissao-ata",
 	"adicionar-emissao-gta",
 	"visualizar-emissao-gta",
+	"documento-emissao-gta",
 	"emitir-emissao-gta",
 	"cancelar-emissao-gta",
 	"pagar-emissao-gta",

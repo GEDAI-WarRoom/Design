@@ -4,6 +4,7 @@ import { Navbar } from "../../../components/Navbar";
 import { FloatInput, Tabs } from "../../../components/ui/FormKit";
 import { ValorIndiceTab } from "./ValorIndiceTab"; // Importando a nova aba
 import * as Icons from "../../../imports/icons";
+import { obterIndice } from "./indiceIndice";
 
 interface VisualizarIndiceProps {
   dados: any;
@@ -18,7 +19,7 @@ export function VisualizarIndice({ dados, onLogout, onNavigate }: VisualizarIndi
   // Controle de abertura do modal da aba de Valor do Índice
   const [isModalValorOpen, setIsModalValorOpen] = useState(false);
 
-  const indice = { id: "1", nome: "UFEMG", situacao: "Ativo", ...(dados || {}) };
+  const indice = { ...(obterIndice(dados?.id) ?? obterIndice(null)!), ...(dados || {}) };
 
   const tabs = [
     {

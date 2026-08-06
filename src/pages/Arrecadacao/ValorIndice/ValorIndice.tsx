@@ -14,13 +14,18 @@ import {
   FloatSelect,
   FloatInput,
 } from "../../../components/ui/FormKit";
+import { listarIndices } from "../Indice/indiceIndice";
+import { listarValoresIndice } from "./valorIndiceData";
 
 const GREEN = "#1A7A3C";
 
 // ==========================================================
 // LISTAS DE OPÇÕES (Valor por Índice)
 // ==========================================================
-const INDICES = [{ value: "UFEMG", label: "UFEMG" }];
+const indicesOptions = () =>
+  listarIndices()
+    .filter((item) => item.situacao === "Ativo")
+    .map((item) => ({ value: item.nome, label: item.nome }));
 
 const MESES = [
   "Janeiro",
@@ -45,58 +50,6 @@ const SITUACOES = [
 // ==========================================================
 // MOCK DE DADOS (substituir por API)
 // ==========================================================
-interface ValorIndice {
-  id: number;
-  indice: string;
-  ano: string;
-  mes: string;
-  valor: number;
-  situacao: "Ativo" | "Inativo";
-}
-
-const VALORES_INDICE_MOCK: ValorIndice[] = [
-  {
-    id: 1,
-    indice: "UFEMG",
-    ano: "2026",
-    mes: "Janeiro",
-    valor: 2000,
-    situacao: "Ativo",
-  },
-  {
-    id: 2,
-    indice: "UFEMG",
-    ano: "2026",
-    mes: "Fevereiro",
-    valor: 2050,
-    situacao: "Ativo",
-  },
-  {
-    id: 3,
-    indice: "UFEMG",
-    ano: "2025",
-    mes: "Dezembro",
-    valor: 1980,
-    situacao: "Inativo",
-  },
-  {
-    id: 4,
-    indice: "UFEMG",
-    ano: "2025",
-    mes: "Novembro",
-    valor: 1960,
-    situacao: "Inativo",
-  },
-  {
-    id: 5,
-    indice: "UFEMG",
-    ano: "2025",
-    mes: "Outubro",
-    valor: 1950,
-    situacao: "Ativo",
-  },
-];
-
 // ==========================================================
 // HELPERS DE UI
 // ==========================================================
@@ -165,7 +118,7 @@ export function ValorIndicePage({
     setPage(1);
   };
 
-  const filtrados = VALORES_INDICE_MOCK.filter((v) => {
+  const filtrados = listarValoresIndice().filter((v) => {
     const matchIndice = !indice || v.indice === indice;
     const matchAno = ano === "" || v.ano === ano;
     const matchMes = !mes || v.mes === mes;
@@ -240,7 +193,7 @@ export function ValorIndicePage({
                 setIndice(v);
                 setErroFiltro(false);
               }}
-              options={INDICES}
+              options={indicesOptions()}
             />
 
             <FloatInput
