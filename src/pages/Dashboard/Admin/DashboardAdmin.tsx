@@ -1,6 +1,6 @@
 import { Navbar } from "../../../components/Navbar";
-import type { MenuCategory } from "../../Dashboard";
 import { DashboardMenu } from "../shared/DashboardMenu";
+import type { MenuCategory } from "../shared/dashboardTypes";
 
 interface DashboardAdminProps {
 	onLogout: () => void;

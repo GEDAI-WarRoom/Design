@@ -5,6 +5,10 @@ import {
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatSelect, FloatMultiSelect } from "../../../components/ui/FormKit";
+import {
+  listarProfissionaisAnimal,
+  type ProfissionalAnimal,
+} from "./profissionalAnimalData";
 
 const GREEN = "#1A7A3C";
 
@@ -29,27 +33,6 @@ const SITUACOES = [
 ];
 
 const HABILITACOES = ["Emissão de GTA", "Exame de Brucelose/Tuberculose", "Exame de Mormo"];
-
-// ==========================================================
-// MOCK DE RESULTADOS
-// ==========================================================
-interface Profissional {
-  id: number;
-  nome: string;
-  cpf: string;
-  formacao: string;
-  numeroConselho: string;
-  servicoOficial: "Sim" | "Não";
-  vacinacaoBrucelose: "Sim" | "Não";
-  habilitacoes: string[];
-  situacao: "Ativo" | "Inativo";
-}
-
-const PROFISSIONAIS_MOCK: Profissional[] = [
-  { id: 1, nome: "Josephina Arantes", cpf: "444.009.956-40", formacao: "Médico Veterinário", numeroConselho: "512633", servicoOficial: "Sim", vacinacaoBrucelose: "Sim", habilitacoes: ["Emissão de GTA"], situacao: "Ativo" },
-  { id: 2, nome: "José Aarão Neto", cpf: "555.009.956-40", formacao: "Zootecnista", numeroConselho: "778812", servicoOficial: "Não", vacinacaoBrucelose: "Não", habilitacoes: ["Emissão de GTA"], situacao: "Ativo" },
-  { id: 3, nome: "Marina Couto Dias", cpf: "333.221.115-09", formacao: "Engenheiro Agrônomo", numeroConselho: "091254", servicoOficial: "Não", vacinacaoBrucelose: "Não", habilitacoes: ["Exame de Mormo"], situacao: "Inativo" },
-];
 
 // ==========================================================
 // UI HELPERS
@@ -77,17 +60,13 @@ function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
   );
 }
 
-function SituacaoTexto({ situacao }: { situacao: Profissional["situacao"] }) {
-  const cor = situacao === "Ativo" ? "#1A7A3C" : "#6B7280";
-  return <span className="text-sm font-medium" style={{ color: cor }}>{situacao}</span>;
-}
-
 interface PageProps {
   onLogout: () => void;
   onNavigate: (screen: any, data?: any) => void;
 }
 
 export function ProfissionalAnimalPage({ onLogout, onNavigate }: PageProps) {
+  const profissionais = listarProfissionaisAnimal();
   // ---- Busca principal ----
   const [busca, setBusca] = useState(""); // Nome ou CPF
 
@@ -121,7 +100,7 @@ export function ProfissionalAnimalPage({ onLogout, onNavigate }: PageProps) {
     else { setSortKey(key); setSortDir("asc"); }
   };
 
-  const filtrados = PROFISSIONAIS_MOCK.filter((p) => {
+  const filtrados = profissionais.filter((p) => {
     const q = busca.trim().toLowerCase();
     const matchBusca = q === "" || p.nome.toLowerCase().includes(q) || p.cpf.replace(/\D/g, "").includes(busca.replace(/\D/g, ""));
     const matchFormacao = formacao === "" || p.formacao === formacao;
@@ -134,7 +113,7 @@ export function ProfissionalAnimalPage({ onLogout, onNavigate }: PageProps) {
   });
 
   const ordenados = [...filtrados].sort((a, b) => {
-    const raw = (p: Profissional) => sortKey === "habilitacoes" ? p.habilitacoes.join(", ") : String(p[sortKey]);
+    const raw = (p: ProfissionalAnimal) => sortKey === "habilitacoes" ? p.habilitacoes.join(", ") : String(p[sortKey]);
     const va = raw(a).toLowerCase();
     const vb = raw(b).toLowerCase();
     if (va < vb) return sortDir === "asc" ? -1 : 1;

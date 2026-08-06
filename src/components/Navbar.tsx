@@ -25,7 +25,7 @@ interface NavbarProps {
 
 export function Navbar({ onLogout, onNavigate, currentScreen, hideSearch = false }: NavbarProps) {
   const [search, setSearch] = useState("");
-  const { role } = useDemoUser();
+  const { role, user } = useDemoUser();
 
   const allItems = [
     ...(cadastrosCategories?.flatMap((c) => c.items.map((i) => ({ ...i, category: c.title }))) || []),
@@ -148,10 +148,10 @@ export function Navbar({ onLogout, onNavigate, currentScreen, hideSearch = false
             <div className="flex items-center gap-4 flex-shrink-0">
               <div className="text-right hidden sm:block">
                 <p className="text-sm font-semibold text-gray-800 leading-tight">
-                  {role === "produtor" ? "Fernando" : "Lucas"}
+                  {user?.name ?? "Usuário"}
                 </p>
                 <p className="text-xs text-gray-400 leading-tight">
-                  {role === "produtor" ? "Produtor" : "Administrador"}
+                  {user?.roleLabel ?? "Perfil não selecionado"}
                 </p>
               </div>
               <button
