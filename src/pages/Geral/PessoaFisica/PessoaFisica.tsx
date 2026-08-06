@@ -8,12 +8,12 @@ const GREEN = "#1A7A3C";
 export const PESSOAS_FISICAS_MOCK = [
   {
     id: "1",
-    nome: "Josephina Arantes",
+    nome: "Eloiza Silva",
     cpf: "444.009.956-40",
     municipio: "Lavras",
     situacao: "Ativo",
     telefone: "(35) 99999-9999",
-    email: "josephina@email.com",
+    email: "eloiza.silva@email.com",
     observacao: "Produtora cadastrada na região central."
   },
   {

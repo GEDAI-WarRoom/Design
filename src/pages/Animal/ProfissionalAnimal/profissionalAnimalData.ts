@@ -28,7 +28,7 @@ export const PROFISSIONAL_VETERINARIO_DEMONSTRACAO_ID = 1;
 
 export const PROFISSIONAL_VETERINARIO_DEMONSTRACAO: ProfissionalAnimal = {
   id: PROFISSIONAL_VETERINARIO_DEMONSTRACAO_ID,
-  nome: "Josephina Arantes",
+  nome: "Eloiza Silva",
   cpf: "444.009.956-40",
   formacao: "Médico Veterinário",
   numeroConselho: "512633",
@@ -69,7 +69,25 @@ export const PROFISSIONAIS_ANIMAL_INICIAIS: ProfissionalAnimal[] = [
 ];
 
 export function listarProfissionaisAnimal() {
-  return listarColecaoMock(COLECAO, PROFISSIONAIS_ANIMAL_INICIAIS);
+  const profissionais = listarColecaoMock(COLECAO, PROFISSIONAIS_ANIMAL_INICIAIS);
+  const possuiNomeAnterior = profissionais.some(
+    (profissional) =>
+      profissional.id === PROFISSIONAL_VETERINARIO_DEMONSTRACAO_ID &&
+      profissional.cpf === PROFISSIONAL_VETERINARIO_DEMONSTRACAO.cpf &&
+      profissional.nome === "Josephina Arantes",
+  );
+
+  if (!possuiNomeAnterior) return profissionais;
+
+  return salvarColecaoMock(
+    COLECAO,
+    profissionais.map((profissional) =>
+      profissional.id === PROFISSIONAL_VETERINARIO_DEMONSTRACAO_ID &&
+      profissional.cpf === PROFISSIONAL_VETERINARIO_DEMONSTRACAO.cpf
+        ? { ...profissional, nome: PROFISSIONAL_VETERINARIO_DEMONSTRACAO.nome }
+        : profissional,
+    ),
+  );
 }
 
 export function obterProfissionalAnimal(id?: number | null) {

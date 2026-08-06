@@ -26,7 +26,7 @@ const SIM_NAO = ["Sim", "Não"];
 // ==========================================================
 const PESSOAS_FISICAS_SERVICO_MOCK = [
   { id: 1, nome: "José Aarão Neto", documento: "555.009.956-40", servicoOficial: "Sim", esfera: "Estadual", masp: "10455301" },
-  { id: 2, nome: "Josephina Arantes", documento: "444.009.956-40", servicoOficial: "Não", esfera: "", masp: "" },
+  { id: 2, nome: "Eloiza Silva", documento: "444.009.956-40", servicoOficial: "Não", esfera: "", masp: "" },
   { id: 3, nome: "Carla Menezes Rocha", documento: "111.998.775-30", servicoOficial: "Sim", esfera: "Federal", masp: "" },
 ];
 

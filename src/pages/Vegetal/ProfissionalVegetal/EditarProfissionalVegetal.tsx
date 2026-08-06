@@ -6,7 +6,7 @@ import { FloatInput, FloatSelect, LargeTextArea } from "../../../components/ui/F
 const GREEN = "#1A7A3C";
 
 const EXEMPLO_PROFISSIONAL = {
-  nome: "Josephina Arantes",
+  nome: "Eloiza Silva",
   cpf: "444.009.956-40",
   formacao: "Engenheiro Agrônomo",
   crea: "506779200",

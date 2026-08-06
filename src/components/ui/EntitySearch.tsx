@@ -2870,7 +2870,7 @@ export const ProfissionalAnimalInput: React.FC<
 // MOCK DE EXEMPLO (Substituir pela sua lista global se necessário)
 // ==========================================================
 export const PESSOAS_FISICAS_MOCK = [
-	{ id: 1, nome: "Josephina Arantes", documento: "444.009.956-40" },
+	{ id: 1, nome: "Eloiza Silva", documento: "444.009.956-40" },
 	{ id: 2, nome: "Pedro Alves Moraes", documento: "222.114.558-70" },
 	{ id: 3, nome: "Carla Menezes Rocha", documento: "111.998.775-30" },
 ];
