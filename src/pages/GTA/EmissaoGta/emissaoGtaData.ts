@@ -328,7 +328,7 @@ export const EXPLORACOES_GTA: ExploracaoGta[] = [
     nome: "Exploração Aves - Vale Verde",
     estabelecimentoId: 2,
     responsavelId: 3,
-    especieId: 3,
+    especieId: 5,
     especie: "Aves",
     produtores: "Marcos Silva, Ana Paula Nunes",
   },
