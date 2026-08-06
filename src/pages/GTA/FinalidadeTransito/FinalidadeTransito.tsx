@@ -19,17 +19,30 @@ const GREEN = "#1A7A3C";
 // --- mock da entidade ---
 
 const TIPOS_DESTINO = [
-  { value: "Evento Pecuário", label: "Evento Pecuário" },
-  { value: "Frigorífico", label: "Frigorífico" },
   {
     value: "Estabelecimento Agropecuário",
     label: "Estabelecimento Agropecuário",
   },
-  { value: "Pesagem", label: "Pesagem" },
+  { value: "Evento Pecuário", label: "Evento Pecuário" },
+  { value: "Abatedouro Frigorífico", label: "Abatedouro Frigorífico" },
   {
     value: "Revendedora de Animais Vivos",
     label: "Revendedora de Animais Vivos",
   },
+  {
+    value: "Unidade de Vigilância Agropecuária",
+    label: "Unidade de Vigilância Agropecuária",
+  },
+  {
+    value: "Instituição de Ensino e Pesquisa",
+    label: "Instituição de Ensino e Pesquisa",
+  },
+  { value: "Local de Pesagem", label: "Local de Pesagem" },
+  {
+    value: "Local de Realização de Exame",
+    label: "Local de Realização de Exame",
+  },
+  { value: "Estabelecimento Genérico", label: "Estabelecimento Genérico" },
 ];
 
 const SITUACOES = [
@@ -85,16 +98,16 @@ const FINALIDADES_MOCK: FinalidadeTransito[] = [
   {
     id: 1,
     finalidade: "Abate",
-    tipoProcedencia: "Frigorífico",
-    tipoDestino: "Frigorífico",
+    tipoProcedencia: "Abatedouro Frigorífico",
+    tipoDestino: "Abatedouro Frigorífico",
     especies: [ESPECIES_MOCK[0]],
     situacao: "Ativo",
   },
   {
     id: 2,
     finalidade: "Pesagem",
-    tipoProcedencia: "Pesagem",
-    tipoDestino: "Pesagem",
+    tipoProcedencia: "Local de Pesagem",
+    tipoDestino: "Local de Pesagem",
     especies: [ESPECIES_MOCK[1]],
     situacao: "Ativo",
   },

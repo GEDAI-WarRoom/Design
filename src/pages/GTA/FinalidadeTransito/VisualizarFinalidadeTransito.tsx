@@ -4,9 +4,8 @@ import { Navbar } from "../../../components/Navbar";
 import { CheckboxGroup, FloatInput } from "../../../components/ui/FormKit";
 
 const GREEN = "#1A7A3C";
-const TIPOS_LOCAL = ["Evento Pecuário", "Frigorífico", "Estabelecimento Agropecuário", "Revendedora de Animais Vivos", "Estabelecimento Genérico", "Instituição de Ensino e Pesquisa"];
+const TIPOS_LOCAL = ["Estabelecimento Agropecuário", "Evento Pecuário", "Abatedouro Frigorífico", "Revendedora de Animais Vivos", "Unidade de Vigilância Agropecuária", "Instituição de Ensino e Pesquisa", "Local de Pesagem", "Local de Realização de Exame", "Estabelecimento Genérico"];
 const EMITE_ACESSO = ["Emite para dentro do Estado", "Emite para fora do Estado"];
-const TAXAS = ["GTA para dentro do Estado", "GTA para fora do Estado"];
 const options = (values: string[]) => values.map((value) => ({ value, label: value }));
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -27,18 +26,17 @@ export function VisualizarFinalidadeTransitoPage({ dados, onLogout, onNavigate }
     id: 1,
     finalidade: "Abate",
     codigoMapa: "01",
-    tipoProcedencia: "Frigorífico",
-    tipoDestino: "Frigorífico",
+    tipoProcedencia: "Abatedouro Frigorífico",
+    tipoDestino: "Abatedouro Frigorífico",
     especies: [{ id: 1, codigo: "ESP-001", nome: "Bovino" }],
     situacao: "Ativo",
     ...(dados || {}),
   };
-  const tiposProcedencia = finalidade.tiposProcedencia?.length ? finalidade.tiposProcedencia : [finalidade.tipoProcedencia || "Frigorífico"];
-  const tiposDestino = finalidade.tiposDestino?.length ? finalidade.tiposDestino : [finalidade.tipoDestino || "Frigorífico"];
+  const tiposProcedencia = finalidade.tiposProcedencia?.length ? finalidade.tiposProcedencia : [finalidade.tipoProcedencia || "Abatedouro Frigorífico"];
+  const tiposDestino = finalidade.tiposDestino?.length ? finalidade.tiposDestino : [finalidade.tipoDestino || "Abatedouro Frigorífico"];
   const emiteAcessoExterno = finalidade.emiteAcessoExterno?.length
     ? finalidade.emiteAcessoExterno
     : tiposProcedencia.includes("Estabelecimento Agropecuário") ? [EMITE_ACESSO[0]] : [];
-  const taxasCobrar = finalidade.taxasCobrar?.length ? finalidade.taxasCobrar : [TAXAS[0]];
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
@@ -48,7 +46,7 @@ export function VisualizarFinalidadeTransitoPage({ dados, onLogout, onNavigate }
           <button type="button" onClick={() => onNavigate("finalidade-transito")} className="mb-3 flex items-center gap-1 text-sm font-semibold text-[#1A7A3C] hover:opacity-70"><ArrowLeft size={15} />Todas as Finalidades de Trânsito</button>
           <div className="flex items-center justify-between gap-4">
             <h1 className="text-2xl font-semibold text-gray-900">Visualizar Finalidade de Trânsito</h1>
-            <button type="button" onClick={() => onNavigate("editar-finalidade-transito", { ...finalidade, tiposProcedencia, tiposDestino, emiteAcessoExterno, taxasCobrar })} className="h-10 rounded-md bg-[#1A7A3C] px-5 text-xs font-bold text-white hover:bg-[#15612F]">Editar</button>
+            <button type="button" onClick={() => onNavigate("editar-finalidade-transito", { ...finalidade, tiposProcedencia, tiposDestino, emiteAcessoExterno })} className="h-10 rounded-md bg-[#1A7A3C] px-5 text-xs font-bold text-white hover:bg-[#15612F]">Editar</button>
           </div>
         </div>
 
@@ -79,10 +77,7 @@ export function VisualizarFinalidadeTransitoPage({ dados, onLogout, onNavigate }
         </Section>
 
         <Section title="Informações de Destino">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <CheckboxGroup title="Tipo de Destino" required options={options(TIPOS_LOCAL)} defaultValue={tiposDestino} disabled />
-            <CheckboxGroup title="Taxas a Cobrar" options={options(TAXAS)} defaultValue={taxasCobrar} disabled />
-          </div>
+          <CheckboxGroup title="Tipo de Destino" required options={options(TIPOS_LOCAL)} defaultValue={tiposDestino} disabled />
         </Section>
       </main>
     </div>
