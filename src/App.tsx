@@ -124,6 +124,7 @@ import { VisualizarEventoPecuarioPage } from "./pages/Animal/EventoPecuario/Visu
 import { AdicionarExploracaoPecuariaPage } from "./pages/Animal/ExploracaoPecuaria/AdicionarExploracaoPecuaria";
 import { ExploracaoPecuariaPage } from "./pages/Animal/ExploracaoPecuaria/ExploracaoPecuaria";
 import { VisualizarExploracaoPecuariaPage } from "./pages/Animal/ExploracaoPecuaria/VisualizarExploracaoPecuaria";
+import EditarExploracaoPecuariaPage, { EditarExploracaoPecuariaPageProps } from "./pages/Animal/ExploracaoPecuaria/EditarExploracaoPecuaria";
 import { AdicionarIntegradoraCooperativaPage } from "./pages/Animal/IntegradoraCooperativa/AdicionarIntegradoraCooperativa";
 import { IntegradoraCooperativaPage } from "./pages/Animal/IntegradoraCooperativa/IntegradoraCooperativa";
 import { VisualizarIntegradoraCooperativaPage } from "./pages/Animal/IntegradoraCooperativa/VisualizarIntegradoraCooperativa";
@@ -421,7 +422,6 @@ export type Screen =
   | "editar-previsao-migracao"
   | "exploracao-pecuaria" // 🚀 Adicionado
   | "adicionar-exploracao-pecuaria" // 🚀 Adicionado
-  | "visualizar-exploracao-pecuaria" // 🚀 Adicionado
   | "atualizacao-cadastral-rebanho"
   | "confirmar-dados-produtor-rebanho"
   | "visualizar-atualizacao-cadastral-rebanho"
@@ -622,6 +622,7 @@ export type Screen =
 	| "exploracao-pecuaria" // 🚀 Adicionado
 	| "adicionar-exploracao-pecuaria" // 🚀 Adicionado
 	| "visualizar-exploracao-pecuaria" // 🚀 Adicionado
+	| "editar-exploracao-pecuaria"
 	| "atualizacao-cadastral-rebanho"
 	| "confirmar-dados-produtor-rebanho"
 	| "visualizar-atualizacao-cadastral-rebanho"
@@ -1623,6 +1624,16 @@ export default function App() {
 					dados={screenData}
 				/>
 			);
+
+		case "editar-exploracao-pecuaria":
+			return (
+				<EditarExploracaoPecuariaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+				/>
+			);
+			
 		case "atualizacao-cadastral-rebanho":
 			return (
 				<AtualizacaoCadastralRebanhoPage
