@@ -3,6 +3,11 @@ import { ArrowLeft, Info, Check, PlusCircle, Trash2, ChevronDown, ChevronUp } fr
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, LargeTextArea, UploadField } from "../../../components/ui/FormKit";
 import { BlocoEnderecoFields, BlocoContatoFields, DynamicListWrapper, ProprietarioInput } from "../../../components/ui/EntitySearch";
+import {
+  UNIDADES_VIGILANCIA_MOCK,
+  registrarUnidadeVigilancia,
+  type UnidadeVigilanciaAgropecuaria,
+} from "./unidadeVigilanciaData";
 
 const GREEN = "#1A7A3C";
 const uid = (p: string) => `${p}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
@@ -20,61 +25,61 @@ function Section({ title, children, defaultOpen = true }: { title: string; child
   );
 }
 
-export function EditarAeroportoPortoPage({ onLogout, onNavigate }: { dados?: any; onLogout: () => void; onNavigate: (screen: string, data?: any) => void; }) {
+export function EditarAeroportoPortoPage({ dados, onLogout, onNavigate }: { dados?: UnidadeVigilanciaAgropecuaria; onLogout: () => void; onNavigate: (screen: string, data?: any) => void; }) {
+  const unidade = dados?.codigo ? dados : UNIDADES_VIGILANCIA_MOCK[0];
   const [isSucesso, setIsSucesso] = useState(false);
 
   // Exemplo fixo - Informações Básicas
-  const [codigo] = useState("UVA-000003");
-  const [nome, setNome] = useState("Unidade de Vigilância Agropecuária de Lavras");
+  const [codigo] = useState(unidade.codigo);
+  const [nome, setNome] = useState(unidade.nome);
 
   // Exemplo fixo - Proprietários
-  const [proprietarios, setProprietarios] = useState<any[]>([
-    {
-      uid: "prop-1",
-      entidade: { nome: "João da Silva", cpf: "123.456.789-00" }
-    }
-  ]);
+  const [proprietarios, setProprietarios] = useState<any[]>(
+    unidade.proprietarios.map((entidade, index) => ({ uid: `prop-${index + 1}`, entidade })),
+  );
 
   // Exemplo fixo - Localização
-  const [endereco, setEndereco] = useState({
-    zona: "Urbana",
-    cep: "37200-000",
-    estado: "Minas Gerais",
-    municipio: "Lavras",
-    bairro: "Centro",
-    endereco: "Avenida Principal",
-    numero: "1000",
-    complemento: "Hangar 02",
-    localidade: "",
-    distrito: "",
-    latitude: "-21.245263",
-    longitude: "-44.999281"
-  });
+  const [endereco, setEndereco] = useState({ ...unidade.endereco, estado: "Minas Gerais" });
 
   // Exemplo fixo - Contatos
-  const [contatos, setContatos] = useState({
-    utilizarContatoProprietario: "Não" as const,
-    proprietariosSelecionados: [] as string[],
-    emailFixo: "contato@uvalavras.gov.br",
-    emailFixoObs: "",
-    telefoneFixo: "(35) 99887-6655",
-    telefoneFixoObs: "",
-    contatosAdicionais: [] as any[]
-  });
+  const [contatos, setContatos] = useState(unidade.contatos);
 
   // Exemplo fixo - Anexos
-  const [anexos, setAnexos] = useState<any[]>([
-    {
-      uid: "anexo-1",
-      nome: "licenca_operacional.pdf",
-      descricao: "Documento de funcionamento da unidade"
-    }
-  ]);
+  const [anexos, setAnexos] = useState<any[]>(unidade.anexos);
 
   // Exemplo fixo - Observações
-  const [observacao, setObservacao] = useState("Unidade responsável pela vigilância agropecuária na região de Lavras.");
+  const [observacao, setObservacao] = useState(unidade.observacao);
+
+  const proprietariosValidos = proprietarios
+    .filter((item) => item.entidade)
+    .map((item) => ({
+      id: String(item.entidade.id ?? item.uid),
+      nome: item.entidade.nome,
+      cpf: item.entidade.documento ?? item.entidade.cpf ?? "",
+      email: item.entidade.email ?? "",
+      telefone: item.entidade.telefone ?? "",
+    }));
+
+  const dadosAtualizados: UnidadeVigilanciaAgropecuaria = {
+    ...unidade,
+    codigo,
+    nome,
+    proprietarios: proprietarios.filter((item) => item.entidade).map((item) => ({
+      id: item.entidade.id ?? item.uid,
+      nome: item.entidade.nome,
+      documento: item.entidade.documento ?? item.entidade.cpf ?? "",
+      tipo: item.entidade.tipo ?? "Pessoa física",
+      email: item.entidade.email,
+      telefone: item.entidade.telefone,
+    })),
+    endereco: { ...endereco, estado: "Minas Gerais" },
+    contatos,
+    anexos,
+    observacao,
+  };
 
   const handleSalvar = () => {
+    registrarUnidadeVigilancia(dadosAtualizados);
     setIsSucesso(true);
   };
 
@@ -107,9 +112,9 @@ export function EditarAeroportoPortoPage({ onLogout, onNavigate }: { dados?: any
         {/* Informações Básicas */}
         <Section title="Informações Básicas">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <FloatInput label="Código" value={codigo} disabled onChange={() => { }} />
+            <FloatInput label="Código da Unidade de Vigilância Agropecuária" value={codigo} disabled onChange={() => { }} />
             <FloatInput
-              label="Nome da Unidade de Vigilância Agropecuária"
+              label="Nome Comercial da Unidade de Vigilância Agropecuária"
               required
               value={nome}
               onChange={setNome}
@@ -169,6 +174,7 @@ export function EditarAeroportoPortoPage({ onLogout, onNavigate }: { dados?: any
           <BlocoEnderecoFields
             title="Endereço Principal"
             tipoEstado="normal"
+            estadoFixo="Minas Gerais"
             data={endereco}
             onChange={(key, val) => setEndereco((p) => ({ ...p, [key]: val }))}
             onSetMultipleFields={(fields) => setEndereco((p) => ({ ...p, ...fields }))}
@@ -180,7 +186,7 @@ export function EditarAeroportoPortoPage({ onLogout, onNavigate }: { dados?: any
           <BlocoContatoFields
             data={contatos}
             onChange={(updated) => setContatos((prev) => ({ ...prev, ...updated }))}
-            proprietariosDisponiveis={[]}
+            proprietariosDisponiveis={proprietariosValidos}
           />
         </Section>
 
@@ -260,7 +266,7 @@ export function EditarAeroportoPortoPage({ onLogout, onNavigate }: { dados?: any
             <p className="text-sm text-gray-500 mt-1">O cadastro de "{nome}" foi atualizado com sucesso.</p>
             <div className="flex gap-3 justify-center mt-6">
               <button onClick={() => { setIsSucesso(false); onNavigate("aeroporto-porto"); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50 transition">Voltar</button>
-              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-aeroporto-porto", { nome, codigo }); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
+              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-aeroporto-porto", dadosAtualizados); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
             </div>
           </div>
         </div>

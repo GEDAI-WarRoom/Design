@@ -1571,6 +1571,7 @@ interface BlocoEnderecoFieldsProps {
 	onChange: (key: keyof EnderecoState, value: string) => void;
 	onSetMultipleFields: (fields: Partial<EnderecoState>) => void;
 	disabled?: boolean;
+	estadoFixo?: string;
 }
 
 export function BlocoEnderecoFields({
@@ -1580,6 +1581,7 @@ export function BlocoEnderecoFields({
 	onChange,
 	onSetMultipleFields,
 	disabled = false,
+	estadoFixo,
 }: BlocoEnderecoFieldsProps) {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -1654,7 +1656,7 @@ export function BlocoEnderecoFields({
 									: json.uf || "";
 					onSetMultipleFields({
 						cep: formatado,
-						estado: tipoEstado === "travado" ? "Minas Gerais" : estadoApi,
+						estado: estadoFixo || (tipoEstado === "travado" ? "Minas Gerais" : estadoApi),
 						municipio: json.localidade || "",
 						bairro: json.bairro || "",
 						endereco: json.logradouro || "",
@@ -1708,7 +1710,7 @@ export function BlocoEnderecoFields({
 					label="Estado"
 					required
 					value={data.estado}
-					disabled={fieldsDisabled}
+					disabled={fieldsDisabled || Boolean(estadoFixo)}
 					onChange={(v) => onChange("estado", v)}
 					options={[
 						{ value: "Acre", label: "Acre" },

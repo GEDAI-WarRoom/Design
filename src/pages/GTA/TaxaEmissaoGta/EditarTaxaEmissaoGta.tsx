@@ -94,7 +94,7 @@ export function EditarTaxaEmissaoGtaPage({
           value={draft}
           mode="edit"
           onChange={(next) => {
-            setTaxa({ ...taxa, ...next, especie: taxa.especie });
+            setTaxa({ ...taxa, ...next, especies: taxa.especies });
             setErro("");
           }}
         />

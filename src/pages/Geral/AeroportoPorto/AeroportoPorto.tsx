@@ -1,328 +1,254 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   ArrowLeft,
-  Search,
-  SlidersHorizontal,
+  Check,
   ChevronLeft,
   ChevronRight,
-  ChevronUp,
-  ChevronDown,
-  Eye as ViewIcon,
-  Pencil,
-  Check,
+  Eye,
   Minus,
+  Pencil,
+  Search,
+  SlidersHorizontal,
+  X,
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
-import {
-  FloatSelect,
-  FloatCombobox,
-  SearchModal,
-  FloatInput,
-} from "../../../components/ui/FormKit";
-import {
-  EntitySearchInput,
-  SelectedChipsContainer,
-  ProprietarioInput,
-} from "../../../components/ui/EntitySearch";
+import { FloatCombobox, FloatInput, FloatSelect, SearchModal } from "../../../components/ui/FormKit";
 import * as Icons from "../../../imports/icons";
-
+import {
+  PROPRIETARIOS_UNIDADE_MOCK,
+  listarUnidadesVigilancia,
+  registrarUnidadeVigilancia,
+  type ProprietarioUnidadeVigilancia,
+} from "./unidadeVigilanciaData";
 
 const GREEN = "#1A7A3C";
-
-// MOCKS (substituir por integração real)
-const ESTADOS_BR = [
-  "Minas Gerais",
-  "São Paulo",
-  "Rio de Janeiro",
-];
-
+const ESTADOS_BR = ["Minas Gerais", "Rio de Janeiro", "São Paulo"];
 const MUNICIPIOS_POR_ESTADO: Record<string, string[]> = {
-  "Minas Gerais": ["Belo Horizonte","Lavras","Oliveira","Uberlândia","Varginha"],
-  "São Paulo": ["Campinas","Ribeirão Preto","Santos","São Paulo"],
-  "Rio de Janeiro": ["Niterói","Petrópolis","Rio de Janeiro"],
+  "Minas Gerais": ["Belo Horizonte", "Lavras", "Oliveira", "Uberlândia", "Varginha"],
+  "Rio de Janeiro": ["Niterói", "Petrópolis", "Rio de Janeiro"],
+  "São Paulo": ["Campinas", "Ribeirão Preto", "Santos", "São Paulo"],
 };
-
-const sanitizeOptions = (arr: unknown): string[] =>
-  Array.isArray(arr) ? arr.filter((o): o is string => typeof o === "string" && o.trim() !== "") : [];
-
-const PROPRIETARIOS_MOCK: ProprietarioEntidade[] = [
-  { id: 1, nome: "José Aarão Neto", documento: "555.009.956-40", tipo: "Pessoa física" },
-  { id: 2, nome: "Divino de Souza Sobrinho", documento: "444.009.956-40", tipo: "Pessoa física" },
-  { id: 3, nome: "Agro Cooperativa IMA", documento: "12.345.678/0001-90", tipo: "Pessoa jurídica" },
-];
-const MUNICIPIOS_MG = [
-  "Abadia dos Dourados", "Abaeté", "Belo Horizonte", "Campo Belo", "Carrancas",
-  "Divino", "Esmeraldas", "Lavras", "Oliveira", "Varginha",
-];
-
 const SITUACOES = [
   { value: "Ativo", label: "Ativo" },
   { value: "Inativo", label: "Inativo" },
 ];
-interface UnidadeVigilanciaAgropecuaria {
-  id: number;
-  codigo: string;
-  nome: string;
-  proprietarios: string[];
-  municipio: string;
-  uf: string;
-  situacao: "Ativo" | "Inativo";
-}
 
-const DADOS_MOCK: UnidadeVigilanciaAgropecuaria[] = [
-  {
-    id: 1,
-    codigo: "3100000001",
-    nome: "Unidade de Vigilância Agropecuária de Belo Horizonte",
-    proprietarios: [
-      "12.345.678/0001-99 - Aero Concessões Ltda",
-    ],
-    municipio: "Belo Horizonte",
-    uf: "MG",
-    situacao: "Ativo",
-  },
-  {
-    id: 2,
-    codigo: "3100000002",
-    nome: "Unidade de Vigilância Agropecuária de Uberlândia",
-    proprietarios: ["99.888.777/0001-00 - Logística Sul S.A"],
-    municipio: "Uberlândia",
-    uf: "MG",
-    situacao: "Ativo",
-  },
-];
+function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
+  return (
+    <span className="inline-flex items-center gap-2 rounded-full bg-[#E6F4EA] px-3 py-1.5 text-xs font-semibold text-[#1A7A3C]">
+      {label}
+      <button type="button" onClick={onRemove} aria-label={`Remover filtro ${label}`}>
+        <X size={13} />
+      </button>
+    </span>
+  );
+}
 
 export function AeroportoPorto({
   onLogout,
   onNavigate,
 }: {
   onLogout: () => void;
-  onNavigate: (s: string, d?: any) => void;
+  onNavigate: (screen: string, data?: any) => void;
 }) {
-   const [busca, setBusca] = useState(""); 
-  const [tipoPessoa, setTipoPessoa] = useState("Pessoa física"); 
-  const [proprietario, setProprietario] = useState<ProprietarioEntidade | null>(null); 
-  const [modalProprietario, setModalProprietario] = useState(false); 
+  const [registros, setRegistros] = useState(() => [...listarUnidadesVigilancia()]);
+  const [busca, setBusca] = useState("");
+  const [tipoPessoa, setTipoPessoa] = useState("Pessoa física");
+  const [proprietario, setProprietario] = useState<ProprietarioUnidadeVigilancia | null>(null);
   const [estado, setEstado] = useState("");
   const [municipio, setMunicipio] = useState("");
   const [situacao, setSituacao] = useState("");
-  const [showFilters, setShowFilters] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
-    const [erroFiltro, setErroFiltro] = useState(false);
+  const [filtrosAbertos, setFiltrosAbertos] = useState(false);
+  const [modalProprietario, setModalProprietario] = useState(false);
+  const [pesquisou, setPesquisou] = useState(false);
+  const [erroFiltro, setErroFiltro] = useState(false);
+  const [pagina, setPagina] = useState(1);
+  const porPagina = 10;
 
-    const estadosOptions = sanitizeOptions(ESTADOS_BR);
+  const temFiltro = Boolean(busca.trim() || proprietario || estado || municipio || situacao);
+  const proprietariosDisponiveis = PROPRIETARIOS_UNIDADE_MOCK.filter((item) => item.tipo === tipoPessoa);
 
+  const resultados = useMemo(() => {
+    const termo = busca.trim().toLocaleLowerCase("pt-BR");
+    return registros
+      .filter((item) =>
+        (!termo || item.codigo.includes(termo) || item.nome.toLocaleLowerCase("pt-BR").includes(termo)) &&
+        (!proprietario || item.proprietarios.some((itemProprietario) => String(itemProprietario.id) === String(proprietario.id))) &&
+        (!estado || item.endereco.estado === estado) &&
+        (!municipio || item.endereco.municipio === municipio) &&
+        (!situacao || item.situacao === situacao),
+      )
+      .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+  }, [busca, estado, municipio, proprietario, registros, situacao]);
 
-    const onChangeEstado = (v: string) => { setEstado(v); setMunicipio(""); if (erroFiltro) setErroFiltro(false); };
+  const totalPaginas = Math.max(1, Math.ceil(resultados.length / porPagina));
+  const linhas = resultados.slice((pagina - 1) * porPagina, pagina * porPagina);
 
-
-  const proprietariosFiltradosModal = PROPRIETARIOS_MOCK.filter(
-    (p) => p.tipo === tipoPessoa
-  );
-
-    const colunasModal = [
-    { 
-      label: tipoPessoa === "PF" ? "Nome" : tipoPessoa === "PJ" ? "Razão Social" : "Nome / Razão Social", 
-      key: "nome" 
-    },
-    { 
-      label: tipoPessoa === "PJ" ? "CNPJ" : tipoPessoa === "PF" ? "CPF" : "CPF / CNPJ", 
-      key: "documento" 
+  const pesquisar = () => {
+    if (!temFiltro) {
+      setErroFiltro(true);
+      setPesquisou(false);
+      return;
     }
-  ];
+    setErroFiltro(false);
+    setPesquisou(true);
+    setPagina(1);
+  };
 
-  const handlePesquisar = () => setHasSearched(true);
+  const limpar = () => {
+    setBusca("");
+    setProprietario(null);
+    setEstado("");
+    setMunicipio("");
+    setSituacao("");
+    setPesquisou(false);
+    setErroFiltro(false);
+    setPagina(1);
+  };
 
-  const filtrados = DADOS_MOCK.filter((r) => {
-    const b = busca.toLowerCase();
-    return (
-      (!busca ||
-        r.nome.toLowerCase().includes(b) ||
-        r.codigo.includes(b)) &&
-      (!proprietario ||
-        r.proprietarios.some((p) =>
-          p.includes(proprietario.nome),
-        )) &&
-      (!estado ||
-        r.uf === (estado === "Minas Gerais" ? "MG" : "SP")) &&
-      (!municipio || r.municipio === municipio) &&
-      (!situacao || r.situacao === situacao)
-    );
-  });
+  const alternarSituacao = (id: number) => {
+    setRegistros((atuais) => atuais.map((item) => {
+      if (item.id !== id) return item;
+      const atualizado = {
+        ...item,
+        situacao: item.situacao === "Ativo" ? "Inativo" as const : "Ativo" as const,
+      };
+      registrarUnidadeVigilancia(atualizado);
+      return atualizado;
+    }));
+  };
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
-      <Navbar
-        onLogout={onLogout}
-        onNavigate={onNavigate}
-        currentScreen="aeroporto-porto"
-        hideSearch
-      />
-      <main className="max-w-[1300px] mx-auto px-6 py-6">
-        <div className="mb-6">
-          <button
-            onClick={() => onNavigate("dashboard")}
-            className="flex items-center gap-1 text-sm text-[#1A7A3C] font-semibold mb-3 hover:opacity-70"
-          >
-            <ArrowLeft size={15} /> Inicial
+      <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="aeroporto-porto" hideSearch />
+      <main className="mx-auto max-w-[1300px] px-6 py-6">
+        <button type="button" onClick={() => onNavigate("dashboard")} className="mb-3 flex items-center gap-1 text-sm font-semibold text-[#1A7A3C] transition hover:opacity-70">
+          <ArrowLeft size={15} /> Inicial
+        </button>
+        <div className="mb-6 flex items-center justify-between gap-4">
+          <h1 className="text-2xl font-semibold text-gray-900">Unidades de Vigilância Agropecuária</h1>
+          <button type="button" onClick={() => onNavigate("adicionar-aeroporto-porto")} className="rounded-md bg-[#1A7A3C] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#15612F]">
+            Adicionar Novo
           </button>
-          <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-semibold text-gray-900">
-              Unidades de Vigilância Agropecuária
-            </h1>
-            <button
-              onClick={() =>
-                onNavigate("adicionar-aeroporto-porto")
-              }
-              className="px-5 py-3 rounded-md bg-[#1A7A3C] text-white text-sm font-semibold hover:opacity-90"
-            >
-              Adicionar Novo
-            </button>
-          </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col gap-5">
+        <section className="flex flex-col gap-5 rounded-xl bg-white p-6 shadow-sm">
           <div className="flex gap-3">
-            <div className="flex-1 border border-gray-300 rounded-md px-3 h-12 flex items-center bg-white">
+            <div className={`flex h-12 flex-1 items-center rounded-md border bg-white px-3 ${erroFiltro ? "border-red-500" : "border-gray-300"}`}>
               <input
                 type="text"
                 placeholder="Código ou Nome da Unidade de Vigilância Agropecuária"
                 value={busca}
-                onChange={(e) => setBusca(e.target.value)}
-                className="w-full h-full text-sm outline-none"
+                onChange={(event) => { setBusca(event.target.value); setErroFiltro(false); setPesquisou(false); }}
+                onKeyDown={(event) => event.key === "Enter" && pesquisar()}
+                className="h-full w-full text-sm outline-none"
               />
               <Search size={18} className="text-gray-400" />
             </div>
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className={`px-4 border rounded-md flex items-center gap-2 ${showFilters ? "bg-transparent text-[#1A7A3C] border-[#1A7A3C]" : "bg-[#1A7A3C] text-white border-[#1A7A3C]"}`}
-            >
-              <SlidersHorizontal size={16} />
+            <button type="button" onClick={() => setFiltrosAbertos((aberto) => !aberto)} title="Exibir filtros" className={`flex h-12 w-12 items-center justify-center rounded-md border transition ${filtrosAbertos ? "border-[#1A7A3C] bg-white text-[#1A7A3C]" : "border-[#1A7A3C] bg-[#1A7A3C] text-white"}`}>
+              <SlidersHorizontal size={17} />
             </button>
+            <button type="button" onClick={pesquisar} className="h-12 rounded-md bg-[#1A7A3C] px-6 text-sm font-semibold text-white transition hover:bg-[#15612F]">Pesquisar</button>
           </div>
 
-          {showFilters && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-fadeIn">
-               <FloatInput
+          {erroFiltro && <p className="text-sm font-medium text-red-600">Informe o código, o nome ou ao menos um filtro para pesquisar.</p>}
+
+          {filtrosAbertos && (
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 animate-fadeIn">
+              <FloatInput
                 label="Proprietário"
-                value={proprietario ? `${proprietario.nome} ` : ""}
-                icon={<img src={Icons.iconeProdutorUrl} alt="Proprietário" className="w-5 h-5 object-contain" />} 
+                value={proprietario ? `${proprietario.documento} - ${proprietario.nome}` : ""}
+                icon={<img src={Icons.iconeProdutorUrl} alt="" className="h-5 w-5 object-contain" />}
                 onClick={() => setModalProprietario(true)}
                 readOnly
-              />  
-             
-                <FloatCombobox label="Estado" value={estado} onChange={onChangeEstado} options={estadosOptions} />
-               
-              <button
-                onClick={handlePesquisar}
-                className="h-12 bg-[#1A7A3C] text-white rounded-md font-semibold text-sm hover:opacity-90"
-              >
-                Pesquisar
-              </button>
-
-               {estado && (
-                <FloatCombobox label="Município" value={municipio} onChange={setMunicipio} options={MUNICIPIOS_MG} />
-                ) }
-              
-              <FloatSelect
-                label="Situação"
-                value={situacao}
-                onChange={setSituacao}
-                options={SITUACOES}
               />
+              <FloatCombobox label="Estado" value={estado} onChange={(valor) => { setEstado(valor); setMunicipio(""); setPesquisou(false); }} options={ESTADOS_BR} />
+              <FloatCombobox label="Município" value={municipio} onChange={(valor) => { setMunicipio(valor); setPesquisou(false); }} options={estado ? MUNICIPIOS_POR_ESTADO[estado] || [] : []} disabled={!estado} />
+              <FloatSelect label="Situação" value={situacao} onChange={(valor) => { setSituacao(valor); setPesquisou(false); }} options={SITUACOES} />
             </div>
           )}
 
-          {hasSearched && (
-            <div className="overflow-x-auto ">
-              <table className="w-full text-sm text-left">
-                <thead className=" text-gray-600 uppercase">
-                  <tr>
-                    <th className="px-4 py-3">Código</th>
-                    <th className="px-4 py-3">Nome</th>
-                    <th className="px-4 py-3">Proprietários</th>
-                    <th className="px-4 py-3">
-                      Município - UF
-                    </th>
-                    <th className="px-4 py-3">Situação</th>
-                    <th className="px-4 py-3"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtrados.map((r) => (
-                    <tr
-                      key={r.id}
-                      className="border-t border-gray-100 hover:bg-gray-50"
-                    >
-                      <td className="px-4 py-3 text-gray-600">
-                        {r.codigo}
-                      </td>
-                      <td className="px-4 py-3 text-gray-600">
-                        {r.nome}
-                      </td>
-                      <td className="px-4 py-3 text-gray-600">
-                        {r.proprietarios.join(", ")}
-                      </td>
-                      <td className="px-4 py-3 text-gray-600">
-                        {r.municipio} - {r.uf}
-                      </td>
-                      <td className="px-4 py-3 text-gray-600">
-                        {r.situacao}
-                      </td>
-                      <td className="px-4 py-3 text-right whitespace-nowrap">
-  <div className="flex items-center justify-end gap-1">
-    <button
-      onClick={() => onNavigate("visualizar-aeroporto-porto", r)}
-      className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md"
-    >
-      <ViewIcon size={18} />
-    </button>
-    <button
-      onClick={() => onNavigate("editar-aeroporto-porto", r)}
-      className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md"
-    >
-      <Pencil size={17} />
-    </button>
-  </div>
-</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          {temFiltro && (
+            <div className="flex flex-wrap items-center gap-2">
+              {busca && <Chip label={`Busca: ${busca}`} onRemove={() => { setBusca(""); setPesquisou(false); }} />}
+              {proprietario && <Chip label={`Proprietário: ${proprietario.nome}`} onRemove={() => { setProprietario(null); setPesquisou(false); }} />}
+              {estado && <Chip label={`Estado: ${estado}`} onRemove={() => { setEstado(""); setMunicipio(""); setPesquisou(false); }} />}
+              {municipio && <Chip label={`Município: ${municipio}`} onRemove={() => { setMunicipio(""); setPesquisou(false); }} />}
+              {situacao && <Chip label={`Situação: ${situacao}`} onRemove={() => { setSituacao(""); setPesquisou(false); }} />}
+              <button type="button" onClick={limpar} className="ml-1 text-xs font-semibold text-gray-500 underline hover:text-gray-700">Limpar filtros</button>
             </div>
           )}
-        </div>
+
+          {pesquisou && (
+            <>
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse text-left text-sm">
+                  <thead>
+                    <tr className="border-b border-gray-100 text-xs uppercase text-gray-600">
+                      <th className="px-4 py-3 font-semibold">Código</th>
+                      <th className="px-4 py-3 font-semibold">Nome</th>
+                      <th className="px-4 py-3 font-semibold">Proprietários</th>
+                      <th className="px-4 py-3 font-semibold">Município - UF</th>
+                      <th className="px-4 py-3 font-semibold">Situação</th>
+                      <th className="px-4 py-3 text-right font-semibold">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {linhas.map((item) => (
+                      <tr key={item.id} className="border-b border-gray-100 transition hover:bg-gray-50/60">
+                        <td className="px-4 py-3.5 text-gray-700">{item.codigo}</td>
+                        <td className="px-4 py-3.5 font-medium text-gray-800">{item.nome}</td>
+                        <td className="px-4 py-3.5 text-gray-700">{item.proprietarios.map((prop) => `${prop.documento} - ${prop.nome}`).join(", ")}</td>
+                        <td className="px-4 py-3.5 text-gray-700">{item.endereco.municipio} - MG</td>
+                        <td className="px-4 py-3.5">
+                          <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${item.situacao === "Ativo" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"}`}>{item.situacao}</span>
+                        </td>
+                        <td className="px-4 py-3.5">
+                          <div className="flex justify-end gap-1 text-[#1A7A3C]">
+                            <button type="button" onClick={() => onNavigate("visualizar-aeroporto-porto", item)} className="rounded-md p-2 hover:bg-green-50" title="Visualizar"><Eye size={18} /></button>
+                            <button type="button" onClick={() => onNavigate("editar-aeroporto-porto", item)} className="rounded-md p-2 hover:bg-green-50" title="Editar"><Pencil size={17} /></button>
+                            <button type="button" onClick={() => alternarSituacao(item.id)} className="rounded-md p-2 hover:bg-green-50" title={item.situacao === "Ativo" ? "Inativar" : "Ativar"}>
+                              {item.situacao === "Ativo" ? <Minus size={18} /> : <Check size={18} />}
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {linhas.length === 0 && <p className="py-10 text-center text-sm text-gray-500">Nenhum registro encontrado para os filtros informados.</p>}
+              </div>
+              <div className="flex items-center justify-between border-t border-gray-100 pt-4 text-sm text-gray-500">
+                <span>{resultados.length} {resultados.length === 1 ? "registro encontrado" : "registros encontrados"}</span>
+                <div className="flex items-center gap-2">
+                  <button type="button" disabled={pagina === 1} onClick={() => setPagina((atual) => atual - 1)} className="rounded-md border border-gray-200 p-2 disabled:opacity-40"><ChevronLeft size={16} /></button>
+                  <span>Página {pagina} de {totalPaginas}</span>
+                  <button type="button" disabled={pagina === totalPaginas} onClick={() => setPagina((atual) => atual + 1)} className="rounded-md border border-gray-200 p-2 disabled:opacity-40"><ChevronRight size={16} /></button>
+                </div>
+              </div>
+            </>
+          )}
+        </section>
       </main>
 
-      {/* Modal do Proprietário */}
-      <SearchModal<ProprietarioEntidade>
+      <SearchModal<ProprietarioUnidadeVigilancia>
         open={modalProprietario}
-        onClose={() => {
-          setModalProprietario(false);
-          setTipoPessoa("Pessoa física");
-        }}
+        onClose={() => setModalProprietario(false)}
         title="Buscar Proprietário"
-        subtitle="Busque por um proprietário cadastrado no sistema:"
-        icon={<img src={Icons.iconeProdutorUrl || Icons.iconeProdutorUrl} alt="Proprietário" className="w-8 h-8 object-contain" />} 
-        data={proprietariosFiltradosModal}
-        columns={colunasModal} // INSERIDO AQUI CONFORME SOLICITADO
+        subtitle="Busque por uma pessoa física ou jurídica proprietária de integradora/cooperativa:"
+        icon={<img src={Icons.iconeProdutorUrl} alt="" className="h-8 w-8 object-contain" />}
+        data={proprietariosDisponiveis}
+        columns={[{ label: "CPF / CNPJ", key: "documento" }, { label: "Nome / Nome Fantasia", key: "nome" }]}
         searchKeys={["nome", "documento"]}
-        searchPlaceholder="Buscar Proprietário"
+        searchPlaceholder="Buscar por CPF, CNPJ ou nome"
         confirmLabel="Confirmar"
-        onConfirm={(p) => {
-          setProprietario(p);
-          setModalProprietario(false);
-        }}
+        onConfirm={(item) => { setProprietario(item); setModalProprietario(false); setPesquisou(false); }}
         headerActions={
           <FloatSelect
             label="Tipo de Pessoa"
-            required
             value={tipoPessoa}
-            onChange={(v) => setTipoPessoa(v)}
-            options={[
-              { value: "Pessoa física", label: "Pessoa Física" },
-              { value: "Pessoa jurídica", label: "Pessoa Jurídica" },
-            ]}
+            onChange={setTipoPessoa}
+            options={[{ value: "Pessoa física", label: "Pessoa Física" }, { value: "Pessoa jurídica", label: "Pessoa Jurídica" }]}
           />
         }
       />

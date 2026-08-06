@@ -1,4 +1,3 @@
-import React from "react";
 import { AdicionarPromotoraEventosPage } from "./AdicionarPromotoraEventos";
 
 interface PageProps {

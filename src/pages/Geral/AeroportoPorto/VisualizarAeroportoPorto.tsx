@@ -2,6 +2,10 @@ import React, { useState } from "react";
 import { ArrowLeft, Pencil, ChevronDown, ChevronUp, Eye, Download } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, LargeTextArea } from "../../../components/ui/FormKit";
+import {
+  UNIDADES_VIGILANCIA_MOCK,
+  type UnidadeVigilanciaAgropecuaria,
+} from "./unidadeVigilanciaData";
 
 const GREEN = "#1A7A3C";
 
@@ -18,8 +22,17 @@ function Section({ title, children, defaultOpen = true }: { title: string; child
   );
 }
 
-export function VisualizarAeroportoPortoPage({ dados, onLogout, onNavigate }: { dados?: any; onLogout: () => void; onNavigate: (s: string, d?: any) => void; }) {
-  const local = dados || {};
+export function VisualizarAeroportoPortoPage({ dados, onLogout, onNavigate }: { dados?: UnidadeVigilanciaAgropecuaria; onLogout: () => void; onNavigate: (s: string, d?: any) => void; }) {
+  const unidade = dados?.codigo ? dados : UNIDADES_VIGILANCIA_MOCK[0];
+  const local = {
+    ...unidade,
+    ...unidade.endereco,
+    email: unidade.contatos.emailFixo,
+    obsEmail: unidade.contatos.emailFixoObs,
+    telefone: unidade.contatos.telefoneFixo,
+    obsTelefone: unidade.contatos.telefoneFixoObs,
+    utilizarContatoProprietarios: unidade.contatos.utilizarContatoProprietario === "Sim",
+  };
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
@@ -45,8 +58,8 @@ export function VisualizarAeroportoPortoPage({ dados, onLogout, onNavigate }: { 
         {/* Informações Básicas */}
         <Section title="Informações Básicas">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <FloatInput label="Código" value={local.codigo || "UVA-001"} disabled onChange={() => { }} />
-            <FloatInput label="Nome da Unidade de Vigilância Agropecuária" value={local.nome || "Unidade de Vigilância Agropecuária Regional"} disabled onChange={() => { }} />
+            <FloatInput label="Código da Unidade de Vigilância Agropecuária" value={local.codigo} disabled onChange={() => { }} />
+            <FloatInput label="Nome Comercial da Unidade de Vigilância Agropecuária" value={local.nome} disabled onChange={() => { }} />
           </div>
         </Section>
 
@@ -59,13 +72,13 @@ export function VisualizarAeroportoPortoPage({ dados, onLogout, onNavigate }: { 
                   <div className="grid flex-1 grid-cols-1 md:grid-cols-2 gap-3">
                     <FloatInput
                       label={`Proprietário ${idx + 1}`}
-                      value={typeof prop === "string" ? prop : prop?.nome || "João da Silva"}
+                      value={typeof prop === "string" ? prop : prop?.nome || ""}
                       disabled
                       onChange={() => { }}
                     />
                     <FloatInput
-                      label="CPF"
-                      value={typeof prop === "string" ? "123.456.789-00" : prop?.cpf || "123.456.789-00"}
+                      label="CPF / CNPJ"
+                      value={typeof prop === "string" ? "" : prop?.documento || prop?.cpf || ""}
                       disabled
                       onChange={() => { }}
                     />

@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import {
   Calendar,
   ChevronDown,
@@ -6,16 +6,28 @@ import {
   Dna,
   Info,
   ListTree,
+  PlusCircle,
+  Route,
+  X,
 } from "lucide-react";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
-import { FloatInput, FloatSelect } from "../../../components/ui/FormKit";
+import {
+  CheckboxGroup,
+  FloatInput,
+  FloatSelect,
+  MultiSearchModal,
+} from "../../../components/ui/FormKit";
 import {
   ESPECIES_TAXA_MOCK,
+  FINALIDADES_TAXA_MOCK,
   ITENS_RECEITA_TAXA_MOCK,
   MODALIDADES_FAIXA,
+  OPCOES_COBRANCA_TAXA,
   TIPOS_COBRANCA,
   TIPOS_DOCUMENTO_SANITARIO,
   modalidadeOposta,
+  type CobrancaTaxa,
+  type FinalidadeTaxa,
   type ItemReceitaTaxa,
   type ModalidadeFaixa,
   type TaxaEmissaoGtaDraft,
@@ -70,10 +82,8 @@ function ItemReceitaField({
   onChange,
   fieldClassName,
 }: ItemReceitaFieldProps) {
-  const quantidadeLabel = `${label} - Quantidade do Índice`;
-
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-[minmax(0,2fr)_minmax(180px,1fr)]">
+    <div className="w-full">
       {mode === "view" ? (
         <FloatInput
           label={label}
@@ -88,25 +98,100 @@ function ItemReceitaField({
           placeholder="Buscar item de receita"
           value={item?.nome ?? ""}
           data={ITENS_RECEITA_TAXA_MOCK}
-          searchKeys={["codigo", "nome", "quantidadeIndice"]}
+          searchKeys={["codigo", "nome", "classificacao"]}
           columns={[
             { label: "Item de Receita", key: "nome" },
+            { label: "Tipo", key: "classificacao" },
             { label: "Quantidade do Índice", key: "quantidadeIndice" },
           ]}
           icon={<ListTree size={18} color="#1A7A3C" />}
           onChange={onChange}
           required
           title="Buscar Item de Receita"
-          subtitle="Busque por um item de receita cadastrado:"
+          subtitle="Busque por um item de receita do tipo 11226600 de taxa de emissão de documentos sanitários."
         />
       )}
+    </div>
+  );
+}
 
-      <FloatInput
-        label="Quantidade do Índice"
-        value={item?.quantidadeIndice ?? ""}
-        disabled
-        className={fieldClassName(quantidadeLabel, item?.quantidadeIndice)}
-      />
+function SelectedItemsBlock<T extends { id: number; nome: string }>({
+  title,
+  items,
+  emptyText,
+  actionLabel,
+  editable,
+  actionDisabled = false,
+  onOpen,
+  onRemove,
+  view,
+}: {
+  title: string;
+  items: T[];
+  emptyText: string;
+  actionLabel: string;
+  editable: boolean;
+  actionDisabled?: boolean;
+  onOpen: () => void;
+  onRemove: (id: number) => void;
+  view: boolean;
+}) {
+  return (
+    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-200 px-5 py-3">
+        <div className="flex items-center gap-3">
+          <span className="text-sm font-semibold text-gray-600">
+            {title}<span className="ml-0.5 text-red-500">*</span>
+          </span>
+          {items.length > 0 && (
+            <span
+              className={`rounded-full px-2.5 py-1 text-xs font-bold ${view
+                  ? "bg-gray-100 text-gray-500"
+                  : "bg-[#E6F4EA] text-[#1A7A3C]"
+                }`}
+            >
+              {items.length} {items.length === 1 ? "selecionado" : "selecionados"}
+            </span>
+          )}
+        </div>
+        {editable && (
+          <button
+            type="button"
+            disabled={actionDisabled}
+            onClick={onOpen}
+            className="flex items-center gap-1.5 rounded-md border border-[#1A7A3C] px-3 py-1.5 text-xs font-bold text-[#1A7A3C] transition hover:bg-green-50 disabled:cursor-not-allowed disabled:border-gray-300 disabled:text-gray-400"
+          >
+            <PlusCircle size={14} /> {actionLabel}
+          </button>
+        )}
+      </div>
+      <div className="flex min-h-20 flex-wrap gap-3 p-5">
+        {items.length === 0 ? (
+          <p className="self-center text-xs italic text-gray-400">{emptyText}</p>
+        ) : (
+          items.map((item) => (
+            <div
+              key={item.id}
+              className={`flex min-w-[190px] items-center justify-between gap-4 rounded-xl border p-3 shadow-sm ${view
+                  ? "border-gray-200 bg-gray-50/40 text-gray-500"
+                  : "border-gray-200 bg-white text-[#1A7A3C]"
+                }`}
+            >
+              <span className="text-sm font-bold">{item.nome}</span>
+              {editable && (
+                <button
+                  type="button"
+                  onClick={() => onRemove(item.id)}
+                  className="text-gray-400 transition hover:text-red-500"
+                  aria-label={`Remover ${item.nome}`}
+                >
+                  <X size={16} />
+                </button>
+              )}
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 }
@@ -118,6 +203,16 @@ export function TaxaEmissaoGtaForm({
   fieldClassName = () => "",
 }: TaxaEmissaoGtaFormProps) {
   const disabled = mode === "view";
+  const [modalEspecies, setModalEspecies] = useState(false);
+  const [modalFinalidades, setModalFinalidades] = useState(false);
+
+  const finalidadesDisponiveis = useMemo(() => {
+    const especiesIds = new Set(value.especies.map((especie) => especie.id));
+    return FINALIDADES_TAXA_MOCK.filter((finalidade) =>
+      finalidade.especiesIds.some((id) => especiesIds.has(id)),
+    );
+  }, [value.especies]);
+
   const update = <K extends keyof TaxaEmissaoGtaDraft>(
     field: K,
     fieldValue: TaxaEmissaoGtaDraft[K],
@@ -150,7 +245,7 @@ export function TaxaEmissaoGtaForm({
   return (
     <>
       <Section title="Informações Básicas">
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <FloatSelect
             label="Tipo de Documento Sanitário"
             required
@@ -169,39 +264,12 @@ export function TaxaEmissaoGtaForm({
             )}
           />
 
-          {mode === "create" ? (
-            <EntitySearchInput
-              label="Espécie"
-              placeholder="Buscar por espécie ou grupo"
-              value={value.especie.nome}
-              data={ESPECIES_TAXA_MOCK}
-              searchKeys={["codigo", "nome", "grupo"]}
-              columns={[
-                { label: "Espécie", key: "nome" },
-                { label: "Grupo", key: "grupo" },
-              ]}
-              icon={<Dna size={18} color="#1A7A3C" />}
-              onChange={(especie) => update("especie", especie)}
-              required
-              title="Buscar Espécie"
-              subtitle="Busque por uma espécie cadastrada no sistema:"
-            />
-          ) : (
-            <FloatInput
-              label="Espécie"
-              required
-              value={value.especie.nome}
-              disabled
-              className={fieldClassName("Espécie", value.especie.nome)}
-            />
-          )}
-
           <FloatInput
             label="Data Início de Vigência"
             type="date"
             required
             value={value.dataInicioVigencia}
-            icon={<Calendar size={18} color="#1A7A3C" />}
+            icon={<Calendar size={18} color={disabled ? "#9CA3AF" : "#1A7A3C"} />}
             onChange={(next) => update("dataInicioVigencia", next)}
             disabled={disabled}
             className={fieldClassName(
@@ -212,8 +280,77 @@ export function TaxaEmissaoGtaForm({
         </div>
       </Section>
 
+      <Section title="Espécies Aplicáveis">
+        <SelectedItemsBlock
+          title="Espécies"
+          items={value.especies}
+          emptyText="Nenhuma espécie selecionada."
+          actionLabel="Adicionar Espécies"
+          editable={mode === "create"}
+          onOpen={() => setModalEspecies(true)}
+          onRemove={(id) => {
+            const especies = value.especies.filter((item) => item.id !== id);
+            const ids = new Set(especies.map((item) => item.id));
+            onChange?.({
+              ...value,
+              especies,
+              finalidades: value.finalidades.filter((finalidade) =>
+                finalidade.especiesIds.some((especieId) => ids.has(especieId)),
+              ),
+            });
+          }}
+          view={mode !== "create"}
+        />
+      </Section>
+
+      <Section title="Finalidades Aplicáveis">
+        <SelectedItemsBlock<FinalidadeTaxa>
+          title="Finalidades de Trânsito"
+          items={value.finalidades}
+          emptyText={
+            value.especies.length
+              ? "Nenhuma finalidade selecionada."
+              : "Selecione primeiro ao menos uma espécie."
+          }
+          actionLabel="Adicionar Finalidades"
+          editable={!disabled}
+          actionDisabled={value.especies.length === 0}
+          onOpen={() => setModalFinalidades(true)}
+          onRemove={(id) =>
+            update(
+              "finalidades",
+              value.finalidades.filter((item) => item.id !== id),
+            )
+          }
+          view={disabled}
+        />
+      </Section>
+
       <Section title="Informações de Cobrança">
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-6">
+          <div
+            className={
+              disabled
+                ? "[&_input:checked]:!border-gray-300 [&_input:checked]:!bg-gray-300"
+                : ""
+            }
+          >
+            <CheckboxGroup
+              key={`${mode}-${value.cobrancasTaxa.join("|")}`}
+              title="Cobrança de Taxa"
+              options={OPCOES_COBRANCA_TAXA.map((opcao) => ({
+                value: opcao,
+                label: opcao,
+              }))}
+              defaultValue={value.cobrancasTaxa}
+              onChange={(selecionadas) =>
+                update("cobrancasTaxa", selecionadas as CobrancaTaxa[])
+              }
+              orientation="horizontal"
+              disabled={disabled}
+            />
+          </div>
+
           <div className="max-w-md">
             <FloatSelect
               label="Tipo de Cobrança"
@@ -231,16 +368,15 @@ export function TaxaEmissaoGtaForm({
 
           {(value.tipoCobranca === "Por Cabeça" ||
             value.tipoCobranca === "Por Documento") && (
-            <ItemReceitaField
-              label={`Item de Receita (cobrado por ${
-                value.tipoCobranca === "Por Cabeça" ? "cabeça" : "documento"
-              })`}
-              item={value.itemReceita}
-              mode={mode}
-              onChange={(item) => update("itemReceita", item)}
-              fieldClassName={fieldClassName}
-            />
-          )}
+              <ItemReceitaField
+                label={`Item de Receita (cobrado por ${value.tipoCobranca === "Por Cabeça" ? "cabeça" : "documento"
+                  })`}
+                item={value.itemReceita}
+                mode={mode}
+                onChange={(item) => update("itemReceita", item)}
+                fieldClassName={fieldClassName}
+              />
+            )}
 
           {value.tipoCobranca === "Por Lotes" && (
             <div className="flex flex-col gap-5">
@@ -258,11 +394,7 @@ export function TaxaEmissaoGtaForm({
                 />
               </div>
               <ItemReceitaField
-                label={
-                  value.tamanhoLote
-                    ? `Item de Receita (cobrado a cada ${value.tamanhoLote} animais)`
-                    : "Item de Receita (cobrado por lote)"
-                }
+                label={rotuloItemReceitaLote(value.tamanhoLote)}
                 item={value.itemReceitaLote}
                 mode={mode}
                 onChange={(item) => update("itemReceitaLote", item)}
@@ -291,7 +423,7 @@ export function TaxaEmissaoGtaForm({
 
               <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                 <FloatSelect
-                  label={`Até ${value.limiteFaixa || "[Limite]"} animais`}
+                  label={rotuloLimiteFaixa("ate", value.limiteFaixa)}
                   required
                   value={value.cobrancaAteLimite}
                   onChange={updateCobrancaAte}
@@ -303,7 +435,7 @@ export function TaxaEmissaoGtaForm({
                   )}
                 />
                 <FloatInput
-                  label={`Acima de ${value.limiteFaixa || "[Limite]"} animais`}
+                  label={rotuloLimiteFaixa("acima", value.limiteFaixa)}
                   required
                   value={value.cobrancaAcimaLimite}
                   disabled
@@ -315,9 +447,11 @@ export function TaxaEmissaoGtaForm({
               </div>
 
               <ItemReceitaField
-                label={`Item de Receita (${modalidadeEmMinusculo(
+                label={rotuloItemReceitaFaixa(
+                  "ate",
                   value.cobrancaAteLimite,
-                )} até ${value.limiteFaixa || "[Limite]"} animais)`}
+                  value.limiteFaixa,
+                )}
                 item={value.itemReceitaAteLimite}
                 mode={mode}
                 onChange={(item) => update("itemReceitaAteLimite", item)}
@@ -325,9 +459,11 @@ export function TaxaEmissaoGtaForm({
               />
 
               <ItemReceitaField
-                label={`Item de Receita (${modalidadeEmMinusculo(
+                label={rotuloItemReceitaFaixa(
+                  "acima",
                   value.cobrancaAcimaLimite,
-                )} acima de ${value.limiteFaixa || "[Limite]"} animais)`}
+                  value.limiteFaixa,
+                )}
                 item={value.itemReceitaAcimaLimite}
                 mode={mode}
                 onChange={(item) => update("itemReceitaAcimaLimite", item)}
@@ -337,13 +473,91 @@ export function TaxaEmissaoGtaForm({
           )}
         </div>
       </Section>
+
+      <MultiSearchModal
+        open={modalEspecies}
+        onClose={() => setModalEspecies(false)}
+        title="Buscar Espécies"
+        subtitle="Busque e selecione uma ou mais espécies aplicáveis:"
+        icon={<Dna size={18} className="text-[#1A7A3C]" />}
+        data={ESPECIES_TAXA_MOCK}
+        columns={[
+          { label: "Espécie", key: "nome" },
+          { label: "Grupo", key: "grupo" },
+        ]}
+        searchKeys={["codigo", "nome", "grupo"]}
+        selectedItems={value.especies}
+        confirmLabel="Salvar Selecionadas"
+        onConfirm={(especies) => {
+          const ids = new Set(especies.map((item) => item.id));
+          onChange?.({
+            ...value,
+            especies,
+            finalidades: value.finalidades.filter((finalidade) =>
+              finalidade.especiesIds.some((id) => ids.has(id)),
+            ),
+          });
+          setModalEspecies(false);
+        }}
+      />
+
+      <MultiSearchModal
+        open={modalFinalidades}
+        onClose={() => setModalFinalidades(false)}
+        title="Buscar Finalidades de Trânsito"
+        subtitle="São exibidas somente finalidades compatíveis com as espécies selecionadas."
+        icon={<Route size={18} className="text-[#1A7A3C]" />}
+        data={finalidadesDisponiveis}
+        columns={[
+          { label: "Código", key: "codigo" },
+          { label: "Finalidade de Trânsito", key: "nome" },
+        ]}
+        searchKeys={["codigo", "nome"]}
+        selectedItems={value.finalidades}
+        confirmLabel="Salvar Selecionadas"
+        onConfirm={(finalidades) => {
+          update("finalidades", finalidades);
+          setModalFinalidades(false);
+        }}
+      />
     </>
   );
 }
 
-function modalidadeEmMinusculo(modalidade: ModalidadeFaixa | "") {
-  if (!modalidade) return "cobrado por [Cabeça | Documento]";
-  return modalidade.replace("Cobrar", "cobrado");
+function rotuloLimiteFaixa(posicao: "ate" | "acima", limite: string) {
+  if (limite) {
+    return posicao === "ate"
+      ? `Até ${limite} animais`
+      : `Acima de ${limite} animais`;
+  }
+  return posicao === "ate"
+    ? "Até o limite informado"
+    : "Acima do limite informado";
+}
+
+function rotuloItemReceitaLote(tamanho: string) {
+  return tamanho
+    ? `Item de Receita (cobrado a cada ${tamanho} animais)`
+    : "Item de Receita (cobrado conforme o tamanho do lote informado)";
+}
+
+function rotuloItemReceitaFaixa(
+  posicao: "ate" | "acima",
+  modalidade: ModalidadeFaixa | "",
+  limite: string,
+) {
+  const modalidadeFormatada = modalidade
+    ? modalidade.replace("Cobrar", "cobrado")
+    : "cobrança";
+  const faixa = limite
+    ? posicao === "ate"
+      ? `até ${limite} animais`
+      : `acima de ${limite} animais`
+    : posicao === "ate"
+      ? "até o limite informado"
+      : "acima do limite informado";
+
+  return `Item de Receita (${modalidadeFormatada} ${faixa})`;
 }
 
 export function RequiredFieldsNotice() {
@@ -361,8 +575,9 @@ export function RequiredFieldsNotice() {
 export function taxaValida(taxa: TaxaEmissaoGtaDraft) {
   if (
     !taxa.tipoDocumentoSanitario ||
-    !taxa.especie.id ||
     !taxa.dataInicioVigencia ||
+    taxa.especies.length === 0 ||
+    taxa.finalidades.length === 0 ||
     !taxa.tipoCobranca
   ) {
     return false;
@@ -381,9 +596,9 @@ export function taxaValida(taxa: TaxaEmissaoGtaDraft) {
 
   return Boolean(
     Number(taxa.limiteFaixa) > 0 &&
-      taxa.cobrancaAteLimite &&
-      taxa.cobrancaAcimaLimite &&
-      taxa.itemReceitaAteLimite &&
-      taxa.itemReceitaAcimaLimite,
+    taxa.cobrancaAteLimite &&
+    taxa.cobrancaAcimaLimite &&
+    taxa.itemReceitaAteLimite &&
+    taxa.itemReceitaAcimaLimite,
   );
 }
