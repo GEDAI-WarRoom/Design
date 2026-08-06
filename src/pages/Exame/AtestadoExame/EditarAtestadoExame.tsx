@@ -2,30 +2,16 @@ import React, { useState } from "react";
 import { ArrowLeft, ChevronUp, ChevronDown, Info, AlertTriangle, Check } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, FloatSelect } from "../../../components/ui/FormKit";
-import { DoencaInput } from "../../../components/ui/EntitySearch";
+import { DoencasAtestadoField } from "./DoencasAtestadoField";
 import {
   obterAtestadoExame,
   salvarEdicaoAtestadoExame,
+  SITUACOES_ATESTADO_EXAME,
+  tipoAtestadoValido,
   type DadosAtestadoExame,
 } from "./atestadoExameData";
 
 const GREEN = "#1A7A3C";
-
-// ==========================================================
-// MOCKS LOCAIS
-// ==========================================================
-const DOENCAS_CORRIGIDAS_MOCK = [
-  { id: 1, codigo: "D01", nome: "Febre Aftosa" },
-  { id: 2, codigo: "D02", nome: "Brucelose" },
-  { id: 3, codigo: "D03", nome: "Tuberculose Bovina" },
-  { id: 4, codigo: "D04", nome: "Raiva" }, 
-  { id: 5, codigo: "D05", nome: "Anemia Infecciosa Equina (AIE)" },
-];
-
-const SITUACOES = [
-  { value: "Ativo", label: "Ativo" },
-  { value: "Inativo", label: "Inativo" },
-];
 
 // ==========================================================
 // HELPERS DE UI
@@ -61,7 +47,7 @@ export function EditarAtestadoExamePage({
     obterAtestadoExame(dados),
   );
   const [descricao, setDescricao] = useState(registroAtual.descricao);
-  const [doenca, setDoenca] = useState<any | null>(registroAtual.doenca);
+  const [doencas, setDoencas] = useState(registroAtual.doencas);
   const [diasValidade, setDiasValidade] = useState(registroAtual.diasValidade);
   const [situacao, setSituacao] = useState(registroAtual.situacao);
 
@@ -71,15 +57,15 @@ export function EditarAtestadoExamePage({
 
   const handleSalvar = () => {
     // Validações de campos obrigatórios (incluindo a Situação, que agora existe)
-    if (!descricao || !doenca || !diasValidade || !situacao) {
+    if (!tipoAtestadoValido({ descricao, doencas, diasValidade }) || !situacao) {
       setIsErro(true);
       return;
     }
     
     const dadosAtuais: DadosAtestadoExame = {
       ...registroAtual,
-      descricao,
-      doenca,
+      descricao: descricao.trim(),
+      doencas,
       diasValidade,
       situacao,
     };
@@ -102,11 +88,11 @@ export function EditarAtestadoExamePage({
             style={{ color: GREEN }}
           >
             <ArrowLeft size={15} />
-            Visualizar Atestado
+            Visualizar Tipo de Atestado
           </button>
           
           <div className="flex justify-between items-center w-full">
-            <h1 className="text-2xl font-semibold text-gray-900">Editar Atestado de Exame</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">Editar Tipo de Atestado</h1>
             <button 
               type="button" 
               onClick={handleSalvar} 
@@ -141,19 +127,13 @@ export function EditarAtestadoExamePage({
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start w-full">
-              
-              <DoencaInput
-                required
-                data={DOENCAS_CORRIGIDAS_MOCK}
-                value={doenca ? doenca.nome : ""}
-                onChange={(entidade) => setDoenca(entidade)}
-                onEyeClick={() => {
-                  if (doenca?.codigo) alert(`Visualizar detalhes da doença: ${doenca.nome}`);
-                  else alert("Por favor, selecione uma doença primeiro.");
-                }}
-              />
+            <DoencasAtestadoField
+              value={doencas}
+              onChange={setDoencas}
+              error={isErro && doencas.length === 0 ? "Selecione ao menos uma doença." : undefined}
+            />
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start w-full">
               <FloatInput
                 label="Dias de Validade do Exame"
                 required
@@ -168,7 +148,7 @@ export function EditarAtestadoExamePage({
                 required
                 value={situacao}
                 onChange={setSituacao}
-                options={SITUACOES}
+                options={SITUACOES_ATESTADO_EXAME}
               />
             </div>
 
@@ -210,7 +190,7 @@ export function EditarAtestadoExamePage({
               <Check size={32} className="text-[#1A7A3C] stroke-[3]" />
             </div>
             
-            <h3 className="text-xl font-bold text-gray-900">Atestado atualizado com sucesso!</h3>
+            <h3 className="text-xl font-bold text-gray-900">Tipo de atestado atualizado com sucesso!</h3>
             <p className="text-sm text-gray-500 mt-2">As alterações foram gravadas no sistema.</p>
             
             <div className="flex gap-4 justify-center mt-8 w-full">

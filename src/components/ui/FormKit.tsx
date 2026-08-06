@@ -834,6 +834,7 @@ export interface MultiSearchModalProps<T extends { id: string | number }> {
 	selectedItems: T[];
 	onConfirm: (selected: T[]) => void;
 	confirmLabel?: string;
+	showResultsOnOpen?: boolean;
 }
 
 export function MultiSearchModal<T extends { id: string | number }>({
@@ -849,6 +850,7 @@ export function MultiSearchModal<T extends { id: string | number }>({
 	selectedItems = [],
 	onConfirm,
 	confirmLabel = "Confirmar",
+	showResultsOnOpen = false,
 }: MultiSearchModalProps<T>) {
 	const [busca, setBusca] = useState("");
 	const [tempSelected, setTempSelected] = useState<T[]>([]);
@@ -956,7 +958,7 @@ export function MultiSearchModal<T extends { id: string | number }>({
 					/>
 				</div>
 
-				{busca.trim().length > 0 && (
+				{(showResultsOnOpen || busca.trim().length > 0) && (
 					<div className="flex flex-col w-full">
 						{resultadosOrdenados.length > 0 ? (
 							<>

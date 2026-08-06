@@ -41,8 +41,9 @@ import {
   Truck,
   User,
   Wallet,
-	Ham,
+  Ham,
   Bell,
+  ClipboardType,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Navbar } from "../components/Navbar";
@@ -76,215 +77,17 @@ export interface MenuCategory {
 
 // Exportamos os dados para que a Navbar consiga importá-los e usá-los na busca
 const cadastrosCategoriesMescladas: any[] = [
-	{
-		title: "Geral",
-		icon: <Globe size={32} color={GREEN} />,
-		items: [
-
-			{
-				label: "Aeroporto/Porto",
-				route: "aeroporto-porto",
-				icon: <TowerControl size={16} />,
-			},
-			{ label: "Açougue", route: "acougue", icon: <Store size={16} /> },
-			{
-				label: "Divisão Municipal",
-				route: "divisao-municipal",
-				icon: <Map size={16} />,
-			},
-			{
-				label: "Classificação Sanitária por Estado",
-				route: "classificacao-sanitaria-estado",
-				icon: <ShieldCheck size={16} />,
-			},
-			{
-				label: "Estabelecimento Agropecuário",
-				route: "estabelecimento-agropecuario",
-				icon: (
-					<img
-						src={Icons.iconeEstabelecimentoUrl}
-						alt="Estabelecimento Agropecuário"
-						className="w-4 h-4"
-					/>
-				),
-			},
-
-			{
-				label: "Venda de Propriedade",
-				route: "venda-propriedade",
-				icon: (
-					<img
-						src={Icons.iconeVendaPropriedadeUrl}
-						alt="Venda Propriedade"
-						className="w-4 h-4"
-					/>
-				),
-			},
-			{
-				label: "Pessoa Física",
-				route: "pessoa-fisica",
-				icon: <User size={16} />,
-			},
-			{
-				label: "Pessoa Jurídica",
-				route: "pessoa-juridica",
-				icon: (
-					<img
-						src={Icons.iconePessoaJuridicaUrl}
-						alt="Pessoa JurídicA"
-						className="w-4 h-4"
-					/>
-				),
-			},
-			{
-				label: "Produto",
-				route: "produto",
-				icon: <ShoppingCart size={16} />,
-			},
-			{
-				label: "Profissional de Serviço Oficial",
-				route: "profissional-oficial",
-				icon: (
-					<img
-						src={Icons.iconeProfissionalUrl}
-						alt="Profissional"
-						className="w-4 h-4"
-					/>
-				),
-			},
-			{
-				label: "Unidade Administrativa",
-				route: "unidade-administrativa",
-				icon: (
-					<img
-						src={Icons.iconeUnidadeAdministrativaUrl}
-						alt="Unidade Administrativa"
-						className="w-4 h-4"
-					/>
-				),
-			},
-			{
-				label: "Unidade de Medida",
-				route: "unidade-medida",
-				icon: <Ruler size={16} />,
-			},
-			{
-				label: "Revendedora de Produtos Agropecuários",
-				route: "revendedora-agropecuario",
-				icon: <Store size={16} />,
-			},
-			{
-				label: "Instituição de Ensino e Pesquisa",
-				route: "instituicao-ensino-pesquisa",
-				icon: <Landmark size={16} />,
-			},
-			{
-				label: "Tipo de Veículo",
-				route: "tipo-veiculo",
-				icon: <Truck size={16} />,
-			},
-		],
-	},
-	{
-		title: "Animal",
-		icon: (
-			<img
-				src={Icons.iconeAnimalUrl}
-				alt="Animal"
-				className="w-9 h-9 object-contain"
-			/>
-		),
-		items: [
-			{
-				label: "Certificadora SISBOV",
-				route: "certificadora-sisbov",
-				icon: (
-					<img
-						src={Icons.iconeCertificadoraUrl}
-						alt="Certificadora"
-						className="w-4 h-4"
-					/>
-				),
-			},
-			{
-				label: "Espécie",
-				route: "especie",
-				icon: <Dna size={16} />,
-			},
-			{
-				label: "Núcleo de Produção",
-				route: "nucleo-producao",
-				icon: (
-					<img
-						src={Icons.iconeNucleoProducaoUrl}
-						alt="Núcleo de Produção"
-						className="w-4 h-4"
-					/>
-				),
-			},
-			{
-				label: "Exploração Pecuária",
-				route: "exploracao-pecuaria",
-				icon: (
-					<img
-						src={Icons.iconeExploracaoUrl}
-						alt="Exploração Pecuária"
-						className="w-4 h-4"
-					/>
-				),
-			},
-				{
-					label: "Estabelecimento Agroindustrial POA - SIE/MG",
-				route: "agroindustrial-sie",
-				icon: (
-					<img
-						src={Icons.iconeEstabelecimentoAgroindustrialUrl}
-						alt="Estabelecimento Agroindustrial"
-						className="w-4 h-4"
-					/>
-					),
-				},
-				{
-					label: "Estabelecimento Agroindustrial POA - Outras Inspeções",
-					route: "agroindustrial-outras-inspecoes",
-					icon: (
-						<img
-							src={Icons.iconeEstabelecimentoAgroindustrialUrl}
-							alt="Estabelecimento Agroindustrial"
-							className="w-4 h-4"
-						/>
-					),
-				},
-			{
-				label: "Passaporte Equestre",
-				route: "passaporte-equestre",
-				icon: (
-					<img
-						src={Icons.iconeEquestreUrl}
-						alt="Equestre"
-						className="w-4 h-4"
-					/>
-				),
-			},
-			{
-				label: "Estabelecimento/Recinto de Eventos Pecuários",
-				route: "estabelecimento-evento-pecuario",
-				icon: <Calendar size={16} />,
-			},
   {
     title: "Geral",
     icon: <Globe size={32} color={GREEN} />,
     items: [
-			{
-				label: "Central de Pendências",
-				route: "pendencias-confirmacao-gta",
-				icon: <Bell size={16} />,
-			},      {
-        label: "Unidade de Vigilância Agropecuária",
+
+      {
+        label: "Aeroporto/Porto",
         route: "aeroporto-porto",
         icon: <TowerControl size={16} />,
       },
-      { label: "Açougue", route: "acougue", icon: <Ham size={16} /> },
+      { label: "Açougue", route: "acougue", icon: <Store size={16} /> },
       {
         label: "Divisão Municipal",
         route: "divisao-municipal",
@@ -443,6 +246,17 @@ const cadastrosCategoriesMescladas: any[] = [
         ),
       },
       {
+        label: "Estabelecimento Agroindustrial POA - Outras Inspeções",
+        route: "agroindustrial-outras-inspecoes",
+        icon: (
+          <img
+            src={Icons.iconeEstabelecimentoAgroindustrialUrl}
+            alt="Estabelecimento Agroindustrial"
+            className="w-4 h-4"
+          />
+        ),
+      },
+      {
         label: "Passaporte Equestre",
         route: "passaporte-equestre",
         icon: (
@@ -459,125 +273,312 @@ const cadastrosCategoriesMescladas: any[] = [
         icon: <Calendar size={16} />,
       },
       {
-        label: "Evento Pecuário",
-        route: "evento-pecuario",
-        icon: <CalendarCheck size={16} />,
+        title: "Geral",
+        icon: <Globe size={32} color={GREEN} />,
+        items: [
+          {
+            label: "Central de Pendências",
+            route: "pendencias-confirmacao-gta",
+            icon: <Bell size={16} />,
+          }, {
+            label: "Unidade de Vigilância Agropecuária",
+            route: "aeroporto-porto",
+            icon: <TowerControl size={16} />,
+          },
+          { label: "Açougue", route: "acougue", icon: <Ham size={16} /> },
+          {
+            label: "Divisão Municipal",
+            route: "divisao-municipal",
+            icon: <Map size={16} />,
+          },
+          {
+            label: "Classificação Sanitária por Estado",
+            route: "classificacao-sanitaria-estado",
+            icon: <ShieldCheck size={16} />,
+          },
+          {
+            label: "Estabelecimento Agropecuário",
+            route: "estabelecimento-agropecuario",
+            icon: (
+              <img
+                src={Icons.iconeEstabelecimentoUrl}
+                alt="Estabelecimento Agropecuário"
+                className="w-4 h-4"
+              />
+            ),
+          },
+
+          {
+            label: "Venda de Propriedade",
+            route: "venda-propriedade",
+            icon: (
+              <img
+                src={Icons.iconeVendaPropriedadeUrl}
+                alt="Venda Propriedade"
+                className="w-4 h-4"
+              />
+            ),
+          },
+          {
+            label: "Pessoa Física",
+            route: "pessoa-fisica",
+            icon: <User size={16} />,
+          },
+          {
+            label: "Pessoa Jurídica",
+            route: "pessoa-juridica",
+            icon: (
+              <img
+                src={Icons.iconePessoaJuridicaUrl}
+                alt="Pessoa JurídicA"
+                className="w-4 h-4"
+              />
+            ),
+          },
+          {
+            label: "Produto",
+            route: "produto",
+            icon: <ShoppingCart size={16} />,
+          },
+          {
+            label: "Profissional de Serviço Oficial",
+            route: "profissional-oficial",
+            icon: (
+              <img
+                src={Icons.iconeProfissionalUrl}
+                alt="Profissional"
+                className="w-4 h-4"
+              />
+            ),
+          },
+          {
+            label: "Unidade Administrativa",
+            route: "unidade-administrativa",
+            icon: (
+              <img
+                src={Icons.iconeUnidadeAdministrativaUrl}
+                alt="Unidade Administrativa"
+                className="w-4 h-4"
+              />
+            ),
+          },
+          {
+            label: "Unidade de Medida",
+            route: "unidade-medida",
+            icon: <Ruler size={16} />,
+          },
+          {
+            label: "Revendedora de Produtos Agropecuários",
+            route: "revendedora-agropecuario",
+            icon: <Store size={16} />,
+          },
+          {
+            label: "Instituição de Ensino e Pesquisa",
+            route: "instituicao-ensino-pesquisa",
+            icon: <Landmark size={16} />,
+          },
+          {
+            label: "Tipo de Veículo",
+            route: "tipo-veiculo",
+            icon: <Truck size={16} />,
+          },
+        ],
       },
       {
-        label: "Integradora Cooperativa",
-        route: "integradora-cooperativa",
+        title: "Animal",
         icon: (
           <img
-            src={Icons.iconeGrupoUrl}
-            alt="Integradora Cooperativa"
-            className="w-5 h-5"
+            src={Icons.iconeAnimalUrl}
+            alt="Animal"
+            className="w-9 h-9 object-contain"
           />
         ),
-      },
+        items: [
+          {
+            label: "Certificadora SISBOV",
+            route: "certificadora-sisbov",
+            icon: (
+              <img
+                src={Icons.iconeCertificadoraUrl}
+                alt="Certificadora"
+                className="w-4 h-4"
+              />
+            ),
+          },
+          {
+            label: "Espécie",
+            route: "especie",
+            icon: <Dna size={16} />,
+          },
+          {
+            label: "Núcleo de Produção",
+            route: "nucleo-producao",
+            icon: (
+              <img
+                src={Icons.iconeNucleoProducaoUrl}
+                alt="Núcleo de Produção"
+                className="w-4 h-4"
+              />
+            ),
+          },
+          {
+            label: "Exploração Pecuária",
+            route: "exploracao-pecuaria",
+            icon: (
+              <img
+                src={Icons.iconeExploracaoUrl}
+                alt="Exploração Pecuária"
+                className="w-4 h-4"
+              />
+            ),
+          },
+          {
+            label: "Estabelecimento Agroindustrial POA - SIE/MG",
+            route: "agroindustrial-sie",
+            icon: (
+              <img
+                src={Icons.iconeEstabelecimentoAgroindustrialUrl}
+                alt="Estabelecimento Agroindustrial"
+                className="w-4 h-4"
+              />
+            ),
+          },
+          {
+            label: "Passaporte Equestre",
+            route: "passaporte-equestre",
+            icon: (
+              <img
+                src={Icons.iconeEquestreUrl}
+                alt="Equestre"
+                className="w-4 h-4"
+              />
+            ),
+          },
+          {
+            label: "Estabelecimento/Recinto de Eventos Pecuários",
+            route: "estabelecimento-evento-pecuario",
+            icon: <Calendar size={16} />,
+          },
+          {
+            label: "Evento Pecuário",
+            route: "evento-pecuario",
+            icon: <CalendarCheck size={16} />,
+          },
+          {
+            label: "Integradora Cooperativa",
+            route: "integradora-cooperativa",
+            icon: (
+              <img
+                src={Icons.iconeGrupoUrl}
+                alt="Integradora Cooperativa"
+                className="w-5 h-5"
+              />
+            ),
+          },
 
-			{
-				label: "Profissional da Área Animal",
-				route: "profissional-animal",
-				icon: (
-					<img
-						src={Icons.iconeProfissionalAnimalUrl}
-						alt="Profissional da Área Animal"
-						className="w-4 h-4"
-					/>
-				),
-			},
-			{
-				label: "Promotora de Eventos Pecuários",
-				route: "promotora-eventos",
-				icon: (
-					<img
-						src={Icons.iconePromotoraUrl}
-						alt="Promotora de Eventos Pecuários"
-						className="w-4 h-4"
-					/>
-				),
-			},
-			{
-				label: "Revendedora de Animais Vivos",
-				route: "revendedora-animais",
-				icon: <Store size={16} />,
-			},
-			{
-				label: "Status Animal",
-				route: "status-animal",
-				icon: (
-					<img src={Icons.iconeStatusUrl} alt="Status" className="w-4 h-4" />
-				),
-			},
-		],
-	},
-	{
-		title: "Vegetal",
-		icon: (
-			<img
-				src={Icons.iconeVegetalUrl}
-				alt="Vegetal"
-				className="w-9 h-9 object-contain"
-			/>
-		),
-		items: [
-			{
-				label: "Estabelecimento Agroindustrial POV",
-				route: "agroindustrial-pov",
-				icon: (
-					<img
-						src={Icons.iconeEstabelecimentoAgroindustrialUrl}
-						alt="Estabelecimento Agroindustrial POV"
-						className="w-4 h-4 object-contain"
-					/>
-				),
-			},
-			{
-				label: "Unidade de Consolidação",
-				route: "unidade-consolidacao",
-				icon: (
-					<img
-						src={Icons.iconeUnidadeConsolidacaoUrl}
-						alt="Unidade de Consolidação"
-						className="w-4 h-4 object-contain"
-					/>
-				),
-			},
-			{
-				label: "Cultura",
-				route: "cultura",
-				icon: (
-					<img
-						src={Icons.iconeCulturaUrl}
-						alt="Cultura"
-						className="w-4 h-4 object-contain"
-					/>
-				),
-			},
-			{
-				label: "Praga",
-				route: "praga",
-				icon: (
-					<img
-						src={Icons.iconePragaUrl}
-						alt="Praga"
-						className="w-4 h-4 object-contain"
-					/>
-				),
-			},
-			{
-				label: "Profissional Vegetal",
-				route: "profissional-vegetal",
-				icon: (
-					<img
-						src={Icons.iconeProfissionalVegetalUrl}
-						alt="Profissional Vegetal"
-						className="w-4 h-4 object-contain"
-					/>
-				),
-			},
-		],
-	},
+          {
+            label: "Profissional da Área Animal",
+            route: "profissional-animal",
+            icon: (
+              <img
+                src={Icons.iconeProfissionalAnimalUrl}
+                alt="Profissional da Área Animal"
+                className="w-4 h-4"
+              />
+            ),
+          },
+          {
+            label: "Promotora de Eventos Pecuários",
+            route: "promotora-eventos",
+            icon: (
+              <img
+                src={Icons.iconePromotoraUrl}
+                alt="Promotora de Eventos Pecuários"
+                className="w-4 h-4"
+              />
+            ),
+          },
+          {
+            label: "Revendedora de Animais Vivos",
+            route: "revendedora-animais",
+            icon: <Store size={16} />,
+          },
+          {
+            label: "Status Animal",
+            route: "status-animal",
+            icon: (
+              <img src={Icons.iconeStatusUrl} alt="Status" className="w-4 h-4" />
+            ),
+          },
+        ],
+      },
+      {
+        title: "Vegetal",
+        icon: (
+          <img
+            src={Icons.iconeVegetalUrl}
+            alt="Vegetal"
+            className="w-9 h-9 object-contain"
+          />
+        ),
+        items: [
+          {
+            label: "Estabelecimento Agroindustrial POV",
+            route: "agroindustrial-pov",
+            icon: (
+              <img
+                src={Icons.iconeEstabelecimentoAgroindustrialUrl}
+                alt="Estabelecimento Agroindustrial POV"
+                className="w-4 h-4 object-contain"
+              />
+            ),
+          },
+          {
+            label: "Unidade de Consolidação",
+            route: "unidade-consolidacao",
+            icon: (
+              <img
+                src={Icons.iconeUnidadeConsolidacaoUrl}
+                alt="Unidade de Consolidação"
+                className="w-4 h-4 object-contain"
+              />
+            ),
+          },
+          {
+            label: "Cultura",
+            route: "cultura",
+            icon: (
+              <img
+                src={Icons.iconeCulturaUrl}
+                alt="Cultura"
+                className="w-4 h-4 object-contain"
+              />
+            ),
+          },
+          {
+            label: "Praga",
+            route: "praga",
+            icon: (
+              <img
+                src={Icons.iconePragaUrl}
+                alt="Praga"
+                className="w-4 h-4 object-contain"
+              />
+            ),
+          },
+          {
+            label: "Profissional Vegetal",
+            route: "profissional-vegetal",
+            icon: (
+              <img
+                src={Icons.iconeProfissionalVegetalUrl}
+                alt="Profissional Vegetal"
+                className="w-4 h-4 object-contain"
+              />
+            ),
+          },
+        ],
+      },
       {
         label: "Profissional da Área Animal",
         route: "profissional-animal",
@@ -834,8 +835,13 @@ export const secondaryCategories: MenuCategory[] = [
         icon: <MapPinned size={16} />,
       },
       {
-        label: "Atestado De Exame",
+        label: "Tipo de Atestado",
         route: "atestado-exame",
+        icon: <ClipboardType size={16} />,
+      },
+      {
+        label: "Atestado de Exame",
+        route: "cadastro-atestado-exame",
         icon: <ClipboardPlus size={16} />,
       },
     ],
@@ -1123,59 +1129,59 @@ const avisosProdutor = [
       "https://lh3.googleusercontent.com/aida-public/AB6AXuAZQyeCdCXZmHpA__EYRTMXvGDj8RA2pzlKUMaIT4LuQ2Be5V6LhRaofs0bDs4uYjQEiQ5Q1hgnRwfpa5xxrs77Us6yGXQgMGiiG6uA7Zzbs4OZn53jyQ3pZVF3q6sV9FQj6s7V9K0jUaAy8IPKi3ZrWmbCpdBJ8NM9T0aUpNAtNfO8znJJ8hBfRd_q7x_lVW0ENHhzNV_UFFxvI5XimQL7uZePyIur_z-eyrnNnDEGAMX0-T767NQT",
     alt: "Tecnologia no campo",
   },
-	{
-		categoria: "Campanha 2026",
-		titulo: "Período de Vacinação Iniciado em Todo o Estado",
-		descricao: "Mantenha seu rebanho protegido e sua documentação em dia. A campanha contra febre aftosa é obrigatória para todos os produtores.",
-		acao: "Saiba mais",
-		imagem: campanhaVacinacao2026Url,
-		alt: "Pecuária",
-	},
-	{
-		categoria: "Infraestrutura",
-		titulo: "Novas Normas para Armazenamento de Grãos",
-		descricao: "O IMA publica novas diretrizes técnicas para silos e armazéns visando a segurança fitossanitária da safra 2025/26.",
-		acao: "Ver Documentação",
-		imagem: armazenamentoGraos2026Url,
-		alt: "Silos",
-	},
-	{
-		categoria: "Tecnologia",
-		titulo: "Inovação Digital no Campo",
-		descricao: "Lançamento do novo aplicativo de gestão de propriedades. Mais agilidade na emissão de guias e controle sanitário direto do celular.",
-		acao: "Baixar App",
-		imagem: inovacaoDigitalCampoUrl,
-		alt: "Tecnologia no campo",
-	},
+  {
+    categoria: "Campanha 2026",
+    titulo: "Período de Vacinação Iniciado em Todo o Estado",
+    descricao: "Mantenha seu rebanho protegido e sua documentação em dia. A campanha contra febre aftosa é obrigatória para todos os produtores.",
+    acao: "Saiba mais",
+    imagem: campanhaVacinacao2026Url,
+    alt: "Pecuária",
+  },
+  {
+    categoria: "Infraestrutura",
+    titulo: "Novas Normas para Armazenamento de Grãos",
+    descricao: "O IMA publica novas diretrizes técnicas para silos e armazéns visando a segurança fitossanitária da safra 2025/26.",
+    acao: "Ver Documentação",
+    imagem: armazenamentoGraos2026Url,
+    alt: "Silos",
+  },
+  {
+    categoria: "Tecnologia",
+    titulo: "Inovação Digital no Campo",
+    descricao: "Lançamento do novo aplicativo de gestão de propriedades. Mais agilidade na emissão de guias e controle sanitário direto do celular.",
+    acao: "Baixar App",
+    imagem: inovacaoDigitalCampoUrl,
+    alt: "Tecnologia no campo",
+  },
 ];
 
 const propriedadesProdutor = [
-	{
-		id: 1,
-		codigo: "51080590041",
-		nome: "Fazenda Santa Helena",
-		municipioUf: "Uberlândia - MG",
-		area: "150 hectares",
-		situacao: "Ativo",
-		proprietarios: "Fernando - Produtor titular",
-		zona: "Rural",
-		imagem: propriedadeSantaHelenaUrl,
-		alt: "Pastagem da Fazenda Santa Helena",
-		rebanhos: ["128 bovinos", "54 ovinos"],
-	},
-	{
-		id: 2,
-		codigo: "31001040082",
-		nome: "Fazenda São José",
-		municipioUf: "Patos de Minas - MG",
-		area: "85 hectares",
-		situacao: "Ativo",
-		proprietarios: "Fernando - Produtor titular",
-		zona: "Rural",
-		imagem: propriedadeSaoJoseUrl,
-		alt: "Área produtiva da Fazenda São José",
-		rebanhos: ["42 bovinos", "12 caprinos"],
-	},
+  {
+    id: 1,
+    codigo: "51080590041",
+    nome: "Fazenda Santa Helena",
+    municipioUf: "Uberlândia - MG",
+    area: "150 hectares",
+    situacao: "Ativo",
+    proprietarios: "Fernando - Produtor titular",
+    zona: "Rural",
+    imagem: propriedadeSantaHelenaUrl,
+    alt: "Pastagem da Fazenda Santa Helena",
+    rebanhos: ["128 bovinos", "54 ovinos"],
+  },
+  {
+    id: 2,
+    codigo: "31001040082",
+    nome: "Fazenda São José",
+    municipioUf: "Patos de Minas - MG",
+    area: "85 hectares",
+    situacao: "Ativo",
+    proprietarios: "Fernando - Produtor titular",
+    zona: "Rural",
+    imagem: propriedadeSaoJoseUrl,
+    alt: "Área produtiva da Fazenda São José",
+    rebanhos: ["42 bovinos", "12 caprinos"],
+  },
 ];
 
 function AvisosNoticias() {
@@ -1284,42 +1290,42 @@ function AvisosNoticias() {
 }
 
 function PropriedadesProdutor({ onNavigate }: { onNavigate: (screen: any, data?: any) => void }) {
-	return (
-		<section className="mb-6" aria-labelledby="propriedades-produtor-title">
-			<div className="mb-4">
-				<div>
-					<h2 id="propriedades-produtor-title" className="text-xl font-semibold text-gray-800">Minhas propriedades</h2>
-					<p className="mt-1 text-sm text-gray-500">Acesse rapidamente os dados e rebanhos de cada propriedade.</p>
-				</div>
-			</div>
+  return (
+    <section className="mb-6" aria-labelledby="propriedades-produtor-title">
+      <div className="mb-4">
+        <div>
+          <h2 id="propriedades-produtor-title" className="text-xl font-semibold text-gray-800">Minhas propriedades</h2>
+          <p className="mt-1 text-sm text-gray-500">Acesse rapidamente os dados e rebanhos de cada propriedade.</p>
+        </div>
+      </div>
 
-			<div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-				{propriedadesProdutor.map((propriedade, index) => (
-					<article key={propriedade.id} className="group overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg">
-						<div className="relative h-48 overflow-hidden bg-gray-200">
-							<img src={propriedade.imagem} alt={propriedade.alt} loading="lazy" className={`h-full w-full object-cover opacity-90 transition duration-500 group-hover:scale-[1.03] group-hover:opacity-100 ${index === 1 ? "object-[center_65%]" : "object-center"}`} />
-							<div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
-							<span className="absolute left-4 top-4 rounded-md bg-[#1A7A3C] px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-white shadow-sm">Ativa</span>
-						</div>
-						<div className="p-5">
-							<h3 className="text-lg font-semibold text-gray-900">{propriedade.nome}</h3>
-							<p className="mt-1 text-sm text-gray-500">{propriedade.municipioUf} <span aria-hidden="true">•</span> {propriedade.area}</p>
-							<div className="mt-5 flex flex-wrap items-center justify-between gap-4 border-t border-gray-100 pt-4">
-								<div className="flex flex-wrap gap-2">
-									{propriedade.rebanhos.map((rebanho, rebanhoIndex) => (
-										<span key={rebanho} className={`rounded-md px-2.5 py-1 text-xs font-semibold ${rebanhoIndex === 0 ? "bg-amber-50 text-amber-700" : "bg-green-50 text-[#1A7A3C]"}`}>{rebanho}</span>
-									))}
-								</div>
-								<button type="button" onClick={() => onNavigate("visualizar-estabelecimento-agropecuario", propriedade)} className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#1A7A3C] transition hover:text-[#15612F]">
-									Gerenciar <ArrowRight size={16} />
-								</button>
-							</div>
-						</div>
-					</article>
-				))}
-			</div>
-		</section>
-	);
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+        {propriedadesProdutor.map((propriedade, index) => (
+          <article key={propriedade.id} className="group overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg">
+            <div className="relative h-48 overflow-hidden bg-gray-200">
+              <img src={propriedade.imagem} alt={propriedade.alt} loading="lazy" className={`h-full w-full object-cover opacity-90 transition duration-500 group-hover:scale-[1.03] group-hover:opacity-100 ${index === 1 ? "object-[center_65%]" : "object-center"}`} />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
+              <span className="absolute left-4 top-4 rounded-md bg-[#1A7A3C] px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-white shadow-sm">Ativa</span>
+            </div>
+            <div className="p-5">
+              <h3 className="text-lg font-semibold text-gray-900">{propriedade.nome}</h3>
+              <p className="mt-1 text-sm text-gray-500">{propriedade.municipioUf} <span aria-hidden="true">•</span> {propriedade.area}</p>
+              <div className="mt-5 flex flex-wrap items-center justify-between gap-4 border-t border-gray-100 pt-4">
+                <div className="flex flex-wrap gap-2">
+                  {propriedade.rebanhos.map((rebanho, rebanhoIndex) => (
+                    <span key={rebanho} className={`rounded-md px-2.5 py-1 text-xs font-semibold ${rebanhoIndex === 0 ? "bg-amber-50 text-amber-700" : "bg-green-50 text-[#1A7A3C]"}`}>{rebanho}</span>
+                  ))}
+                </div>
+                <button type="button" onClick={() => onNavigate("visualizar-estabelecimento-agropecuario", propriedade)} className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#1A7A3C] transition hover:text-[#15612F]">
+                  Gerenciar <ArrowRight size={16} />
+                </button>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
 }
 
 // Componente Principal do Dashboard
@@ -1333,8 +1339,8 @@ export function DashboardPage({ onLogout, onNavigate }: any) {
     role === "produtor"
       ? [[...visibleCadastros, ...visibleSecondary, ...visibleThird]]
       : [visibleCadastros, visibleSecondary, visibleThird].filter(
-          (group) => group.length > 0,
-        );
+        (group) => group.length > 0,
+      );
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">

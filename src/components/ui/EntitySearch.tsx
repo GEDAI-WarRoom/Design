@@ -183,6 +183,7 @@ export const DOENCAS_MOCK = [
 	{ id: 3, codigo: "D03", nome: "Tuberculose Bovina" },
 	{ id: 4, codigo: "D04", nome: "Raiva dos Herbívoros" },
 	{ id: 5, codigo: "D05", nome: "Anemia Infecciosa Equina (AIE)" },
+	{ id: 6, codigo: "D06", nome: "Mormo" },
 ];
 
 // Componente utilitário interno do olho de visualização (Padrão do Projeto)
@@ -503,6 +504,7 @@ interface DomainInputProps {
 	onChange: (entidade: any) => void;
 	onEyeClick?: (entidade?: any) => void;
 	required?: boolean;
+	data?: any[];
 
 	// Repassando as novas propriedades para o componente especialista
 	isMulti?: boolean;
@@ -516,9 +518,11 @@ export function ExploracaoPecuariaInput({
 	onChange,
 	onEyeClick,
 	required = false,
+	data,
 }: DomainInputProps) {
+	const database = data ?? EXPLORACOES_MOCK;
 	// Encontra a entidade selecionada no mock para extrair os campos reboque (Espécie)
-	const entidadeSelecionada = EXPLORACOES_MOCK.find((x) => x.codigo === value);
+	const entidadeSelecionada = database.find((x) => x.codigo === value);
 
 	return (
 		<div className="flex flex-col gap-3 w-full">
@@ -534,7 +538,7 @@ export function ExploracaoPecuariaInput({
 					placeholder="Buscar por código, estabelecimento, espécie ou produtor."
 					required={required}
 					value={value || ""}
-					data={EXPLORACOES_MOCK}
+					data={database}
 					// 🔥 Configurações de exibição exatas passadas por você:
 					title="Buscar Exploração Pecuária"
 					subtitle="Busque por uma exploração pecuária cadastrada:"
@@ -559,6 +563,7 @@ export function ExploracaoPecuariaInput({
 					]}
 					searchPlaceholder="Buscar por código, estabelecimento, espécie ou produtor."
 					confirmLabel="Confirmar"
+					showResultsOnOpen
 					className="[&_td]:whitespace-pre-line" // Garante a quebra de linha correta do \n na tabela
 					onChange={onChange}
 				/>
@@ -590,14 +595,16 @@ export function EstabelecimentoAgropecuarioInput({
 	onChange,
 	onEyeClick,
 	required = false,
+	data,
 }: DomainInputProps) {
+	const database = data ?? ESTABELECIMENTOS_MOCK;
 	// Encontra pelo nome ou código no mock original para preencher o campo cinza reboque ao lado
-	const entidadeSelecionada = ESTABELECIMENTOS_MOCK.find(
+	const entidadeSelecionada = database.find(
 		(x) => x.nome === value || x.codigo === value,
 	);
 
 	// 🔥 Transforma os dados injetando o "proprietarioFormatado" exatamente como o seu modal fazia na página!
-	const dadosFormatadosParaModal = ESTABELECIMENTOS_MOCK.map((estab) => ({
+	const dadosFormatadosParaModal = database.map((estab) => ({
 		...estab,
 	}));
 
@@ -635,6 +642,7 @@ export function EstabelecimentoAgropecuarioInput({
 					searchKeys={["codigo", "nome", "municipio", "proprietario"]}
 					searchPlaceholder="Buscar por código, nome, município ou proprietário."
 					confirmLabel="Confirmar"
+					showResultsOnOpen
 					onChange={onChange}
 				/>
 

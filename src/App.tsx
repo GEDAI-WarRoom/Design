@@ -248,6 +248,11 @@ import { AdicionarAtestadoExamePage } from "./pages/Exame/AtestadoExame/Adiciona
 import { AtestadoExamePage } from "./pages/Exame/AtestadoExame/AtestadoExame";
 import { EditarAtestadoExamePage } from "./pages/Exame/AtestadoExame/EditarAtestadoExame";
 import { VisualizarAtestadoExamePage } from "./pages/Exame/AtestadoExame/VisualizarAtestadoExame";
+import { AdicionarAtestadoExameCadastroPage } from "./pages/Exame/AtestadoExameCadastro/AdicionarAtestadoExameCadastro";
+import { AtestadoExameCadastroPage } from "./pages/Exame/AtestadoExameCadastro/AtestadoExameCadastro";
+import { EditarAtestadoExameCadastroPage } from "./pages/Exame/AtestadoExameCadastro/EditarAtestadoExameCadastro";
+import { VinculacoesAtestadoExameCadastroPage } from "./pages/Exame/AtestadoExameCadastro/VinculacoesAtestadoExameCadastro";
+import { VisualizarAtestadoExameCadastroPage } from "./pages/Exame/AtestadoExameCadastro/VisualizarAtestadoExameCadastro";
 
 //ARRECADACAO
 import { AdicionarDAEPage } from "./pages/Arrecadacao/DAE/AdicionarDAE";
@@ -571,6 +576,11 @@ export type Screen =
   | "adicionar-atestado-exame"
   | "visualizar-atestado-exame"
   | "editar-atestado-exame"
+  | "cadastro-atestado-exame"
+  | "adicionar-cadastro-atestado-exame"
+  | "visualizar-cadastro-atestado-exame"
+  | "editar-cadastro-atestado-exame"
+  | "vinculacoes-cadastro-atestado-exame"
   | "venda-entrada-insumos-exames"
   | "adicionar-venda-entrada-insumos-exames"
   | "visualizar-venda-entrada-insumos-exames"
@@ -780,6 +790,11 @@ export type Screen =
 	| "adicionar-atestado-exame"
 	| "visualizar-atestado-exame"
 	| "editar-atestado-exame"
+	| "cadastro-atestado-exame"
+	| "adicionar-cadastro-atestado-exame"
+	| "visualizar-cadastro-atestado-exame"
+	| "editar-cadastro-atestado-exame"
+	| "vinculacoes-cadastro-atestado-exame"
 	| "venda-entrada-insumos-exames"
 	| "adicionar-venda-entrada-insumos-exames"
 	| "status-animal"
@@ -2399,6 +2414,16 @@ export default function App() {
       return <VisualizarAtestadoExamePage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "editar-atestado-exame":
       return <EditarAtestadoExamePage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "cadastro-atestado-exame":
+      return <AtestadoExameCadastroPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-cadastro-atestado-exame":
+      return <AdicionarAtestadoExameCadastroPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-cadastro-atestado-exame":
+      return <VisualizarAtestadoExameCadastroPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-cadastro-atestado-exame":
+      return <EditarAtestadoExameCadastroPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "vinculacoes-cadastro-atestado-exame":
+      return <VinculacoesAtestadoExameCadastroPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "evento-pecuario":
       return <EventoPecuarioPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-evento-pecuario":
