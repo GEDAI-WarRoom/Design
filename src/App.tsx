@@ -145,6 +145,10 @@ import { AdicionarDoencaPage } from "./pages/Vacinacao/Doenca/AdicionarDoenca";
 import { DoencaPage } from "./pages/Vacinacao/Doenca/Doenca";
 import { AdicionarEtapaVacinacaoPage } from "./pages/Vacinacao/EtapaVacinacao/AdicionarEtapaVacinacao";
 import { EtapaVacinacaoPage } from "./pages/Vacinacao/EtapaVacinacao/EtapaVacinacao";
+import { VisualizarEtapaVacinacaoPage } from "./pages/Vacinacao/EtapaVacinacao/VisualizarEtapaVacinacao";
+import { EditarEtapaVacinacaoPage } from "./pages/Vacinacao/EtapaVacinacao/EditarEtapaVacinacao";
+
+
 import { AdicionarLaboratorioPage } from "./pages/Vacinacao/Laboratorio/AdicionarLaboratorio";
 import { LaboratorioPage } from "./pages/Vacinacao/Laboratorio/Laboratorio";
 import { AdicionarLancamentoDosesVacinaPage } from "./pages/Vacinacao/LancamentoDoses/AdicionarLancamentoDoses";
@@ -167,7 +171,6 @@ import { AjusteDosesInsumoPage } from "./pages/Vacinacao/AjusteDosesInsumo/Ajust
 import { AdicionarAjusteDosesInsumoPage } from "./pages/Vacinacao/AjusteDosesInsumo/AdicionarAjusteDosesInsumo";
 import { VisualizarAjusteDosesInsumoPage } from "./pages/Vacinacao/AjusteDosesInsumo/VisualizarAjusteDosesInsumo";
 import { EditarAjusteDosesInsumoPage } from "./pages/Vacinacao/AjusteDosesInsumo/EditarAjusteDosesInsumo";
-
 import { AtestadoExamePage } from "./pages/Vacinacao/AtestadoExame/AtestadoExame";
 import { AdicionarAtestadoExamePage } from "./pages/Vacinacao/AtestadoExame/AdicionarAtestadoExame";
 import { VisualizarAtestadoExamePage } from "./pages/Vacinacao/AtestadoExame/VisualizarAtestadoExame";
@@ -314,6 +317,8 @@ export type Screen =
 	| "adicionar-lancamento-doses-vacina"
 	| "etapa-vacinacao"
 	| "adicionar-etapa-vacinacao"
+	| "visualizar-etapa-vacinacao"
+	| "editar-etapa-vacinacao"
 	| "autorizacao-vacinacao"
 	| "adicionar-autorizacao-vacinacao"
 	| "declaracao-vacinacao"
@@ -892,6 +897,20 @@ export default function App() {
 		case "adicionar-etapa-vacinacao":
 			return (
 				<AdicionarEtapaVacinacaoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "visualizar-etapa-vacinacao":
+			return (
+				<VisualizarEtapaVacinacaoPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "editar-etapa-vacinacao":
+			return (
+				<EditarEtapaVacinacaoPage
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
 				/>
