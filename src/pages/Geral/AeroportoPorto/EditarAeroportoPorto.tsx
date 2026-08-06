@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ArrowLeft, Info, Check, PlusCircle, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
-import { FloatInput, FloatSelect, LargeTextArea, UploadField } from "../../../components/ui/FormKit";
+import { FloatInput, LargeTextArea, UploadField } from "../../../components/ui/FormKit";
 import { BlocoEnderecoFields, BlocoContatoFields, DynamicListWrapper, ProprietarioInput } from "../../../components/ui/EntitySearch";
 
 const GREEN = "#1A7A3C";
@@ -24,9 +24,8 @@ export function EditarAeroportoPortoPage({ onLogout, onNavigate }: { dados?: any
   const [isSucesso, setIsSucesso] = useState(false);
 
   // Exemplo fixo - Informações Básicas
-  const [codigo] = useState("AP-000003");
-  const [nome, setNome] = useState("Aeroporto Regional de Lavras");
-  const [tipo, setTipo] = useState("Aeroporto");
+  const [codigo] = useState("UVA-000003");
+  const [nome, setNome] = useState("Unidade de Vigilância Agropecuária de Lavras");
 
   // Exemplo fixo - Proprietários
   const [proprietarios, setProprietarios] = useState<any[]>([
@@ -43,7 +42,7 @@ export function EditarAeroportoPortoPage({ onLogout, onNavigate }: { dados?: any
     estado: "Minas Gerais",
     municipio: "Lavras",
     bairro: "Centro",
-    endereco: "Avenida do Aeroporto",
+    endereco: "Avenida Principal",
     numero: "1000",
     complemento: "Hangar 02",
     localidade: "",
@@ -56,7 +55,7 @@ export function EditarAeroportoPortoPage({ onLogout, onNavigate }: { dados?: any
   const [contatos, setContatos] = useState({
     utilizarContatoProprietario: "Não" as const,
     proprietariosSelecionados: [] as string[],
-    emailFixo: "contato@aeroportolavras.com.br",
+    emailFixo: "contato@uvalavras.gov.br",
     emailFixoObs: "",
     telefoneFixo: "(35) 99887-6655",
     telefoneFixoObs: "",
@@ -68,12 +67,12 @@ export function EditarAeroportoPortoPage({ onLogout, onNavigate }: { dados?: any
     {
       uid: "anexo-1",
       nome: "licenca_operacional.pdf",
-      descricao: "Licença de Operação e Funcionamento ANAC"
+      descricao: "Documento de funcionamento da unidade"
     }
   ]);
 
   // Exemplo fixo - Observações
-  const [observacao, setObservacao] = useState("Aeroporto regional utilizado para aviação executiva e transporte de cargas.");
+  const [observacao, setObservacao] = useState("Unidade responsável pela vigilância agropecuária na região de Lavras.");
 
   const handleSalvar = () => {
     setIsSucesso(true);
@@ -87,10 +86,10 @@ export function EditarAeroportoPortoPage({ onLogout, onNavigate }: { dados?: any
         {/* Cabeçalho */}
         <div>
           <button type="button" onClick={() => onNavigate("aeroporto-porto")} className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70 font-semibold" style={{ color: GREEN }}>
-            <ArrowLeft size={15} /> Todos os Aeroportos/Portos
+            <ArrowLeft size={15} /> Todas as Unidades de Vigilância Agropecuária
           </button>
           <div className="flex justify-between items-center w-full">
-            <h1 className="text-2xl font-semibold text-gray-900">Editar Aeroporto / Porto</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">Editar Unidade de Vigilância Agropecuária</h1>
             <button type="button" onClick={handleSalvar} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm">
               Salvar
             </button>
@@ -107,21 +106,14 @@ export function EditarAeroportoPortoPage({ onLogout, onNavigate }: { dados?: any
 
         {/* Informações Básicas */}
         <Section title="Informações Básicas">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <FloatInput label="Código" value={codigo} disabled onChange={() => { }} />
             <FloatInput
-              label="Nome Comercial do Aeroporto/Porto"
+              label="Nome da Unidade de Vigilância Agropecuária"
               required
               value={nome}
               onChange={setNome}
               maxLength={255}
-            />
-            <FloatSelect
-              label="Aeroporto ou Porto?"
-              required
-              value={tipo}
-              onChange={setTipo}
-              options={["Aeroporto", "Porto"]}
             />
           </div>
         </Section>
@@ -268,7 +260,7 @@ export function EditarAeroportoPortoPage({ onLogout, onNavigate }: { dados?: any
             <p className="text-sm text-gray-500 mt-1">O cadastro de "{nome}" foi atualizado com sucesso.</p>
             <div className="flex gap-3 justify-center mt-6">
               <button onClick={() => { setIsSucesso(false); onNavigate("aeroporto-porto"); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50 transition">Voltar</button>
-              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-aeroporto-porto", { nome, tipo, codigo }); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
+              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-aeroporto-porto", { nome, codigo }); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
             </div>
           </div>
         </div>

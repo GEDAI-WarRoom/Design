@@ -19,24 +19,21 @@ import {
 const GREEN = "#1A7A3C";
 
 // --- lista de opcoes (US0RXX - CA3) ---
-const TIPOS_DESTINO = [
-  "Evento Pecuário",
-  "Frigorífico",
+const TIPOS_LOCAL = [
   "Estabelecimento Agropecuário",
-  "Revendedora de Animais Vivos",
-  "Estabelecimento Genérico",
-  "Instituição de Ensino e Pesquisa",
-];
-const TIPOS_PROCEDENCIA = [
   "Evento Pecuário",
-  "Frigorífico",
-  "Propriedade Rural",
+  "Abatedouro Frigorífico",
+  "Revendedora de Animais Vivos",
+  "Unidade de Vigilância Agropecuária",
+  "Instituição de Ensino e Pesquisa",
+  "Local de Pesagem",
+  "Local de Realização de Exame",
+  "Estabelecimento Genérico",
 ];
 const EMITE_GTA_ACESSO_EXTERNO = [
   "Emite para dentro do Estado",
   "Emite para fora do Estado",
 ];
-const TAXAS_COBRAR = ["GTA para dentro do Estado", "GTA para fora do Estado"];
 
 // --- mock da entidade ---
 const ESPECIES_MOCK = [
@@ -125,7 +122,6 @@ export function AdicionarFinalidadeTransitoPage({
   const [codigoMapa, setCodigoMapa] = useState("");
   const [emiteAcessoExterno, setEmiteAcessoExterno] = useState<string[]>([]);
   const [tiposDestino, setTiposDestino] = useState<string[]>([]);
-  const [taxasCobrar, setTaxasCobrar] = useState<string[]>([]);
   const [especies, setEspecies] = useState<typeof ESPECIES_MOCK>([]);
   const [modalEspecieAberto, setModalEspecieAberto] = useState(false);
 
@@ -150,13 +146,12 @@ export function AdicionarFinalidadeTransitoPage({
 		id: Date.now(),
 		finalidade: finalidadeTransito || "Abate",
 		codigoMapa: codigoMapa || "01",
-		tipoProcedencia: tiposProcedencia[0] || "Frigorífico",
-		tiposProcedencia: tiposProcedencia.length ? tiposProcedencia : ["Frigorífico"],
-		tipoDestino: tiposDestino[0] || "Frigorífico",
-		tiposDestino: tiposDestino.length ? tiposDestino : ["Frigorífico"],
+		tipoProcedencia: tiposProcedencia[0] || "Abatedouro Frigorífico",
+		tiposProcedencia: tiposProcedencia.length ? tiposProcedencia : ["Abatedouro Frigorífico"],
+		tipoDestino: tiposDestino[0] || "Abatedouro Frigorífico",
+		tiposDestino: tiposDestino.length ? tiposDestino : ["Abatedouro Frigorífico"],
 		especies: especies.length ? especies : [ESPECIES_MOCK[0]],
 		emiteAcessoExterno,
-		taxasCobrar,
 		procedencias,
 		situacao: "Ativo",
 	};
@@ -332,7 +327,7 @@ export function AdicionarFinalidadeTransitoPage({
               <CheckboxGroup
                 title="Tipo de Procedência"
                 required
-                options={TIPOS_DESTINO.map((item) => ({
+                options={TIPOS_LOCAL.map((item) => ({
                   value: item,
                   label: item,
                 }))}
@@ -360,25 +355,16 @@ export function AdicionarFinalidadeTransitoPage({
         {/* --- [3] informacoes de destino --- */}
         <Section title="Informações de Destino">
           <div className="pt-5 flex flex-col gap-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               <CheckboxGroup
                 title="Tipo de Destino"
                 required
-                options={TIPOS_DESTINO.map((item) => ({
+                options={TIPOS_LOCAL.map((item) => ({
                   value: item,
                   label: item,
                 }))}
                 defaultValue={tiposDestino}
                 onChange={setTiposDestino}
-              />
-              <CheckboxGroup
-                title="Taxas a Cobrar"
-                options={TAXAS_COBRAR.map((item) => ({
-                  value: item,
-                  label: item,
-                }))}
-                defaultValue={taxasCobrar}
-                onChange={setTaxasCobrar}
               />
             </div>
           </div>
