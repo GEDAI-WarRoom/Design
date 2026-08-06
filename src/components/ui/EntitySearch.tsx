@@ -854,6 +854,7 @@ interface FornecedorVacinaInputProps {
 	required?: boolean;
 	tooltipText?: string;
 	data?: any[]; // <-- Recebe os dados de fora de forma limpa
+	produtoLabel?: string;
 }
 
 export function FornecedorVacinaInput({
@@ -863,6 +864,7 @@ export function FornecedorVacinaInput({
 	required = false,
 	tooltipText,
 	data = FORNECEDORES_VACINA_MOCK, // <-- Fallback usando o mock local se nenhum dado for passado
+	produtoLabel = "Vacina",
 }: FornecedorVacinaInputProps) {
 	const entidadeSelecionada = data.find((x: any) => x.codigo === value);
 
@@ -883,7 +885,7 @@ export function FornecedorVacinaInput({
 						value={entidadeSelecionada?.nome || ""}
 						data={data}
 						searchKeys={["codigo", "nome", "tipo"]}
-						title="Buscar Fornecedor de Vacina"
+						title={`Buscar Fornecedor de ${produtoLabel}`}
 						subtitle="Busque por laboratórios ou revendedoras cadastrados:"
 						icon={
 							<img
@@ -927,6 +929,9 @@ export function FornecedorVacinaInput({
 		</div>
 	);
 }
+
+// Alias semântico para cadastros de insumos; mantém compatibilidade com os fluxos de vacinação.
+export const FornecedorInsumoInput = FornecedorVacinaInput;
 
 // ==========================================================
 // MODAL DOENÇA (ATUALIZADO)
