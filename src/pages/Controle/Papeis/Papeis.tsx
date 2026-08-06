@@ -18,27 +18,13 @@ import {
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatSelect } from "../../../components/ui/FormKit";
+import { PAPEIS_MOCK, type Papel } from "./papeisData";
 
 const GREEN = "#1A7A3C";
 
 // ==========================================================
 // MOCKS DE ENTIDADE E OPÇÕES
 // ==========================================================
-export interface Papel {
-  id: number;
-  nome: string;
-  tipo: "Base" | "Complementar";
-  situacao: "Ativo" | "Inativo";
-}
-
-const PAPEIS_MOCK: Papel[] = [
-  { id: 1, nome: "Funcionário", tipo: "Base", situacao: "Ativo" },
-  { id: 2, nome: "Responsável Técnico", tipo: "Complementar", situacao: "Ativo" },
-  { id: 3, nome: "Administrador", tipo: "Base", situacao: "Ativo" },
-  { id: 4, nome: "Produtor Rural", tipo: "Complementar", situacao: "Inativo" },
-  { id: 5, nome: "Gestor de Cadastros", tipo: "Base", situacao: "Ativo" },
-];
-
 const TIPOS_PAPEL = [
   { value: "Base", label: "Base" },
   { value: "Complementar", label: "Complementar" },
