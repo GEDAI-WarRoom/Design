@@ -432,7 +432,7 @@ export function EditarExploracaoPecuariaPage({
               onClick={handleSalvar}
               className="h-10 px-6 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white font-semibold text-sm transition shadow-sm flex items-center gap-2 self-start md:self-auto"
             >
-              Salvar
+              Salvar 
             </button>
           </div>
         </div>
