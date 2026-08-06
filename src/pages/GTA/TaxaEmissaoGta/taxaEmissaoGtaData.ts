@@ -273,6 +273,15 @@ export function modalidadeOposta(modalidade: ModalidadeFaixa) {
 export function listarTaxasEmissaoDocumentoSanitario() {
   return listarColecaoMock(COLECAO, TAXAS_EMISSAO_GTA_MOCK).map((taxa) => {
     const especiesAtuais = listarEspeciesTaxa();
+    const {
+      especie: especieLegada,
+      ...taxaAtual
+    } = taxa as TaxaEmissaoGta & { especie?: EspecieTaxa };
+    const especiesSalvas = Array.isArray(taxa.especies)
+      ? taxa.especies
+      : especieLegada
+        ? [especieLegada]
+        : [];
     const atualizarItem = (item: ItemReceitaTaxa | null) => {
       if (!item) return null;
       const atual = obterItemReceita(Number(item.id));
@@ -287,11 +296,15 @@ export function listarTaxasEmissaoDocumentoSanitario() {
         : item;
     };
     return {
-      ...taxa,
-      especies: taxa.especies.map(
+      ...taxaAtual,
+      especies: especiesSalvas.map(
         (especie) =>
           especiesAtuais.find((item) => item.id === especie.id) ?? especie,
       ),
+      finalidades: Array.isArray(taxa.finalidades) ? taxa.finalidades : [],
+      cobrancasTaxa: Array.isArray(taxa.cobrancasTaxa)
+        ? taxa.cobrancasTaxa
+        : [],
       itemReceita: atualizarItem(taxa.itemReceita),
       itemReceitaLote: atualizarItem(taxa.itemReceitaLote),
       itemReceitaAteLimite: atualizarItem(taxa.itemReceitaAteLimite),

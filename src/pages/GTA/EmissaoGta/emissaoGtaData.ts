@@ -671,10 +671,17 @@ function valorUnitarioItemTaxa(itemTaxa: ItemReceitaTaxa | null) {
 
 export function calcularValorGta(form: EmissaoGtaFormValue) {
   if (form.motivoIsencaoTaxa || !form.especie) return 0;
+  const especieId = form.especie.id;
   const animais = totalAnimaisGta(form);
   const hoje = new Date().toISOString().slice(0, 10);
   const taxa = listarTaxasEmissaoDocumentoSanitario()
-    .filter((item) => item.situacao === "Ativo" && item.tipoDocumentoSanitario === "GTA" && item.especie.id === form.especie?.id && item.dataInicioVigencia <= hoje)
+    .filter(
+      (item) =>
+        item.situacao === "Ativo" &&
+        item.tipoDocumentoSanitario === "GTA" &&
+        item.especies.some((especie) => especie.id === especieId) &&
+        item.dataInicioVigencia <= hoje,
+    )
     .sort((a, b) => b.dataInicioVigencia.localeCompare(a.dataInicioVigencia))[0];
   if (!taxa) return 0;
 
