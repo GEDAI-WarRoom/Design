@@ -826,8 +826,8 @@ export function totalAnimaisGta(form: EmissaoGtaFormValue) {
   return form.faixasAnimais.reduce((total, item) => total + item.animaisGta, 0);
 }
 
-export function dataPadraoValidade() {
-  const data = new Date();
-  data.setDate(data.getDate() + 3);
+export function dataPadraoValidade(dataEmissao = new Date().toISOString().slice(0, 10)) {
+  const [ano, mes, dia] = dataEmissao.split("-").map(Number);
+  const data = new Date(Date.UTC(ano, mes - 1, dia + 2));
   return data.toISOString().slice(0, 10);
 }

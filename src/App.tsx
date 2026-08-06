@@ -219,6 +219,12 @@ import { AdicionarVendaComEntradaInsumosExamesPage } from "./pages/Exame/VendaCo
 import { EditarVendaComEntradaInsumosExamesPage } from "./pages/Exame/VendaComEntradaInsumosExames/EditarVendaComEntradaInsumosExames";
 import { VendaComEntradaInsumosExamesPage } from "./pages/Exame/VendaComEntradaInsumosExames/VendaComEntradaInsumosExames";
 import { VisualizarVendaComEntradaInsumosExamesPage } from "./pages/Exame/VendaComEntradaInsumosExames/VisualizarVendaComEntradaInsumosExames";
+import {
+  AdicionarVendaComSaidaInsumoPage,
+  EditarVendaComSaidaInsumoPage,
+  VendaComSaidaInsumoPage,
+  VisualizarVendaComSaidaInsumoPage,
+} from "./pages/Exame/VendaComSaidaInsumo/VendaComSaidaInsumo";
 import { AdicionarVendaComEntradaVacinaPage } from "./pages/Vacinacao/VendaComEntradaVacina/AdicionarVendaComEntradaVacina";
 import { VendaComEntradaVacinaPage } from "./pages/Vacinacao/VendaComEntradaVacina/VendaComEntradaVacina";
 import { AdicionarVendaComSaidaVacinaPage } from "./pages/Vacinacao/VendaComSaidaVacina/AdicionarVendaComSaidaVacina";
@@ -248,6 +254,11 @@ import { AdicionarAtestadoExamePage } from "./pages/Exame/AtestadoExame/Adiciona
 import { AtestadoExamePage } from "./pages/Exame/AtestadoExame/AtestadoExame";
 import { EditarAtestadoExamePage } from "./pages/Exame/AtestadoExame/EditarAtestadoExame";
 import { VisualizarAtestadoExamePage } from "./pages/Exame/AtestadoExame/VisualizarAtestadoExame";
+import { AdicionarAtestadoExameCadastroPage } from "./pages/Exame/AtestadoExameCadastro/AdicionarAtestadoExameCadastro";
+import { AtestadoExameCadastroPage } from "./pages/Exame/AtestadoExameCadastro/AtestadoExameCadastro";
+import { EditarAtestadoExameCadastroPage } from "./pages/Exame/AtestadoExameCadastro/EditarAtestadoExameCadastro";
+import { VinculacoesAtestadoExameCadastroPage } from "./pages/Exame/AtestadoExameCadastro/VinculacoesAtestadoExameCadastro";
+import { VisualizarAtestadoExameCadastroPage } from "./pages/Exame/AtestadoExameCadastro/VisualizarAtestadoExameCadastro";
 
 //ARRECADACAO
 import { AdicionarDAEPage } from "./pages/Arrecadacao/DAE/AdicionarDAE";
@@ -327,6 +338,10 @@ export type Screen =
   | "editar-laboratorio"
   | "visualizar-venda-saida-vacina"
   | "editar-venda-saida-vacina"
+  | "venda-saida-insumo"
+  | "adicionar-venda-saida-insumo"
+  | "visualizar-venda-saida-insumo"
+  | "editar-venda-saida-insumo"
   | "visualizar-venda-entrada-vacina"
   | "editar-venda-entrada-vacina"
   | "visualizar-partilha-vacina"
@@ -571,6 +586,11 @@ export type Screen =
   | "adicionar-atestado-exame"
   | "visualizar-atestado-exame"
   | "editar-atestado-exame"
+  | "cadastro-atestado-exame"
+  | "adicionar-cadastro-atestado-exame"
+  | "visualizar-cadastro-atestado-exame"
+  | "editar-cadastro-atestado-exame"
+  | "vinculacoes-cadastro-atestado-exame"
   | "venda-entrada-insumos-exames"
   | "adicionar-venda-entrada-insumos-exames"
   | "visualizar-venda-entrada-insumos-exames"
@@ -780,6 +800,11 @@ export type Screen =
 	| "adicionar-atestado-exame"
 	| "visualizar-atestado-exame"
 	| "editar-atestado-exame"
+	| "cadastro-atestado-exame"
+	| "adicionar-cadastro-atestado-exame"
+	| "visualizar-cadastro-atestado-exame"
+	| "editar-cadastro-atestado-exame"
+	| "vinculacoes-cadastro-atestado-exame"
 	| "venda-entrada-insumos-exames"
 	| "adicionar-venda-entrada-insumos-exames"
 	| "status-animal"
@@ -840,6 +865,12 @@ export default function App() {
       return <VisualizarVendaComSaidaVacinaPage key={`visualizar-venda-saida-vacina-${screenData?.id ?? "novo"}`} dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "editar-venda-saida-vacina":
       return <EditarVendaComSaidaVacinaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+
+    // VENDA COM SAÍDA DE INSUMO
+    case "visualizar-venda-saida-insumo":
+      return <VisualizarVendaComSaidaInsumoPage key={`visualizar-venda-saida-insumo-${screenData?.id ?? "novo"}`} dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-venda-saida-insumo":
+      return <EditarVendaComSaidaInsumoPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
 
     // VENDA COM ENTRADA DE VACINA
     case "visualizar-venda-entrada-vacina":
@@ -2379,6 +2410,10 @@ export default function App() {
       return (
         <VendaComEntradaInsumosExamesPage onLogout={handleLogout} onNavigate={handleNavigate} />
       );
+    case "venda-saida-insumo":
+      return <VendaComSaidaInsumoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-venda-saida-insumo":
+      return <AdicionarVendaComSaidaInsumoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-venda-entrada-insumos-exames":
       return (
         <AdicionarVendaComEntradaInsumosExamesPage
@@ -2399,6 +2434,16 @@ export default function App() {
       return <VisualizarAtestadoExamePage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "editar-atestado-exame":
       return <EditarAtestadoExamePage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "cadastro-atestado-exame":
+      return <AtestadoExameCadastroPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-cadastro-atestado-exame":
+      return <AdicionarAtestadoExameCadastroPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-cadastro-atestado-exame":
+      return <VisualizarAtestadoExameCadastroPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-cadastro-atestado-exame":
+      return <EditarAtestadoExameCadastroPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "vinculacoes-cadastro-atestado-exame":
+      return <VinculacoesAtestadoExameCadastroPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "evento-pecuario":
       return <EventoPecuarioPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-evento-pecuario":

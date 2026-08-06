@@ -1,7 +1,14 @@
 import { useState } from "react";
-import { ArrowLeft, FileInput } from "lucide-react";
+import { ArrowLeft, CalendarPlus, FileInput } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, LargeTextArea } from "../../../components/ui/FormKit";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "../../../components/ui-1/dialog";
 import { EmissaoGtaForm } from "./EmissaoGtaForm";
 import {
   dataPadraoValidade,
@@ -22,26 +29,69 @@ export function EmitirEmissaoGtaPage({
 }) {
   const registroInicial = dados ?? obterEmissaoGta(null);
   const [emissao] = useState<EmissaoGta | null>(registroInicial);
-  const [dataValidade, setDataValidade] = useState(
-    registroInicial?.dataValidade || dataPadraoValidade(),
+  const dataEmissao = registroInicial?.situacao === "Emitida"
+    ? registroInicial.dataEmissao
+    : new Date().toISOString().slice(0, 10);
+  const dataValidadePadrao = dataPadraoValidade(dataEmissao);
+  const [estenderValidade, setEstenderValidade] = useState(
+    Boolean(registroInicial?.justificativaValidade),
+  );
+  const [novaDataValidade, setNovaDataValidade] = useState(
+    registroInicial?.justificativaValidade
+      ? registroInicial.dataValidade
+      : "",
   );
   const [justificativa, setJustificativa] = useState(
     registroInicial?.justificativaValidade ?? "",
   );
+  const [modalExtensaoAberto, setModalExtensaoAberto] = useState(false);
+  const [novaDataRascunho, setNovaDataRascunho] = useState("");
+  const [justificativaRascunho, setJustificativaRascunho] = useState("");
+  const [tentouConfirmarExtensao, setTentouConfirmarExtensao] = useState(false);
   const [tentouEmitir, setTentouEmitir] = useState(false);
 
   if (!emissao) return null;
 
-  const dataLimite = dataPadraoValidade();
-  const ultrapassaTresDias = Boolean(dataValidade && dataValidade > dataLimite);
-  const valida = Boolean(
-    dataValidade && (!ultrapassaTresDias || justificativa.trim()),
-  );
   const bloqueada = emissao.situacao === "Emitida";
+  const dataValidade = bloqueada
+    ? emissao.dataValidade
+    : estenderValidade
+      ? novaDataValidade
+      : dataValidadePadrao;
+  const justificativaExibida = bloqueada
+    ? emissao.justificativaValidade
+    : justificativa;
+  const extensaoValida = Boolean(
+    !estenderValidade ||
+      (novaDataValidade > dataValidadePadrao && justificativa.trim()),
+  );
+  const rascunhoExtensaoValido = Boolean(
+    novaDataRascunho > dataValidadePadrao && justificativaRascunho.trim(),
+  );
+  const dataRascunhoFoiAlterada = Boolean(
+    novaDataRascunho && novaDataRascunho !== dataValidadePadrao,
+  );
+
+  const abrirModalExtensao = () => {
+    setNovaDataRascunho(estenderValidade ? novaDataValidade : "");
+    setJustificativaRascunho(estenderValidade ? justificativa : "");
+    setTentouConfirmarExtensao(false);
+    setModalExtensaoAberto(true);
+  };
+
+  const confirmarExtensao = () => {
+    setTentouConfirmarExtensao(true);
+    if (!rascunhoExtensaoValido) return;
+    setNovaDataValidade(novaDataRascunho);
+    setJustificativa(justificativaRascunho.trim());
+    setEstenderValidade(true);
+    setTentouEmitir(false);
+    setModalExtensaoAberto(false);
+  };
 
   const emitir = () => {
     setTentouEmitir(true);
-    if (!valida || bloqueada) return;
+    if (!extensaoValida || bloqueada) return;
     const atualizada = emitirEmissaoGta(
       emissao.id,
       dataValidade,
@@ -86,7 +136,7 @@ export function EmitirEmissaoGtaPage({
           </div>
         </div>
 
-        <section className="bg-white rounded-xl shadow-sm p-6">
+        <section className="bg-white rounded-xl shadow-sm p-6 flex flex-col gap-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <FloatInput
               label="Série - Número da GTA"
@@ -101,51 +151,128 @@ export function EmitirEmissaoGtaPage({
               required
             />
           </div>
-        </section>
-
-        <EmissaoGtaForm value={emissao} mode="view" />
-
-        <section className="bg-white rounded-xl shadow-sm overflow-visible">
-          <div className="px-6 py-4">
-            <h2 className="text-base font-semibold text-gray-800">
-              Informações da GTA
-            </h2>
-          </div>
-          <div className="px-6 pb-6 border-t border-gray-100 pt-5 flex flex-col gap-5">
+          <div className="grid grid-cols-1 items-center gap-5 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]">
+            <FloatInput
+              label="Data de Emissão"
+              type="date"
+              value={dataEmissao}
+              disabled
+              required
+            />
             <FloatInput
               label="Data de Validade"
               type="date"
-              required
               value={dataValidade}
-              onChange={setDataValidade}
-              disabled={bloqueada}
+              disabled
+              required
             />
-            {ultrapassaTresDias && (
+            {!bloqueada && (
+              <button
+                type="button"
+                onClick={abrirModalExtensao}
+                className="flex h-12 items-center justify-center gap-2 rounded-md border border-[#1A7A3C] bg-white px-4 text-sm font-semibold text-[#1A7A3C] transition hover:bg-[#F4FAF6] md:whitespace-nowrap"
+              >
+                <CalendarPlus size={17} />
+                {estenderValidade ? "Alterar extensão" : "Estender validade"}
+              </button>
+            )}
+          </div>
+          {dataValidade !== dataValidadePadrao && justificativaExibida && (
+            <LargeTextArea
+              label="Justificativa da Extensão"
+              value={justificativaExibida}
+              onChange={() => undefined}
+              disabled
+              rows={2}
+              maxLength={1500}
+            />
+          )}
+          {tentouEmitir && !extensaoValida && (
+            <p className="text-sm font-medium text-red-600">
+              Informe uma nova data posterior a {formatarDataGta(dataValidadePadrao)} e a justificativa da extensão.
+            </p>
+          )}
+        </section>
+
+        <EmissaoGtaForm value={emissao} mode="view" />
+      </main>
+
+      <Dialog
+        open={modalExtensaoAberto}
+        onOpenChange={(aberto) => {
+          setModalExtensaoAberto(aberto);
+          if (!aberto) setTentouConfirmarExtensao(false);
+        }}
+      >
+        <DialogContent className="max-w-[620px] rounded-xl border border-gray-200 bg-white p-6 shadow-xl sm:p-8">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-gray-900">
+              Estender validade da GTA
+            </DialogTitle>
+            <DialogDescription className="mt-1 text-sm text-gray-500">
+              Informe a nova data de validade e justifique a extensão.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="mt-3 flex flex-col gap-5">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+              <FloatInput
+                label="Data Antiga"
+                type="date"
+                value={dataValidadePadrao}
+                disabled
+                required
+              />
+              <FloatInput
+                label="Nova Data"
+                type="date"
+                value={novaDataRascunho}
+                onChange={(novaData) => {
+                  setNovaDataRascunho(novaData);
+                  if (!novaData || novaData === dataValidadePadrao) {
+                    setJustificativaRascunho("");
+                  }
+                }}
+                required
+              />
+            </div>
+            {dataRascunhoFoiAlterada && (
               <LargeTextArea
                 label="Justificativa"
+                value={justificativaRascunho}
+                onChange={setJustificativaRascunho}
                 required
-                value={justificativa}
-                onChange={setJustificativa}
-                disabled={bloqueada}
+                rows={4}
                 maxLength={1500}
               />
             )}
-            {bloqueada && (
-              <p className="text-sm text-gray-500">
-                Esta GTA foi emitida com validade até{" "}
-                {formatarDataGta(emissao.dataValidade)}. A data está bloqueada
-                para edição.
-              </p>
-            )}
-            {tentouEmitir && !valida && (
-              <p className="text-sm text-red-600 font-medium">
-                Informe a data de validade e justifique quando ela ultrapassar
-                três dias após a data atual.
+            {tentouConfirmarExtensao && !rascunhoExtensaoValido && (
+              <p className="text-sm font-medium text-red-600">
+                {novaDataRascunho <= dataValidadePadrao
+                  ? `Informe uma nova data posterior a ${formatarDataGta(dataValidadePadrao)}.`
+                  : "Informe a justificativa da extensão."}
               </p>
             )}
           </div>
-        </section>
-      </main>
+
+          <div className="mt-4 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <button
+              type="button"
+              onClick={() => setModalExtensaoAberto(false)}
+              className="h-11 rounded-md border border-gray-300 px-5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              onClick={confirmarExtensao}
+              className="h-11 rounded-md bg-[#1A7A3C] px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#15612F]"
+            >
+              Confirmar extensão
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
     </div>
   );
