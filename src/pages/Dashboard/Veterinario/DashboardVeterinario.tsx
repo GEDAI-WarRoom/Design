@@ -103,8 +103,12 @@ export function DashboardVeterinario({
                       profissional.habilitacoes.map((habilitacao) => (
                         <span
                           key={habilitacao}
-                          className="rounded-md bg-green-50 px-3 py-1.5 text-xs font-semibold text-[#1A7A3C]"
+                          className="inline-flex items-center gap-1.5 rounded-md bg-green-50 px-3 py-1.5 text-xs font-semibold text-[#1A7A3C]"
                         >
+                          <span
+                            aria-hidden="true"
+                            className="h-2 w-2 flex-shrink-0 rounded-full bg-[#1A7A3C]"
+                          />
                           {habilitacao}
                         </span>
                       ))

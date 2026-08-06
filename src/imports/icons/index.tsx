@@ -38,6 +38,7 @@ import iconePragaUrl from "./Ícone=Praga.svg";
 import iconeVinculacoesUrl from "./Ícone=Vinculações.svg";
 import iconeProfissionaisUrl from "./Ícone=Profissionais.svg";
 import iconeHabilitacaoUrl from "./Ícone=Habilitação.svg";
+import iconeHabilitacaoCinzaUrl from "./Ícone=Habilitação Cinza.svg";
 import iconePontuacaoUrl from "./Ícone=Pontuação.svg";
 import iconeInsumoUrl from "./Ícone=Tipo de Insumo.svg";
 import iconeIndiceUrl from "./Ícone=Valor por Indice.svg";
@@ -93,6 +94,7 @@ export {
   iconeVinculacoesUrl,
   iconeProfissionaisUrl,
   iconeHabilitacaoUrl,
+  iconeHabilitacaoCinzaUrl,
   iconePontuacaoUrl,
   iconeInsumoUrl,
   iconeIndiceUrl,
