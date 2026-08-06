@@ -8,7 +8,9 @@
     "dev": "vite",
     "test:evento-pecuario": "node tests/eventoPecuarioUS066.test.mjs",
     "test:parametros": "node tests/parametrosSistema.test.mjs",
-    "test:vacinacao": "node tests/vacinacaoTelas.test.mjs"
+    "test:vacinacao": "node tests/vacinacaoTelas.test.mjs",
+    "test:tipo-atestado": "node tests/tipoAtestado.test.mjs",
+    "test:atestado-exame": "node tests/atestadoExameCadastro.test.mjs"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",

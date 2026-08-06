@@ -1,6 +1,37 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
+import { PROFISSIONAL_VETERINARIO_DEMONSTRACAO } from "../pages/Animal/ProfissionalAnimal/profissionalAnimalData";
+import { PRODUTOR_REBANHO_DEMONSTRACAO_DOCUMENTO } from "../pages/Rebanho/AtualizacaoCadastralRebanho/atualizacaoCadastralRebanhoData";
 
-export type DemoUserRole = "admin" | "produtor";
+export type DemoUserRole = "admin" | "produtor" | "veterinario";
+
+export interface DemoUserIdentity {
+	role: DemoUserRole;
+	name: string;
+	roleLabel: string;
+	document?: string;
+	entityId?: number;
+}
+
+export const DEMO_USERS: Record<DemoUserRole, DemoUserIdentity> = {
+	admin: {
+		role: "admin",
+		name: "Thomas Anderson",
+		roleLabel: "Administrador",
+	},
+	produtor: {
+		role: "produtor",
+		name: "Fernando",
+		roleLabel: "Produtor",
+		document: PRODUTOR_REBANHO_DEMONSTRACAO_DOCUMENTO,
+	},
+	veterinario: {
+		role: "veterinario",
+		name: PROFISSIONAL_VETERINARIO_DEMONSTRACAO.nome,
+		roleLabel: "Médica Veterinária",
+		document: PROFISSIONAL_VETERINARIO_DEMONSTRACAO.cpf,
+		entityId: PROFISSIONAL_VETERINARIO_DEMONSTRACAO.id,
+	},
+};
 
 const produtorEntryRoutes = new Set([
 	"pessoa-fisica",
@@ -28,7 +59,6 @@ const produtorEntryRoutes = new Set([
 
 const produtorAllowedRoutes = new Set([
 	"dashboard",
-	"pendencias-confirmacao-gta",
 	...produtorEntryRoutes,
 	"adicionar-pessoa-fisica",
 	"visualizar-pessoa-fisica",
@@ -95,15 +125,53 @@ const produtorAllowedRoutes = new Set([
 	"adicionar-finalidade-transito",
 	"visualizar-finalidade-transito",
 	"editar-finalidade-transito",
-	"atualizacao-cadastral-rebanho",
 	"confirmar-dados-produtor-rebanho",
 	"visualizar-atualizacao-cadastral-rebanho",
 	"atualizar-cadastro-rebanho",
 	"visualizar-rebanho-atualizado",
 ]);
 
+const veterinarioEntryRoutes = new Set([
+	"declaracao-vacinacao",
+	"partilha-vacina",
+	"vacinador",
+	"atestado-exame",
+	"local-realizacao-exame",
+	"emissao-gta",
+]);
+
+const veterinarioAllowedRoutes = new Set([
+	"dashboard",
+	...veterinarioEntryRoutes,
+	"adicionar-declaracao-vacinacao",
+	"visualizar-declaracao-vacinacao",
+	"editar-declaracao-vacinacao",
+	"adicionar-partilha-vacina",
+	"visualizar-partilha-vacina",
+	"editar-partilha-vacina",
+	"adicionar-vacinador",
+	"visualizar-vacinador-brucelose",
+	"editar-vacinador-brucelose",
+	"adicionar-atestado-exame",
+	"visualizar-atestado-exame",
+	"editar-atestado-exame",
+	"visualizar-pessoa-fisica",
+	"adicionar-local-realizacao-exame",
+	"visualizar-local-realizacao-exame",
+	"editar-local-realizacao-exame",
+	"adicionar-emissao-gta",
+	"visualizar-emissao-gta",
+	"documento-emissao-gta",
+	"emitir-emissao-gta",
+	"cancelar-emissao-gta",
+	"pagar-emissao-gta",
+]);
+
+const produtorOnlyRoutes = new Set(["pendencias-confirmacao-gta"]);
+
 interface DemoUserContextValue {
 	role: DemoUserRole | null;
+	user: DemoUserIdentity | null;
 	selectRole: (role: DemoUserRole) => void;
 	clearRole: () => void;
 }
@@ -112,11 +180,13 @@ const DemoUserContext = createContext<DemoUserContextValue | undefined>(undefine
 
 export function DemoUserProvider({ children }: { children: ReactNode }) {
 	const [role, setRole] = useState<DemoUserRole | null>(null);
+	const user = useMemo(() => (role ? DEMO_USERS[role] : null), [role]);
 
 	return (
 		<DemoUserContext.Provider
 			value={{
 				role,
+				user,
 				selectRole: setRole,
 				clearRole: () => setRole(null),
 			}}
@@ -137,15 +207,17 @@ export function useDemoUser() {
 }
 
 export function isEntryRouteAllowed(role: DemoUserRole | null, route: string) {
-	if (route === "pendencias-confirmacao-gta") {
-		return role === "produtor";
-	}
-	return role !== "produtor" || produtorEntryRoutes.has(route);
+	if (!role) return false;
+	if (produtorOnlyRoutes.has(route)) return role === "produtor";
+	if (role === "admin") return true;
+	if (role === "produtor") return produtorEntryRoutes.has(route);
+	return veterinarioEntryRoutes.has(route);
 }
 
 export function isRouteAllowed(role: DemoUserRole | null, route: string) {
-	if (route === "pendencias-confirmacao-gta") {
-		return role === "produtor";
-	}
-	return role !== "produtor" || produtorAllowedRoutes.has(route);
+	if (!role) return false;
+	if (produtorOnlyRoutes.has(route)) return role === "produtor";
+	if (role === "admin") return true;
+	if (role === "produtor") return produtorAllowedRoutes.has(route);
+	return veterinarioAllowedRoutes.has(route);
 }

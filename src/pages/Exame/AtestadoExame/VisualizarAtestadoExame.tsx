@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ArrowLeft, ChevronUp, ChevronDown, Eye, Pencil } from "lucide-react";
+import { ArrowLeft, ChevronUp, ChevronDown, Pencil } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, FloatSelect } from "../../../components/ui/FormKit";
 import {
@@ -9,17 +9,19 @@ import {
   type CampoHistoricoComparavel,
 } from "../../../components/ui/HistoricoCadastroLayout";
 import {
+  formatarDoencas,
   obterAtestadoExame,
   obterHistoricoAtestadoExame,
   type DadosAtestadoExame,
 } from "./atestadoExameData";
+import { DoencasAtestadoField } from "./DoencasAtestadoField";
 
 const GREEN = "#1A7A3C";
 
 function camposComparaveis(dados: DadosAtestadoExame): CampoHistoricoComparavel[] {
   return [
     { label: "Descrição do atestado", value: dados.descricao },
-    { label: "Doença", value: dados.doenca.nome },
+    { label: "Doenças", value: formatarDoencas(dados.doencas) },
     { label: "Dias de Validade do Exame", value: dados.diasValidade },
     { label: "Situação", value: dados.situacao },
   ];
@@ -35,27 +37,6 @@ function Section({ title, children, defaultOpen = true }: { title: string; child
         {open ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
       </button>
       {open && <div className="px-6 pb-6 border-t border-gray-100 pt-5">{children}</div>}
-    </div>
-  );
-}
-
-// Componente para exibir entidades selecionadas com o botão de visualizar ("olhinho")
-function EntidadeLeitura({ label, value, icon, onVer, className = "" }: { label: string; value: string; icon?: React.ReactNode; onVer?: () => void; className?: string }) {
-  return (
-    <div className="flex items-center gap-2 w-full">
-      <div className="flex-1">
-        <FloatInput label={label} value={value} icon={icon} disabled onChange={() => { }} className={className} />
-      </div>
-      {onVer && (
-        <button
-          type="button"
-          onClick={onVer}
-          title={`Visualizar ${label}`}
-          className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md transition h-12 flex items-center flex-shrink-0 cursor-pointer"
-        >
-          <Eye size={20} />
-        </button>
-      )}
     </div>
   );
 }
@@ -110,11 +91,11 @@ export function VisualizarAtestadoExamePage({
             style={{ color: GREEN }}
           >
             <ArrowLeft size={15} />
-            Todos os Atestados de Exame
+            Todos os Tipos de Atestado
           </button>
           
           <div className="flex justify-between items-center gap-4 w-full">
-            <h1 className="text-2xl font-semibold text-gray-900">Visualizar Atestado de Exame</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">Visualizar Tipo de Atestado</h1>
             <div className="flex items-center gap-3">
               {botaoHistorico}
               {!visualizandoVersaoAntiga && (
@@ -147,16 +128,11 @@ export function VisualizarAtestadoExamePage({
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start w-full">
-              
-              {/* Leitura da Entidade Doença com olhinho para ver detalhes */}
-              <EntidadeLeitura 
-                label="Doença" 
-                value={r.doenca.nome} 
-                onVer={() => alert(`Visualizar detalhes da doença: ${r.doenca.nome}`)} 
-                className={classeCampo("Doença", r.doenca.nome)}
-              />
+            <div className={classeCampo("Doenças", formatarDoencas(r.doencas))}>
+              <DoencasAtestadoField value={r.doencas} onChange={() => {}} disabled />
+            </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start w-full">
               <FloatInput
                 label="Dias de Validade do Exame"
                 value={r.diasValidade}

@@ -51,7 +51,7 @@ interface Profissional {
 const PROFISSIONAIS_MOCK: Profissional[] = [
   {
     id: 1,
-    nome: "Josephina Arantes",
+    nome: "Eloiza Silva",
     documento: "444.009.956-40",
     formacao: "Engenheiro Agrônomo",
     crea: "506779200",

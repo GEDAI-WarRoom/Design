@@ -30,6 +30,7 @@ import {
 // Importação dos Ícones Padrão do Projeto
 
 import * as Icons from "../../imports/icons";
+import { listarProfissionaisAnimal } from "../../pages/Animal/ProfissionalAnimal/profissionalAnimalData";
 
 const GREEN = "#1A7A3C";
 
@@ -183,6 +184,7 @@ export const DOENCAS_MOCK = [
 	{ id: 3, codigo: "D03", nome: "Tuberculose Bovina" },
 	{ id: 4, codigo: "D04", nome: "Raiva dos Herbívoros" },
 	{ id: 5, codigo: "D05", nome: "Anemia Infecciosa Equina (AIE)" },
+	{ id: 6, codigo: "D06", nome: "Mormo" },
 ];
 
 // Componente utilitário interno do olho de visualização (Padrão do Projeto)
@@ -503,6 +505,7 @@ interface DomainInputProps {
 	onChange: (entidade: any) => void;
 	onEyeClick?: (entidade?: any) => void;
 	required?: boolean;
+	data?: any[];
 
 	// Repassando as novas propriedades para o componente especialista
 	isMulti?: boolean;
@@ -516,9 +519,11 @@ export function ExploracaoPecuariaInput({
 	onChange,
 	onEyeClick,
 	required = false,
+	data,
 }: DomainInputProps) {
+	const database = data ?? EXPLORACOES_MOCK;
 	// Encontra a entidade selecionada no mock para extrair os campos reboque (Espécie)
-	const entidadeSelecionada = EXPLORACOES_MOCK.find((x) => x.codigo === value);
+	const entidadeSelecionada = database.find((x) => x.codigo === value);
 
 	return (
 		<div className="flex flex-col gap-3 w-full">
@@ -534,7 +539,7 @@ export function ExploracaoPecuariaInput({
 					placeholder="Buscar por código, estabelecimento, espécie ou produtor."
 					required={required}
 					value={value || ""}
-					data={EXPLORACOES_MOCK}
+					data={database}
 					// 🔥 Configurações de exibição exatas passadas por você:
 					title="Buscar Exploração Pecuária"
 					subtitle="Busque por uma exploração pecuária cadastrada:"
@@ -559,6 +564,7 @@ export function ExploracaoPecuariaInput({
 					]}
 					searchPlaceholder="Buscar por código, estabelecimento, espécie ou produtor."
 					confirmLabel="Confirmar"
+					showResultsOnOpen
 					className="[&_td]:whitespace-pre-line" // Garante a quebra de linha correta do \n na tabela
 					onChange={onChange}
 				/>
@@ -590,14 +596,16 @@ export function EstabelecimentoAgropecuarioInput({
 	onChange,
 	onEyeClick,
 	required = false,
+	data,
 }: DomainInputProps) {
+	const database = data ?? ESTABELECIMENTOS_MOCK;
 	// Encontra pelo nome ou código no mock original para preencher o campo cinza reboque ao lado
-	const entidadeSelecionada = ESTABELECIMENTOS_MOCK.find(
+	const entidadeSelecionada = database.find(
 		(x) => x.nome === value || x.codigo === value,
 	);
 
 	// 🔥 Transforma os dados injetando o "proprietarioFormatado" exatamente como o seu modal fazia na página!
-	const dadosFormatadosParaModal = ESTABELECIMENTOS_MOCK.map((estab) => ({
+	const dadosFormatadosParaModal = database.map((estab) => ({
 		...estab,
 	}));
 
@@ -635,6 +643,7 @@ export function EstabelecimentoAgropecuarioInput({
 					searchKeys={["codigo", "nome", "municipio", "proprietario"]}
 					searchPlaceholder="Buscar por código, nome, município ou proprietário."
 					confirmLabel="Confirmar"
+					showResultsOnOpen
 					onChange={onChange}
 				/>
 
@@ -846,6 +855,7 @@ interface FornecedorVacinaInputProps {
 	required?: boolean;
 	tooltipText?: string;
 	data?: any[]; // <-- Recebe os dados de fora de forma limpa
+	produtoLabel?: string;
 }
 
 export function FornecedorVacinaInput({
@@ -855,6 +865,7 @@ export function FornecedorVacinaInput({
 	required = false,
 	tooltipText,
 	data = FORNECEDORES_VACINA_MOCK, // <-- Fallback usando o mock local se nenhum dado for passado
+	produtoLabel = "Vacina",
 }: FornecedorVacinaInputProps) {
 	const entidadeSelecionada = data.find((x: any) => x.codigo === value);
 
@@ -875,7 +886,7 @@ export function FornecedorVacinaInput({
 						value={entidadeSelecionada?.nome || ""}
 						data={data}
 						searchKeys={["codigo", "nome", "tipo"]}
-						title="Buscar Fornecedor de Vacina"
+						title={`Buscar Fornecedor de ${produtoLabel}`}
 						subtitle="Busque por laboratórios ou revendedoras cadastrados:"
 						icon={
 							<img
@@ -919,6 +930,9 @@ export function FornecedorVacinaInput({
 		</div>
 	);
 }
+
+// Alias semântico para cadastros de insumos; mantém compatibilidade com os fluxos de vacinação.
+export const FornecedorInsumoInput = FornecedorVacinaInput;
 
 // ==========================================================
 // MODAL DOENÇA (ATUALIZADO)
@@ -2583,11 +2597,14 @@ export function NucleoInput({
 // ==========================================================
 // MOCK DE MÉDICOS VETERINÁRIOS (Global)
 // ==========================================================
-export const VETERINARIOS_MOCK = [
-	{ id: 1, nome: "Dr. Carlos Eduardo Silva", cpf: "123.456.789-00" },
-	{ id: 2, nome: "Dra. Mariana Costa Alencar", cpf: "987.654.321-11" },
-	{ id: 3, nome: "Dr. Roberto Antunes Vieira", cpf: "456.789.123-22" },
-];
+export const VETERINARIOS_MOCK = listarProfissionaisAnimal()
+	.filter((profissional) => profissional.formacao === "Médico Veterinário")
+	.map(({ id, nome, cpf, numeroConselho }) => ({
+		id,
+		nome,
+		cpf,
+		numeroConselho,
+	}));
 
 interface MedicoVeterinarioInputProps {
 	value: any; // Aceita string ou objeto
@@ -2866,7 +2883,7 @@ export const ProfissionalAnimalInput: React.FC<
 // MOCK DE EXEMPLO (Substituir pela sua lista global se necessário)
 // ==========================================================
 export const PESSOAS_FISICAS_MOCK = [
-	{ id: 1, nome: "Josephina Arantes", documento: "444.009.956-40" },
+	{ id: 1, nome: "Eloiza Silva", documento: "444.009.956-40" },
 	{ id: 2, nome: "Pedro Alves Moraes", documento: "222.114.558-70" },
 	{ id: 3, nome: "Carla Menezes Rocha", documento: "111.998.775-30" },
 ];

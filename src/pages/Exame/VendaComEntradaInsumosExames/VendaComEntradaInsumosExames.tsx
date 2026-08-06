@@ -22,9 +22,9 @@ const MEDICOS_VETERINARIOS_MOCK = [
   { id: 5, codigo: "555.555.555-55", nome: "Ricardo Mendes", uf: "MG" },
 ];
 
-const FORNECEDORES_VACINA_MOCK = [
+const FORNECEDORES_INSUMO_MOCK = [
   { id: 1, codigo: "3540987753", nome: "Laboratório BioMed", tipo: "Laboratório", uf: "SP" },
-  { id: 2, codigo: "3190987753", nome: "Vacinas Imunotech", tipo: "Laboratório", uf: "PR" },
+  { id: 2, codigo: "3190987753", nome: "Insumos Diagnósticos Imunotech", tipo: "Laboratório", uf: "PR" },
   { id: 3, codigo: "3520938028", nome: "AgroVet Distribuidora", tipo: "Revendedora", uf: "SP" },
 ];
 
@@ -54,7 +54,7 @@ interface VendaEntrada {
   numeroPartida: string;
   fornecedor: string;
   doenca: string;
-  tipoVacina: string;
+  tipoInsumo: string;
   situacao: "Gravada" | "Cancelada";
 }
 
@@ -67,7 +67,7 @@ const VENDAS_MOCK: VendaEntrada[] = [
     numeroPartida: "0013225/24",
     fornecedor: "Laboratório BioMed",
     doenca: "Brucelose (Bovina e Bubalina)",
-    tipoVacina: "B19",
+    tipoInsumo: "Antígeno Acidificado Tamponado (AAT)",
     situacao: "Gravada",
   },
   {
@@ -78,7 +78,7 @@ const VENDAS_MOCK: VendaEntrada[] = [
     numeroPartida: "0044120/23",
     fornecedor: "AgroVet Distribuidora",
     doenca: "Tuberculose (Bovina e Bubalina)",
-    tipoVacina: "",
+    tipoInsumo: "Tuberculina PPD Bovina",
     situacao: "Cancelada",
   },
   {
@@ -87,9 +87,9 @@ const VENDAS_MOCK: VendaEntrada[] = [
     revendedoraNome: "Casa do Produtor Lavras",
     numeroNotaFiscal: "9080706",
     numeroPartida: "0099001/24",
-    fornecedor: "Vacinas Imunotech",
+    fornecedor: "Insumos Diagnósticos Imunotech",
     doenca: "Raiva dos Herbívoros / Outras Doenças",
-    tipoVacina: "",
+    tipoInsumo: "Tuberculina PPD Aviária",
     situacao: "Gravada",
   },
 ];
@@ -186,7 +186,7 @@ export function VendaComEntradaInsumosExamesPage({
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
-      <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="venda-entrada-vacina" hideSearch />
+      <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="venda-entrada-insumos-exames" hideSearch />
 
       <main className="max-w-5xl mx-auto px-4 md:px-6 py-6">
         {/* Cabeçalho */}
@@ -222,7 +222,7 @@ export function VendaComEntradaInsumosExamesPage({
                 label="Fornecedor"
                 placeholder="Buscar por nome ou código."
                 value={fornecedor ? fornecedor.nome : ""}
-                data={FORNECEDORES_VACINA_MOCK}
+                data={FORNECEDORES_INSUMO_MOCK}
                 searchKeys={["codigo", "nome", "tipo"]}
                 columns={[
                   { label: "Tipo", key: "tipo" },

@@ -14,7 +14,7 @@ import { Navbar } from "../../../components/Navbar";
 import {
 	DynamicListWrapper,
 	EntitySearchInput,
-	FornecedorVacinaInput,
+	FornecedorInsumoInput,
 	RevendedoraInput,
 	MedicoVeterinarioInput
 } from "../../../components/ui/EntitySearch";
@@ -36,7 +36,7 @@ const REVENDEDORAS_MG_MOCK = [
 	{ id: 3, codigo: "3120938090", nome: "Casa do Produtor Lavras", uf: "MG" },
 ];
 
-const FORNECEDORES_VACINA_MOCK = [
+const FORNECEDORES_INSUMO_MOCK = [
 	{
 		id: 1,
 		codigo: "LAB-0001",
@@ -47,7 +47,7 @@ const FORNECEDORES_VACINA_MOCK = [
 	{
 		id: 2,
 		codigo: "LAB-0002",
-		nome: "Vacinas Imunotech",
+		nome: "Insumos Diagnósticos Imunotech",
 		tipo: "Laboratório",
 		uf: "PR",
 	},
@@ -178,7 +178,7 @@ export const mockExamSupplyTypes: MockExamSupplyType[] = [
 
 const LABORATORIOS_MOCK = [
 	{ id: 1, codigo: "LAB-0001", nome: "Laboratório BioMed" },
-	{ id: 2, codigo: "LAB-0002", nome: "Vacinas Imunotech" },
+	{ id: 2, codigo: "LAB-0002", nome: "Insumos Diagnósticos Imunotech" },
 	{ id: 3, codigo: "LAB-0003", nome: "ImunoVet Biológicos" },
 ];
 
@@ -320,7 +320,6 @@ const novoLote = () => ({
 	numeroPartida: "",
 	laboratorio: null as any,
 	doenca: null as any,
-	tipoVacina: "",
 	tipoInsumoExame: "",
 	validade: "",
 	apresentacoes: [novaApresentacao()],
@@ -360,11 +359,6 @@ export function LoteCardItem({
 	const examSupplyTypes = mockExamSupplyTypes.filter(
 		(item) => item.diseaseId === lote.doenca?.diseaseId,
 	);
-	const doencaTemTipo =
-		lote.doenca &&
-		lote.doenca.tiposVacina &&
-		lote.doenca.tiposVacina.length > 0;
-
 	return (
 		<div className="flex flex-col gap-4 w-full pb-4">
 			<div className="grid grid-cols-2 md:grid-cols-2 gap-4 items-end">
@@ -402,7 +396,7 @@ export function LoteCardItem({
 				)}
 			</div>
 
-			{/* Grid contendo Doença, Tipo de Vacina (se houver) e Validade alinhados */}
+			{/* Grid contendo Doença, Tipo de Insumo (se houver) e Validade alinhados */}
 			<div
 				className={`grid grid-cols-1 ${examSupplyTypes.length > 0 ? "md:grid-cols-3" : "md:grid-cols-2"
 					} gap-4 items-end`}>
@@ -422,8 +416,8 @@ export function LoteCardItem({
 					}
 					title="Buscar Doença"
 					subtitle="Busque por uma doença cadastrada:"
-					onChange={(ent) =>
-						updateLote(lote.uid, { doenca: ent, tipoVacina: "" })
+						onChange={(ent) =>
+							updateLote(lote.uid, { doenca: ent, tipoInsumoExame: "" })
 					}
 				/>
 				{examSupplyTypes.length > 0 && (
@@ -621,7 +615,7 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
 			<Navbar
 				onLogout={onLogout}
 				onNavigate={onNavigate}
-				currentScreen="venda-entrada-vacina"
+				currentScreen="venda-entrada-insumos-exames"
 				hideSearch
 			/>
 
@@ -662,10 +656,12 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
 
 					<Section title="Emitente">
 						<div className="flex flex-col gap-3">
-							<FornecedorVacinaInput
+							<FornecedorInsumoInput
 								value={fornecedor ? fornecedor.codigo : ""}
+								produtoLabel="Insumo"
 								required
-								tooltipText="Não encontrou a Fornecedora de Vacina? Entre em contato com o Escritório Seccional do IMA de sua região."
+								data={FORNECEDORES_INSUMO_MOCK}
+								tooltipText="Não encontrou o fornecedor de insumos? Entre em contato com o Escritório Seccional do IMA de sua região."
 								onChange={(entidadeSelecionada) =>
 									setFornecedor(entidadeSelecionada)
 								}
