@@ -26,6 +26,7 @@ import iconeNotaFiscalUrl from "../../../imports/icons/Ícone=Nota Fiscal.png";
 
 
 import * as Icons from "../../../imports/icons";
+import { useDemoUser } from "../../../contexts/DemoUserContext";
 import { CadastroVacinacaoHeader, cadastroVacinacaoPageClass, mensagemSucessoCadastro, preencherComExemplo, type CadastroVacinacaoModeProps } from "../shared/CadastroVacinacaoMode";
 
 const GREEN = "#1A7A3C";
@@ -571,7 +572,9 @@ function TabelaFaixas({
   vacinados: Record<string, string>;
   onVacinadosChange: (faixa: string, v: string) => void;
 }) {
-  const mostraNaoVacinados = regime === "Vacina Oficial" || regime === "Primeira Dose";
+  // Na declaração oficial, a referência é o saldo já vacinado; somente
+  // a primeira dose trabalha com a coluna de não vacinados.
+  const mostraNaoVacinados = regime === "Primeira Dose";
   const colStatusLabel = mostraNaoVacinados ? "Não Vacinados" : "Já Vacinados";
 
   return (
@@ -604,7 +607,7 @@ function TabelaFaixas({
                 {/* Coluna 2: Existentes */}
                 <div className="px-4 text-gray-500 text-base font-semibold">{existentes}</div>
 
-                {/* Coluna 3: Não Vacinados / Status */}
+                {/* Coluna 3: status da faixa */}
                 <div className="px-4 text-gray-500 text-base font-semibold">{existentes}</div>
 
                 {/* Coluna 4: Stepper Input de Vacinados */}
@@ -683,7 +686,7 @@ interface LoteCardItemProps {
 
 // 1º: Declare a lista base
 const AGE_RANGES = [
-  "De 0 a 12 meses",
+  "De 3 a 8 meses",
   "De 13 a 24 meses",
   "De 25 a 36 meses",
   "Acima de 36 meses",
@@ -703,12 +706,12 @@ const FIXED = AGE_RANGES.map(() => ({
 // ══════════════════════════════════════════════════════════════════
 // REGRAS DE FAIXA ETÁRIA / GÊNERO POR DOENÇA + REGIME
 //   - Brucelose: só fêmeas (nunca machos)
-//   - Brucelose + "Vacina Oficial": única faixa "De 3 a 8 meses"
+//   - Brucelose + "Vacina Oficial": única faixa "De 0 a 8 meses"
 //   - Demais casos: faixas padrão, ambos os gêneros
 // Retorna as linhas da tabela + flags de exibição por gênero.
 // (valores de existentes/nãoVacinados vêm da API — aqui mockados)
 // ══════════════════════════════════════════════════════════════════
-const FAIXA_BRUCELOSE_OFICIAL = "De 3 a 8 meses";
+const FAIXA_BRUCELOSE_OFICIAL = "De 0 a 8 meses";
 
 function derivarFaixas(doencaNome: string | undefined, regime: string): {
   faixas: FaixaLinha[];
@@ -727,8 +730,8 @@ function derivarFaixas(doencaNome: string | undefined, regime: string): {
     if (regime === "Vacina Oficial") {
       return { faixas: [linhaPadrao(FAIXA_BRUCELOSE_OFICIAL)], mostrarMachos: false, mostrarFemeas: true };
     }
-    // Vacina Complementar (ou regime ainda não escolhido) → todas as faixas, só fêmeas
-    return { faixas: AGE_RANGES.map(linhaPadrao), mostrarMachos: false, mostrarFemeas: true };
+    // Vacina Complementar: todas as faixas, exceto a primeira (3 a 8 meses).
+    return { faixas: AGE_RANGES.slice(1).map(linhaPadrao), mostrarMachos: false, mostrarFemeas: true };
   }
 
   // Demais doenças (Raiva, Aftosa, etc.): ambos os gêneros, faixas padrão
@@ -871,42 +874,44 @@ interface PageProps extends CadastroVacinacaoModeProps {
 }
 
 export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = "create", dados }: PageProps) {
+  const { role } = useDemoUser();
+  const produtorEhUsuario = role === "produtor";
   const preenchendoRegistro = mode !== "create";
   const nomeDoencaInicial = dados?.doencaEntidade?.nome ?? dados?.doenca ?? "";
   const dataVacinacaoInicial = dados?.dataVacinacao ?? "";
   const produtorInicial = dados?.produtor ?? (dados?.produtorNome
     ? PRODUTORES_MOCK.find((item) => item.documento === dados.produtorDoc) ?? {
-        id: `produtor-${dados?.id ?? "registro"}`,
-        nome: dados.produtorNome,
-        documento: dados.produtorDoc,
-        tipo: dados.produtorDoc?.includes("/") ? "PJ" : "PF",
-      }
-    : null);
+      id: `produtor-${dados?.id ?? "registro"}`,
+      nome: dados.produtorNome,
+      documento: dados.produtorDoc,
+      tipo: dados.produtorDoc?.includes("/") ? "PJ" : "PF",
+    }
+    : produtorEhUsuario ? PRODUTORES_MOCK[0] : null);
   const estabelecimentoInicial = dados?.estabelecimento ?? (dados?.estabNome
     ? ESTABELECIMENTOS_MOCK.find((item) => item.codigo === dados.estabCodigo) ?? {
-        id: `estabelecimento-${dados?.id ?? "registro"}`,
-        produtorId: produtorInicial?.id,
-        codigo: dados.estabCodigo,
-        nome: dados.estabNome,
-        municipio: dados.municipio,
-      }
+      id: `estabelecimento-${dados?.id ?? "registro"}`,
+      produtorId: produtorInicial?.id,
+      codigo: dados.estabCodigo,
+      nome: dados.estabNome,
+      municipio: dados.municipio,
+    }
     : null);
   const exploracaoInicial = dados?.exploracao ?? (dados?.especie
     ? {
-        id: `exploracao-${dados?.id ?? "registro"}`,
-        codigo: dados?.exploracaoCodigo ?? `${dados?.estabCodigo ?? "31001040005"}0001`,
-        estabId: estabelecimentoInicial?.id,
-        produtorId: produtorInicial?.id,
-        especie: dados.especie,
-        grupoEspecieFormatado: `Grupo da espécie - ${dados.especie}`,
-      }
+      id: `exploracao-${dados?.id ?? "registro"}`,
+      codigo: dados?.exploracaoCodigo ?? `${dados?.estabCodigo ?? "31001040005"}0001`,
+      estabId: estabelecimentoInicial?.id,
+      produtorId: produtorInicial?.id,
+      especie: dados.especie,
+      grupoEspecieFormatado: `Grupo da espécie - ${dados.especie}`,
+    }
     : null);
   const doencaInicial = dados?.doencaEntidade ?? (nomeDoencaInicial
     ? DOENCAS_MOCK.find((item) => item.nome === nomeDoencaInicial) ?? {
-        id: `doenca-${dados?.id ?? "registro"}`,
-        nome: nomeDoencaInicial,
-        tiposVacina: [],
-      }
+      id: `doenca-${dados?.id ?? "registro"}`,
+      nome: nomeDoencaInicial,
+      tiposVacina: [],
+    }
     : null);
 
   // ---- Informações Básicas ----
@@ -925,7 +930,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
   const [mordidaMorcego, setMordidaMorcego] = useState(dados?.mordidaMorcego ?? (preenchendoRegistro ? "Não" : ""));
 
   // ---- Regime + faixas por gênero ----
-  const [regime, setRegime] = useState(dados?.regime ?? (preenchendoRegistro ? (nomeDoencaInicial === "Brucelose" ? "Vacina Oficial" : "Primeira Dose") : ""));
+  const [regime, setRegime] = useState(dados?.regime ?? dados?.tipoDeclaracao ?? (preenchendoRegistro ? (nomeDoencaInicial === "Brucelose" ? "Vacina Oficial" : "Primeira Dose") : ""));
   const [vacMacho, setVacMacho] = useState<Record<string, string>>(dados?.vacMacho ?? {});
   const [vacFemea, setVacFemea] = useState<Record<string, string>>(dados?.vacFemea ?? {});
 
@@ -954,7 +959,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
   const [notasListasMinimizadas, setNotasListasMinimizadas] = useState<Record<string, boolean>>({});
   const [lotesMinimizados, setLotesMinimizados] = useState<Record<string, boolean>>({});
   const [vacinados, setVacinados] = useState<VacinadosRow[]>(dados?.vacinados ?? (preenchendoRegistro ? INITIAL_VACINADOS.map((linha, index) => ({ ...linha, machos: index === 0 ? 4 : 0, femeas: index === 0 ? 6 : 0 })) : INITIAL_VACINADOS));
-  const [origemNota, setOrigemNota] = useState(dados?.origemNota ?? (preenchendoRegistro ? "Revendedora" : ""));
+  const [origemNota, setOrigemNota] = useState(dados?.origemNota ?? (preenchendoRegistro ? "Produtor" : ""));
   const [revendedora, setRevendedora] = useState<any | null>(dados?.revendedora ?? (preenchendoRegistro ? { codigo: "3120938028", nome: "Comercial AgroVat" } : null));
   const DOSES_DISPONIVEIS = 70;
 
@@ -982,11 +987,14 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
   }, [doenca]);
 
   const isRaiva = doenca?.nome === "Raiva";
+  const dataAtestadoObrigatoria = doenca?.nome === "Brucelose";
 
   // 3. CÁLCULOS DE DOSES E SALDOS
   const utilizadas = vacinados.reduce((s, r) => s + r.machos + r.femeas, 0);
   const saldo = DOSES_DISPONIVEIS - utilizadas;
-  const totalAlocadoEmLotes = notasFiscais.reduce((acc, nf) => acc + nf.lotes.reduce((a, l) => a + l.dosesUtilizadas, 0), 0);
+  const totalAlocadoEmLotes = notasFiscais.length > 0
+    ? notasFiscais.reduce((acc, nf) => acc + nf.lotes.reduce((a, l) => a + l.dosesUtilizadas, 0), 0)
+    : notasFiscaisOrigem.reduce((acc, nf) => acc + (nf.quantidadeDoses || 0), 0);
   const restante = utilizadas - totalAlocadoEmLotes;
 
   // 4. VALIDAÇÕES E ERROS (Agora já possuem acesso a todas as variáveis acima)
@@ -996,7 +1004,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
 
   const formValido =
     !!produtor && !!estabelecimento && !!exploracao && (!exigeNucleo || !!nucleo) &&
-    !!doenca && regime !== "" && dataVacinacao !== "" && dataAtestado !== "" && !!veterinario &&
+    !!doenca && regime !== "" && dataVacinacao !== "" && (!dataAtestadoObrigatoria || dataAtestado !== "") && !!veterinario &&
     (!isRaiva || mordidaMorcego !== "") &&
     origemNota !== "" && !!revendedora &&
     dosesValidas && !erroDataVac && !erroDataAtestado;
@@ -1023,6 +1031,8 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
   // 5. OUTROS USEMEMO E VARIÁVEIS COMPLEMENTARES
   const isBrucelose = doenca?.nome === "Brucelose";
   const tipoVacinaDisponivel = (doenca?.tiposVacina?.length ?? 0) > 0;
+  // Brucelose disponibiliza os dois tipos de vacina: B19 e RB51.
+  const tiposVacinaFiltrados = doenca?.tiposVacina ?? [];
   const opcoesRegime = isBrucelose
     ? ["Vacina Oficial", "Vacina Complementar"]
     : ["Primeira Dose", "Dose de Reforço"];
@@ -1030,11 +1040,11 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
   // Gate: Vacinação e Nota Fiscal só aparecem após Produtor + Doença
   const mostrarVacinacaoENota = !!produtor && !!doenca;
 
-  // Faixas/gênero derivados da doença + regime (Brucelose = só fêmea; Oficial = De 3 a 8 meses)
+  // Faixas/gênero derivados da doença + regime (Brucelose = só fêmea; Oficial = De 0 a 8 meses)
   const { faixas: faixasTabela, mostrarMachos, mostrarFemeas } = derivarFaixas(doenca?.nome, regime);
-  // "Não Vacinados" (Oficial/Primeira Dose) vs "Já Vacinados" (Complementar/Reforço)
+  // Oficial, complementar e reforço exibem "Já Vacinados"; primeira dose exibe "Não Vacinados".
   const statusColLabel =
-    regime === "Vacina Oficial" || regime === "Primeira Dose" ? "Não Vacinados" : "Já Vacinados";
+    regime === "Primeira Dose" ? "Não Vacinados" : "Já Vacinados";
   // vacinados alinhado ao nº de faixas correntes (evita índice fora do range ao trocar regime)
   const vacinadosView: VacinadosRow[] = faixasTabela.map((_, i) => vacinados[i] ?? { machos: 0, femeas: 0 });
 
@@ -1077,6 +1087,8 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
 
   const handleSalvar = () => {
     if (mode === "create") {
+      setTentouSalvar(true);
+      if (!formValido) return;
       setSucesso(true);
       return;
     }
@@ -1144,6 +1156,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
     vacinadorBrucelose,
     mordidaMorcego,
     regime,
+    tipoDeclaracao: regime,
     vacMacho,
     vacFemea,
     numeroNotaFiscal,
@@ -1160,7 +1173,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
     municipio: estabelecimento?.municipio,
     especie: exploracao?.especie,
     doenca: doenca?.nome,
-    situacao: "Finalizada",
+    situacao: "Ativo",
   }, {
     id: "declaracao-exemplo",
     produtor: { id: 1, nome: "José Aarão Neto", documento: "555.009.956-40", tipo: "PF" },
@@ -1175,8 +1188,9 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
     vacinadorBrucelose: { id: 1, vetId: 1, nome: "Eloiza Silva", documento: "444.009.956-40" },
     mordidaMorcego: "Não",
     regime: "Vacina Oficial",
+    tipoDeclaracao: "Vacina Oficial",
     vacMacho: {},
-    vacFemea: { "De 3 a 8 meses": "10" },
+    vacFemea: { "De 0 a 8 meses": "10" },
     numeroNotaFiscal: "1234567",
     ufNotaFiscal: "MG",
     notasFiscaisOrigem: [{
@@ -1185,7 +1199,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
       doenca: "Brucelose", tipoVacina: "B19", laboratorio: "BioMed/MG", validade: "20/12/2026",
     }],
     vacinados: [{ machos: 0, femeas: 10 }],
-    origemNota: "Revendedora",
+    origemNota: "Produtor",
     revendedora: { id: 1, codigo: "3120938028", nome: "Comercial AgroVat" },
     lotes: [{
       uid: "lote-dinamico-exemplo", numeroPartida: "0013225/24", laboratorio: { id: 1, nome: "BioMed/MG" },
@@ -1199,7 +1213,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
     municipio: "Lavras",
     especie: "Bovino",
     doenca: "Brucelose",
-    situacao: "Finalizada",
+    situacao: "Ativo",
   });
 
   return (
@@ -1212,7 +1226,18 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
             <ArrowLeft size={15} />
             Todas Declarações de Vacinação
           </button>
-          <CadastroVacinacaoHeader mode={mode} nomeCadastro="Declaração de Vacinação" rotaEditar="editar-declaracao-vacinacao" dados={dados} onNavigate={onNavigate} onSubmit={handleSalvar} />
+          <div className="flex flex-col gap-2">
+            <CadastroVacinacaoHeader mode={mode} nomeCadastro="Declaração de Vacinação" rotaEditar="editar-declaracao-vacinacao" dados={dados} onNavigate={onNavigate} onSubmit={handleSalvar} />
+            {mode === "edit" && dados?.situacao !== "Cancelado" && (
+              <button
+                type="button"
+                onClick={() => onNavigate("declaracao-vacinacao", { ...registroAtual, situacao: "Cancelado" })}
+                className="self-end text-sm font-semibold text-red-600 hover:text-red-700"
+              >
+                Cancelar declaração
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="w-full bg-white border border-gray-100 rounded-lg p-5 shadow-sm flex items-center gap-3 mt-4 mb-6">
@@ -1231,6 +1256,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
               <ProdutorInput
                 value={produtor ? produtor.nome : ""}
                 required
+                disabled={produtorEhUsuario}
                 onChange={onChangeProdutor}
                 error={err(!produtor)}
                 onEyeClick={() => {
@@ -1245,6 +1271,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
                 <EstabelecimentoAgropecuarioInput
                   value={estabelecimento ? estabelecimento.nome : ""}
                   required
+                  mostrarMunicipio
                   data={estabsFiltrados}
                   onChange={onChangeEstabelecimento}
                   error={err(!estabelecimento)}
@@ -1314,8 +1341,11 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
                 <FloatSelect
                   label="Tipo de Vacina"
                   value={tipoVacina}
-                  onChange={setTipoVacina}
-                  options={(doenca?.tiposVacina ?? []).map((t: string) => ({ value: t, label: t }))}
+                  onChange={(v: string) => {
+                    setTipoVacina(v);
+                    if (isBrucelose) setRegime(v === "B19" ? "Vacina Oficial" : "Vacina Complementar");
+                  }}
+                  options={tiposVacinaFiltrados.map((t: string) => ({ value: t, label: t }))}
                 />
               </div>
             )}
@@ -1324,7 +1354,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
             {doenca && (
               <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
                 <FloatSelect
-                  label={isBrucelose ? "Tipo de Vacinação" : "Tipo de Vacinação"}
+                  label="Tipo de Declaração"
                   required
                   value={regime}
                   onChange={(v: string) => {
@@ -1332,6 +1362,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
                     setVacinados(AGE_RANGES.map(() => ({ machos: 0, femeas: 0 })));
                   }}
                   options={opcoesRegime.map((o) => ({ value: o, label: o }))}
+                  disabled={isBrucelose && (tipoVacina === "B19" || tipoVacina === "RB51")}
                   error={err(regime === "")}
                 />
               </div>
@@ -1355,14 +1386,14 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
             <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
               <FloatInput
                 label="Data de Atestado de Vacinação"
-                required
+                required={dataAtestadoObrigatoria}
                 type="date"
                 icon={<Calendar size={18} color={GREEN} />}
                 min={dataVacinacao || undefined}
                 max={hoje}
                 value={dataAtestado}
                 onChange={setDataAtestado}
-                error={err(dataAtestado === "") || (erroDataAtestado ? "Entre a Data de Vacinação e hoje." : undefined)}
+                error={err(dataAtestadoObrigatoria && dataAtestado === "") || (erroDataAtestado ? "Entre a Data de Vacinação e hoje." : undefined)}
               />
             </div>
 
@@ -1427,8 +1458,37 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
 
         {/* Seção 2: Nota Fiscal de Origem — só após Produtor + Doença */}
         {mostrarVacinacaoENota && (
-          <Section title="Nota Fiscal">
+          <Section title="Saldo de Vacinas">
             <div className="flex flex-col gap-4">
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FloatSelect
+                  label="Origem do Saldo"
+                  required
+                  value={origemNota}
+                  onChange={setOrigemNota}
+                  options={[
+                    { value: "Produtor", label: "Produtor" },
+                    { value: "Médico Veterinário", label: "Médico Veterinário" },
+                    { value: "Vacinador", label: "Vacinador" },
+                  ]}
+                  error={err(origemNota === "")}
+                />
+                <EntitySearchInput
+                  label="Revendedora de Insumos"
+                  required
+                  placeholder="Buscar revendedora"
+                  value={revendedora?.nome ?? ""}
+                  data={REVENDEDORAS_MOCK}
+                  searchKeys={["nome", "documento"]}
+                  columns={[{ label: "Nome", key: "nome" }, { label: "CNPJ", key: "documento" }]}
+                  icon={<Store size={18} color={GREEN} />}
+                  title="Buscar Revendedora de Insumos"
+                  subtitle="Busque por uma revendedora cadastrada:"
+                  onChange={setRevendedora}
+                  error={err(!revendedora)}
+                />
+              </div>
 
               {/* Topo da seção: Título interno, Total de Doses Adquiridas e o Botão Padronizado */}
               <div className="flex items-center justify-between border-b border-gray-100 pb-3">

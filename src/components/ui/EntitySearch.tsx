@@ -511,6 +511,7 @@ interface DomainInputProps {
 	isMulti?: boolean;
 	behavior?: "at-least-one" | "zero-or-more";
 	addButtonLabel?: string;
+	mostrarMunicipio?: boolean;
 }
 
 // MODAL EXPLORAÇÃO
@@ -597,6 +598,7 @@ export function EstabelecimentoAgropecuarioInput({
 	onEyeClick,
 	required = false,
 	data,
+	mostrarMunicipio = false,
 }: DomainInputProps) {
 	const database = data ?? ESTABELECIMENTOS_MOCK;
 	// Encontra pelo nome ou código no mock original para preencher o campo cinza reboque ao lado
@@ -660,6 +662,17 @@ export function EstabelecimentoAgropecuarioInput({
 								className="w-full"
 							/>
 						</div>
+						{mostrarMunicipio && (
+							<div className="flex-1">
+								<FloatInput
+									label="Município do Estabelecimento Agropecuário"
+									value={entidadeSelecionada.municipio || ""}
+									onChange={() => { }}
+									disabled
+									className="w-full"
+								/>
+							</div>
+						)}
 						<EyeAction onClick={onEyeClick} />
 					</div>
 				)}
@@ -674,6 +687,7 @@ export function ProdutorInput({
 	onChange,
 	onEyeClick,
 	required = false,
+	disabled = false,
 }: DomainInputProps) {
 	// Estado local para o filtro que antes ficava na página
 	const [tipoPessoa, setTipoPessoa] = useState<string>("");
@@ -723,6 +737,7 @@ export function ProdutorInput({
 					required={required}
 					value={entidadeSelecionada?.nome || ""} // Exibe o nome amigável no input
 					data={databaseFiltrada} // Passa os dados filtrados dinamicamente
+					disabled={disabled}
 					// 🔥 Suas propriedades exatas de tela:
 					title="Buscar Produtor"
 					subtitle="Busque por um produtor cadastrado no sistema:"

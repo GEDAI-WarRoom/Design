@@ -20,6 +20,7 @@ import { Navbar } from "../../../components/Navbar";
 import { FloatSelect, FloatCombobox, FloatInput, SearchModal } from "../../../components/ui/FormKit";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
 import * as Icons from "../../../imports/icons";
+import { useDemoUser } from "../../../contexts/DemoUserContext";
 
 const GREEN = "#1A7A3C";
 
@@ -46,7 +47,7 @@ const ESTABELECIMENTOS_MOCK = [
 ];
 
 
-const EXPLORACOES_MOCK =  [
+const EXPLORACOES_MOCK = [
   {
     id: 1,
     codigo: "3100104050003",
@@ -142,8 +143,15 @@ const MUNICIPIOS_MG = [
 ];
 
 const SITUACOES = [
-  { value: "Finalizada", label: "Finalizada" },
-  { value: "Cancelada", label: "Cancelada" },
+  { value: "Ativo", label: "Ativo" },
+  { value: "Cancelado", label: "Cancelado" },
+];
+
+const TIPOS_DECLARACAO = [
+  { value: "Vacina Oficial", label: "Vacina Oficial" },
+  { value: "Vacina Complementar", label: "Vacina Complementar" },
+  { value: "Primeira Dose", label: "Primeira Dose" },
+  { value: "Dose de Reforço", label: "Dose de Reforço" },
 ];
 
 // ==========================================================
@@ -151,39 +159,41 @@ const SITUACOES = [
 // ==========================================================
 interface DeclaracaoVacinacao {
   id: number;
+  tipoDeclaracao: string;
   produtorNome: string;
   produtorDoc: string;
   estabCodigo: string;
   estabNome: string;
+  exploracaoCodigo?: string;
   municipio: string;
   especie: string;
   doenca: string;
   dataVacinacao: string; // ISO AAAA-MM-DD
-  situacao: "Finalizada" | "Cancelada";
+  situacao: "Ativo" | "Cancelado";
 }
 
 const DECLARACOES_MOCK: DeclaracaoVacinacao[] = [
   {
-    id: 1, produtorNome: "José Aarão Neto", produtorDoc: "555.009.956-40",
-    estabCodigo: "31234567891", estabNome: "Fazenda do Rio", municipio: "Lavras",
-    especie: "Bovino", doenca: "Brucelose", dataVacinacao: "2026-02-01", situacao: "Finalizada",
+    id: 1, tipoDeclaracao: "Vacina Oficial", produtorNome: "José Aarão Neto", produtorDoc: "555.009.956-40",
+    estabCodigo: "31234567891", estabNome: "Fazenda do Rio", exploracaoCodigo: "312345678910109", municipio: "Lavras",
+    especie: "Bovino", doenca: "Brucelose", dataVacinacao: "2026-02-01", situacao: "Ativo",
   },
   {
-    id: 2, produtorNome: "Divino de Souza Sobrinho", produtorDoc: "444.009.956-40",
-    estabCodigo: "31001040005", estabNome: "Fazenda Rio Preto", municipio: "Lavras",
-    especie: "Bovino", doenca: "Febre Aftosa", dataVacinacao: "2026-01-15", situacao: "Cancelada",
+    id: 2, tipoDeclaracao: "Vacina Complementar", produtorNome: "Divino de Souza Sobrinho", produtorDoc: "444.009.956-40",
+    estabCodigo: "31001040005", estabNome: "Fazenda Rio Preto", exploracaoCodigo: "310010400050001", municipio: "Lavras",
+    especie: "Bovino", doenca: "Febre Aftosa", dataVacinacao: "2026-01-15", situacao: "Cancelado",
   },
   {
-    id: 3, produtorNome: "Agropecuária Vale Verde Ltda.", produtorDoc: "56.338.814/0001-95",
-    estabCodigo: "42001040005", estabNome: "Fazenda Vertentes", municipio: "Varginha",
-    especie: "Equino", doenca: "Raiva", dataVacinacao: "2026-03-02", situacao: "Finalizada",
+    id: 3, tipoDeclaracao: "Primeira Dose", produtorNome: "Agropecuária Vale Verde Ltda.", produtorDoc: "56.338.814/0001-95",
+    estabCodigo: "42001040005", estabNome: "Fazenda Vertentes", exploracaoCodigo: "420010400050001", municipio: "Varginha",
+    especie: "Equino", doenca: "Raiva", dataVacinacao: "2026-03-02", situacao: "Ativo",
   },
 ];
 
 function SituacaoBadge({ situacao }: { situacao: DeclaracaoVacinacao["situacao"] }) {
   const map = {
-    Finalizada: { bg: "#E6F4EA", border: "#A3E2B8", text: "#1A7A3C", Icon: Check },
-    Cancelada: { bg: "#FEF3E2", border: "#FCD9A3", text: "#B45309", Icon: Ban },
+    Ativo: { bg: "#E6F4EA", border: "#A3E2B8", text: "#1A7A3C", Icon: Check },
+    Cancelado: { bg: "#FEF3E2", border: "#FCD9A3", text: "#B45309", Icon: Ban },
   } as const;
   const { bg, border, text, Icon } = map[situacao];
   return (
@@ -215,8 +225,11 @@ interface PageProps {
 }
 
 export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
+  const { role } = useDemoUser();
+  const produtorEhUsuario = role === "produtor";
   const [busca, setBusca] = useState("");
-  const [produtor, setProdutor] = useState<any | null>(null);
+  const [tipoDeclaracao, setTipoDeclaracao] = useState("");
+  const [produtor, setProdutor] = useState<any | null>(() => produtorEhUsuario ? PRODUTORES_MOCK[0] : null);
   const [estabelecimento, setEstabelecimento] = useState<any | null>(null);
   const [exploracao, setExploracao] = useState<any | null>(null);
   const [nucleo, setNucleo] = useState<any | null>(null);
@@ -244,7 +257,7 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
   const erroPeriodo = periodoDe !== "" && periodoAte !== "" && periodoAte < periodoDe;
 
   const temFiltroAtivo =
-    busca || produtor || estabelecimento || exploracao || nucleo ||
+    busca || tipoDeclaracao || produtor || estabelecimento || exploracao || nucleo ||
     municipio || especie || doenca || periodoDe || periodoAte || situacao;
 
   const handlePesquisar = () => {
@@ -267,7 +280,7 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
     { label: "Documento", key: "documento" },
   ];
 
-    const colunasModal =
+  const colunasModal =
     tipoPessoa === "PJ"
       ? [{ label: "Razão Social", key: "nome" }, { label: "CNPJ", key: "documento" }]
       : [{ label: "Nome", key: "nome" }, { label: "CPF", key: "documento" }];
@@ -276,9 +289,11 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
     const termo = busca.trim().toLowerCase();
     const matchBusca =
       termo === "" ||
-      [e.produtorNome, e.produtorDoc, e.estabCodigo, e.estabNome, e.especie, e.doenca]
+      [e.tipoDeclaracao, e.produtorNome, e.produtorDoc, e.estabCodigo, e.estabNome, e.especie, e.doenca]
         .join(" ").toLowerCase().includes(termo);
+    const matchTipoDeclaracao = !tipoDeclaracao || e.tipoDeclaracao === tipoDeclaracao;
     const matchProdutor = !produtor || e.produtorDoc === produtor.documento;
+    const matchProdutorUsuario = !produtorEhUsuario || e.produtorDoc === PRODUTORES_MOCK[0].documento;
     const matchEstab = !estabelecimento || e.estabCodigo === estabelecimento.codigo;
     const matchExplor = !exploracao || e.especie === exploracao.especie;
     const matchMunicipio = municipio === "" || e.municipio === municipio;
@@ -287,7 +302,7 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
     const matchDe = periodoDe === "" || e.dataVacinacao >= periodoDe;
     const matchAte = periodoAte === "" || e.dataVacinacao <= periodoAte;
     const matchSituacao = situacao === "" || e.situacao === situacao;
-    return matchBusca && matchProdutor && matchEstab && matchExplor && matchMunicipio &&
+    return matchBusca && matchTipoDeclaracao && matchProdutor && matchProdutorUsuario && matchEstab && matchExplor && matchMunicipio &&
       matchEspecie && matchDoenca && matchDe && matchAte && matchSituacao;
   });
 
@@ -320,140 +335,144 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
         {/* CONTAINER BRANCO ÚNICO (Filtros + Mensagens + Tabela) */}
         <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col gap-5">
 
-          
 
-          
-            <div className="animate-fadeIn flex flex-col gap-3 w-full">
 
-              {/* FILEIRA 1: Produtor + Estabelecimento + Pesquisar */}
-              <div className="flex flex-col lg:flex-row items-end gap-3 w-full">
-                 {/* 1. Produtor (Sempre coluna 1) */}
-                    <div className="w-full lg:flex-1">
-                      <FloatInput
-                        label="Produtor"
-                        value={produtor ? produtor.nome : ""} 
-                        icon={<img src={Icons.iconeProdutorUrl} alt="Produtor" className="w-5 h-5 object-contain" />} 
-                        onClick={() => setModalProdutor(true)}
-                        readOnly
-                      />            
-                    </div>
 
-                <div className="w-full lg:flex-1">
-                  <EntitySearchInput
-                    label="Estabelecimento Agropecuário"
-                    placeholder="Buscar por código, nome, município ou proprietário."
-                    value={estabelecimento ? estabelecimento.nome : ""}
-                    data={ESTABELECIMENTOS_MOCK}
-                    searchKeys={["codigo", "nome", "municipio", "proprietario"]}
-                    columns={[
-                      { label: "Código", key: "codigo" },
-                      { label: "Estabelecimento", key: "nome" },
-                      { label: "Município", key: "municipio" },
-                      { label: "Proprietário", key: "proprietario" },
-                    ]}
-                    icon={<img src={Icons.iconeEstabelecimentoUrl} alt="Estabelecimento Agropecuário" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}
-                    title="Buscar Estabelecimento Agropecuário"
-                    subtitle="Busque por um estabelecimento cadastrado:"
-                    onChange={(ent) => setEstabelecimento(ent)}
-                  />
-                </div>
+          <div className="animate-fadeIn flex flex-col gap-3 w-full">
 
-                <button
-                  onClick={handlePesquisar}
-                  className="h-12 w-full lg:w-fit px-5 rounded-md text-white text-sm font-semibold transition hover:opacity-90 flex items-center justify-center whitespace-nowrap"
-                  style={{ backgroundColor: GREEN }}
-                >
-                  Pesquisar
-                </button>
+            {/* FILEIRA 1: Produtor + Estabelecimento + Pesquisar */}
+            <div className="flex flex-col lg:flex-row items-end gap-3 w-full">
+
+              <div className="w-full lg:flex-1">
+                <FloatSelect label="Tipo de Declaração" value={tipoDeclaracao} onChange={setTipoDeclaracao} options={TIPOS_DECLARACAO} />
               </div>
-
-              {/* FILEIRA 2+: Grid Organizado */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 w-full items-end">
-             
-                
-                {/* Campo Customizado de Gatilho para a Exploração Pecuária */}
+              {/* 1. Produtor (Sempre coluna 1) */}
+              {!produtorEhUsuario && <div className="w-full lg:flex-1">
                 <FloatInput
-                    label="Exploração Pecuária"
-                    required
-                    value={exploracao ? exploracao.codigo : ""}
-                    onChange={() => { }}
-                    icon={<img src={Icons.iconeExploracaoUrl} alt="Exploração" className="w-5 h-5 object-contain" />}
-                    onClick={() => setModalExploracao(true)}
-                  />
-              
-             
-              <EntitySearchInput
-          label="Núcleo de Produção"
-          placeholder="Buscar por nome ou código"
-          value={nucleo ? nucleo.nome : ""}
-          
-          // Passa os dados direto do mock atualizado
-          data={NUCLEOS_MOCK} 
-          
-          // Chaves que a barra de digitação interna vai usar para achar o item
-          searchKeys={["codigo", "nome"]}
-          
-          // Configuração das colunas no formato: Código - Nome / Documento - Nome
-          columns={[
-            { label: "Núcleo de Produção", key: "nucleoCompleto" },
-            { label: "Estabelecimento Agropecuário", key: "estabelecimentoCompleto" },
-            { label: "Produtor", key: "produtorCompleto" },
-          ]}
-          
-          icon={<img src={Icons.iconeNucleoProducaoUrl} alt="Núcleo de Produção" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}
-          title="Buscar Núcleo de Produção"
-          subtitle="Busque por um núcleo de produção cadastrado:"
-          onChange={(ent) => setNucleo(ent)}
-          
-          // max-w-5xl dá a largura ideal e o [&_td]:whitespace-pre-line obedece o \n do hífen
-          className="max-w-5xl w-full [&_td]:whitespace-pre-line"
-        />
+                  label="Produtor"
+                  value={produtor ? produtor.nome : ""}
+                  icon={<img src={Icons.iconeProdutorUrl} alt="Produtor" className="w-5 h-5 object-contain" />}
+                  onClick={() => setModalProdutor(true)}
+                  readOnly
+                />
+              </div>}
 
-                <FloatCombobox label="Município do Estabelecimento" value={municipio} onChange={setMunicipio} options={MUNICIPIOS_MG} />
-
+              <div className="w-full lg:flex-1">
                 <EntitySearchInput
-                  label="Espécie"
-                  placeholder="Buscar por nome da espécie"
-                  value={especie ? especie.nome : ""}
-                  data={ESPECIES_MOCK}
-                  searchKeys={["nome", "grupo"]}
+                  label="Estabelecimento Agropecuário"
+                  placeholder="Buscar por código, nome, município ou proprietário."
+                  value={estabelecimento ? estabelecimento.nome : ""}
+                  data={ESTABELECIMENTOS_MOCK}
+                  searchKeys={["codigo", "nome", "municipio", "proprietario"]}
                   columns={[
-                    { label: "Espécie", key: "nome" },
-                    { label: "Grupo", key: "grupo" },
+                    { label: "Código", key: "codigo" },
+                    { label: "Estabelecimento", key: "nome" },
+                    { label: "Município", key: "municipio" },
+                    { label: "Proprietário", key: "proprietario" },
                   ]}
-                  icon={<Dna size={18} color={GREEN} />}
-                  title="Buscar Espécie"
-                  subtitle="Busque por uma espécie cadastrada:"
-                  onChange={(ent) => setEspecie(ent)}
+                  icon={<img src={Icons.iconeEstabelecimentoUrl} alt="Estabelecimento Agropecuário" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}
+                  title="Buscar Estabelecimento Agropecuário"
+                  subtitle="Busque por um estabelecimento cadastrado:"
+                  onChange={(ent) => setEstabelecimento(ent)}
                 />
-
-                <EntitySearchInput
-                  label="Doença"
-                  placeholder="Buscar por doença"
-                  value={doenca ? doenca.nome : ""}
-                  data={DOENCAS_MOCK}
-                  searchKeys={["nome"]}
-                  columns={[{ label: "Doença", key: "nome" }]}
-                    icon={<img src={Icons.iconeDoencaUrl} alt="Doença" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}
-                  title="Buscar Doença"
-                  subtitle="Busque por uma doença cadastrada:"
-                  onChange={(ent) => setDoenca(ent)}
-                />
-
-                <FloatInput label="Período - De" type="date" max={hoje} value={periodoDe} icon={<Calendar size={18} color={GREEN} />} onChange={setPeriodoDe} />
-                <FloatInput label="Período - Até" type="date" min={periodoDe || undefined} value={periodoAte}  icon={<Calendar size={18} color={GREEN} />}onChange={setPeriodoAte} />
-                <FloatSelect label="Situação" value={situacao} onChange={setSituacao} options={SITUACOES} />
               </div>
 
-              {/* Validações de data (AC1) */}
-              {erroDeFuturo && (
-                <p className="text-sm text-red-500">A data "De" não pode ser maior que a data atual.</p>
-              )}
-              {erroPeriodo && (
-                <p className="text-sm text-red-500">A data "Até" deve ser maior ou igual à data "De".</p>
-              )}
+              <button
+                onClick={handlePesquisar}
+                className="h-12 w-full lg:w-fit px-5 rounded-md text-white text-sm font-semibold transition hover:opacity-90 flex items-center justify-center whitespace-nowrap"
+                style={{ backgroundColor: GREEN }}
+              >
+                Pesquisar
+              </button>
             </div>
-          
+
+            {/* FILEIRA 2+: Grid Organizado */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 w-full items-end">
+
+
+              {/* Campo Customizado de Gatilho para a Exploração Pecuária */}
+              <FloatInput
+                label="Exploração Pecuária"
+                required
+                value={exploracao ? exploracao.codigo : ""}
+                onChange={() => { }}
+                icon={<img src={Icons.iconeExploracaoUrl} alt="Exploração" className="w-5 h-5 object-contain" />}
+                onClick={() => setModalExploracao(true)}
+              />
+
+
+              <EntitySearchInput
+                label="Núcleo de Produção"
+                placeholder="Buscar por nome ou código"
+                value={nucleo ? nucleo.nome : ""}
+
+                // Passa os dados direto do mock atualizado
+                data={NUCLEOS_MOCK}
+
+                // Chaves que a barra de digitação interna vai usar para achar o item
+                searchKeys={["codigo", "nome"]}
+
+                // Configuração das colunas no formato: Código - Nome / Documento - Nome
+                columns={[
+                  { label: "Núcleo de Produção", key: "nucleoCompleto" },
+                  { label: "Estabelecimento Agropecuário", key: "estabelecimentoCompleto" },
+                  { label: "Produtor", key: "produtorCompleto" },
+                ]}
+
+                icon={<img src={Icons.iconeNucleoProducaoUrl} alt="Núcleo de Produção" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}
+                title="Buscar Núcleo de Produção"
+                subtitle="Busque por um núcleo de produção cadastrado:"
+                onChange={(ent) => setNucleo(ent)}
+
+                // max-w-5xl dá a largura ideal e o [&_td]:whitespace-pre-line obedece o \n do hífen
+                className="max-w-5xl w-full [&_td]:whitespace-pre-line"
+              />
+
+              <FloatCombobox label="Município do Estabelecimento" value={municipio} onChange={setMunicipio} options={MUNICIPIOS_MG} />
+
+              <EntitySearchInput
+                label="Espécie"
+                placeholder="Buscar por nome da espécie"
+                value={especie ? especie.nome : ""}
+                data={ESPECIES_MOCK}
+                searchKeys={["nome", "grupo"]}
+                columns={[
+                  { label: "Espécie", key: "nome" },
+                  { label: "Grupo", key: "grupo" },
+                ]}
+                icon={<Dna size={18} color={GREEN} />}
+                title="Buscar Espécie"
+                subtitle="Busque por uma espécie cadastrada:"
+                onChange={(ent) => setEspecie(ent)}
+              />
+
+              <EntitySearchInput
+                label="Doença"
+                placeholder="Buscar por doença"
+                value={doenca ? doenca.nome : ""}
+                data={DOENCAS_MOCK}
+                searchKeys={["nome"]}
+                columns={[{ label: "Doença", key: "nome" }]}
+                icon={<img src={Icons.iconeDoencaUrl} alt="Doença" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}
+                title="Buscar Doença"
+                subtitle="Busque por uma doença cadastrada:"
+                onChange={(ent) => setDoenca(ent)}
+              />
+
+              <FloatInput label="Período - De" type="date" max={hoje} value={periodoDe} icon={<Calendar size={18} color={GREEN} />} onChange={setPeriodoDe} />
+              <FloatInput label="Período - Até" type="date" min={periodoDe || undefined} value={periodoAte} icon={<Calendar size={18} color={GREEN} />} onChange={setPeriodoAte} />
+              <FloatSelect label="Situação" value={situacao} onChange={setSituacao} options={SITUACOES} />
+            </div>
+
+            {/* Validações de data (AC1) */}
+            {erroDeFuturo && (
+              <p className="text-sm text-red-500">A data "De" não pode ser maior que a data atual.</p>
+            )}
+            {erroPeriodo && (
+              <p className="text-sm text-red-500">A data "Até" deve ser maior ou igual à data "De".</p>
+            )}
+          </div>
+
 
           {/* Feedback de Erro Global (AC2) */}
           {erroFiltro && (
@@ -466,6 +485,7 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
           {temFiltroAtivo && (
             <div className="flex flex-wrap gap-2 animate-fadeIn">
               {busca && <Chip label={`Busca: ${busca}`} onRemove={() => setBusca("")} />}
+              {tipoDeclaracao && <Chip label={`Tipo: ${tipoDeclaracao}`} onRemove={() => setTipoDeclaracao("")} />}
               {produtor && <Chip label={`Produtor: ${produtor.nome}`} onRemove={() => setProdutor(null)} />}
               {estabelecimento && <Chip label={`Estab.: ${estabelecimento.nome}`} onRemove={() => setEstabelecimento(null)} />}
               {exploracao && <Chip label={`Exploração: ${exploracao.codigo}`} onRemove={() => setExploracao(null)} />}
@@ -497,8 +517,10 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
                 <table className="w-full text-sm border-collapse">
                   <thead>
                     <tr className=" border-b ">
+                      <th className="text-left px-4 py-3 font-semibold uppercase text-gray-600 whitespace-normal max-w-[140px]">Tipo de Declaração</th>
                       <th className="text-left px-4 py-3 font-semibold uppercase text-gray-600 whitespace-normal max-w-[170px]">Produtor</th>
                       <th className="text-left px-4 py-3 font-semibold uppercase text-gray-600 whitespace-normal max-w-[180px]">Estabelecimento Agropecuário</th>
+                      <th className="text-left px-4 py-3 font-semibold uppercase text-gray-600 whitespace-normal max-w-[150px]">Exploração Pecuária</th>
                       <th className="text-left px-4 py-3 font-semibold uppercase text-gray-600 whitespace-normal max-w-[100px]">Espécie</th>
                       <th className="text-left px-4 py-3 font-semibold uppercase text-gray-600 whitespace-normal max-w-[110px]">Doença</th>
                       <th className="text-left px-4 py-3 font-semibold uppercase text-gray-600 whitespace-normal max-w-[110px]">Data de Vacinação</th>
@@ -509,6 +531,7 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
                   <tbody>
                     {pagina.map((e) => (
                       <tr key={e.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/60 transition">
+                        <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">{e.tipoDeclaracao}</td>
                         {/* Produtor: CPF/CNPJ - Nome */}
                         <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">
                           <div>{e.produtorDoc}</div>
@@ -519,6 +542,7 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
                           <div>{e.estabCodigo}</div>
                           <div>{e.estabNome}</div>
                         </td>
+                        <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">{e.exploracaoCodigo ?? "—"}</td>
                         <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">{e.especie}</td>
                         <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">{e.doenca}</td>
                         <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">{fmtData(e.dataVacinacao)}</td>
@@ -572,19 +596,19 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
           setModalExploracao(false);
         }}
         confirmLabel="Confirmar"
-      className="max-w-4xl lg:max-w-5xl w-full [&_td]:whitespace-pre-line"     
-        />
+        className="max-w-4xl lg:max-w-5xl w-full [&_td]:whitespace-pre-line"
+      />
 
       {/* Modal do Produtor */}
       <SearchModal<ProdutorEntidade>
         open={modalProdutor}
         onClose={() => {
           setModalProdutor(false);
-          setTipoPessoa(""); 
+          setTipoPessoa("");
         }}
         title="Buscar Proprietário"
         subtitle="Busque por um proprietário cadastrado no sistema:"
-        icon={<img src={Icons.iconeProdutorUrl} alt="Produtor" className="w-8 h-8 object-contain" />} 
+        icon={<img src={Icons.iconeProdutorUrl} alt="Produtor" className="w-8 h-8 object-contain" />}
         data={databaseFiltrada}
         columns={colunasModal}
         searchKeys={["nome", "documento"]}
@@ -593,7 +617,7 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
         onConfirm={(p) => {
           setProdutor(p);
           setModalProdutor(false);
-          setTipoPessoa(""); 
+          setTipoPessoa("");
         }}
         headerActions={
           <FloatSelect
