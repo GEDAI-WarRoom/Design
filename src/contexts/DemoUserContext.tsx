@@ -15,7 +15,7 @@ export interface DemoUserIdentity {
 export const DEMO_USERS: Record<DemoUserRole, DemoUserIdentity> = {
 	admin: {
 		role: "admin",
-		name: "Lucas",
+		name: "Thomas Anderson",
 		roleLabel: "Administrador",
 	},
 	produtor: {

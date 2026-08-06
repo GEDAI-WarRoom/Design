@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { ClipboardCheck, Syringe, Truck } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
+import { ProfileCard } from "../../../components/ProfileCard";
 import { useDemoUser } from "../../../contexts/DemoUserContext";
 import fotoVeterinariaExemploUrl from "../../../imports/images/perfil-veterinaria-exemplo.png";
 import { obterProfissionalAnimal } from "../../Animal/ProfissionalAnimal/profissionalAnimalData";
@@ -38,21 +39,6 @@ const atalhos = [
   },
 ];
 
-function InfoItem({
-  label,
-  value,
-}: {
-  label: string;
-  value: string;
-}) {
-  return (
-    <div className="min-w-0 px-0 py-3 sm:px-4 sm:py-0">
-      <p className="text-xs font-medium text-gray-500">{label}</p>
-      <p className="mt-0.5 break-words text-sm font-semibold text-gray-900">{value}</p>
-    </div>
-  );
-}
-
 export function DashboardVeterinario({
   onLogout,
   onNavigate,
@@ -83,72 +69,33 @@ export function DashboardVeterinario({
         {newsFeed}
 
         <div className="mb-6">
-          <section className="w-full overflow-hidden rounded-xl border border-green-100 bg-white shadow-sm" aria-label="Perfil profissional">
-            {profissional ? (
-              <div className="px-5 py-4 md:px-6">
-                <div className="flex flex-col gap-5 md:flex-row md:items-center">
-                  <div className="flex min-w-0 items-center gap-4 md:w-[280px] md:flex-shrink-0">
-                    <span className="relative flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-[#EEF2F1] ring-4 ring-gray-50">
-                      <img
-                        src={fotoVeterinariaExemploUrl}
-                        alt={`Foto de ${profissional.nome}`}
-                        className="h-full w-full rounded-full object-cover"
-                      />
-                      <span
-                        className="absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white bg-[#22A447]"
-                        aria-hidden="true"
-                      />
-                    </span>
-                    <div className="min-w-0">
-                      <p className="truncate text-base font-semibold text-gray-900">{profissional.nome}</p>
-                      <p className="mt-0.5 text-sm text-gray-500">{profissional.formacao}</p>
-                      <p className="mt-0.5 text-xs text-gray-500">
-                        Situação: <span className="font-semibold text-[#1A7A3C]">{profissional.situacao}</span>
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="grid min-w-0 flex-1 grid-cols-1 divide-y divide-gray-100 border-t border-gray-200 pt-3 sm:grid-cols-3 sm:divide-x sm:divide-y-0 md:border-l md:border-t-0 md:py-2 md:pl-1">
-                    <InfoItem label="CRMV-MG" value={profissional.numeroConselho} />
-                    <InfoItem
-                      label="Tipo de registro"
-                      value={profissional.tipoRegistroConselho || "Não informado"}
-                    />
-                    <InfoItem
-                      label="Serviço oficial"
-                      value={profissional.servicoOficial}
-                    />
-                  </div>
-                </div>
-
-                <div className="mt-4 border-t border-gray-100 pt-4">
-                  <p className="text-sm font-semibold text-gray-700">Habilitações vigentes</p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {profissional.habilitacoes.length > 0 ? (
-                      profissional.habilitacoes.map((habilitacao) => (
-                        <span
-                          key={habilitacao}
-                          className="inline-flex items-center gap-1.5 rounded-md border border-green-200 bg-green-50 px-3 py-1.5 text-xs font-semibold text-gray-500"
-                        >
-                          <span
-                            aria-hidden="true"
-                            className="h-2 w-2 flex-shrink-0 rounded-full bg-green-300"
-                          />
-                          {habilitacao}
-                        </span>
-                      ))
-                    ) : (
-                      <span className="text-sm text-gray-500">Nenhuma habilitação vigente.</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="p-6 text-sm text-gray-500">
-                Não foi possível localizar o cadastro profissional vinculado a este acesso.
-              </div>
-            )}
-          </section>
+          {profissional ? (
+            <ProfileCard
+              name={profissional.nome}
+              subtitle={profissional.formacao}
+              avatarSrc={fotoVeterinariaExemploUrl}
+              showActiveIndicator={profissional.situacao === "Ativo"}
+              details={[
+                { label: "CRMV-MG", value: profissional.numeroConselho },
+                {
+                  label: "Tipo de registro",
+                  value: profissional.tipoRegistroConselho || "Não informado",
+                },
+                { label: "Serviço oficial", value: profissional.servicoOficial },
+              ]}
+              highlights={profissional.habilitacoes}
+              highlightsTitle="Habilitações vigentes"
+              emptyHighlightsMessage="Nenhuma habilitação vigente."
+              ariaLabel="Perfil profissional"
+            />
+          ) : (
+            <section
+              className="w-full rounded-xl border border-green-100 bg-white p-6 text-sm text-gray-500 shadow-sm"
+              aria-label="Perfil profissional"
+            >
+              Não foi possível localizar o cadastro profissional vinculado a este acesso.
+            </section>
+          )}
         </div>
 
         <section className="mb-6" aria-label="Atalhos">
