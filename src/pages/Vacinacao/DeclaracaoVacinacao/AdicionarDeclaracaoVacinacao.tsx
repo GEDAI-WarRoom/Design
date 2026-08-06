@@ -921,7 +921,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
   const [dataVacinacao, setDataVacinacao] = useState(dados?.dataVacinacao ?? "");
   const [dataAtestado, setDataAtestado] = useState(dados?.dataAtestado ?? (preenchendoRegistro ? dataVacinacaoInicial : ""));
   const [veterinario, setVeterinario] = useState<any | null>(dados?.veterinario ?? (preenchendoRegistro ? { id: 1, nome: "Dr. Roberto Silva", cpf: "123.456.789-00" } : null));
-  const [vacinadorBrucelose, setVacinadorBrucelose] = useState<any | null>(dados?.vacinadorBrucelose ?? (preenchendoRegistro && nomeDoencaInicial === "Brucelose" ? { id: 1, vetId: 1, nome: "Josephina Arantes", documento: "444.009.956-40" } : null));
+  const [vacinadorBrucelose, setVacinadorBrucelose] = useState<any | null>(dados?.vacinadorBrucelose ?? (preenchendoRegistro && nomeDoencaInicial === "Brucelose" ? { id: 1, vetId: 1, nome: "Eloiza Silva", documento: "444.009.956-40" } : null));
   const [mordidaMorcego, setMordidaMorcego] = useState(dados?.mordidaMorcego ?? (preenchendoRegistro ? "Não" : ""));
 
   // ---- Regime + faixas por gênero ----
@@ -1172,7 +1172,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
     dataVacinacao: "2026-02-01",
     dataAtestado: "2026-02-01",
     veterinario: { id: 1, nome: "Dr. Roberto Silva", cpf: "123.456.789-00" },
-    vacinadorBrucelose: { id: 1, vetId: 1, nome: "Josephina Arantes", documento: "444.009.956-40" },
+    vacinadorBrucelose: { id: 1, vetId: 1, nome: "Eloiza Silva", documento: "444.009.956-40" },
     mordidaMorcego: "Não",
     regime: "Vacina Oficial",
     vacMacho: {},

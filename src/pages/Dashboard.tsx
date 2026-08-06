@@ -46,7 +46,6 @@ import {
   ClipboardType,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Navbar } from "../components/Navbar";
 import { PendenciasConfirmacaoGta } from "../components/PendenciasConfirmacaoGta";
 import * as Icons from "../imports/icons";
 import campanhaVacinacao2026Url from "../imports/images/campanha-vacinacao-2026.png";
@@ -59,21 +58,15 @@ import {
   useDemoUser,
   type DemoUserRole,
 } from "../contexts/DemoUserContext";
+import { DashboardAdmin } from "./Dashboard/Admin/DashboardAdmin";
+import { DashboardProdutor } from "./Dashboard/Produtor/DashboardProdutor";
+import { DashboardVeterinario } from "./Dashboard/Veterinario/DashboardVeterinario";
+import type {
+  MenuCategory,
+  MenuItem,
+} from "./Dashboard/shared/dashboardTypes";
 
 const GREEN = "#1A7A3C";
-
-// Definindo os tipos locais para organização
-export interface MenuItem {
-  label: string;
-  route: string;
-  icon?: React.ReactNode; // O '?' deixa o ícone opcional caso algum link não tenha
-}
-
-export interface MenuCategory {
-  title: string;
-  icon: React.ReactNode;
-  items: MenuItem[];
-}
 
 // Exportamos os dados para que a Navbar consiga importá-los e usá-los na busca
 const cadastrosCategoriesMescladas: any[] = [
@@ -1059,52 +1052,6 @@ function filterCategoriesByRole(
     .filter((category) => category.items.length > 0);
 }
 
-// Componente auxiliar de Card interno ajustado para renderizar o ícone do item
-function CategoryCard({
-  cat,
-  onNavigate,
-}: {
-  cat: MenuCategory;
-  onNavigate: (s: any) => void;
-}) {
-  return (
-    <div className="flex flex-col gap-2">
-      <div className="mb-1">{cat.icon}</div>
-      <h3 className="text-base font-semibold text-gray-800 mb-1">
-        {cat.title}
-      </h3>
-      <ul className="flex flex-col gap-1">
-        {cat.items.map((item) => (
-          <li key={item.label}>
-            <a
-              href="#"
-              className="text-sm flex items-center gap-2 hover:underline transition py-0.5"
-              style={{ color: GREEN }}
-              onClick={(e) => {
-                e.preventDefault();
-                if (item.route) onNavigate(item.route);
-              }}
-            >
-              {/* MODIFICADO AQUI: Se houver ícone, renderiza o ícone personalizado, senão mantém a bolinha clássica */}
-              {item.icon ? (
-                <span className="flex-shrink-0 text-[#1A7A3C]">
-                  {item.icon}
-                </span>
-              ) : (
-                <span
-                  className="w-1.5 h-1.5 rounded-full inline-block flex-shrink-0"
-                  style={{ backgroundColor: GREEN }}
-                />
-              )}
-              <span>{item.label}</span>
-            </a>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
 const avisosProdutor = [
   {
     categoria: "Campanha 2026",
@@ -1336,78 +1283,49 @@ function PropriedadesProdutor({ onNavigate }: { onNavigate: (screen: any, data?:
 
 // Componente Principal do Dashboard
 export function DashboardPage({ onLogout, onNavigate }: any) {
-  const { role } = useDemoUser();
+  const { role, user } = useDemoUser();
   const visibleCadastros = filterCategoriesByRole(cadastrosCategories, role);
   const visibleSecondary = filterCategoriesByRole(secondaryCategories, role);
   const visibleThird = filterCategoriesByRole(thirdCategories, role);
   const visibleFourth = filterCategoriesByRole(fourthCategories, role);
-  const mainCategoryGroups =
-    role === "produtor"
-      ? [[...visibleCadastros, ...visibleSecondary, ...visibleThird]]
-      : [visibleCadastros, visibleSecondary, visibleThird].filter(
-        (group) => group.length > 0,
-      );
 
-  return (
-    <div className="min-h-screen bg-[#f2f3f5]">
-      {/* Importação limpa da Navbar que está na pasta de componentes */}
-      <Navbar
+  if (role === "produtor") {
+    return (
+      <DashboardProdutor
         onLogout={onLogout}
         onNavigate={onNavigate}
-        currentScreen="dashboard"
-      />
-
-      <main className="max-w-5xl mx-auto px-4 md:px-6 py-6">
-        {role === "produtor" && (
+        categories={[...visibleCadastros, ...visibleSecondary, ...visibleThird]}
+        userName={user?.name ?? "produtor"}
+        beforeMenu={
           <>
-            <div className="mb-6">
-              <h1 className="text-2xl font-semibold text-gray-900">
-                Bem-vindo, Fernando
-              </h1>
-              <p className="mt-1 text-sm text-gray-600">
-                Gerencie suas propriedades e movimentações agropecuárias.
-              </p>
-            </div>
             <AvisosNoticias />
             <PendenciasConfirmacaoGta onNavigate={onNavigate} />
           </>
-        )}
+        }
+        afterMenu={<PropriedadesProdutor onNavigate={onNavigate} />}
+      />
+    );
+  }
 
-        {/* Bloco de Cadastros (Exatamente como estava) */}
-        <div className="flex flex-col bg-white rounded-xl shadow-sm p-6 mb-6 gap-6">
-          <h2 className="text-xl font-semibold text-gray-800">Cadastros</h2>
-          {mainCategoryGroups.map((categories, index) => (
-            <div
-              key={index}
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
-            >
-              {categories.map((cat) => (
-                <CategoryCard
-                  key={cat.title}
-                  cat={cat}
-                  onNavigate={onNavigate}
-                />
-              ))}
-            </div>
-          ))}
-        </div>
+  if (role === "veterinario") {
+    return (
+      <DashboardVeterinario
+        onLogout={onLogout}
+        onNavigate={onNavigate}
+        categories={[...visibleCadastros, ...visibleSecondary, ...visibleThird]}
+        newsFeed={<AvisosNoticias />}
+      />
+    );
+  }
 
-        {role === "produtor" && <PropriedadesProdutor onNavigate={onNavigate} />}
-
-        {visibleFourth.length > 0 && (
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {visibleFourth.map((cat) => (
-                <CategoryCard
-                  key={cat.title}
-                  cat={cat}
-                  onNavigate={onNavigate}
-                />
-              ))}
-            </div>
-          </div>
-        )}
-      </main>
-    </div>
+  return (
+    <DashboardAdmin
+      onLogout={onLogout}
+      onNavigate={onNavigate}
+      categoryGroups={[visibleCadastros, visibleSecondary, visibleThird].filter(
+        (group) => group.length > 0,
+      )}
+      controlCategories={visibleFourth}
+    />
   );
 }
