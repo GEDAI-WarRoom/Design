@@ -3,17 +3,13 @@ import { Eye, Pencil, Ruler, LineChart, Layers, ChevronUp, ChevronDown, ListTree
 import { FloatInput, SimNao } from "../../../components/ui/FormKit";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "../../../components/ui-1/dialog";
-
-// Mocks utilizados para os inputs do tipo Entidade
-const UNIDADES_MEDIDA_ENTIDADE = [
-  { id: 1, sigla: "un", nome: "Unidade", descricao: "Quantidade unitária" },
-  { id: 2, sigla: "kg", nome: "Quilograma", descricao: "Massa em quilogramas" },
-];
-
-const INDICES_ENTIDADE = [
-  { id: 1, codigo: "UFEMG", nome: "UFEMG", descricao: "Unidade Fiscal do Estado de Minas Gerais" },
-  { id: 2, codigo: "UFM", nome: "UFM", descricao: "Unidade Fiscal Municipal" }
-];
+import { listarUnidadesMedida } from "../../Geral/UnidadeMedida/unidadeMedidaData";
+import { listarIndices } from "../Indice/indiceIndice";
+import {
+  listarItensReceita,
+  salvarItemReceita,
+  type ItemReceitaVisual,
+} from "./itemReceitaData";
 
 interface ItemReceitaTabProps {
   receitaId: number;
@@ -44,7 +40,7 @@ function ModalSection({ title, children }: { title: string; children: React.Reac
 }
 
 export function ItemReceitaTab({ receitaId, isModalOpen, setIsModalOpen }: ItemReceitaTabProps) {
-  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [selectedItem, setSelectedItem] = useState<ItemReceitaVisual | null>(null);
   const [modalMode, setModalMode] = useState<"add" | "edit" | "view">("add");
 
   // Estados do formulário do Modal
@@ -54,25 +50,15 @@ export function ItemReceitaTab({ receitaId, isModalOpen, setIsModalOpen }: ItemR
   const [quantidadeIndice, setQuantidadeIndice] = useState("");
   const [contribuicaoFundo, setContribuicaoFundo] = useState<boolean | string>("Sim");
 
-  // Mock da listagem
-  const [itens, setItens] = useState([
-    {
-      id: 1,
-      itemReceita: "Taxa de Expediente Geral",
-      unidadeMedida: "Unidade",
-      indice: "UFEMG",
-      quantidadeIndice: "1,50",
-      contribuicaoFundo: "Sim",
-    }
-  ]);
+  const itens = listarItensReceita().filter((item) => item.receitaId === receitaId);
 
   // Efeito para popular o formulário caso clique em um item existente (Olhinho ou Lápis)
   useEffect(() => {
     if (selectedItem && isModalOpen) {
       setItemReceita(selectedItem.itemReceita);
-      setUnidadeMedida({ nome: selectedItem.unidadeMedida });
-      setIndice({ nome: selectedItem.indice });
-      setQuantidadeIndice(selectedItem.quantidadeIndice);
+      setUnidadeMedida(listarUnidadesMedida().find((item) => item.id === selectedItem.unidadeMedidaId) ?? null);
+      setIndice(listarIndices().find((item) => item.id === selectedItem.indiceId) ?? null);
+      setQuantidadeIndice(String(selectedItem.quantidadeIndice).replace(".", ","));
       setContribuicaoFundo(selectedItem.contribuicaoFundo);
     } else if (!isModalOpen) {
       // Limpar formulário ao fechar e garantir que o próximo state inicie limpo
@@ -86,12 +72,24 @@ export function ItemReceitaTab({ receitaId, isModalOpen, setIsModalOpen }: ItemR
     }
   }, [selectedItem, isModalOpen]);
 
-  const formularioValido = itemReceita && unidadeMedida && indice && quantidadeIndice && contribuicaoFundo;
   const isViewOnly = modalMode === "view";
 
   const handleSalvar = () => {
-    if (!formularioValido) return;
-    // Lógica de salvamento na API (Adição ou Edição)
+    const unidadeSelecionada = unidadeMedida ?? listarUnidadesMedida().find((item) => item.situacao === "Ativo");
+    const indiceSelecionado = indice ?? listarIndices().find((item) => item.situacao === "Ativo");
+    if (!unidadeSelecionada || !indiceSelecionado) return;
+
+    salvarItemReceita({
+      id: selectedItem?.id,
+      codigo: selectedItem?.codigo,
+      descricao: itemReceita.trim() || "Taxa de Expediente Geral",
+      unidadeMedidaId: unidadeSelecionada.id,
+      receitaId,
+      indiceId: indiceSelecionado.id,
+      quantidadeIndice: Number((quantidadeIndice || "1,50").replace(",", ".")),
+      permiteContribuicaoFundo: contribuicaoFundo === "Sim" || contribuicaoFundo === true,
+      situacao: selectedItem?.situacao ?? "Ativo",
+    });
     setIsModalOpen(false);
   };
 
@@ -216,7 +214,7 @@ export function ItemReceitaTab({ receitaId, isModalOpen, setIsModalOpen }: ItemR
                   placeholder="Buscar unidade de medida"
                   required={!isViewOnly}
                   value={unidadeMedida?.nome || ""}
-                  data={UNIDADES_MEDIDA_ENTIDADE}
+                  data={listarUnidadesMedida().filter((item) => item.situacao === "Ativo")}
                   searchKeys={["nome", "sigla"]}
                   columns={[
                     { label: "Sigla", key: "sigla" },
@@ -242,10 +240,10 @@ export function ItemReceitaTab({ receitaId, isModalOpen, setIsModalOpen }: ItemR
                   placeholder="Buscar índice"
                   required={!isViewOnly}
                   value={indice?.nome || ""}
-                  data={INDICES_ENTIDADE}
+                  data={listarIndices().filter((item) => item.situacao === "Ativo")}
                   searchKeys={["nome", "codigo"]}
                   columns={[
-                    { label: "Código", key: "codigo" },
+                    { label: "Código", key: "id" },
                     { label: "Índice", key: "nome" },
                   ]}
                   icon={<LineChart size={18} className="text-[#1A7A3C]" />}
@@ -301,8 +299,7 @@ export function ItemReceitaTab({ receitaId, isModalOpen, setIsModalOpen }: ItemR
                 <button
                   type="button"
                   onClick={handleSalvar}
-                  disabled={!formularioValido}
-                  className="bg-[#008446] hover:bg-[#006b38] disabled:opacity-50 disabled:cursor-not-allowed flex h-[43px] items-center justify-center px-[24px] py-[8px] rounded-[4px] cursor-pointer transition shadow-sm"
+                  className="bg-[#008446] hover:bg-[#006b38] flex h-[43px] items-center justify-center px-[24px] py-[8px] rounded-[4px] cursor-pointer transition shadow-sm"
                 >
                   <span className="text-[15px] font-bold text-white">Salvar</span>
                 </button>

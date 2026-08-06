@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import {
   ArrowLeft, ChevronUp, ChevronDown, Info, Check, Trash2, PlusCircle, Download,
-  MapPin, Dna, User, Eye,
+  Dna, User, Eye, Pencil,
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import {
@@ -17,11 +17,6 @@ const GREEN = "#1A7A3C";
 // ==========================================================
 // LISTAS (US072 - AC3)
 // ==========================================================
-const FORMATOS_GEO = [
-  { value: "DMS (graus, minutos, segundos)", label: "DMS (graus, minutos, segundos)" },
-  { value: "DD (decimal)", label: "DD (decimal)" },
-];
-
 // ==========================================================
 // MOCKS (substituir por API)
 // ==========================================================
@@ -64,71 +59,165 @@ const uid = (p: string) => `${p}-${Date.now()}-${Math.random().toString(36).slic
 interface PageProps {
   onLogout: () => void;
   onNavigate: (screen: any, data?: any) => void;
+  dados?: any;
+  modo?: "adicionar" | "visualizar" | "editar";
+  embutido?: boolean;
 }
 
-export function AdicionarRevendedoraAnimaisPage({ onLogout, onNavigate }: PageProps) {
+export const EXEMPLO_REVENDEDORA_ANIMAIS_VIVOS = {
+  id: 1,
+  codigo: "3123659848",
+  nomeComercial: "Revendedora São José",
+  proprietarios: [{
+    uid: "prop-revendedora-exemplo",
+    entidade: { id: 1, nome: "José Aarão Neto", documento: "555.009.956-40", tipo: "PF" },
+  }],
+  especies: [{
+    uid: "esp-revendedora-exemplo",
+    especie: ESPECIES_MOCK[1],
+    capacidade: "350",
+  }],
+  funcionarios: [{
+    uid: "func-revendedora-exemplo",
+    funcionario: FUNCIONARIOS_MOCK[0],
+  }],
+  endereco: {
+    zona: "Urbana", cep: "37200-000", estado: "Minas Gerais", municipio: "Lavras",
+    bairro: "Centro", endereco: "Rua das Palmeiras", numero: "245", complemento: "Loja 2",
+    localidade: "", distrito: "", latitude: "-21.2451", longitude: "-44.9998",
+  },
+  contato: {
+    utilizarContatoProprietario: "Sim",
+    proprietariosSelecionados: ["prop-revendedora-exemplo"],
+    emailFixo: "contato@revendedorasaijose.com.br", emailFixoObs: "Comercial",
+    telefoneFixo: "(35) 3333-4455", telefoneFixoObs: "Atendimento", contatosAdicionais: [],
+  },
+  anexos: [{ id: "anexo-revendedora-exemplo", nome: "registro_revendedora.pdf", descricao: "Registro da revendedora" }],
+  observacao: "Revendedora habilitada para comercialização de aves.",
+};
+
+function normalizarRegistro(dados?: any) {
+  const base: any = { ...EXEMPLO_REVENDEDORA_ANIMAIS_VIVOS, ...(dados || {}) };
+  const proprietarios = dados?.proprietarios?.length
+    ? dados.proprietarios.map((pessoa: any, index: number) => pessoa.entidade
+      ? pessoa
+      : { uid: `prop-revendedora-${index}`, entidade: { ...pessoa, tipo: pessoa.tipo || "PF" } })
+    : base.proprietarios;
+  const especies = dados?.especies?.length
+    ? dados.especies
+    : dados?.especie
+      ? [{ uid: "esp-revendedora-selecionada", especie: { id: 1, nome: dados.especie, grupo: dados.grupo || "" }, capacidade: dados.capacidade || "350" }]
+      : base.especies;
+
+  return {
+    ...base,
+    nomeComercial: dados?.nomeComercial || dados?.nome || base.nomeComercial,
+    proprietarios,
+    especies,
+  };
+}
+
+export function AdicionarRevendedoraAnimaisPage({ onLogout, onNavigate, dados, modo = "adicionar", embutido = false }: PageProps) {
+  const isView = modo === "visualizar";
+  const isEdit = modo === "editar";
+  const inicial = modo === "adicionar" ? null : normalizarRegistro(dados);
+
   // ---- Informações Básicas ----
-  const [nomeComercial, setNomeComercial] = useState("");
+  const [nomeComercial, setNomeComercial] = useState(inicial?.nomeComercial || "");
 
   // ---- Proprietários (um ou mais) ----
-  const [proprietarios, setProprietarios] = useState<any[]>([{ uid: uid("prop"), proprietario: null }]);
+  const [proprietarios, setProprietarios] = useState<any[]>(inicial?.proprietarios || [{ uid: uid("prop"), entidade: null }]);
 
   // ---- Espécies Comercializadas (uma ou mais) ----
-  const [especies, setEspecies] = useState<any[]>([{ uid: uid("esp"), especie: null, capacidade: "" }]);
+  const [especies, setEspecies] = useState<any[]>(inicial?.especies || [{ uid: uid("esp"), especie: null, capacidade: "" }]);
   const [modalEspecieUid, setModalEspecieUid] = useState<string | null>(null);
 
   // ---- Funcionários (zero ou mais) ----
-  const [funcionarios, setFuncionarios] = useState<any[]>([]);
+  const [funcionarios, setFuncionarios] = useState<any[]>(inicial?.funcionarios || []);
   const [modalFuncUid, setModalFuncUid] = useState<string | null>(null);
 
   // ---- Localização ----
-  const [endereco, setEndereco] = useState<any>({
+  const [endereco, setEndereco] = useState<any>(inicial?.endereco || {
     zona: "", cep: "", estado: "Minas Gerais", municipio: "", bairro: "",
     endereco: "", numero: "", complemento: "", localidade: "", distrito: "",
     latitude: "", longitude: "",
   });
 
-  // ---- Geolocalização ----
-  const [formatoGeo, setFormatoGeo] = useState("DMS (graus, minutos, segundos)");
-  const [latitude, setLatitude] = useState("");
-  const [longitude, setLongitude] = useState("");
-
   // ---- Contatos ----
-  const [contato, setContato] = useState<any>({
+  const [contato, setContato] = useState<any>(inicial?.contato || {
     utilizarContatoProprietario: "Não", proprietariosSelecionados: [],
     emailFixo: "", emailFixoObs: "", telefoneFixo: "", telefoneFixoObs: "", contatosAdicionais: [],
   });
 
   // ---- Anexos / Observação ----
-  const [anexos, setAnexos] = useState<any[]>([]);
-  const [observacao, setObservacao] = useState("");
+  const [anexos, setAnexos] = useState<any[]>(inicial?.anexos || []);
+  const [observacao, setObservacao] = useState(inicial?.observacao || "");
 
   const [isSucesso, setIsSucesso] = useState(false);
 
-  return (
-    <div className="min-h-screen bg-[#f2f3f5]">
-      <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="revendedora-animais-vivos" hideSearch />
+  const montarRegistro = () => ({
+    id: dados?.id || inicial?.id || Date.now(),
+    codigo: dados?.codigo || inicial?.codigo || "3123659848",
+    nome: nomeComercial,
+    nomeComercial,
+    proprietarios,
+    especies,
+    funcionarios,
+    endereco,
+    municipio: endereco.municipio,
+    uf: endereco.estado === "Minas Gerais" ? "MG" : endereco.estado,
+    grupo: especies[0]?.especie?.grupo || "",
+    especie: especies[0]?.especie?.nome || "",
+    contato,
+    anexos,
+    observacao,
+  });
 
-      <main className="max-w-[1088px] mx-auto px-4 md:px-6 py-6 flex flex-col gap-4">
+  const concluir = () => {
+    if (isEdit) {
+      onNavigate("visualizar-revendedora-animais-vivos", montarRegistro());
+      return;
+    }
+    setIsSucesso(true);
+  };
+
+  const titulo = isView
+    ? "Visualizar Revendedora de Animais Vivos"
+    : isEdit
+      ? "Editar Revendedora de Animais Vivos"
+      : "Adicionar Revendedora de Animais Vivos";
+  const ContentContainer: any = embutido ? "div" : "main";
+
+  return (
+    <div className={embutido ? "contents" : "min-h-screen bg-[#f2f3f5]"}>
+      {!embutido && <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="revendedora-animais" hideSearch />}
+
+      <ContentContainer className={embutido ? "flex flex-col gap-4" : "max-w-[1088px] mx-auto px-4 md:px-6 py-6 flex flex-col gap-4"}>
         {/* Cabeçalho */}
-        <div>
-          <button type="button" onClick={() => onNavigate("revendedora-animais-vivos")} className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70" style={{ color: GREEN }}>
+        {!embutido && <div>
+          <button type="button" onClick={() => onNavigate("revendedora-animais")} className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70" style={{ color: GREEN }}>
             <ArrowLeft size={15} />
             Todas as Revendedoras de Animais Vivos
           </button>
           <div className="flex justify-between items-center w-full">
-            <h1 className="text-2xl font-semibold text-gray-900">Adicionar Revendedora de Animais Vivos</h1>
-            <button type="button" onClick={() => setIsSucesso(true)} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm">Adicionar</button>
+            <h1 className="text-2xl font-semibold text-gray-900">{titulo}</h1>
+            {isView ? (
+              <button type="button" onClick={() => onNavigate("editar-revendedora-animais", montarRegistro())} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2"><Pencil size={16} /> Editar</button>
+            ) : (
+              <button type="button" onClick={concluir} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm">{isEdit ? "Salvar" : "Adicionar"}</button>
+            )}
           </div>
-        </div>
+        </div>}
 
         {/* Banner de obrigatórios */}
-        <div className="w-full bg-white border border-gray-100 rounded-lg p-5 shadow-sm flex items-center gap-3 mt-4 mb-6">
+        {!embutido && !isView && <div className="w-full bg-white border border-gray-100 rounded-lg p-5 shadow-sm flex items-center gap-3 mt-4 mb-6">
           <div className="text-gray-500 flex-shrink-0"><Info size={20} className="stroke-[2.5]" /></div>
           <p className="text-sm text-gray-600 font-medium leading-relaxed">
             Campos indicados com <span className="text-red-500 font-bold">*</span> são obrigatórios e deverão ser preenchidos.
           </p>
-        </div>
+        </div>}
+
+        <fieldset disabled={isView} className={`border-0 p-0 m-0 min-w-0 flex flex-col gap-4 ${isView ? "poa-readonly" : ""}`}>
 
         {/* 1. Informações Básicas */}
         <Section title="Informações Básicas">
@@ -268,8 +357,8 @@ export function AdicionarRevendedoraAnimaisPage({ onLogout, onNavigate }: PagePr
             data={contato}
             onChange={(updated) => setContato((prev: any) => ({ ...prev, ...updated }))}
             proprietariosDisponiveis={proprietarios
-              .filter((p) => p.proprietario)
-              .map((p) => ({ id: p.uid, nome: p.proprietario.nome, cpf: p.proprietario.documento }))}
+              .filter((p) => p.entidade)
+              .map((p) => ({ id: p.uid, nome: p.entidade.nome, cpf: p.entidade.documento }))}
           />
         </Section>
 
@@ -309,7 +398,8 @@ export function AdicionarRevendedoraAnimaisPage({ onLogout, onNavigate }: PagePr
         <Section title="Observações">
           <LargeTextArea label="Observação" value={observacao} onChange={setObservacao} maxLength={1500} hasTooltip tooltipText="Informações adicionais pertinentes ao cadastro." />
         </Section>
-      </main>
+        </fieldset>
+      </ContentContainer>
 
       {/* Modal Espécie */}
       <SearchModal<EspecieEntidade>
@@ -355,8 +445,8 @@ export function AdicionarRevendedoraAnimaisPage({ onLogout, onNavigate }: PagePr
             <h3 className="text-lg font-bold text-gray-900">Revendedora cadastrada com sucesso!</h3>
             <p className="text-sm text-gray-500 mt-1">{nomeComercial ? `"${nomeComercial}"` : "A revendedora"} foi cadastrada.</p>
             <div className="flex gap-3 justify-center mt-6">
-              <button onClick={() => { setIsSucesso(false); onNavigate("revendedora-animais-vivos"); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition">Voltar</button>
-              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-revendedora-animais-vivos"); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
+              <button onClick={() => { setIsSucesso(false); onNavigate("revendedora-animais"); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition">Voltar</button>
+              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-revendedora-animais-vivos", montarRegistro()); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
             </div>
           </div>
         </div>

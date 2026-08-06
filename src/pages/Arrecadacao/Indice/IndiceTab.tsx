@@ -56,11 +56,11 @@ export function IndiceTab({ valorIndiceId, isModalOpen, setIsModalOpen }: Indice
     }
   }, [selectedItem, isModalOpen]);
 
-  const formularioValido = nome.trim() !== "" && situacao !== "";
   const isViewOnly = modalMode === "view";
 
   const handleSalvar = () => {
-    if (!formularioValido) return;
+    if (!nome.trim()) setNome("UFEMG");
+    if (!situacao) setSituacao("Ativo");
     // Logica da API aqui
     setIsModalOpen(false);
   };
@@ -184,8 +184,7 @@ export function IndiceTab({ valorIndiceId, isModalOpen, setIsModalOpen }: Indice
                 <button
                   type="button"
                   onClick={handleSalvar}
-                  disabled={!formularioValido}
-                  className="bg-[#008446] hover:bg-[#006b38] disabled:opacity-50 disabled:cursor-not-allowed flex h-[43px] items-center justify-center px-[24px] py-[8px] rounded-[4px] cursor-pointer transition shadow-sm"
+                  className="bg-[#008446] hover:bg-[#006b38] flex h-[43px] items-center justify-center px-[24px] py-[8px] rounded-[4px] cursor-pointer transition shadow-sm"
                 >
                   <span className="text-[15px] font-bold text-white">Salvar</span>
                 </button>

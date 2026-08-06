@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import {
-  ArrowLeft, ChevronUp, ChevronDown, Info, Check, Bug,
+  ArrowLeft, ChevronUp, ChevronDown, Info, Bug,
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
-import { FloatInput, FloatSelect, SearchModal } from "../../../components/ui/FormKit";
+import { FloatInput, FloatSelect, LargeTextArea, SearchModal } from "../../../components/ui/FormKit";
 import { DynamicListWrapper } from "../../../components/ui/EntitySearch";
 import * as Icons from "../../../imports/icons";
 
@@ -70,6 +70,7 @@ export function AdicionarCulturaPage({ onLogout, onNavigate }: PageProps) {
   // ---- Pragas (zero ou mais) ----
   const [pragas, setPragas] = useState<any[]>([]);
   const [modalPragaUid, setModalPragaUid] = useState<string | null>(null);
+  const [observacao, setObservacao] = useState("");
 
   const [isSucesso, setIsSucesso] = useState(false);
 
@@ -163,6 +164,10 @@ export function AdicionarCulturaPage({ onLogout, onNavigate }: PageProps) {
             )}
           </DynamicListWrapper>
         </Section>
+
+        <Section title="Observações">
+          <LargeTextArea label="Observações" value={observacao} onChange={setObservacao} />
+        </Section>
       </main>
 
       {/* Modal Praga (busca por nome científico ou popular) */}
@@ -188,12 +193,11 @@ export function AdicionarCulturaPage({ onLogout, onNavigate }: PageProps) {
       {isSucesso && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
-            <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4"><Check size={28} className="text-[#1A7A3C]" strokeWidth={3} /></div>
             <h3 className="text-lg font-bold text-gray-900">Cultura cadastrada com sucesso!</h3>
             <p className="text-sm text-gray-500 mt-1">{nome ? `"${nome}"` : "A cultura"} foi cadastrada.</p>
             <div className="flex gap-3 justify-center mt-6">
               <button onClick={() => { setIsSucesso(false); onNavigate("cultura"); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition">Voltar</button>
-              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-cultura", { nome, tipo, variedades, pragas, situacao: "Ativo" }); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
+              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-cultura", { nome, tipo, variedades, pragas, observacao, situacao: "Ativo" }); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
             </div>
           </div>
         </div>

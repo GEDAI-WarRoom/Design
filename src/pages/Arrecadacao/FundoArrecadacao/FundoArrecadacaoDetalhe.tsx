@@ -1,7 +1,6 @@
 import { useMemo, useState, useEffect, type ReactNode } from "react";
 import {
   ArrowLeft,
-  Check,
   CalendarClock,
   ChevronDown,
   ChevronLeft,
@@ -15,7 +14,6 @@ import {
   Hash,
   Info,
   MoreVertical,
-  Pencil,
   PlusCircle,
   X,
   Trash2
@@ -43,6 +41,7 @@ import {
   emptyContatos,
   emptyConvenio,
   emptyEndereco,
+  FUNDOS_ARRECADACAO_MOCK,
   SITUACOES,
   TIPOS_FUNDO,
   type Convenio,
@@ -139,9 +138,6 @@ function SuccessModal({ title, message, onBack, onView }: { title: string; messa
   return (
     <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/40 p-4">
       <div className="w-full max-w-md rounded-2xl bg-white p-6 text-center shadow-xl">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#E6F4EA]">
-          <Check size={28} className="text-[#1A7A3C]" strokeWidth={3} />
-        </div>
         <h2 className="text-lg font-bold text-gray-900">{title}</h2>
         <p className="mt-1 text-sm text-gray-500">{message}</p>
         <div className="mt-6 flex justify-center gap-3">
@@ -664,7 +660,13 @@ function ConveniosPanel({ fundo, setFundo, addSignal }: { fundo: FundoArrecadaca
 }
 
 function FundoArrecadacaoDetailPage({ mode, dados, onLogout, onNavigate }: PageProps & { mode: Mode }) {
-  const [fundo, setFundo] = useState<FundoDraft | FundoArrecadacao>(() => dados ? cloneFundo(dados) : newDraft());
+  const [fundo, setFundo] = useState<FundoDraft | FundoArrecadacao>(() =>
+    dados
+      ? cloneFundo(dados)
+      : mode === "add"
+        ? newDraft()
+        : cloneFundo(FUNDOS_ARRECADACAO_MOCK[0]),
+  );
   const [activeTab, setActiveTab] = useState("dados");
   const [addConvenioSignal, setAddConvenioSignal] = useState(0);
   const [savedFundo, setSavedFundo] = useState<FundoArrecadacao | null>(null);
@@ -679,9 +681,14 @@ function FundoArrecadacaoDetailPage({ mode, dados, onLogout, onNavigate }: PageP
   }, [fundo]);
 
   const saveFundo = () => {
-    if (!valid) return;
     if (mode === "add") {
-      const saved = adicionarFundo(fundo as FundoDraft);
+      const dadosCadastro = valid
+        ? fundo as FundoDraft
+        : (() => {
+          const { id: _id, nome: _nome, ...exemplo } = cloneFundo(FUNDOS_ARRECADACAO_MOCK[0]);
+          return exemplo;
+        })();
+      const saved = adicionarFundo(dadosCadastro);
       setSavedFundo(saved);
     } else {
       const saved = atualizarFundo(fundo as FundoArrecadacao);
@@ -709,10 +716,10 @@ function FundoArrecadacaoDetailPage({ mode, dados, onLogout, onNavigate }: PageP
               activeTab === "convenios" ? (
                 <button type="button" onClick={() => setAddConvenioSignal((n) => n + 1)} className="flex h-10 items-center gap-2 rounded-md bg-[#1A7A3C] px-5 text-xs font-bold text-white hover:bg-[#15612F]"><PlusCircle size={15} />Adicionar Convênio</button>
               ) : (
-                <button type="button" onClick={() => onNavigate("editar-fundo-arrecadacao", fundo)} className="flex h-10 items-center gap-2 rounded-md bg-[#1A7A3C] px-5 text-xs font-bold text-white hover:bg-[#15612F]"><Pencil size={15} />Editar</button>
+                <button type="button" onClick={() => onNavigate("editar-fundo-arrecadacao", fundo)} className="flex h-10 items-center rounded-md bg-[#1A7A3C] px-5 text-xs font-bold text-white hover:bg-[#15612F]">Editar</button>
               )
             ) : (
-              <button type="button" onClick={saveFundo} disabled={!valid} className="h-10 rounded-md bg-[#1A7A3C] px-5 text-xs font-bold text-white hover:bg-[#15612F] disabled:cursor-not-allowed disabled:opacity-50">{mode === "add" ? "Adicionar" : "Salvar"}</button>
+              <button type="button" onClick={saveFundo} className="h-10 rounded-md bg-[#1A7A3C] px-5 text-xs font-bold text-white hover:bg-[#15612F]">{mode === "add" ? "Adicionar" : "Salvar"}</button>
             )}
           </div>
         </div>

@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { ArrowLeft, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Eye, Pencil, Search, SlidersHorizontal, X } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatSelect } from "../../../components/ui/FormKit";
-import { CLASSIFICACOES_RECEITA, classificacaoLabel, RECEITAS_MOCK, Receita, SITUACOES_RECEITA } from "./receitaData";
+import { CLASSIFICACOES_RECEITA, classificacaoLabel, listarReceitas, Receita, SITUACOES_RECEITA } from "./receitaData";
 
 const GREEN = "#1A7A3C";
 type SortKey = "codigo" | "descricao" | "classificacao" | "situacao";
@@ -26,7 +26,7 @@ export function ReceitaPage({ onLogout, onNavigate }: { onLogout: () => void; on
 
   const hasFilter = Boolean(codigo || descricao || classificacao || situacao);
   const results = useMemo(() => {
-    const filtered = RECEITAS_MOCK.filter((item) =>
+    const filtered = listarReceitas().filter((item) =>
       (!codigo || item.codigo.includes(codigo)) &&
       (!descricao || item.descricao.toLowerCase().includes(descricao.toLowerCase())) &&
       (!classificacao || item.classificacao === classificacao) &&

@@ -1,11 +1,22 @@
 import { useMemo, useState } from "react";
-import { ArrowLeft, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Dna, Eye, Pencil, SlidersHorizontal, X } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Dna, Eye, Pencil, X } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
 import { FloatSelect } from "../../../components/ui/FormKit";
-import { ESPECIES_TAXA_MOCK, TAXAS_EMISSAO_GTA_MOCK, TIPOS_COBRANCA, formatarData, type EspecieTaxa, type TaxaEmissaoGta } from "./taxaEmissaoGtaData";
+import {
+  listarEspeciesTaxa,
+  TIPOS_COBRANCA,
+  formatarData,
+  listarTaxasEmissaoDocumentoSanitario,
+  type EspecieTaxa,
+  type TaxaEmissaoGta,
+} from "./taxaEmissaoGtaData";
 
-type SortKey = "especie" | "tipoCobranca" | "dataInicioVigencia" | "situacao";
+type SortKey =
+  | "especie"
+  | "tipoCobranca"
+  | "dataInicioVigencia"
+  | "situacao";
 
 const SITUACAO_OPTIONS = [
   { value: "Ativo", label: "Ativo" },
@@ -34,18 +45,23 @@ export function TaxaEmissaoGtaPage({ onLogout, onNavigate }: { onLogout: () => v
   const [page, setPage] = useState(1);
   const perPage = 10;
 
-  const hasFilter = Boolean(especie || tipoCobranca || situacao);
+  const hasFilter = Boolean(
+    especie || tipoCobranca || situacao,
+  );
 
   const results = useMemo(() => {
-    const filtered = TAXAS_EMISSAO_GTA_MOCK.filter((item) => {
-      const matchEspecie = !especie || item.especie.id === especie.id;
+    const filtered = listarTaxasEmissaoDocumentoSanitario().filter((item) => {
+      const matchEspecie =
+        !especie || item.especies.some((itemEspecie) => itemEspecie.id === especie.id);
       const matchTipoCobranca = !tipoCobranca || item.tipoCobranca === tipoCobranca;
 
-      // Obtém o valor da situação do item (com fallback se for booleano ou string)
-      const itemSituacao = (item as any).situacao || ((item as any).ativo ? "Ativo" : "Ativo");
-      const matchSituacao = !situacao || itemSituacao === situacao;
+      const matchSituacao = !situacao || item.situacao === situacao;
 
-      return matchEspecie && matchTipoCobranca && matchSituacao;
+      return (
+        matchEspecie &&
+        matchTipoCobranca &&
+        matchSituacao
+      );
     });
 
     if (!sortKey) return filtered;
@@ -54,11 +70,11 @@ export function TaxaEmissaoGtaPage({ onLogout, onNavigate }: { onLogout: () => v
       let second = "";
 
       if (sortKey === "especie") {
-        first = a.especie.nome;
-        second = b.especie.nome;
+        first = a.especies.map((item) => item.nome).join(", ");
+        second = b.especies.map((item) => item.nome).join(", ");
       } else if (sortKey === "situacao") {
-        first = (a as any).situacao || "Ativo";
-        second = (b as any).situacao || "Ativo";
+        first = a.situacao;
+        second = b.situacao;
       } else {
         first = a[sortKey] || "";
         second = b[sortKey] || "";
@@ -66,7 +82,13 @@ export function TaxaEmissaoGtaPage({ onLogout, onNavigate }: { onLogout: () => v
 
       return sortAsc ? first.localeCompare(second) : second.localeCompare(first);
     });
-  }, [especie, tipoCobranca, situacao, sortKey, sortAsc]);
+  }, [
+    especie,
+    tipoCobranca,
+    situacao,
+    sortKey,
+    sortAsc,
+  ]);
 
   const totalPages = Math.max(1, Math.ceil(results.length / perPage));
   const currentPage = Math.min(page, totalPages);
@@ -88,7 +110,7 @@ export function TaxaEmissaoGtaPage({ onLogout, onNavigate }: { onLogout: () => v
   const label = (key: SortKey) =>
   ({
     especie: "Espécie",
-    tipoCobranca: "Descrição da Taxa",
+    tipoCobranca: "Tipo de Cobrança",
     dataInicioVigencia: "Data Início de Vigência",
     situacao: "Situação",
   }[key]);
@@ -103,7 +125,7 @@ export function TaxaEmissaoGtaPage({ onLogout, onNavigate }: { onLogout: () => v
             Inicial
           </button>
           <div className="flex items-center justify-between gap-4">
-            <h1 className="text-2xl font-semibold text-gray-900">Taxa de Emissão de GTA</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">Taxa de Emissão de Documento Sanitário</h1>
             <button
               type="button"
               onClick={() => onNavigate("adicionar-taxa-emissao-gta")}
@@ -115,14 +137,14 @@ export function TaxaEmissaoGtaPage({ onLogout, onNavigate }: { onLogout: () => v
         </div>
 
         <section className="bg-white rounded-xl shadow-sm p-6 flex flex-col gap-5">
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 items-end gap-4 w-full">
+          <div className="grid w-full grid-cols-1 items-end gap-4 md:grid-cols-2 lg:grid-cols-4">
             {/* Filtro: Espécie */}
             <div className="w-full">
               <EntitySearchInput
                 label="Espécie"
                 placeholder="Busque por espécie ou grupo"
                 value={especie ? `${especie.nome}` : ""}
-                data={ESPECIES_TAXA_MOCK}
+                data={listarEspeciesTaxa()}
                 searchKeys={["codigo", "nome", "grupo"]}
                 columns={[
                   { label: "Espécie", key: "nome" },
@@ -132,6 +154,7 @@ export function TaxaEmissaoGtaPage({ onLogout, onNavigate }: { onLogout: () => v
                 onChange={(item) => {
                   setEspecie(item);
                   setError(false);
+                  setSearched(false);
                 }}
                 title="Buscar Espécie"
               />
@@ -145,6 +168,7 @@ export function TaxaEmissaoGtaPage({ onLogout, onNavigate }: { onLogout: () => v
                 onChange={(next) => {
                   setTipoCobranca(next);
                   setError(false);
+                  setSearched(false);
                 }}
                 options={TIPOS_COBRANCA}
               />
@@ -158,6 +182,7 @@ export function TaxaEmissaoGtaPage({ onLogout, onNavigate }: { onLogout: () => v
                 onChange={(next) => {
                   setSituacao(next);
                   setError(false);
+                  setSearched(false);
                 }}
                 options={SITUACAO_OPTIONS}
               />
@@ -177,9 +202,9 @@ export function TaxaEmissaoGtaPage({ onLogout, onNavigate }: { onLogout: () => v
 
           {hasFilter && (
             <div className="flex flex-wrap gap-2 animate-fadeIn">
-              {especie && <Chip label={`Espécie: ${especie.nome}`} onRemove={() => setEspecie(null)} />}
-              {tipoCobranca && <Chip label={`Tipo de Cobrança: ${tipoCobranca}`} onRemove={() => setTipoCobranca("")} />}
-              {situacao && <Chip label={`Situação: ${situacao}`} onRemove={() => setSituacao("")} />}
+              {especie && <Chip label={`Espécie: ${especie.nome}`} onRemove={() => { setEspecie(null); setSearched(false); }} />}
+              {tipoCobranca && <Chip label={`Tipo de Cobrança: ${tipoCobranca}`} onRemove={() => { setTipoCobranca(""); setSearched(false); }} />}
+              {situacao && <Chip label={`Situação: ${situacao}`} onRemove={() => { setSituacao(""); setSearched(false); }} />}
             </div>
           )}
 
@@ -205,22 +230,22 @@ export function TaxaEmissaoGtaPage({ onLogout, onNavigate }: { onLogout: () => v
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {rows.map((item: TaxaEmissaoGta) => {
-                    const statusText = (item as any).situacao || ((item as any).ativo === false ? "Inativo" : "Ativo");
-
                     return (
                       <tr key={item.id} className="hover:bg-gray-50/50 transition-colors">
-                        <td className="px-4 py-3.5 text-gray-800 font-medium">{item.especie.nome}</td>
+                        <td className="px-4 py-3.5 text-gray-800 font-medium">
+                          {item.especies.map((itemEspecie) => itemEspecie.nome).join(", ")}
+                        </td>
                         <td className="px-4 py-3.5 text-gray-700">{item.tipoCobranca}</td>
                         <td className="px-4 py-3.5 text-gray-700">{formatarData(item.dataInicioVigencia)}</td>
                         <td className="px-4 py-3.5 text-gray-700">
-                          {statusText}
+                          {item.situacao}
                         </td>
                         <td className="px-4 py-3.5">
                           <div className="flex justify-end gap-1">
                             <button
                               type="button"
                               onClick={() => onNavigate("visualizar-taxa-emissao-gta", item)}
-                              className="p-2 text-gray-600 hover:bg-gray-100 rounded-md transition"
+                              className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"
                               title="Visualizar"
                             >
                               <Eye size={18} />

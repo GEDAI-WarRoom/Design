@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import {
-  ArrowLeft, ChevronUp, ChevronDown, Info, Check, Trash2, PlusCircle, Download,
+  ArrowLeft, ChevronUp, ChevronDown, Info, Trash2, PlusCircle, Download,
   Leaf, Eye,
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
@@ -218,7 +218,7 @@ export function AdicionarUnidadeConsolidacaoPage({ onLogout, onNavigate }: PageP
                 label="Engenheiro Agrônomo/Florestal"
                 value={engenheiro}
                 onOpen={() => setModalEngenheiro(true)}
-                onEye={() => engenheiro && onNavigate("visualizar-profissional-area-vegetal", engenheiro)}
+                onEye={() => engenheiro && onNavigate("visualizar-profissional-vegetal", engenheiro)}
               />
             </SubGrupo>
 
@@ -227,7 +227,7 @@ export function AdicionarUnidadeConsolidacaoPage({ onLogout, onNavigate }: PageP
                 label="Responsável pela Emissão de PTV"
                 value={responsavelPtv}
                 onOpen={() => setModalPtv(true)}
-                onEye={() => responsavelPtv && onNavigate("visualizar-profissional-area-vegetal", responsavelPtv)}
+                onEye={() => responsavelPtv && onNavigate("visualizar-profissional-vegetal", responsavelPtv)}
               />
             </SubGrupo>
           </div>
@@ -329,12 +329,25 @@ export function AdicionarUnidadeConsolidacaoPage({ onLogout, onNavigate }: PageP
       {isSucesso && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
-            <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4"><Check size={28} className="text-[#1A7A3C]" strokeWidth={3} /></div>
             <h3 className="text-lg font-bold text-gray-900">Unidade de consolidação cadastrada com sucesso!</h3>
             <p className="text-sm text-gray-500 mt-1">{nome ? `"${nome}"` : "A unidade"} foi cadastrada.</p>
             <div className="flex gap-3 justify-center mt-6">
               <button onClick={() => { setIsSucesso(false); onNavigate("unidade-consolidacao"); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition">Voltar</button>
-              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-unidade-consolidacao"); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
+              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-unidade-consolidacao", {
+                nome,
+                localizacaoLivro,
+                proprietarios: proprietarios.map((item) => item.entidade || item.proprietario).filter(Boolean),
+                engenheiroNome: engenheiro?.nome,
+                engenheiroCpf: engenheiro?.cpf,
+                responsavelPtvNome: responsavelPtv?.nome,
+                responsavelPtvCpf: responsavelPtv?.cpf,
+                endereco,
+                municipio: endereco.municipio,
+                contato,
+                anexos,
+                observacao,
+                situacao: "Ativo",
+              }); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
             </div>
           </div>
         </div>

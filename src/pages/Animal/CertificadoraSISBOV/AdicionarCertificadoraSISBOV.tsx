@@ -184,14 +184,15 @@ export function AdicionarCertificadoraSISBOVPage({ onLogout, onNavigate }: PageP
             </div>
 
             <div className="grid grid-cols-1  gap-5">
-              <SimNao
+    <SimNao
       label="Possui Certificadora do Escritório?"
+      name="possui-certificadora-escritorio"
       required
       value={possuiCertEscritorio}
-      onChange={handlePossui} // 💡 Certifique-se de que a sua função salva "Sim" ou "Não" (ou true/false)
+      onChange={(valor: boolean) => handlePossui(valor ? "Sim" : "Não")}
     />
                
-            {possuiCertEscritorio && (
+            {possuiCertEscritorio === "Sim" && (
                 <CertificadoraInput
                  label="Certificadora do Escritório"
                   required
@@ -260,8 +261,8 @@ export function AdicionarCertificadoraSISBOVPage({ onLogout, onNavigate }: PageP
                 nome,
                 proprietario: proprietario?.nome, cnpj: proprietario?.documento,
                 responsavel: responsavel?.nome, cpf: responsavel?.documento,
-                credenciamento, status,
-                situacao: "Ativo",
+                credenciamento, status, possuiCertEscritorio,
+                certEscritorio, anexos, observacao,
               }); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
             </div>
           </div>

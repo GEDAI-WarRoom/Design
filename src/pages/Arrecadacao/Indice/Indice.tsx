@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { ArrowLeft, Search, SlidersHorizontal, ChevronLeft, ChevronRight, Eye as ViewIcon, Pencil, X } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatSelect } from "../../../components/ui/FormKit";
-import { MOCK_INDICES, SITUACOES_OPCOES } from "./indiceIndice";
+import { listarIndices, SITUACOES_OPCOES } from "./indiceIndice";
 
 const GREEN = "#1A7A3C";
 
@@ -36,7 +36,7 @@ export function Indice({ onLogout, onNavigate }: IndiceProps) {
     setPage(1);
   };
 
-  const filtrados = MOCK_INDICES.filter((item) => {
+  const filtrados = listarIndices().filter((item) => {
     const matchNome = nomeIndice.trim() === "" || item.nome.toLowerCase().includes(nomeIndice.trim().toLowerCase());
     const matchSituacao = situacaoFiltro === "" || item.situacao === situacaoFiltro;
     return matchNome && matchSituacao;

@@ -1,53 +1,74 @@
 import { useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Check } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
-import { RequiredFieldsNotice, TaxaEmissaoGtaForm, taxaValida } from "./TaxaEmissaoGtaForm";
-import { adicionarTaxaEmissaoGta, criarTaxaVazia } from "./taxaEmissaoGtaData";
+import {
+  RequiredFieldsNotice,
+  TaxaEmissaoGtaForm,
+  taxaValida,
+} from "./TaxaEmissaoGtaForm";
+import {
+  adicionarTaxaEmissaoGta,
+  criarTaxaVazia,
+  type TaxaEmissaoGta,
+} from "./taxaEmissaoGtaData";
 
-interface AdicionarTaxaEmissaoGtaPageProps {
+interface PageProps {
   onLogout: () => void;
   onNavigate: (screen: string, data?: any) => void;
 }
 
-export function AdicionarTaxaEmissaoGtaPage({ onLogout, onNavigate }: AdicionarTaxaEmissaoGtaPageProps) {
+export function AdicionarTaxaEmissaoGtaPage({
+  onLogout,
+  onNavigate,
+}: PageProps) {
   const [taxa, setTaxa] = useState(criarTaxaVazia);
-  const [error, setError] = useState("");
+  const [erro, setErro] = useState("");
+  const [taxaCriada, setTaxaCriada] = useState<TaxaEmissaoGta | null>(null);
 
   const salvar = () => {
-    const resultado = adicionarTaxaEmissaoGta(taxa);
-    if (resultado.erro) {
-      setError(resultado.erro);
+    if (!taxaValida(taxa)) {
+      setErro("Preencha todos os campos obrigatórios antes de prosseguir.");
       return;
     }
-    setError("");
 
-    // Redirecionamento direto para a tela de visualização conforme solicitado
-    if (resultado.taxa) {
-      onNavigate("visualizar-taxa-emissao-gta", resultado.taxa);
+    const resultado = adicionarTaxaEmissaoGta(taxa);
+    if (resultado.erro) {
+      setErro(resultado.erro);
+      return;
     }
+
+    setErro("");
+    setTaxaCriada(resultado.taxa ?? null);
   };
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
-      <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="taxa-emissao-gta" hideSearch />
+      <Navbar
+        onLogout={onLogout}
+        onNavigate={onNavigate}
+        currentScreen="taxa-emissao-gta"
+        hideSearch
+      />
 
-      <main className="max-w-[1088px] mx-auto px-4 md:px-6 py-6 flex flex-col gap-4">
+      <main className="mx-auto flex max-w-[1088px] flex-col gap-4 px-4 py-6 md:px-6">
         <div>
           <button
             type="button"
             onClick={() => onNavigate("taxa-emissao-gta")}
-            className="flex items-center gap-1 text-sm mb-3 font-semibold text-[#1A7A3C] hover:opacity-80 transition"
+            className="mb-3 flex items-center gap-1 text-sm font-semibold text-[#1A7A3C] transition hover:opacity-80"
           >
-            <ArrowLeft size={15} /> Todas as Taxas de Emissão de GTA
+            <ArrowLeft size={15} /> Todas as Taxas de Emissão de Documento
+            Sanitário
           </button>
 
           <div className="flex items-center justify-between gap-4">
-            <h1 className="text-2xl font-semibold text-gray-900">Adicionar Taxa de Emissão de GTA</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">
+              Adicionar Taxa de Emissão de Documento Sanitário
+            </h1>
             <button
               type="button"
               onClick={salvar}
-              disabled={!taxaValida(taxa)}
-              className="px-5 h-10 text-xs font-bold rounded-md text-white bg-[#1A7A3C] hover:bg-[#15612F] disabled:opacity-50 disabled:cursor-not-allowed transition"
+              className="h-10 rounded-md bg-[#1A7A3C] px-5 text-xs font-bold text-white transition hover:bg-[#15612F]"
             >
               Adicionar
             </button>
@@ -56,9 +77,9 @@ export function AdicionarTaxaEmissaoGtaPage({ onLogout, onNavigate }: AdicionarT
 
         <RequiredFieldsNotice />
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm font-medium text-red-700">
-            {error}
+        {erro && (
+          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+            {erro}
           </div>
         )}
 
@@ -66,10 +87,41 @@ export function AdicionarTaxaEmissaoGtaPage({ onLogout, onNavigate }: AdicionarT
           value={taxa}
           onChange={(next) => {
             setTaxa(next);
-            setError("");
+            setErro("");
           }}
         />
       </main>
+
+      {taxaCriada && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 p-4">
+          <div className="flex w-full max-w-md flex-col items-center rounded-2xl bg-white p-8 text-center shadow-xl">
+            <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-[#eaf4eb]">
+              <Check size={32} className="text-[#1A7A3C] stroke-[3]" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900">
+              Taxa de Emissão de Documento Sanitário cadastrada com sucesso!
+            </h2>
+            <div className="mt-8 flex w-full justify-center gap-4">
+              <button
+                type="button"
+                onClick={() => onNavigate("taxa-emissao-gta")}
+                className="h-11 rounded-md border border-[#1A7A3C] px-8 text-sm font-semibold text-[#1A7A3C]"
+              >
+                Voltar
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  onNavigate("visualizar-taxa-emissao-gta", taxaCriada)
+                }
+                className="h-11 rounded-md bg-[#1A7A3C] px-8 text-sm font-semibold text-white hover:bg-[#15612F]"
+              >
+                Visualizar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

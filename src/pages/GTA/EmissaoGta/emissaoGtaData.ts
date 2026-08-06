@@ -1,3 +1,17 @@
+import {
+  listarColecaoMock,
+  proximoIdNumerico,
+  salvarColecaoMock,
+} from "../../../mocks/mockDatabase";
+import { listarEspeciesParaGta } from "../../Animal/Especie/especieData";
+import { obterItemReceita } from "../../Arrecadacao/ItemReceita/itemReceitaData";
+import { obterValorVigenteIndice } from "../../Arrecadacao/ValorIndice/valorIndiceData";
+import { listarFinalidadesParaGta } from "../FinalidadeTransito/finalidadeTransitoData";
+import {
+  listarTaxasEmissaoDocumentoSanitario,
+  type ItemReceitaTaxa,
+} from "../TaxaEmissaoGta/taxaEmissaoGtaData";
+
 export type TipoFormularioGta = "Manual" | "Digital";
 export type TipoLocalGta =
   | "Estabelecimento Agropecuário"
@@ -18,7 +32,7 @@ export interface EntidadeGta {
 }
 
 export interface EspecieGta extends EntidadeGta {
-  grupo: "Bovídeos" | "Equídeos" | "Aves" | "Suídeos" | "Abelhas";
+  grupo: string;
   possuiSexoDefinido: boolean;
   possuiNucleo: boolean;
   faixasEtarias: string[];
@@ -65,7 +79,6 @@ export interface DestinoGta extends LocalGta {
   municipio: string;
   responsavelExterno: string;
   documentoResponsavelExterno: string;
-  codigoLocal: string;
   estabelecimentoExterno: string;
   codigoEstabelecimentoExterno: string;
   codigoExploracaoExterna: string;
@@ -126,10 +139,10 @@ export interface EmissaoGtaFormValue {
   procedencia: LocalGta;
   destino: DestinoGta;
   meiosTransporte: string[];
-  placaVeiculo: string;
   possuiParadaDescanso: "Sim" | "Não";
   enderecoParadaDescanso?: EnderecoParadaDescanso; // 👈 Adicione esta linha (com ? se opcional)
   faixasAnimais: FaixaAnimalGta[];
+  possuiMotivoIsencaoTaxa: "Sim" | "Não" | "";
   motivoIsencaoTaxa: EntidadeGta | null;
   valorGta: number;
   dataRaivaPrimeiraEtapa: string;
@@ -153,6 +166,8 @@ export interface EmissaoGta extends EmissaoGtaFormValue {
   justificativaValidade: string;
   motivoCancelamento: EntidadeGta | null;
   observacaoCancelamento: string;
+  horaEmissao?: string;
+  codigoAutenticidade?: string;
 }
 
 export const TIPOS_FORMULARIO_GTA = ["Manual", "Digital"].map((valor) => ({
@@ -193,8 +208,8 @@ export const ESPECIES_GTA: EspecieGta[] = [
   {
     id: 2,
     codigo: "ESP-002",
-    nome: "Equino",
-    grupo: "Equídeos",
+    nome: "Bubalino",
+    grupo: "Bovídeos",
     possuiSexoDefinido: true,
     possuiNucleo: false,
     faixasEtarias: ["De 0 a 12 meses", "Acima de 12 meses"],
@@ -202,11 +217,11 @@ export const ESPECIES_GTA: EspecieGta[] = [
   {
     id: 3,
     codigo: "ESP-003",
-    nome: "Aves",
-    grupo: "Aves",
+    nome: "Equino",
+    grupo: "Equídeos",
     possuiSexoDefinido: true,
-    possuiNucleo: true,
-    faixasEtarias: ["Pintos de 1 dia", "Jovens", "Adultas"],
+    possuiNucleo: false,
+    faixasEtarias: ["De 0 a 12 meses", "Acima de 12 meses"],
   },
   {
     id: 4,
@@ -220,6 +235,15 @@ export const ESPECIES_GTA: EspecieGta[] = [
   {
     id: 5,
     codigo: "ESP-005",
+    nome: "Galinha",
+    grupo: "Aves",
+    possuiSexoDefinido: true,
+    possuiNucleo: true,
+    faixasEtarias: ["Pintos de 1 dia", "Jovens", "Adultas"],
+  },
+  {
+    id: 6,
+    codigo: "ESP-006",
     nome: "Abelha com Ferrão",
     grupo: "Abelhas",
     possuiSexoDefinido: false,
@@ -235,6 +259,14 @@ export const FINALIDADES_GTA: EntidadeGta[] = [
   { id: 4, codigo: "FIN-004", nome: "Evento" },
 ];
 
+export function listarEspeciesGta(): EspecieGta[] {
+  return listarEspeciesParaGta();
+}
+
+export function listarFinalidadesGta(especieId?: number): EntidadeGta[] {
+  return listarFinalidadesParaGta(especieId);
+}
+
 export const PESSOAS_GTA: EntidadeGta[] = [
   { id: 1, nome: "José Aarão Neto", documento: "055.145.986-99" },
   { id: 2, nome: "Maria Silva Mendes", documento: "444.111.222-33" },
@@ -246,7 +278,7 @@ export const PESSOAS_GTA: EntidadeGta[] = [
 ];
 
 export const ESTABELECIMENTOS_GTA: EntidadeGta[] = [
-  { id: 1, codigo: "31002030039", nome: "Fazenda Recanto dos Pássaros", municipio: "Lavras - MG", proprietarios: "Carlos Henrique Souza" },
+  { id: 1, codigo: "31002030039", nome: "[INTERDITADO] Fazenda Recanto dos Pássaros", municipio: "Lavras - MG", proprietarios: "Carlos Henrique Souza" },
   { id: 2, codigo: "31002030040", nome: "Granja Vale Verde", municipio: "Nepomuceno - MG", proprietarios: "Marcos Silva, Ana Paula Nunes" },
   { id: 3, codigo: "31002030041", nome: "Fazenda Santa Rita", municipio: "Ijaci - MG", proprietarios: "Maria Oliveira" },
 ];
@@ -259,7 +291,7 @@ export const ESTABELECIMENTOS_INTERDITADOS_GTA: Record<string, {
   status: string[];
   observacao: string;
 }> = {
-  "Fazenda Recanto dos Pássaros": {
+  "[INTERDITADO] Fazenda Recanto dos Pássaros": {
     inicio: "20/02/2026",
     validade: "20/05/2026",
     status: [
@@ -310,6 +342,26 @@ export const EXPLORACOES_GTA: ExploracaoGta[] = [
     especie: "Suínos",
     produtores: "Maria Oliveira",
   },
+  {
+    id: 4,
+    codigo: "310020300411004",
+    nome: "Exploração Bovinos - Santa Rita",
+    estabelecimentoId: 3,
+    responsavelId: 2,
+    especieId: 1,
+    especie: "Bovinos",
+    produtores: "Maria Oliveira",
+  },
+  {
+    id: 5,
+    codigo: "310020300401005",
+    nome: "Exploração Suínos - Vale Verde",
+    estabelecimentoId: 2,
+    responsavelId: 3,
+    especieId: 4,
+    especie: "Suínos",
+    produtores: "Marcos Silva, Ana Paula Nunes",
+  },
 ];
 
 export const NUCLEOS_GTA: NucleoGta[] = [
@@ -338,6 +390,10 @@ export const NUCLEOS_GTA: NucleoGta[] = [
     classificacao: "Ciclo Completo",
   },
 ];
+
+export const NUCLEOS_EXTERNOS_GTA: Record<string, string> = {
+  "33009457901392301": "Núcleo 09",
+};
 
 export const FRIGORIFICOS_GTA: EntidadeGta[] = [
   { id: 1, codigo: "33013646850", nome: "Frigorífico Vale da Sapucaí Ltda" },
@@ -414,10 +470,32 @@ export const ESTADOS_BRASIL = [
 ];
 
 export const MUNICIPIOS_POR_ESTADO: Record<string, string[]> = {
-  Goiás: ["Anápolis", "Goiânia", "Rio Verde"],
-  "Rio de Janeiro": ["Campos dos Goytacazes", "Rio de Janeiro", "Volta Redonda"],
-  "São Paulo": ["Campinas", "Sorocaba", "Valinhos"],
+  Acre: ["Cruzeiro do Sul", "Rio Branco"],
+  Alagoas: ["Arapiraca", "Maceió"],
+  Amapá: ["Macapá", "Santana"],
+  Amazonas: ["Manaus", "Parintins"],
   Bahia: ["Feira de Santana", "Salvador", "Vitória da Conquista"],
+  Ceará: ["Fortaleza", "Juazeiro do Norte"],
+  "Distrito Federal": ["Brasília", "Taguatinga"],
+  "Espírito Santo": ["Vila Velha", "Vitória"],
+  Goiás: ["Anápolis", "Goiânia", "Rio Verde"],
+  Maranhão: ["Imperatriz", "São Luís"],
+  "Mato Grosso": ["Cuiabá", "Rondonópolis"],
+  "Mato Grosso do Sul": ["Campo Grande", "Dourados"],
+  Pará: ["Belém", "Santarém"],
+  Paraíba: ["Campina Grande", "João Pessoa"],
+  Paraná: ["Curitiba", "Londrina"],
+  Pernambuco: ["Caruaru", "Recife"],
+  Piauí: ["Parnaíba", "Teresina"],
+  "Rio de Janeiro": ["Campos dos Goytacazes", "Rio de Janeiro", "Volta Redonda"],
+  "Rio Grande do Norte": ["Mossoró", "Natal"],
+  "Rio Grande do Sul": ["Caxias do Sul", "Porto Alegre"],
+  Rondônia: ["Ji-Paraná", "Porto Velho"],
+  Roraima: ["Boa Vista", "Rorainópolis"],
+  "Santa Catarina": ["Florianópolis", "Joinville"],
+  "São Paulo": ["Campinas", "Sorocaba", "Valinhos"],
+  Sergipe: ["Aracaju", "Itabaiana"],
+  Tocantins: ["Araguaína", "Palmas"],
 };
 
 export const MEIOS_TRANSPORTE = [
@@ -447,7 +525,6 @@ export const criarDestinoVazio = (): DestinoGta => ({
   municipio: "",
   responsavelExterno: "",
   documentoResponsavelExterno: "",
-  codigoLocal: "",
   estabelecimentoExterno: "",
   codigoEstabelecimentoExterno: "",
   codigoExploracaoExterna: "",
@@ -490,9 +567,9 @@ export function criarEmissaoGtaVazia(): EmissaoGtaFormValue {
     procedencia: criarLocalVazio(),
     destino: criarDestinoVazio(),
     meiosTransporte: [],
-    placaVeiculo: "",
     possuiParadaDescanso: "Não",
     faixasAnimais: [],
+    possuiMotivoIsencaoTaxa: "",
     motivoIsencaoTaxa: null,
     valorGta: 0,
     dataRaivaPrimeiraEtapa: "2025-03-25",
@@ -519,8 +596,8 @@ function criarRegistroInicial(
     ...criarLocalVazio(),
     tipo: "Estabelecimento Agropecuário",
     responsavel: PESSOAS_GTA[0],
-    estabelecimento: ESTABELECIMENTOS_GTA[0],
-    exploracao: EXPLORACOES_GTA[0],
+    estabelecimento: ESTABELECIMENTOS_GTA[1],
+    exploracao: EXPLORACOES_GTA[1],
   };
   const destino: DestinoGta = {
     ...criarDestinoVazio(),
@@ -531,6 +608,7 @@ function criarRegistroInicial(
   };
   return {
     ...form,
+    possuiMotivoIsencaoTaxa: "Não",
     id,
     serieNumero,
     tipoFormulario: id === 1 ? "Digital" : "Manual",
@@ -539,7 +617,6 @@ function criarRegistroInicial(
     procedencia,
     destino,
     meiosTransporte: ["Rodoviário"],
-    placaVeiculo: "ABC1D23",
     faixasAnimais: criarFaixasAnimais(especie).map((item, index) => ({
       ...item,
       animaisGta: index < 2 ? 5 : 0,
@@ -554,38 +631,100 @@ function criarRegistroInicial(
     justificativaValidade: "",
     motivoCancelamento: null,
     observacaoCancelamento: "",
+    horaEmissao: situacao === "Emitida" ? "14:30" : "",
+    codigoAutenticidade: `31${String(184526 + id - 1).padStart(18, "0")}`,
   };
 }
 
 export const EMISSOES_GTA_MOCK: EmissaoGta[] = [
   criarRegistroInicial(1, "MG - 184526", ESPECIES_GTA[0], FINALIDADES_GTA[0], "Gravada"),
-  criarRegistroInicial(2, "MG - 184527", ESPECIES_GTA[1], FINALIDADES_GTA[3], "Emitida"),
+  criarRegistroInicial(2, "MG - 184527", ESPECIES_GTA[2], FINALIDADES_GTA[3], "Emitida"),
+  criarRegistroInicial(3, "MG - 184528", ESPECIES_GTA[3], FINALIDADES_GTA[0], "Gravada"),
+  criarRegistroInicial(4, "MG - 184529", ESPECIES_GTA[4], FINALIDADES_GTA[1], "Gravada"),
+  criarRegistroInicial(5, "MG - 184530", ESPECIES_GTA[0], FINALIDADES_GTA[2], "Emitida"),
 ];
 
-let proximoId = 3;
-let proximoNumero = 184528;
+const COLECAO = "emissoes-gta";
+
+export function listarEmissoesGta() {
+  return listarColecaoMock(COLECAO, EMISSOES_GTA_MOCK);
+}
+
+function salvarEmissaoGta(registro: EmissaoGta) {
+  const emissoes = listarEmissoesGta();
+  salvarColecaoMock(
+    COLECAO,
+    emissoes.some((item) => item.id === registro.id)
+      ? emissoes.map((item) => (item.id === registro.id ? registro : item))
+      : [registro, ...emissoes],
+  );
+  return registro;
+}
+
+function valorUnitarioItemTaxa(itemTaxa: ItemReceitaTaxa | null) {
+  if (!itemTaxa) return 0;
+  const item = obterItemReceita(Number(itemTaxa.id));
+  if (!item) return 0;
+  const vigente = obterValorVigenteIndice(item.indiceId, new Date().toISOString().slice(0, 10));
+  return item.quantidadeIndice * (vigente?.valor ?? 0);
+}
+
+export function calcularValorGta(form: EmissaoGtaFormValue) {
+  if (form.motivoIsencaoTaxa || !form.especie) return 0;
+  const animais = totalAnimaisGta(form);
+  const hoje = new Date().toISOString().slice(0, 10);
+  const taxa = listarTaxasEmissaoDocumentoSanitario()
+    .filter((item) => item.situacao === "Ativo" && item.tipoDocumentoSanitario === "GTA" && item.especie.id === form.especie?.id && item.dataInicioVigencia <= hoje)
+    .sort((a, b) => b.dataInicioVigencia.localeCompare(a.dataInicioVigencia))[0];
+  if (!taxa) return 0;
+
+  if (taxa.tipoCobranca === "Por Cabeça") return animais * valorUnitarioItemTaxa(taxa.itemReceita);
+  if (taxa.tipoCobranca === "Por Documento") return valorUnitarioItemTaxa(taxa.itemReceita);
+  if (taxa.tipoCobranca === "Por Lotes") {
+    const tamanho = Math.max(1, Number(taxa.tamanhoLote));
+    return Math.ceil(animais / tamanho) * valorUnitarioItemTaxa(taxa.itemReceitaLote);
+  }
+
+  const limite = Math.max(0, Number(taxa.limiteFaixa));
+  const ate = Math.min(animais, limite);
+  const acima = Math.max(0, animais - limite);
+  const multiplicador = (quantidade: number, modalidade: string) =>
+    modalidade === "Cobrar por Documento" ? (quantidade > 0 ? 1 : 0) : quantidade;
+  return (
+    multiplicador(ate, taxa.cobrancaAteLimite) * valorUnitarioItemTaxa(taxa.itemReceitaAteLimite) +
+    multiplicador(acima, taxa.cobrancaAcimaLimite) * valorUnitarioItemTaxa(taxa.itemReceitaAcimaLimite)
+  );
+}
 
 export function adicionarEmissaoGta(form: EmissaoGtaFormValue): EmissaoGta {
+  const emissoes = listarEmissoesGta();
+  const proximoNumero = Math.max(
+    184530,
+    ...emissoes.map((item) => Number(item.serieNumero.match(/\d+/g)?.at(-1) ?? 0)),
+  ) + 1;
+  const valorCalculado = calcularValorGta(form);
   const nova: EmissaoGta = {
     ...form,
-    id: proximoId++,
-    serieNumero: `MG - ${String(proximoNumero++).padStart(6, "0")}`,
+    id: proximoIdNumerico(emissoes),
+    serieNumero: `MG - ${String(proximoNumero).padStart(6, "0")}`,
     dataEmissao: new Date().toISOString().slice(0, 10),
     situacao: "Gravada",
-    necessitaPagamento: !form.motivoIsencaoTaxa,
-    valorGta: form.motivoIsencaoTaxa ? 0 : form.valorGta || 8.56,
+    necessitaPagamento: !form.motivoIsencaoTaxa && valorCalculado > 0,
+    valorGta: valorCalculado,
     dataValidade: "",
     justificativaValidade: "",
     motivoCancelamento: null,
     observacaoCancelamento: "",
+    horaEmissao: "",
+    codigoAutenticidade: "",
   };
-  EMISSOES_GTA_MOCK.unshift(nova);
-  return nova;
+  return salvarEmissaoGta(nova);
 }
 
 export function obterEmissaoGta(id?: number | null) {
-  if (id == null) return EMISSOES_GTA_MOCK[0] ?? null;
-  return EMISSOES_GTA_MOCK.find((item) => item.id === id) ?? null;
+  const emissoes = listarEmissoesGta();
+  if (id == null) return emissoes[0] ?? null;
+  return emissoes.find((item) => item.id === id) ?? null;
 }
 
 export function copiarEmissaoGta(registro: EmissaoGta): EmissaoGtaFormValue {
@@ -599,6 +738,8 @@ export function copiarEmissaoGta(registro: EmissaoGta): EmissaoGtaFormValue {
     justificativaValidade: _justificativaValidade,
     motivoCancelamento: _motivoCancelamento,
     observacaoCancelamento: _observacaoCancelamento,
+    horaEmissao: _horaEmissao,
+    codigoAutenticidade: _codigoAutenticidade,
     ...form
   } = registro;
   return {
@@ -614,9 +755,7 @@ export function pagarEmissaoGta(id: number) {
   const registro = obterEmissaoGta(id);
   if (!registro || registro.situacao !== "Gravada" || !registro.necessitaPagamento)
     return registro;
-  registro.situacao = "Paga";
-  registro.necessitaPagamento = false;
-  return registro;
+  return salvarEmissaoGta({ ...registro, situacao: "Paga", necessitaPagamento: false });
 }
 
 export function emitirEmissaoGta(
@@ -626,11 +765,31 @@ export function emitirEmissaoGta(
 ) {
   const registro = obterEmissaoGta(id);
   if (!registro || registro.situacao === "Cancelada") return null;
-  registro.situacao = "Emitida";
-  registro.dataValidade = dataValidade;
-  registro.justificativaValidade = justificativaValidade;
-  registro.necessitaPagamento = false;
-  return registro;
+  const agora = new Date();
+  const horaEmissao = new Intl.DateTimeFormat("pt-BR", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(agora);
+  const codigoAutenticidade = [
+    "31",
+    String(registro.id).padStart(8, "0"),
+    agora.getFullYear(),
+    String(agora.getMonth() + 1).padStart(2, "0"),
+    String(agora.getDate()).padStart(2, "0"),
+    String(agora.getHours()).padStart(2, "0"),
+    String(agora.getMinutes()).padStart(2, "0"),
+  ].join("");
+  return salvarEmissaoGta({
+    ...registro,
+    situacao: "Emitida",
+    dataEmissao: agora.toISOString().slice(0, 10),
+    dataValidade,
+    justificativaValidade,
+    necessitaPagamento: false,
+    horaEmissao,
+    codigoAutenticidade,
+  });
 }
 
 export function cancelarEmissaoGta(
@@ -640,11 +799,7 @@ export function cancelarEmissaoGta(
 ) {
   const registro = obterEmissaoGta(id);
   if (!registro || registro.situacao === "Cancelada") return null;
-  registro.situacao = "Cancelada";
-  registro.motivoCancelamento = motivo;
-  registro.observacaoCancelamento = observacao;
-  registro.necessitaPagamento = false;
-  return registro;
+  return salvarEmissaoGta({ ...registro, situacao: "Cancelada", motivoCancelamento: motivo, observacaoCancelamento: observacao, necessitaPagamento: false });
 }
 
 export function formatarDataGta(data: string) {

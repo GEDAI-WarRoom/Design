@@ -24,14 +24,15 @@ interface Praga {
   codigo: string;
   nomeCientifico: string;
   nomePopular: string;
+  observacao: string;
   situacao: "Ativo" | "Inativo";
 }
 
 const PRAGAS_MOCK: Praga[] = [
-  { id: 1, codigo: "112", nomeCientifico: "Cerodirphia rubripes", nomePopular: "Lagarta-Verde", situacao: "Ativo" },
-  { id: 2, codigo: "113", nomeCientifico: "Spodoptera frugiperda", nomePopular: "Lagarta-do-cartucho", situacao: "Ativo" },
-  { id: 3, codigo: "114", nomeCientifico: "Hypothenemus hampei", nomePopular: "Broca-do-café", situacao: "Inativo" },
-  { id: 4, codigo: "115", nomeCientifico: "Acalymma sp.", nomePopular: "Vaquinha", situacao: "Ativo" },
+  { id: 1, codigo: "112", nomeCientifico: "Cerodirphia rubripes", nomePopular: "Lagarta-Verde", observacao: "Praga desfolhadora monitorada em culturas hospedeiras.", situacao: "Ativo" },
+  { id: 2, codigo: "113", nomeCientifico: "Spodoptera frugiperda", nomePopular: "Lagarta-do-cartucho", observacao: "Praga de importância econômica para a cultura do milho.", situacao: "Ativo" },
+  { id: 3, codigo: "114", nomeCientifico: "Hypothenemus hampei", nomePopular: "Broca-do-café", observacao: "Cadastro inativo mantido para consulta histórica.", situacao: "Inativo" },
+  { id: 4, codigo: "115", nomeCientifico: "Acalymma sp.", nomePopular: "Vaquinha", observacao: "Inseto-praga associado a diferentes culturas anuais.", situacao: "Ativo" },
 ];
 
 // ==========================================================

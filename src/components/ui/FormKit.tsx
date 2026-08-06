@@ -111,6 +111,7 @@ export function FloatInput({
 
 	return (
 		<div
+			data-form-control
 			onClick={(e) => {
 				if (disabled) return;
 				if (isCalendar) {
@@ -248,6 +249,7 @@ export function FloatSelect({
 
 	return (
 		<div
+			data-form-control
 			ref={containerRef}
 			onClick={() => !disabled && setIsOpen(!isOpen)}
 			className={`relative border rounded-md h-12 flex items-end px-3 pb-1.5 transition-all select-none ${className} 
@@ -516,6 +518,7 @@ export function LargeTextArea({
 }: TextAreaProps) {
 	return (
 		<div
+			data-form-control
 			className={`relative border rounded-md p-4 transition-all 
       ${disabled ? "bg-gray-50 border-gray-200 cursor-not-allowed" : "bg-white border-gray-200 focus-within:border-[#1A7A3C] focus-within:ring-1 focus-within:ring-[#1A7A3C]"}`}>
 			<div className="flex items-center gap-1.5 text-[12px] text-gray-400 font-medium mb-1 tracking-wide relative w-fit">

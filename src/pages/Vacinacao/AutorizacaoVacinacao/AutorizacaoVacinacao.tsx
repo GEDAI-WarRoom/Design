@@ -212,7 +212,7 @@ export function AutorizacaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
-      <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="autorizacao-vacina" hideSearch />
+      <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="autorizacao-vacinacao" hideSearch />
 
       <main className="max-w-[1300px] mx-auto px-4 md:px-6 py-6">
         {/* Topo da Página */}
@@ -409,8 +409,8 @@ export function AutorizacaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
                         <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">{e.situacao} </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-1 justify-end">
-                            <button onClick={() => onNavigate("visualizar-autorizacao-vacina", e)} className="p-2 rounded-md hover:bg-green-50 transition" style={{ color: GREEN }} title="Visualizar"><ViewIcon size={18} /></button>
-                            <button onClick={() => onNavigate("editar-autorizacao-vacina", e)} className="p-2 rounded-md hover:bg-green-50 transition" style={{ color: GREEN }} title="Editar"><Pencil size={17} /></button>
+                            <button onClick={() => onNavigate("visualizar-autorizacao-vacinacao", e)} className="p-2 rounded-md hover:bg-green-50 transition" style={{ color: GREEN }} title="Visualizar"><ViewIcon size={18} /></button>
+                            <button onClick={() => onNavigate("editar-autorizacao-vacinacao", e)} className="p-2 rounded-md hover:bg-green-50 transition" style={{ color: GREEN }} title="Editar"><Pencil size={17} /></button>
                           </div>
                         </td>
                       </tr>

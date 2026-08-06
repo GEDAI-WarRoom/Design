@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ArrowLeft, Info, Check, ChevronDown, ChevronUp, Dna, Route, Eye, RotateCcw, Minus, Plus, Calendar, Syringe, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
-import { FloatInput, FloatSelect, LargeTextArea, UploadField } from "../../../components/ui/FormKit";
+import { FloatInput, FloatSelect, LargeTextArea, SimNao, UploadField } from "../../../components/ui/FormKit";
 import {
   DynamicListWrapper,
   EntitySearchInput,
@@ -348,6 +348,7 @@ export function AdicionarEmissaoATAPage({ dados, onLogout, onNavigate }: { dados
   // INICIALIZADOS COM ARRAY VAZIO [] PARA SEREM "ZERO OR MORE"
   const [atestados, setAtestados] = useState<{ id: string; tipo: string; arquivo: string }[]>([]);
   const [motivoIsencao, setMotivoIsencao] = useState<any>(null);
+  const [possuiMotivoIsencao, setPossuiMotivoIsencao] = useState<boolean | "">("");
   const [outrasVacinas, setOutrasVacinas] = useState<{ id: string; vacina: string; data: string }[]>([]);
 
   // Estado para as faixas de animais da AdjustmentTable
@@ -372,6 +373,9 @@ export function AdicionarEmissaoATAPage({ dados, onLogout, onNavigate }: { dados
     nucleoProc &&
     !interdicaoInfo
   );
+  const informacoesAtaValidas =
+    possuiMotivoIsencao !== "" &&
+    (possuiMotivoIsencao === false || Boolean(motivoIsencao));
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
@@ -383,10 +387,10 @@ export function AdicionarEmissaoATAPage({ dados, onLogout, onNavigate }: { dados
             <ArrowLeft size={15} /> Todas as ATAs
           </button>
           <div className="flex justify-between items-center w-full">
-            <h1 className="text-2xl font-semibold text-gray-900">{isEdicao ? "Editar ATA" : "Emitir Nova ATA"}</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">{"Emitir ATA"}</h1>
             <button
               type="button"
-              disabled={Boolean(interdicaoInfo) || !procedenciaConcluida}
+              disabled={Boolean(interdicaoInfo) || !procedenciaConcluida || !informacoesAtaValidas}
               onClick={() => {
                 if (interdicaoInfo) {
                   setModalInterdicao(true);
@@ -394,7 +398,7 @@ export function AdicionarEmissaoATAPage({ dados, onLogout, onNavigate }: { dados
                 }
                 setIsSucesso(true);
               }}
-              className={`px-5 h-10 text-xs font-bold rounded-md transition shadow-sm ${interdicaoInfo || !procedenciaConcluida
+              className={`px-5 h-10 text-xs font-bold rounded-md transition shadow-sm ${interdicaoInfo || !procedenciaConcluida || !informacoesAtaValidas
                 ? "bg-gray-200 text-gray-400 cursor-not-allowed"
                 : "bg-[#1A7A3C] hover:bg-[#15612F] text-white"
                 }`}
@@ -869,20 +873,34 @@ export function AdicionarEmissaoATAPage({ dados, onLogout, onNavigate }: { dados
             </Section>
 
             <Section title="Informações da ATA">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <EntitySearchInput
-                  label="Motivo de Isenção de Taxa"
-                  placeholder="Buscar motivo de isenção"
-                  value={motivoIsencao ? motivoIsencao.nome : ""}
-                  data={ISENCOES_MOCK}
-                  searchKeys={["nome"]}
-                  columns={[{ label: "Motivo", key: "nome" }]}
-                  title="Buscar Motivo de Isenção de Taxa"
-                  subtitle="Busque por um motivo de isenção cadastrado no sistema:"
-                  onChange={(ent: any) => setMotivoIsencao(ent)}
-                  icon={<img src={Icons.iconeIsencaoTaxaUrl} alt="Isenção" className="w-5 h-5 object-contain" />}
+              <div className="flex flex-col gap-5">
+                <SimNao
+                  label="Possui motivo de isenção de taxa de ATA?"
+                  name="possuiMotivoIsencaoAta"
+                  required
+                  value={possuiMotivoIsencao}
+                  onChange={(possui) => {
+                    setPossuiMotivoIsencao(possui);
+                    if (!possui) setMotivoIsencao(null);
+                  }}
                 />
-                <FloatInput label="Valor da ATA" value={motivoIsencao ? "R$ 0,00" : "R$ 8,56"} disabled />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  {possuiMotivoIsencao === true && (
+                    <EntitySearchInput
+                      label="Motivo de Isenção de Taxa"
+                      placeholder="Buscar motivo de isenção"
+                      value={motivoIsencao ? motivoIsencao.nome : ""}
+                      data={ISENCOES_MOCK}
+                      searchKeys={["nome"]}
+                      columns={[{ label: "Motivo", key: "nome" }]}
+                      title="Buscar Motivo de Isenção de Taxa"
+                      subtitle="Busque por um motivo de isenção cadastrado no sistema:"
+                      onChange={(ent: any) => setMotivoIsencao(ent)}
+                      icon={<img src={Icons.iconeIsencaoTaxaUrl} alt="Isenção" className="w-5 h-5 object-contain" />}
+                    />
+                  )}
+                  <FloatInput label="Valor da ATA" value={motivoIsencao ? "R$ 0,00" : "R$ 8,56"} disabled />
+                </div>
               </div>
             </Section>
 
@@ -909,11 +927,11 @@ export function AdicionarEmissaoATAPage({ dados, onLogout, onNavigate }: { dados
               {/* Valor / Liquidação */}
               <div className="relative z-10">
                 <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[#8FBF9F]">
-                  Liquidação Final da ATA
+                  Valor Final da ATA
                   <CheckCircle2 size={14} className="text-[#8FBF9F]" />
                 </p>
                 <p className="text-[11px] uppercase tracking-wider text-[#6E9A7D] mt-0.5">
-                  {motivoIsencao ? "Isenção aplicada" : "Total devido ao tesouro estadual"}
+                  {motivoIsencao ? "Isenção aplicada" : "Total do documento"}
                 </p>
                 <div className="flex items-baseline gap-1.5 mt-2">
                   <span className="text-lg font-semibold text-[#8FBF9F]">R$</span>
@@ -929,7 +947,7 @@ export function AdicionarEmissaoATAPage({ dados, onLogout, onNavigate }: { dados
                   Animais na ATA
                 </p>
                 <p className="text-[11px] uppercase tracking-wider text-[#6E9A7D] mt-0.5">
-                  Total transportado nesta guia
+                  Total transportado neste documento
                 </p>
                 <div className="flex items-baseline gap-2 mt-2">
                   <span className="text-4xl font-bold text-white leading-none tracking-tight">

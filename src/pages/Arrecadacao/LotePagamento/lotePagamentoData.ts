@@ -150,6 +150,49 @@ export const formatarMoedaLote = (valor: number) =>
 
 export const listarLotesPagamento = () => LOTES_PAGAMENTO_MOCK;
 
+export function normalizarLotePagamento(dados?: Partial<LotePagamento> | null): LotePagamento {
+  const exemplo = LOTES_PAGAMENTO_MOCK[0];
+  const documentos = Array.isArray(dados?.documentos) && dados.documentos.length
+    ? dados.documentos
+    : exemplo.documentos;
+  const valor = documentos.reduce((total, item) => total + Number(item.valor || 0), 0);
+
+  return {
+    ...exemplo,
+    ...(dados || {}),
+    titular: { ...exemplo.titular, ...(dados?.titular || {}) },
+    unidadeAdministrativa: {
+      ...exemplo.unidadeAdministrativa,
+      ...(dados?.unidadeAdministrativa || {}),
+    },
+    documentos,
+    quantidadeDocumentos: documentos.length,
+    valor: dados?.valor || valor || exemplo.valor,
+    dae: { ...exemplo.dae, ...(dados?.dae || {}) },
+  };
+}
+
+export function atualizarLotePagamento(
+  id: number,
+  dados: Pick<LotePagamento, "documento" | "titular" | "unidadeAdministrativa" | "documentos">,
+) {
+  const indice = LOTES_PAGAMENTO_MOCK.findIndex((lote) => lote.id === id);
+  const atual = normalizarLotePagamento(indice >= 0 ? LOTES_PAGAMENTO_MOCK[indice] : { id });
+  const documentos = [...dados.documentos];
+  const valor = documentos.reduce((total, item) => total + item.valor, 0);
+  const atualizado: LotePagamento = {
+    ...atual,
+    ...dados,
+    documentos,
+    quantidadeDocumentos: documentos.length,
+    valor,
+    dae: { ...atual.dae, valor },
+  };
+
+  if (indice >= 0) LOTES_PAGAMENTO_MOCK[indice] = atualizado;
+  return atualizado;
+}
+
 export function criarLotePagamento(dados: {
   documento: TipoDocumentoLote;
   titular: PessoaLote;

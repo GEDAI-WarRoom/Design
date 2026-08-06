@@ -1,3 +1,9 @@
+import {
+  listarColecaoMock,
+  proximoIdNumerico,
+  salvarColecaoMock,
+} from "../../../mocks/mockDatabase";
+
 export type SituacaoReceita = "Ativo" | "Inativo";
 
 export interface Receita {
@@ -19,23 +25,42 @@ export const SITUACOES_RECEITA = [
   { value: "Inativo", label: "Inativo" },
 ];
 
-export const RECEITAS_MOCK: Receita[] = [
+const COLECAO_RECEITAS = "receitas";
+
+export const RECEITAS_INICIAIS: Receita[] = [
   { id: 1, codigo: "1001", descricao: "Taxa de expediente para cadastro", classificacao: "11226009", situacao: "Ativo" },
   { id: 2, codigo: "1002", descricao: "Emissão de certificado sanitário", classificacao: "11226600", situacao: "Ativo" },
   { id: 3, codigo: "1003", descricao: "Serviços administrativos diversos", classificacao: "16009900", situacao: "Inativo" },
 ];
 
-let nextReceitaId = RECEITAS_MOCK.length + 1;
+export function listarReceitas() {
+  return listarColecaoMock(COLECAO_RECEITAS, RECEITAS_INICIAIS);
+}
+
+export function obterReceita(id?: number | null) {
+  const receitas = listarReceitas();
+  if (id == null) return receitas[0] ?? null;
+  return receitas.find((receita) => receita.id === id) ?? null;
+}
 
 export function adicionarReceita(receita: Omit<Receita, "id">) {
-  const novaReceita: Receita = { ...receita, id: nextReceitaId++ };
-  RECEITAS_MOCK.push(novaReceita);
+  const receitas = listarReceitas();
+  const novaReceita: Receita = {
+    ...receita,
+    id: proximoIdNumerico(receitas),
+  };
+  salvarColecaoMock(COLECAO_RECEITAS, [novaReceita, ...receitas]);
   return novaReceita;
 }
 
 export function atualizarReceita(receitaAtualizada: Receita) {
-  const index = RECEITAS_MOCK.findIndex((receita) => receita.id === receitaAtualizada.id);
-  if (index >= 0) RECEITAS_MOCK[index] = receitaAtualizada;
+  const receitas = listarReceitas();
+  const atualizadas = receitas.some((receita) => receita.id === receitaAtualizada.id)
+    ? receitas.map((receita) =>
+        receita.id === receitaAtualizada.id ? receitaAtualizada : receita,
+      )
+    : [receitaAtualizada, ...receitas];
+  salvarColecaoMock(COLECAO_RECEITAS, atualizadas);
   return receitaAtualizada;
 }
 

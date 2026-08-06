@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ArrowLeft, Info, Check, PlusCircle, Trash2, Download } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
-import { FloatInput, FloatSelect, LargeTextArea, UploadField } from "../../../components/ui/FormKit";
+import { FloatInput, LargeTextArea, UploadField } from "../../../components/ui/FormKit";
 import {
   ProprietarioInput,
   BlocoEnderecoFields,
@@ -9,6 +9,11 @@ import {
   DynamicListWrapper
 } from "../../../components/ui/EntitySearch";
 import * as Icons from "../../../imports/icons";
+import {
+  gerarCodigoUnidadeVigilancia,
+  registrarUnidadeVigilancia,
+  type UnidadeVigilanciaAgropecuaria,
+} from "./unidadeVigilanciaData";
 
 
 const GREEN = "#1A7A3C";
@@ -34,7 +39,6 @@ interface PageProps {
 export function AdicionarAeroportoPorto({ onLogout, onNavigate }: PageProps) {
   // 1. Informações Básicas
   const [nomeComercial, setNomeComercial] = useState("");
-  const [tipoLocal, setTipoLocal] = useState("");
 
   // 2. Proprietários
   const [proprietarios, setProprietarios] = useState<any[]>([{ uid: uid("prop"), entidade: null }]);
@@ -49,7 +53,7 @@ export function AdicionarAeroportoPorto({ onLogout, onNavigate }: PageProps) {
   // 4. Contatos
   const [contatos, setContatos] = useState({
     utilizarContatoProprietario: "Não",
-    
+
     proprietariosSelecionados: [] as string[],
     emailFixo: "",
     emailFixoObs: "",
@@ -64,6 +68,8 @@ export function AdicionarAeroportoPorto({ onLogout, onNavigate }: PageProps) {
 
   // Estado do Modal de Sucesso
   const [isSucesso, setIsSucesso] = useState(false);
+  const [erro, setErro] = useState("");
+  const [registroCriado, setRegistroCriado] = useState<UnidadeVigilanciaAgropecuaria | null>(null);
 
   // Derivando proprietários para o componente de contatos
   const proprietariosValidos = proprietarios
@@ -76,6 +82,37 @@ export function AdicionarAeroportoPorto({ onLogout, onNavigate }: PageProps) {
       telefone: p.entidade.telefone || ""
     }));
 
+  const handleAdicionar = () => {
+    const selecionados = proprietarios.filter((item) => item.entidade);
+    if (!nomeComercial.trim() || selecionados.length === 0 || !endereco.municipio || !endereco.endereco) {
+      setErro("Preencha o nome, ao menos um proprietário e os campos obrigatórios de localização.");
+      return;
+    }
+
+    const registro: UnidadeVigilanciaAgropecuaria = {
+      id: Date.now(),
+      codigo: gerarCodigoUnidadeVigilancia(),
+      nome: nomeComercial.trim(),
+      proprietarios: selecionados.map((item) => ({
+        id: item.entidade.id ?? item.uid,
+        nome: item.entidade.nome,
+        documento: item.entidade.documento ?? item.entidade.cpf ?? "",
+        tipo: item.entidade.tipo ?? "Pessoa física",
+        email: item.entidade.email,
+        telefone: item.entidade.telefone,
+      })),
+      endereco: { ...endereco, estado: "Minas Gerais" },
+      contatos,
+      anexos,
+      observacao,
+      situacao: "Ativo",
+    };
+    registrarUnidadeVigilancia(registro);
+    setRegistroCriado(registro);
+    setErro("");
+    setIsSucesso(true);
+  };
+
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
       <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="aeroporto-porto" hideSearch />
@@ -85,11 +122,11 @@ export function AdicionarAeroportoPorto({ onLogout, onNavigate }: PageProps) {
         <div>
           <button type="button" onClick={() => onNavigate("aeroporto-porto")} className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70 font-semibold" style={{ color: GREEN }}>
             <ArrowLeft size={15} />
-            Todos os Aeroportos e Portos
+            Todas as Unidades de Vigilância Agropecuária
           </button>
           <div className="flex justify-between items-center w-full">
-            <h1 className="text-2xl font-semibold text-gray-900">Adicionar Aeroporto / Porto</h1>
-            <button type="button" onClick={() => setIsSucesso(true)} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm">
+            <h1 className="text-2xl font-semibold text-gray-900">Adicionar Unidade de Vigilância Agropecuária</h1>
+            <button type="button" onClick={handleAdicionar} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm">
               Adicionar
             </button>
           </div>
@@ -103,25 +140,18 @@ export function AdicionarAeroportoPorto({ onLogout, onNavigate }: PageProps) {
           </p>
         </div>
 
+        {erro && <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">{erro}</div>}
+
         {/* 1. Informações Básicas */}
         <Section title="Informações Básicas">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 gap-5">
+
             <FloatInput
-              label="Nome Comercial do Aeroporto / Porto"
+              label="Nome Comercial da Unidade de Vigilância Agropecuária"
               required
               value={nomeComercial}
               onChange={setNomeComercial}
               maxLength={255}
-            />
-            <FloatSelect
-              label="Aeroporto ou Porto?"
-              required
-              value={tipoLocal}
-              onChange={setTipoLocal}
-              options={[
-                { value: "Aeroporto", label: "Aeroporto" },
-                { value: "Porto", label: "Porto" }
-              ]}
             />
           </div>
         </Section>
@@ -153,6 +183,7 @@ export function AdicionarAeroportoPorto({ onLogout, onNavigate }: PageProps) {
           <BlocoEnderecoFields
             title="Endereço Principal"
             tipoEstado="normal"
+            estadoFixo="Minas Gerais"
             data={endereco}
             onChange={(key, val) => setEndereco((p) => ({ ...p, [key]: val }))}
             onSetMultipleFields={(fields) => setEndereco((p) => ({ ...p, ...fields }))}
@@ -164,12 +195,7 @@ export function AdicionarAeroportoPorto({ onLogout, onNavigate }: PageProps) {
           <BlocoContatoFields
             data={contatos}
             onChange={(updated) => setContatos((prev) => ({ ...prev, ...updated }))}
-             proprietariosDisponiveis={[
-              { id: "prop-1", nome: "Carlos Henrique Silva", cpf: "123.456.789-00", email: "carlos.silva@email.com", telefone: "(11) 98888-7777" },
-              { id: "prop-2", nome: "Maria Fernanda Oliveira", cpf: "987.654.321-11", email: "maria.fernanda@email.com", telefone: "(21) 99999-8888" },
-              { id: "prop-3", nome: "Antônio Marcos de Souza", cpf: "456.123.789-22", email: "antonio.marcos@email.com", telefone: "(31) 97777-6666" },
-              { id: "prop-4", nome: "Juliana Costa Rezende", cpf: "789.456.123-33", email: "juliana.costa@email.com", telefone: "(61) 96666-5555" }
-            ]}
+            proprietariosDisponiveis={proprietariosValidos}
           />
         </Section>
 
@@ -188,7 +214,7 @@ export function AdicionarAeroportoPorto({ onLogout, onNavigate }: PageProps) {
                       required
                       fileName={anexo.nome}
                       onSelectFile={() =>
-                        setAnexos(prev => prev.map((a, i) => i === index ? { ...a, nome: `anexo_aeroporto_porto_${index + 1}.pdf` } : a))
+                        setAnexos(prev => prev.map((a, i) => i === index ? { ...a, nome: `anexo_unidade_vigilancia_${index + 1}.pdf` } : a))
                       }
                     />
 
@@ -246,16 +272,14 @@ export function AdicionarAeroportoPorto({ onLogout, onNavigate }: PageProps) {
       {isSucesso && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
-            <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4">
-              <Check size={28} className="text-[#1A7A3C]" strokeWidth={3} />
-            </div>
+
             <h3 className="text-lg font-bold text-gray-900">Cadastro realizado com sucesso!</h3>
-            <p className="text-sm text-gray-500 mt-1">O {tipoLocal || "Aeroporto / Porto"} "{nomeComercial}" foi adicionado.</p>
+            <p className="text-sm text-gray-500 mt-1">A unidade de vigilância agropecuária "{nomeComercial}" foi adicionada.</p>
             <div className="flex gap-3 justify-center mt-6">
               <button onClick={() => { setIsSucesso(false); onNavigate("aeroporto-porto"); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition">
                 Voltar
               </button>
-              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-aeroporto-porto"); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">
+              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-aeroporto-porto", registroCriado); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">
                 Visualizar
               </button>
             </div>

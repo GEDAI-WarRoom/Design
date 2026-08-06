@@ -1,3 +1,48 @@
 @import './fonts.css';
 @import './tailwind.css';
 @import './theme.css';
+@import './globals.css';
+
+/* Visualização somente leitura do estabelecimento POA: mantém os campos
+   brancos e troca apenas os marcadores de ação/seleção por cinza claro. */
+.poa-readonly {
+  pointer-events: none;
+}
+
+.poa-readonly [class*="bg-gray-50"] {
+  background-color: #fff !important;
+}
+
+.poa-readonly [class*="border-[#1A7A3C]"],
+.poa-readonly [class*="border-[#32C47F]"] {
+  border-color: #d1d5db !important;
+}
+
+.poa-readonly [class*="bg-[#1A7A3C]"],
+.poa-readonly [class*="bg-[#32C47F]"] {
+  background-color: #d1d5db !important;
+}
+
+.poa-readonly input:disabled,
+.poa-readonly textarea:disabled {
+  color: #1f2937 !important;
+  -webkit-text-fill-color: #1f2937;
+  opacity: 1;
+}
+
+@keyframes progresso-slide-aviso {
+  from {
+    transform: translate3d(0, 0, 0) scaleX(0);
+  }
+
+  to {
+    transform: translate3d(0, 0, 0) scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [style*='progresso-slide-aviso'] {
+    animation: none !important;
+    transform: scaleX(1);
+  }
+}

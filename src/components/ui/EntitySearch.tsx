@@ -126,6 +126,18 @@ export const PRODUTORES_MOCK = [
 		documento: "12.345.678/0001-99",
 		tipo: "PJ",
 	},
+	{
+		id: 4,
+		nome: "Divino de Souza Sobrinho",
+		documento: "444.009.956-40",
+		tipo: "PF",
+	},
+	{
+		id: 5,
+		nome: "Agropecuária Vale Verde Ltda.",
+		documento: "56.338.814/0001-95",
+		tipo: "PJ",
+	},
 ];
 
 export const REVENDEDORAS_MOCK = [
@@ -242,6 +254,7 @@ export function EntitySearchInput({
 	return (
 		<>
 			<div
+				data-form-control
 				className="w-full cursor-pointer"
 				onClick={() => setModalAberto(true)}>
 				<div className="pointer-events-none">
@@ -918,6 +931,7 @@ interface DoencaInputProps {
 	tooltipText?: string;
 	data?: any[];
 	apenasVacinaveis?: boolean; // 👈 Adicionado aqui para resolver o erro de tipagem
+	disabled?: boolean;
 }
 
 export function DoencaInput({
@@ -928,6 +942,7 @@ export function DoencaInput({
 	tooltipText,
 	data = DOENCAS_MOCK,
 	apenasVacinaveis = false, // 👈 Inicializa como false por padrão
+	disabled = false,
 }: DoencaInputProps) {
 	// 💡 Se 'apenasVacinaveis' for true, você pode filtrar os dados aqui se o seu mock tiver esse campo,
 	// ou apenas repassar a lista completa por enquanto.
@@ -949,6 +964,7 @@ export function DoencaInput({
 						label="Doença"
 						placeholder="Buscar por nome da doença."
 						required={required}
+						disabled={disabled}
 						value={BlacklistedOuSelecionada?.nome || ""}
 						data={dadosFiltrados}
 						searchKeys={["nome"]}
@@ -973,7 +989,7 @@ export function DoencaInput({
 					/>
 				</div>
 
-				{value && BlacklistedOuSelecionada && (
+				{!disabled && value && BlacklistedOuSelecionada && (
 					<EyeAction onClick={onEyeClick} />
 				)}
 			</div>
@@ -986,19 +1002,30 @@ export function DoencaInput({
 // ==========================================================
 export function ProprietarioInput({
 	value,
+	documento,
 	onChange,
 	onEyeClick,
 	required = false,
+	disabled = false,
+	data = PRODUTORES_MOCK,
 }: DomainInputProps) {
 	const [tipoPessoa, setTipoPessoa] = useState<string>("");
 
-	const entidadeSelecionada = PRODUTORES_MOCK.find(
+	const entidadeSelecionada = data.find(
 		(x) => x.nome === value || x.documento === value,
 	);
+	const entidadeExibida = entidadeSelecionada || (value
+		? {
+			id: "proprietario-atual",
+			nome: value,
+			documento: documento || "",
+			tipo: documento?.includes("/") ? "PJ" : "PF",
+		}
+		: null);
 
 	const databaseFiltrada = tipoPessoa
-		? PRODUTORES_MOCK.filter((p) => p.tipo === tipoPessoa)
-		: PRODUTORES_MOCK;
+		? data.filter((p: any) => p.tipo === tipoPessoa)
+		: data;
 
 	// Definição estrita das colunas baseada no estado atual
 	const colunasModal = [
@@ -1034,7 +1061,8 @@ export function ProprietarioInput({
 					label="Proprietário"
 					placeholder="Buscar pelo nome do proprietário."
 					required={required}
-					value={entidadeSelecionada?.nome || ""}
+					value={entidadeExibida?.nome || ""}
+					disabled={disabled}
 					data={databaseFiltrada}
 					title="Buscar Proprietário"
 					subtitle="Busque por um proprietário cadastrado:"
@@ -1068,13 +1096,13 @@ export function ProprietarioInput({
 				/>
 
 				{/* Campo Extra reboque */}
-				{value && entidadeSelecionada && (
+				{value && entidadeExibida && (
 					<div className="flex items-center gap-2 animate-fadeIn w-full">
 						<div className="flex-1">
 							<FloatInput
-								label={entidadeSelecionada.tipo === "PJ" ? "CNPJ" : "CPF"}
+								label={entidadeExibida.tipo === "PJ" ? "CNPJ" : "CPF"}
 								required={required}
-								value={entidadeSelecionada.documento}
+								value={entidadeExibida.documento}
 								onChange={() => { }}
 								disabled
 								className="w-full"
@@ -1093,6 +1121,8 @@ interface DomainInputProps {
 	value: string; // Nome selecionado
 	documento?: string; // Documento selecionado (CPF/CNPJ)
 	required?: boolean;
+	disabled?: boolean;
+	data?: any[];
 	onChange: (selectedEntity: any) => void;
 	onEyeClick?: () => void;
 }
@@ -1540,6 +1570,8 @@ interface BlocoEnderecoFieldsProps {
 	tipoEstado: "travado" | "normal";
 	onChange: (key: keyof EnderecoState, value: string) => void;
 	onSetMultipleFields: (fields: Partial<EnderecoState>) => void;
+	disabled?: boolean;
+	estadoFixo?: string;
 }
 
 export function BlocoEnderecoFields({
@@ -1548,6 +1580,8 @@ export function BlocoEnderecoFields({
 	tipoEstado,
 	onChange,
 	onSetMultipleFields,
+	disabled = false,
+	estadoFixo,
 }: BlocoEnderecoFieldsProps) {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -1555,6 +1589,7 @@ export function BlocoEnderecoFields({
 	const [mesmaGeoEstab, setMesmaGeoEstab] = useState<boolean | "">("");
 
 	const isGlobalDisabled = tipoEstado === "travado";
+	const fieldsDisabled = disabled || isGlobalDisabled;
 	const isRural = data.zona === "Rural";
 
 	// Efeito para tratar o preenchimento automático das coordenadas se marcar "Sim"
@@ -1580,7 +1615,7 @@ export function BlocoEnderecoFields({
 	};
 
 	const handleZonaChange = (novaZona: string) => {
-		if (isGlobalDisabled) return;
+		if (fieldsDisabled) return;
 		if (novaZona === "Rural") {
 			onSetMultipleFields({
 				zona: "Rural",
@@ -1599,7 +1634,7 @@ export function BlocoEnderecoFields({
 	};
 
 	const handleCepChange = async (val: string) => {
-		if (isGlobalDisabled) return;
+		if (fieldsDisabled) return;
 		const formatado = aplicarMascaraCEP(val);
 		onChange("cep", formatado);
 		const apenasNumeros = formatado.replace(/\D/g, "");
@@ -1621,7 +1656,7 @@ export function BlocoEnderecoFields({
 									: json.uf || "";
 					onSetMultipleFields({
 						cep: formatado,
-						estado: tipoEstado === "travado" ? "Minas Gerais" : estadoApi,
+						estado: estadoFixo || (tipoEstado === "travado" ? "Minas Gerais" : estadoApi),
 						municipio: json.localidade || "",
 						bairro: json.bairro || "",
 						endereco: json.logradouro || "",
@@ -1655,7 +1690,7 @@ export function BlocoEnderecoFields({
 					required
 					value={data.zona}
 					onChange={handleZonaChange}
-					disabled={isGlobalDisabled}
+					disabled={fieldsDisabled}
 					options={[
 						{ value: "Urbana", label: "Urbana" },
 						{ value: "Rural", label: "Rural" },
@@ -1668,19 +1703,43 @@ export function BlocoEnderecoFields({
 						value={data.cep}
 						onChange={handleCepChange}
 						maxLength={9}
-						disabled={isGlobalDisabled}
+						disabled={fieldsDisabled}
 					/>
 				)}
 				<FloatSelect
 					label="Estado"
 					required
 					value={data.estado}
-					disabled={isGlobalDisabled}
+					disabled={fieldsDisabled || Boolean(estadoFixo)}
 					onChange={(v) => onChange("estado", v)}
 					options={[
+						{ value: "Acre", label: "Acre" },
+						{ value: "Alagoas", label: "Alagoas" },
+						{ value: "Amapá", label: "Amapá" },
+						{ value: "Amazonas", label: "Amazonas" },
+						{ value: "Bahia", label: "Bahia" },
+						{ value: "Ceará", label: "Ceará" },
+						{ value: "Distrito Federal", label: "Distrito Federal" },
+						{ value: "Espírito Santo", label: "Espírito Santo" },
+						{ value: "Goiás", label: "Goiás" },
+						{ value: "Maranhão", label: "Maranhão" },
+						{ value: "Mato Grosso", label: "Mato Grosso" },
+						{ value: "Mato Grosso do Sul", label: "Mato Grosso do Sul" },
 						{ value: "Minas Gerais", label: "Minas Gerais" },
-						{ value: "São Paulo", label: "São Paulo" },
+						{ value: "Pará", label: "Pará" },
+						{ value: "Paraíba", label: "Paraíba" },
+						{ value: "Paraná", label: "Paraná" },
+						{ value: "Pernambuco", label: "Pernambuco" },
+						{ value: "Piauí", label: "Piauí" },
 						{ value: "Rio de Janeiro", label: "Rio de Janeiro" },
+						{ value: "Rio Grande do Norte", label: "Rio Grande do Norte" },
+						{ value: "Rio Grande do Sul", label: "Rio Grande do Sul" },
+						{ value: "Rondônia", label: "Rondônia" },
+						{ value: "Roraima", label: "Roraima" },
+						{ value: "Santa Catarina", label: "Santa Catarina" },
+						{ value: "São Paulo", label: "São Paulo" },
+						{ value: "Sergipe", label: "Sergipe" },
+						{ value: "Tocantins", label: "Tocantins" },
 					]}
 				/>
 				<FloatCombobox
@@ -1689,7 +1748,7 @@ export function BlocoEnderecoFields({
 					value={data.municipio}
 					onChange={(v) => onChange("municipio", v)}
 					options={MUNICIPIOS_MOCK}
-					disabled={isGlobalDisabled}
+					disabled={fieldsDisabled}
 				/>
 				{!isRural && (
 					<FloatInput
@@ -1697,7 +1756,7 @@ export function BlocoEnderecoFields({
 						required
 						value={data.bairro}
 						onChange={(v) => onChange("bairro", v)}
-						disabled={isGlobalDisabled}
+						disabled={fieldsDisabled}
 					/>
 				)}
 			</div>
@@ -1713,7 +1772,7 @@ export function BlocoEnderecoFields({
 						className="w-full"
 						hasTooltip={isRural}
 						tooltipText="Nome da estrada e o quilômetro de referência."
-						disabled={isGlobalDisabled}
+						disabled={fieldsDisabled}
 					/>
 				</div>
 				{!isRural && (
@@ -1724,14 +1783,14 @@ export function BlocoEnderecoFields({
 							value={data.numero}
 							onChange={(v) => onChange("numero", v)}
 							className="md:col-span-2"
-							disabled={isGlobalDisabled}
+							disabled={fieldsDisabled}
 						/>
 						<FloatInput
 							label="Complemento"
 							value={data.complemento}
 							onChange={(v) => onChange("complemento", v)}
 							className="md:col-span-3"
-							disabled={isGlobalDisabled}
+							disabled={fieldsDisabled}
 						/>
 					</>
 				)}
@@ -1743,14 +1802,14 @@ export function BlocoEnderecoFields({
 					value={data.localidade}
 					onChange={(v) => onChange("localidade", v)}
 					options={LOCALIDADES_MOCK}
-					disabled={isGlobalDisabled}
+					disabled={fieldsDisabled}
 				/>
 				<FloatCombobox
 					label="Distrito"
 					value={data.distrito}
 					onChange={(v) => onChange("distrito", v)}
 					options={DISTRITOS_MOCK}
-					disabled={isGlobalDisabled}
+					disabled={fieldsDisabled}
 				/>
 			</div>
 
@@ -1797,11 +1856,13 @@ export function BlocoEnderecoFields({
 					{!(data.latitude && data.longitude) ? (
 						<button
 							type="button"
+							disabled={fieldsDisabled}
 							onClick={(e) => {
 								e.preventDefault();
+								if (fieldsDisabled) return;
 								setIsModalOpen(true);
 							}}
-							className="w-full flex items-center justify-center gap-2 border border-[#1A7A3C] rounded-md h-11 text-sm font-semibold text-[#1A7A3C] hover:bg-green-50 transition shadow-sm cursor-pointer">
+							className="w-full flex items-center justify-center gap-2 border border-[#1A7A3C] rounded-md h-11 text-sm font-semibold text-[#1A7A3C] hover:bg-green-50 transition shadow-sm cursor-pointer disabled:cursor-not-allowed disabled:opacity-60">
 							<Map size={16} /> Adicionar Coordenadas
 						</button>
 					) : (
@@ -1809,11 +1870,13 @@ export function BlocoEnderecoFields({
 							<div className="md:col-span-2">
 								<button
 									type="button"
+									disabled={fieldsDisabled}
 									onClick={(e) => {
 										e.preventDefault();
+										if (fieldsDisabled) return;
 										setIsModalOpen(true);
 									}}
-									className="w-full flex items-center justify-center border border-[#1A7A3C] rounded-md h-11 bg-white hover:bg-green-50/30 text-[#1A7A3C] transition cursor-pointer">
+									className="w-full flex items-center justify-center border border-[#1A7A3C] rounded-md h-11 bg-white hover:bg-green-50/30 text-[#1A7A3C] transition cursor-pointer disabled:cursor-not-allowed disabled:opacity-60">
 									<Map size={18} />
 								</button>
 							</div>
@@ -1838,7 +1901,7 @@ export function BlocoEnderecoFields({
 				</div>
 			)}
 
-			{isModalOpen && !isGlobalDisabled && (
+			{isModalOpen && !fieldsDisabled && (
 				<MapModal
 					onClose={() => setIsModalOpen(false)}
 					onConfirm={(lat, lng) => {
@@ -3100,6 +3163,7 @@ interface ResponsavelTecnicoInputProps {
 	value: string;
 	onChange: (entidade: any) => void;
 	onEyeClick?: () => void;
+	icon?: React.ReactNode;
 	error?: boolean;
 	disabled?: boolean;
 	required?: boolean;
@@ -3112,6 +3176,7 @@ export const ResponsavelTecnicoInput: React.FC<
 	value,
 	onChange,
 	onEyeClick,
+	icon,
 	error,
 	disabled,
 	required = false,
@@ -3138,13 +3203,13 @@ export const ResponsavelTecnicoInput: React.FC<
 							{ label: "Nome", key: "nome" },
 							{ label: "CPF", key: "documento" },
 						]}
-						icon={
+						icon={icon || (
 							<UserRoundCheck
 								size={18}
 								color={GREEN}
 								className="mr-2 -ml-1 flex-shrink-0"
 							/>
-						}
+						)}
 						title="Buscar Responsável Técnico"
 						subtitle="Busque por um profissional responsável técnico cadastrado:"
 						onChange={onChange}

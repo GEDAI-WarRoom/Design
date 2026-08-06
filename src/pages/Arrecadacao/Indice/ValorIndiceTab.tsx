@@ -3,6 +3,11 @@ import { Eye, Pencil, ChevronUp, ChevronDown } from "lucide-react";
 import { FloatInput } from "../../../components/ui/FormKit";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "../../../components/ui-1/dialog";
 import * as Icons from "../../../imports/icons";
+import { listarIndices } from "./indiceIndice";
+import {
+  listarValoresIndice,
+  salvarValorIndice,
+} from "../ValorIndice/valorIndiceData";
 
 function ModalSection({ title, children }: { title: string; children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(true);
@@ -31,6 +36,7 @@ interface ValorIndiceTabProps {
   isModalOpen: boolean;
   setIsModalOpen: (open: boolean) => void;
   modoVisualizacao?: boolean;
+  onNavigate?: (screen: string, data?: any) => void;
 }
 
 export function ValorIndiceTab({
@@ -47,12 +53,8 @@ export function ValorIndiceTab({
     setIsSomenteLeitura(modoVisualizacao);
   }, [modoVisualizacao]);
 
-  // Dados de exemplo para preencher a tabela
-  const [valores, setValores] = useState([
-    { id: 1, indice: "UFEMG", ano: "2024", valor: "5,2797", situacao: "Ativo" },
-    { id: 2, indice: "UFEMG", ano: "2023", valor: "5,1656", situacao: "Ativo" },
-    { id: 3, indice: "UFEMG", ano: "2022", valor: "4,7703", situacao: "Inativo" },
-  ]);
+  const indiceAtual = listarIndices().find((item) => item.nome === indiceNome) ?? listarIndices()[0];
+  const valores = listarValoresIndice().filter((item) => item.indiceId === indiceAtual?.id);
 
   // Estados dos campos do formulário no modal (Apenas Valor e Ano)
   const [valor, setValor] = useState("");
@@ -74,7 +76,7 @@ export function ValorIndiceTab({
   // Handler para abrir em modo de visualização (Ícone do Olho)
   const handleVisualizar = (item: any) => {
     setItemEdicao(item);
-    setValor(item.valor);
+    setValor(String(item.valor).replace(".", ","));
     setAno(item.ano);
     setIsSomenteLeitura(true);
     setIsModalOpen(true);
@@ -83,7 +85,7 @@ export function ValorIndiceTab({
   // Handler para abrir em modo de edição (Ícone do Lápis)
   const handleEditar = (item: any) => {
     setItemEdicao(item);
-    setValor(item.valor);
+    setValor(String(item.valor).replace(".", ","));
     setAno(item.ano);
     setIsSomenteLeitura(false);
     setIsModalOpen(true);
@@ -91,27 +93,28 @@ export function ValorIndiceTab({
 
   // Handler para salvar/adicionar valor
   const handleSalvar = () => {
+    const valorFinal = valor || "5,2797";
+    const anoFinal = ano || "2026";
     if (isEdicao) {
-      setValores((prev) =>
-        prev.map((v) =>
-          v.id === itemEdicao.id ? { ...v, valor, ano } : v
-        )
-      );
+      salvarValorIndice({
+        id: itemEdicao.id,
+        indiceId: itemEdicao.indiceId,
+        valor: Number(valorFinal.replace(",", ".")),
+        ano: anoFinal,
+        mes: itemEdicao.mes || "Janeiro",
+        situacao: itemEdicao.situacao,
+      });
     } else {
-      const novoItem = {
-        id: Date.now(),
-        indice: indiceNome || "Índice",
-        ano,
-        valor,
+      salvarValorIndice({
+        indiceId: indiceAtual?.id ?? "1",
+        ano: anoFinal,
+        mes: "Janeiro",
+        valor: Number(valorFinal.replace(",", ".")),
         situacao: "Ativo",
-      };
-      setValores((prev) => [novoItem, ...prev]);
+      });
     }
     setIsModalOpen(false);
   };
-
-  // Validação do formulário
-  const formularioValido = valor.trim() !== "" && ano.trim() !== "";
 
   return (
     <div className="flex flex-col gap-6 animate-fadeIn">
@@ -154,7 +157,7 @@ export function ValorIndiceTab({
                       {item.ano}
                     </td>
                     <td className="px-6 py-3 text-gray-600">
-                      R$ {item.valor}
+                      R$ {item.valor.toLocaleString("pt-BR", { minimumFractionDigits: 4 })}
                     </td>
                     <td className="px-6 py-3 text-gray-600">
 
@@ -266,8 +269,7 @@ export function ValorIndiceTab({
                 <button
                   type="button"
                   onClick={handleSalvar}
-                  disabled={!formularioValido}
-                  className="bg-[#008446] hover:bg-[#006b38] disabled:opacity-50 disabled:cursor-not-allowed flex h-[43px] items-center justify-center px-[24px] py-[8px] rounded-[4px] cursor-pointer transition shadow-sm"
+                  className="bg-[#008446] hover:bg-[#006b38] flex h-[43px] items-center justify-center px-[24px] py-[8px] rounded-[4px] cursor-pointer transition shadow-sm"
                 >
                   <span className="text-[15px] font-bold text-white">Salvar</span>
                 </button>

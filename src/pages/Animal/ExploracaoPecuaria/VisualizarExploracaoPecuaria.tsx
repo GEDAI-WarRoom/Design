@@ -11,6 +11,11 @@ import {
   Info,
   Ruler,
   ShieldCheck,
+  BadgeCheck,
+  MoreVertical,
+  PlusCircle,
+  X,
+  Trash2,
 } from "lucide-react";
 import React, { useState } from "react";
 import { Navbar } from "../../../components/Navbar";
@@ -24,6 +29,7 @@ import {
   HistoryCard,
   LargeTextArea,
   SimNao,
+  UploadField,
 } from "../../../components/ui/FormKit";
 import * as Icons from "../../../imports/icons";
 
@@ -411,7 +417,7 @@ function EntidadeLeitura({
           value={value}
           icon={icon}
           disabled
-          onChange={() => {}}
+          onChange={() => { }}
         />
       </div>
       {onVer && (
@@ -437,13 +443,13 @@ function CicloProducaoLeitura({
 }: {
   titulo: string;
   ciclo:
-    | {
-        quantidade: string;
-        unidade: string;
-        tamanho: string;
-        quantidadeTanques: string;
-      }
-    | any;
+  | {
+    quantidade: string;
+    unidade: string;
+    tamanho: string;
+    quantidadeTanques: string;
+  }
+  | any;
   labelQuantidade: string;
 }) {
   return (
@@ -453,25 +459,25 @@ function CicloProducaoLeitura({
           label={labelQuantidade}
           value={ciclo.quantidade}
           disabled
-          onChange={() => {}}
+          onChange={() => { }}
         />
         <FloatInput
           label="Unidade de Medida dos Tanques"
           value={ciclo.unidade}
           disabled
-          onChange={() => {}}
+          onChange={() => { }}
         />
         <FloatInput
           label="Tamanho médio dos tanques"
           value={ciclo.tamanho}
           disabled
-          onChange={() => {}}
+          onChange={() => { }}
         />
         <FloatInput
           label="Quantidade de Tanques"
           value={ciclo.quantidadeTanques}
           disabled
-          onChange={() => {}}
+          onChange={() => { }}
         />
       </div>
     </SubGrupo>
@@ -480,6 +486,123 @@ function CicloProducaoLeitura({
 
 const toCheck = (arr: string[]) => arr.map((v) => ({ id: v, label: v }));
 const toOptions = (arr: string[]) => arr.map((v) => ({ value: v, label: v }));
+
+// ==========================================================
+// ==========================================================
+// CERTIFICADOS — TIPOS E MOCK
+// ==========================================================
+interface Certificado {
+  id: string;
+  atualizadoEm: string;
+  numero: string;
+  validade: string;
+  situacao: "Ativa" | "Vencida" | "Suspensa";
+  nucleos: string[];
+}
+
+interface GrupoCertificado {
+  id: number;
+  titulo: string;
+  certificados: Certificado[];
+  inativos?: Certificado[];
+}
+
+const NUCLEOS_CERTIFICADO_MOCK = [
+  { id: 1, nome: "Núcleo Setor A", codigo: "203213222001" },
+  { id: 2, nome: "Núcleo Setor B", codigo: "203213222002" },
+  { id: 3, nome: "Núcleo Setor C", codigo: "203213222003" },
+  { id: 4, nome: "Núcleo Setor D", codigo: "203213222004" },
+];
+
+const GRUPOS_CERTIFICADOS_SUIDEOS: GrupoCertificado[] = [
+  {
+    id: 1,
+    titulo: "Granja de Reprodutores Suídeos Certificada (GRSC)",
+    certificados: [
+      { id: "c1", atualizadoEm: "14/04/2012", numero: "213456", validade: "14/06/2025", situacao: "Ativa", nucleos: ["Núcleo Setor A"] },
+      { id: "c2", atualizadoEm: "14/04/2012", numero: "213478", validade: "18/07/2025", situacao: "Ativa", nucleos: ["Núcleo Setor A", "Núcleo Setor B"] },
+      { id: "c3", atualizadoEm: "14/04/2012", numero: "213465", validade: "20/04/2025", situacao: "Ativa", nucleos: ["Núcleo Setor A", "Núcleo Setor B", "Núcleo Setor C", "Núcleo Setor D", "Núcleo Setor E", "Núcleo Setor F"] },
+    ],
+
+  },
+  {
+    id: 2,
+    titulo: "Estabelecimento de Alojamento Temporário (EAT)",
+    certificados: [
+      { id: "c4", atualizadoEm: "14/04/2012", numero: "213456", validade: "14/06/2025", situacao: "Ativa", nucleos: ["Núcleo Setor A"] },
+      { id: "c5", atualizadoEm: "14/04/2012", numero: "213478", validade: "18/07/2025", situacao: "Ativa", nucleos: ["Núcleo Setor A", "Núcleo Setor B"] },
+      { id: "c6", atualizadoEm: "14/04/2012", numero: "213465", validade: "20/04/2025", situacao: "Ativa", nucleos: ["Núcleo Setor A", "Núcleo Setor B", "Núcleo Setor C"] },
+    ],
+  },
+  {
+    id: 3,
+    titulo: "Centro de Coleta e Processamento de Sêmen (CCPS)",
+    certificados: [
+      { id: "c7", atualizadoEm: "14/04/2012", numero: "213456", validade: "14/06/2025", situacao: "Ativa", nucleos: ["Núcleo Setor A"] },
+      { id: "c8", atualizadoEm: "14/04/2012", numero: "213478", validade: "18/07/2025", situacao: "Ativa", nucleos: ["Núcleo Setor A", "Núcleo Setor B"] },
+      { id: "c9", atualizadoEm: "14/04/2012", numero: "213465", validade: "20/04/2025", situacao: "Ativa", nucleos: ["Núcleo Setor A", "Núcleo Setor B", "Núcleo Setor C"] },
+    ],
+  },
+  {
+    id: 4,
+    titulo: "Livre de Doença de Aujeszky",
+    certificados: [
+      { id: "c10", atualizadoEm: "14/04/2012", numero: "213456", validade: "14/06/2025", situacao: "Ativa", nucleos: ["Núcleo Setor A"] },
+      { id: "c11", atualizadoEm: "14/04/2012", numero: "213478", validade: "18/07/2025", situacao: "Ativa", nucleos: ["Núcleo Setor A", "Núcleo Setor B"] },
+      { id: "c12", atualizadoEm: "14/04/2012", numero: "213465", validade: "20/04/2025", situacao: "Ativa", nucleos: ["Núcleo Setor A", "Núcleo Setor B", "Núcleo Setor C"] },
+    ],
+  },
+];
+
+// Certificados de AVES (backlog: Sanitário, Compartimento, Frango Caipira, Ovo Caipira)
+const GRUPOS_CERTIFICADOS_AVES: GrupoCertificado[] = [
+  {
+    id: 1,
+    titulo: "Sanitário",
+    certificados: [
+      { id: "av1", atualizadoEm: "14/04/2012", numero: "213456", validade: "14/06/2025", situacao: "Ativa", nucleos: ["Núcleo Avícola A"] },
+    ],
+
+  },
+  {
+    id: 2,
+    titulo: "Compartimento",
+    certificados: [
+      { id: "av2", atualizadoEm: "14/04/2012", numero: "213478", validade: "18/07/2025", situacao: "Ativa", nucleos: ["Núcleo Avícola A", "Núcleo Avícola B"] },
+    ],
+  },
+  {
+    id: 3,
+    titulo: "Frango Caipira",
+    certificados: [
+      { id: "av4", atualizadoEm: "14/04/2012", numero: "213500", validade: "14/06/2025", situacao: "Ativa", nucleos: ["Núcleo Avícola A"] },
+    ],
+  },
+  {
+    id: 4,
+    titulo: "Ovo Caipira",
+    certificados: [
+      { id: "av5", atualizadoEm: "14/04/2012", numero: "213512", validade: "18/07/2025", situacao: "Ativa", nucleos: ["Núcleo Avícola B"] },
+    ],
+  },
+];
+
+const TIPOS_CERTIFICADOS_BOVINOS = [
+  "Brucelose",
+  "Tuberculose",
+  "Tuberculose e Brucelose",
+];
+
+// Para bovinos somente um certificado fica ativo e visível por vez.
+const GRUPOS_CERTIFICADOS_BOVINOS: GrupoCertificado[] = [
+  {
+    id: 1,
+    titulo: "Tuberculose e Brucelose",
+    certificados: [
+      { id: "bv1", atualizadoEm: "14/04/2012", numero: "213465", validade: "20/04/2025", situacao: "Ativa", nucleos: ["Núcleo Setor A", "Núcleo Setor B", "Núcleo Setor C"] },
+    ],
+  },
+];
 
 // ==========================================================
 // BIOSSEGURIDADE — TIPOS E MOCK
@@ -571,7 +694,7 @@ const BIOSSEGURIDADES_MOCK: Biosseguridade[] = [
   },
 ];
 
-const REGISTRO = {
+export const REGISTRO = {
   codigo: "310010400050007",
   situacao: "Ativo" as const,
   estabelecimento: {
@@ -600,7 +723,7 @@ const REGISTRO = {
   nomeReservatorio: "",
   fonteOutro: "",
   finalidadeProducao: "Ciclo Completo",
-  tipoPiscicultura: "Unidade de Production",
+  tipoPiscicultura: "Unidade de Produção",
   origemMatrizes: ["Nacional", "Própria"],
   sistemaProducao: "Fechado",
   sistFechado: ["Aquário", "Tanque Suspenso"],
@@ -655,13 +778,110 @@ const REGISTRO = {
 interface PageProps {
   onLogout?: () => void;
   onNavigate?: (screen: any, data?: any) => void;
+  dados?: any;
+}
+
+// ==========================================================
+// CERTIFICADOS — COMPONENTES
+// ==========================================================
+function CertificadoCard({
+  certificado,
+  onVisualizar,
+}: {
+  certificado: Certificado;
+  onVisualizar: () => void;
+}) {
+  const MAX_CHIPS = 4;
+  const nucleosVisiveis = certificado.nucleos.slice(0, MAX_CHIPS);
+  const extras = certificado.nucleos.length - MAX_CHIPS;
+
+  return (
+    <div className="flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white">
+      {/* Barra superior verde */}
+      <div className="h-1 bg-[#1A7A3C]" />
+      <div className="flex flex-1 flex-col gap-3 p-4">
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] text-gray-500">
+            Atualizado em: <span className="font-medium text-gray-700">{certificado.atualizadoEm}</span>
+          </span>
+          <span className="text-[11px] font-semibold text-[#1A7A3C]">
+            {certificado.situacao}
+          </span>
+        </div>
+
+        <div className="flex items-start gap-2">
+          <BadgeCheck size={18} className="mt-0.5 flex-shrink-0 text-[#1A7A3C]" />
+          <div>
+            <p className="text-sm font-bold text-gray-900">{certificado.numero}</p>
+            <p className="text-[11px] text-gray-500">Certificado</p>
+          </div>
+        </div>
+
+        <div className="flex items-start gap-2">
+          <Calendar size={18} className="mt-0.5 flex-shrink-0 text-[#1A7A3C]" />
+          <div>
+            <p className="text-sm font-bold text-gray-900">{certificado.validade}</p>
+            <p className="text-[11px] text-gray-500">Validade</p>
+          </div>
+        </div>
+
+        <div className="flex items-start gap-2">
+          <img
+            src={Icons.iconeNucleoProducaoUrl}
+            alt="Núcleo de Produção"
+            className="w-5 h-5"
+          />
+
+          <div className="min-w-0">
+            <p className="mb-1.5 flex items-center gap-1 text-[11px] text-gray-500">
+              Núcleos do certificado:
+              {extras > 0 && (
+                <span className="font-semibold text-gray-400">+{extras}</span>
+              )}
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {nucleosVisiveis.map((nucleo) => (
+                <span
+                  key={nucleo}
+                  className="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-0.5 text-[11px] text-gray-600"
+                >
+                  {nucleo}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Rodapé com ação */}
+      <div className="flex items-center gap-2 border-t border-gray-100 p-3">
+        <button
+          type="button"
+          onClick={onVisualizar}
+          className="flex-1 h-10 rounded-md bg-[#1A7A3C] text-sm font-semibold text-white transition hover:bg-[#15612F]"
+        >
+          Visualizar
+        </button>
+        <button
+          type="button"
+          title="Mais opções"
+          className="flex h-10 w-9 items-center justify-center rounded-md text-gray-400 hover:bg-gray-50 hover:text-gray-600"
+        >
+          <MoreVertical size={18} />
+        </button>
+      </div>
+    </div>
+  );
 }
 
 export function VisualizarExploracaoPecuariaPage({
-  onLogout = () => {},
+  onLogout = () => { },
   onNavigate = (screen: any) => console.log("navigate:", screen),
+  dados,
 }: PageProps = {}) {
-  const r = REGISTRO;
+  // Usa o registro selecionado na busca; cai no mock apenas se a tela
+  // for aberta sem nenhum registro (ex.: acesso direto/protótipo).
+  const r = dados ?? REGISTRO;
   const d = CICLO_UP_MOCK;
   const ativos = d.filter((c) => c.situacao === "Ativo");
   const inativos = d.filter((c) => c.situacao === "Inativo");
@@ -672,7 +892,15 @@ export function VisualizarExploracaoPecuariaPage({
   const [modalBiosseguiradadeAberto, setModalBiosseguiradadeAberto] =
     useState(false);
   const [modalCicloAberto, setModalCicloAberto] = useState(false);
-  // ==========================================================
+  const [modalCertificadoAberto, setModalCertificadoAberto] = useState(false);
+  const [grupoCertificadoBovino, setGrupoCertificadoBovino] =
+    useState<GrupoCertificado>(GRUPOS_CERTIFICADOS_BOVINOS[0]);
+  const [certTipo, setCertTipo] = useState("");
+  const [certValidade, setCertValidade] = useState("");
+  const [certNumero, setCertNumero] = useState("");
+  const [certDocumento, setCertDocumento] = useState("");
+  const [certDocumentoDescricao, setCertDocumentoDescricao] = useState("");
+  const [certNucleos, setCertNucleos] = useState<any[]>([null]);  // ==========================================================
   // ESTADOS DA AVALIAÇÃO DE BIOSSEGURIDADE (CONFORME O PDF)
   // ==========================================================
   const [profissional, setProfissional] = useState("");
@@ -724,6 +952,49 @@ export function VisualizarExploracaoPecuariaPage({
   const [novaObs, setNovaObs] = useState("");
 
   const isPeixes = r.especie.grupo === "Peixes";
+  const isAves = r.especie.grupo === "Aves";
+  const isSuideos = r.especie.grupo === "Suídeos" || r.especie.grupo === "Suínos";
+  const isBovinos = r.especie.grupo === "Bovinos" || r.especie.grupo === "Bovídeos";
+  const temCertificados = isAves || isSuideos || isBovinos;
+  const gruposCertificados = isAves
+    ? GRUPOS_CERTIFICADOS_AVES
+    : isBovinos
+      ? [grupoCertificadoBovino]
+      : GRUPOS_CERTIFICADOS_SUIDEOS;
+  const opcoesCertificado = (isBovinos
+    ? TIPOS_CERTIFICADOS_BOVINOS
+    : gruposCertificados.map((grupo) => grupo.titulo)
+  ).map((titulo) => ({ value: titulo, label: titulo }));
+  const abrirModalCertificado = () => {
+    setCertTipo(isBovinos ? grupoCertificadoBovino.titulo : "");
+    setModalCertificadoAberto(true);
+  };
+  const salvarCertificado = () => {
+    if (isBovinos && certTipo) {
+      const certificadoAtual = grupoCertificadoBovino.certificados[0];
+      const nucleosSelecionados = certNucleos
+        .filter(Boolean)
+        .map((nucleo) => nucleo.nome);
+      const validadeFormatada = certValidade
+        ? certValidade.split("-").reverse().join("/")
+        : certificadoAtual.validade;
+
+      setGrupoCertificadoBovino({
+        id: 1,
+        titulo: certTipo,
+        certificados: [{
+          ...certificadoAtual,
+          atualizadoEm: new Date().toLocaleDateString("pt-BR"),
+          numero: certNumero || certificadoAtual.numero,
+          validade: validadeFormatada,
+          nucleos: nucleosSelecionados.length
+            ? nucleosSelecionados
+            : certificadoAtual.nucleos,
+        }],
+      });
+    }
+    setModalCertificadoAberto(false);
+  };
   const isOrnamental =
     r.aptidao === "Ornamental" || r.especie.nome === "Peixe Ornamental";
 
@@ -799,16 +1070,15 @@ export function VisualizarExploracaoPecuariaPage({
 
   const TABS = [
     { id: "cadastro", label: "Cadastro", icon: <FileText size={16} /> },
-    {
-      id: "biosseguridade",
-      label: "Biosseguridade",
-      icon: <ShieldCheck size={16} />,
-    },
-    {
-      id: "producao/distribuicao",
-      label: "Ciclo de produção/distribuição",
-      icon: <History size={16} />,
-    },
+    ...(temCertificados
+      ? [{ id: "certificados", label: "Certificados", icon: <BadgeCheck size={16} /> }]
+      : []),
+    ...(isPeixes
+      ? [
+        { id: "biosseguridade", label: "Biosseguridade", icon: <ShieldCheck size={16} /> },
+        { id: "producao/distribuicao", label: "Ciclo de produção/distribuição", icon: <History size={16} /> },
+      ]
+      : []),
   ];
 
   const renderActionButton = () => {
@@ -821,6 +1091,17 @@ export function VisualizarExploracaoPecuariaPage({
             className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2"
           >
             Editar
+          </button>
+        );
+
+      case "certificados":
+        return (
+          <button
+            type="button"
+            onClick={abrirModalCertificado}
+            className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2"
+          >
+            Adicionar Certificado
           </button>
         );
 
@@ -974,11 +1255,10 @@ export function VisualizarExploracaoPecuariaPage({
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 py-2 px-4 border-b-2 text-sm font-medium transition ${
-                activeTab === tab.id
-                  ? "border-[#1A7A3C] text-[#1A7A3C]"
-                  : "border-transparent text-gray-500 hover:text-gray-700"
-              }`}
+              className={`flex items-center gap-2 py-2 px-4 border-b-2 text-sm font-medium transition ${activeTab === tab.id
+                ? "border-[#1A7A3C] text-[#1A7A3C]"
+                : "border-transparent text-gray-500 hover:text-gray-700"
+                }`}
             >
               {tab.icon}
               {tab.label}
@@ -996,7 +1276,7 @@ export function VisualizarExploracaoPecuariaPage({
                   label="Código do Estabelecimento"
                   value={r.estabelecimento.codigo}
                   disabled
-                  onChange={() => {}}
+                  onChange={() => { }}
                 />
 
                 {/* 2º Elemento: Nome do Estabelecimento com a ação "Ver" (Lado Direito / Depois do código) */}
@@ -1015,7 +1295,7 @@ export function VisualizarExploracaoPecuariaPage({
                 <FloatSelect
                   label="Unidade de Medida da Área"
                   value={r.unidadeArea}
-                  onChange={() => {}}
+                  onChange={() => { }}
                   disabled
                   options={toOptions([r.unidadeArea])}
                 />
@@ -1023,13 +1303,13 @@ export function VisualizarExploracaoPecuariaPage({
                   label="Área Produtiva do Estabelecimento"
                   value={r.areaProdutiva}
                   disabled
-                  onChange={() => {}}
+                  onChange={() => { }}
                 />
                 <FloatInput
                   label="Área Útil da Exploração"
                   value={r.areaUtil}
                   disabled
-                  onChange={() => {}}
+                  onChange={() => { }}
                   hasTooltip
                   tooltipText="A área útil da exploração deve respeitar os limites da área produtiva disponível para a abertura de explorações no estabelecimento agropecuário."
                 />
@@ -1042,7 +1322,7 @@ export function VisualizarExploracaoPecuariaPage({
                   <FloatSelect
                     label="Tipo de Produtor"
                     value={r.titularTipo}
-                    onChange={() => {}}
+                    onChange={() => { }}
                     disabled
                     options={toOptions([r.titularTipo])}
                   />
@@ -1066,7 +1346,7 @@ export function VisualizarExploracaoPecuariaPage({
                       value={r.especie.grupo}
                       icon={<Dna size={18} color={GREEN} />}
                       disabled
-                      onChange={() => {}}
+                      onChange={() => { }}
                     />
                     <EntidadeLeitura
                       label="Espécie"
@@ -1107,14 +1387,14 @@ export function VisualizarExploracaoPecuariaPage({
                         <FloatSelect
                           label="Aptidão"
                           value={r.aptidao}
-                          onChange={() => {}}
+                          onChange={() => { }}
                           disabled
                           options={toOptions([r.aptidao])}
                         />
                         <FloatSelect
                           label="Bacia Hidrográfica"
                           value={r.bacia}
-                          onChange={() => {}}
+                          onChange={() => { }}
                           disabled
                           options={toOptions([r.bacia])}
                         />
@@ -1125,7 +1405,7 @@ export function VisualizarExploracaoPecuariaPage({
                         actionLabel=""
                         options={toCheck(r.origemCaptacao)}
                         defaultValue={r.origemCaptacao}
-                        onChange={() => {}}
+                        onChange={() => { }}
                         orientation="horizontal"
                       />
                       <CheckboxGroup
@@ -1133,7 +1413,7 @@ export function VisualizarExploracaoPecuariaPage({
                         actionLabel=""
                         options={toCheck(r.fonteCaptacao)}
                         defaultValue={r.fonteCaptacao}
-                        onChange={() => {}}
+                        onChange={() => { }}
                         orientation="grid"
                       />
 
@@ -1143,7 +1423,7 @@ export function VisualizarExploracaoPecuariaPage({
                             label="Nome do Rio"
                             value={r.nomeRio}
                             disabled
-                            onChange={() => {}}
+                            onChange={() => { }}
                           />
                         )}
                       </div>
@@ -1157,22 +1437,22 @@ export function VisualizarExploracaoPecuariaPage({
               <Section title="Caracterização do Sistema Produtivo">
                 <div className="flex flex-col gap-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-                    <FloatSelect
-                      label="Finalidade de Production"
-                      value={r.finalidadeProducao}
-                      onChange={() => {}}
-                      disabled
-                      options={toOptions([r.finalidadeProducao])}
-                    />
                     {isOrnamental && (
                       <FloatSelect
                         label="Tipo de Piscicultura Ornamental"
                         value={r.tipoPiscicultura}
-                        onChange={() => {}}
+                        onChange={() => { }}
                         disabled
                         options={toOptions([r.tipoPiscicultura])}
                       />
                     )}
+                    <FloatSelect
+                      label="Finalidade de Produção"
+                      value={r.finalidadeProducao}
+                      onChange={() => { }}
+                      disabled
+                      options={toOptions([r.finalidadeProducao])}
+                    />
                   </div>
 
                   <CheckboxGroup
@@ -1180,7 +1460,7 @@ export function VisualizarExploracaoPecuariaPage({
                     actionLabel=""
                     options={toCheck(r.origemMatrizes)}
                     defaultValue={r.origemMatrizes}
-                    onChange={() => {}}
+                    onChange={() => { }}
                     orientation="horizontal"
                   />
 
@@ -1188,7 +1468,7 @@ export function VisualizarExploracaoPecuariaPage({
                     <FloatSelect
                       label="Sistema de Produção"
                       value={r.sistemaProducao}
-                      onChange={() => {}}
+                      onChange={() => { }}
                       disabled
                       options={toOptions([r.sistemaProducao])}
                     />
@@ -1201,7 +1481,7 @@ export function VisualizarExploracaoPecuariaPage({
                         actionLabel=""
                         options={toCheck(r.sistFechado)}
                         defaultValue={r.sistFechado}
-                        onChange={() => {}}
+                        onChange={() => { }}
                         orientation="vertical"
                       />
                     )}
@@ -1210,7 +1490,7 @@ export function VisualizarExploracaoPecuariaPage({
                       actionLabel=""
                       options={toCheck(r.abastecimento)}
                       defaultValue={r.abastecimento}
-                      onChange={() => {}}
+                      onChange={() => { }}
                       orientation="vertical"
                     />
                     <CheckboxGroup
@@ -1218,7 +1498,7 @@ export function VisualizarExploracaoPecuariaPage({
                       actionLabel=""
                       options={toCheck(r.localDescarte)}
                       defaultValue={r.localDescarte}
-                      onChange={() => {}}
+                      onChange={() => { }}
                       orientation="vertical"
                     />
                   </div>
@@ -1227,7 +1507,7 @@ export function VisualizarExploracaoPecuariaPage({
                     label="Realiza depuração de peixes?"
                     name="depuracao-view"
                     value={r.realizaDepuracao}
-                    onChange={() => {}}
+                    onChange={() => { }}
                     disabled
                   />
 
@@ -1237,7 +1517,7 @@ export function VisualizarExploracaoPecuariaPage({
                       actionLabel=""
                       options={toCheck(r.tipoDestino)}
                       defaultValue={r.tipoDestino}
-                      onChange={() => {}}
+                      onChange={() => { }}
                       orientation="horizontal"
                     />
                     <CheckboxGroup
@@ -1245,7 +1525,7 @@ export function VisualizarExploracaoPecuariaPage({
                       actionLabel=""
                       options={toCheck(r.escalaComercio)}
                       defaultValue={r.escalaComercio}
-                      onChange={() => {}}
+                      onChange={() => { }}
                       orientation="horizontal"
                     />
                   </SubGrupo>
@@ -1258,7 +1538,7 @@ export function VisualizarExploracaoPecuariaPage({
                           actionLabel=""
                           options={toCheck(r.tratAfluente)}
                           defaultValue={r.tratAfluente}
-                          onChange={() => {}}
+                          onChange={() => { }}
                           orientation="vertical"
                         />
                         <CheckboxGroup
@@ -1266,7 +1546,7 @@ export function VisualizarExploracaoPecuariaPage({
                           actionLabel=""
                           options={toCheck(r.tratEfluente)}
                           defaultValue={r.tratEfluente}
-                          onChange={() => {}}
+                          onChange={() => { }}
                           orientation="vertical"
                         />
                       </div>
@@ -1318,7 +1598,7 @@ export function VisualizarExploracaoPecuariaPage({
                   label="É um Subarrendamento/Subcomodato?"
                   name="sub-exploracao-view"
                   value={r.isSub}
-                  onChange={() => {}}
+                  onChange={() => { }}
                   disabled
                   hasTooltip
                   tooltipText="Para casos em que a exploração pecuária é uma sub alocação dentro de outra exploração pecuária."
@@ -1351,7 +1631,7 @@ export function VisualizarExploracaoPecuariaPage({
                           label="Documento"
                           value={anexo.nome}
                           disabled
-                          onChange={() => {}}
+                          onChange={() => { }}
                         />
                       </div>
                       <div className="flex-1">
@@ -1359,7 +1639,7 @@ export function VisualizarExploracaoPecuariaPage({
                           label="Descrição"
                           value={anexo.descricao || "—"}
                           disabled
-                          onChange={() => {}}
+                          onChange={() => { }}
                         />
                       </div>
                       <div className="h-12 flex items-center">
@@ -1383,7 +1663,7 @@ export function VisualizarExploracaoPecuariaPage({
               <LargeTextArea
                 label="Observação"
                 value={r.observacao}
-                onChange={() => {}}
+                onChange={() => { }}
                 disabled
                 hasTooltip
                 tooltipText="Informações adicionais pertinentes ao cadastro."
@@ -1396,16 +1676,61 @@ export function VisualizarExploracaoPecuariaPage({
                   label="Usuário"
                   value={r.usuarioAlteracao}
                   disabled
-                  onChange={() => {}}
+                  onChange={() => { }}
                 />
                 <FloatInput
                   label="Data e Hora da Última Modificação"
                   value={r.dataAlteracao}
                   disabled
-                  onChange={() => {}}
+                  onChange={() => { }}
                 />
               </div>
             </Section>
+          </div>
+        )}
+
+        {/* ================= ABA CERTIFICADOS ================= */}
+        {activeTab === "certificados" && (
+          <div className="flex flex-col gap-4 mt-2">
+            {gruposCertificados.map((grupo) => (
+              <AccordionCardGroup
+                key={grupo.id}
+                title={grupo.titulo}
+                activeCountText={`${grupo.certificados.length} Certificados Ativos`}
+                icon={<BadgeCheck className="w-5 h-5" />}
+                onAddClick={abrirModalCertificado}
+                variant="sem-vinculacao"
+                grid="triplo"
+                historicoTitle="Histórico de Inativos"
+                historicoChildren={(grupo.inativos ?? []).map((cert) => (
+                  <HistoryCard
+                    key={cert.id}
+                    label={cert.numero}
+                    subLabel={`Validade: ${cert.validade}`}
+                    topBarSvgPath={TOP_BAR_HISTORY}
+                    icon={<BadgeCheck size={18} className="text-gray-500" />}
+                    actionIcon={
+                      <Eye
+                        size={16}
+                        className="text-gray-500 hover:text-[#008446] transition-colors"
+                      />
+                    }
+                    onActionClick={() => onNavigate("visualizar-certificado", cert)}
+                    actionIconPath={""}
+                  />
+                ))}
+              >
+                {grupo.certificados.map((certificado) => (
+                  <CertificadoCard
+                    key={certificado.id}
+                    certificado={certificado}
+                    onVisualizar={() =>
+                      onNavigate("visualizar-certificado", certificado)
+                    }
+                  />
+                ))}
+              </AccordionCardGroup>
+            ))}
           </div>
         )}
 
@@ -1522,28 +1847,28 @@ export function VisualizarExploracaoPecuariaPage({
                       className="rounded-sm"
                       value={c.quantidade}
                       disabled
-                      onChange={() => {}}
+                      onChange={() => { }}
                     />
                     <FloatInput
                       label="Unidade de Medida dos Tanques"
                       className="rounded-sm"
                       value={c.unidade}
                       disabled
-                      onChange={() => {}}
+                      onChange={() => { }}
                     />
                     <FloatInput
                       label="Tamanho médio dos Tanques"
                       className="rounded-sm"
                       value={c.capacidade}
                       disabled
-                      onChange={() => {}}
+                      onChange={() => { }}
                     />
                     <FloatInput
                       label="Quantidade de Tanques"
                       className="rounded-sm"
                       value={c.quantidadeTanques}
                       disabled
-                      onChange={() => {}}
+                      onChange={() => { }}
                     />
                   </div>
                 </div>
@@ -1567,28 +1892,28 @@ export function VisualizarExploracaoPecuariaPage({
                       className="rounded-sm"
                       value={c.quantidade}
                       disabled
-                      onChange={() => {}}
+                      onChange={() => { }}
                     />
                     <FloatInput
                       label="Unidade de Medida dos Tanques"
                       className="rounded-sm"
                       value={c.unidade}
                       disabled
-                      onChange={() => {}}
+                      onChange={() => { }}
                     />
                     <FloatInput
                       label="Tamanho médio dos Tanques"
                       className="rounded-sm"
                       value={c.capacidade}
                       disabled
-                      onChange={() => {}}
+                      onChange={() => { }}
                     />
                     <FloatInput
                       label="Quantidade de Tanques"
                       className="rounded-sm"
                       value={c.quantidadeTanques}
                       disabled
-                      onChange={() => {}}
+                      onChange={() => { }}
                     />
                   </div>
                 </div>
@@ -1623,7 +1948,7 @@ export function VisualizarExploracaoPecuariaPage({
                     className="rounded-sm"
                     value={""}
                     required
-                    onChange={() => {}}
+                    onChange={() => { }}
                   />
                   <FloatInput
                     label="Unidade de Medida dos Tanques"
@@ -1655,14 +1980,14 @@ export function VisualizarExploracaoPecuariaPage({
                     className="rounded-sm"
                     value={""}
                     required
-                    onChange={() => {}}
+                    onChange={() => { }}
                   />
                   <FloatInput
                     label="Quantidade de Tanques"
                     className="rounded-sm"
                     value={""}
                     required
-                    onChange={() => {}}
+                    onChange={() => { }}
                   />
                 </div>
               </SubGrupo>
@@ -1673,7 +1998,7 @@ export function VisualizarExploracaoPecuariaPage({
                     className="rounded-sm"
                     value={""}
                     required
-                    onChange={() => {}}
+                    onChange={() => { }}
                   />
                   <FloatInput
                     label="Unidade de Medida dos Tanques"
@@ -1705,14 +2030,14 @@ export function VisualizarExploracaoPecuariaPage({
                     className="rounded-sm"
                     value={""}
                     required
-                    onChange={() => {}}
+                    onChange={() => { }}
                   />
                   <FloatInput
                     label="Quantidade de Tanques"
                     className="rounded-sm"
                     value={""}
                     required
-                    onChange={() => {}}
+                    onChange={() => { }}
                   />
                 </div>
               </SubGrupo>
@@ -1723,7 +2048,7 @@ export function VisualizarExploracaoPecuariaPage({
                     className="rounded-sm"
                     value={""}
                     required
-                    onChange={() => {}}
+                    onChange={() => { }}
                   />
                   {/* <FloatInput
                     label="Unidade de Medida dos Tanques"
@@ -1755,14 +2080,14 @@ export function VisualizarExploracaoPecuariaPage({
                     className="rounded-sm"
                     value={""}
                     required
-                    onChange={() => {}}
+                    onChange={() => { }}
                   />
                   <FloatInput
                     label="Quantidade de Tanques"
                     className="rounded-sm"
                     value={""}
                     required
-                    onChange={() => {}}
+                    onChange={() => { }}
                   />
                 </div>
               </SubGrupo>
@@ -1773,7 +2098,7 @@ export function VisualizarExploracaoPecuariaPage({
                     className="rounded-sm"
                     value={""}
                     required
-                    onChange={() => {}}
+                    onChange={() => { }}
                   />
                   {/* <FloatInput
                     label="Unidade de Medida dos Tanques"
@@ -1805,14 +2130,14 @@ export function VisualizarExploracaoPecuariaPage({
                     className="rounded-sm"
                     value={""}
                     required
-                    onChange={() => {}}
+                    onChange={() => { }}
                   />
                   <FloatInput
                     label="Quantidade de Tanques"
                     className="rounded-sm"
                     value={""}
                     required
-                    onChange={() => {}}
+                    onChange={() => { }}
                   />
                 </div>
               </SubGrupo>
@@ -1825,7 +2150,7 @@ export function VisualizarExploracaoPecuariaPage({
                 className="rounded-sm"
                 value={""}
                 required
-                onChange={() => {}}
+                onChange={() => { }}
               />
               {/* <FloatInput
                 label="Unidade de Medida dos Tanques/Aquários"
@@ -1857,14 +2182,14 @@ export function VisualizarExploracaoPecuariaPage({
                 className="rounded-sm"
                 value={""}
                 required
-                onChange={() => {}}
+                onChange={() => { }}
               />
               <FloatInput
                 label="Quantidade de Tanques/Aquários"
                 className="rounded-sm"
                 value={""}
                 required
-                onChange={() => {}}
+                onChange={() => { }}
               />
             </div>
           </Section>
@@ -2061,6 +2386,183 @@ export function VisualizarExploracaoPecuariaPage({
               </div>
             </div>
           </div>
+        </div>
+      </ModalBase>
+
+      {/* MODAL — ADICIONAR CERTIFICADO */}
+      <ModalBase
+        open={modalCertificadoAberto}
+        onClose={() => setModalCertificadoAberto(false)}
+        title="Certificado"
+        subtitle="Preencha os campos para adicionar um certificado aos núcleos da exploração."
+        icon={<BadgeCheck size={24} />}
+        saveText="Salvar"
+        cancelText="Cancelar"
+        onSave={salvarCertificado}
+      >
+        <div className="w-full flex flex-col gap-6">
+          {/* Informações Gerais */}
+          <Section title="Informações Gerais" defaultOpen={true}>
+            <div className="flex flex-col gap-5 w-full">
+              <FloatSelect
+                label="Certificado "
+                required
+                value={certTipo}
+                onChange={setCertTipo}
+                options={opcoesCertificado}
+              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <FloatInput
+                  label="Data de Validade "
+                  type="date"
+                  required
+                  value={certValidade}
+                  onChange={setCertValidade}
+                  icon={<Calendar size={20} color={GREEN} />}
+                />
+                <FloatInput
+                  label="Número do Certificado "
+                  required
+                  value={certNumero}
+                  onChange={setCertNumero}
+                />
+              </div>
+
+              {/* Documento (upload no padrão do projeto) */}
+              <div className="flex items-start gap-3">
+                <div className="flex-1">
+                  <UploadField
+                    label="Documento"
+                    required
+                    fileName={certDocumento}
+                    onSelectFile={() => setCertDocumento("documento_certificado.pdf")}
+                  />
+
+                </div>
+
+                {/* Descrição e Download aparecem só após anexar */}
+                {certDocumento && (
+                  <>
+                    <div className="flex-1">
+                      <FloatInput
+                        label="Descrição"
+                        value={certDocumentoDescricao}
+                        placeholder="Descrição opcional..."
+                        onChange={setCertDocumentoDescricao}
+                      />
+                    </div>
+                    <div className="h-12 flex items-center">
+                      <button
+                        type="button"
+                        onClick={() => alert(`Fazendo download de: ${certDocumento}`)}
+                        className="p-2.5 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"
+                      >
+                        <Download size={20} />
+                      </button>
+                    </div>
+                    <div className="h-12 flex items-center">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCertDocumento("");
+                          setCertDocumentoDescricao("");
+                        }}
+                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+                      >
+                        <Trash2 size={20} />
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          </Section>
+
+          {/* Núcleo de Produção */}
+          <Section title="Núcleo de Produção" defaultOpen={true}>
+            <div className="flex flex-col gap-4 w-full">
+              {certNucleos.map((nucleo, index) => (
+                <div key={index} className="flex items-end gap-3">
+                  {/* Campo de Busca do Núcleo */}
+                  <div className="flex-1">
+                    <EntitySearchInput
+                      label="Núcleo de Produção"
+                      placeholder="Buscar núcleo de produção"
+                      required
+                      value={nucleo?.nome ?? ""}
+                      data={NUCLEOS_CERTIFICADO_MOCK}
+                      searchKeys={["nome", "codigo"]}
+                      columns={[
+                        { label: "Núcleo", key: "nome" },
+                        { label: "Código", key: "codigo" },
+                      ]}
+                      title="Buscar Núcleo de Produção"
+                      subtitle="Selecione um núcleo de produção da exploração:"
+                      confirmLabel="Selecionar"
+                      icon={
+                        <img
+                          src={Icons.iconeNucleoProducaoUrl}
+                          alt=""
+                          className="w-5 h-5 object-contain"
+                        />
+                      }
+                      onChange={(ent: any) =>
+                        setCertNucleos((prev) =>
+                          prev.map((n, i) => (i === index ? ent : n)),
+                        )
+                      }
+                    />
+                  </div>
+
+                  {/* Exibe o Código caso o núcleo tenha sido selecionado */}
+                  {nucleo?.codigo && (
+                    <div className="w-32 flex-shrink-0">
+                      <FloatInput label="Código" value={nucleo.codigo} disabled />
+                    </div>
+                  )}
+
+                  {/* Botões de Ação */}
+                  <div className="flex items-center gap-1">
+                    {/* Ícone de Olho (Verde) - Só aparece se o núcleo for selecionado */}
+                    {nucleo && (
+                      <button
+                        type="button"
+                        title="Visualizar detalhes do núcleo"
+                        onClick={() => {
+                          console.log("Visualizar núcleo:", nucleo);
+                        }}
+                        className="flex h-11 w-11 items-center justify-center  text-[#1A7A3C] "
+                      >
+                        <Eye size={18} />
+                      </button>
+                    )}
+
+                    {/* Botão de Remover */}
+                    <button
+                      type="button"
+                      title="Remover núcleo"
+                      onClick={() =>
+                        setCertNucleos((prev) => prev.filter((_, i) => i !== index))
+                      }
+                      className="flex h-11 w-11 items-center justify-center  bg-white text-red-500 transition "
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+
+              {/* Botão para adicionar a primeira linha / novas linhas */}
+              <button
+                type="button"
+                onClick={() => setCertNucleos((prev) => [...prev, null])}
+                className="flex w-fit items-center gap-2 rounded-md border border-[#1A7A3C] px-4 py-2.5 text-sm font-semibold text-[#1A7A3C] transition hover:bg-green-50 mt-1"
+              >
+                <PlusCircle size={18} />
+                Adicionar Núcleo
+              </button>
+            </div>
+          </Section>
         </div>
       </ModalBase>
     </div>

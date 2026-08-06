@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { ArrowLeft, Pencil, FileText, Hash, PlusCircle } from "lucide-react";
+import { ArrowLeft, FileText, Hash, PlusCircle } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, Tabs } from "../../../components/ui/FormKit";
 import { IndiceTab } from "../Indice/IndiceTab";
+import { obterValorIndice } from "./valorIndiceData";
 
 interface VisualizarValorIndiceProps {
   dados: any; 
@@ -18,11 +19,12 @@ export function VisualizarValorIndicePage({ dados, onLogout, onNavigate }: Visua
   const [isModalIndiceOpen, setIsModalIndiceOpen] = useState(false);
 
   // Fallback de dados
-  const valorIndice = dados || {
-    indice: "",
-    ano: "",
-    mes: "",
-    valor: 0,
+  const valorIndice = obterValorIndice(dados?.id) || dados || {
+    id: 1,
+    indice: "UFEMG",
+    ano: "2026",
+    mes: "Julho",
+    valor: "5,2797",
     situacao: "Ativo"
   };
 
@@ -68,7 +70,7 @@ export function VisualizarValorIndicePage({ dados, onLogout, onNavigate }: Visua
                 onClick={() => onNavigate("adicionar-valor-indice", valorIndice)} 
                 className="px-5 h-10 bg-[#1A7A3C] text-white text-xs font-bold rounded-md flex items-center gap-2 hover:bg-[#15612F] transition shadow-sm"
               >
-                <Pencil size={15} /> Editar
+                Editar
               </button>
             )}
 

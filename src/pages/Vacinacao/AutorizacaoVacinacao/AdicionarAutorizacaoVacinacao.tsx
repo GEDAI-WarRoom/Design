@@ -10,6 +10,7 @@ import { Navbar } from "../../../components/Navbar";
 import { FloatInput, FloatSelect, SearchModal, LargeTextArea } from "../../../components/ui/FormKit";
 import { EntitySearchInput, ProdutorInput, EstabelecimentoAgropecuarioInput, ExploracaoPecuariaInput } from "../../../components/ui/EntitySearch";
 import * as Icons from "../../../imports/icons";
+import { CadastroVacinacaoHeader, cadastroVacinacaoPageClass, mensagemSucessoCadastro, preencherComExemplo, type CadastroVacinacaoModeProps } from "../shared/CadastroVacinacaoMode";
 
 const GREEN = "#1A7A3C";
 
@@ -70,22 +71,49 @@ function SectionCard({ title, children }: { title: string; children: React.React
   );
 }
 
-interface PageProps {
+interface PageProps extends CadastroVacinacaoModeProps {
   onLogout: () => void;
   onNavigate: (screen: any, data?: any) => void;
 }
 
-export function AdicionarAutorizacaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
+export function AdicionarAutorizacaoVacinacaoPage({ onLogout, onNavigate, mode = "create", dados }: PageProps) {
+  const preenchendoRegistro = mode !== "create";
+  const produtorInicial = dados?.produtor ?? (dados?.produtorNome
+    ? PRODUTORES_MOCK.find((item) => item.documento === dados.produtorDoc) ?? {
+        id: `produtor-${dados?.id ?? "registro"}`,
+        nome: dados.produtorNome,
+        documento: dados.produtorDoc,
+        tipo: dados.produtorDoc?.includes("/") ? "PJ" : "PF",
+      }
+    : null);
+  const estabelecimentoInicial = dados?.estabelecimento ?? (dados?.estabNome
+    ? ESTABELECIMENTOS_MOCK.find((item) => item.codigo === dados.estabCodigo) ?? {
+        id: `estabelecimento-${dados?.id ?? "registro"}`,
+        produtorId: produtorInicial?.id,
+        codigo: dados.estabCodigo,
+        nome: dados.estabNome,
+      }
+    : null);
+  const especieInicial = dados?.especieEntidade ?? (dados?.especie
+    ? ESPECIES_MOCK.find((item) => item.nome === dados.especie) ?? { id: `especie-${dados?.id ?? "registro"}`, nome: dados.especie }
+    : null);
+  const doencaInicial = dados?.doencaEntidade ?? (dados?.doenca
+    ? DOENCAS_MOCK.find((item) => item.nome === dados.doenca) ?? { id: `doenca-${dados?.id ?? "registro"}`, nome: dados.doenca }
+    : null);
+  const etapaInicial = dados?.etapaEntidade ?? (dados?.etapa
+    ? ETAPAS_MOCK.find((item) => item.nome === dados.etapa) ?? { id: `etapa-${dados?.id ?? "registro"}`, nome: dados.etapa }
+    : null);
+
   // ---- Informações Básicas (AC3) ----
-  const [produtor, setProdutor] = useState<any | null>(null);
-  const [estabelecimento, setEstabelecimento] = useState<any | null>(null);
-  const [exploracao, setExploracao] = useState<any | null>(null);
-  const [nucleo, setNucleo] = useState<any | null>(null);
-  const [especie, setEspecie] = useState<any | null>(null);
-  const [doenca, setDoenca] = useState<any | null>(null);
-  const [etapa, setEtapa] = useState<any | null>(null);
-  const [quantidadeDoses, setQuantidadeDoses] = useState("");
-   const [observacaoResidencia, setObservacaoResidencia] = useState("");
+  const [produtor, setProdutor] = useState<any | null>(produtorInicial);
+  const [estabelecimento, setEstabelecimento] = useState<any | null>(estabelecimentoInicial);
+  const [exploracao, setExploracao] = useState<any | null>(dados?.exploracao ?? null);
+  const [nucleo, setNucleo] = useState<any | null>(dados?.nucleo ?? null);
+  const [especie, setEspecie] = useState<any | null>(especieInicial);
+  const [doenca, setDoenca] = useState<any | null>(doencaInicial);
+  const [etapa, setEtapa] = useState<any | null>(etapaInicial);
+  const [quantidadeDoses, setQuantidadeDoses] = useState(dados?.quantidadeDoses ?? (preenchendoRegistro ? "50" : ""));
+   const [observacaoResidencia, setObservacaoResidencia] = useState(dados?.justificativa ?? (preenchendoRegistro ? "Autorização emitida conforme a etapa de vacinação vigente." : ""));
 
 
   // ---- Modal do Produtor (seleção PF/PJ) ----
@@ -164,6 +192,10 @@ export function AdicionarAutorizacaoVacinacaoPage({ onLogout, onNavigate }: Page
 
 
   const handleSalvar = () => {
+    if (mode === "create") {
+      setSucesso(true);
+      return;
+    }
     setTentouSalvar(true);
     if (!formValido) return;
     // TODO: chamada de API. Por ora, exibe o card de sucesso.
@@ -175,22 +207,60 @@ export function AdicionarAutorizacaoVacinacaoPage({ onLogout, onNavigate }: Page
     { label: "Documento", key: "documento" },
   ];
 
+  const registroAtual = preencherComExemplo({
+    ...(dados ?? {}),
+    id: dados?.id ?? `autorizacao-${Date.now()}`,
+    produtor,
+    estabelecimento,
+    exploracao,
+    nucleo,
+    especieEntidade: especie,
+    doencaEntidade: doenca,
+    etapaEntidade: etapa,
+    produtorNome: produtor?.nome,
+    produtorDoc: produtor?.documento,
+    estabCodigo: estabelecimento?.codigo,
+    estabNome: estabelecimento?.nome,
+    especie: especie?.nome,
+    doenca: doenca?.nome,
+    etapa: etapa?.nome,
+    quantidadeDoses,
+    justificativa: observacaoResidencia,
+    situacao: "Gravada",
+  }, {
+    id: "autorizacao-exemplo",
+    produtor: { id: 1, nome: "José Aarão Neto", documento: "555.009.956-40", tipo: "PF" },
+    estabelecimento: { id: 1, produtorId: 1, codigo: "31234567891", nome: "Fazenda do Rio" },
+    exploracao: { id: 1, codigo: "3100104050003", especie: "Bovino" },
+    nucleo: null,
+    especieEntidade: { id: 1, codigo: "ESP-001", nome: "Bovino", grupo: "Bovídeos" },
+    doencaEntidade: { id: 1, nome: "Brucelose" },
+    etapaEntidade: { id: 1, nome: "2026/02", doencaNome: "Brucelose" },
+    produtorNome: "José Aarão Neto",
+    produtorDoc: "555.009.956-40",
+    estabCodigo: "31234567891",
+    estabNome: "Fazenda do Rio",
+    especie: "Bovino",
+    doenca: "Brucelose",
+    etapa: "2026/02",
+    quantidadeDoses: "50",
+    justificativa: "Autorização de exemplo conforme a etapa de vacinação vigente.",
+    situacao: "Gravada",
+  });
+
   return (
-    <div className="min-h-screen bg-[#f2f3f5] pb-24">
-      <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="autorizacao-vacina" hideSearch />
+    <div className={cadastroVacinacaoPageClass(mode, "min-h-screen bg-[#f2f3f5] pb-24")}>
+      <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="autorizacao-vacinacao" hideSearch />
 
       <main className="max-w-[1300px] mx-auto px-4 md:px-6 py-6">
         {/* Topo da Página */}
         <div className="mb-4">
-          <button onClick={() => onNavigate("autorizacao-vacina")} className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70" style={{ color: GREEN }}>
+          <button onClick={() => onNavigate("autorizacao-vacinacao")} className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70" style={{ color: GREEN }}>
             <ArrowLeft size={15} />
             Inicial
           </button>
          
-          <div className="flex justify-between items-center w-full">
-            <h1 className="text-2xl font-semibold text-gray-900">Adicionar Autorização de Vacina</h1>
-            <button type="button" onClick={() => setIsSucesso(true)} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm">Adicionar</button>
-          </div>
+          <CadastroVacinacaoHeader mode={mode} nomeCadastro="Autorização de Vacinação" rotaEditar="editar-autorizacao-vacinacao" dados={dados} onNavigate={onNavigate} onSubmit={handleSalvar} />
           
         </div>
 
@@ -367,30 +437,20 @@ export function AdicionarAutorizacaoVacinacaoPage({ onLogout, onNavigate }: Page
               <CheckCircle2 size={48} style={{ color: GREEN }} />
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-1">
-              Autorização de Vacina adicionada com sucesso!
+              {mensagemSucessoCadastro(mode, "Autorização de Vacinação")}
             </h3>
             <p className="text-sm text-gray-500 mb-6">
               A autorização de vacina foi cadastrada e gravada no sistema.
             </p>
             <div className="flex items-center justify-center gap-3">
               <button
-                onClick={() => onNavigate("autorizacao-vacina")}
+                onClick={() => onNavigate("autorizacao-vacinacao")}
                 className="px-5 py-2.5 rounded-md text-sm font-semibold border border-gray-300 text-gray-700 transition hover:bg-gray-50"
               >
                 Voltar
               </button>
               <button
-                onClick={() => onNavigate("visualizar-autorizacao-vacina", {
-                  produtorNome: produtor?.nome,
-                  produtorDoc: produtor?.documento,
-                  estabCodigo: estabelecimento?.codigo,
-                  estabNome: estabelecimento?.nome,
-                  especie: especie?.nome,
-                  doenca: doenca?.nome,
-                  etapa: etapa?.nome,
-                  quantidadeDoses,
-                  situacao: "Gravada",
-                })}
+                onClick={() => onNavigate("visualizar-autorizacao-vacinacao", registroAtual)}
                 className="px-5 py-2.5 rounded-md text-white text-sm font-semibold transition hover:opacity-90"
                 style={{ backgroundColor: GREEN }}
               >
