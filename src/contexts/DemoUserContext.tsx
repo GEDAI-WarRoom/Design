@@ -74,6 +74,7 @@ const produtorAllowedRoutes = new Set([
 	"editar-venda-propriedade",
 	"adicionar-exploracao-pecuaria",
 	"visualizar-exploracao-pecuaria",
+	"editar-exploracao-pecuaria",
 	"adicionar-nucleo-producao",
 	"visualizar-nucleo-producao",
 	"editar-nucleo-producao",
@@ -132,10 +133,16 @@ const produtorAllowedRoutes = new Set([
 ]);
 
 const veterinarioEntryRoutes = new Set([
+	"pessoa-fisica",
+	"pessoa-juridica",
+	"pendencias-confirmacao-gta",
 	"declaracao-vacinacao",
 	"partilha-vacina",
 	"vacinador",
 	"atestado-exame",
+	"cadastro-atestado-exame",
+	"pessoa-fisica",
+	"pessoa-juridica",
 	"local-realizacao-exame",
 	"emissao-gta",
 ]);
@@ -155,6 +162,7 @@ const veterinarioAllowedRoutes = new Set([
 	"adicionar-atestado-exame",
 	"visualizar-atestado-exame",
 	"editar-atestado-exame",
+	"cadastro-atestado-exame",
 	"visualizar-pessoa-fisica",
 	"adicionar-local-realizacao-exame",
 	"visualizar-local-realizacao-exame",
@@ -165,9 +173,10 @@ const veterinarioAllowedRoutes = new Set([
 	"emitir-emissao-gta",
 	"cancelar-emissao-gta",
 	"pagar-emissao-gta",
+	"pendencias-confirmacao-gta",
 ]);
 
-const produtorOnlyRoutes = new Set(["pendencias-confirmacao-gta"]);
+const produtorOnlyRoutes = new Set<string>();
 
 interface DemoUserContextValue {
 	role: DemoUserRole | null;

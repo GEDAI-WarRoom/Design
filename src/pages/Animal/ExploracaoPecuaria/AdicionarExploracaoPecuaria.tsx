@@ -26,6 +26,7 @@ import {
   SimNao,
   UploadField,
 } from "../../../components/ui/FormKit";
+import { REGISTRO as REGISTRO_VISUALIZACAO } from "./VisualizarExploracaoPecuaria";
 
 const GREEN = "#1A7A3C";
 
@@ -460,20 +461,28 @@ function CicloProducao({
 interface PageProps {
   onLogout: () => void;
   onNavigate: (screen: any, data?: any) => void;
+  modoEdicao?: boolean;
+  dados?: any;
 }
 
 export function AdicionarExploracaoPecuariaPage({
   onLogout,
   onNavigate,
+  modoEdicao = false,
+  dados,
 }: PageProps) {
   // Estabelecimento + Área
-  const [estabelecimento, setEstabelecimento] = useState<any | null>(null);
-  const [unidadeArea, setUnidadeArea] = useState("Hectares");
-  const [areaUtil, setAreaUtil] = useState("");
+  const [estabelecimento, setEstabelecimento] = useState<any | null>(dados?.estabelecimento ?? (dados?.estabCodigo ? {
+    codigo: dados.estabCodigo,
+    nome: dados.estabNome,
+    municipio: `${dados.municipio ?? ""}${dados.uf ? ` - ${dados.uf}` : ""}`,
+  } : null));
+  const [unidadeArea, setUnidadeArea] = useState(dados?.unidadeArea ?? "Hectares");
+  const [areaUtil, setAreaUtil] = useState(String(dados?.areaUtil ?? ""));
 
   // Produtores
-  const [titularTipo, setTitularTipo] = useState("");
-  const [produtor, setProdutor] = useState<any | null>(null);
+  const [titularTipo, setTitularTipo] = useState(dados?.titularTipo ?? "");
+  const [produtor, setProdutor] = useState<any | null>(dados?.produtorTitular ?? null);
   const [outrosProdutores, setOutrosProdutores] = useState<any[]>([]);
   // Contrato de vínculo
   const [contratoVinculo, setContratoVinculo] = useState("");
@@ -483,8 +492,8 @@ export function AdicionarExploracaoPecuariaPage({
   const [raca, setRaca] = useState<any | null>(null); // <-- Novo estado adicionado aqui
 
   // Espécie
-  const [especie, setEspecie] = useState<any | null>(null);
-  const [subespecies, setSubespecies] = useState<any[]>([]);
+  const [especie, setEspecie] = useState<any | null>(dados?.especie ?? null);
+  const [subespecies, setSubespecies] = useState<any[]>(dados?.subespecies ?? []);
 
   // Complementares — Bovinos/Bubalinos
   const [bovArea, setBovArea] = useState<string[]>([]);
@@ -583,6 +592,69 @@ export function AdicionarExploracaoPecuariaPage({
 
   const destinoOpcoes = isOrnamental ? DESTINO_ORNAMENTAL : DESTINO_DEMAIS;
 
+  const montarRegistroCadastrado = () => ({
+    ...REGISTRO_VISUALIZACAO,
+    estabelecimento: estabelecimento
+      ? {
+          ...REGISTRO_VISUALIZACAO.estabelecimento,
+          codigo: estabelecimento.codigo,
+          nome: estabelecimento.nome,
+          municipio: estabelecimento.municipio,
+        }
+      : REGISTRO_VISUALIZACAO.estabelecimento,
+    unidadeArea,
+    areaProdutiva: areaProdutiva != null ? String(areaProdutiva) : "",
+    areaUtil,
+    titularTipo: titularTipo || REGISTRO_VISUALIZACAO.titularTipo,
+    produtorTitular: produtor
+      ? {
+          nome: produtor.nome,
+          documento: produtor.documento ?? produtor.codigo ?? "",
+        }
+      : REGISTRO_VISUALIZACAO.produtorTitular,
+    outrosProdutores: outrosProdutores
+      .filter((item) => item.produtor)
+      .map((item) => ({ ...item.produtor, tipo: item.tipo })),
+    especie: especie
+      ? { nome: especie.nome, grupo: especie.grupo }
+      : REGISTRO_VISUALIZACAO.especie,
+    subespecies,
+    aptidao,
+    bacia,
+    origemCaptacao,
+    fonteCaptacao,
+    nomeCorrego,
+    nomeRio,
+    nomeLago,
+    nomeReservatorio,
+    fonteOutro,
+    finalidadeProducao,
+    tipoPiscicultura,
+    origemMatrizes,
+    sistemaProducao,
+    sistSemifechado,
+    sistFechado,
+    abastecimento,
+    localDescarte,
+    realizaDepuracao,
+    tipoDestino,
+    escalaComercio,
+    tratAfluente,
+    tratEfluente,
+    cicloRepro,
+    cicloEngorda,
+    cicloCria,
+    cicloUP,
+    isSub: isSub === true,
+    exploracaoPai: exploracao
+      ? { codigo: exploracao.codigo }
+      : undefined,
+    anexos,
+    observacao,
+    usuarioAlteracao: "Thomas Anderson",
+    dataAlteracao: new Date().toLocaleString("pt-BR"),
+  });
+
   // Listas que variam entre ornamentais e demais (peixes)
   const finalidadeOpcoes =
     isOrnamental && tipoPiscicultura !== "Unidade de Distribuição"
@@ -619,14 +691,14 @@ export function AdicionarExploracaoPecuariaPage({
           </button>
           <div className="flex justify-between items-center w-full">
             <h1 className="text-2xl font-semibold text-gray-900">
-              Adicionar Exploração Pecuária
+              {modoEdicao ? "Editar Exploração Pecuária" : "Adicionar Exploração Pecuária"}
             </h1>
             <button
               type="button"
               onClick={() => setIsSucesso(true)}
               className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm"
             >
-              Adicionar
+              {modoEdicao ? "Salvar alterações" : "Adicionar"}
             </button>
           </div>
         </div>
@@ -1597,7 +1669,9 @@ export function AdicionarExploracaoPecuariaPage({
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
             {" "}
             <h3 className="text-lg font-bold text-gray-900">
-              Exploração pecuária cadastrada com sucesso!
+              {modoEdicao
+                ? "Exploração pecuária atualizada com sucesso!"
+                : "Exploração pecuária cadastrada com sucesso!"}
             </h3>
             <p className="text-sm text-gray-500 mt-1">
               {especie ? `A exploração de ${especie.nome}` : "A exploração"} foi
@@ -1605,6 +1679,7 @@ export function AdicionarExploracaoPecuariaPage({
             </p>
             <div className="flex gap-3 justify-center mt-6">
               <button
+                type="button"
                 onClick={() => {
                   setIsSucesso(false);
                   onNavigate("exploracao-pecuaria");
@@ -1614,9 +1689,13 @@ export function AdicionarExploracaoPecuariaPage({
                 Voltar
               </button>
               <button
+                type="button"
                 onClick={() => {
                   setIsSucesso(false);
-                  onNavigate("visualizar-exploracao-pecuaria");
+                  onNavigate(
+                    "visualizar-exploracao-pecuaria",
+                    montarRegistroCadastrado(),
+                  );
                 }}
                 className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition"
               >

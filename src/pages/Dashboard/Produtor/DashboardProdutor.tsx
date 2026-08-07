@@ -14,6 +14,7 @@ interface DashboardProdutorProps {
 	userName: string;
 	beforeMenu: ReactNode;
 	afterMenu: ReactNode;
+	linkedItems: Array<{ title: string; subtitle: string; location: string; status: string; statusTone?: "active" | "pending"; icon?: ReactNode; titleTone?: string; subtitleTone?: string }>;
 }
 
 export function DashboardProdutor({
@@ -23,6 +24,7 @@ export function DashboardProdutor({
 	userName,
 	beforeMenu,
 	afterMenu,
+	linkedItems,
 }: DashboardProdutorProps) {
 	const { user } = useDemoUser();
 	const produtor = PRODUTORES_ATUALIZACAO.find(
@@ -57,6 +59,7 @@ export function DashboardProdutor({
 							avatarFallback={
 								<UserRound className="h-7 w-7" aria-hidden="true" />
 							}
+							showActiveIndicator
 							details={[
 								{ label: "CPF", value: produtor.documento },
 								...(email ? [{ label: "E-mail", value: email.valor }] : []),
@@ -65,6 +68,8 @@ export function DashboardProdutor({
 									: []),
 							]}
 							ariaLabel="Perfil do produtor"
+							linkedItems={linkedItems}
+							linkedItemsTitle="Cadastros vinculados"
 						/>
 					) : (
 						<section

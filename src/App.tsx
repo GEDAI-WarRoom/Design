@@ -432,6 +432,7 @@ export type Screen =
   | "exploracao-pecuaria" // 🚀 Adicionado
   | "adicionar-exploracao-pecuaria" // 🚀 Adicionado
   | "visualizar-exploracao-pecuaria" // 🚀 Adicionado
+  | "editar-exploracao-pecuaria" // 🚀 Adicionado
   | "atualizacao-cadastral-rebanho"
   | "confirmar-dados-produtor-rebanho"
   | "visualizar-atualizacao-cadastral-rebanho"
@@ -632,6 +633,7 @@ export type Screen =
 	| "exploracao-pecuaria" // 🚀 Adicionado
 	| "adicionar-exploracao-pecuaria" // 🚀 Adicionado
 	| "visualizar-exploracao-pecuaria" // 🚀 Adicionado
+	| "editar-exploracao-pecuaria" // 🚀 Adicionado
 	| "atualizacao-cadastral-rebanho"
 	| "confirmar-dados-produtor-rebanho"
 	| "visualizar-atualizacao-cadastral-rebanho"
@@ -1637,6 +1639,15 @@ export default function App() {
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
 					dados={screenData}
+				/>
+			);
+		case "editar-exploracao-pecuaria":
+			return (
+				<AdicionarExploracaoPecuariaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+					modoEdicao
 				/>
 			);
 		case "atualizacao-cadastral-rebanho":

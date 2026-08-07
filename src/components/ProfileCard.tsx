@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import { useState } from "react";
+import { MapPin } from "lucide-react";
 
 export interface ProfileCardDetail {
   label: string;
@@ -20,6 +22,20 @@ export interface ProfileCardProps {
   emptyHighlightsMessage?: string;
   ariaLabel?: string;
   className?: string;
+  linkedItems?: ProfileLinkedItem[];
+  linkedItemsTitle?: string;
+  showDetailsWithLinked?: boolean;
+}
+
+export interface ProfileLinkedItem {
+  title: string;
+  subtitle: string;
+  location?: string;
+  status?: string;
+  statusTone?: "active" | "pending";
+  icon?: ReactNode;
+  titleTone?: string;
+  subtitleTone?: string;
 }
 
 function getInitials(name: string) {
@@ -52,6 +68,9 @@ export function ProfileCard({
   emptyHighlightsMessage = "Nenhum destaque informado.",
   ariaLabel = "Perfil",
   className = "",
+  linkedItems,
+  linkedItemsTitle = "Estabelecimentos vinculados",
+  showDetailsWithLinked = false,
 }: ProfileCardProps) {
   const detailColumns =
     details.length <= 1
@@ -60,7 +79,8 @@ export function ProfileCard({
         ? "sm:grid-cols-2"
         : details.length === 3
           ? "sm:grid-cols-3"
-          : "sm:grid-cols-2 lg:grid-cols-4";
+        : "sm:grid-cols-2 lg:grid-cols-4";
+  const [linkedExpanded, setLinkedExpanded] = useState(true);
 
   return (
     <section
@@ -99,7 +119,7 @@ export function ProfileCard({
             </div>
           </div>
 
-          {details.length > 0 && (
+          {details.length > 0 && (!linkedItems || showDetailsWithLinked) && (
             <div
               className={`grid min-w-0 flex-1 grid-cols-1 divide-y divide-gray-100 border-t border-gray-200 pt-3 sm:divide-x sm:divide-y-0 md:border-l md:border-t-0 md:py-2 md:pl-1 ${detailColumns}`}
             >
@@ -110,7 +130,7 @@ export function ProfileCard({
           )}
         </div>
 
-        {highlights && (
+        {highlights && !linkedItems && (
           <div className="mt-4 border-t border-gray-100 pt-4">
             <p className="text-sm font-semibold text-gray-700">{highlightsTitle}</p>
             <div className="mt-3 flex flex-wrap gap-2">
@@ -134,6 +154,32 @@ export function ProfileCard({
           </div>
         )}
       </div>
+      {linkedItems && (
+        <div className="border-t border-gray-100 bg-[#f7f8f8]">
+          <button type="button" onClick={() => setLinkedExpanded((expanded) => !expanded)} className="flex w-full items-center justify-between px-5 py-5 text-left md:px-8 md:py-6">
+            <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-gray-500"><span className={`text-base transition-transform ${linkedExpanded ? "rotate-90" : ""}`}>›</span>{linkedItemsTitle} ({linkedItems.length})</span>
+          </button>
+          {linkedExpanded && <div className="grid grid-cols-1 gap-4 px-5 pb-6 md:grid-cols-3 md:px-8 md:pb-8">
+            {linkedItems.map((item) => (
+              <article key={`${item.title}-${item.subtitle}`} className="min-h-[150px] rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md md:p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#EAF5ED] text-[#1A7A3C]">
+                    {item.icon}
+                  </span>
+                  {item.status && (
+                    <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${item.statusTone === "pending" ? "bg-amber-100 text-amber-700" : "bg-[#EAF5ED] text-[#1A7A3C]"}`}>
+                      {item.status}
+                    </span>
+                  )}
+                </div>
+                <h3 className={`mt-4 text-base font-semibold ${item.titleTone ?? "text-gray-900"}`}>{item.title}</h3>
+                <p className={`mt-1 text-sm ${item.subtitleTone ?? "text-gray-600"}`}>{item.subtitle}</p>
+                {item.location && <p className="mt-2 flex items-center gap-1 text-sm text-gray-500"><MapPin size={14} /> {item.location}</p>}
+              </article>
+            ))}
+          </div>}
+        </div>
+      )}
     </section>
   );
 }

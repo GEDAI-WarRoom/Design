@@ -1042,12 +1042,24 @@ function filterCategoriesByRole(
   categories: MenuCategory[],
   role: DemoUserRole | null,
 ) {
+  const produtorRoutesOcultas = new Set([
+    "profissional-oficial",
+    "profissional-vegetal",
+    "cultura",
+    "praga",
+    "finalidade-transito",
+  ]);
+  const rotasOcultasNoMenu = new Set(["pendencias-confirmacao-gta"]);
   return categories
     .map((category) => ({
       ...category,
       items: category.items.filter((item) =>
-        isEntryRouteAllowed(role, item.route),
-      ),
+        isEntryRouteAllowed(role, item.route) &&
+        !(role === "produtor" && produtorRoutesOcultas.has(item.route)) &&
+        !rotasOcultasNoMenu.has(item.route),
+      ).map((item) => role === "veterinario" && item.route === "cadastro-atestado-exame"
+        ? { ...item, label: "Atestado de Exame" }
+        : item).filter((item) => !(role === "veterinario" && item.route === "atestado-exame")),
     }))
     .filter((category) => category.items.length > 0);
 }
@@ -1303,6 +1315,11 @@ export function DashboardPage({ onLogout, onNavigate }: any) {
           </>
         }
         afterMenu={<PropriedadesProdutor onNavigate={onNavigate} />}
+        linkedItems={[
+          { title: propriedadesProdutor[0].nome, subtitle: "Exploração Pecuária", location: propriedadesProdutor[0].municipioUf, status: "Ativo", icon: <img src={Icons.iconeExploracaoUrl} alt="" className="h-5 w-5 object-contain" />, titleTone: "text-gray-900", subtitleTone: "text-gray-500" },
+          { title: propriedadesProdutor[1].nome, subtitle: "Estabelecimento Agropecuário", location: propriedadesProdutor[1].municipioUf, status: "Ativo", icon: <img src={Icons.iconeEstabelecimentoUrl} alt="" className="h-5 w-5 object-contain" />, titleTone: "text-gray-900", subtitleTone: "text-gray-500" },
+          { title: "Fazenda Santa Fé", subtitle: "Exploração Pecuária", location: "Uberaba - MG", status: "Ativo", icon: <img src={Icons.iconeExploracaoUrl} alt="" className="h-5 w-5 object-contain" />, titleTone: "text-gray-900", subtitleTone: "text-gray-500" },
+        ]}
       />
     );
   }

@@ -1,3 +1,4 @@
+import { BriefcaseBusiness, ShieldCheck } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { ProfileCard } from "../../../components/ProfileCard";
 import { useDemoUser } from "../../../contexts/DemoUserContext";
@@ -60,6 +61,12 @@ export function DashboardAdmin({
 							highlightsTitle="Papéis"
 							emptyHighlightsMessage="Nenhum papel atribuído."
 							ariaLabel="Perfil do administrador"
+							linkedItemsTitle="Papéis"
+							showDetailsWithLinked
+							linkedItems={[
+								{ title: "Administrador do Sistema", subtitle: "Papel administrativo", location: "Serviço oficial estadual", status: "Ativo", icon: <ShieldCheck size={20} /> },
+								{ title: "Profissional do Serviço Oficial", subtitle: "Papel institucional", location: "Coordenadoria Regional de Belo Horizonte", status: "Ativo", icon: <BriefcaseBusiness size={20} /> },
+							]}
 						/>
 					) : (
 						<section
