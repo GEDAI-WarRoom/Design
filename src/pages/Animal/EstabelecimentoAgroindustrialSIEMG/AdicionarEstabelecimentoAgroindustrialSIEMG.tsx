@@ -946,7 +946,14 @@ export function AdicionarEstabelecimentoAgroindustrialSIEMGPage({ onLogout, onNa
 
         {/* 7. Localização */}
         <Section title="Localização">
-          <BlocoEnderecoFields title="Endereço do Estabelecimento" data={endereco} tipoEstado="travado" onChange={(key, value) => setEndereco((prev: any) => ({ ...prev, [key]: value }))} onSetMultipleFields={(fields) => setEndereco((prev: any) => ({ ...prev, ...fields }))} />
+          <BlocoEnderecoFields
+            title="Endereço do Estabelecimento"
+            data={endereco}
+            tipoEstado="normal"
+            estadoFixo="Minas Gerais"
+            onChange={(key, value) => setEndereco((prev: any) => ({ ...prev, [key]: value }))}
+            onSetMultipleFields={(fields) => setEndereco((prev: any) => ({ ...prev, ...fields }))}
+          />
         </Section>
 
         {/* 8. Contatos */}

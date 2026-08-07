@@ -10,7 +10,8 @@
     "test:parametros": "node tests/parametrosSistema.test.mjs",
     "test:vacinacao": "node tests/vacinacaoTelas.test.mjs",
     "test:tipo-atestado": "node tests/tipoAtestado.test.mjs",
-    "test:atestado-exame": "node tests/atestadoExameCadastro.test.mjs"
+    "test:atestado-exame": "node tests/atestadoExameCadastro.test.mjs",
+    "test:meu-perfil": "node tests/meuPerfilData.test.mjs"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",

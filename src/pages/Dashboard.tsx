@@ -54,6 +54,7 @@ import {
   type DemoUserRole,
 } from "../contexts/DemoUserContext";
 import { DashboardAdmin } from "./Dashboard/Admin/DashboardAdmin";
+import { DashboardLiderEstabelecimento } from "./Dashboard/LiderEstabelecimento/DashboardLiderEstabelecimento";
 import { DashboardProdutor } from "./Dashboard/Produtor/DashboardProdutor";
 import { DashboardVeterinario } from "./Dashboard/Veterinario/DashboardVeterinario";
 import { NoticiasCarousel } from "./Dashboard/shared/NoticiasCarousel";
@@ -1203,6 +1204,17 @@ export function DashboardPage({ onLogout, onNavigate }: any) {
         onLogout={onLogout}
         onNavigate={onNavigate}
         categories={[...visibleCadastros, ...visibleSecondary, ...visibleThird]}
+        news={<NoticiasCarousel items={noticiasCompartilhadas} />}
+      />
+    );
+  }
+
+  if (role === "lider-estabelecimento") {
+    return (
+      <DashboardLiderEstabelecimento
+        onLogout={onLogout}
+        onNavigate={onNavigate}
+        categories={visibleCadastros}
         news={<NoticiasCarousel items={noticiasCompartilhadas} />}
       />
     );

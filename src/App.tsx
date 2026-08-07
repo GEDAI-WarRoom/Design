@@ -332,8 +332,10 @@ import { AdicionarUsuariosPage } from "./pages/Controle/Usuarios/AdicionarUsuari
 import { UsuariosPage } from "./pages/Controle/Usuarios/Usuarios";
 import { VisualizarUsuariosPage } from "./pages/Controle/Usuarios/VisualizarUsuarios";
 import { ParametrosSistemaPage } from "./pages/Controle/ParametrosSistema/ParametrosSistema";
+import { MeuPerfilPage } from "./pages/Geral/MeuPerfil/MeuPerfil";
 // 1. Adicionamos as novas rotas de Pessoa Jurídica no tipo Screen
 export type Screen =
+| "meu-perfil"
 | "visualizar-laboratorio"
   | "editar-laboratorio"
   | "visualizar-venda-saida-vacina"
@@ -856,6 +858,8 @@ export default function App() {
 	};
 
 	switch (screen) {
+		case "meu-perfil":
+			return <MeuPerfilPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 		// LABORATORIO
     case "visualizar-laboratorio":
       return <VisualizarLaboratorioPage key={`visualizar-laboratorio-${screenData?.id ?? "novo"}`} dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
