@@ -146,14 +146,19 @@ export function Navbar({ onLogout, onNavigate, currentScreen, hideSearch = false
             </div>
 
             <div className="flex items-center gap-4 flex-shrink-0">
-              <div className="text-right hidden sm:block">
+              <button
+                type="button"
+                onClick={() => onNavigate("meu-perfil")}
+                aria-label="Abrir meu perfil"
+                className="hidden rounded-md px-2 py-1 text-right transition hover:bg-green-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A7A3C] sm:block"
+              >
                 <p className="text-sm font-semibold text-gray-800 leading-tight">
                   {user?.name ?? "Usuário"}
                 </p>
                 <p className="text-xs text-gray-400 leading-tight">
                   {user?.roleLabel ?? "Perfil não selecionado"}
                 </p>
-              </div>
+              </button>
               <button
                 onClick={onLogout}
                 className="flex items-center gap-1 text-sm font-medium transition hover:opacity-80"

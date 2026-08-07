@@ -3,7 +3,6 @@ import { UserRound } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { ProfileCard } from "../../../components/ProfileCard";
 import { useDemoUser } from "../../../contexts/DemoUserContext";
-import { PRODUTORES_ATUALIZACAO } from "../../Rebanho/AtualizacaoCadastralRebanho/atualizacaoCadastralRebanhoData";
 import { DashboardMenu } from "../shared/DashboardMenu";
 import type { MenuCategory } from "../shared/dashboardTypes";
 
@@ -12,7 +11,8 @@ interface DashboardProdutorProps {
 	onNavigate: (screen: any, data?: any) => void;
 	categories: MenuCategory[];
 	userName: string;
-	beforeMenu: ReactNode;
+	newsFeed: ReactNode;
+	pendencias: ReactNode;
 	afterMenu: ReactNode;
 }
 
@@ -21,17 +21,11 @@ export function DashboardProdutor({
 	onNavigate,
 	categories,
 	userName,
-	beforeMenu,
+	newsFeed,
+	pendencias,
 	afterMenu,
 }: DashboardProdutorProps) {
 	const { user } = useDemoUser();
-	const produtor = PRODUTORES_ATUALIZACAO.find(
-		(registro) => registro.documento === user?.document,
-	);
-	const email = produtor?.contatos.find((contato) => contato.tipo === "E-mail");
-	const telefone = produtor?.contatos.find(
-		(contato) => contato.tipo === "Telefone",
-	);
 
 	return (
 		<div className="min-h-screen bg-[#f2f3f5]">
@@ -49,19 +43,22 @@ export function DashboardProdutor({
 						Gerencie suas propriedades e movimentações agropecuárias.
 					</p>
 				</div>
+				{newsFeed}
 				<div className="mb-6">
-					{produtor ? (
+					{user ? (
 						<ProfileCard
-							name={produtor.nome}
-							subtitle={user?.roleLabel}
+							name={user.name}
+							subtitle={user.roleLabel}
+							avatarSrc={user.avatarDataUrl}
+							avatarAlt={`Foto de ${user.name}`}
 							avatarFallback={
 								<UserRound className="h-7 w-7" aria-hidden="true" />
 							}
 							details={[
-								{ label: "CPF", value: produtor.documento },
-								...(email ? [{ label: "E-mail", value: email.valor }] : []),
-								...(telefone
-									? [{ label: "Telefone", value: telefone.valor }]
+								{ label: "CPF", value: user.document ?? "Não informado" },
+								...(user.email ? [{ label: "E-mail", value: user.email }] : []),
+								...(user.phone
+									? [{ label: "Telefone", value: user.phone }]
 									: []),
 							]}
 							ariaLabel="Perfil do produtor"
@@ -75,7 +72,7 @@ export function DashboardProdutor({
 						</section>
 					)}
 				</div>
-				{beforeMenu}
+				{pendencias}
 				<DashboardMenu categoryGroups={[categories]} onNavigate={onNavigate} />
 				{afterMenu}
 			</main>

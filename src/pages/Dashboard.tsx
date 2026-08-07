@@ -59,6 +59,7 @@ import {
   type DemoUserRole,
 } from "../contexts/DemoUserContext";
 import { DashboardAdmin } from "./Dashboard/Admin/DashboardAdmin";
+import { DashboardLiderEstabelecimento } from "./Dashboard/LiderEstabelecimento/DashboardLiderEstabelecimento";
 import { DashboardProdutor } from "./Dashboard/Produtor/DashboardProdutor";
 import { DashboardVeterinario } from "./Dashboard/Veterinario/DashboardVeterinario";
 import type {
@@ -1296,12 +1297,8 @@ export function DashboardPage({ onLogout, onNavigate }: any) {
         onNavigate={onNavigate}
         categories={[...visibleCadastros, ...visibleSecondary, ...visibleThird]}
         userName={user?.name ?? "produtor"}
-        beforeMenu={
-          <>
-            <AvisosNoticias />
-            <PendenciasConfirmacaoGta onNavigate={onNavigate} />
-          </>
-        }
+        newsFeed={<AvisosNoticias />}
+        pendencias={<PendenciasConfirmacaoGta onNavigate={onNavigate} />}
         afterMenu={<PropriedadesProdutor onNavigate={onNavigate} />}
       />
     );
@@ -1313,6 +1310,17 @@ export function DashboardPage({ onLogout, onNavigate }: any) {
         onLogout={onLogout}
         onNavigate={onNavigate}
         categories={[...visibleCadastros, ...visibleSecondary, ...visibleThird]}
+        newsFeed={<AvisosNoticias />}
+      />
+    );
+  }
+
+  if (role === "lider-estabelecimento") {
+    return (
+      <DashboardLiderEstabelecimento
+        onLogout={onLogout}
+        onNavigate={onNavigate}
+        categories={visibleCadastros}
         newsFeed={<AvisosNoticias />}
       />
     );

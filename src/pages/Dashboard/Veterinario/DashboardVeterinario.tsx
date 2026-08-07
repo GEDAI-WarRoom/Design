@@ -71,12 +71,15 @@ export function DashboardVeterinario({
         <div className="mb-6">
           {profissional ? (
             <ProfileCard
-              name={profissional.nome}
+              name={user?.name ?? profissional.nome}
               subtitle={profissional.formacao}
-              avatarSrc={fotoVeterinariaExemploUrl}
+              avatarSrc={user?.avatarDataUrl ?? fotoVeterinariaExemploUrl}
               showActiveIndicator={profissional.situacao === "Ativo"}
               details={[
-                { label: "CRMV-MG", value: profissional.numeroConselho },
+                {
+                  label: "Documento de responsabilidade técnica",
+                  value: profissional.numeroConselho,
+                },
                 {
                   label: "Tipo de registro",
                   value: profissional.tipoRegistroConselho || "Não informado",

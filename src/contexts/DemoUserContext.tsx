@@ -1,8 +1,12 @@
 import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
-import { PROFISSIONAL_VETERINARIO_DEMONSTRACAO } from "../pages/Animal/ProfissionalAnimal/profissionalAnimalData";
-import { PRODUTOR_REBANHO_DEMONSTRACAO_DOCUMENTO } from "../pages/Rebanho/AtualizacaoCadastralRebanho/atualizacaoCadastralRebanhoData";
+import { useMockDatabaseRevision } from "../mocks/useMockDatabase";
+import {
+	PERFIS_USUARIO_INICIAIS,
+	listarPerfisUsuario,
+	type PerfilUsuarioRole,
+} from "../pages/Geral/MeuPerfil/meuPerfilData";
 
-export type DemoUserRole = "admin" | "produtor" | "veterinario";
+export type DemoUserRole = PerfilUsuarioRole;
 
 export interface DemoUserIdentity {
 	role: DemoUserRole;
@@ -10,28 +14,29 @@ export interface DemoUserIdentity {
 	roleLabel: string;
 	document?: string;
 	entityId?: number;
+	email?: string;
+	phone?: string;
+	avatarDataUrl?: string;
+	acceptedTerms: boolean;
 }
 
-export const DEMO_USERS: Record<DemoUserRole, DemoUserIdentity> = {
-	admin: {
-		role: "admin",
-		name: "Thomas Anderson",
-		roleLabel: "Administrador",
+export const DEMO_USERS = PERFIS_USUARIO_INICIAIS.reduce(
+	(usuarios, perfil) => {
+		usuarios[perfil.role] = {
+			role: perfil.role,
+			name: perfil.nome,
+			roleLabel: perfil.perfil,
+			document: perfil.documento,
+			entityId: perfil.entityId,
+			email: perfil.email,
+			phone: perfil.telefone,
+			avatarDataUrl: perfil.avatarDataUrl,
+			acceptedTerms: perfil.aceitouTermos,
+		};
+		return usuarios;
 	},
-	produtor: {
-		role: "produtor",
-		name: "Fernando",
-		roleLabel: "Produtor",
-		document: PRODUTOR_REBANHO_DEMONSTRACAO_DOCUMENTO,
-	},
-	veterinario: {
-		role: "veterinario",
-		name: PROFISSIONAL_VETERINARIO_DEMONSTRACAO.nome,
-		roleLabel: "Médica Veterinária",
-		document: PROFISSIONAL_VETERINARIO_DEMONSTRACAO.cpf,
-		entityId: PROFISSIONAL_VETERINARIO_DEMONSTRACAO.id,
-	},
-};
+	{} as Record<DemoUserRole, DemoUserIdentity>,
+);
 
 const produtorEntryRoutes = new Set([
 	"pessoa-fisica",
@@ -59,6 +64,7 @@ const produtorEntryRoutes = new Set([
 
 const produtorAllowedRoutes = new Set([
 	"dashboard",
+	"meu-perfil",
 	...produtorEntryRoutes,
 	"adicionar-pessoa-fisica",
 	"visualizar-pessoa-fisica",
@@ -142,6 +148,7 @@ const veterinarioEntryRoutes = new Set([
 
 const veterinarioAllowedRoutes = new Set([
 	"dashboard",
+	"meu-perfil",
 	...veterinarioEntryRoutes,
 	"adicionar-declaracao-vacinacao",
 	"visualizar-declaracao-vacinacao",
@@ -167,6 +174,39 @@ const veterinarioAllowedRoutes = new Set([
 	"pagar-emissao-gta",
 ]);
 
+const liderEstabelecimentoEntryRoutes = new Set([
+	"pessoa-fisica",
+	"pessoa-juridica",
+	"agroindustrial-sie",
+	"integradora-cooperativa",
+	"revendedora-animais",
+	"revendedora-agropecuario",
+]);
+
+const liderEstabelecimentoAllowedRoutes = new Set([
+	"dashboard",
+	"meu-perfil",
+	...liderEstabelecimentoEntryRoutes,
+	"adicionar-pessoa-fisica",
+	"visualizar-pessoa-fisica",
+	"editar-pessoa-fisica",
+	"adicionar-pessoa-juridica",
+	"visualizar-pessoa-juridica",
+	"editar-pessoa-juridica",
+	"adicionar-agroindustrial-sie",
+	"visualizar-agroindustrial-sie",
+	"editar-agroindustrial-sie",
+	"adicionar-integradora-cooperativa",
+	"visualizar-integradora-cooperativa",
+	"editar-integradora-cooperativa",
+	"adicionar-revendedora-animais",
+	"visualizar-revendedora-animais-vivos",
+	"editar-revendedora-animais",
+	"adicionar-revendedora-agropecuario",
+	"visualizar-revendedora-agropecuario",
+	"editar-revendedora-agropecuario",
+]);
+
 const produtorOnlyRoutes = new Set(["pendencias-confirmacao-gta"]);
 
 interface DemoUserContextValue {
@@ -180,7 +220,24 @@ const DemoUserContext = createContext<DemoUserContextValue | undefined>(undefine
 
 export function DemoUserProvider({ children }: { children: ReactNode }) {
 	const [role, setRole] = useState<DemoUserRole | null>(null);
-	const user = useMemo(() => (role ? DEMO_USERS[role] : null), [role]);
+	const databaseRevision = useMockDatabaseRevision();
+	const perfis = useMemo(() => listarPerfisUsuario(), [databaseRevision]);
+	const user = useMemo(() => {
+		if (!role) return null;
+		const perfil = perfis.find((item) => item.role === role);
+		if (!perfil) return DEMO_USERS[role];
+		return {
+			role: perfil.role,
+			name: perfil.nome,
+			roleLabel: perfil.perfil,
+			document: perfil.documento,
+			entityId: perfil.entityId,
+			email: perfil.email,
+			phone: perfil.telefone,
+			avatarDataUrl: perfil.avatarDataUrl,
+			acceptedTerms: perfil.aceitouTermos,
+		};
+	}, [perfis, role]);
 
 	return (
 		<DemoUserContext.Provider
@@ -211,7 +268,8 @@ export function isEntryRouteAllowed(role: DemoUserRole | null, route: string) {
 	if (produtorOnlyRoutes.has(route)) return role === "produtor";
 	if (role === "admin") return true;
 	if (role === "produtor") return produtorEntryRoutes.has(route);
-	return veterinarioEntryRoutes.has(route);
+	if (role === "veterinario") return veterinarioEntryRoutes.has(route);
+	return liderEstabelecimentoEntryRoutes.has(route);
 }
 
 export function isRouteAllowed(role: DemoUserRole | null, route: string) {
@@ -219,5 +277,6 @@ export function isRouteAllowed(role: DemoUserRole | null, route: string) {
 	if (produtorOnlyRoutes.has(route)) return role === "produtor";
 	if (role === "admin") return true;
 	if (role === "produtor") return produtorAllowedRoutes.has(route);
-	return veterinarioAllowedRoutes.has(route);
+	if (role === "veterinario") return veterinarioAllowedRoutes.has(route);
+	return liderEstabelecimentoAllowedRoutes.has(route);
 }
