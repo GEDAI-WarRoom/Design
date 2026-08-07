@@ -14,7 +14,6 @@ interface DashboardPerfilPadraoProps {
 	pendingContent: ReactNode;
 	categories: MenuCategory[];
 	beforeNews?: ReactNode;
-	afterMenu?: ReactNode;
 }
 
 export function DashboardPerfilPadrao({
@@ -28,7 +27,6 @@ export function DashboardPerfilPadrao({
 	pendingContent,
 	categories,
 	beforeNews,
-	afterMenu,
 }: DashboardPerfilPadraoProps) {
 	return (
 		<div className="min-h-screen bg-[#f2f3f5]">
@@ -46,7 +44,6 @@ export function DashboardPerfilPadrao({
 				</div>
 				{pendingContent}
 				<DashboardMenu title="Área de trabalho" categoryGroups={[categories]} onNavigate={onNavigate} />
-				{afterMenu}
 			</main>
 		</div>
 	);

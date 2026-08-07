@@ -15,7 +15,6 @@ interface MeuPerfilCardProps {
 	details: DashboardProfileDetail[];
 	highlights?: DashboardProfileHighlight[];
 	highlightsTitle?: string;
-	emptyHighlightsMessage?: string;
 	className?: string;
 }
 
@@ -35,7 +34,6 @@ export function MeuPerfilCard({
 	details,
 	highlights = [],
 	highlightsTitle = "Habilitações vigentes",
-	emptyHighlightsMessage = "Nenhuma habilitação vigente.",
 	className = "",
 }: MeuPerfilCardProps) {
 	return (
@@ -79,9 +77,9 @@ export function MeuPerfilCard({
 					))}
 				</div>
 
-				<div className="mt-5 border-t border-gray-100 pt-4 text-left">
+				{highlights.length > 0 && (
+					<div className="mt-5 border-t border-gray-100 pt-4 text-left">
 					<h2 className="text-xs font-semibold text-gray-700">{highlightsTitle}</h2>
-					{highlights.length > 0 ? (
 						<div className="mt-3 flex flex-col gap-2">
 							{highlights.map((highlight) => (
 								<div
@@ -95,10 +93,8 @@ export function MeuPerfilCard({
 								</div>
 							))}
 						</div>
-					) : (
-						<p className="mt-3 text-xs text-gray-500">{emptyHighlightsMessage}</p>
-					)}
-				</div>
+					</div>
+				)}
 			</div>
 		</section>
 	);

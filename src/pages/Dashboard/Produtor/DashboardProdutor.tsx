@@ -15,7 +15,6 @@ interface DashboardProdutorProps {
 	userName: string;
 	news: ReactNode;
 	pendingContent: ReactNode;
-	afterMenu: ReactNode;
 	linkedItems: LinkedRegistration[];
 }
 
@@ -26,7 +25,6 @@ export function DashboardProdutor({
 	userName,
 	news,
 	pendingContent,
-	afterMenu,
 	linkedItems,
 }: DashboardProdutorProps) {
 	const { user } = useDemoUser();
@@ -47,8 +45,6 @@ export function DashboardProdutor({
 				...(telefone ? [{ id: "telefone", label: "Telefone", value: telefone.valor }] : []),
 			]}
 			highlights={[]}
-			highlightsTitle="Habilitações vigentes"
-			emptyHighlightsMessage="Nenhuma habilitação vigente."
 		/>
 	) : (
 		<section className="rounded-xl border border-green-100 bg-white p-6 text-sm text-gray-500 shadow-sm" aria-label="Meu perfil">
@@ -67,7 +63,6 @@ export function DashboardProdutor({
 			linkedContent={<CadastrosVinculados items={linkedItems} />}
 			pendingContent={pendingContent}
 			categories={categories}
-			afterMenu={afterMenu}
 		/>
 	);
 }
