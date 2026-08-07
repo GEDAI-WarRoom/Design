@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { Navbar } from "../../../components/Navbar";
 import { ProfileCard } from "../../../components/ProfileCard";
 import { useDemoUser } from "../../../contexts/DemoUserContext";
@@ -13,12 +13,78 @@ interface DashboardLiderEstabelecimentoProps {
 	newsFeed: ReactNode;
 }
 
-const estabelecimentoVinculado = {
-	nome: "Frigorífico São José",
-	codigo: "3100000001",
-	registroSie: "17126",
-	situacao: "Ativo",
-};
+const estabelecimentosVinculados = [
+	{
+		id: "frigorifico-sao-jose",
+		nome: "Frigorífico São José",
+		codigo: "3100000001",
+		registroSie: "17126",
+		situacao: "Ativo",
+	},
+	{
+		id: "unidade-industrial-ii",
+		nome: "Unidade Industrial II",
+		codigo: "3100000002",
+		registroSie: "17127",
+		situacao: "Ativo",
+	},
+	{
+		id: "centro-distribuicao",
+		nome: "Centro de Distribuição",
+		codigo: "3100000003",
+		registroSie: "17128",
+		situacao: "Ativo",
+	},
+	{
+		id: "unidade-beneficiamento",
+		nome: "Unidade de Beneficiamento",
+		codigo: "3100000004",
+		registroSie: "17129",
+		situacao: "Ativo",
+	},
+	{
+		id: "entreposto-regional",
+		nome: "Entreposto Regional",
+		codigo: "3100000005",
+		registroSie: "17130",
+		situacao: "Ativo",
+	},
+	{
+		id: "unidade-abate",
+		nome: "Unidade de Abate",
+		codigo: "3100000006",
+		registroSie: "17131",
+		situacao: "Ativo",
+	},
+	{
+		id: "centro-logistico",
+		nome: "Centro Logístico",
+		codigo: "3100000007",
+		registroSie: "17132",
+		situacao: "Ativo",
+	},
+	{
+		id: "fabrica-produtos-carneos",
+		nome: "Fábrica de Produtos Cárneos",
+		codigo: "3100000008",
+		registroSie: "17133",
+		situacao: "Ativo",
+	},
+	{
+		id: "unidade-armazenamento",
+		nome: "Unidade de Armazenamento",
+		codigo: "3100000009",
+		registroSie: "17134",
+		situacao: "Ativo",
+	},
+	{
+		id: "posto-distribuicao",
+		nome: "Posto de Distribuição",
+		codigo: "3100000010",
+		registroSie: "17135",
+		situacao: "Ativo",
+	},
+] as const;
 
 export function DashboardLiderEstabelecimento({
 	onLogout,
@@ -27,6 +93,13 @@ export function DashboardLiderEstabelecimento({
 	newsFeed,
 }: DashboardLiderEstabelecimentoProps) {
 	const { user } = useDemoUser();
+	const [estabelecimentoAtivoId, setEstabelecimentoAtivoId] = useState(
+		estabelecimentosVinculados[0].id,
+	);
+	const estabelecimentoAtivo =
+		estabelecimentosVinculados.find(
+			(estabelecimento) => estabelecimento.id === estabelecimentoAtivoId,
+		) ?? estabelecimentosVinculados[0];
 
 	return (
 		<div className="min-h-screen bg-[#f2f3f5]">
@@ -42,7 +115,7 @@ export function DashboardLiderEstabelecimento({
 						Bem-vinda, {user?.name ?? "líder de estabelecimento"}
 					</h1>
 					<p className="mt-1 text-sm text-gray-600">
-						Consulte seus dados profissionais e gerencie o estabelecimento vinculado.
+						Consulte seus dados profissionais e gerencie os estabelecimentos vinculados.
 					</p>
 				</div>
 
@@ -55,19 +128,27 @@ export function DashboardLiderEstabelecimento({
 							subtitle={user.roleLabel}
 							avatarSrc={fotoLiderEstabelecimentoExemploUrl}
 							avatarAlt={`Foto de ${user.name}`}
-							showActiveIndicator={estabelecimentoVinculado.situacao === "Ativo"}
+							showActiveIndicator={estabelecimentoAtivo.situacao === "Ativo"}
+							tabs={estabelecimentosVinculados.map((estabelecimento) => ({
+								id: estabelecimento.id,
+								label: estabelecimento.nome,
+							}))}
+							activeTabId={estabelecimentoAtivo.id}
+							onTabChange={setEstabelecimentoAtivoId}
+							tabsAriaLabel="Estabelecimentos vinculados"
+							maxVisibleTabs={3}
 							details={[
 								{
 									label: "Estabelecimento vinculado",
-									value: estabelecimentoVinculado.nome,
+									value: estabelecimentoAtivo.nome,
 								},
 								{
 									label: "Código do estabelecimento",
-									value: estabelecimentoVinculado.codigo,
+									value: estabelecimentoAtivo.codigo,
 								},
 								{
 									label: "Registro no SIE/MG",
-									value: estabelecimentoVinculado.registroSie,
+									value: estabelecimentoAtivo.registroSie,
 								},
 							]}
 							ariaLabel="Perfil profissional"
