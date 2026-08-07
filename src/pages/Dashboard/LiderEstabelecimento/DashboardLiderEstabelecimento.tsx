@@ -126,7 +126,7 @@ export function DashboardLiderEstabelecimento({
 						<ProfileCard
 							name={user.name}
 							subtitle={user.roleLabel}
-							avatarSrc={fotoLiderEstabelecimentoExemploUrl}
+							avatarSrc={user.avatarDataUrl ?? fotoLiderEstabelecimentoExemploUrl}
 							avatarAlt={`Foto de ${user.name}`}
 							showActiveIndicator={estabelecimentoAtivo.situacao === "Ativo"}
 							tabs={estabelecimentosVinculados.map((estabelecimento) => ({

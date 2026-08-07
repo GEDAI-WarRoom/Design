@@ -71,9 +71,9 @@ export function DashboardVeterinario({
         <div className="mb-6">
           {profissional ? (
             <ProfileCard
-              name={profissional.nome}
+              name={user?.name ?? profissional.nome}
               subtitle={profissional.formacao}
-              avatarSrc={fotoVeterinariaExemploUrl}
+              avatarSrc={user?.avatarDataUrl ?? fotoVeterinariaExemploUrl}
               showActiveIndicator={profissional.situacao === "Ativo"}
               details={[
                 {

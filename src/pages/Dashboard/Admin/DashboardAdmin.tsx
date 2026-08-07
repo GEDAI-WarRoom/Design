@@ -42,7 +42,7 @@ export function DashboardAdmin({
 						<ProfileCard
 							name={user.name}
 							subtitle={user.roleLabel}
-							avatarSrc={fotoAdministradorExemploUrl}
+							avatarSrc={user.avatarDataUrl ?? fotoAdministradorExemploUrl}
 							avatarAlt={`Foto de ${user.name}`}
 							showActiveIndicator
 							details={[
