@@ -1,10 +1,11 @@
 import type { ReactNode } from "react";
 import { UserRound } from "lucide-react";
-import { Navbar } from "../../../components/Navbar";
-import { ProfileCard } from "../../../components/ProfileCard";
 import { useDemoUser } from "../../../contexts/DemoUserContext";
 import { PRODUTORES_ATUALIZACAO } from "../../Rebanho/AtualizacaoCadastralRebanho/atualizacaoCadastralRebanhoData";
-import { DashboardMenu } from "../shared/DashboardMenu";
+import { CadastrosVinculados } from "../shared/CadastrosVinculados";
+import { DashboardPerfilPadrao } from "../shared/DashboardPerfilPadrao";
+import { MeuPerfilCard } from "../shared/MeuPerfilCard";
+import type { LinkedRegistration } from "../shared/dashboardProfileTypes";
 import type { MenuCategory } from "../shared/dashboardTypes";
 
 interface DashboardProdutorProps {
@@ -12,9 +13,10 @@ interface DashboardProdutorProps {
 	onNavigate: (screen: any, data?: any) => void;
 	categories: MenuCategory[];
 	userName: string;
-	beforeMenu: ReactNode;
+	news: ReactNode;
+	pendingContent: ReactNode;
 	afterMenu: ReactNode;
-	linkedItems: Array<{ title: string; subtitle: string; location: string; status: string; statusTone?: "active" | "pending"; icon?: ReactNode; titleTone?: string; subtitleTone?: string }>;
+	linkedItems: LinkedRegistration[];
 }
 
 export function DashboardProdutor({
@@ -22,7 +24,8 @@ export function DashboardProdutor({
 	onNavigate,
 	categories,
 	userName,
-	beforeMenu,
+	news,
+	pendingContent,
 	afterMenu,
 	linkedItems,
 }: DashboardProdutorProps) {
@@ -31,59 +34,40 @@ export function DashboardProdutor({
 		(registro) => registro.documento === user?.document,
 	);
 	const email = produtor?.contatos.find((contato) => contato.tipo === "E-mail");
-	const telefone = produtor?.contatos.find(
-		(contato) => contato.tipo === "Telefone",
+	const telefone = produtor?.contatos.find((contato) => contato.tipo === "Telefone");
+
+	const profile = produtor ? (
+		<MeuPerfilCard
+			name={produtor.nome}
+			roleLabel={user?.roleLabel ?? "Produtor"}
+			avatarFallback={<UserRound className="h-7 w-7" aria-hidden="true" />}
+			details={[
+				{ id: "cpf", label: "CPF", value: produtor.documento },
+				...(email ? [{ id: "email", label: "E-mail", value: email.valor }] : []),
+				...(telefone ? [{ id: "telefone", label: "Telefone", value: telefone.valor }] : []),
+			]}
+			highlights={[]}
+			highlightsTitle="Habilitações vigentes"
+			emptyHighlightsMessage="Nenhuma habilitação vigente."
+		/>
+	) : (
+		<section className="rounded-xl border border-green-100 bg-white p-6 text-sm text-gray-500 shadow-sm" aria-label="Meu perfil">
+			Não foi possível localizar o cadastro do produtor vinculado a este acesso.
+		</section>
 	);
 
 	return (
-		<div className="min-h-screen bg-[#f2f3f5]">
-			<Navbar
-				onLogout={onLogout}
-				onNavigate={onNavigate}
-				currentScreen="dashboard"
-			/>
-			<main className="mx-auto max-w-5xl px-4 py-6 md:px-6">
-				<div className="mb-6">
-					<h1 className="text-2xl font-semibold text-gray-900">
-						Bem-vindo, {userName}
-					</h1>
-					<p className="mt-1 text-sm text-gray-600">
-						Gerencie suas propriedades e movimentações agropecuárias.
-					</p>
-				</div>
-				<div className="mb-6">
-					{produtor ? (
-						<ProfileCard
-							name={produtor.nome}
-							subtitle={user?.roleLabel}
-							avatarFallback={
-								<UserRound className="h-7 w-7" aria-hidden="true" />
-							}
-							showActiveIndicator
-							details={[
-								{ label: "CPF", value: produtor.documento },
-								...(email ? [{ label: "E-mail", value: email.valor }] : []),
-								...(telefone
-									? [{ label: "Telefone", value: telefone.valor }]
-									: []),
-							]}
-							ariaLabel="Perfil do produtor"
-							linkedItems={linkedItems}
-							linkedItemsTitle="Cadastros vinculados"
-						/>
-					) : (
-						<section
-							className="w-full rounded-xl border border-green-100 bg-white p-6 text-sm text-gray-500 shadow-sm"
-							aria-label="Perfil do produtor"
-						>
-							Não foi possível localizar o cadastro do produtor vinculado a este acesso.
-						</section>
-					)}
-				</div>
-				{beforeMenu}
-				<DashboardMenu categoryGroups={[categories]} onNavigate={onNavigate} />
-				{afterMenu}
-			</main>
-		</div>
+		<DashboardPerfilPadrao
+			onLogout={onLogout}
+			onNavigate={onNavigate}
+			userName={userName}
+			description="Gerencie suas propriedades e movimentações agropecuárias."
+			news={news}
+			profile={profile}
+			linkedContent={<CadastrosVinculados items={linkedItems} />}
+			pendingContent={pendingContent}
+			categories={categories}
+			afterMenu={afterMenu}
+		/>
 	);
 }

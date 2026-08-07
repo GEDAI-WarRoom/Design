@@ -5,8 +5,6 @@ import {
   Calendar,
   CalendarCheck,
   CalendarDays,
-  ChevronLeft,
-  ChevronRight,
   ClipboardList,
   ClipboardPlus,
   Dna,
@@ -45,7 +43,6 @@ import {
   Bell,
   ClipboardType,
 } from "lucide-react";
-import { useEffect, useState } from "react";
 import { PendenciasConfirmacaoGta } from "../components/PendenciasConfirmacaoGta";
 import * as Icons from "../imports/icons";
 import campanhaVacinacao2026Url from "../imports/images/campanha-vacinacao-2026.png";
@@ -61,6 +58,7 @@ import {
 import { DashboardAdmin } from "./Dashboard/Admin/DashboardAdmin";
 import { DashboardProdutor } from "./Dashboard/Produtor/DashboardProdutor";
 import { DashboardVeterinario } from "./Dashboard/Veterinario/DashboardVeterinario";
+import { NoticiasCarousel } from "./Dashboard/shared/NoticiasCarousel";
 import type {
   MenuCategory,
   MenuItem,
@@ -1120,6 +1118,22 @@ const avisosProdutor = [
   },
 ];
 
+const noticiasCompartilhadas = avisosProdutor.map((aviso, index) => ({
+	id: `noticia-${index + 1}`,
+	category: aviso.categoria,
+	title: aviso.titulo,
+	description: aviso.descricao,
+	actionLabel: aviso.acao,
+	image: aviso.imagem,
+	imageAlt: aviso.alt,
+	actionIcon:
+		index % 3 === 2 ? (
+			<Download size={18} />
+		) : index % 3 === 1 ? (
+			<FileText size={18} />
+		) : undefined,
+}));
+
 const propriedadesProdutor = [
   {
     id: 1,
@@ -1148,111 +1162,6 @@ const propriedadesProdutor = [
     rebanhos: ["42 bovinos", "12 caprinos"],
   },
 ];
-
-function AvisosNoticias() {
-  const [slideAtivo, setSlideAtivo] = useState(0);
-
-  useEffect(() => {
-    const intervalo = window.setInterval(
-      () => setSlideAtivo((atual) => (atual + 1) % avisosProdutor.length),
-      7000,
-    );
-    return () => window.clearInterval(intervalo);
-  }, []);
-
-  const anterior = () =>
-    setSlideAtivo((atual) =>
-      atual === 0 ? avisosProdutor.length - 1 : atual - 1,
-    );
-  const proximo = () =>
-    setSlideAtivo((atual) => (atual + 1) % avisosProdutor.length);
-
-  return (
-    <section className="mb-6" aria-label="Avisos e Notícias">
-      <div className="mb-3 flex justify-end">
-        <div
-          className="flex gap-2"
-          aria-label={`Notícia ${slideAtivo + 1} de ${avisosProdutor.length}`}
-        >
-          {avisosProdutor.map((aviso, index) => (
-            <button
-              key={aviso.titulo}
-              type="button"
-              onClick={() => setSlideAtivo(index)}
-              aria-label={`Exibir notícia ${index + 1}`}
-              aria-current={index === slideAtivo}
-              className="h-1 w-12 overflow-hidden rounded-full bg-gray-300"
-            >
-              <span
-                className={`block h-full bg-[#1A7A3C] transition-all duration-500 ${index === slideAtivo ? "w-full" : "w-0"}`}
-              />
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="relative h-[420px] overflow-hidden rounded-2xl bg-gray-900 shadow-sm sm:h-[400px]">
-        {avisosProdutor.map((aviso, index) => (
-          <article
-            key={aviso.titulo}
-            aria-hidden={index !== slideAtivo}
-            className={`absolute inset-0 transition-opacity duration-700 ${index === slideAtivo ? "z-10 opacity-100" : "pointer-events-none opacity-0"}`}
-          >
-            <img
-              src={aviso.imagem}
-              alt={aviso.alt}
-              className="absolute inset-0 h-full w-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/55 to-black/10" />
-            <div className="absolute inset-0 flex max-w-3xl flex-col justify-end p-6 sm:p-9 md:p-12">
-              <span className="mb-4 w-fit rounded-full bg-green-100 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-[#1A7A3C]">
-                {aviso.categoria}
-              </span>
-              <h3 className="max-w-2xl text-2xl font-bold leading-tight text-white drop-shadow-lg sm:text-3xl md:text-4xl">
-                {aviso.titulo}
-              </h3>
-              <p className="mt-4 max-w-xl text-sm font-medium leading-6 text-white/85 sm:text-base">
-                {aviso.descricao}
-              </p>
-              <button
-                type="button"
-                className="mt-6 flex w-fit items-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-bold text-gray-900 shadow-xl transition hover:bg-gray-100"
-              >
-                {aviso.acao}
-                {index === 2 ? (
-                  <Download size={18} />
-                ) : index === 1 ? (
-                  <FileText size={18} />
-                ) : (
-                  <ArrowRight size={18} />
-                )}
-              </button>
-            </div>
-          </article>
-        ))}
-
-        <div className="absolute bottom-5 right-5 z-20 flex gap-3 sm:bottom-8 sm:right-8">
-          <button
-            type="button"
-            onClick={anterior}
-            aria-label="Notícia anterior"
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-white/30 bg-black/20 text-white backdrop-blur-md transition hover:bg-white/20"
-          >
-            <ChevronLeft size={22} />
-          </button>
-          <button
-            type="button"
-            onClick={proximo}
-            aria-label="Próxima notícia"
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-white/30 bg-black/20 text-white backdrop-blur-md transition hover:bg-white/20"
-          >
-            <ChevronRight size={22} />
-          </button>
-        </div>
-      </div>
-    </section>
-  );
-}
 
 function PropriedadesProdutor({ onNavigate }: { onNavigate: (screen: any, data?: any) => void }) {
   return (
@@ -1308,17 +1217,39 @@ export function DashboardPage({ onLogout, onNavigate }: any) {
         onNavigate={onNavigate}
         categories={[...visibleCadastros, ...visibleSecondary, ...visibleThird]}
         userName={user?.name ?? "produtor"}
-        beforeMenu={
-          <>
-            <AvisosNoticias />
-            <PendenciasConfirmacaoGta onNavigate={onNavigate} />
-          </>
-        }
+        news={<NoticiasCarousel items={noticiasCompartilhadas} />}
+        pendingContent={<PendenciasConfirmacaoGta onNavigate={onNavigate} />}
         afterMenu={<PropriedadesProdutor onNavigate={onNavigate} />}
         linkedItems={[
-          { title: propriedadesProdutor[0].nome, subtitle: "Exploração Pecuária", location: propriedadesProdutor[0].municipioUf, status: "Ativo", icon: <img src={Icons.iconeExploracaoUrl} alt="" className="h-5 w-5 object-contain" />, titleTone: "text-gray-900", subtitleTone: "text-gray-500" },
-          { title: propriedadesProdutor[1].nome, subtitle: "Estabelecimento Agropecuário", location: propriedadesProdutor[1].municipioUf, status: "Ativo", icon: <img src={Icons.iconeEstabelecimentoUrl} alt="" className="h-5 w-5 object-contain" />, titleTone: "text-gray-900", subtitleTone: "text-gray-500" },
-          { title: "Fazenda Santa Fé", subtitle: "Exploração Pecuária", location: "Uberaba - MG", status: "Ativo", icon: <img src={Icons.iconeExploracaoUrl} alt="" className="h-5 w-5 object-contain" />, titleTone: "text-gray-900", subtitleTone: "text-gray-500" },
+          {
+            id: "fazenda-santa-helena",
+            title: propriedadesProdutor[0].nome,
+            icon: <img src={Icons.iconeExploracaoUrl} alt="" className="h-5 w-5 object-contain" />,
+            details: [
+              { id: "tipo", label: "Tipo", value: "Exploração Pecuária" },
+              { id: "localizacao", label: "Localização", value: propriedadesProdutor[0].municipioUf },
+            ],
+            onView: () => onNavigate("visualizar-estabelecimento-agropecuario", propriedadesProdutor[0]),
+          },
+          {
+            id: "fazenda-sao-jose",
+            title: propriedadesProdutor[1].nome,
+            icon: <img src={Icons.iconeEstabelecimentoUrl} alt="" className="h-5 w-5 object-contain" />,
+            details: [
+              { id: "tipo", label: "Tipo", value: "Estabelecimento Agropecuário" },
+              { id: "localizacao", label: "Localização", value: propriedadesProdutor[1].municipioUf },
+            ],
+            onView: () => onNavigate("visualizar-estabelecimento-agropecuario", propriedadesProdutor[1]),
+          },
+          {
+            id: "fazenda-santa-fe",
+            title: "Fazenda Santa Fé",
+            icon: <img src={Icons.iconeExploracaoUrl} alt="" className="h-5 w-5 object-contain" />,
+            details: [
+              { id: "tipo", label: "Tipo", value: "Exploração Pecuária" },
+              { id: "localizacao", label: "Localização", value: "Uberaba - MG" },
+            ],
+          },
         ]}
       />
     );
@@ -1330,7 +1261,7 @@ export function DashboardPage({ onLogout, onNavigate }: any) {
         onLogout={onLogout}
         onNavigate={onNavigate}
         categories={[...visibleCadastros, ...visibleSecondary, ...visibleThird]}
-        newsFeed={<AvisosNoticias />}
+        news={<NoticiasCarousel items={noticiasCompartilhadas} />}
       />
     );
   }
