@@ -76,7 +76,10 @@ export function DashboardVeterinario({
               avatarSrc={fotoVeterinariaExemploUrl}
               showActiveIndicator={profissional.situacao === "Ativo"}
               details={[
-                { label: "CRMV-MG", value: profissional.numeroConselho },
+                {
+                  label: "Documento de responsabilidade técnica",
+                  value: profissional.numeroConselho,
+                },
                 {
                   label: "Tipo de registro",
                   value: profissional.tipoRegistroConselho || "Não informado",

@@ -2,7 +2,11 @@ import { createContext, useContext, useMemo, useState, type ReactNode } from "re
 import { PROFISSIONAL_VETERINARIO_DEMONSTRACAO } from "../pages/Animal/ProfissionalAnimal/profissionalAnimalData";
 import { PRODUTOR_REBANHO_DEMONSTRACAO_DOCUMENTO } from "../pages/Rebanho/AtualizacaoCadastralRebanho/atualizacaoCadastralRebanhoData";
 
-export type DemoUserRole = "admin" | "produtor" | "veterinario";
+export type DemoUserRole =
+	| "admin"
+	| "produtor"
+	| "veterinario"
+	| "lider-estabelecimento";
 
 export interface DemoUserIdentity {
 	role: DemoUserRole;
@@ -30,6 +34,11 @@ export const DEMO_USERS: Record<DemoUserRole, DemoUserIdentity> = {
 		roleLabel: "Médica Veterinária",
 		document: PROFISSIONAL_VETERINARIO_DEMONSTRACAO.cpf,
 		entityId: PROFISSIONAL_VETERINARIO_DEMONSTRACAO.id,
+	},
+	"lider-estabelecimento": {
+		role: "lider-estabelecimento",
+		name: "Thais Lopes",
+		roleLabel: "Líder de Estabelecimento",
 	},
 };
 
@@ -167,6 +176,26 @@ const veterinarioAllowedRoutes = new Set([
 	"pagar-emissao-gta",
 ]);
 
+const liderEstabelecimentoEntryRoutes = new Set([
+	"pessoa-fisica",
+	"pessoa-juridica",
+	"agroindustrial-sie",
+]);
+
+const liderEstabelecimentoAllowedRoutes = new Set([
+	"dashboard",
+	...liderEstabelecimentoEntryRoutes,
+	"adicionar-pessoa-fisica",
+	"visualizar-pessoa-fisica",
+	"editar-pessoa-fisica",
+	"adicionar-pessoa-juridica",
+	"visualizar-pessoa-juridica",
+	"editar-pessoa-juridica",
+	"adicionar-agroindustrial-sie",
+	"visualizar-agroindustrial-sie",
+	"editar-agroindustrial-sie",
+]);
+
 const produtorOnlyRoutes = new Set(["pendencias-confirmacao-gta"]);
 
 interface DemoUserContextValue {
@@ -211,7 +240,8 @@ export function isEntryRouteAllowed(role: DemoUserRole | null, route: string) {
 	if (produtorOnlyRoutes.has(route)) return role === "produtor";
 	if (role === "admin") return true;
 	if (role === "produtor") return produtorEntryRoutes.has(route);
-	return veterinarioEntryRoutes.has(route);
+	if (role === "veterinario") return veterinarioEntryRoutes.has(route);
+	return liderEstabelecimentoEntryRoutes.has(route);
 }
 
 export function isRouteAllowed(role: DemoUserRole | null, route: string) {
@@ -219,5 +249,6 @@ export function isRouteAllowed(role: DemoUserRole | null, route: string) {
 	if (produtorOnlyRoutes.has(route)) return role === "produtor";
 	if (role === "admin") return true;
 	if (role === "produtor") return produtorAllowedRoutes.has(route);
-	return veterinarioAllowedRoutes.has(route);
+	if (role === "veterinario") return veterinarioAllowedRoutes.has(route);
+	return liderEstabelecimentoAllowedRoutes.has(route);
 }

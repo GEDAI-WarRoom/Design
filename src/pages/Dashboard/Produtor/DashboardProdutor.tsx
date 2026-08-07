@@ -12,7 +12,8 @@ interface DashboardProdutorProps {
 	onNavigate: (screen: any, data?: any) => void;
 	categories: MenuCategory[];
 	userName: string;
-	beforeMenu: ReactNode;
+	newsFeed: ReactNode;
+	pendencias: ReactNode;
 	afterMenu: ReactNode;
 }
 
@@ -21,7 +22,8 @@ export function DashboardProdutor({
 	onNavigate,
 	categories,
 	userName,
-	beforeMenu,
+	newsFeed,
+	pendencias,
 	afterMenu,
 }: DashboardProdutorProps) {
 	const { user } = useDemoUser();
@@ -49,6 +51,7 @@ export function DashboardProdutor({
 						Gerencie suas propriedades e movimentações agropecuárias.
 					</p>
 				</div>
+				{newsFeed}
 				<div className="mb-6">
 					{produtor ? (
 						<ProfileCard
@@ -75,7 +78,7 @@ export function DashboardProdutor({
 						</section>
 					)}
 				</div>
-				{beforeMenu}
+				{pendencias}
 				<DashboardMenu categoryGroups={[categories]} onNavigate={onNavigate} />
 				{afterMenu}
 			</main>
