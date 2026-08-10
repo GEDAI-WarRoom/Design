@@ -77,7 +77,6 @@ const produtorAllowedRoutes = new Set([
 	"visualizar-estabelecimento-agropecuario",
 	"adicionar-venda-propriedade",
 	"visualizar-venda-propriedade",
-	"editar-venda-propriedade",
 	"adicionar-exploracao-pecuaria",
 	"visualizar-exploracao-pecuaria",
 	"adicionar-nucleo-producao",
