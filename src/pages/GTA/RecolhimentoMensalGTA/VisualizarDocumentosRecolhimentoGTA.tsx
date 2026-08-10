@@ -50,7 +50,7 @@ export function VisualizarBoletoRecolhimentoGTAPage({ onLogout, onNavigate, dado
             <table className="w-full min-w-[940px] border-collapse text-sm">
               <thead>
                 <tr className="border-b border-gray-100">
-                  {["Número", "Data da emissão", "Finalidade", "Situação", "Espécie", "Total de animais", "Valor de contribuição ao fundo"].map((titulo) => (
+                  {["Série / número", "Origem", "Destino", "Finalidade", "Valor"].map((titulo) => (
                     <th key={titulo} className="whitespace-nowrap px-3 py-3 text-left font-semibold uppercase text-gray-600">{titulo}</th>
                   ))}
                 </tr>
@@ -58,12 +58,10 @@ export function VisualizarBoletoRecolhimentoGTAPage({ onLogout, onNavigate, dado
               <tbody>
                 {boleto.gtas.map((gta) => (
                   <tr key={gta.numero} className="border-b border-gray-50">
-                    <td className="whitespace-nowrap px-3 py-3 text-gray-500">{gta.numero}</td>
-                    <td className="whitespace-nowrap px-3 py-3 text-gray-500">{formatarData(gta.dataEmissao)}</td>
+                    <td className="whitespace-nowrap px-3 py-3 text-gray-500">{gta.serie ? `${gta.serie} - ` : ""}{gta.numero}</td>
+                    <td className="px-3 py-3 text-gray-500">{gta.origem ?? "-"}</td>
+                    <td className="px-3 py-3 text-gray-500">{gta.destino ?? "-"}</td>
                     <td className="px-3 py-3 text-gray-500">{gta.finalidade}</td>
-                    <td className="px-3 py-3 text-gray-500">{gta.situacao}</td>
-                    <td className="px-3 py-3 text-gray-500">{gta.especie}</td>
-                    <td className="px-3 py-3 text-gray-500">{gta.totalAnimais}</td>
                     <td className="whitespace-nowrap px-3 py-3 text-gray-500">{formatarMoeda(gta.valorContribuicao)}</td>
                   </tr>
                 ))}

@@ -38,6 +38,17 @@ export const DEMO_USERS = PERFIS_USUARIO_INICIAIS.reduce(
 	{} as Record<DemoUserRole, DemoUserIdentity>,
 );
 
+DEMO_USERS["representante-agroindustria"] = {
+	role: "representante-agroindustria", name: "Carlos Henrique",
+	roleLabel: "Representante de Agroindústria", document: "23.456.789/0001-10",
+	entityId: 2, email: "representante.agroindustria@email.com", phone: "(31) 99111-2233", acceptedTerms: false,
+};
+DEMO_USERS["representante-integradora"] = {
+	role: "representante-integradora", name: "Ana Paula Mendes",
+	roleLabel: "Representante de Integradora", document: "34.567.890/0001-21",
+	entityId: 4, email: "representante.integradora@email.com", phone: "(31) 99222-3344", acceptedTerms: false,
+};
+
 const produtorEntryRoutes = new Set([
 	"pessoa-fisica",
 	"pessoa-juridica",
@@ -181,6 +192,7 @@ const liderEstabelecimentoEntryRoutes = new Set([
 	"integradora-cooperativa",
 	"revendedora-animais",
 	"revendedora-agropecuario",
+	"boletos-gta",
 ]);
 
 const liderEstabelecimentoAllowedRoutes = new Set([
@@ -208,6 +220,12 @@ const liderEstabelecimentoAllowedRoutes = new Set([
 ]);
 
 const produtorOnlyRoutes = new Set(["pendencias-confirmacao-gta"]);
+const representanteRoutes = new Set([
+	"boletos-gta",
+	"visualizar-recolhimento-mensal-gta",
+	"visualizar-boleto-recolhimento-gta",
+	"visualizar-dae-recolhimento-gta",
+]);
 
 interface DemoUserContextValue {
 	role: DemoUserRole | null;
@@ -267,6 +285,7 @@ export function isEntryRouteAllowed(role: DemoUserRole | null, route: string) {
 	if (!role) return false;
 	if (produtorOnlyRoutes.has(route)) return role === "produtor";
 	if (role === "admin") return true;
+	if (role === "representante-agroindustria" || role === "representante-integradora") return route === "boletos-gta";
 	if (role === "produtor") return produtorEntryRoutes.has(route);
 	if (role === "veterinario") return veterinarioEntryRoutes.has(route);
 	return liderEstabelecimentoEntryRoutes.has(route);
@@ -276,6 +295,7 @@ export function isRouteAllowed(role: DemoUserRole | null, route: string) {
 	if (!role) return false;
 	if (produtorOnlyRoutes.has(route)) return role === "produtor";
 	if (role === "admin") return true;
+	if (role === "representante-agroindustria" || role === "representante-integradora") return route === "dashboard" || route === "meu-perfil" || representanteRoutes.has(route);
 	if (role === "produtor") return produtorAllowedRoutes.has(route);
 	if (role === "veterinario") return veterinarioAllowedRoutes.has(route);
 	return liderEstabelecimentoAllowedRoutes.has(route);

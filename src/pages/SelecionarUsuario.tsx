@@ -43,6 +43,18 @@ const perfis = [
 		description: "Acesso aos cadastros de pessoas e ao estabelecimento agroindustrial vinculado.",
 		icon: Factory,
 	},
+	{
+		role: "representante-agroindustria" as const,
+		title: "Representante de Agroindústria",
+		description: "Acesso aos boletos mensais das GTAs vinculadas à agroindústria.",
+		icon: Factory,
+	},
+	{
+		role: "representante-integradora" as const,
+		title: "Representante de Integradora",
+		description: "Acesso aos boletos mensais das GTAs vinculadas à integradora.",
+		icon: Factory,
+	},
 ];
 
 export function SelecionarUsuarioPage({ onSelect, onBack }: SelecionarUsuarioProps) {

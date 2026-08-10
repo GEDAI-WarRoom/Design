@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Check, CreditCard } from "lucide-react";
+import { ArrowLeft, Check, CreditCard, QrCode, Barcode } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput } from "../../../components/ui/FormKit";
 import {
@@ -21,7 +21,10 @@ export function PagarEmissaoGtaPage({
   const registroInicial = dados ?? obterEmissaoGta(null);
   const [emissao, setEmissao] = useState<EmissaoGta | null>(registroInicial);
   const [sucesso, setSucesso] = useState(false);
+  const [formaPagamento, setFormaPagamento] = useState<"pix-dae" | "boleto">("pix-dae");
   if (!emissao) return null;
+
+  const frigorificoAderido = emissao.destino.tipo === "Frigorífico" && emissao.aderidoFundo === true;
 
   const confirmar = () => {
     const atualizada = pagarEmissaoGta(emissao.id);
@@ -92,6 +95,22 @@ export function PagarEmissaoGtaPage({
               required
             />
           </div>
+        </section>
+
+        <section className="bg-white rounded-xl shadow-sm p-6">
+          <h2 className="text-base font-semibold text-gray-800">Opção de recolhimento</h2>
+          <p className="mt-1 text-sm text-gray-500">Escolha PIX/DAE ou boleto. Para frigorífico aderido ao fundo, o boleto mensal é obrigatório.</p>
+          <div className="mt-5 grid grid-cols-1 gap-3 md:grid-cols-2">
+            <button type="button" onClick={() => !frigorificoAderido && setFormaPagamento("pix-dae")} className={`rounded-lg border p-4 text-left ${formaPagamento === "pix-dae" ? "border-[#1A7A3C] bg-green-50" : "border-gray-200"} ${frigorificoAderido ? "cursor-not-allowed opacity-50" : ""}`}>
+              <span className="flex items-center gap-2 font-semibold text-gray-800"><QrCode size={18} className="text-[#1A7A3C]" /> PIX / DAE</span>
+              <span className="mt-1 block text-xs text-gray-500">Pagamento imediato após a emissão.</span>
+            </button>
+            <button type="button" onClick={() => setFormaPagamento("boleto")} className={`rounded-lg border p-4 text-left ${formaPagamento === "boleto" ? "border-[#1A7A3C] bg-green-50" : "border-gray-200"}`}>
+              <span className="flex items-center gap-2 font-semibold text-gray-800"><Barcode size={18} className="text-[#1A7A3C]" /> Boleto</span>
+              <span className="mt-1 block text-xs text-gray-500">Incluído no boleto mensal do representante.</span>
+            </button>
+          </div>
+          {frigorificoAderido && <p className="mt-3 text-xs font-medium text-amber-700">Esta GTA será recolhida no boleto mensal do frigorífico aderido.</p>}
         </section>
       </main>
 

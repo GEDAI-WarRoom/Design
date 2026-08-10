@@ -7,7 +7,9 @@ export type PerfilUsuarioRole =
   | "admin"
   | "produtor"
   | "veterinario"
-  | "lider-estabelecimento";
+  | "lider-estabelecimento"
+  | "representante-agroindustria"
+  | "representante-integradora";
 
 export interface PerfilUsuario {
   id: PerfilUsuarioRole;

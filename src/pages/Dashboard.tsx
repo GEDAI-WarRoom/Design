@@ -1003,6 +1003,11 @@ export const thirdCategories: MenuCategory[] = [
         icon: <CalendarDays size={16} />,
       },
       {
+        label: "Boletos de GTAs",
+        route: "boletos-gta",
+        icon: <ReceiptText size={16} />,
+      },
+      {
         label: "Emissão de ATA",
         route: "emissao-ata",
         icon: <FileText size={16} />,
@@ -1209,12 +1214,12 @@ export function DashboardPage({ onLogout, onNavigate }: any) {
     );
   }
 
-  if (role === "lider-estabelecimento") {
+  if (role === "lider-estabelecimento" || role === "representante-agroindustria" || role === "representante-integradora") {
     return (
       <DashboardLiderEstabelecimento
         onLogout={onLogout}
         onNavigate={onNavigate}
-        categories={visibleCadastros}
+        categories={[...visibleCadastros, ...visibleThird]}
         news={<NoticiasCarousel items={noticiasCompartilhadas} />}
       />
     );

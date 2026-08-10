@@ -14,8 +14,13 @@ export interface ContribuinteRecolhimento {
 
 export interface GTARecolhimento {
   numero: string;
+  serie?: string;
   dataEmissao: string;
   finalidade: string;
+  origem?: string;
+  origemTipo?: "Estabelecimento" | "Pessoa";
+  origemDocumento?: string;
+  destino?: string;
   situacao: string;
   especie: string;
   totalAnimais: number;
@@ -79,8 +84,8 @@ const boletosMaria: BoletoRecolhimento[] = [
     valor: 420.5,
     situacaoPagamento: "Pago",
     gtas: [
-      { numero: "GTA-MG-2026-001284", dataEmissao: "2026-06-04", finalidade: "Engorda", situacao: "Emitida", especie: "Bovina", totalAnimais: 35, valorContribuicao: 245.0 },
-      { numero: "GTA-MG-2026-001311", dataEmissao: "2026-06-11", finalidade: "Reprodução", situacao: "Emitida", especie: "Bovina", totalAnimais: 18, valorContribuicao: 175.5 },
+      { numero: "GTA-MG-2026-001284", serie: "AB", dataEmissao: "2026-06-04", finalidade: "Engorda", origem: "Fazenda Santa Clara", destino: "Frigorífico Vale do Rio", situacao: "Emitida", especie: "Bovina", totalAnimais: 35, valorContribuicao: 245.0 },
+      { numero: "GTA-MG-2026-001311", serie: "AB", dataEmissao: "2026-06-11", finalidade: "Reprodução", origem: "Fazenda Santa Clara", destino: "Fazenda Boa Vista", situacao: "Emitida", especie: "Bovina", totalAnimais: 18, valorContribuicao: 175.5 },
     ],
   },
   {
@@ -91,7 +96,7 @@ const boletosMaria: BoletoRecolhimento[] = [
     valor: 250.25,
     situacaoPagamento: "Pago",
     gtas: [
-      { numero: "GTA-MG-2026-001402", dataEmissao: "2026-06-19", finalidade: "Abate", situacao: "Emitida", especie: "Suína", totalAnimais: 42, valorContribuicao: 250.25 },
+      { numero: "GTA-MG-2026-001402", serie: "CD", dataEmissao: "2026-06-19", finalidade: "Abate", origem: "Granja Santa Luzia", destino: "Frigorífico Minas Sul", situacao: "Emitida", especie: "Suína", totalAnimais: 42, valorContribuicao: 250.25 },
     ],
   },
 ];
@@ -105,8 +110,8 @@ const boletosCampoVerde: BoletoRecolhimento[] = [
     valor: 925.0,
     situacaoPagamento: "Aguardando pagamento",
     gtas: [
-      { numero: "GTA-MG-2026-001587", dataEmissao: "2026-07-03", finalidade: "Abate", situacao: "Emitida", especie: "Bovina", totalAnimais: 80, valorContribuicao: 560.0 },
-      { numero: "GTA-MG-2026-001633", dataEmissao: "2026-07-09", finalidade: "Engorda", situacao: "Emitida", especie: "Bovina", totalAnimais: 52, valorContribuicao: 365.0 },
+      { numero: "GTA-MG-2026-001587", serie: "EF", dataEmissao: "2026-07-03", finalidade: "Abate", origem: "Agropecuária Campo Verde", destino: "Frigorífico Campo Sul", situacao: "Emitida", especie: "Bovina", totalAnimais: 80, valorContribuicao: 560.0 },
+      { numero: "GTA-MG-2026-001633", serie: "EF", dataEmissao: "2026-07-09", finalidade: "Engorda", origem: "João Batista Ferreira", origemTipo: "Pessoa", origemDocumento: "987.654.321-00", destino: "Unidade de Engorda Horizonte", situacao: "Emitida", especie: "Bovina", totalAnimais: 52, valorContribuicao: 365.0 },
     ],
   },
 ];
@@ -121,7 +126,7 @@ export const RECOLHIMENTOS_MOCK: RecolhimentoMensalGTA[] = [
     anoReferencia: 2026,
     mesReferencia: 6,
     situacao: "Pago",
-    dataVencimento: "2026-07-10",
+    dataVencimento: quintoDiaUtilDoMesSeguinte(2026, 6),
     boletos: copiarBoletos(boletosMaria),
     daeEmitido: true,
     numeroDAE: "DAE-2026-000184",
@@ -133,7 +138,7 @@ export const RECOLHIMENTOS_MOCK: RecolhimentoMensalGTA[] = [
     anoReferencia: 2026,
     mesReferencia: 7,
     situacao: "Pagamento boleto",
-    dataVencimento: "2026-08-10",
+    dataVencimento: quintoDiaUtilDoMesSeguinte(2026, 7),
     boletos: copiarBoletos(boletosCampoVerde),
     daeEmitido: false,
   },
@@ -158,6 +163,17 @@ export const formatarData = (data?: string) => {
   const [ano, mes, dia] = data.split("-");
   return `${dia}/${mes}/${ano}`;
 };
+
+export function quintoDiaUtilDoMesSeguinte(ano: number, mes: number) {
+  const data = new Date(Date.UTC(ano, mes, 1));
+  let uteis = 0;
+  while (uteis < 5) {
+    const dia = data.getUTCDay();
+    if (dia !== 0 && dia !== 6) uteis += 1;
+    if (uteis < 5) data.setUTCDate(data.getUTCDate() + 1);
+  }
+  return data.toISOString().slice(0, 10);
+}
 
 export const valorTotalRecolhimento = (registro: RecolhimentoMensalGTA) =>
   registro.boletos.reduce((total, boleto) => total + boleto.valor, 0);
@@ -186,9 +202,7 @@ export function criarRecolhimento(dados: {
   mesReferencia: number;
 }) {
   const boletos = boletosDisponiveis(dados.contribuinte.id, dados.anoReferencia, dados.mesReferencia);
-  const proximoVencimento = new Date(Date.UTC(dados.anoReferencia, dados.mesReferencia, 10))
-    .toISOString()
-    .slice(0, 10);
+  const proximoVencimento = quintoDiaUtilDoMesSeguinte(dados.anoReferencia, dados.mesReferencia);
   const novo: RecolhimentoMensalGTA = {
     id: proximoId++,
     ...dados,

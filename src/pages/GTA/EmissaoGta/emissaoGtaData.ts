@@ -154,6 +154,7 @@ export interface EmissaoGtaFormValue {
   atestadosExame: AtestadoExameGta[];
   gtasRastreio: GtaRastreio[];
   observacoes: string;
+  aderidoFundo?: boolean;
 }
 
 export interface EmissaoGta extends EmissaoGtaFormValue {
@@ -581,6 +582,7 @@ export function criarEmissaoGtaVazia(): EmissaoGtaFormValue {
     atestadosExame: [],
     gtasRastreio: [],
     observacoes: "",
+    aderidoFundo: false,
   };
 }
 
@@ -616,6 +618,7 @@ function criarRegistroInicial(
     finalidade,
     procedencia,
     destino,
+    aderidoFundo: true,
     meiosTransporte: ["Rodoviário"],
     faixasAnimais: criarFaixasAnimais(especie).map((item, index) => ({
       ...item,

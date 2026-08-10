@@ -560,6 +560,7 @@ export type Screen =
   | "isencao-taxa-gta"
   | "adicionar-isencao-taxa-gta"
   | "recolhimento-mensal-gta"
+  | "boletos-gta"
   | "adicionar-recolhimento-mensal-gta"
   | "visualizar-recolhimento-mensal-gta"
   | "editar-recolhimento-mensal-gta"
@@ -775,7 +776,8 @@ export type Screen =
 	| "editar-instituicao-ensino-pesquisa"
 	| "isencao-taxa-gta"
 	| "adicionar-isencao-taxa-gta"
-	| "recolhimento-mensal-gta"
+  | "recolhimento-mensal-gta"
+  | "boletos-gta"
 	| "adicionar-recolhimento-mensal-gta"
 	| "visualizar-recolhimento-mensal-gta"
 	| "editar-recolhimento-mensal-gta"
@@ -2152,6 +2154,14 @@ export default function App() {
 				<RecolhimentoMensalGTAPage
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
+				/>
+			);
+		case "boletos-gta":
+			return (
+				<RecolhimentoMensalGTAPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					portalRepresentante
 				/>
 			);
 		case "adicionar-recolhimento-mensal-gta":
