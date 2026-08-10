@@ -134,18 +134,18 @@ export function LocalRealizacaoExamePage({ onLogout, onNavigate }: PageProps) {
           {showFilters && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 items-end animate-fadeIn">
               <EntitySearchInput
-                label="Proprietário"
+                label="CNPJ"
                 placeholder="Buscar por nome ou CPF/CNPJ"
                 value={proprietario?.nome ?? ""}
-                data={PROPRIETARIOS_LOCAL_EXAME}
+                data={PROPRIETARIOS_LOCAL_EXAME.filter((item) => item.tipo === "PJ")}
                 searchKeys={["nome", "documento"]}
                 columns={[
                   { label: "Nome / Razão Social", key: "nome" },
                   { label: "CPF / CNPJ", key: "documento" },
                 ]}
                 icon={<img src={Icons.iconeProdutorUrl} alt="Proprietário" className="w-5 h-5 object-contain" />}
-                title="Buscar Proprietário"
-                subtitle="Busque por uma pessoa física ou jurídica cadastrada no sistema:"
+                title="Buscar CNPJ"
+                subtitle="Busque por uma pessoa jurídica cadastrada no sistema:"
                 onChange={setProprietario}
               />
 
@@ -207,7 +207,8 @@ export function LocalRealizacaoExamePage({ onLogout, onNavigate }: PageProps) {
                 <thead>
                   <tr className="border-b border-gray-100">
                     <th className="text-left px-4 py-3 font-semibold uppercase text-gray-600">Código</th>
-                    <th className="text-left px-4 py-3 font-semibold uppercase text-gray-600">Proprietários</th>
+                    <th className="text-left px-4 py-3 font-semibold uppercase text-gray-600">CNPJ</th>
+                    <th className="text-left px-4 py-3 font-semibold uppercase text-gray-600">Médicos Veterinários</th>
                     <th className="text-left px-4 py-3 font-semibold uppercase text-gray-600">Situação</th>
                     <th className="px-4 py-3 w-[100px]" />
                   </tr>
@@ -217,6 +218,7 @@ export function LocalRealizacaoExamePage({ onLogout, onNavigate }: PageProps) {
                     <tr key={item.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/60 transition">
                       <td className="px-4 py-3 text-gray-500">{item.codigo}</td>
                       <td className="px-4 py-3 text-gray-500 whitespace-normal">{formatarProprietarios(item.proprietarios)}</td>
+                      <td className="px-4 py-3 text-gray-500 whitespace-normal">{item.veterinarios.map((veterinario) => `${veterinario.cpf} - ${veterinario.nome}`).join("; ") || "—"}</td>
                       <td className="px-4 py-3 text-gray-500">{item.situacao}</td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1 justify-end">

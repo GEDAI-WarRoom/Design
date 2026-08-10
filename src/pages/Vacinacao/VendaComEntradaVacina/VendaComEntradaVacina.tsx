@@ -287,9 +287,10 @@ export function VendaComEntradaVacinaPage({ onLogout, onNavigate }: PageProps) {
                 </label>
                 <input
                   type="text"
+                  maxLength={10}
                   value={numeroPartida}
                   onChange={(e) => {
-                    setNumeroPartida(e.target.value);
+                    setNumeroPartida(e.target.value.replace(/[^0-9/]/g, "").slice(0, 10));
                     limparErro();
                   }}
                   className="w-full bg-transparent text-sm text-gray-800 outline-none h-6"

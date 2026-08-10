@@ -750,7 +750,7 @@ export function ProdutorInput({
 					}
 					columns={colunasModal}
 					searchKeys={["nome", "documento"]}
-					searchPlaceholder="Buscar Proprietário"
+					searchPlaceholder={`Buscar ${label}`}
 					confirmLabel="Confirmar"
 					// Intercepta e reseta o filtro do tipo de pessoa ao fechar/confirmar se o EntitySearchInput permitir customização
 					onChange={(p) => {
@@ -758,7 +758,7 @@ export function ProdutorInput({
 						setTipoPessoa(""); // Reseta o select
 					}}
 					// 🔥 Injeta o FloatSelect customizado direto nas ações do cabeçalho do modal base
-					headerActions={
+					{...(label !== "Pessoa Jurídica" ? { headerActions: (
 						<div className="w-48 !mr-4 pr-1 relative z-10 flex-shrink-0">
 							<FloatSelect
 								label="Tipo de Pessoa"
@@ -771,7 +771,7 @@ export function ProdutorInput({
 								]}
 							/>
 						</div>
-					}
+					) } : {})}
 				/>
 
 				{/* Campo Extra reboque: CPF/CNPJ do Produtor */}
@@ -1037,6 +1037,7 @@ export function ProprietarioInput({
 	required = false,
 	disabled = false,
 	data = PRODUTORES_MOCK,
+	label = "Proprietário",
 }: DomainInputProps) {
 	const [tipoPessoa, setTipoPessoa] = useState<string>("");
 
@@ -1087,28 +1088,28 @@ export function ProprietarioInput({
 						: "w-full"
 				}>
 				<EntitySearchInput
-					label="Proprietário"
+					label={label}
 					placeholder="Buscar pelo nome do proprietário."
 					required={required}
 					value={entidadeExibida?.nome || ""}
 					disabled={disabled}
 					data={databaseFiltrada}
-					title="Buscar Proprietário"
-					subtitle="Busque por um proprietário cadastrado:"
+					title={`Buscar ${label}`}
+					subtitle={`Busque por ${label.toLowerCase()} cadastrada:`}
 					icon={
 						<img
-							src={Icons.iconeProdutorUrl}
-							alt="Proprietário"
+							alt={label}
+							src={label === "Pessoa Jurídica" ? Icons.iconePessoaJuridicaUrl : Icons.iconeProdutorUrl}
 							className="w-5 h-5 object-contain"
 						/>
 					}
 					columns={colunasModal}
 					searchKeys={["nome", "documento"]}
-					searchPlaceholder="Buscar Proprietário"
+					searchPlaceholder={`Buscar ${label}`}
 					confirmLabel="Confirmar"
 					// 💡 APENAS repassa a entidade sem resetar o estado prematuramente aqui
 					onChange={onChange}
-					headerActions={
+					headerActions={label === "Pessoa Jurídica" ? undefined : (
 						<div className="w-48 !mr-4 pr-1 relative z-10 flex-shrink-0">
 							<FloatSelect
 								label="Tipo de Pessoa"
@@ -1121,7 +1122,7 @@ export function ProprietarioInput({
 								]}
 							/>
 						</div>
-					}
+					)}
 				/>
 
 				{/* Campo Extra reboque */}
@@ -1146,7 +1147,7 @@ export function ProprietarioInput({
 }
 
 interface DomainInputProps {
-	label: string;
+	label?: string;
 	value: string; // Nome selecionado
 	documento?: string; // Documento selecionado (CPF/CNPJ)
 	required?: boolean;

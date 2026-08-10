@@ -16,7 +16,6 @@ import {
 	EntitySearchInput,
 	FornecedorInsumoInput,
 	RevendedoraInput,
-	MedicoVeterinarioInput
 } from "../../../components/ui/EntitySearch";
 import {
 	FloatCombobox,
@@ -403,6 +402,7 @@ export function LoteCardItem({
 				<EntitySearchInput
 					label="Doença"
 					placeholder="Buscar doença..."
+					required
 					value={lote.doenca ? lote.doenca.nome : ""}
 					data={DOENCAS_MOCK}
 					searchKeys={["nome"]}
@@ -422,12 +422,13 @@ export function LoteCardItem({
 				/>
 				{examSupplyTypes.length > 0 && (
 					<FloatSelect
-						label="Tipo de Reagente"
+						label="Tipo de Insumo"
 						options={examSupplyTypes.map((item) => ({
 							value: item.id,
 							label: item.name,
 						}))}
 						value={lote.tipoInsumoExame || ""}
+						required
 						onChange={(v) => updateLote(lote.uid, { tipoInsumoExame: v })}
 					/>
 				)}
@@ -515,12 +516,11 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
 	onLogout,
 	onNavigate,
 }: PageProps) {
-	const [destinatario, setDestinatario] = useState<any | null>(null);
 	const [revendedora, setRevendedora] = useState<any | null>(null);
-	const [medicoVeterinario, setMedicoVeterinario] = useState<any | null>(null);
 	const [fornecedor, setFornecedor] = useState<any | null>(null);
 	const [numeroNotaFiscal, setNumeroNotaFiscal] = useState("");
 	const [ufNotaFiscal, setUfNotaFiscal] = useState("");
+	const [dataNotaFiscal, setDataNotaFiscal] = useState("");
 	const [lotes, setLotes] = useState<any[]>([novoLote()]);
 	const [isSucesso, setIsSucesso] = useState(false);
 
@@ -589,7 +589,7 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
 	const totaisPorDoenca = useMemo(() => {
 		const map = new Map<string, number>();
 		lotes.forEach((l) => {
-			const nome = l.doenca?.nome;
+			const nome = l.tipoInsumoExame;
 			if (!nome) return;
 			const totalLote = l.apresentacoes.reduce(
 				(s: number, a: any) =>
@@ -598,15 +598,15 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
 			);
 			map.set(nome, (map.get(nome) || 0) + totalLote);
 		});
-		return Array.from(map, ([doenca, total]) => ({ doenca, total }));
+		return Array.from(map, ([tipoInsumo, total]) => ({ tipoInsumo, total }));
 		}, [lotes]);
 	const vendaCadastrada = {
 		fornecedor,
-		destinatario: destinatario || "Revendedora de Produtos Agropecuários",
+		destinatario: "Revendedora de Produtos Agropecuários",
 		revendedora,
-		medicoVeterinario,
 		numeroNotaFiscal,
 		ufNotaFiscal,
+		dataNotaFiscal,
 		lotes,
 	};
 
@@ -673,28 +673,13 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
 											"Por favor, digite ou selecione um fornecedor primeiro.",
 										);
 								}}
-							/>
-						</div>
+									/>
+							</div>
 					</Section>
 					<Section title="Destinatário">
 						<div
 							className={`grid grid-cols-1 gap-4`}>
-							{/* 1. Seleção do Tipo de Destinatário */}
-							<FloatSelect
-								label="Tipo de Destinatário"
-								value={destinatario || ""}
-								onChange={(val) => {
-									setDestinatario(val);
-									setRevendedora(null);
-									setMedicoVeterinario(null);
-								}}
-								options={TIPOS_DESTINATARIOS}
-								required
-							/>
-
-							{/* 2. Campo da Revendedora (Aparece apenas quando selecionado "Revendedora de Produtos Agropecuários") */}
-							{destinatario === "Revendedora de Produtos Agropecuários" && (
-								<div className="flex flex-col gap-3">
+							<div className="flex flex-col gap-3">
 									<RevendedoraInput
 										value={revendedora ? revendedora.codigo : ""}
 										required
@@ -706,30 +691,12 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
 												alert("Por favor, digite ou selecione uma revendedora primeiro.");
 										}}
 									/>
-								</div>
-							)}
-
-							{/* 3. Campo do Médico Veterinário (Aparece apenas quando selecionado "Médico Veterinário") */}
-							{destinatario === "Médico Veterinário" && (
-								<div className="flex flex-col gap-3">
-									<MedicoVeterinarioInput
-										value={medicoVeterinario ? medicoVeterinario.codigo : ""}
-										required
-										onChange={(entidadeSelecionada) => setMedicoVeterinario(entidadeSelecionada)}
-										onEyeClick={() => {
-											if (medicoVeterinario?.codigo)
-												alert(`Visualizar detalhes: ${medicoVeterinario.codigo}`);
-											else
-												alert("Por favor, digite ou selecione um médico veterinário primeiro.");
-										}}
-									/>
-								</div>
-							)}
-						</div>
+							</div>
+					</div>
 					</Section>
 					<Section title="Nota Fiscal">
 						<div className="flex flex-col gap-6">
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+							<div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
 								<FloatInput
 									label="Número da Nota Fiscal"
 									required
@@ -745,6 +712,15 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
 									value={ufNotaFiscal}
 									onChange={setUfNotaFiscal}
 									options={ESTADOS_BR}
+								/>
+								<FloatInput
+									label="Data da Nota Fiscal"
+									required
+									type="date"
+									max={new Date().toISOString().slice(0, 10)}
+									icon={<Calendar size={18} />}
+									value={dataNotaFiscal}
+									onChange={setDataNotaFiscal}
 								/>
 							</div>
 
@@ -780,12 +756,12 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
 									<div className="flex flex-col gap-3">
 										{totaisPorDoenca.map((t) => (
 											<div
-												key={t.doenca}
+																		key={t.tipoInsumo}
 												className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
 												<FloatInput
-													label="Doença"
-													disabled
-													value={t.doenca}
+																		label="Tipo de Insumo"
+																		disabled
+																		value={t.tipoInsumo}
 													onChange={() => { }}
 												/>
 												<FloatInput
