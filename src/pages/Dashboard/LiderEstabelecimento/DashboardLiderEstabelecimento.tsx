@@ -77,15 +77,15 @@ export function DashboardLiderEstabelecimento({
 							actionLabel: "Ver boletos",
 							onAction: () => onNavigate("relatorio-boletos-gta"),
 						},
+						...pendencias.map((pendencia) => ({
+							id: String(pendencia.id),
+							title: pendencia.titulo || "Pendência de estabelecimento",
+							description: pendencia.descricao || "Solicitação que precisa da sua atenção",
+							icon: <Building2 size={18} />,
+							actionLabel: "Resolver pendência",
+							onAction: () => onNavigate("pendencias-confirmacao-gta"),
+						})),
 					]}
-					items={pendencias.map((pendencia) => ({
-						id: String(pendencia.id),
-						title: pendencia.titulo || "Pendência de estabelecimento",
-						description: pendencia.descricao || "Solicitação que precisa da sua atenção",
-						icon: <Building2 size={18} />,
-						actionLabel: "Resolver pendência",
-						onAction: () => onNavigate("pendencias-confirmacao-gta"),
-					}))}
 					onViewAll={() => onNavigate("pendencias-confirmacao-gta")}
 				/>
 			}

@@ -1038,7 +1038,6 @@ export function ProprietarioInput({
 	onEyeClick,
 	required = false,
 	disabled = false,
-	data = PRODUTORES_MOCK,
 	label = "Proprietário",
 	data,
 }: DomainInputProps) {

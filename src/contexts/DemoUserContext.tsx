@@ -238,8 +238,6 @@ const responsavelEstabelecimentoRoutes = new Set([
 	"visualizar-integradora-cooperativa",
 	"editar-integradora-cooperativa",
 ]);
-const produtorOnlyRoutes = new Set<string>();
-
 interface DemoUserContextValue {
 	role: DemoUserRole | null;
 	user: DemoUserIdentity | null;
