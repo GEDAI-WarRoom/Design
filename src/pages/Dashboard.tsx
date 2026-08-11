@@ -911,6 +911,16 @@ export const thirdCategories: MenuCategory[] = [
         icon: <ScanBarcode size={16} />,
       },
       {
+        label: "Boletos",
+        route: "boletos-gta",
+        icon: <ReceiptText size={16} />,
+      },
+      {
+        label: "Relatório de Boletos",
+        route: "relatorio-boletos-gta",
+        icon: <ReceiptText size={16} />,
+      },
+      {
         label: "Fundo de Arrecadação",
         route: "fundo-arrecadacao",
         icon: <Wallet size={16} />,
@@ -1046,7 +1056,10 @@ function filterCategoriesByRole(
     "praga",
     "finalidade-transito",
   ]);
-  const rotasOcultasNoMenu = new Set(["pendencias-confirmacao-gta"]);
+  const rotasOcultasNoMenu = new Set([
+    "pendencias-confirmacao-gta",
+    "recolhimento-mensal-gta",
+  ]);
   return categories
     .map((category) => ({
       ...category,
@@ -1209,12 +1222,12 @@ export function DashboardPage({ onLogout, onNavigate }: any) {
     );
   }
 
-  if (role === "lider-estabelecimento") {
+  if (role === "responsavel-agroindustria-integradora") {
     return (
       <DashboardLiderEstabelecimento
         onLogout={onLogout}
         onNavigate={onNavigate}
-        categories={visibleCadastros}
+        categories={[...visibleCadastros, ...visibleThird]}
         news={<NoticiasCarousel items={noticiasCompartilhadas} />}
       />
     );

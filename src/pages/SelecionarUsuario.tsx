@@ -38,9 +38,9 @@ const perfis = [
 		icon: Stethoscope,
 	},
 	{
-		role: "lider-estabelecimento" as const,
-		title: "Líder de Estabelecimento",
-		description: "Acesso aos cadastros de pessoas e ao estabelecimento agroindustrial vinculado.",
+		role: "responsavel-agroindustria-integradora" as const,
+		title: "Responsável de Agroindústria/Integradora",
+		description: "Acesso ao relatório de boletos das GTAs vinculadas à agroindústria ou integradora.",
 		icon: Factory,
 	},
 ];

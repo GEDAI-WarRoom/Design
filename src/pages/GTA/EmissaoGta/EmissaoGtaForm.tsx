@@ -1476,14 +1476,21 @@ export function EmissaoGtaForm({
               semComplemento
               required
               disabled={disabled}
-              onChange={(finalidade) =>
+              onChange={(finalidade) => {
+                const destinoPorFinalidade: Record<string, TipoLocalGta> = {
+                  Abate: "Frigorífico",
+                  Engorda: "Estabelecimento Agropecuário",
+                  Reprodução: "Estabelecimento Agropecuário",
+                  Evento: "Evento Pecuário",
+                };
                 onChange?.({
                   ...value,
                   finalidade,
+                  procedencia: { ...criarLocalVazio(), tipo: "Estabelecimento Agropecuário" },
                   destino: {
-                    ...value.destino,
-                    abateTerceirizado: "",
-                    empresaAbate: null,
+                    ...criarDestinoVazio(),
+                    tipo: destinoPorFinalidade[finalidade.nome] ?? "",
+                    dentroEstado: value.destino.dentroEstado,
                   },
                   gtasRastreio:
                     finalidade.nome === "Abate" && value.especie?.grupo === "Aves"
@@ -1491,8 +1498,8 @@ export function EmissaoGtaForm({
                         ? value.gtasRastreio
                         : [{ id: uid(), uf: "", serieNumero: "" }]
                       : [],
-                })
-              }
+                });
+              }}
             />
           </div>
         </Section>
