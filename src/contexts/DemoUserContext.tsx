@@ -306,10 +306,11 @@ export function isEntryRouteAllowed(role: DemoUserRole | null, route: string) {
 
 export function isRouteAllowed(role: DemoUserRole | null, route: string) {
 	if (!role) return false;
-	if (produtorOnlyRoutes.has(route)) return role === "produtor";
-	if (representanteRoutes.has(route)) return role === "responsavel-agroindustria-integradora";
 	if (role === "admin") return true;
-	if (role === "responsavel-agroindustria-integradora") return route === "dashboard" || route === "meu-perfil" || responsavelEstabelecimentoRoutes.has(route);
+	if (produtorOnlyRoutes.has(route)) return role === "produtor";
+	if (role === "responsavel-agroindustria-integradora") {
+		return route === "dashboard" || route === "meu-perfil" || representanteRoutes.has(route) || responsavelEstabelecimentoRoutes.has(route);
+	}
 	if (role === "produtor") return produtorAllowedRoutes.has(route);
 	if (role === "veterinario") return veterinarioAllowedRoutes.has(route);
 	return liderEstabelecimentoAllowedRoutes.has(route);

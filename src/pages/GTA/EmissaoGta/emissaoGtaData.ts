@@ -19,6 +19,10 @@ export type TipoLocalGta =
   | "Frigorífico"
   | "Evento Pecuário"
   | "Revendedora de Animais Vivos"
+  | "Instituição de Ensino e Pesquisa"
+  | "Unidade de Vigilância Agropecuária"
+  | "Local de Pesagem"
+  | "Local de Realização de Exame"
   | "Estabelecimento Genérico";
 export type SituacaoGta =
   | "Gravada"
@@ -79,6 +83,7 @@ export interface LocalGta {
   evento: EntidadeGta | null;
   revendedora: EntidadeGta | null;
   aeroporto: EntidadeGta | null;
+  outroLocal: EntidadeGta | null;
 }
 
 export interface DestinoGta extends LocalGta {
@@ -142,6 +147,10 @@ export interface EnderecoParadaDescanso {
 
 export interface EmissaoGtaFormValue {
   tipoFormulario: TipoFormularioGta | "";
+  emitente: EntidadeGta | null;
+  requerente: EntidadeGta | null;
+  requerimento: string;
+  descricaoRequerimento: string;
   especie: EspecieGta | null;
   finalidade: EntidadeGta | null;
   procedencia: LocalGta;
@@ -185,12 +194,12 @@ export interface EmissaoGta extends EmissaoGtaFormValue {
   cancelamentoAutomatico?: boolean;
 }
 
-export const TIPOS_FORMULARIO_GTA = ["Manual", "Digital"].map((valor) => ({
+export const TIPOS_FORMULARIO_GTA = ["Digital", "Manual"].map((valor) => ({
   value: valor,
   label: valor,
 }));
 
-export const TIPOS_LOCAL_GTA: TipoLocalGta[] = [
+export const TIPOS_DESTINO_GTA: TipoLocalGta[] = [
   "Estabelecimento Agropecuário",
   "Frigorífico",
   "Evento Pecuário",
@@ -198,7 +207,24 @@ export const TIPOS_LOCAL_GTA: TipoLocalGta[] = [
   "Estabelecimento Genérico",
 ];
 
-export const TIPOS_LOCAL_OPTIONS = TIPOS_LOCAL_GTA.map((valor) => ({
+export const TIPOS_PROCEDENCIA_GTA: TipoLocalGta[] = [
+  "Estabelecimento Agropecuário",
+  "Evento Pecuário",
+  "Frigorífico",
+  "Revendedora de Animais Vivos",
+  "Unidade de Vigilância Agropecuária",
+  "Instituição de Ensino e Pesquisa",
+  "Local de Pesagem",
+  "Local de Realização de Exame",
+  "Estabelecimento Genérico",
+];
+
+export const TIPOS_LOCAL_OPTIONS = TIPOS_DESTINO_GTA.map((valor) => ({
+  value: valor,
+  label: valor,
+}));
+
+export const TIPOS_PROCEDENCIA_OPTIONS = TIPOS_PROCEDENCIA_GTA.map((valor) => ({
   value: valor,
   label: valor,
 }));
@@ -417,9 +443,11 @@ export const FRIGORIFICOS_GTA: EntidadeGta[] = [
   { id: 2, codigo: "33013646851", nome: "Frigorífico Santa Bárbara" },
 ];
 
-/** Regra interna: somente frigoríficos cadastrados como aderidos ao fundo. */
-export function frigorificoAderidoAoFundo(destino: DestinoGta) {
-  return destino.tipo === "Frigorífico" && destino.frigorifico?.aderidoFundo === true;
+/** Regra interna: boleto somente para abate em frigorífico aderido ao fundo. */
+export function frigorificoAderidoAoFundo(destino: DestinoGta, finalidade: EntidadeGta | null) {
+  return destino.tipo === "Frigorífico" &&
+    finalidade?.nome === "Abate" &&
+    destino.frigorifico?.aderidoFundo === true;
 }
 export const EVENTOS_GTA: EntidadeGta[] = [
   { id: 1, codigo: "EVT-0001", nome: "Rodeio ABC" },
@@ -433,6 +461,20 @@ export const AEROPORTOS_GTA: EntidadeGta[] = [
   { id: 1, codigo: "AER-001", nome: "Aeroporto de Confins" },
   { id: 2, codigo: "AER-002", nome: "Aeroporto de Uberlândia" },
 ];
+export const OUTROS_LOCAIS_GTA: Record<string, EntidadeGta[]> = {
+  "Instituição de Ensino e Pesquisa": [
+    { id: 701, codigo: "IEP-001", nome: "FUNDECC", municipio: "Lavras" },
+  ],
+  "Unidade de Vigilância Agropecuária": [
+    { id: 702, codigo: "UVA-001", nome: "Vigiagro", municipio: "Confins" },
+  ],
+  "Local de Pesagem": [
+    { id: 703, codigo: "PES-001", nome: "Agropec Balanças", municipio: "Uberaba" },
+  ],
+  "Local de Realização de Exame": [
+    { id: 704, codigo: "EXA-001", nome: "Clínica Vet+", municipio: "Belo Horizonte" },
+  ],
+};
 export const ACOUGUES_GTA: EntidadeGta[] = [
   { id: 1, codigo: "ACO-001", nome: "Açougue Santa Mara" },
   { id: 2, codigo: "ACO-002", nome: "Casa de Carnes Mineira" },
@@ -538,6 +580,7 @@ export const criarLocalVazio = (): LocalGta => ({
   evento: null,
   revendedora: null,
   aeroporto: null,
+  outroLocal: null,
 });
 
 export const criarDestinoVazio = (): DestinoGta => ({
@@ -584,6 +627,10 @@ export function criarFaixasAnimais(especie: EspecieGta | null): FaixaAnimalGta[]
 export function criarEmissaoGtaVazia(): EmissaoGtaFormValue {
   return {
     tipoFormulario: "",
+    emitente: PESSOAS_GTA[1] ?? PESSOAS_GTA[0] ?? null,
+    requerente: null,
+    requerimento: "",
+    descricaoRequerimento: "",
     especie: null,
     finalidade: null,
     procedencia: criarLocalVazio(),
@@ -647,6 +694,10 @@ function criarRegistroInicial(
     tipoFormulario: id === 1 ? "Digital" : "Manual",
     especie,
     finalidade,
+    emitente: PESSOAS_GTA[(id - 1) % PESSOAS_GTA.length],
+    requerente: PESSOAS_GTA[(id + 1) % PESSOAS_GTA.length],
+    requerimento: "requerimento.pdf",
+    descricaoRequerimento: "Requerimento apresentado para emissão da GTA.",
     procedencia,
     destino,
     meiosTransporte: ["Rodoviário"],
@@ -908,6 +959,26 @@ export function emitirEmissaoGta(
     necessitaPagamento: false,
     horaEmissao,
     codigoAutenticidade,
+  });
+}
+
+export function estenderValidadeEmissaoGta(id: number, novaData: string, justificativa: string) {
+  const registro = obterEmissaoGta(id);
+  if (!registro || registro.situacao !== "Emitida" || !justificativa.trim()) return null;
+
+  const hoje = new Date().toISOString().slice(0, 10);
+  const limiteAno = ultimoDiaUtilDoAno(Number(registro.dataEmissao.slice(0, 4)));
+  if (
+    hoje > registro.dataValidade ||
+    !novaData ||
+    novaData <= registro.dataValidade ||
+    novaData > limiteAno
+  ) return null;
+
+  return salvarEmissaoGta({
+    ...registro,
+    dataValidade: novaData,
+    justificativaValidade: justificativa.trim(),
   });
 }
 

@@ -8,6 +8,7 @@ import {
   CheckCircle2,
   Dna,
   Truck,
+  User,
   AlertTriangle,
   Calendar,
   Building2,
@@ -20,8 +21,11 @@ import {
   RotateCcw,
   Check,
   Bug,
+  Download,
+  TowerControl,
 } from "lucide-react";
 import * as Icons from "../../../imports/icons";
+import { useDemoUser } from "../../../contexts/DemoUserContext";
 import {
   EntitySearchInput,
   DynamicListWrapper,
@@ -54,11 +58,13 @@ import {
   MUNICIPIOS_POR_ESTADO,
   NUCLEOS_GTA,
   NUCLEOS_EXTERNOS_GTA,
+  OUTROS_LOCAIS_GTA,
   PESSOAS_GTA,
   REVENDEDORAS_ANIMAIS_GTA,
   TIPOS_ATESTADO_EXAME_GTA,
   TIPOS_FORMULARIO_GTA,
   TIPOS_LOCAL_OPTIONS,
+  TIPOS_PROCEDENCIA_OPTIONS,
   criarDestinoVazio,
   criarFaixasAnimais,
   criarLocalVazio,
@@ -503,6 +509,7 @@ function EntityPicker<T extends EntidadeGta = EntidadeGta>({
   semComplemento,
   devValue,
   tooltipText,
+  showViewActionWhenDisabled,
 }: {
   label: string;
   value: T | null;
@@ -519,6 +526,7 @@ function EntityPicker<T extends EntidadeGta = EntidadeGta>({
   semComplemento?: boolean;
   devValue?: string;
   tooltipText?: string;
+  showViewActionWhenDisabled?: boolean;
 }) {
   const codigo = value?.[codeKey] ?? "";
   const colunasModal = columns ?? [
@@ -527,6 +535,22 @@ function EntityPicker<T extends EntidadeGta = EntidadeGta>({
   ];
   const chavesBusca = searchKeys ?? ["nome", codeKey];
   if (disabled) {
+    if (showViewActionWhenDisabled) {
+      return (
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3">
+          <FloatInput label={label} value={value?.nome ?? ""} required={required} disabled icon={icon} />
+          <button
+            type="button"
+            title={`Visualizar ${label}`}
+            aria-label={`Visualizar ${label}`}
+            onClick={() => value && window.alert(`${value.nome}${value.documento ? `\n${value.documento}` : ""}`)}
+            className="flex h-12 w-10 items-center justify-center rounded-full text-[#1A7A3C] transition hover:bg-green-50"
+          >
+            <Eye size={20} />
+          </button>
+        </div>
+      );
+    }
     return semComplemento ? (
       <FloatInput label={label} value={value?.nome ?? ""} required={required} disabled />
     ) : (
@@ -576,6 +600,87 @@ function EntityPicker<T extends EntidadeGta = EntidadeGta>({
             <Eye size={20} />
           </button>
         </>
+      )}
+    </div>
+  );
+}
+
+function RequerenteInput({
+  value,
+  onChange,
+  disabled,
+}: {
+  value: EntidadeGta | null;
+  onChange: (entidade: EntidadeGta) => void;
+  disabled: boolean;
+}) {
+  const [tipoPessoa, setTipoPessoa] = useState<"PF" | "PJ" | "">("");
+  const pessoas = PESSOAS_GTA.map((pessoa) => ({
+    ...pessoa,
+    tipo: pessoa.documento?.includes("/") ? "PJ" : "PF",
+  }));
+  const pessoasFiltradas = tipoPessoa
+    ? pessoas.filter((pessoa) => pessoa.tipo === tipoPessoa)
+    : pessoas;
+  const documentoEhCnpj = value?.documento?.includes("/");
+
+  return (
+    <div className={value ? "grid grid-cols-1 gap-4 md:grid-cols-2 md:items-end" : "w-full"}>
+      <EntitySearchInput
+        label="Requerente"
+        placeholder="Buscar pessoa física ou jurídica"
+        required
+        value={value?.nome ?? ""}
+        data={pessoasFiltradas}
+        searchKeys={["nome", "documento"]}
+        columns={[
+          { label: tipoPessoa === "PJ" ? "Razão Social" : tipoPessoa === "PF" ? "Nome" : "Nome/Razão Social", key: "nome" },
+          { label: tipoPessoa === "PJ" ? "CNPJ" : tipoPessoa === "PF" ? "CPF" : "CPF/CNPJ", key: "documento" },
+        ]}
+        title="Buscar Requerente"
+        subtitle="Busque uma pessoa física ou jurídica cadastrada no sistema:"
+        icon={<img src={Icons.iconeProdutorUrl} alt="" className="h-5 w-5 object-contain" />}
+        confirmLabel="Confirmar"
+        disabled={disabled}
+        headerActions={
+          <div className="w-48 pr-1">
+            <FloatSelect
+              label="Tipo de Pessoa"
+              required
+              value={tipoPessoa}
+              onChange={(tipo) => setTipoPessoa(tipo as "PF" | "PJ" | "")}
+              options={[
+                { value: "PF", label: "Pessoa Física" },
+                { value: "PJ", label: "Pessoa Jurídica" },
+              ]}
+            />
+          </div>
+        }
+        onChange={(requerente) => {
+          onChange(requerente);
+          setTipoPessoa("");
+        }}
+      />
+      {value && (
+        <div className="flex items-end gap-2">
+          <div className="flex-1">
+            <FloatInput
+              label={documentoEhCnpj ? "CNPJ" : "CPF"}
+              value={value.documento ?? ""}
+              disabled
+              required
+            />
+          </div>
+          <button
+            type="button"
+            aria-label="Visualizar requerente"
+            title="Visualizar requerente"
+            onClick={() => window.alert(`${value.nome}${value.documento ? `\n${value.documento}` : ""}`)}
+            className="flex h-12 w-10 items-center justify-center rounded-full text-[#1A7A3C] transition hover:bg-green-50"
+          >
+            <Eye size={20} />
+          </button>
+        </div>
       )}
     </div>
   );
@@ -830,8 +935,22 @@ function LocalDentroEstado({
           data={AEROPORTOS_GTA}
           required
           disabled={disabled}
-          icon={<Building2 size={18} className="text-[#1A7A3C]" />}
+          icon={local.tipo === "Unidade de Vigilância Agropecuária"
+            ? <TowerControl size={18} className="text-[#1A7A3C]" />
+            : <Building2 size={18} className="text-[#1A7A3C]" />}
           onChange={(aeroporto) => update({ aeroporto })}
+        />
+      )}
+
+      {OUTROS_LOCAIS_GTA[local.tipo] && (
+        <EntityPicker
+          label={local.tipo}
+          value={local.outroLocal}
+          data={OUTROS_LOCAIS_GTA[local.tipo]}
+          required
+          disabled={disabled}
+          icon={<Building2 size={18} className="text-[#1A7A3C]" />}
+          onChange={(outroLocal) => update({ outroLocal })}
         />
       )}
 
@@ -1329,7 +1448,9 @@ export function EmissaoGtaForm({
   mode?: FormMode;
   showBasicSection?: boolean;
 }) {
+  const { role } = useDemoUser();
   const disabled = mode === "view";
+  const funcionarioIma = role === "admin";
   const update = <K extends keyof EmissaoGtaFormValue>(
     campo: K,
     valor: EmissaoGtaFormValue[K],
@@ -1341,12 +1462,10 @@ export function EmissaoGtaForm({
   const especieGrandesAnimais = ["Bovídeos", "Equídeos"].includes(
     value.especie?.grupo ?? "",
   );
-  const selecoesIniciaisPreenchidas = Boolean(
-    value.especie && value.finalidade,
+  const informacoesBasicasPreenchidas = Boolean(
+    value.tipoFormulario && value.emitente && (!funcionarioIma || (value.requerente && value.requerimento)) && value.especie && value.finalidade,
   );
-  const mensagemSelecoesIniciais = value.especie
-    ? "Selecione uma finalidade de trânsito para carregar."
-    : "Selecione uma espécie para carregar.";
+  const secoesDisponiveis = !showBasicSection || informacoesBasicasPreenchidas;
   const [endereco, setEndereco] = useState<EnderecoState>({
     zona: "Urbana",
     cep: "",
@@ -1369,7 +1488,8 @@ export function EmissaoGtaForm({
     value.procedencia.frigorifico ||
     value.procedencia.evento ||
     value.procedencia.revendedora ||
-    value.procedencia.aeroporto,
+    value.procedencia.aeroporto ||
+    value.procedencia.outroLocal,
   );
   const alterarFaixa = (id: string, animaisGta: number) =>
     update(
@@ -1418,6 +1538,52 @@ export function EmissaoGtaForm({
     <div className="flex flex-col gap-4">
       {showBasicSection && (
         <Section title="Informações Básicas">
+          <EntityPicker
+            label="Emitente"
+            value={value.emitente}
+            data={PESSOAS_GTA}
+            codeKey="documento"
+            icon={<User size={18} className="text-[#1A7A3C]" />}
+            required
+            disabled
+            semComplemento
+            showViewActionWhenDisabled
+            onChange={() => undefined}
+          />
+          {funcionarioIma && <>
+            <RequerenteInput
+              value={value.requerente}
+              onChange={(requerente) => update("requerente", requerente)}
+              disabled={disabled}
+            />
+            <div className={value.requerimento ? "grid grid-cols-1 items-start gap-4 md:grid-cols-[340px_minmax(0,1fr)_auto]" : "w-fit"}>
+              <UploadField
+                label="Requerimento"
+                required
+                fileName={value.requerimento}
+                disabled={disabled}
+                onSelectFile={() => update("requerimento", "requerimento.pdf")}
+              />
+              {value.requerimento && <>
+                <FloatInput
+                  label="Descrição"
+                  value={value.descricaoRequerimento}
+                  onChange={(descricaoRequerimento) => update("descricaoRequerimento", descricaoRequerimento)}
+                  disabled={disabled}
+                  maxLength={500}
+                />
+                <button
+                  type="button"
+                  title="Baixar requerimento"
+                  aria-label="Baixar requerimento"
+                  onClick={() => window.alert("Requerimento preparado para download no protótipo.")}
+                  className="mt-0.5 flex h-11 w-10 items-center justify-center rounded-full text-[#1A7A3C] transition hover:bg-green-50"
+                >
+                  <Download size={19} />
+                </button>
+              </>}
+            </div>
+          </>}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             <FloatSelect
               label="Tipo de Formulário"
@@ -1467,7 +1633,6 @@ export function EmissaoGtaForm({
             />
             <EntityPicker
               label="Finalidade de Trânsito"
-              tooltipText="Selecione a finalidade para a qual os animais serão transportados."
               value={value.finalidade}
               data={listarFinalidadesGta(value.especie?.id)}
               icon={<Truck size={18} className="text-[#1A7A3C]" />}
@@ -1477,21 +1642,11 @@ export function EmissaoGtaForm({
               required
               disabled={disabled}
               onChange={(finalidade) => {
-                const destinoPorFinalidade: Record<string, TipoLocalGta> = {
-                  Abate: "Frigorífico",
-                  Engorda: "Estabelecimento Agropecuário",
-                  Reprodução: "Estabelecimento Agropecuário",
-                  Evento: "Evento Pecuário",
-                };
                 onChange?.({
                   ...value,
                   finalidade,
-                  procedencia: { ...criarLocalVazio(), tipo: "Estabelecimento Agropecuário" },
-                  destino: {
-                    ...criarDestinoVazio(),
-                    tipo: destinoPorFinalidade[finalidade.nome] ?? "",
-                    dentroEstado: value.destino.dentroEstado,
-                  },
+                  procedencia: criarLocalVazio(),
+                  destino: criarDestinoVazio(),
                   gtasRastreio:
                     finalidade.nome === "Abate" && value.especie?.grupo === "Aves"
                       ? value.gtasRastreio.length > 0
@@ -1505,13 +1660,9 @@ export function EmissaoGtaForm({
         </Section>
       )}
 
+      {secoesDisponiveis && <>
       <Section title="Informações da Procedência">
-        {!selecoesIniciaisPreenchidas ? (
-          <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-500">
-            {mensagemSelecoesIniciais}
-          </p>
-        ) : (
-          <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-5">
           <FloatSelect
             label="Tipo de Procedência"
             required
@@ -1522,7 +1673,7 @@ export function EmissaoGtaForm({
                 tipo: tipo as TipoLocalGta,
               })
             }
-            options={TIPOS_LOCAL_OPTIONS}
+            options={TIPOS_PROCEDENCIA_OPTIONS}
             disabled={disabled}
           />
           {value.procedencia.tipo && (
@@ -1534,21 +1685,15 @@ export function EmissaoGtaForm({
               disabled={disabled}
             />
           )}
-          </div>
-        )}
+        </div>
       </Section>
 
-      {selecoesIniciaisPreenchidas && (
+      {secoesDisponiveis && (
         <DadosComplementaresProcedencia value={value} />
       )}
 
       <Section title="Informações de Destino">
-        {!selecoesIniciaisPreenchidas ? (
-          <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-500">
-            {mensagemSelecoesIniciais}
-          </p>
-        ) : (
-          <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <FloatSelect
               label="Tipo de Destino"
@@ -1597,8 +1742,7 @@ export function EmissaoGtaForm({
               disabled={disabled}
             />
           )}
-          </div>
-        )}
+        </div>
       </Section>
 
       <Section title="Informações do Trânsito">
@@ -1645,7 +1789,7 @@ export function EmissaoGtaForm({
         </div>
       </Section>
 
-      {selecoesIniciaisPreenchidas && (
+      {secoesDisponiveis && (
       <Section title="Informações dos Animais">
         {!value.especie ? (
           <p className="text-sm text-gray-500">
@@ -1921,7 +2065,7 @@ export function EmissaoGtaForm({
         </Section>
       )}
 
-      {selecoesIniciaisPreenchidas && (
+      {secoesDisponiveis && (
       <Section title="Atestados">
         <div className="flex flex-col gap-4">
           <UploadField
@@ -2016,7 +2160,7 @@ export function EmissaoGtaForm({
       </Section>
       )}
 
-      {selecoesIniciaisPreenchidas && (
+      {secoesDisponiveis && (
       <Section title="Observações">
         <div className="flex flex-col gap-6">
           {value.especie?.grupo === "Aves" && value.procedencia.nucleo && (
@@ -2232,6 +2376,7 @@ export function EmissaoGtaForm({
           </div>
         </div>
       </div>
+      </>}
     </div>
   );
 }
@@ -2249,7 +2394,8 @@ function localPreenchido(local: LocalGta) {
   if (local.tipo === "Evento Pecuário") return Boolean(local.evento);
   if (local.tipo === "Revendedora de Animais Vivos")
     return Boolean(local.revendedora);
-  return Boolean(local.aeroporto);
+  if (local.tipo === "Estabelecimento Genérico") return Boolean(local.aeroporto);
+  return Boolean(local.outroLocal);
 }
 
 function destinoPreenchido(destino: DestinoGta, finalidade?: string) {
@@ -2289,9 +2435,11 @@ function destinoPreenchido(destino: DestinoGta, finalidade?: string) {
   return Boolean(destino.aeroportoExterno);
 }
 
-export function emissaoGtaValida(value: EmissaoGtaFormValue) {
+export function emissaoGtaValida(value: EmissaoGtaFormValue, exigeRequerimento = true) {
   if (
     !value.tipoFormulario ||
+    !value.emitente ||
+    (exigeRequerimento && (!value.requerente || !value.requerimento)) ||
     !value.especie ||
     !value.finalidade ||
     !value.possuiMotivoIsencaoTaxa ||

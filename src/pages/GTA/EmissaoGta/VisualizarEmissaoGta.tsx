@@ -10,6 +10,7 @@ import {
   CreditCard,
   DollarSign,
   Download,
+  FileText,
   Info,
   Loader2,
   Pencil,
@@ -17,14 +18,17 @@ import {
   ReceiptText,
   ScanBarcode,
   Settings,
+  Truck,
   X,
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
-import { FloatInput } from "../../../components/ui/FormKit";
+import { FloatInput, LargeTextArea } from "../../../components/ui/FormKit";
 import { EmissaoGtaForm } from "./EmissaoGtaForm";
 import {
   copiarEmissaoGta,
-  confirmarTransitoGta,
+  dataPadraoValidade,
+  emitirEmissaoGta,
+  estenderValidadeEmissaoGta,
   formatarDataGta,
   formatarMoedaGta,
   frigorificoAderidoAoFundo,
@@ -32,8 +36,10 @@ import {
   obterEmissaoGta,
   obterPrazoAtualGta,
   pagarEmissaoGta,
+  ultimoDiaUtilDoAno,
   type EmissaoGta,
 } from "./emissaoGtaData";
+import { adicionarPendenciaConfirmacaoGta } from "../PendenciasConfirmacao/pendenciasConfirmacaoGtaData";
 
 // Importação da imagem do DAE a partir do diretório do projeto
 import daeExemploImg from "../../../imports/documents/dae-exemplo.jpeg";
@@ -77,44 +83,56 @@ const ETAPAS_CICLO_GTA = [
   { status: "Transitada", label: "Transitada", campo: "dataTransito" },
 ] as const;
 
-const DESCRICOES_STATUS_GTA: Record<EmissaoGta["situacao"], string> = {
-  Gravada: "Os dados podem ser editados enquanto a cobrança ainda não foi gerada.",
-  "Aguardando Pagamento": "A cobrança foi gerada e os dados da GTA estão bloqueados para edição.",
-  Paga: "O pagamento foi confirmado e a GTA está apta para emissão dentro do prazo.",
-  Emitida: "A GTA está válida para o trânsito e aguarda a confirmação do destinatário.",
-  Transitada: "O destinatário confirmou o trânsito e o ciclo da GTA foi concluído.",
-  Cancelada: "A GTA deixou de ser válida e o cancelamento não pode ser revertido.",
-};
-
 function iconeEtapaAtual(status: EmissaoGta["situacao"]) {
-  if (status === "Gravada") return <Pencil size={17} />;
-  if (status === "Aguardando Pagamento") return <ReceiptText size={17} />;
-  if (status === "Paga") return <CreditCard size={17} />;
-  if (status === "Emitida") return <ReceiptText size={17} />;
-  if (status === "Transitada") return <ArrowRight size={17} />;
+  if (status === "Gravada") return <FileText size={17} />;
+  if (status === "Aguardando Pagamento") return <Clock size={17} />;
+  if (status === "Paga") return <Check size={17} />;
+  if (status === "Emitida") return <ArrowRight size={17} />;
+  if (status === "Transitada") return <Truck size={17} />;
   return null;
+}
+
+function mascararDataBrasileira(valor: string) {
+  const numeros = valor.replace(/\D/g, "").slice(0, 8);
+  if (numeros.length <= 2) return numeros;
+  if (numeros.length <= 4) return `${numeros.slice(0, 2)}/${numeros.slice(2)}`;
+  return `${numeros.slice(0, 2)}/${numeros.slice(2, 4)}/${numeros.slice(4)}`;
+}
+
+function dataBrasileiraParaIso(valor: string) {
+  const correspondencia = valor.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (!correspondencia) return "";
+  const [, dia, mes, ano] = correspondencia;
+  const iso = `${ano}-${mes}-${dia}`;
+  const data = new Date(`${iso}T00:00:00`);
+  if (
+    Number.isNaN(data.getTime()) ||
+    data.getFullYear() !== Number(ano) ||
+    data.getMonth() + 1 !== Number(mes) ||
+    data.getDate() !== Number(dia)
+  ) return "";
+  return iso;
 }
 
 function CicloVidaGta({ emissao }: { emissao: EmissaoGta }) {
   const cancelada = emissao.situacao === "Cancelada";
   const indiceAtual = ETAPAS_CICLO_GTA.findIndex((etapa) => etapa.status === emissao.situacao);
-  const prazoAtual = obterPrazoAtualGta(emissao);
 
   return (
     <section className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
       <div>
         <div>
-          <h2 className="text-base font-semibold text-gray-900">Ciclo de vida da GTA</h2>
-          <p className="mt-1 text-xs text-gray-500">Acompanhe o progresso e os prazos de cada etapa.</p>
+          <h2 className="text-base font-semibold text-gray-900">Etapas da Emissão da GTA</h2>
+          <p className="mt-1 text-xs text-gray-500">Acompanhe o andamento do processo de emissão.</p>
         </div>
       </div>
 
       <div className="mt-6 overflow-x-auto pb-2">
         <div className="relative grid min-w-[760px] grid-cols-5 items-start">
-          <div className="absolute left-[10%] right-[10%] top-[18px] h-1 rounded-full bg-gray-300" />
+          <div className="absolute left-[10%] right-[10%] top-[19px] border-t border-dashed border-gray-200" />
           {!cancelada && indiceAtual >= 0 && (
             <div
-              className="absolute left-[10%] top-[18px] h-1 rounded-full bg-[#1A7A3C]"
+              className="absolute left-[10%] top-[19px] border-t border-dashed border-[#1A7A3C]"
               style={{ width: `${indiceAtual * 20}%` }}
             />
           )}
@@ -126,13 +144,13 @@ function CicloVidaGta({ emissao }: { emissao: EmissaoGta }) {
               <div key={etapa.status} className="relative z-10 flex min-w-0 flex-col items-center text-center">
                   <span className="flex h-10 w-10 items-center justify-center">
                     {atual ? (
-                      <span className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-[#1A7A3C] text-white shadow-[0_3px_10px_rgba(26,122,60,0.28)] ring-1 ring-green-100">
+                      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1A7A3C] text-white shadow-[0_2px_6px_rgba(26,122,60,0.22)]">
                         {iconeEtapaAtual(etapa.status)}
                       </span>
                     ) : concluida ? (
                       <span className="h-3.5 w-3.5 rounded-full bg-[#1A7A3C]" />
                     ) : (
-                      <span className="h-3.5 w-3.5 rounded-full border-[3px] border-gray-300 bg-white" />
+                      <span className="h-3.5 w-3.5 rounded-full border-2 border-gray-200 bg-white" />
                     )}
                   </span>
                   <span className={`mt-2 text-xs font-semibold ${atual ? "text-[#1A7A3C]" : concluida ? "text-gray-800" : "text-gray-400"}`}>{etapa.label}</span>
@@ -142,19 +160,6 @@ function CicloVidaGta({ emissao }: { emissao: EmissaoGta }) {
           })}
         </div>
       </div>
-
-      {!cancelada && (
-        <div className="mt-4 flex flex-col items-start gap-1.5 rounded-lg border border-gray-100 bg-gray-50 px-4 py-3">
-          <p className="text-xs leading-relaxed text-gray-600">
-            <strong className="text-gray-800">{emissao.situacao}:</strong> {DESCRICOES_STATUS_GTA[emissao.situacao]}
-          </p>
-          {prazoAtual && (
-            <span className="inline-flex shrink-0 items-center gap-1.5 text-xs font-semibold text-[#1A7A3C]">
-              <Clock size={13} /> Prazo até {formatarDataGta(prazoAtual)}
-            </span>
-          )}
-        </div>
-      )}
 
       {cancelada && (
         <div className="mt-4 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-700">
@@ -188,9 +193,15 @@ export function VisualizarEmissaoGtaPage({
   >("opcoes");
   const [pagamentoConfirmado, setPagamentoConfirmado] = useState(false);
   const [carregandoPagamento, setCarregandoPagamento] = useState(false);
+  const dataEmissaoHoje = new Date().toISOString().slice(0, 10);
+  const [modalExtensaoValidadeAberto, setModalExtensaoValidadeAberto] = useState(false);
+  const [novaDataValidade, setNovaDataValidade] = useState("");
+  const [justificativaValidade, setJustificativaValidade] = useState("");
+  const [tentouEstenderValidade, setTentouEstenderValidade] = useState(false);
 
   // Modal para pré-visualização do documento DAE/Boleto
   const [modalDaeAberto, setModalDaeAberto] = useState(false);
+  const [modalBoletoAberto, setModalBoletoAberto] = useState(false);
 
   // Timer para expiração do Pix (15 minutos = 900 segundos)
   const [tempoRestantePix, setTempoRestantePix] = useState(900);
@@ -248,10 +259,12 @@ export function VisualizarEmissaoGtaPage({
   // Regras de exibição das opções do menu
   const aguardaGeracaoPagamento = emissao.situacao === "Gravada";
   const temPagamentoPendente = emissao.necessitaPagamento && emissao.situacao === "Aguardando Pagamento";
-  const frigorificoAderido = frigorificoAderidoAoFundo(emissao.destino);
+  const frigorificoAderido = frigorificoAderidoAoFundo(emissao.destino, emissao.finalidade);
   const pagamentoConcluido = ["Paga", "Emitida", "Transitada"].includes(emissao.situacao);
+  const documentoPagamentoDisponivel = ["Aguardando Pagamento", "Paga", "Emitida"].includes(emissao.situacao);
   const foiEmitida = ["Emitida", "Transitada"].includes(emissao.situacao);
   const podeEmitir = emissao.situacao === "Paga";
+  const podeEstenderValidade = emissao.situacao === "Emitida" && dataEmissaoHoje <= emissao.dataValidade;
   const podeCancelar = !["Cancelada", "Transitada"].includes(emissao.situacao);
 
   const executarAcao = (acao: () => void) => {
@@ -268,7 +281,12 @@ export function VisualizarEmissaoGtaPage({
 
   const gerarDadosPagamento = () => {
     const atualizada = gerarDadosPagamentoGta(emissao.id);
-    if (atualizada) setEmissao({ ...atualizada });
+    if (!atualizada) return;
+
+    setEmissao({ ...atualizada });
+    if (atualizada.situacao === "Aguardando Pagamento") {
+      abrirModalPagamento();
+    }
   };
 
   const simularPagamentoPix = () => {
@@ -294,6 +312,11 @@ export function VisualizarEmissaoGtaPage({
     setModalDaeAberto(false);
   };
 
+  const abrirVisualizadorBoleto = () => {
+    setModalPagamento(false);
+    setModalBoletoAberto(true);
+  };
+
   const pagar = () => {
     if (temPagamentoPendente) {
       abrirModalPagamento();
@@ -307,12 +330,44 @@ export function VisualizarEmissaoGtaPage({
       window.alert("A GTA precisa estar paga para ser emitida.");
       return;
     }
-    onNavigate("emitir-emissao-gta", emissao);
+    const atualizada = emitirEmissaoGta(
+      emissao.id,
+      dataPadraoValidade(dataEmissaoHoje),
+      "",
+    );
+    if (atualizada) {
+      adicionarPendenciaConfirmacaoGta(atualizada);
+      setEmissao({ ...atualizada });
+    }
   };
 
-  const confirmarRecebimento = () => {
-    const atualizada = confirmarTransitoGta(emissao.id);
-    if (atualizada) setEmissao({ ...atualizada });
+  const limiteValidadeAno = ultimoDiaUtilDoAno(Number((emissao.dataEmissao || dataEmissaoHoje).slice(0, 4)));
+  const novaDataValidadeIso = dataBrasileiraParaIso(novaDataValidade);
+  const extensaoValidadeValida = Boolean(
+    novaDataValidadeIso > emissao.dataValidade &&
+    novaDataValidadeIso <= limiteValidadeAno &&
+    justificativaValidade.trim(),
+  );
+
+  const abrirExtensaoValidade = () => {
+    if (!podeEstenderValidade) return;
+    setNovaDataValidade("");
+    setJustificativaValidade("");
+    setTentouEstenderValidade(false);
+    setModalExtensaoValidadeAberto(true);
+  };
+
+  const confirmarExtensaoValidade = () => {
+    setTentouEstenderValidade(true);
+    if (!podeEstenderValidade || !extensaoValidadeValida) return;
+    const atualizada = estenderValidadeEmissaoGta(
+      emissao.id,
+      novaDataValidadeIso,
+      justificativaValidade,
+    );
+    if (!atualizada) return;
+    setEmissao({ ...atualizada });
+    setModalExtensaoValidadeAberto(false);
   };
 
   const cancelar = () => {
@@ -411,16 +466,26 @@ export function VisualizarEmissaoGtaPage({
 
                         <button
                           type="button"
-                          onClick={() => executarAcao(() => frigorificoAderido ? downloadMock("Boleto") : abrirVisualizadorDae())}
+                          onClick={() => executarAcao(frigorificoAderido ? abrirVisualizadorBoleto : abrirVisualizadorDae)}
                           className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition text-left"
                         >
-                          <ReceiptText size={15} className="text-gray-400" /> {frigorificoAderido ? "Baixar Boleto" : "Baixar Boleto / DAE"}
+                          <ReceiptText size={15} className="text-gray-400" /> {frigorificoAderido ? "Visualizar Boleto" : "Visualizar DAE"}
                         </button>
 
                         {(podeEmitir || pagamentoConcluido || foiEmitida) && (
                           <div className="my-1 border-t border-gray-100" />
                         )}
                       </>
+                    )}
+
+                    {documentoPagamentoDisponivel && !temPagamentoPendente && (
+                      <button
+                        type="button"
+                        onClick={() => executarAcao(frigorificoAderido ? abrirVisualizadorBoleto : abrirVisualizadorDae)}
+                        className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition text-left"
+                      >
+                        <ReceiptText size={15} className="text-gray-400" /> {frigorificoAderido ? "Visualizar Boleto" : "Visualizar DAE"}
+                      </button>
                     )}
 
                     {/* EMISSÃO */}
@@ -435,22 +500,20 @@ export function VisualizarEmissaoGtaPage({
                     )}
 
                     {/* COPIAR GTA */}
-                    {pagamentoConcluido && (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          executarAcao(() =>
-                            onNavigate(
-                              "adicionar-emissao-gta",
-                              copiarEmissaoGta(emissao),
-                            ),
-                          )
-                        }
-                        className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition text-left"
-                      >
-                        <Copy size={15} className="text-gray-400" /> Copiar GTA
-                      </button>
-                    )}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        executarAcao(() =>
+                          onNavigate(
+                            "adicionar-emissao-gta",
+                            copiarEmissaoGta(emissao),
+                          ),
+                        )
+                      }
+                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition text-left"
+                    >
+                      <Copy size={15} className="text-gray-400" /> Copiar GTA
+                    </button>
 
                     {/* BAIXAR GTA */}
                     {foiEmitida && (
@@ -460,16 +523,6 @@ export function VisualizarEmissaoGtaPage({
                         className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition text-left"
                       >
                         <Download size={15} className="text-gray-400" /> Baixar GTA
-                      </button>
-                    )}
-
-                    {emissao.situacao === "Emitida" && (
-                      <button
-                        type="button"
-                        onClick={() => executarAcao(confirmarRecebimento)}
-                        className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition text-left"
-                      >
-                        <Check size={15} className="text-gray-400" /> Confirmar trânsito
                       </button>
                     )}
 
@@ -496,18 +549,25 @@ export function VisualizarEmissaoGtaPage({
         <CicloVidaGta emissao={emissao} />
 
         {aguardaGeracaoPagamento && (
-          <div className="mt-2 flex w-full flex-col justify-between gap-4 rounded-xl border border-blue-200 bg-blue-50 p-5 shadow-sm sm:flex-row sm:items-center">
+          <div className="mt-2 flex w-full flex-col justify-between gap-4 rounded-xl border border-[#FFE0B2] bg-[#FFF9E6] p-5 shadow-sm sm:flex-row sm:items-center">
             <div className="flex items-start gap-3.5">
-              <Info size={22} className="mt-0.5 shrink-0 text-blue-600" />
-              <div>
-                <p className="text-sm font-bold text-gray-900">Dados de pagamento ainda não gerados</p>
+              <Info size={22} className="mt-0.5 shrink-0 text-[#F57C00] stroke-[2.5]" />
+              <div className="space-y-1.5">
+                <div className="flex flex-wrap items-center gap-3.5">
+                  <p className="text-sm font-bold text-gray-900">Dados de pagamento ainda não gerados</p>
+                  <span className="inline-flex items-center gap-1.5 rounded-md border border-amber-200/80 bg-amber-100/80 px-2.5 py-1 text-xs font-medium text-amber-900">
+                    <CalendarDays size={13} className="text-amber-700" />
+                    <span className="text-amber-800/70">Prazo:</span>
+                    <span className="text-amber-800/70">{prazoEtapaAtual}</span>
+                  </span>
+                </div>
                 <p className="mt-1 text-sm text-gray-600">A GTA ainda pode ser editada. Ao gerar a cobrança, os dados serão bloqueados para edição.</p>
               </div>
             </div>
             <button
               type="button"
               onClick={gerarDadosPagamento}
-              className="flex shrink-0 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-blue-700"
+              className="flex shrink-0 items-center justify-center gap-2 rounded-lg bg-[#F57C00] px-4 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-[#E65100]"
             >
               <ReceiptText size={15} /> Gerar dados de pagamento
             </button>
@@ -545,6 +605,73 @@ export function VisualizarEmissaoGtaPage({
             >
               <CreditCard size={15} />
               Dados de Pagamento
+            </button>
+          </div>
+        )}
+
+        {podeEmitir && (
+          <div className="mt-2 flex w-full flex-col justify-between gap-4 rounded-xl border border-[#A3E2B8] bg-[#F3FBF5] p-5 shadow-sm sm:flex-row sm:items-center">
+            <div className="flex items-start gap-3.5">
+              <Check size={22} className="mt-0.5 shrink-0 text-[#1A7A3C] stroke-[2.5]" />
+              <div className="space-y-1.5">
+                <div className="flex flex-wrap items-center gap-3.5">
+                  <p className="text-sm font-bold text-gray-900">GTA disponível para emissão</p>
+                  <span className="inline-flex items-center gap-1.5 rounded-md border border-green-200 bg-green-100/80 px-2.5 py-1 text-xs font-medium text-green-900">
+                    <CalendarDays size={13} className="text-green-700" />
+                    <span className="text-green-800/70">Emitir até:</span>
+                    <span className="text-green-800/70">{prazoEtapaAtual}</span>
+                  </span>
+                </div>
+                <p className="text-sm leading-relaxed text-gray-600">
+                  O pagamento foi confirmado. Emita a GTA dentro do prazo informado.
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={emitir}
+              className="flex shrink-0 items-center justify-center gap-2 rounded-lg bg-[#1A7A3C] px-4 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-[#15612F]"
+            >
+              <ArrowRight size={15} /> Emitir GTA
+            </button>
+          </div>
+        )}
+
+        {emissao.situacao === "Emitida" && (
+          <div className="mt-2 flex w-full flex-col justify-between gap-4 rounded-xl border border-[#A3E2B8] bg-[#F3FBF5] p-5 shadow-sm sm:flex-row sm:items-center">
+            <div className="flex items-start gap-3.5">
+              <Check size={22} className="mt-0.5 shrink-0 text-[#1A7A3C] stroke-[2.5]" />
+              <div className="space-y-1.5">
+                <div className="flex flex-wrap items-center gap-3.5">
+                  <p className="text-sm font-bold text-gray-900">GTA emitida</p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="inline-flex items-center gap-1.5 rounded-md border border-green-200 bg-green-100/80 px-2.5 py-1 text-xs font-medium text-green-900">
+                      <CalendarDays size={13} className="text-green-700" />
+                      <span className="text-green-800/70">Válida até:</span>
+                      <span className="text-green-800/70">{formatarDataGta(emissao.dataValidade)}</span>
+                    </span>
+                    {podeEstenderValidade && (
+                      <button
+                        type="button"
+                        onClick={abrirExtensaoValidade}
+                        className="text-xs font-semibold text-[#1A7A3C] underline decoration-[#1A7A3C]/40 underline-offset-2 transition hover:text-[#15612F]"
+                      >
+                        Estender validade
+                      </button>
+                    )}
+                  </div>
+                </div>
+                <p className="text-sm leading-relaxed text-gray-600">
+                  O documento está disponível para consulta e download durante a vigência.
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={baixarGta}
+              className="flex shrink-0 items-center justify-center gap-2 rounded-lg bg-[#1A7A3C] px-4 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-[#15612F]"
+            >
+              <Download size={15} /> Baixar GTA
             </button>
           </div>
         )}
@@ -657,7 +784,7 @@ export function VisualizarEmissaoGtaPage({
               {/* TELA 1: OPÇÕES DE PAGAMENTO */}
               {etapaPagamento === "opcoes" && (
                 <div className="w-full max-w-2xl my-auto flex flex-col gap-8">
-                  <div className={`grid grid-cols-1 gap-6 w-full ${frigorificoAderido ? "md:grid-cols-2" : "md:grid-cols-3"}`}>
+                  <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-2">
                     {/* CARD PIX */}
                     <div className="flex flex-col items-center justify-between gap-5 rounded-2xl border-2 border-[#1A7A3C] bg-[#F3FBF5] p-7 text-center shadow-sm transition-all hover:shadow-md">
                       <div className="flex flex-col items-center gap-3">
@@ -685,29 +812,26 @@ export function VisualizarEmissaoGtaPage({
                       </button>
                     </div>
 
-                    {/* CARD BOLETO */}
-                    <div className="flex flex-col items-center justify-between gap-5 rounded-2xl border border-gray-200 bg-white p-7 text-center shadow-sm transition-all hover:border-gray-300 hover:shadow-md">
-                      <div className="flex flex-col items-center gap-3">
-                        <span className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 text-gray-600">
-                          <ScanBarcode size={32} />
-                        </span>
-                        <span className="text-lg font-bold text-gray-900">
-                          Boleto
-                        </span>
-                        <span className="text-xs leading-relaxed text-gray-600">
-                          Gere o boleto para pagamento bancário.
-                        </span>
+                    {frigorificoAderido && (
+                      <div className="flex flex-col items-center justify-between gap-5 rounded-2xl border border-gray-200 bg-white p-7 text-center shadow-sm transition-all hover:border-gray-300 hover:shadow-md">
+                        <div className="flex flex-col items-center gap-3">
+                          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 text-gray-600">
+                            <ScanBarcode size={32} />
+                          </span>
+                          <span className="text-lg font-bold text-gray-900">Boleto</span>
+                          <span className="text-xs leading-relaxed text-gray-600">
+                            Gere o boleto para pagamento pelo fundo de indenização.
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={abrirVisualizadorBoleto}
+                          className="mt-2 flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-[#1A7A3C] bg-white px-4 text-xs font-bold text-[#1A7A3C] transition-colors hover:bg-[#F3FBF5]"
+                        >
+                          <ScanBarcode size={16} /> Visualizar Boleto
+                        </button>
                       </div>
-
-                      <button
-                        type="button"
-                        onClick={() => downloadMock("Boleto")}
-                        className="mt-2 flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-[#1A7A3C] bg-white px-4 text-xs font-bold text-[#1A7A3C] transition-colors hover:bg-[#F3FBF5]"
-                      >
-                        <Download size={16} />
-                        Baixar Boleto
-                      </button>
-                    </div>
+                    )}
 
                     {!frigorificoAderido && (
                       <div className="flex flex-col items-center justify-between gap-5 rounded-2xl border border-gray-200 bg-white p-7 text-center shadow-sm transition-all hover:border-gray-300 hover:shadow-md">
@@ -725,8 +849,8 @@ export function VisualizarEmissaoGtaPage({
                           onClick={abrirVisualizadorDae}
                           className="mt-2 flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-[#1A7A3C] bg-white px-4 text-xs font-bold text-[#1A7A3C] transition-colors hover:bg-[#F3FBF5]"
                         >
-                          <Download size={16} />
-                          Baixar DAE
+                          <ReceiptText size={16} />
+                          Visualizar DAE
                         </button>
                       </div>
                     )}
@@ -748,7 +872,7 @@ export function VisualizarEmissaoGtaPage({
                       </div>
                     </div>
                     <div className="text-center sm:text-right text-xs text-gray-500 border-t sm:border-t-0 sm:border-l border-gray-200 pt-3 sm:pt-0 sm:pl-6 w-full sm:w-auto">
-                      <p className="font-semibold text-gray-600">Vencimento: {dataVencimentoExemplo}</p>
+                      <p className="font-semibold text-gray-600">Vencimento: {prazoEtapaAtual}</p>
                       <p>Referente a: GTA - Guia de Trânsito Animal</p>
                     </div>
                   </div>
@@ -790,7 +914,7 @@ export function VisualizarEmissaoGtaPage({
                       </div>
                     </div>
                     <div className="text-center sm:text-right text-xs text-gray-500 border-t sm:border-t-0 sm:border-l border-gray-200 pt-3 sm:pt-0 sm:pl-6 w-full sm:w-auto">
-                      <p className="font-semibold text-gray-600">Vencimento: {dataVencimentoExemplo}</p>
+                      <p className="font-semibold text-gray-600">Vencimento: {prazoEtapaAtual}</p>
                       <p>Referente a: GTA - Guia de Trânsito Animal</p>
                     </div>
                   </div>
@@ -877,6 +1001,89 @@ export function VisualizarEmissaoGtaPage({
         </div>
       )}
 
+      {modalExtensaoValidadeAberto && (
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
+          <div className="w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-2xl">
+            <div className="relative border-b border-gray-100 px-6 py-5 text-center">
+              <h2 className="text-xl font-bold text-gray-900">Estender validade da GTA</h2>
+              <p className="mt-1 text-sm text-gray-500">Informe a nova data e justifique a extensão.</p>
+              <button
+                type="button"
+                onClick={() => setModalExtensaoValidadeAberto(false)}
+                className="absolute right-5 top-5 rounded-lg p-1.5 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
+                aria-label="Fechar extensão de validade"
+              >
+                <X size={21} />
+              </button>
+            </div>
+
+            <div className="flex flex-col gap-5 p-6">
+              <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+                <p className="text-sm font-semibold text-amber-900">Validade atual: {formatarDataGta(emissao.dataValidade)}</p>
+                <p className="mt-0.5 text-xs text-amber-700">A extensão deve ser realizada enquanto a GTA estiver vigente.</p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                <FloatInput
+                  label="Data de Validade Atual"
+                  value={formatarDataGta(emissao.dataValidade)}
+                  disabled
+                  required
+                />
+                <FloatInput
+                  label="Nova Data de Validade"
+                  type="text"
+                  value={novaDataValidade}
+                  onChange={(data) => {
+                    setNovaDataValidade(mascararDataBrasileira(data));
+                    setTentouEstenderValidade(false);
+                  }}
+                  placeholder="dd/mm/aaaa"
+                  maxLength={10}
+                  icon={<CalendarDays size={18} />}
+                  required
+                />
+              </div>
+
+              <LargeTextArea
+                label="Justificativa da Extensão da Validade"
+                value={justificativaValidade}
+                onChange={(texto) => {
+                  setJustificativaValidade(texto);
+                  setTentouEstenderValidade(false);
+                }}
+                required
+                maxLength={1500}
+                rows={3}
+              />
+
+              {tentouEstenderValidade && !extensaoValidadeValida && (
+                <p className="text-sm font-medium text-red-600">
+                  Informe uma data posterior a {formatarDataGta(emissao.dataValidade)}, até {formatarDataGta(limiteValidadeAno)}, e preencha a justificativa.
+                </p>
+              )}
+            </div>
+
+            <div className="flex items-center justify-center gap-3 border-t border-gray-100 px-6 py-4">
+              <button
+                type="button"
+                onClick={() => setModalExtensaoValidadeAberto(false)}
+                className="h-11 rounded-md border border-gray-300 px-5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={confirmarExtensaoValidade}
+                className="flex h-11 items-center justify-center gap-2 rounded-md bg-[#1A7A3C] px-5 text-sm font-semibold text-white transition hover:bg-[#15612F]"
+              >
+                <Check size={17} /> Confirmar Extensão
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* MODAL DE VISUALIZAÇÃO DO DAE */}
       {modalDaeAberto && (
         <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/50 p-4 md:p-6 backdrop-blur-xs">
@@ -888,16 +1095,26 @@ export function VisualizarEmissaoGtaPage({
                   Documento de Arrecadação Estadual - DAE
                 </h3>
                 <p className="text-xs font-medium text-gray-500 mt-0.5">
-                  GTA Nº {emissao.serieNumero} • Vencimento: <strong className="text-gray-600">{dataVencimentoExemplo}</strong>
+                  GTA Nº {emissao.serieNumero} • Vencimento: <strong className="text-gray-600">{prazoEtapaAtual}</strong>
                 </p>
               </div>
-              <button
-                type="button"
-                onClick={fecharVisualizadorDae}
-                className="absolute right-6 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
-              >
-                <X size={22} />
-              </button>
+              <div className="absolute right-5 top-1/2 flex -translate-y-1/2 items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => downloadMock("DAE_PDF")}
+                  className="flex h-9 items-center gap-2 rounded-md bg-[#1A7A3C] px-3 text-xs font-semibold text-white transition hover:bg-[#15612F]"
+                >
+                  <Download size={15} /> Baixar DAE
+                </button>
+                <button
+                  type="button"
+                  onClick={fecharVisualizadorDae}
+                  className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
+                  aria-label="Fechar DAE"
+                >
+                  <X size={22} />
+                </button>
+              </div>
             </div>
 
             <div className="flex-1 overflow-y-auto bg-gray-100 p-6 flex justify-center items-start">
@@ -918,16 +1135,84 @@ export function VisualizarEmissaoGtaPage({
               >
                 Voltar
               </button>
-              <button
-                type="button"
-                onClick={() => downloadMock("DAE_PDF")}
-                className="flex h-11 items-center justify-center gap-2 rounded-lg bg-[#1A7A3C] px-6 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#15612F]"
-              >
-                <Download size={18} />
-                Baixar Boleto / DAE
-              </button>
             </div>
 
+          </div>
+        </div>
+      )}
+
+      {modalBoletoAberto && (
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/50 p-4 md:p-6 backdrop-blur-xs">
+          <div className="flex h-[92vh] max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+            <div className="relative flex shrink-0 items-center justify-center border-b border-gray-200 bg-white px-6 py-5 text-center">
+              <div>
+                <h3 className="text-xl font-bold text-gray-900">Boleto para Pagamento da GTA</h3>
+                <p className="mt-0.5 text-xs font-medium text-gray-500">
+                  GTA Nº {emissao.serieNumero} • Vencimento: <strong className="text-gray-600">{prazoEtapaAtual}</strong>
+                </p>
+              </div>
+              <div className="absolute right-5 top-1/2 flex -translate-y-1/2 items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => downloadMock("Boleto_PDF")}
+                  className="flex h-9 items-center gap-2 rounded-md bg-[#1A7A3C] px-3 text-xs font-semibold text-white transition hover:bg-[#15612F]"
+                >
+                  <Download size={15} /> Baixar Boleto
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setModalBoletoAberto(false)}
+                  className="rounded-lg p-1.5 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
+                  aria-label="Fechar boleto"
+                >
+                  <X size={22} />
+                </button>
+              </div>
+            </div>
+
+            <div className="flex flex-1 items-start justify-center overflow-y-auto bg-gray-100 p-6">
+              <div className="my-auto w-full max-w-3xl rounded-lg border border-gray-300 bg-white p-8 shadow-md">
+                <div className="flex items-start justify-between gap-6 border-b-2 border-gray-900 pb-4">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">Fundo de indenização</p>
+                    <h4 className="mt-1 text-xl font-bold text-gray-900">Boleto de Cobrança</h4>
+                  </div>
+                  <ScanBarcode size={42} className="text-gray-800" />
+                </div>
+                <div className="grid grid-cols-1 gap-px bg-gray-300 md:grid-cols-2">
+                  {[
+                    ["Número da GTA", emissao.serieNumero],
+                    ["Vencimento", prazoEtapaAtual],
+                    ["Beneficiário", "Fundo de Indenização Sanitária"],
+                    ["Valor", formatarMoedaGta(emissao.valorGta)],
+                    ["Frigorífico", emissao.destino.frigorifico?.nome ?? "-"],
+                    ["Finalidade", emissao.finalidade?.nome ?? "-"],
+                  ].map(([label, valor]) => (
+                    <div key={label} className="bg-white px-4 py-3">
+                      <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-500">{label}</p>
+                      <p className="mt-1 text-sm font-medium text-gray-900">{valor}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-8">
+                  <p className="mb-2 text-center font-mono text-xs tracking-[0.18em] text-gray-700">00190.00009 01234.567890 12345.678901 1 00000000000000</p>
+                  <div
+                    className="h-16 w-full"
+                    style={{ backgroundImage: "repeating-linear-gradient(90deg, #111 0, #111 2px, transparent 2px, transparent 5px, #111 5px, #111 6px, transparent 6px, transparent 9px)" }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex shrink-0 items-center justify-center border-t border-gray-200 bg-white px-6 py-4">
+              <button
+                type="button"
+                onClick={() => setModalBoletoAberto(false)}
+                className="h-11 min-w-[140px] rounded-lg border border-gray-300 px-6 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+              >
+                Voltar
+              </button>
+            </div>
           </div>
         </div>
       )}
