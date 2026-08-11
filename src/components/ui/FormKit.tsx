@@ -53,6 +53,8 @@ interface FloatInputProps {
 	type?: string;
 	placeholder?: string;
 	maxLength?: number;
+	min?: string;
+	max?: string;
 	icon?: React.ReactNode;
 	onClick?: () => void;
 	className?: string;
@@ -70,6 +72,8 @@ export function FloatInput({
 	type = "text",
 	placeholder,
 	maxLength,
+	min,
+	max,
 	icon,
 	onClick,
 	className = "",
@@ -151,6 +155,8 @@ export function FloatInput({
 				disabled={disabled}
 				// Se for month, o tamanho máximo com a barra é 7 (MM/AAAA)
 				maxLength={isMonthVariant ? 7 : maxLength}
+				min={min}
+				max={max}
 				placeholder={
 					focused ? placeholder || (isMonthVariant ? "mm/aaaa" : "") : ""
 				}
