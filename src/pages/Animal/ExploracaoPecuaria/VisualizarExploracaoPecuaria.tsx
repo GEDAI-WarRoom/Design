@@ -1757,7 +1757,7 @@ export function VisualizarExploracaoPecuariaPage({
         {/* ================= ABA CICLO DE PRODUÇÃO/DISTRIBUIÇÃO ================= */}
         {activeTab === "producao/distribuicao" && (
           <AccordionCardGroup
-            title="Ciclos de Produção/Distribuição"
+            title="Ciclos de Produção/Distribuição "
             activeCountText={`${ativas} cadastro ativo`}
             icon={<History className="w-5 h-5" />}
             onAddClick={abrirModalCiclo}
