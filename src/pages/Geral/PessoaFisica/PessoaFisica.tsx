@@ -2,49 +2,21 @@ import { useState } from "react";
 import { ArrowLeft, Eye as ViewIcon, Pencil, PlusCircle, Search, SlidersHorizontal } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatSelect } from "../../../components/ui/FormKit";
+import { useMockDatabaseRevision } from "../../../mocks/useMockDatabase";
+import { listarPessoasFisicas } from "./pessoaFisicaData";
 
 const GREEN = "#1A7A3C";
 
-export const PESSOAS_FISICAS_MOCK = [
-  {
-    id: "1",
-    nome: "Eloiza Silva",
-    cpf: "444.009.956-40",
-    municipio: "Lavras",
-    situacao: "Ativo",
-    telefone: "(35) 99999-9999",
-    email: "eloiza.silva@email.com",
-    observacao: "Produtora cadastrada na região central."
-  },
-  {
-    id: "2",
-    nome: "Pedro Alves Moraes",
-    cpf: "222.114.558-70",
-    municipio: "Belo Horizonte",
-    situacao: "Ativo",
-    telefone: "(31) 98888-8888",
-    email: "pedro@email.com",
-    observacao: ""
-  },
-  {
-    id: "3",
-    nome: "Carla Menezes Rocha",
-    cpf: "111.998.775-30",
-    municipio: "Uberlândia",
-    situacao: "Inativo",
-    telefone: "(34) 97777-7777",
-    email: "carla@email.com",
-    observacao: "Cadastro inativado temporariamente."
-  }
-];
-
 export function PessoaFisicaPage({ onLogout, onNavigate }: { onLogout: () => void; onNavigate: (s: string, d?: any) => void; }) {
+  const databaseRevision = useMockDatabaseRevision();
+  void databaseRevision;
+  const pessoas = listarPessoasFisicas();
   const [busca, setBusca] = useState("");
   const [situacao, setSituacao] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
 
-  const filtrados = PESSOAS_FISICAS_MOCK.filter((r) => {
+  const filtrados = pessoas.filter((r) => {
     const b = busca.toLowerCase();
     return (
       (!busca || r.nome.toLowerCase().includes(b) || r.cpf.includes(b)) &&
@@ -113,19 +85,19 @@ export function PessoaFisicaPage({ onLogout, onNavigate }: { onLogout: () => voi
                     <tr key={r.id} className="border-b border-gray-50 hover:bg-gray-50 transition">
                       <td className="px-4 py-3 font-medium text-gray-800">{r.nome}</td>
                       <td className="px-4 py-3 text-gray-600">{r.cpf}</td>
-                      <td className="px-4 py-3 text-gray-600">{r.municipio}</td>
+                      <td className="px-4 py-3 text-gray-600">{r.correspondencia.municipio}</td>
                       <td className="px-4 py-3 text-gray-600">{r.situacao}</td>
                       <td className="px-4 py-3 text-right whitespace-nowrap">
                         <div className="flex items-center justify-end gap-1">
                           <button
-                            onClick={() => onNavigate("visualizar-pessoa-fisica", r)}
+                            onClick={() => onNavigate("visualizar-pessoa-fisica", { id: r.id })}
                             className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"
                             title="Visualizar"
                           >
                             <ViewIcon size={18} />
                           </button>
                           <button
-                            onClick={() => onNavigate("editar-pessoa-fisica", r)}
+                            onClick={() => onNavigate("editar-pessoa-fisica", { id: r.id })}
                             className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"
                             title="Editar"
                           >

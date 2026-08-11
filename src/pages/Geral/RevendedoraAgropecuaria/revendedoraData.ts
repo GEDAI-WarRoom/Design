@@ -1,4 +1,9 @@
 import { salvarResponsabilidadeTecnica } from "./responsabilidadeTecnicaData";
+import {
+  listarColecaoMock,
+  proximoIdNumerico,
+  salvarColecaoMock,
+} from "../../../mocks/mockDatabase";
 
 export type Situacao = "Ativo" | "Inativo";
 
@@ -100,7 +105,9 @@ const enderecoLavras: EnderecoRevendedora = {
   longitude: "-44.9998",
 };
 
-let revendedoras: Revendedora[] = [
+const COLECAO = "revendedoras-agropecuarias";
+
+const REVENDEDORAS_INICIAIS: Revendedora[] = [
   {
     id: 1,
     codigo: "3100000001",
@@ -161,6 +168,10 @@ let revendedoras: Revendedora[] = [
   },
 ];
 
+function listarRevendedoras() {
+  return listarColecaoMock(COLECAO, REVENDEDORAS_INICIAIS);
+}
+
 function formatarProfissional(item: ProfissionalVinculado) {
   return `${item.documento} - ${item.nome}`;
 }
@@ -181,16 +192,18 @@ function sincronizarVinculos(revendedora: Revendedora): Revendedora {
 }
 
 export function getRevendedoras() {
-  return revendedoras.map((item) => ({ ...item }));
+  return listarRevendedoras();
 }
 
 export function getRevendedora(id?: number) {
+  const revendedoras = listarRevendedoras();
   return revendedoras.find((item) => item.id === id) ?? revendedoras[0];
 }
 
 export function adicionarRevendedora(
   dados: Omit<Revendedora, "id" | "codigo" | "responsaveis" | "funcionarios" | "profissionais">,
 ) {
+  const revendedoras = listarRevendedoras();
   const codigoEstado = obterCodigoIbgeEstado(dados.estado);
   if (!codigoEstado) throw new Error("Estado inválido para geração do código da revendedora.");
   const maiorSequencial = revendedoras
@@ -205,7 +218,7 @@ export function adicionarRevendedora(
     funcionarios: [],
     profissionais: [],
   };
-  revendedoras = [...revendedoras, nova];
+  salvarColecaoMock(COLECAO, [...revendedoras, nova]);
   return nova;
 }
 
@@ -253,12 +266,14 @@ export function obterCodigoIbgeEstado(estado: string) {
 }
 
 export function atualizarRevendedora(id: number, dados: Partial<Revendedora>) {
+  const revendedoras = listarRevendedoras();
   let atualizada: Revendedora | undefined;
-  revendedoras = revendedoras.map((item) => {
+  const registrosAtualizados = revendedoras.map((item) => {
     if (item.id !== id) return item;
     atualizada = sincronizarVinculos({ ...item, ...dados });
     return atualizada;
   });
+  salvarColecaoMock(COLECAO, registrosAtualizados);
   return atualizada;
 }
 
