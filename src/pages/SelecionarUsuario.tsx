@@ -38,21 +38,9 @@ const perfis = [
 		icon: Stethoscope,
 	},
 	{
-		role: "lider-estabelecimento" as const,
-		title: "Líder de Estabelecimento",
-		description: "Acesso aos cadastros de pessoas e ao estabelecimento agroindustrial vinculado.",
-		icon: Factory,
-	},
-	{
-		role: "representante-agroindustria" as const,
-		title: "Representante de Agroindústria",
-		description: "Acesso aos boletos mensais das GTAs vinculadas à agroindústria.",
-		icon: Factory,
-	},
-	{
-		role: "representante-integradora" as const,
-		title: "Representante de Integradora",
-		description: "Acesso aos boletos mensais das GTAs vinculadas à integradora.",
+		role: "responsavel-agroindustria-integradora" as const,
+		title: "Responsável de Agroindústria/Integradora",
+		description: "Acesso ao relatório de boletos das GTAs vinculadas à agroindústria ou integradora.",
 		icon: Factory,
 	},
 ];

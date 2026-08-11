@@ -20,6 +20,7 @@ import {
   FileDown,
   Landmark,
   Plane,
+  Pencil,
   Search,
   SlidersHorizontal,
   Store,
@@ -48,6 +49,7 @@ import {
   listarFinalidadesGta,
   criarLocalVazio,
   formatarDataGta,
+  frigorificoAderidoAoFundo,
   type EmissaoGta,
   type EntidadeGta,
   type LocalGta,
@@ -613,7 +615,9 @@ export function EmissaoGtaPage({
                           {formatarDataGta(item.dataEmissao)}
                         </td>
                         <td className="px-3 py-3 text-gray-600">
-                          {item.situacao}
+                          <span className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${item.situacao === "Cancelada" ? "bg-red-50 text-red-700" : item.situacao === "Transitada" ? "bg-emerald-100 text-emerald-800" : item.situacao === "Emitida" ? "bg-blue-50 text-blue-700" : item.situacao === "Paga" ? "bg-green-50 text-green-700" : item.situacao === "Aguardando Pagamento" ? "bg-amber-50 text-amber-800" : "bg-gray-100 text-gray-700"}`}>
+                            {item.situacao}
+                          </span>
                         </td>
                         <td className="px-2 py-3">
                           <div className="flex items-center justify-end gap-0.5">
@@ -625,6 +629,14 @@ export function EmissaoGtaPage({
                             >
                               <Eye size={16} />
                             </ActionButton>
+                            {item.situacao === "Gravada" && (
+                              <ActionButton
+                                title="Editar GTA"
+                                onClick={() => onNavigate("adicionar-emissao-gta", item)}
+                              >
+                                <Pencil size={15} />
+                              </ActionButton>
+                            )}
                             <ActionButton
                               title="Copiar GTA"
                               onClick={() =>
@@ -636,7 +648,7 @@ export function EmissaoGtaPage({
                             >
                               <Copy size={15} />
                             </ActionButton>
-                            {item.situacao === "Gravada" &&
+                            {item.situacao === "Aguardando Pagamento" &&
                               item.necessitaPagamento && (
                                 <ActionButton
                                   title="Pagar"
@@ -647,17 +659,15 @@ export function EmissaoGtaPage({
                                   <DollarSign size={16} />
                                 </ActionButton>
                               )}
-                            {["Gravada", "Paga"].includes(item.situacao) && (
+                            {["Aguardando Pagamento", "Paga"].includes(item.situacao) && (
                               <ActionButton
-                                title="Baixar Boleto/DAE"
-                                onClick={() => downloadMock("Boleto/DAE", item)}
+                                title={frigorificoAderidoAoFundo(item.destino) ? "Baixar boleto" : "Baixar boleto/DAE"}
+                                onClick={() => downloadMock(frigorificoAderidoAoFundo(item.destino) ? "Boleto" : "Boleto/DAE", item)}
                               >
                                 <FileDown size={16} />
                               </ActionButton>
                             )}
-                            {(item.situacao === "Paga" ||
-                              (item.situacao === "Gravada" &&
-                                !item.necessitaPagamento)) && (
+                            {item.situacao === "Paga" && (
                                 <ActionButton
                                   title="Emitir"
                                   onClick={() =>
@@ -667,7 +677,7 @@ export function EmissaoGtaPage({
                                   <ArrowRight size={17} />
                                 </ActionButton>
                               )}
-                            {item.situacao === "Emitida" && (
+                            {["Emitida", "Transitada"].includes(item.situacao) && (
                               <ActionButton
                                 title="Baixar GTA"
                                 onClick={() => onNavigate("documento-emissao-gta", item)}
@@ -675,7 +685,7 @@ export function EmissaoGtaPage({
                                 <FileCheck2 size={16} />
                               </ActionButton>
                             )}
-                            {item.situacao !== "Cancelada" && (
+                            {!['Cancelada', 'Transitada'].includes(item.situacao) && (
                               <ActionButton
                                 title="Cancelar"
                                 onClick={() =>

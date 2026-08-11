@@ -264,6 +264,7 @@ import { VisualizarAtestadoExameCadastroPage } from "./pages/Exame/AtestadoExame
 import { AdicionarDAEPage } from "./pages/Arrecadacao/DAE/AdicionarDAE";
 import { DAEBuscaPage } from "./pages/Arrecadacao/DAE/DAE";
 import { VisualizarDAEPage } from "./pages/Arrecadacao/DAE/VisualizarDAE";
+import { BoletosBuscaPage } from "./pages/Arrecadacao/Boletos/Boletos";
 import { FundoArrecadacaoPage } from "./pages/Arrecadacao/FundoArrecadacao/FundoArrecadacao";
 import {
   AdicionarFundoArrecadacaoPage,
@@ -561,6 +562,7 @@ export type Screen =
   | "adicionar-isencao-taxa-gta"
   | "recolhimento-mensal-gta"
   | "boletos-gta"
+  | "relatorio-boletos-gta"
   | "adicionar-recolhimento-mensal-gta"
   | "visualizar-recolhimento-mensal-gta"
   | "editar-recolhimento-mensal-gta"
@@ -778,6 +780,7 @@ export type Screen =
 	| "adicionar-isencao-taxa-gta"
   | "recolhimento-mensal-gta"
   | "boletos-gta"
+	| "relatorio-boletos-gta"
 	| "adicionar-recolhimento-mensal-gta"
 	| "visualizar-recolhimento-mensal-gta"
 	| "editar-recolhimento-mensal-gta"
@@ -2158,6 +2161,13 @@ export default function App() {
 			);
 		case "boletos-gta":
 			return (
+				<BoletosBuscaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "relatorio-boletos-gta":
+			return (
 				<RecolhimentoMensalGTAPage
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
@@ -2247,6 +2257,7 @@ export default function App() {
 		case "adicionar-lote-pagamento":
 			return (
 				<AdicionarLotePagamentoPage
+					dados={screenData}
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
 				/>

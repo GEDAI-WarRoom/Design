@@ -1505,22 +1505,6 @@ export function EmissaoGtaForm({
         </Section>
       )}
 
-      <Section title="Opção de recolhimento">
-        <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
-          <SimNao
-            label="Destinatário aderido ao fundo de arrecadação?"
-            name="aderidoFundo"
-            required
-            value={value.aderidoFundo}
-            onChange={(aderidoFundo) => onChange?.({ ...value, aderidoFundo })}
-            disabled={disabled}
-          />
-          <p className="mt-3 text-xs text-gray-500">
-            Para GTA destinada a frigorífico aderido, o recolhimento fica disponível somente por boleto mensal. Nos demais casos, o pagamento oferece PIX/DAE e boleto.
-          </p>
-        </div>
-      </Section>
-
       <Section title="Informações da Procedência">
         {!selecoesIniciaisPreenchidas ? (
           <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-500">

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Building2 } from "lucide-react";
+import { Building2, CreditCard } from "lucide-react";
 import { useDemoUser } from "../../../contexts/DemoUserContext";
 import fotoLiderEstabelecimentoExemploUrl from "../../../imports/images/perfil-estabelecimento-exemplo.png";
 import { CadastrosVinculados } from "../shared/CadastrosVinculados";
@@ -65,7 +65,21 @@ export function DashboardLiderEstabelecimento({
 					onViewAll={() => onNavigate("agroindustrial-sie")}
 				/>
 			}
-			pendingContent={<PendenciasResumo items={[]} />}
+			pendingContent={
+				<PendenciasResumo
+					title="Pendências"
+					items={[
+						{
+							id: "boleto-julho-pendente",
+							title: "Pagamento de boleto pendente",
+							description: "Integradora Vale do Campo · vencimento em 07/08/2026",
+							icon: <CreditCard size={18} />,
+							actionLabel: "Ver boletos",
+							onAction: () => onNavigate("relatorio-boletos-gta"),
+						},
+					]}
+				/>
+			}
 			categories={categories}
 		/>
 	);

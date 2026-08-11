@@ -8,6 +8,7 @@ import {
 } from "./EmissaoGtaForm";
 import {
   adicionarEmissaoGta,
+  atualizarEmissaoGta,
   calcularValorGta,
   criarEmissaoGtaVazia,
   type EmissaoGta,
@@ -19,7 +20,7 @@ export function AdicionarEmissaoGtaPage({
   onLogout,
   onNavigate,
 }: {
-  dados?: EmissaoGtaFormValue | null;
+  dados?: EmissaoGtaFormValue | EmissaoGta | null;
   onLogout: () => void;
   onNavigate: (screen: any, data?: any) => void;
 }) {
@@ -28,11 +29,16 @@ export function AdicionarEmissaoGtaPage({
   );
   const [tentouSalvar, setTentouSalvar] = useState(false);
   const [emissaoSalva, setEmissaoSalva] = useState<EmissaoGta | null>(null);
+  const registroEmEdicao = dados && "id" in dados ? dados as EmissaoGta : null;
 
   const salvar = () => {
     setTentouSalvar(true);
     if (!emissaoGtaValida(emissao)) return;
-    setEmissaoSalva(adicionarEmissaoGta(emissao));
+    setEmissaoSalva(
+      registroEmEdicao
+        ? atualizarEmissaoGta(registroEmEdicao.id, emissao)
+        : adicionarEmissaoGta(emissao),
+    );
   };
 
   return (
@@ -55,14 +61,14 @@ export function AdicionarEmissaoGtaPage({
           </button>
           <div className="flex items-center justify-between gap-4">
             <h1 className="text-2xl font-semibold text-gray-900">
-              Adicionar GTA
+              {registroEmEdicao ? "Editar GTA" : "Adicionar GTA"}
             </h1>
             <button
               type="button"
               onClick={salvar}
               className="px-5 h-10 text-xs font-bold rounded-md text-white bg-[#1A7A3C] hover:bg-[#15612F]"
             >
-              Adicionar
+              {registroEmEdicao ? "Salvar" : "Adicionar"}
             </button>
           </div>
         </div>
@@ -94,7 +100,7 @@ export function AdicionarEmissaoGtaPage({
               />
             </div>
             <h2 className="text-lg font-bold text-gray-900">
-              GTA cadastrada com sucesso!
+              GTA {registroEmEdicao ? "atualizada" : "cadastrada"} com sucesso!
             </h2>
             <p className="text-sm text-gray-500 mt-1">
               A GTA {emissaoSalva.serieNumero} foi cadastrada para{" "}

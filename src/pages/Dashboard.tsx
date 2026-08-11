@@ -911,6 +911,16 @@ export const thirdCategories: MenuCategory[] = [
         icon: <ScanBarcode size={16} />,
       },
       {
+        label: "Boletos",
+        route: "boletos-gta",
+        icon: <ReceiptText size={16} />,
+      },
+      {
+        label: "Relatório de Boletos",
+        route: "relatorio-boletos-gta",
+        icon: <ReceiptText size={16} />,
+      },
+      {
         label: "Fundo de Arrecadação",
         route: "fundo-arrecadacao",
         icon: <Wallet size={16} />,
@@ -1003,11 +1013,6 @@ export const thirdCategories: MenuCategory[] = [
         icon: <CalendarDays size={16} />,
       },
       {
-        label: "Boletos de GTAs",
-        route: "boletos-gta",
-        icon: <ReceiptText size={16} />,
-      },
-      {
         label: "Emissão de ATA",
         route: "emissao-ata",
         icon: <FileText size={16} />,
@@ -1051,7 +1056,10 @@ function filterCategoriesByRole(
     "praga",
     "finalidade-transito",
   ]);
-  const rotasOcultasNoMenu = new Set(["pendencias-confirmacao-gta"]);
+  const rotasOcultasNoMenu = new Set([
+    "pendencias-confirmacao-gta",
+    "recolhimento-mensal-gta",
+  ]);
   return categories
     .map((category) => ({
       ...category,
@@ -1214,7 +1222,7 @@ export function DashboardPage({ onLogout, onNavigate }: any) {
     );
   }
 
-  if (role === "lider-estabelecimento" || role === "representante-agroindustria" || role === "representante-integradora") {
+  if (role === "responsavel-agroindustria-integradora") {
     return (
       <DashboardLiderEstabelecimento
         onLogout={onLogout}

@@ -7,9 +7,7 @@ export type PerfilUsuarioRole =
   | "admin"
   | "produtor"
   | "veterinario"
-  | "lider-estabelecimento"
-  | "representante-agroindustria"
-  | "representante-integradora";
+  | "responsavel-agroindustria-integradora";
 
 export interface PerfilUsuario {
   id: PerfilUsuarioRole;
@@ -58,12 +56,14 @@ export const PERFIS_USUARIO_INICIAIS: PerfilUsuario[] = [
     aceitouTermos: false,
   },
   {
-    id: "lider-estabelecimento",
-    role: "lider-estabelecimento",
+    id: "responsavel-agroindustria-integradora",
+    role: "responsavel-agroindustria-integradora",
     nome: "Thais Lopes",
-    perfil: "Líder de Estabelecimento",
+    perfil: "Responsável de Agroindústria/Integradora",
+    documento: "23.456.789/0001-10",
     email: "thais.lopes@email.com",
     telefone: "(31) 99714-8802",
+    entityId: 2,
     aceitouTermos: false,
   },
 ];
