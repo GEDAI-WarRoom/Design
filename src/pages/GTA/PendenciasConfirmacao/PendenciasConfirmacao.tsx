@@ -2,10 +2,15 @@ import { useMemo, useState } from "react";
 import {
 	ArrowRight,
 	ArrowLeft,
+	AlignLeft,
+	BadgeCheck,
 	ChevronLeft,
 	ChevronRight,
 	CalendarClock,
+	CheckCircle2,
 	FileInput,
+	FileText,
+	Link2,
 	MapPin,
 	RefreshCw,
 	Search,
@@ -13,7 +18,10 @@ import {
 import { Navbar } from "../../../components/Navbar";
 import { RecebimentoGtaModal } from "../../../components/PendenciasConfirmacaoGta";
 import { FloatInput } from "../../../components/ui/FormKit";
+import { useDemoUser } from "../../../contexts/DemoUserContext";
+import { useMockDatabaseRevision } from "../../../mocks/useMockDatabase";
 import * as Icons from "../../../imports/icons";
+import { listarAtestadosExame } from "../../Exame/AtestadoExame/atestadoExameData";
 import {
 	dadosProdutorConfirmados,
 	listarAtualizacoesCadastrais,
@@ -26,6 +34,31 @@ import {
 	type PendenciaGta,
 	type RespostaRecebimentoGta,
 } from "./pendenciasConfirmacaoGtaData";
+import {
+	listarPendenciasCentrais,
+	resolverPendenciaCentral,
+	type PendenciaCentral,
+} from "./pendenciasCentralData";
+
+const ITENS_POR_PAGINA = 10;
+
+function rotuloTipoPendencia(tipo: PendenciaCentral["tipo"]) {
+	switch (tipo) {
+		case "habilitacao": return "Habilitação profissional";
+		case "atestado-exame": return "Atestado de exame";
+		case "vinculo-profissional": return "Vínculo profissional";
+		case "renovacao-responsabilidade": return "Renovação de responsabilidade";
+	}
+}
+
+function IconeTipoPendencia({ tipo, size = 20 }: { tipo: PendenciaCentral["tipo"]; size?: number }) {
+	switch (tipo) {
+		case "habilitacao": return <BadgeCheck size={size} />;
+		case "atestado-exame": return <FileText size={size} />;
+		case "vinculo-profissional": return <Link2 size={size} />;
+		case "renovacao-responsabilidade": return <RefreshCw size={size} />;
+	}
+}
 
 function IconePendente({ src, label }: { src: string; label: string }) {
 	return (
@@ -73,10 +106,16 @@ export function PendenciasConfirmacaoPage({
 	onNavigate: (screen: any, data?: any) => void;
 	dados?: { aba?: "gta" | "rebanho" };
 }) {
+	const databaseRevision = useMockDatabaseRevision();
+	void databaseRevision;
+	const { role, user } = useDemoUser();
 	const [pendencias, setPendencias] = useState(listarPendenciasConfirmacaoGta);
 	const [busca, setBusca] = useState("");
 	const [buscaAplicada, setBuscaAplicada] = useState("");
 	const [pendenciaAberta, setPendenciaAberta] = useState<PendenciaGta | null>(null);
+	const [paginaPerfil, setPaginaPerfil] = useState(1);
+	const [pendenciaParaConcluir, setPendenciaParaConcluir] = useState<PendenciaCentral | null>(null);
+	const [pendenciaConcluida, setPendenciaConcluida] = useState<PendenciaCentral | null>(null);
 	const [abaAtiva, setAbaAtiva] = useState(
 		dados?.aba === "rebanho" ? "rebanho" : "gta",
 	);
@@ -146,6 +185,130 @@ export function PendenciasConfirmacaoPage({
 		const [ano, mes, dia] = data.split("-");
 		return dia && mes && ano ? `${dia}/${mes}/${ano}` : data;
 	};
+
+	if (role === "veterinario" || role === "lider-estabelecimento") {
+		const pendenciasPerfil = listarPendenciasCentrais(
+			role,
+			role === "veterinario" ? user?.entityId : undefined,
+		);
+		const termoPerfil = buscaAplicada.trim().toLocaleLowerCase("pt-BR");
+		const resultadosPerfil = termoPerfil
+			? pendenciasPerfil.filter((pendencia) =>
+				[pendencia.titulo, pendencia.descricao, rotuloTipoPendencia(pendencia.tipo), pendencia.situacao].some((valor) =>
+					valor.toLocaleLowerCase("pt-BR").includes(termoPerfil),
+				),
+			)
+			: pendenciasPerfil;
+		const totalPaginasPerfil = Math.max(1, Math.ceil(resultadosPerfil.length / ITENS_POR_PAGINA));
+		const paginaAtualPerfil = Math.min(paginaPerfil, totalPaginasPerfil);
+		const inicioPerfil = resultadosPerfil.length ? (paginaAtualPerfil - 1) * ITENS_POR_PAGINA + 1 : 0;
+		const fimPerfil = Math.min(paginaAtualPerfil * ITENS_POR_PAGINA, resultadosPerfil.length);
+		const resultadosPaginaPerfil = resultadosPerfil.slice(inicioPerfil ? inicioPerfil - 1 : 0, fimPerfil);
+		const confirmarConclusao = () => {
+			if (!pendenciaParaConcluir) return;
+			resolverPendenciaCentral(pendenciaParaConcluir.id);
+			setPendenciaConcluida(pendenciaParaConcluir);
+			setPendenciaParaConcluir(null);
+		};
+		const visualizarEntidadeRelacionada = (pendencia: PendenciaCentral) => {
+			if (!pendencia.entidadeRelacionada) return;
+			const { rota, id } = pendencia.entidadeRelacionada;
+			if (pendencia.tipo === "atestado-exame" && id != null) {
+				const atestado = listarAtestadosExame().find((item) => String(item.id) === String(id));
+				onNavigate(rota, atestado ?? { id });
+				return;
+			}
+			onNavigate(rota, id == null ? undefined : { id });
+		};
+		return (
+			<div className="min-h-screen bg-[#f2f3f5]">
+				<Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="pendencias-confirmacao-gta" hideSearch />
+				<main className="mx-auto max-w-[1280px] px-4 py-6 md:px-6 lg:py-8">
+					<header className="mb-6">
+						<button type="button" onClick={() => onNavigate("dashboard")} className="mb-4 flex items-center gap-1.5 text-sm font-semibold text-[#1A7A3C] transition hover:text-[#15612F]">
+							<ArrowLeft size={16} /> Inicial
+						</button>
+						<div className="flex flex-wrap items-center gap-3">
+							<h1 className="text-2xl font-semibold tracking-tight text-gray-900 md:text-[28px]">Central de Pendências</h1>
+							<span className="inline-flex items-center rounded-full bg-[#FEF3D6] px-3 py-1 text-xs font-semibold text-[#B45309]">
+								{pendenciasPerfil.length} {pendenciasPerfil.length === 1 ? "pendência" : "pendências"}
+							</span>
+						</div>
+						<p className="mt-2 max-w-2xl text-sm text-gray-500">Acompanhe e resolva as solicitações que precisam da sua atenção.</p>
+					</header>
+					<section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+						<div className="border-b border-gray-100 p-4 md:p-5">
+							<div className="grid gap-2 rounded-xl bg-gray-100 p-1.5">
+								<div className="flex min-h-14 items-center gap-3 rounded-lg bg-white px-4 text-[#1A7A3C] shadow-sm ring-1 ring-black/5">
+									<span className="flex h-9 w-9 items-center justify-center rounded-lg bg-green-50"><FileInput size={18} /></span>
+									<span className="min-w-0 flex-1"><span className="block text-sm font-semibold">Pendências de confirmação</span><span className="mt-0.5 block text-xs font-normal text-gray-500">Solicitações que precisam da sua atenção</span></span>
+									<span className="rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold">{pendenciasPerfil.length}</span>
+								</div>
+							</div>
+						</div>
+						<form onSubmit={(event) => { event.preventDefault(); setBuscaAplicada(busca); setPaginaPerfil(1); }} className="flex flex-col gap-3 border-b border-gray-100 bg-white px-4 py-5 sm:flex-row md:px-6">
+							<FloatInput label="Buscar por título, tipo, descrição ou situação" value={busca} onChange={setBusca} icon={<Search size={17} />} className="flex-1" />
+							<button type="submit" className="h-12 rounded-lg bg-[#1A7A3C] px-8 text-sm font-semibold text-white transition hover:bg-[#15612F] focus:outline-none focus:ring-2 focus:ring-[#1A7A3C]/30">Pesquisar</button>
+						</form>
+						<div className="bg-[#fafafa] p-4 md:p-6">
+							<div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+								<div><h2 className="text-sm font-semibold text-gray-800">Solicitações aguardando confirmação</h2><p className="mt-0.5 text-xs text-gray-500">{resultadosPerfil.length} de {pendenciasPerfil.length} {pendenciasPerfil.length === 1 ? "pendência" : "pendências"}</p></div>
+								{buscaAplicada && <button type="button" onClick={() => { setBusca(""); setBuscaAplicada(""); setPaginaPerfil(1); }} className="text-xs font-semibold text-[#1A7A3C] hover:text-[#15612F]">Limpar busca</button>}
+							</div>
+							{resultadosPerfil.length ? <div className="grid w-full grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+								{resultadosPaginaPerfil.map((pendencia) => {
+									const titulo = pendencia.titulo || "Pendência de confirmação";
+									const descricao = pendencia.descricao || "Solicitação que precisa da sua atenção";
+									return <article key={pendencia.id} className="group relative flex min-w-0 flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition duration-200 hover:-translate-y-1 hover:border-green-200 hover:shadow-lg">
+										<div className="flex items-start gap-3 p-5 pb-4">
+											<span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-green-50 text-[#1A7A3C]"><IconeTipoPendencia tipo={pendencia.tipo} /></span>
+											<div className="min-w-0 flex-1"><p className="text-xs font-medium text-gray-500">Solicitação de confirmação</p><h3 className="mt-1 truncate text-base font-semibold text-gray-900">{titulo}</h3></div>
+											<span className="inline-flex shrink-0 items-center rounded-full bg-[#FEF3D6] px-2.5 py-1 text-xs font-semibold text-[#B45309]">Pendente</span>
+										</div>
+										<div className="mx-5 flex-1 space-y-4 rounded-xl bg-gray-50 p-4">
+											<div className="flex items-start gap-3"><FileInput size={18} className="mt-0.5 shrink-0 text-[#1A7A3C]" /><div className="min-w-0"><p className="text-[11px] font-medium uppercase tracking-wide text-gray-400">Tipo de solicitação</p><p className="mt-0.5 truncate text-sm font-medium text-gray-800">{rotuloTipoPendencia(pendencia.tipo)}</p><p className="mt-0.5 truncate text-xs text-gray-500">Aguardando sua confirmação</p></div></div>
+											<div className="flex items-start gap-3"><AlignLeft size={18} className="mt-0.5 shrink-0 text-[#1A7A3C]" /><div className="min-w-0"><p className="text-[11px] font-medium uppercase tracking-wide text-gray-400">Descrição</p><p className="mt-0.5 text-sm font-medium text-gray-800">{descricao}</p><p className="mt-0.5 text-xs text-gray-500">Conclua a solicitação para regularizar a pendência</p></div></div>
+										</div>
+										<div className="mt-4 flex items-center justify-end gap-3 border-t border-gray-100 px-5 py-4">{pendencia.entidadeRelacionada && <button type="button" className="inline-flex h-9 items-center justify-center rounded-lg border border-[#1A7A3C] px-4 text-sm font-semibold text-[#1A7A3C] transition hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-[#1A7A3C]/30" onClick={() => visualizarEntidadeRelacionada(pendencia)}>Visualizar</button>}<button type="button" className="inline-flex h-9 items-center gap-2 rounded-lg bg-[#1A7A3C] px-4 text-sm font-semibold text-white transition hover:bg-[#15612F] focus:outline-none focus:ring-2 focus:ring-[#1A7A3C]/30" onClick={() => setPendenciaParaConcluir(pendencia)}>Concluir <ArrowRight size={15} /></button></div>
+									</article>;
+								})}
+							</div> : <p className="py-12 text-center text-sm text-gray-500">Nenhuma pendência encontrada para a busca informada.</p>}
+							{resultadosPerfil.length > 0 && <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-gray-200 pt-4 text-xs text-gray-500">
+								<span>Itens por página: {ITENS_POR_PAGINA}</span>
+								<div className="flex items-center gap-3">
+									<span>Mostrando de {inicioPerfil} a {fimPerfil} de {resultadosPerfil.length} resultados</span>
+									<button type="button" disabled={paginaAtualPerfil === 1} onClick={() => setPaginaPerfil(paginaAtualPerfil - 1)} aria-label="Página anterior" className="rounded p-1 text-[#1A7A3C] transition hover:bg-green-50 disabled:opacity-30"><ChevronLeft size={16} /></button>
+									<button type="button" disabled={paginaAtualPerfil === totalPaginasPerfil} onClick={() => setPaginaPerfil(paginaAtualPerfil + 1)} aria-label="Próxima página" className="rounded p-1 text-[#1A7A3C] transition hover:bg-green-50 disabled:opacity-30"><ChevronRight size={16} /></button>
+								</div>
+							</div>}
+						</div>
+					</section>
+				</main>
+				{pendenciaParaConcluir && <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 p-4" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setPendenciaParaConcluir(null); }}>
+					<div role="dialog" aria-modal="true" aria-labelledby="titulo-confirmar-pendencia" className="w-full max-w-md rounded-2xl bg-white p-6 text-center shadow-xl">
+						<span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-amber-50 text-amber-600"><BadgeCheck size={25} /></span>
+						<h2 id="titulo-confirmar-pendencia" className="mt-4 text-lg font-bold text-gray-900">Concluir pendência?</h2>
+						<p className="mt-2 text-sm text-gray-500">Confirme que a solicitação <strong className="font-semibold text-gray-700">{pendenciaParaConcluir.titulo}</strong> foi atendida. Ela deixará de aparecer na Central de Pendências.</p>
+						<div className="mt-6 flex justify-center gap-3">
+							<button type="button" onClick={() => setPendenciaParaConcluir(null)} className="h-11 rounded-lg border border-[#1A7A3C] px-5 text-sm font-semibold text-[#1A7A3C] transition hover:bg-green-50">Cancelar</button>
+							<button type="button" onClick={confirmarConclusao} className="h-11 rounded-lg bg-[#1A7A3C] px-5 text-sm font-semibold text-white transition hover:bg-[#15612F]">Confirmar conclusão</button>
+						</div>
+					</div>
+				</div>}
+				{pendenciaConcluida && <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 p-4" role="presentation">
+					<div role="dialog" aria-modal="true" aria-labelledby="titulo-sucesso-pendencia" className="w-full max-w-md rounded-2xl bg-white p-6 text-center shadow-xl">
+						<span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-50 text-[#1A7A3C]"><CheckCircle2 size={27} /></span>
+						<h2 id="titulo-sucesso-pendencia" className="mt-4 text-lg font-bold text-gray-900">Pendência concluída com sucesso!</h2>
+						<p className="mt-2 text-sm text-gray-500">A solicitação foi removida da sua lista de pendências.</p>
+						<div className="mt-6 flex justify-center gap-3">
+							<button type="button" onClick={() => setPendenciaConcluida(null)} className="h-11 rounded-lg border border-[#1A7A3C] px-5 text-sm font-semibold text-[#1A7A3C] transition hover:bg-green-50">Voltar</button>
+							{pendenciaConcluida.entidadeRelacionada && <button type="button" onClick={() => { const pendencia = pendenciaConcluida; setPendenciaConcluida(null); visualizarEntidadeRelacionada(pendencia); }} className="h-11 rounded-lg bg-[#1A7A3C] px-5 text-sm font-semibold text-white transition hover:bg-[#15612F]">Visualizar</button>}
+						</div>
+					</div>
+				</div>}
+			</div>
+		);
+	}
 
 	return (
 		<div className="min-h-screen bg-[#f2f3f5]">

@@ -12,6 +12,7 @@ import {
   Download,
   Info,
   Loader2,
+  Pencil,
   QrCode,
   ReceiptText,
   ScanBarcode,
@@ -23,9 +24,13 @@ import { FloatInput } from "../../../components/ui/FormKit";
 import { EmissaoGtaForm } from "./EmissaoGtaForm";
 import {
   copiarEmissaoGta,
+  confirmarTransitoGta,
   formatarDataGta,
   formatarMoedaGta,
+  frigorificoAderidoAoFundo,
+  gerarDadosPagamentoGta,
   obterEmissaoGta,
+  obterPrazoAtualGta,
   pagarEmissaoGta,
   type EmissaoGta,
 } from "./emissaoGtaData";
@@ -61,6 +66,106 @@ function ManagementMenuItem({
       </span>
       <span className="whitespace-nowrap">{children}</span>
     </button>
+  );
+}
+
+const ETAPAS_CICLO_GTA = [
+  { status: "Gravada", label: "Gravada", campo: "dataGravacao" },
+  { status: "Aguardando Pagamento", label: "Aguardando pagamento", campo: "dataGeracaoPagamento" },
+  { status: "Paga", label: "Paga", campo: "dataPagamento" },
+  { status: "Emitida", label: "Emitida", campo: "dataEmissao" },
+  { status: "Transitada", label: "Transitada", campo: "dataTransito" },
+] as const;
+
+const DESCRICOES_STATUS_GTA: Record<EmissaoGta["situacao"], string> = {
+  Gravada: "Os dados podem ser editados enquanto a cobrança ainda não foi gerada.",
+  "Aguardando Pagamento": "A cobrança foi gerada e os dados da GTA estão bloqueados para edição.",
+  Paga: "O pagamento foi confirmado e a GTA está apta para emissão dentro do prazo.",
+  Emitida: "A GTA está válida para o trânsito e aguarda a confirmação do destinatário.",
+  Transitada: "O destinatário confirmou o trânsito e o ciclo da GTA foi concluído.",
+  Cancelada: "A GTA deixou de ser válida e o cancelamento não pode ser revertido.",
+};
+
+function iconeEtapaAtual(status: EmissaoGta["situacao"]) {
+  if (status === "Gravada") return <Pencil size={17} />;
+  if (status === "Aguardando Pagamento") return <ReceiptText size={17} />;
+  if (status === "Paga") return <CreditCard size={17} />;
+  if (status === "Emitida") return <ReceiptText size={17} />;
+  if (status === "Transitada") return <ArrowRight size={17} />;
+  return null;
+}
+
+function CicloVidaGta({ emissao }: { emissao: EmissaoGta }) {
+  const cancelada = emissao.situacao === "Cancelada";
+  const indiceAtual = ETAPAS_CICLO_GTA.findIndex((etapa) => etapa.status === emissao.situacao);
+  const prazoAtual = obterPrazoAtualGta(emissao);
+
+  return (
+    <section className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+      <div>
+        <div>
+          <h2 className="text-base font-semibold text-gray-900">Ciclo de vida da GTA</h2>
+          <p className="mt-1 text-xs text-gray-500">Acompanhe o progresso e os prazos de cada etapa.</p>
+        </div>
+      </div>
+
+      <div className="mt-6 overflow-x-auto pb-2">
+        <div className="relative grid min-w-[760px] grid-cols-5 items-start">
+          <div className="absolute left-[10%] right-[10%] top-[18px] h-1 rounded-full bg-gray-300" />
+          {!cancelada && indiceAtual >= 0 && (
+            <div
+              className="absolute left-[10%] top-[18px] h-1 rounded-full bg-[#1A7A3C]"
+              style={{ width: `${indiceAtual * 20}%` }}
+            />
+          )}
+          {ETAPAS_CICLO_GTA.map((etapa, index) => {
+            const concluida = !cancelada && indiceAtual > index;
+            const atual = !cancelada && indiceAtual === index;
+            const data = emissao[etapa.campo];
+            return (
+              <div key={etapa.status} className="relative z-10 flex min-w-0 flex-col items-center text-center">
+                  <span className="flex h-10 w-10 items-center justify-center">
+                    {atual ? (
+                      <span className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-[#1A7A3C] text-white shadow-[0_3px_10px_rgba(26,122,60,0.28)] ring-1 ring-green-100">
+                        {iconeEtapaAtual(etapa.status)}
+                      </span>
+                    ) : concluida ? (
+                      <span className="h-3.5 w-3.5 rounded-full bg-[#1A7A3C]" />
+                    ) : (
+                      <span className="h-3.5 w-3.5 rounded-full border-[3px] border-gray-300 bg-white" />
+                    )}
+                  </span>
+                  <span className={`mt-2 text-xs font-semibold ${atual ? "text-[#1A7A3C]" : concluida ? "text-gray-800" : "text-gray-400"}`}>{etapa.label}</span>
+                  <span className="mt-0.5 text-[11px] text-gray-400">{data ? formatarDataGta(data) : "—"}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {!cancelada && (
+        <div className="mt-4 flex flex-col items-start gap-1.5 rounded-lg border border-gray-100 bg-gray-50 px-4 py-3">
+          <p className="text-xs leading-relaxed text-gray-600">
+            <strong className="text-gray-800">{emissao.situacao}:</strong> {DESCRICOES_STATUS_GTA[emissao.situacao]}
+          </p>
+          {prazoAtual && (
+            <span className="inline-flex shrink-0 items-center gap-1.5 text-xs font-semibold text-[#1A7A3C]">
+              <Clock size={13} /> Prazo até {formatarDataGta(prazoAtual)}
+            </span>
+          )}
+        </div>
+      )}
+
+      {cancelada && (
+        <div className="mt-4 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+          <X size={18} className="mt-0.5 shrink-0" />
+          <div>
+            <p className="text-sm font-semibold">GTA cancelada — ciclo interrompido</p>
+            <p className="mt-0.5 text-xs text-red-600">{emissao.observacaoCancelamento || "O cancelamento é definitivo e não pode ser revertido."}</p>
+          </div>
+        </div>
+      )}
+    </section>
   );
 }
 
@@ -131,9 +236,8 @@ export function VisualizarEmissaoGtaPage({
   if (!emissao) return null;
 
   // Definição da Data de Vencimento Exemplo
-  const dataVencimentoExemplo = emissao.dataValidade
-    ? formatarDataGta(emissao.dataValidade)
-    : "18/08/2026";
+  const dataVencimentoExemplo = formatarDataGta(emissao.dataValidade);
+  const prazoEtapaAtual = formatarDataGta(obterPrazoAtualGta(emissao));
 
   const downloadMock = (documento: string) => {
     window.alert(
@@ -142,11 +246,13 @@ export function VisualizarEmissaoGtaPage({
   };
 
   // Regras de exibição das opções do menu
-  const temPagamentoPendente = emissao.necessitaPagamento && emissao.situacao === "Gravada";
-  const pagamentoConcluido = !emissao.necessitaPagamento;
-  const foiEmitida = emissao.situacao === "Emitida";
-  const podeEmitir = emissao.situacao !== "Cancelada" && !foiEmitida && pagamentoConcluido;
-  const podeCancelar = emissao.situacao !== "Cancelada";
+  const aguardaGeracaoPagamento = emissao.situacao === "Gravada";
+  const temPagamentoPendente = emissao.necessitaPagamento && emissao.situacao === "Aguardando Pagamento";
+  const frigorificoAderido = frigorificoAderidoAoFundo(emissao.destino);
+  const pagamentoConcluido = ["Paga", "Emitida", "Transitada"].includes(emissao.situacao);
+  const foiEmitida = ["Emitida", "Transitada"].includes(emissao.situacao);
+  const podeEmitir = emissao.situacao === "Paga";
+  const podeCancelar = !["Cancelada", "Transitada"].includes(emissao.situacao);
 
   const executarAcao = (acao: () => void) => {
     setMenuAberto(false);
@@ -158,6 +264,11 @@ export function VisualizarEmissaoGtaPage({
     setPagamentoConfirmado(false);
     setCarregandoPagamento(false);
     setModalPagamento(true);
+  };
+
+  const gerarDadosPagamento = () => {
+    const atualizada = gerarDadosPagamentoGta(emissao.id);
+    if (atualizada) setEmissao({ ...atualizada });
   };
 
   const simularPagamentoPix = () => {
@@ -192,15 +303,16 @@ export function VisualizarEmissaoGtaPage({
   };
 
   const emitir = () => {
-    if (emissao.necessitaPagamento) {
-      window.alert("Realize o pagamento da taxa antes de emitir a GTA.");
-      return;
-    }
     if (!podeEmitir) {
-      window.alert(`Não é possível emitir uma GTA com situação ${emissao.situacao}.`);
+      window.alert("A GTA precisa estar paga para ser emitida.");
       return;
     }
     onNavigate("emitir-emissao-gta", emissao);
+  };
+
+  const confirmarRecebimento = () => {
+    const atualizada = confirmarTransitoGta(emissao.id);
+    if (atualizada) setEmissao({ ...atualizada });
   };
 
   const cancelar = () => {
@@ -266,6 +378,26 @@ export function VisualizarEmissaoGtaPage({
                   />
 
                   <div className="absolute right-0 mt-2 w-60 rounded-lg border border-gray-200 bg-white shadow-lg z-20 overflow-hidden py-1">
+                    {aguardaGeracaoPagamento && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => executarAcao(() => onNavigate("adicionar-emissao-gta", emissao))}
+                          className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition text-left"
+                        >
+                          <Pencil size={15} className="text-gray-400" /> Editar dados
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => executarAcao(gerarDadosPagamento)}
+                          className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition text-left"
+                        >
+                          <ReceiptText size={15} className="text-gray-400" /> Gerar dados de pagamento
+                        </button>
+                        <div className="my-1 border-t border-gray-100" />
+                      </>
+                    )}
+
                     {/* OPÇÕES DE PAGAMENTO */}
                     {temPagamentoPendente && (
                       <>
@@ -279,10 +411,10 @@ export function VisualizarEmissaoGtaPage({
 
                         <button
                           type="button"
-                          onClick={() => executarAcao(abrirVisualizadorDae)}
+                          onClick={() => executarAcao(() => frigorificoAderido ? downloadMock("Boleto") : abrirVisualizadorDae())}
                           className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition text-left"
                         >
-                          <ReceiptText size={15} className="text-gray-400" /> Baixar Boleto / DAE
+                          <ReceiptText size={15} className="text-gray-400" /> {frigorificoAderido ? "Baixar Boleto" : "Baixar Boleto / DAE"}
                         </button>
 
                         {(podeEmitir || pagamentoConcluido || foiEmitida) && (
@@ -331,6 +463,16 @@ export function VisualizarEmissaoGtaPage({
                       </button>
                     )}
 
+                    {emissao.situacao === "Emitida" && (
+                      <button
+                        type="button"
+                        onClick={() => executarAcao(confirmarRecebimento)}
+                        className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition text-left"
+                      >
+                        <Check size={15} className="text-gray-400" /> Confirmar trânsito
+                      </button>
+                    )}
+
                     {/* CANCELAMENTO */}
                     {podeCancelar && (
                       <>
@@ -351,6 +493,27 @@ export function VisualizarEmissaoGtaPage({
           </div>
         </header>
 
+        <CicloVidaGta emissao={emissao} />
+
+        {aguardaGeracaoPagamento && (
+          <div className="mt-2 flex w-full flex-col justify-between gap-4 rounded-xl border border-blue-200 bg-blue-50 p-5 shadow-sm sm:flex-row sm:items-center">
+            <div className="flex items-start gap-3.5">
+              <Info size={22} className="mt-0.5 shrink-0 text-blue-600" />
+              <div>
+                <p className="text-sm font-bold text-gray-900">Dados de pagamento ainda não gerados</p>
+                <p className="mt-1 text-sm text-gray-600">A GTA ainda pode ser editada. Ao gerar a cobrança, os dados serão bloqueados para edição.</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={gerarDadosPagamento}
+              className="flex shrink-0 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-blue-700"
+            >
+              <ReceiptText size={15} /> Gerar dados de pagamento
+            </button>
+          </div>
+        )}
+
         {/* CARD DE PAGAMENTO PENDENTE (FUNDO DO CHIP EM AMARELO E TEXTO EM CINZA) */}
         {temPagamentoPendente && (
           <div className="mt-2 flex w-full flex-col justify-between gap-4 rounded-xl border border-[#FFE0B2] bg-[#FFF9E6] p-5 shadow-sm sm:flex-row sm:items-center">
@@ -367,7 +530,7 @@ export function VisualizarEmissaoGtaPage({
                   <span className="inline-flex items-center gap-1.5 rounded-md bg-amber-100/80 px-2.5 py-1 text-xs font-medium text-amber-900 border border-amber-200/80">
                     <CalendarDays size={13} className="text-amber-700" />
                     <span className="text-amber-800/70">Vencimento:</span>
-                    <span className="text-amber-800/70">{dataVencimentoExemplo}</span>
+                    <span className="text-amber-800/70">{prazoEtapaAtual}</span>
                   </span>
                 </div>
                 <p className="text-sm leading-relaxed text-gray-600">
@@ -494,7 +657,7 @@ export function VisualizarEmissaoGtaPage({
               {/* TELA 1: OPÇÕES DE PAGAMENTO */}
               {etapaPagamento === "opcoes" && (
                 <div className="w-full max-w-2xl my-auto flex flex-col gap-8">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+                  <div className={`grid grid-cols-1 gap-6 w-full ${frigorificoAderido ? "md:grid-cols-2" : "md:grid-cols-3"}`}>
                     {/* CARD PIX */}
                     <div className="flex flex-col items-center justify-between gap-5 rounded-2xl border-2 border-[#1A7A3C] bg-[#F3FBF5] p-7 text-center shadow-sm transition-all hover:shadow-md">
                       <div className="flex flex-col items-center gap-3">
@@ -522,29 +685,51 @@ export function VisualizarEmissaoGtaPage({
                       </button>
                     </div>
 
-                    {/* CARD BOLETO / DAE */}
+                    {/* CARD BOLETO */}
                     <div className="flex flex-col items-center justify-between gap-5 rounded-2xl border border-gray-200 bg-white p-7 text-center shadow-sm transition-all hover:border-gray-300 hover:shadow-md">
                       <div className="flex flex-col items-center gap-3">
                         <span className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 text-gray-600">
                           <ScanBarcode size={32} />
                         </span>
                         <span className="text-lg font-bold text-gray-900">
-                          Boleto / DAE
+                          Boleto
                         </span>
                         <span className="text-xs leading-relaxed text-gray-600">
-                          Visualize e imprima o DAE oficial para pagamento bancário.
+                          Gere o boleto para pagamento bancário.
                         </span>
                       </div>
 
                       <button
                         type="button"
-                        onClick={abrirVisualizadorDae}
+                        onClick={() => downloadMock("Boleto")}
                         className="mt-2 flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-[#1A7A3C] bg-white px-4 text-xs font-bold text-[#1A7A3C] transition-colors hover:bg-[#F3FBF5]"
                       >
                         <Download size={16} />
-                        Baixar Boleto / DAE
+                        Baixar Boleto
                       </button>
                     </div>
+
+                    {!frigorificoAderido && (
+                      <div className="flex flex-col items-center justify-between gap-5 rounded-2xl border border-gray-200 bg-white p-7 text-center shadow-sm transition-all hover:border-gray-300 hover:shadow-md">
+                        <div className="flex flex-col items-center gap-3">
+                          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 text-gray-600">
+                            <ReceiptText size={32} />
+                          </span>
+                          <span className="text-lg font-bold text-gray-900">DAE</span>
+                          <span className="text-xs leading-relaxed text-gray-600">
+                            Visualize e imprima o DAE oficial para pagamento bancário.
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={abrirVisualizadorDae}
+                          className="mt-2 flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-[#1A7A3C] bg-white px-4 text-xs font-bold text-[#1A7A3C] transition-colors hover:bg-[#F3FBF5]"
+                        >
+                          <Download size={16} />
+                          Baixar DAE
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   {/* INFORMATIVO DA TAXA E VENCIMENTO */}

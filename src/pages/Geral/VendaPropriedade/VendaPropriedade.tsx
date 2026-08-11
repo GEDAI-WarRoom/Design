@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Calendar, ChevronLeft, ChevronRight, Eye, Pencil, Search, UserRound, X } from "lucide-react";
+import { ArrowLeft, Calendar, ChevronLeft, ChevronRight, Eye, Search, UserRound, X } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
 import { FloatInput, FloatSelect } from "../../../components/ui/FormKit";
@@ -248,7 +248,7 @@ export function VendaPropriedadePage({ onLogout, onNavigate }: PageProps) {
                         {titulo}
                       </th>
                     ))}
-                    <th className="px-4 py-3 w-24 text-right" aria-label="Ações">
+                    <th className="px-4 py-3 w-12 text-right" aria-label="Ações">
                     </th>
                   </tr>
                 </thead>
@@ -278,9 +278,9 @@ export function VendaPropriedadePage({ onLogout, onNavigate }: PageProps) {
                       {/* Data da Venda */}
                       <td className="px-4 py-3 text-gray-700 whitespace-nowrap">{formatarData(venda.dataVenda)}</td>
 
-                      {/* 🌟 Ações: Botões de Visualizar e Editar lado a lado */}
+                      {/* Ação de visualizar */}
                       <td className="px-4 py-3 text-right whitespace-nowrap">
-                        <div className="flex items-center justify-end gap-1">
+                        <div className="flex items-center justify-end">
                           <button
                             type="button"
                             onClick={() => onNavigate("visualizar-venda-propriedade", venda)}
@@ -288,14 +288,6 @@ export function VendaPropriedadePage({ onLogout, onNavigate }: PageProps) {
                             title="Visualizar"
                           >
                             <Eye size={18} />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => onNavigate("editar-venda-propriedade", venda)}
-                            className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"
-                            title="Editar"
-                          >
-                            <Pencil size={18} />
                           </button>
                         </div>
                       </td>

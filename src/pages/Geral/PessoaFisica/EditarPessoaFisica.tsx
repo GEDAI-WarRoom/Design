@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ArrowLeft, Check, Info } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { PessoaFisicaCadastroForm, normalizarPessoaFisica } from "./PessoaFisicaCadastroForm";
+import { obterPessoaFisica, salvarPessoaFisica } from "./pessoaFisicaData";
 
 interface Props {
   dadosIniciais?: any;
@@ -10,7 +11,8 @@ interface Props {
 }
 
 export function EditarPessoaFisica({ dadosIniciais, onLogout, onNavigate }: Props) {
-  const [form, setForm] = useState(() => normalizarPessoaFisica(dadosIniciais));
+  const pessoaPersistida = obterPessoaFisica(dadosIniciais?.id);
+  const [form, setForm] = useState(() => normalizarPessoaFisica(pessoaPersistida ?? dadosIniciais));
   const [sucesso, setSucesso] = useState(false);
   return (
     <div className="min-h-screen bg-[#f2f3f5] pb-16">
@@ -22,7 +24,7 @@ export function EditarPessoaFisica({ dadosIniciais, onLogout, onNavigate }: Prop
           </button>
           <div className="flex items-center justify-between gap-4">
             <h1 className="text-2xl font-semibold text-gray-900">Editar Pessoa Física</h1>
-            <button type="button" onClick={() => setSucesso(true)} className="h-10 rounded-md bg-[#1A7A3C] px-5 text-sm font-semibold text-white hover:bg-[#15612F]">Salvar</button>
+            <button type="button" onClick={() => { salvarPessoaFisica({ ...form, id: dadosIniciais?.id ?? pessoaPersistida?.id }); setSucesso(true); }} className="h-10 rounded-md bg-[#1A7A3C] px-5 text-sm font-semibold text-white hover:bg-[#15612F]">Salvar</button>
           </div>
         </header>
         <div className="flex items-center gap-3 rounded-lg border border-gray-100 bg-white p-5 shadow-sm">
@@ -39,7 +41,7 @@ export function EditarPessoaFisica({ dadosIniciais, onLogout, onNavigate }: Prop
             <p className="mt-1 text-sm text-gray-500">O cadastro de “{form.nome}” foi atualizado com sucesso.</p>
             <div className="mt-6 flex justify-center gap-3">
               <button type="button" onClick={() => onNavigate("pessoa-fisica")} className="h-11 rounded-md border border-[#1A7A3C] px-5 text-sm font-semibold text-[#1A7A3C] hover:bg-green-50">Voltar</button>
-              <button type="button" onClick={() => onNavigate("visualizar-pessoa-fisica", form)} className="h-11 rounded-md bg-[#1A7A3C] px-5 text-sm font-semibold text-white hover:bg-[#15612F]">Visualizar</button>
+              <button type="button" onClick={() => onNavigate("visualizar-pessoa-fisica", { id: dadosIniciais?.id ?? pessoaPersistida?.id })} className="h-11 rounded-md bg-[#1A7A3C] px-5 text-sm font-semibold text-white hover:bg-[#15612F]">Visualizar</button>
             </div>
           </div>
         </div>

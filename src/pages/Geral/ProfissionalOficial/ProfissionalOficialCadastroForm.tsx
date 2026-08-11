@@ -8,9 +8,10 @@ import {
 } from "../../../components/ui/FormKit";
 import {
   PessoaFisicaInput,
-  PESSOAS_FISICAS_MOCK,
   UnidadeAdministrativaInput,
 } from "../../../components/ui/EntitySearch";
+import { listarPessoasFisicasAtivasParaBusca } from "../PessoaFisica/pessoaFisicaData";
+import { useMockDatabaseRevision } from "../../../mocks/useMockDatabase";
 
 export interface ProfissionalOficialValue {
   id?: number;
@@ -99,11 +100,14 @@ export function ProfissionalOficialCadastroForm({
   disabled = false,
   onNavigate,
 }: Props) {
+  const databaseRevision = useMockDatabaseRevision();
+  void databaseRevision;
   const atualizar = (campos: Partial<ProfissionalOficialValue>) =>
     onChange?.({ ...value, ...campos });
+  const pessoasCadastradas = listarPessoasFisicasAtivasParaBusca();
   const pessoas = [
     value.pessoa,
-    ...PESSOAS_FISICAS_MOCK.filter((pessoa) => pessoa.nome !== value.pessoa.nome),
+    ...pessoasCadastradas.filter((pessoa) => pessoa.nome !== value.pessoa.nome),
   ];
 
   return (

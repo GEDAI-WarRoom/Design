@@ -40,7 +40,6 @@ import { EditarProdutoPage } from "./pages/Geral/Produto/EditarProduto";
 
 import { VisualizarProfissionalOficialPage } from "./pages/Geral/ProfissionalOficial/VisualizarProfissionalOficial";
 import { EditarProfissionalOficialPage } from "./pages/Geral/ProfissionalOficial/EditarProfissionalOficial";
-import { EditarVendaPropriedadePage } from "./pages/Geral/VendaPropriedade/EditarVendaPropriedade";
 import { VisualizarDivisaoMunicipalPage } from "./pages/Geral/DivisaoMunicipal/VisualizarDivisaoMunicipal";
 import { EditarDivisaoMunicipalPage } from "./pages/Geral/DivisaoMunicipal/EditarDivisaoMunicipal";
 import { VisualizarAeroportoPortoPage } from "./pages/Geral/AeroportoPorto/VisualizarAeroportoPorto";
@@ -264,6 +263,7 @@ import { VisualizarAtestadoExameCadastroPage } from "./pages/Exame/AtestadoExame
 import { AdicionarDAEPage } from "./pages/Arrecadacao/DAE/AdicionarDAE";
 import { DAEBuscaPage } from "./pages/Arrecadacao/DAE/DAE";
 import { VisualizarDAEPage } from "./pages/Arrecadacao/DAE/VisualizarDAE";
+import { BoletosBuscaPage } from "./pages/Arrecadacao/Boletos/Boletos";
 import { FundoArrecadacaoPage } from "./pages/Arrecadacao/FundoArrecadacao/FundoArrecadacao";
 import {
   AdicionarFundoArrecadacaoPage,
@@ -387,7 +387,6 @@ export type Screen =
   | "editar-profissional-oficial"
   | "visualizar-profissional-oficial"
 | "editar-estabelecimento-agropecuario"
-  | "editar-venda-propriedade"
 | "editar-divisao-municipal"
   | "visualizar-divisao-municipal"
   | "emissao-ata"
@@ -434,6 +433,7 @@ export type Screen =
   | "exploracao-pecuaria" // 🚀 Adicionado
   | "adicionar-exploracao-pecuaria" // 🚀 Adicionado
   | "visualizar-exploracao-pecuaria" // 🚀 Adicionado
+  | "editar-exploracao-pecuaria" // 🚀 Adicionado
   | "atualizacao-cadastral-rebanho"
   | "confirmar-dados-produtor-rebanho"
   | "visualizar-atualizacao-cadastral-rebanho"
@@ -559,6 +559,8 @@ export type Screen =
   | "isencao-taxa-gta"
   | "adicionar-isencao-taxa-gta"
   | "recolhimento-mensal-gta"
+  | "boletos-gta"
+  | "relatorio-boletos-gta"
   | "adicionar-recolhimento-mensal-gta"
   | "visualizar-recolhimento-mensal-gta"
   | "editar-recolhimento-mensal-gta"
@@ -634,6 +636,7 @@ export type Screen =
 	| "exploracao-pecuaria" // 🚀 Adicionado
 	| "adicionar-exploracao-pecuaria" // 🚀 Adicionado
 	| "visualizar-exploracao-pecuaria" // 🚀 Adicionado
+	| "editar-exploracao-pecuaria" // 🚀 Adicionado
 	| "atualizacao-cadastral-rebanho"
 	| "confirmar-dados-produtor-rebanho"
 	| "visualizar-atualizacao-cadastral-rebanho"
@@ -773,7 +776,9 @@ export type Screen =
 	| "editar-instituicao-ensino-pesquisa"
 	| "isencao-taxa-gta"
 	| "adicionar-isencao-taxa-gta"
-	| "recolhimento-mensal-gta"
+  | "recolhimento-mensal-gta"
+  | "boletos-gta"
+	| "relatorio-boletos-gta"
 	| "adicionar-recolhimento-mensal-gta"
 	| "visualizar-recolhimento-mensal-gta"
 	| "editar-recolhimento-mensal-gta"
@@ -1042,8 +1047,6 @@ export default function App() {
       return <VendaPropriedadePage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-venda-propriedade":
       return <AdicionarVendaPropriedadePage onLogout={handleLogout} onNavigate={handleNavigate} />;
-    case "editar-venda-propriedade":
-      return <EditarVendaPropriedadePage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "visualizar-venda-propriedade":
       return <VisualizarVendaPropriedadePage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
 		case "divisao-municipal":
@@ -1643,6 +1646,15 @@ export default function App() {
 					dados={screenData}
 				/>
 			);
+		case "editar-exploracao-pecuaria":
+			return (
+				<AdicionarExploracaoPecuariaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+					modoEdicao
+				/>
+			);
 		case "atualizacao-cadastral-rebanho":
 			return (
 				<AtualizacaoCadastralRebanhoPage
@@ -2143,6 +2155,21 @@ export default function App() {
 					onNavigate={handleNavigate}
 				/>
 			);
+		case "boletos-gta":
+			return (
+				<BoletosBuscaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "relatorio-boletos-gta":
+			return (
+				<RecolhimentoMensalGTAPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					portalRepresentante
+				/>
+			);
 		case "adicionar-recolhimento-mensal-gta":
 			return (
 				<AdicionarRecolhimentoMensalGTAPage
@@ -2226,6 +2253,7 @@ export default function App() {
 		case "adicionar-lote-pagamento":
 			return (
 				<AdicionarLotePagamentoPage
+					dados={screenData}
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
 				/>

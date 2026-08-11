@@ -13,6 +13,7 @@ export interface DemoUserIdentity {
 	name: string;
 	roleLabel: string;
 	document?: string;
+	pessoaFisicaId?: number;
 	entityId?: number;
 	email?: string;
 	phone?: string;
@@ -27,6 +28,7 @@ export const DEMO_USERS = PERFIS_USUARIO_INICIAIS.reduce(
 			name: perfil.nome,
 			roleLabel: perfil.perfil,
 			document: perfil.documento,
+			pessoaFisicaId: perfil.pessoaFisicaId,
 			entityId: perfil.entityId,
 			email: perfil.email,
 			phone: perfil.telefone,
@@ -77,7 +79,6 @@ const produtorAllowedRoutes = new Set([
 	"visualizar-estabelecimento-agropecuario",
 	"adicionar-venda-propriedade",
 	"visualizar-venda-propriedade",
-	"editar-venda-propriedade",
 	"adicionar-exploracao-pecuaria",
 	"visualizar-exploracao-pecuaria",
 	"adicionar-nucleo-producao",
@@ -172,15 +173,20 @@ const veterinarioAllowedRoutes = new Set([
 	"emitir-emissao-gta",
 	"cancelar-emissao-gta",
 	"pagar-emissao-gta",
+	"pendencias-confirmacao-gta",
+	"visualizar-revendedora-agropecuario",
+	"visualizar-unidade-consolidacao",
 ]);
 
 const liderEstabelecimentoEntryRoutes = new Set([
+	"pendencias-confirmacao-gta",
 	"pessoa-fisica",
 	"pessoa-juridica",
 	"agroindustrial-sie",
 	"integradora-cooperativa",
 	"revendedora-animais",
 	"revendedora-agropecuario",
+	"relatorio-boletos-gta",
 ]);
 
 const liderEstabelecimentoAllowedRoutes = new Set([
@@ -194,8 +200,8 @@ const liderEstabelecimentoAllowedRoutes = new Set([
 	"visualizar-pessoa-juridica",
 	"editar-pessoa-juridica",
 	"adicionar-agroindustrial-sie",
-	"visualizar-agroindustrial-sie",
-	"editar-agroindustrial-sie",
+	"visualizar-estabelecimento-poa",
+	"editar-estabelecimento-poa",
 	"adicionar-integradora-cooperativa",
 	"visualizar-integradora-cooperativa",
 	"editar-integradora-cooperativa",
@@ -208,6 +214,31 @@ const liderEstabelecimentoAllowedRoutes = new Set([
 ]);
 
 const produtorOnlyRoutes = new Set(["pendencias-confirmacao-gta"]);
+const representanteRoutes = new Set([
+	"relatorio-boletos-gta",
+	"visualizar-recolhimento-mensal-gta",
+	"visualizar-boleto-recolhimento-gta",
+	"visualizar-dae-recolhimento-gta",
+	"visualizar-pessoa-fisica",
+	"visualizar-pessoa-juridica",
+	"visualizar-emissao-gta",
+]);
+
+const responsavelEstabelecimentoEntryRoutes = new Set([
+	"agroindustrial-sie",
+	"integradora-cooperativa",
+]);
+
+const responsavelEstabelecimentoRoutes = new Set([
+	...responsavelEstabelecimentoEntryRoutes,
+	"adicionar-agroindustrial-sie",
+	"visualizar-agroindustrial-sie",
+	"editar-agroindustrial-sie",
+	"adicionar-integradora-cooperativa",
+	"visualizar-integradora-cooperativa",
+	"editar-integradora-cooperativa",
+]);
+const produtorOnlyRoutes = new Set<string>();
 
 interface DemoUserContextValue {
 	role: DemoUserRole | null;
@@ -231,6 +262,7 @@ export function DemoUserProvider({ children }: { children: ReactNode }) {
 			name: perfil.nome,
 			roleLabel: perfil.perfil,
 			document: perfil.documento,
+			pessoaFisicaId: perfil.pessoaFisicaId,
 			entityId: perfil.entityId,
 			email: perfil.email,
 			phone: perfil.telefone,
@@ -266,7 +298,9 @@ export function useDemoUser() {
 export function isEntryRouteAllowed(role: DemoUserRole | null, route: string) {
 	if (!role) return false;
 	if (produtorOnlyRoutes.has(route)) return role === "produtor";
+	if (route === "relatorio-boletos-gta") return role === "responsavel-agroindustria-integradora";
 	if (role === "admin") return true;
+	if (role === "responsavel-agroindustria-integradora") return responsavelEstabelecimentoEntryRoutes.has(route);
 	if (role === "produtor") return produtorEntryRoutes.has(route);
 	if (role === "veterinario") return veterinarioEntryRoutes.has(route);
 	return liderEstabelecimentoEntryRoutes.has(route);
@@ -275,7 +309,9 @@ export function isEntryRouteAllowed(role: DemoUserRole | null, route: string) {
 export function isRouteAllowed(role: DemoUserRole | null, route: string) {
 	if (!role) return false;
 	if (produtorOnlyRoutes.has(route)) return role === "produtor";
+	if (representanteRoutes.has(route)) return role === "responsavel-agroindustria-integradora";
 	if (role === "admin") return true;
+	if (role === "responsavel-agroindustria-integradora") return route === "dashboard" || route === "meu-perfil" || responsavelEstabelecimentoRoutes.has(route);
 	if (role === "produtor") return produtorAllowedRoutes.has(route);
 	if (role === "veterinario") return veterinarioAllowedRoutes.has(route);
 	return liderEstabelecimentoAllowedRoutes.has(route);

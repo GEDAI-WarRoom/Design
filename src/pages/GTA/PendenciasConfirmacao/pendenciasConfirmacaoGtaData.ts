@@ -1,4 +1,5 @@
 import { daeExemploUrl } from "../../../imports/documents";
+import { listarColecaoMock, salvarColecaoMock } from "../../../mocks/mockDatabase";
 
 export interface PendenciaGta {
 	id: number;
@@ -13,7 +14,9 @@ export interface PendenciaGta {
 
 export type RespostaRecebimentoGta = "confirmar" | "negar";
 
-let pendenciasDaSessao: PendenciaGta[] = [
+const COLECAO = "pendencias-confirmacao-gta";
+
+const PENDENCIAS_INICIAIS: PendenciaGta[] = [
 	{
 		id: 1,
 		numero: "768578",
@@ -47,15 +50,16 @@ let pendenciasDaSessao: PendenciaGta[] = [
 ];
 
 export function listarPendenciasConfirmacaoGta() {
-	return [...pendenciasDaSessao];
+	return listarColecaoMock(COLECAO, PENDENCIAS_INICIAIS);
 }
 
 export function responderPendenciaGta(
 	id: number,
 	_resposta: RespostaRecebimentoGta,
 ) {
-	pendenciasDaSessao = pendenciasDaSessao.filter(
+	const pendencias = listarPendenciasConfirmacaoGta().filter(
 		(pendencia) => pendencia.id !== id,
 	);
-	return listarPendenciasConfirmacaoGta();
+	salvarColecaoMock(COLECAO, pendencias);
+	return pendencias;
 }

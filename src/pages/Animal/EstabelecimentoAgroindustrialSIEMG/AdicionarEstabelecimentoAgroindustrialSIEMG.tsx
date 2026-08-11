@@ -1,18 +1,19 @@
 import React, { useState, useMemo, ReactNode } from "react";
 import {
   ArrowLeft, ChevronUp, ChevronDown, Check, Info, Trash2, PlusCircle, ShoppingCart,
-  Download, Dna, Package, Ruler, Calendar, Shuffle, Beef, Milk, Disc, Layers, Home, Activity, Hexagon, Egg, Fish, Pencil, CircleCheck
+  Download, Dna, Package, Ruler, Calendar, Shuffle, Beef, Milk, Disc, Layers, Home, Activity, Hexagon, Egg, Fish, Pencil, CircleCheck, FileText
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import {
   FloatInput, FloatSelect, CustomButton, UploadField,
-  LargeTextArea, CheckboxGroup, SimNao, MultiSearchModal,
+  LargeTextArea, CheckboxGroup, SimNao, MultiSearchModal, Tabs,
 } from "../../../components/ui/FormKit";
 import {
   DynamicListWrapper, EntitySearchInput, ProprietarioInput, ResponsavelTecnicoInput,
   ExploracaoPecuariaInput, BlocoEnderecoFields, BlocoContatoFields,
 } from "../../../components/ui/EntitySearch";
 import * as Icons from "../../../imports/icons";
+import { OpcaoRecolhimentoTab, type OpcaoRecolhimento } from "../../../components/ui/OpcaoRecolhimentoTab";
 
 
 const GREEN = "#1A7A3C";
@@ -186,6 +187,23 @@ export const EXEMPLO_ESTABELECIMENTO_AGROINDUSTRIAL_SIE_MG = {
   },
   anexos: [{ id: "anexo-exemplo", nome: "registro_sie.pdf", descricao: "Registro do estabelecimento" }],
   observacao: "Estabelecimento habilitado para processamento de produtos cárneos.",
+  opcaoRecolhimento: {
+    tipoFundoArrecadacao: "Privado",
+    numeroTermo: "000005-2019/IMA",
+    historico: [
+      {
+        id: "opcao-recolhimento-exemplo",
+        tipoFundoArrecadacao: "Privado",
+        numeroTermo: "000005-2019/IMA",
+        usuarioCadastro: "José da Silva",
+        dataCadastro: "22/02/19 13:43",
+        usuarioAlteracao: "Maria dos Santos",
+        dataAlteracao: "27/07/26 08:47",
+        dataValidade: "Indeterminado",
+        situacao: "Ativo",
+      },
+    ],
+  } satisfies OpcaoRecolhimento,
 };
 
 let proximoCodigoSequencial = 2;
@@ -195,6 +213,8 @@ export function AdicionarEstabelecimentoAgroindustrialSIEMGPage({ onLogout, onNa
   const isView = modo === "visualizar";
   const isEdit = modo === "editar";
   const registroInicial: any = modo === "adicionar" ? {} : { ...EXEMPLO_ESTABELECIMENTO_AGROINDUSTRIAL_SIE_MG, ...(dados || {}) };
+  const [activeTab, setActiveTab] = useState("cadastro");
+  const [addOpcaoRecolhimentoRequestKey, setAddOpcaoRecolhimentoRequestKey] = useState(0);
 
   const [codigoUnico, setCodigoUnico] = useState(registroInicial.codigoUnico || "");
   const [situacao, setSituacao] = useState(registroInicial.situacao || "Ativo");
@@ -278,6 +298,13 @@ export function AdicionarEstabelecimentoAgroindustrialSIEMGPage({ onLogout, onNa
   });
   const [anexos, setAnexos] = useState<any[]>(registroInicial.anexos || []);
   const [observacao, setObservacao] = useState(registroInicial.observacao || "");
+  const [opcaoRecolhimento, setOpcaoRecolhimento] = useState<OpcaoRecolhimento>(
+    registroInicial.opcaoRecolhimento || {
+      tipoFundoArrecadacao: "",
+      numeroTermo: "",
+      historico: [],
+    },
+  );
 
   const [isSucesso, setIsSucesso] = useState(false);
 
@@ -382,6 +409,7 @@ export function AdicionarEstabelecimentoAgroindustrialSIEMGPage({ onLogout, onNa
     contato,
     anexos,
     observacao,
+    opcaoRecolhimento,
   });
 
   const concluirFormulario = () => {
@@ -415,9 +443,15 @@ export function AdicionarEstabelecimentoAgroindustrialSIEMGPage({ onLogout, onNa
           <div className="flex justify-between items-center w-full">
             <h1 className="text-2xl font-semibold text-gray-900">{tituloPagina}</h1>
             {isView ? (
-              <button type="button" onClick={() => onNavigate("editar-estabelecimento-poa", montarRegistro())} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold rounded-md transition shadow-sm flex items-center gap-2">
-                <Pencil size={16} /> Editar
-              </button>
+              activeTab === "opcoes-recolhimento" ? (
+                <button type="button" onClick={() => setAddOpcaoRecolhimentoRequestKey((value) => value + 1)} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold rounded-md transition shadow-sm flex items-center gap-2">
+                  <PlusCircle size={16} /> Adicionar opção de recolhimento
+                </button>
+              ) : (
+                <button type="button" onClick={() => onNavigate("editar-estabelecimento-poa", montarRegistro())} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold rounded-md transition shadow-sm flex items-center gap-2">
+                  <Pencil size={16} /> Editar
+                </button>
+              )
             ) : (
               <button type="button" onClick={concluirFormulario} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold rounded-md transition shadow-sm">
                 {isEdit ? "Salvar" : "Adicionar"}
@@ -435,6 +469,18 @@ export function AdicionarEstabelecimentoAgroindustrialSIEMGPage({ onLogout, onNa
           </p>
         </div>}
 
+        {modo !== "adicionar" && (
+          <Tabs
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            tabs={[
+              { id: "cadastro", label: "Cadastro", icon: (active: boolean) => <FileText size={18} className={active ? "text-[#1A7A3C]" : "text-gray-400"} /> },
+              { id: "opcoes-recolhimento", label: "Opções de recolhimento", icon: (active: boolean) => <CircleCheck size={18} className={active ? "text-[#1A7A3C]" : "text-gray-400"} /> },
+            ]}
+          />
+        )}
+
+        {activeTab === "cadastro" && (
         <fieldset disabled={isView} className={`border-0 p-0 m-0 min-w-0 flex flex-col gap-4 ${isView ? "poa-readonly" : ""}`}>
 
         {/* 1. Informações Básicas */}
@@ -998,6 +1044,16 @@ export function AdicionarEstabelecimentoAgroindustrialSIEMGPage({ onLogout, onNa
           <LargeTextArea label="Observação" value={observacao} onChange={setObservacao} hasTooltip tooltipText="Informações adicionais pertinentes ao cadastro." />
         </Section>
         </fieldset>
+        )}
+
+        {modo !== "adicionar" && activeTab === "opcoes-recolhimento" && (
+          <OpcaoRecolhimentoTab
+            entityKey={`estabelecimento-agroindustrial-sie-${registroInicial.id || registroInicial.codigoUnico || "novo"}`}
+            value={opcaoRecolhimento}
+            onChange={setOpcaoRecolhimento}
+            addRequestKey={addOpcaoRecolhimentoRequestKey}
+          />
+        )}
       </main>
 
       {/* Modal de Sucesso */}

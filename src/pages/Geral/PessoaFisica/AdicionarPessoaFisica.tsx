@@ -28,6 +28,7 @@ import {
   CustomButton,
   SearchModal
 } from "../../../components/ui/FormKit";
+import { salvarPessoaFisica, type PessoaFisica } from "./pessoaFisicaData";
 
 
 const GREEN = "#1A7A3C";
@@ -531,6 +532,7 @@ export function AdicionarPessoaFisicaPage({ onLogout, onNavigate }: { onLogout: 
   const [anexoDescricao, setAnexoDescricao] = useState("");
   const [observacaoGeral, setObservacaoGeral] = useState("");
   const [isSucessoModalOpen, setIsSucessoModalOpen] = useState(false);
+  const [registroCriado, setRegistroCriado] = useState<PessoaFisica | null>(null);
 
   const [representantes, setRepresentantes] = useState<RepresentanteState[]>([]);
   const [modalRepIndex, setModalRepIndex] = useState<number | null>(null);
@@ -567,6 +569,27 @@ export function AdicionarPessoaFisicaPage({ onLogout, onNavigate }: { onLogout: 
     }
   };
 
+  const salvar = () => {
+    const registro = salvarPessoaFisica({
+      cpf,
+      nome: nome.trim() || "Pessoa sem nome",
+      apelido,
+      dataNascimento,
+      sexo,
+      estadoCivil,
+      representantes,
+      correspondencia: { ...correspondencia, latitude: correspondencia.latitude ?? "", longitude: correspondencia.longitude ?? "" },
+      enderecoResidencia: isEnderecoResidencia,
+      residencia: { ...residencia, latitude: residencia.latitude ?? "", longitude: residencia.longitude ?? "" },
+      observacaoResidencia,
+      contatos: [...contatosFixos, ...outrosContatos],
+      anexos: anexos.map((anexo) => ({ id: String(anexo.id), nome: anexo.nome ?? "", descricao: anexo.descricao ?? "" })),
+      observacao: observacaoGeral,
+    });
+    setRegistroCriado(registro);
+    setIsSucessoModalOpen(true);
+  };
+
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
       <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="pessoa-fisica" hideSearch />
@@ -595,7 +618,7 @@ export function AdicionarPessoaFisicaPage({ onLogout, onNavigate }: { onLogout: 
 
             <button
               type="button"
-              onClick={() => setIsSucessoModalOpen(true)} // Abre o modal de sucesso do cadastro inteiro
+              onClick={salvar}
               className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition flex items-center gap-2 shadow-sm"
             >
               Adicionar
@@ -857,18 +880,7 @@ export function AdicionarPessoaFisicaPage({ onLogout, onNavigate }: { onLogout: 
                   onClick={() => {
                     setIsSucessoModalOpen(false);
                     // ENVIANDO OS DADOS COMPLETOS INCLUINDO OS CONTATOS
-                    onNavigate("visualizar-pessoa-fisica", {
-                      cpf,
-                      nome,
-                      apelido,
-                      dataNascimento,
-                      sexo,
-                      estadoCivil,
-                      residencia,
-                      correspondencia,
-                      contatosFixos,    // <--- Adicionado aqui
-                      outrosContatos    // <--- Adicionado aqui
-                    });
+                    onNavigate("visualizar-pessoa-fisica", { id: registroCriado?.id });
                   }}
                   className="flex-1 h-11 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold rounded-lg transition shadow-sm"
                 >

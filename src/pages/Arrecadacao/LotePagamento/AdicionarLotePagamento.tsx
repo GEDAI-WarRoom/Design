@@ -24,6 +24,7 @@ import {
   DOCUMENTOS_CADASTRO_OPTIONS,
   DOCUMENTOS_DISPONIVEIS_LOTE,
   DocumentoLotePagamento,
+  formatarDataLote,
   formatarMoedaLote,
   LotePagamento,
   normalizarLotePagamento,
@@ -60,7 +61,7 @@ interface PageProps {
 }
 
 export function AdicionarLotePagamentoPage({ onLogout, onNavigate, onViewPessoa, onViewUnidade, dados, modoEdicao = false }: PageProps) {
-  const loteInicial = modoEdicao ? normalizarLotePagamento(dados) : null;
+  const loteInicial = dados ? normalizarLotePagamento(dados) : null;
   const [documento, setDocumento] = useState<TipoDocumentoLote | "">(loteInicial?.documento || "");
   const [titular, setTitular] = useState<PessoaLote | null>(loteInicial?.titular || null);
   const [tipoPessoa, setTipoPessoa] = useState<string>("");
@@ -296,20 +297,21 @@ export function AdicionarLotePagamentoPage({ onLogout, onNavigate, onViewPessoa,
               {/* TABELA COM CABEÇALHO E RODAPÉ SEMPRE VISÍVEIS */}
               {documentos.length > 0 && (
                 <div className="overflow-hidden rounded-lg border border-gray-100 shadow-sm bg-white">
-                  <table className="w-full border-collapse text-sm">
+                  <table className="w-full table-fixed border-collapse text-xs">
+                    <colgroup><col className="w-[18%]" /><col className="w-[11%]" /><col className="w-[10%]" /><col className="w-[10%]" /><col className="w-[13%]" /><col className="w-[13%]" /><col className="w-[12%]" /><col className="w-[9%]" /></colgroup>
 
                     {/* CABEÇALHO COM AÇÃO DE MINIMIZAR */}
                     <thead>
                       <tr className="border-b border-gray-100 bg-gray-50 text-gray-600 select-none">
-                        <th className="px-4 py-3 text-left font-semibold">Código</th>
-                        <th className="px-4 py-3 text-left font-semibold">Valor</th>
-                        <th className="px-4 py-3 text-right font-normal">
+                        {["Número", "Finalidade", "Espécie", "Total de animais", "Valor", "Data da emissão", "Situação"].map((titulo) => <th key={titulo} className="px-2.5 py-3 text-left font-semibold leading-4">{titulo}</th>)}
+                        <th className="px-2 py-3 text-right font-normal">
                           <button
                             type="button"
                             onClick={() => setTabelaExpandida(!tabelaExpandida)}
-                            className="inline-flex items-center gap-1 font-semibold text-gray-500 hover:text-gray-800 transition"
+                            aria-label={tabelaExpandida ? "Recolher tabela" : "Expandir tabela"}
+                            title={tabelaExpandida ? "Recolher" : "Expandir"}
+                            className="inline-flex rounded-md p-1 text-gray-500 transition hover:bg-gray-100 hover:text-gray-800"
                           >
-                            <span className="text-xs">{tabelaExpandida ? "Minimizar" : "Expandir"}</span>
                             {tabelaExpandida ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                           </button>
                         </th>
@@ -321,9 +323,16 @@ export function AdicionarLotePagamentoPage({ onLogout, onNavigate, onViewPessoa,
                       <tbody>
                         {documentos.map((item) => (
                           <tr key={item.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50">
-                            <td className="px-4 py-3 font-medium text-gray-700">{item.id}</td>
-                            <td className="px-4 py-3 text-gray-700">{formatarMoedaLote(item.valor)}</td>
-                            <td className="px-4 py-3 text-right">
+                            <td className="whitespace-nowrap px-2.5 py-3 font-medium text-gray-700">{item.id}</td>
+                            <td className="break-words px-2.5 py-3 text-gray-700">{item.finalidade}</td>
+                            <td className="break-words px-2.5 py-3 text-gray-700">{item.especie}</td>
+                            <td className="px-2.5 py-3 text-gray-700">{item.totalAnimais}</td>
+                            <td className="px-2.5 py-3 text-gray-700">{formatarMoedaLote(item.valor)}</td>
+                            <td className="px-2.5 py-3 text-gray-700">{formatarDataLote(item.dataEmissao)}</td>
+                            <td className="break-words px-2.5 py-3 text-gray-700">{item.status}</td>
+                            <td className="px-1 py-3 text-right">
+                              <div className="flex items-center justify-end gap-1">
+                              <button type="button" onClick={() => onNavigate("visualizar-documento-lote-pagamento", { documento: item, lote: normalizarLotePagamento({ ...(loteInicial ?? {}), documento: documento as TipoDocumentoLote, titular: titular!, unidadeAdministrativa: unidade!, documentos }), origem: modoEdicao ? "editar-lote-pagamento" : "adicionar-lote-pagamento" })} className="rounded-md p-2 text-[#1A7A3C] transition hover:bg-green-50" title="Visualizar" aria-label={`Visualizar ${item.id}`}><Eye size={17} /></button>
                               <button
                                 type="button"
                                 onClick={() => setDocumentos((items) => items.filter((doc) => doc.id !== item.id))}
@@ -332,6 +341,7 @@ export function AdicionarLotePagamentoPage({ onLogout, onNavigate, onViewPessoa,
                               >
                                 <Trash2 size={17} />
                               </button>
+                              </div>
                             </td>
                           </tr>
                         ))}
@@ -341,10 +351,10 @@ export function AdicionarLotePagamentoPage({ onLogout, onNavigate, onViewPessoa,
                     {/* RODAPÉ PERMANECE FIXO COM RESUMO */}
                     <tfoot>
                       <tr className="border-t border-gray-100 bg-gray-50/80 font-bold text-gray-800">
-                        <td className="px-4 py-3 text-left">
+                        <td colSpan={4} className="px-4 py-3 text-left">
                           Documentos selecionados ({quantidade})
                         </td>
-                        <td className="px-4 py-3 text-[#1A7A3C]">
+                        <td colSpan={3} className="px-4 py-3 text-right text-[#1A7A3C]">
                           {formatarMoedaLote(valor)}
                         </td>
                         <td />

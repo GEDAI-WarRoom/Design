@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ArrowLeft, CalendarPlus, FileInput } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
+import { useDemoUser } from "../../../contexts/DemoUserContext";
 import { FloatInput, LargeTextArea } from "../../../components/ui/FormKit";
 import {
   Dialog,
@@ -12,9 +13,12 @@ import {
 import { EmissaoGtaForm } from "./EmissaoGtaForm";
 import {
   dataPadraoValidade,
+  estenderPrazoEmissaoGta,
   emitirEmissaoGta,
   formatarDataGta,
   obterEmissaoGta,
+  obterPrazoAtualGta,
+  ultimoDiaUtilDoAno,
   type EmissaoGta,
 } from "./emissaoGtaData";
 
@@ -28,11 +32,13 @@ export function EmitirEmissaoGtaPage({
   onNavigate: (screen: any, data?: any) => void;
 }) {
   const registroInicial = dados ?? obterEmissaoGta(null);
-  const [emissao] = useState<EmissaoGta | null>(registroInicial);
+  const { role } = useDemoUser();
+  const [emissao, setEmissao] = useState<EmissaoGta | null>(registroInicial);
   const dataEmissao = registroInicial?.situacao === "Emitida"
     ? registroInicial.dataEmissao
     : new Date().toISOString().slice(0, 10);
   const dataValidadePadrao = dataPadraoValidade(dataEmissao);
+  const limiteValidadeAno = ultimoDiaUtilDoAno(Number(dataEmissao.slice(0, 4)));
   const [estenderValidade, setEstenderValidade] = useState(
     Boolean(registroInicial?.justificativaValidade),
   );
@@ -49,10 +55,21 @@ export function EmitirEmissaoGtaPage({
   const [justificativaRascunho, setJustificativaRascunho] = useState("");
   const [tentouConfirmarExtensao, setTentouConfirmarExtensao] = useState(false);
   const [tentouEmitir, setTentouEmitir] = useState(false);
+  const [modalPrazoEmissaoAberto, setModalPrazoEmissaoAberto] = useState(false);
+  const [novaDataPrazoEmissao, setNovaDataPrazoEmissao] = useState("");
+  const [justificativaPrazoEmissao, setJustificativaPrazoEmissao] = useState("");
+  const [tentouEstenderPrazoEmissao, setTentouEstenderPrazoEmissao] = useState(false);
 
   if (!emissao) return null;
 
-  const bloqueada = emissao.situacao === "Emitida";
+  const bloqueada = emissao.situacao !== "Paga";
+  const funcionarioIma = role === "admin" || role === "veterinario";
+  const prazoEmissaoAtual = obterPrazoAtualGta(emissao);
+  const extensaoPrazoEmissaoValida = Boolean(
+    novaDataPrazoEmissao > prazoEmissaoAtual &&
+    novaDataPrazoEmissao <= limiteValidadeAno &&
+    justificativaPrazoEmissao.trim(),
+  );
   const dataValidade = bloqueada
     ? emissao.dataValidade
     : estenderValidade
@@ -63,10 +80,10 @@ export function EmitirEmissaoGtaPage({
     : justificativa;
   const extensaoValida = Boolean(
     !estenderValidade ||
-      (novaDataValidade > dataValidadePadrao && justificativa.trim()),
+      (novaDataValidade > dataValidadePadrao && novaDataValidade <= limiteValidadeAno && justificativa.trim()),
   );
   const rascunhoExtensaoValido = Boolean(
-    novaDataRascunho > dataValidadePadrao && justificativaRascunho.trim(),
+    novaDataRascunho > dataValidadePadrao && novaDataRascunho <= limiteValidadeAno && justificativaRascunho.trim(),
   );
   const dataRascunhoFoiAlterada = Boolean(
     novaDataRascunho && novaDataRascunho !== dataValidadePadrao,
@@ -99,6 +116,19 @@ export function EmitirEmissaoGtaPage({
     );
     if (!atualizada) return;
     onNavigate("documento-emissao-gta", atualizada);
+  };
+
+  const confirmarExtensaoPrazoEmissao = () => {
+    setTentouEstenderPrazoEmissao(true);
+    if (!extensaoPrazoEmissaoValida) return;
+    const atualizada = estenderPrazoEmissaoGta(
+      emissao.id,
+      novaDataPrazoEmissao,
+      justificativaPrazoEmissao,
+    );
+    if (!atualizada) return;
+    setEmissao({ ...atualizada });
+    setModalPrazoEmissaoAberto(false);
   };
 
   return (
@@ -137,6 +167,26 @@ export function EmitirEmissaoGtaPage({
         </div>
 
         <section className="bg-white rounded-xl shadow-sm p-6 flex flex-col gap-5">
+          <div className="flex flex-col justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 sm:flex-row sm:items-center">
+            <div>
+              <p className="text-sm font-semibold text-amber-900">Prazo para emissão: {formatarDataGta(prazoEmissaoAtual)}</p>
+              <p className="mt-0.5 text-xs text-amber-700">Após esse prazo, a GTA será cancelada automaticamente.</p>
+            </div>
+            {funcionarioIma && !bloqueada && (
+              <button
+                type="button"
+                onClick={() => {
+                  setNovaDataPrazoEmissao(emissao.dataLimiteEmissaoEstendida || "");
+                  setJustificativaPrazoEmissao(emissao.justificativaPrazoEmissao || "");
+                  setTentouEstenderPrazoEmissao(false);
+                  setModalPrazoEmissaoAberto(true);
+                }}
+                className="h-9 rounded-md border border-amber-400 bg-white px-3 text-xs font-semibold text-amber-800 hover:bg-amber-100"
+              >
+                Estender prazo para emissão
+              </button>
+            )}
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <FloatInput
               label="Série - Número da GTA"
@@ -210,7 +260,7 @@ export function EmitirEmissaoGtaPage({
               Estender validade da GTA
             </DialogTitle>
             <DialogDescription className="mt-1 text-sm text-gray-500">
-              Informe a nova data de validade e justifique a extensão.
+              Informe a nova data e justifique a extensão. O limite anual é {formatarDataGta(limiteValidadeAno)}.
             </DialogDescription>
           </DialogHeader>
 
@@ -248,7 +298,9 @@ export function EmitirEmissaoGtaPage({
             )}
             {tentouConfirmarExtensao && !rascunhoExtensaoValido && (
               <p className="text-sm font-medium text-red-600">
-                {novaDataRascunho <= dataValidadePadrao
+                {novaDataRascunho > limiteValidadeAno
+                  ? `A validade não pode ultrapassar o último dia útil do ano (${formatarDataGta(limiteValidadeAno)}).`
+                  : novaDataRascunho <= dataValidadePadrao
                   ? `Informe uma nova data posterior a ${formatarDataGta(dataValidadePadrao)}.`
                   : "Informe a justificativa da extensão."}
               </p>
@@ -270,6 +322,46 @@ export function EmitirEmissaoGtaPage({
             >
               Confirmar extensão
             </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={modalPrazoEmissaoAberto}
+        onOpenChange={(aberto) => {
+          setModalPrazoEmissaoAberto(aberto);
+          if (!aberto) setTentouEstenderPrazoEmissao(false);
+        }}
+      >
+        <DialogContent className="max-w-[620px] rounded-xl border border-gray-200 bg-white p-6 shadow-xl sm:p-8">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-gray-900">Estender prazo para emissão</DialogTitle>
+            <DialogDescription className="mt-1 text-sm text-gray-500">
+              Ação exclusiva de funcionário do IMA. Informe a nova data e a justificativa.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-3 flex flex-col gap-5">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+              <FloatInput label="Prazo Atual" type="date" value={prazoEmissaoAtual} disabled required />
+              <FloatInput label="Novo Prazo" type="date" value={novaDataPrazoEmissao} onChange={setNovaDataPrazoEmissao} required />
+            </div>
+            <LargeTextArea
+              label="Justificativa"
+              value={justificativaPrazoEmissao}
+              onChange={setJustificativaPrazoEmissao}
+              required
+              rows={4}
+              maxLength={1500}
+            />
+            {tentouEstenderPrazoEmissao && !extensaoPrazoEmissaoValida && (
+              <p className="text-sm font-medium text-red-600">
+                Informe uma data posterior ao prazo atual, sem ultrapassar {formatarDataGta(limiteValidadeAno)}, e justifique a extensão.
+              </p>
+            )}
+          </div>
+          <div className="mt-4 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <button type="button" onClick={() => setModalPrazoEmissaoAberto(false)} className="h-11 rounded-md border border-gray-300 px-5 text-sm font-semibold text-gray-700 hover:bg-gray-50">Cancelar</button>
+            <button type="button" onClick={confirmarExtensaoPrazoEmissao} className="h-11 rounded-md bg-[#1A7A3C] px-5 text-sm font-semibold text-white hover:bg-[#15612F]">Confirmar extensão</button>
           </div>
         </DialogContent>
       </Dialog>

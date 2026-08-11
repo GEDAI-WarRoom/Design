@@ -7,6 +7,7 @@ import { FloatInput, FloatSelect, FloatCombobox, SimNao, LargeTextArea, UploadFi
 import { ProprietarioInput, DynamicListWrapper, BlocoEnderecoFields, BlocoContatoFields, SelectedChipsContainer, } from "../../../components/ui/EntitySearch";
 
 import * as Icons from "../../../imports/icons";
+import { salvarEstabelecimentoAgropecuario, type EstabelecimentoAgropecuario } from "./estabelecimentoAgropecuarioData";
 
 const GREEN = "#1A7A3C";
 
@@ -110,6 +111,7 @@ export function AdicionarEstabelecimentoAgropecuarioPage({ onLogout, onNavigate 
 
   // UI
   const [isSucesso, setIsSucesso] = useState(false);
+  const [registroCriado, setRegistroCriado] = useState<EstabelecimentoAgropecuario | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Anexos (zero ou mais) e Observações
@@ -129,6 +131,35 @@ export function AdicionarEstabelecimentoAgropecuarioPage({ onLogout, onNavigate 
     }
   };
 
+  const salvar = () => {
+    const proprietariosSelecionados = proprietarios
+      .map((item) => item.proprietario)
+      .filter(Boolean) as NonNullable<ProprietarioFormItem["proprietario"]>[];
+    const registro = salvarEstabelecimentoAgropecuario({
+      nome: nome.trim() || tipo || "Estabelecimento sem nome",
+      proprietarios: proprietariosSelecionados.map((item) => `${item.nome} - ${item.documento}`).join(", "),
+      zona: zona as "Rural" | "Urbana",
+      municipioUf: `${endereco.municipio || municipio || "Não informado"} - ${endereco.estado === "Minas Gerais" ? "MG" : ""}`.replace(/ - $/, ""),
+      situacao: "Ativo",
+      tipo,
+      cadastroProvisorio: provisorio,
+      proprietarioNome: proprietariosSelecionados[0]?.nome,
+      proprietarioDocumento: proprietariosSelecionados[0]?.documento,
+      ...endereco,
+      unidadeMedida,
+      areaTotal,
+      areaProdutiva,
+      numeroCar,
+      confrontantes,
+      viasAcesso,
+      documento: anexos[0]?.nome || "",
+      descricaoDocumento: anexos[0]?.descricao || "",
+      observacao,
+    });
+    setRegistroCriado(registro);
+    setIsSucesso(true);
+  };
+
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
       <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="estabelecimento-agropecuario" hideSearch />
@@ -142,7 +173,7 @@ export function AdicionarEstabelecimentoAgropecuarioPage({ onLogout, onNavigate 
           </button>
           <div className="flex justify-between items-center w-full">
             <h1 className="text-2xl font-semibold text-gray-900">Adicionar Estabelecimento Agropecuário</h1>
-            <button type="button" onClick={() => setIsSucesso(true)} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm">Adicionar</button>
+            <button type="button" onClick={salvar} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm">Adicionar</button>
           </div>
         </div>
 
@@ -404,7 +435,7 @@ export function AdicionarEstabelecimentoAgropecuarioPage({ onLogout, onNavigate 
             <p className="text-sm text-gray-500 mt-1">O cadastro de "{nome}" foi realizado com sucesso.</p>
             <div className="flex gap-3 justify-center mt-6">
               <button onClick={() => onNavigate("estabelecimento-agropecuario")} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition">Voltar</button>
-              <button onClick={() => onNavigate("visualizar-estabelecimento-agropecuario", { nome })} className="px-5 h-11 rounded-md bg-[#1A7A3C] text-white text-sm font-semibold transition">Visualizar</button>
+              <button onClick={() => onNavigate("visualizar-estabelecimento-agropecuario", { id: registroCriado?.id })} className="px-5 h-11 rounded-md bg-[#1A7A3C] text-white text-sm font-semibold transition">Visualizar</button>
             </div>
           </div>
         </div>
