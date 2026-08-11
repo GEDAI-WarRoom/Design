@@ -6,7 +6,9 @@ interface MockDatabaseState {
 }
 
 const STORAGE_KEY = "sidagro:demo-db";
-const DATABASE_VERSION = 1;
+// A versão 2 preserva as coleções da primeira implementação e formaliza a
+// migração para que um novo campo de controle não descarte cadastros do demo.
+const DATABASE_VERSION = 2;
 const colecoesRegistradas = new Map<string, MockRegistro[]>();
 const listeners = new Set<() => void>();
 
@@ -27,15 +29,17 @@ function estadoVazio(): MockDatabaseState {
   return { versao: DATABASE_VERSION, colecoes: {} };
 }
 
-function estadoValido(value: unknown): value is MockDatabaseState {
-  if (!value || typeof value !== "object") return false;
+function normalizarEstado(value: unknown): MockDatabaseState | null {
+  if (!value || typeof value !== "object") return null;
   const state = value as Partial<MockDatabaseState>;
-  return (
-    state.versao === DATABASE_VERSION &&
-    Boolean(state.colecoes) &&
-    typeof state.colecoes === "object" &&
-    !Array.isArray(state.colecoes)
-  );
+  if (!state.colecoes || typeof state.colecoes !== "object" || Array.isArray(state.colecoes)) {
+    return null;
+  }
+
+  // v1 e v2 possuem o mesmo envelope. Manter as coleções evita perder dados
+  // quando a aplicação passa a registrar as coleções adicionais.
+  if (state.versao !== 1 && state.versao !== DATABASE_VERSION) return null;
+  return { versao: DATABASE_VERSION, colecoes: state.colecoes };
 }
 
 function carregarEstado(): MockDatabaseState {
@@ -48,7 +52,10 @@ function carregarEstado(): MockDatabaseState {
   try {
     const salvo = window.localStorage.getItem(STORAGE_KEY);
     const parsed = salvo ? JSON.parse(salvo) : null;
-    cache = estadoValido(parsed) ? parsed : estadoVazio();
+    cache = normalizarEstado(parsed) ?? estadoVazio();
+    if (cache.versao === DATABASE_VERSION && parsed?.versao !== DATABASE_VERSION) {
+      persistirEstado(cache, false);
+    }
   } catch {
     cache = estadoVazio();
   }
@@ -74,7 +81,7 @@ function instalarStorageListener() {
     if (event.key !== STORAGE_KEY) return;
     try {
       const parsed = event.newValue ? JSON.parse(event.newValue) : null;
-      cache = estadoValido(parsed) ? parsed : estadoVazio();
+      cache = normalizarEstado(parsed) ?? estadoVazio();
     } catch {
       cache = estadoVazio();
     }

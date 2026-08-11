@@ -13,6 +13,7 @@ export interface DemoUserIdentity {
 	name: string;
 	roleLabel: string;
 	document?: string;
+	pessoaFisicaId?: number;
 	entityId?: number;
 	email?: string;
 	phone?: string;
@@ -27,6 +28,7 @@ export const DEMO_USERS = PERFIS_USUARIO_INICIAIS.reduce(
 			name: perfil.nome,
 			roleLabel: perfil.perfil,
 			document: perfil.documento,
+			pessoaFisicaId: perfil.pessoaFisicaId,
 			entityId: perfil.entityId,
 			email: perfil.email,
 			phone: perfil.telefone,
@@ -77,7 +79,6 @@ const produtorAllowedRoutes = new Set([
 	"visualizar-estabelecimento-agropecuario",
 	"adicionar-venda-propriedade",
 	"visualizar-venda-propriedade",
-	"editar-venda-propriedade",
 	"adicionar-exploracao-pecuaria",
 	"visualizar-exploracao-pecuaria",
 	"adicionar-nucleo-producao",
@@ -172,9 +173,13 @@ const veterinarioAllowedRoutes = new Set([
 	"emitir-emissao-gta",
 	"cancelar-emissao-gta",
 	"pagar-emissao-gta",
+	"pendencias-confirmacao-gta",
+	"visualizar-revendedora-agropecuario",
+	"visualizar-unidade-consolidacao",
 ]);
 
 const liderEstabelecimentoEntryRoutes = new Set([
+	"pendencias-confirmacao-gta",
 	"pessoa-fisica",
 	"pessoa-juridica",
 	"agroindustrial-sie",
@@ -195,8 +200,8 @@ const liderEstabelecimentoAllowedRoutes = new Set([
 	"visualizar-pessoa-juridica",
 	"editar-pessoa-juridica",
 	"adicionar-agroindustrial-sie",
-	"visualizar-agroindustrial-sie",
-	"editar-agroindustrial-sie",
+	"visualizar-estabelecimento-poa",
+	"editar-estabelecimento-poa",
 	"adicionar-integradora-cooperativa",
 	"visualizar-integradora-cooperativa",
 	"editar-integradora-cooperativa",
@@ -233,6 +238,7 @@ const responsavelEstabelecimentoRoutes = new Set([
 	"visualizar-integradora-cooperativa",
 	"editar-integradora-cooperativa",
 ]);
+const produtorOnlyRoutes = new Set<string>();
 
 interface DemoUserContextValue {
 	role: DemoUserRole | null;
@@ -256,6 +262,7 @@ export function DemoUserProvider({ children }: { children: ReactNode }) {
 			name: perfil.nome,
 			roleLabel: perfil.perfil,
 			document: perfil.documento,
+			pessoaFisicaId: perfil.pessoaFisicaId,
 			entityId: perfil.entityId,
 			email: perfil.email,
 			phone: perfil.telefone,

@@ -40,7 +40,6 @@ import { EditarProdutoPage } from "./pages/Geral/Produto/EditarProduto";
 
 import { VisualizarProfissionalOficialPage } from "./pages/Geral/ProfissionalOficial/VisualizarProfissionalOficial";
 import { EditarProfissionalOficialPage } from "./pages/Geral/ProfissionalOficial/EditarProfissionalOficial";
-import { EditarVendaPropriedadePage } from "./pages/Geral/VendaPropriedade/EditarVendaPropriedade";
 import { VisualizarDivisaoMunicipalPage } from "./pages/Geral/DivisaoMunicipal/VisualizarDivisaoMunicipal";
 import { EditarDivisaoMunicipalPage } from "./pages/Geral/DivisaoMunicipal/EditarDivisaoMunicipal";
 import { VisualizarAeroportoPortoPage } from "./pages/Geral/AeroportoPorto/VisualizarAeroportoPorto";
@@ -388,7 +387,6 @@ export type Screen =
   | "editar-profissional-oficial"
   | "visualizar-profissional-oficial"
 | "editar-estabelecimento-agropecuario"
-  | "editar-venda-propriedade"
 | "editar-divisao-municipal"
   | "visualizar-divisao-municipal"
   | "emissao-ata"
@@ -1049,8 +1047,6 @@ export default function App() {
       return <VendaPropriedadePage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-venda-propriedade":
       return <AdicionarVendaPropriedadePage onLogout={handleLogout} onNavigate={handleNavigate} />;
-    case "editar-venda-propriedade":
-      return <EditarVendaPropriedadePage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "visualizar-venda-propriedade":
       return <VisualizarVendaPropriedadePage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
 		case "divisao-municipal":

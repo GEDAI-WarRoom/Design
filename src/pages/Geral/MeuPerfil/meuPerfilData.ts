@@ -17,6 +17,7 @@ export interface PerfilUsuario {
   documento?: string;
   email: string;
   telefone?: string;
+  pessoaFisicaId?: number;
   entityId?: number;
   avatarDataUrl?: string;
   aceitouTermos: boolean;
@@ -32,6 +33,7 @@ export const PERFIS_USUARIO_INICIAIS: PerfilUsuario[] = [
     perfil: "Administrador",
     email: "thomas.anderson@ima.mg.gov.br",
     telefone: "(31) 3915-8000",
+    pessoaFisicaId: 6,
     aceitouTermos: false,
   },
   {
@@ -42,6 +44,7 @@ export const PERFIS_USUARIO_INICIAIS: PerfilUsuario[] = [
     documento: "362.778.831-19",
     email: "fernando@email.com",
     telefone: "(35) 98855-4433",
+    pessoaFisicaId: 4,
     aceitouTermos: false,
   },
   {
@@ -53,6 +56,7 @@ export const PERFIS_USUARIO_INICIAIS: PerfilUsuario[] = [
     email: "eloiza.silva@email.com",
     telefone: "(31) 99845-1200",
     entityId: 1,
+    pessoaFisicaId: 1,
     aceitouTermos: false,
   },
   {
@@ -64,12 +68,44 @@ export const PERFIS_USUARIO_INICIAIS: PerfilUsuario[] = [
     email: "thais.lopes@email.com",
     telefone: "(31) 99714-8802",
     entityId: 2,
+    pessoaFisicaId: 5,
     aceitouTermos: false,
   },
 ];
 
 export function listarPerfisUsuario() {
-  return listarColecaoMock(COLECAO, PERFIS_USUARIO_INICIAIS);
+  const perfis = listarColecaoMock(COLECAO, PERFIS_USUARIO_INICIAIS);
+  let precisaPersistir = false;
+
+  const atualizados = perfis.map((perfil) => {
+    const perfilInicial = PERFIS_USUARIO_INICIAIS.find(
+      (item) => item.role === perfil.role,
+    );
+    if (!perfilInicial) return perfil;
+
+    const pessoaFisicaId = perfil.pessoaFisicaId ?? perfilInicial.pessoaFisicaId;
+    const entityId = perfil.entityId ?? perfilInicial.entityId;
+    if (
+      pessoaFisicaId === perfil.pessoaFisicaId &&
+      entityId === perfil.entityId
+    ) {
+      return perfil;
+    }
+
+    precisaPersistir = true;
+    return { ...perfil, pessoaFisicaId, entityId };
+  });
+
+  const perfisFaltantes = PERFIS_USUARIO_INICIAIS.filter(
+    (perfilInicial) =>
+      !atualizados.some((perfil) => perfil.role === perfilInicial.role),
+  );
+  if (perfisFaltantes.length) precisaPersistir = true;
+
+  const resultado = [...atualizados, ...perfisFaltantes];
+  return precisaPersistir
+    ? salvarColecaoMock(COLECAO, resultado)
+    : resultado;
 }
 
 export function obterPerfilUsuario(role?: PerfilUsuarioRole | null) {

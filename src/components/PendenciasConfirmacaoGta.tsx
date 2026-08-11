@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import {
-	ArrowRight,
 	Check,
 	FileInput,
 	RefreshCw,
@@ -18,6 +17,7 @@ import {
 	PRODUTOR_REBANHO_DEMONSTRACAO_DOCUMENTO,
 	type AtualizacaoCadastralRebanho,
 } from "../pages/Rebanho/AtualizacaoCadastralRebanho/atualizacaoCadastralRebanhoData";
+import { PendenciasResumo } from "../pages/Dashboard/shared/PendenciasResumo";
 
 type RespostaRecebimento = RespostaRecebimentoGta | null;
 
@@ -173,10 +173,6 @@ export function PendenciasConfirmacaoGta({
 	};
 
 	const quantidadePendencias = pendencias.length + pendenciasRebanho.length;
-	const textoContador = `${quantidadePendencias} ${
-		quantidadePendencias === 1 ? "Pendência" : "Pendências"
-	}`;
-
 	const abrirAtualizacaoRebanho = (
 		atualizacao: AtualizacaoCadastralRebanho,
 	) => {
@@ -189,87 +185,19 @@ export function PendenciasConfirmacaoGta({
 		const [ano, mes, dia] = data.split("-");
 		return dia && mes && ano ? `${dia}/${mes}/${ano}` : data;
 	};
+	const itensResumo = [
+		...pendencias.slice(0, 1).map((pendencia) => ({ id: `gta-${pendencia.id}`, title: `GTA NR - ${pendencia.numero}`, description: "Confirmação de recebimento dos animais", icon: <FileInput size={18} />, details: [`Proprietário ${pendencia.procedencia}`, `Destino: ${pendencia.destino} • ${pendencia.municipioDestino}`], actionLabel: "Confirmar GTA", onAction: () => setPendenciaAberta(pendencia) })),
+		...pendenciasRebanho.slice(0, 1).map((atualizacao) => ({ id: `rebanho-${atualizacao.id}`, title: "Atualização Cadastral", description: "Revisão periódica dos dados da propriedade", icon: <RefreshCw size={18} />, details: [`Referência: ${atualizacao.etapa}`, `Prazo: ${formatarData(atualizacao.dataFimEtapa)}`], actionLabel: "Atualizar Agora", onAction: () => abrirAtualizacaoRebanho(atualizacao) })),
+		...pendencias.slice(1, 2).map((pendencia) => ({ id: `gta-${pendencia.id}`, title: `GTA NR - ${pendencia.numero}`, description: "Confirmação de recebimento dos animais", icon: <FileInput size={18} />, details: [`Proprietário ${pendencia.procedencia}`, `Destino: ${pendencia.destino} • ${pendencia.municipioDestino}`], actionLabel: "Confirmar GTA", onAction: () => setPendenciaAberta(pendencia) })),
+	];
 	return (
 		<>
-			<section className="mb-6 rounded-xl bg-white p-6 shadow-sm">
-				<div className="flex flex-wrap items-center justify-between gap-3">
-					<div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-						<h2 className="text-base font-semibold text-gray-800">Pendências de Confirmação</h2>
-						<span className="inline-flex items-center rounded-full bg-[#FEF3D6] px-3 py-1 text-xs font-semibold text-[#B45309]">
-							{textoContador}
-						</span>
-					</div>
-					<button
-						type="button"
-						onClick={() => onNavigate("pendencias-confirmacao-gta", { aba: "gta" })}
-						className="flex items-center gap-2 text-sm font-semibold text-[#1A7A3C] transition hover:text-[#15612F]"
-					>
-						Ver todas
-						<ArrowRight size={16} />
-					</button>
-				</div>
-
-				{quantidadePendencias > 0 ? (
-					<div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-						{pendencias.slice(0, 2).map((pendencia, index) => (
-							<article
-								key={pendencia.id}
-								className={`relative flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition duration-200 ease-out hover:z-10 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-lg focus-within:z-10 focus-within:-translate-y-1 focus-within:scale-[1.02] focus-within:shadow-lg ${index === 0 ? "order-1" : "order-3"}`}
-							>
-								<div className="flex flex-col p-4">
-									<div className="flex items-center gap-3">
-										<span className="flex h-9 w-9 items-center justify-center rounded-lg bg-green-50 text-[#1A7A3C]">
-											<FileInput size={18} />
-										</span>
-										<div className="min-w-0 flex-1">
-											<h3 className="truncate text-sm font-semibold text-gray-900">GTA NR - {pendencia.numero}</h3>
-											<p className="mt-1 text-xs leading-4 text-gray-500">
-												Confirmação de recebimento dos animais
-											</p>
-										</div>
-									</div>
-									<p className="mt-4 truncate text-xs text-gray-500">
-										Proprietário {pendencia.procedencia}
-									</p>
-									<p className="mt-2 truncate text-xs text-gray-500">
-										Destino: {pendencia.destino} • {pendencia.municipioDestino}
-									</p>
-								</div>
-								<button type="button" onClick={() => setPendenciaAberta(pendencia)} className="mt-auto h-11 bg-[#1A7A3C] text-sm font-semibold text-white transition hover:bg-[#15612F]">
-									Confirmar GTA
-								</button>
-							</article>
-						))}
-						{pendenciasRebanho.slice(0, Math.max(1, 3 - pendencias.slice(0, 2).length)).map((atualizacao) => (
-							<article
-								key={atualizacao.id}
-								className="relative order-2 flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition duration-200 ease-out hover:z-10 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-lg focus-within:z-10 focus-within:-translate-y-1 focus-within:scale-[1.02] focus-within:shadow-lg"
-							>
-								<div className="flex flex-col p-4">
-									<div className="flex items-center gap-3">
-										<span className="flex h-9 w-9 items-center justify-center rounded-lg bg-green-50 text-[#1A7A3C]"><RefreshCw size={18} /></span>
-										<div className="min-w-0 flex-1">
-											<h3 className="text-sm font-semibold text-gray-900">Atualização Cadastral</h3>
-											<p className="mt-1 text-xs leading-4 text-gray-500">
-												Revisão periódica dos dados da propriedade
-											</p>
-										</div>
-									</div>
-									<div className="mt-4 space-y-2 text-xs text-gray-500">
-										<p>Referência: {atualizacao.etapa}</p>
-										<p>Prazo: {formatarData(atualizacao.dataFimEtapa)}</p>
-									</div>
-								</div>
-								<button type="button" onClick={() => abrirAtualizacaoRebanho(atualizacao)} className="mt-auto h-11 bg-[#1A7A3C] text-sm font-semibold text-white transition hover:bg-[#15612F]">
-									Atualizar Agora
-								</button>
-							</article>
-						))}
-					</div>
-				) : (
-					<p className="mt-5 text-sm text-gray-500">Nenhuma pendência de confirmação.</p>
-				)}
-			</section>
+			<PendenciasResumo
+				title="Pendências de Confirmação"
+				items={itensResumo}
+				totalCount={quantidadePendencias}
+				onViewAll={() => onNavigate("pendencias-confirmacao-gta", { aba: "gta" })}
+			/>
 
 			{pendenciaAberta && (
 				<RecebimentoGtaModal

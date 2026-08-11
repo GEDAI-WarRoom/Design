@@ -31,6 +31,8 @@ import {
 
 import * as Icons from "../../imports/icons";
 import { listarProfissionaisAnimal } from "../../pages/Animal/ProfissionalAnimal/profissionalAnimalData";
+import { listarPessoasFisicasAtivasParaBusca } from "../../pages/Geral/PessoaFisica/pessoaFisicaData";
+import { useMockDatabaseRevision } from "../../mocks/useMockDatabase";
 
 const GREEN = "#1A7A3C";
 
@@ -1036,11 +1038,18 @@ export function ProprietarioInput({
 	onEyeClick,
 	required = false,
 	disabled = false,
-	data = PRODUTORES_MOCK,
+	data,
 }: DomainInputProps) {
+	const databaseRevision = useMockDatabaseRevision();
+	void databaseRevision;
+	const pessoasFisicas = listarPessoasFisicasAtivasParaBusca().map((pessoa) => ({ ...pessoa, tipo: "PF" }));
+	const database = data ?? [
+		...pessoasFisicas,
+		...PRODUTORES_MOCK.filter((item) => item.tipo === "PJ"),
+	];
 	const [tipoPessoa, setTipoPessoa] = useState<string>("");
 
-	const entidadeSelecionada = data.find(
+	const entidadeSelecionada = database.find(
 		(x) => x.nome === value || x.documento === value,
 	);
 	const entidadeExibida = entidadeSelecionada || (value
@@ -1053,8 +1062,8 @@ export function ProprietarioInput({
 		: null);
 
 	const databaseFiltrada = tipoPessoa
-		? data.filter((p: any) => p.tipo === tipoPessoa)
-		: data;
+		? database.filter((p: any) => p.tipo === tipoPessoa)
+		: database;
 
 	// Definição estrita das colunas baseada no estado atual
 	const colunasModal = [
@@ -2920,10 +2929,13 @@ export function PessoaFisicaInput({
 	required = false,
 	disabled = false,
 	error = false,
-	data = PESSOAS_FISICAS_MOCK,
+	data,
 }: PessoaFisicaInputProps) {
+	const databaseRevision = useMockDatabaseRevision();
+	void databaseRevision;
+	const database = data ?? listarPessoasFisicasAtivasParaBusca();
 	// Encontra a entidade selecionada para exibir no campo reboque se necessário
-	const entidadeSelecionada = data.find(
+	const entidadeSelecionada = database.find(
 		(x) => x.nome === value || x.documento === value,
 	);
 
@@ -2951,7 +2963,7 @@ export function PessoaFisicaInput({
 						disabled={disabled}
 						error={error}
 						value={entidadeSelecionada?.nome || ""} // Exibe o nome amigável no input principal
-						data={data}
+						data={database}
 						// Configurações do Cabeçalho e comportamento do Modal
 						title="Buscar Pessoa Física"
 						subtitle="Busque por uma pessoa física cadstrada:"

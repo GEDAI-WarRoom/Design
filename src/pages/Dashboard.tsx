@@ -981,7 +981,7 @@ export const thirdCategories: MenuCategory[] = [
         icon: <Route size={18} />,
       },
       {
-        label: "Distribuição de Formulários",
+        label: "Distribuição de Formulários de GTA",
         route: "distribuicao-formularios-gta",
         icon: <ClipboardList size={16} />,
       },

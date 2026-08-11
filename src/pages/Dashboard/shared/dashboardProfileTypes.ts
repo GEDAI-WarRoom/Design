@@ -31,6 +31,7 @@ export interface DashboardPendingItem {
 	title: string;
 	description: string;
 	icon: ReactNode;
+	details?: string[];
 	actionLabel?: string;
 	onAction?: () => void;
 }
