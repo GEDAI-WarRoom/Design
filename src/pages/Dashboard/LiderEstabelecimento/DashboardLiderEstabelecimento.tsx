@@ -7,6 +7,10 @@ import { DashboardPerfilPadrao } from "../shared/DashboardPerfilPadrao";
 import { MeuPerfilCard } from "../shared/MeuPerfilCard";
 import { PendenciasResumo } from "../shared/PendenciasResumo";
 import type { MenuCategory } from "../shared/dashboardTypes";
+import { useMockDatabaseRevision } from "../../../mocks/useMockDatabase";
+import { obterPessoaFisica } from "../../Geral/PessoaFisica/pessoaFisicaData";
+import { listarEstabelecimentosDoLider } from "./liderEstabelecimentoData";
+import { listarPendenciasCentrais } from "../../GTA/PendenciasConfirmacao/pendenciasCentralData";
 
 interface DashboardLiderEstabelecimentoProps {
 	onLogout: () => void;
@@ -15,22 +19,18 @@ interface DashboardLiderEstabelecimentoProps {
 	news: ReactNode;
 }
 
-const estabelecimentosVinculados = [
-	{ id: "frigorifico-sao-jose", nome: "Frigorífico São José", codigo: "3100000001", registroSie: "17126" },
-	{ id: "unidade-industrial-ii", nome: "Unidade Industrial II", codigo: "3100000002", registroSie: "17127" },
-	{ id: "centro-distribuicao", nome: "Centro de Distribuição", codigo: "3100000003", registroSie: "17128" },
-	{ id: "unidade-beneficiamento", nome: "Unidade de Beneficiamento", codigo: "3100000004", registroSie: "17129" },
-	{ id: "entreposto-regional", nome: "Entreposto Regional", codigo: "3100000005", registroSie: "17130" },
-	{ id: "unidade-abate", nome: "Unidade de Abate", codigo: "3100000006", registroSie: "17131" },
-];
-
 export function DashboardLiderEstabelecimento({
 	onLogout,
 	onNavigate,
 	categories,
 	news,
 }: DashboardLiderEstabelecimentoProps) {
+	const databaseRevision = useMockDatabaseRevision();
+	void databaseRevision;
 	const { user } = useDemoUser();
+	const pessoa = obterPessoaFisica(user?.pessoaFisicaId);
+	const estabelecimentosVinculados = listarEstabelecimentosDoLider("lider-estabelecimento");
+	const pendencias = listarPendenciasCentrais("lider-estabelecimento");
 
 	return (
 		<DashboardPerfilPadrao
@@ -41,11 +41,11 @@ export function DashboardLiderEstabelecimento({
 			news={news}
 			profile={
 				<MeuPerfilCard
-					name={user?.name ?? "Líder de Estabelecimento"}
+					name={user?.name ?? pessoa?.nome ?? "Líder de Estabelecimento"}
 					roleLabel={user?.roleLabel ?? "Líder de Estabelecimento"}
 					avatarSrc={user?.avatarDataUrl ?? fotoLiderEstabelecimentoExemploUrl}
 					details={[
-						{ id: "perfil", label: "Perfil", value: "Líder de estabelecimento" },
+						{ id: "documento", label: "CPF", value: pessoa?.cpf || "Não informado" },
 						{ id: "vinculos", label: "Estabelecimentos", value: estabelecimentosVinculados.length },
 					]}
 				/>
@@ -54,18 +54,30 @@ export function DashboardLiderEstabelecimento({
 				<CadastrosVinculados
 					items={estabelecimentosVinculados.map((estabelecimento) => ({
 						id: estabelecimento.id,
-						title: estabelecimento.nome,
+						title: estabelecimento.nomeComercial,
 						icon: <Building2 size={19} />,
 						details: [
 							{ id: "codigo", label: "Código do estabelecimento", value: estabelecimento.codigo },
 							{ id: "sie", label: "Registro no SIE/MG", value: estabelecimento.registroSie },
 						],
-						onView: () => onNavigate("agroindustrial-sie", estabelecimento),
+						onView: () => onNavigate("visualizar-estabelecimento-poa", { id: estabelecimento.id, ...estabelecimento }),
 					}))}
 					onViewAll={() => onNavigate("agroindustrial-sie")}
 				/>
 			}
-			pendingContent={<PendenciasResumo items={[]} />}
+			pendingContent={
+				<PendenciasResumo
+					items={pendencias.map((pendencia) => ({
+						id: String(pendencia.id),
+						title: pendencia.titulo || "Pendência de estabelecimento",
+						description: pendencia.descricao || "Solicitação que precisa da sua atenção",
+						icon: <Building2 size={18} />,
+						actionLabel: "Resolver pendência",
+						onAction: () => onNavigate("pendencias-confirmacao-gta"),
+					}))}
+					onViewAll={() => onNavigate("pendencias-confirmacao-gta")}
+				/>
+			}
 			categories={categories}
 		/>
 	);

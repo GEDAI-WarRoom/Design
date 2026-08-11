@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { UserRound } from "lucide-react";
 import { useDemoUser } from "../../../contexts/DemoUserContext";
 import { PRODUTORES_ATUALIZACAO } from "../../Rebanho/AtualizacaoCadastralRebanho/atualizacaoCadastralRebanhoData";
+import { obterPessoaFisica } from "../../Geral/PessoaFisica/pessoaFisicaData";
 import { CadastrosVinculados } from "../shared/CadastrosVinculados";
 import { DashboardPerfilPadrao } from "../shared/DashboardPerfilPadrao";
 import { MeuPerfilCard } from "../shared/MeuPerfilCard";
@@ -28,6 +29,7 @@ export function DashboardProdutor({
 	linkedItems,
 }: DashboardProdutorProps) {
 	const { user } = useDemoUser();
+	const pessoa = obterPessoaFisica(user?.pessoaFisicaId);
 	const produtor = PRODUTORES_ATUALIZACAO.find(
 		(registro) => registro.documento === user?.document,
 	);
@@ -36,11 +38,13 @@ export function DashboardProdutor({
 
 	const profile = produtor ? (
 		<MeuPerfilCard
-			name={produtor.nome}
+			name={user?.name ?? pessoa?.nome ?? produtor.nome}
 			roleLabel={user?.roleLabel ?? "Produtor"}
+			avatarSrc={user?.avatarDataUrl}
+			avatarAlt={user?.name ?? pessoa?.nome ?? produtor.nome}
 			avatarFallback={<UserRound className="h-7 w-7" aria-hidden="true" />}
 			details={[
-				{ id: "cpf", label: "CPF", value: produtor.documento },
+				{ id: "cpf", label: "CPF", value: pessoa?.cpf || produtor.documento },
 				...(email ? [{ id: "email", label: "E-mail", value: email.valor }] : []),
 				...(telefone ? [{ id: "telefone", label: "Telefone", value: telefone.valor }] : []),
 			]}

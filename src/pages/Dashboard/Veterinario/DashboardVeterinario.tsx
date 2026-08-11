@@ -2,13 +2,15 @@ import type { ReactNode } from "react";
 import { Building2, Clock3, FileCheck2, Store } from "lucide-react";
 import { useDemoUser } from "../../../contexts/DemoUserContext";
 import fotoVeterinariaExemploUrl from "../../../imports/images/perfil-veterinaria-exemplo.png";
-import * as Icons from "../../../imports/icons";
 import { obterProfissionalAnimal } from "../../Animal/ProfissionalAnimal/profissionalAnimalData";
 import { CadastrosVinculados } from "../shared/CadastrosVinculados";
 import { DashboardPerfilPadrao } from "../shared/DashboardPerfilPadrao";
 import { MeuPerfilCard } from "../shared/MeuPerfilCard";
 import { PendenciasResumo } from "../shared/PendenciasResumo";
 import type { MenuCategory } from "../shared/dashboardTypes";
+import { useMockDatabaseRevision } from "../../../mocks/useMockDatabase";
+import { listarPendenciasCentrais } from "../../GTA/PendenciasConfirmacao/pendenciasCentralData";
+import { getRevendedoras } from "../../Geral/RevendedoraAgropecuaria/revendedoraData";
 
 interface DashboardVeterinarioProps {
 	onLogout: () => void;
@@ -17,98 +19,12 @@ interface DashboardVeterinarioProps {
 	news: ReactNode;
 }
 
-const pendenciasVeterinario = [
-	{
-		id: "atualizacao-habilitacao",
-		title: "Atualização de habilitação",
-		description: "Documentação aguardando análise",
-		icon: <FileCheck2 size={18} />,
-	},
-	{
-		id: "atestado-exame",
-		title: "Atestado de exame",
-		description: "Rascunho não finalizado",
-		icon: <Clock3 size={18} />,
-	},
-	{
-		id: "vinculo-profissional",
-		title: "Vínculo profissional",
-		description: "Confirmação solicitada pela revendedora",
-		icon: <Building2 size={18} />,
-	},
-	{
-		id: "renovacao-responsabilidade",
-		title: "Renovação de responsabilidade",
-		description: "Prazo de renovação se aproxima",
-		icon: <FileCheck2 size={18} />,
-	},
-];
-
-const vinculosVeterinario = [
-	{
-		id: "vale-verde",
-		title: "Revendedora Agropecuária Vale Verde",
-		owner: "Agropecuária Vale Verde Ltda.",
-		location: "Uberaba - MG",
-		route: "revendedora-agropecuario",
-		icon: <Store size={19} />,
-		status: "Ativo",
-	},
-	{
-		id: "unidade-sao-jose",
-		title: "Unidade de Consolidação São José",
-		owner: "Carlos Eduardo Souza",
-		location: "Patos de Minas - MG",
-		route: "unidade-consolidacao",
-		icon: <Building2 size={19} />,
-		status: "Ativo",
-	},
-	{
-		id: "minas-animal",
-		title: "Revendedora Minas Animal",
-		owner: "Minas Animal Comércio Ltda.",
-		location: "Belo Horizonte - MG",
-		route: "revendedora-agropecuario",
-		icon: <Store size={19} />,
-		status: "Ativo",
-	},
-	{
-		id: "agroindustrial-horizonte",
-		title: "Estabelecimento Agroindustrial Horizonte",
-		owner: "Horizonte Alimentos S.A.",
-		location: "Contagem - MG",
-		route: "agroindustrial-pov",
-		icon: <img src={Icons.iconeEstabelecimentoAgroindustrialUrl} alt="" className="h-5 w-5 object-contain" />,
-		status: "Pendente",
-	},
-	{
-		id: "clinica-sao-lucas",
-		title: "Clínica Veterinária São Lucas",
-		owner: "José Lucas Ferreira",
-		location: "Uberlândia - MG",
-		route: "unidade-consolidacao",
-		icon: <Building2 size={19} />,
-		status: "Ativo",
-	},
-	{
-		id: "vigilancia-animal-central",
-		title: "Unidade de Vigilância Animal Central",
-		owner: "Prefeitura Municipal",
-		location: "Araxá - MG",
-		route: "unidade-consolidacao",
-		icon: <Building2 size={19} />,
-		status: "Ativo",
-	},
-	{
-		id: "campo-forte",
-		title: "Revendedora Campo Forte",
-		owner: "Campo Forte Produtos Ltda.",
-		location: "Lavras - MG",
-		route: "revendedora-agropecuario",
-		icon: <Store size={19} />,
-		status: "Ativo",
-	},
-];
+const textoPadraoPendencia: Record<string, { titulo: string; descricao: string }> = {
+	"habilitacao": { titulo: "Atualização de habilitação", descricao: "Documentação aguardando análise" },
+	"atestado-exame": { titulo: "Atestado de exame", descricao: "Rascunho não finalizado" },
+	"vinculo-profissional": { titulo: "Vínculo profissional", descricao: "Confirmação solicitada pela revendedora" },
+	"renovacao-responsabilidade": { titulo: "Renovação de responsabilidade", descricao: "Prazo de renovação se aproxima" },
+};
 
 export function DashboardVeterinario({
 	onLogout,
@@ -116,16 +32,25 @@ export function DashboardVeterinario({
 	categories,
 	news,
 }: DashboardVeterinarioProps) {
+	const databaseRevision = useMockDatabaseRevision();
+	void databaseRevision;
 	const { user } = useDemoUser();
 	const profissional = obterProfissionalAnimal(user?.entityId);
-	const vinculosAtivos = vinculosVeterinario.filter((vinculo) => vinculo.status === "Ativo");
+	const pendencias = listarPendenciasCentrais("veterinario", user?.entityId);
+	const revendedoras = getRevendedoras();
+	const vinculosAtivos = revendedoras.filter((revendedora) =>
+		revendedora.situacao === "Ativo" &&
+		revendedora.profissionais.some(
+			(item) => item.documento === profissional?.cpf && item.situacao === "Ativo",
+		),
+	);
 
 	const profile = profissional ? (
 		<MeuPerfilCard
-			name={profissional.nome}
-			roleLabel={profissional.formacao}
-			avatarSrc={fotoVeterinariaExemploUrl}
-			avatarAlt={profissional.nome}
+			name={user?.name ?? profissional.nome}
+			roleLabel={user?.roleLabel ?? profissional.formacao}
+			avatarSrc={user?.avatarDataUrl ?? fotoVeterinariaExemploUrl}
+			avatarAlt={user?.name ?? profissional.nome}
 			details={[
 				{ id: "crmv", label: "CRMV-MG", value: profissional.numeroConselho },
 				{ id: "registro", label: "Registro", value: profissional.tipoRegistroConselho || "Não informado" },
@@ -151,25 +76,31 @@ export function DashboardVeterinario({
 				<CadastrosVinculados
 					items={vinculosAtivos.map((vinculo) => ({
 						id: vinculo.id,
-						title: vinculo.title,
-						icon: vinculo.icon,
+						title: vinculo.nome,
+						icon: <Store size={19} />,
 						details: [
-							{ id: "proprietario", label: "Proprietário", value: vinculo.owner },
-							{ id: "localizacao", label: "Localização", value: vinculo.location },
+							{ id: "proprietario", label: "Proprietário", value: vinculo.proprietarios.join(", ") || "Não informado" },
+							{ id: "localizacao", label: "Localização", value: `${vinculo.municipio} - ${vinculo.uf}` },
 						],
-						onView: () => onNavigate(vinculo.route, vinculo),
+						onView: () => onNavigate("visualizar-revendedora-agropecuario", { id: vinculo.id }),
 					}))}
 					count={vinculosAtivos.length}
-					onViewAll={() => onNavigate("profissional-animal")}
+					onViewAll={() => onNavigate("visualizar-revendedora-agropecuario", { id: vinculosAtivos[0]?.id ?? 1 })}
 				/>
 			}
 			pendingContent={
 				<PendenciasResumo
-					items={pendenciasVeterinario.map((pendencia) => ({
+					items={pendencias.map((pendencia) => ({
 						...pendencia,
-						onAction: () => onNavigate("pendencias-confirmacao-gta", { aba: "gta" }),
+						title: pendencia.titulo || textoPadraoPendencia[pendencia.tipo]?.titulo || "Pendência de confirmação",
+						description: pendencia.descricao || textoPadraoPendencia[pendencia.tipo]?.descricao || "Solicitação que precisa da sua atenção",
+						icon:
+							pendencia.tipo === "atestado-exame" ? <Clock3 size={18} /> :
+							pendencia.tipo === "vinculo-profissional" ? <Building2 size={18} /> :
+							<FileCheck2 size={18} />,
+						onAction: () => onNavigate("pendencias-confirmacao-gta"),
 					}))}
-					onViewAll={() => onNavigate("pendencias-confirmacao-gta", { aba: "gta" })}
+					onViewAll={() => onNavigate("pendencias-confirmacao-gta")}
 				/>
 			}
 			categories={categories}

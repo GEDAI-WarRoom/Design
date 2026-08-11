@@ -13,6 +13,7 @@ import {
   listarAtualizacoesCadastrais,
   PRODUTOR_REBANHO_DEMONSTRACAO_DOCUMENTO,
 } from "../pages/Rebanho/AtualizacaoCadastralRebanho/atualizacaoCadastralRebanhoData";
+import { listarPendenciasCentrais } from "../pages/GTA/PendenciasConfirmacao/pendenciasCentralData";
 
 const GREEN = "#1A7A3C";
 
@@ -37,7 +38,7 @@ export function Navbar({ onLogout, onNavigate, currentScreen, hideSearch = false
   const filtered = search.trim()
     ? allItems.filter((i) => i.label.toLowerCase().includes(search.toLowerCase()))
     : [];
-  const totalPendenciasProdutor = role === "produtor"
+  const totalPendencias = role === "produtor"
     ? listarPendenciasConfirmacaoGta().length +
       listarAtualizacoesCadastrais().filter(
         (atualizacao) =>
@@ -45,7 +46,11 @@ export function Navbar({ onLogout, onNavigate, currentScreen, hideSearch = false
             PRODUTOR_REBANHO_DEMONSTRACAO_DOCUMENTO &&
           !atualizacao.concluida,
       ).length
-    : 0;
+    : role === "veterinario"
+      ? listarPendenciasCentrais("veterinario", user?.entityId).length
+      : role === "lider-estabelecimento"
+        ? listarPendenciasCentrais("lider-estabelecimento").length
+        : 0;
   const abaPendenciasAtual = currentScreen.includes("rebanho")
     ? "rebanho"
     : "gta";
@@ -60,21 +65,21 @@ export function Navbar({ onLogout, onNavigate, currentScreen, hideSearch = false
             <img src={logo} alt="Logo IMA" className="h-8 w-auto" />
           </div>
           <div className="flex items-center gap-6">
-            {role === "produtor" ? (
+			{role === "produtor" || role === "veterinario" || role === "lider-estabelecimento" ? (
               <button
                 type="button"
                 onClick={() =>
                   onNavigate("pendencias-confirmacao-gta", {
-                    aba: abaPendenciasAtual,
+					...(role === "produtor" ? { aba: abaPendenciasAtual } : {}),
                   })
                 }
-                aria-label={`Abrir Central de Pendências: ${totalPendenciasProdutor} pendências`}
+				aria-label={`Abrir Central de Pendências: ${totalPendencias} pendências`}
                 title="Central de Pendências"
                 className="relative rounded-full p-1 text-gray-500 transition hover:bg-amber-50 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-amber-300"
               >
                 <Bell size={20} />
                 <span className="absolute -right-2 -top-2 flex min-h-5 min-w-5 items-center justify-center rounded-full border-2 border-white bg-amber-400 px-1 text-[10px] font-bold leading-none text-amber-950">
-                  {totalPendenciasProdutor}
+				  {totalPendencias}
                 </span>
               </button>
             ) : (

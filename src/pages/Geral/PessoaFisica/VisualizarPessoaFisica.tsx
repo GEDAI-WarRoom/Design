@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ArrowLeft, Pencil } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { PessoaFisicaCadastroForm, normalizarPessoaFisica } from "./PessoaFisicaCadastroForm";
+import { obterPessoaFisica } from "./pessoaFisicaData";
 
 interface Props {
   dados?: any;
@@ -10,7 +11,8 @@ interface Props {
 }
 
 export function VisualizarPessoaFisica({ dados, onLogout, onNavigate }: Props) {
-  const [pessoa] = useState(() => normalizarPessoaFisica(dados));
+  const pessoaPersistida = obterPessoaFisica(dados?.id);
+  const [pessoa] = useState(() => normalizarPessoaFisica(pessoaPersistida ?? dados));
   return (
     <div className="min-h-screen bg-[#f2f3f5] pb-16">
       <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="pessoa-fisica" hideSearch />
@@ -21,7 +23,7 @@ export function VisualizarPessoaFisica({ dados, onLogout, onNavigate }: Props) {
           </button>
           <div className="flex items-center justify-between gap-4">
             <h1 className="text-2xl font-semibold text-gray-900">Visualizar Pessoa Física</h1>
-            <button type="button" onClick={() => onNavigate("editar-pessoa-fisica", pessoa)} className="flex h-10 items-center gap-2 rounded-md bg-[#1A7A3C] px-5 text-sm font-semibold text-white hover:bg-[#15612F]">
+            <button type="button" onClick={() => onNavigate("editar-pessoa-fisica", { id: dados?.id })} className="flex h-10 items-center gap-2 rounded-md bg-[#1A7A3C] px-5 text-sm font-semibold text-white hover:bg-[#15612F]">
               Editar
             </button>
           </div>

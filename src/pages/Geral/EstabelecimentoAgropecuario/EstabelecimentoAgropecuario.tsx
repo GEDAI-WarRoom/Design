@@ -15,6 +15,7 @@ import { Navbar } from "../../../components/Navbar";
 import { FloatSelect, FloatCombobox, SearchModal, FloatInput } from "../../../components/ui/FormKit";
 import * as Icons from "../../../imports/icons";
 import { listarEstabelecimentosAgropecuarios } from "./estabelecimentoAgropecuarioData";
+import { useMockDatabaseRevision } from "../../../mocks/useMockDatabase";
 
 const GREEN = "#1A7A3C";
 
@@ -112,6 +113,9 @@ interface PageProps {
 }
 
 export function EstabelecimentoAgropecuarioPage({ onLogout, onNavigate }: PageProps) {
+
+  const databaseRevision = useMockDatabaseRevision();
+  void databaseRevision;
   // ==========================================================
   // ESTADOS DA PÁGINA
   // ==========================================================
@@ -134,7 +138,7 @@ export function EstabelecimentoAgropecuarioPage({ onLogout, onNavigate }: PagePr
   const [sortKey, setSortKey] = useState<SortKey>("nome");
   const [sortAsc, setSortAsc] = useState(true);
 
-  const [estabelecimentos] = useState(() => listarEstabelecimentosAgropecuarios());
+  const estabelecimentos = listarEstabelecimentosAgropecuarios();
     
   // Filtra os proprietários passados para o modal com base no tipo selecionado
   const proprietariosFiltradosModal = PROPRIETARIOS_MOCK.filter(
