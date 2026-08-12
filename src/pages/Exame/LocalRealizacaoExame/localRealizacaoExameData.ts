@@ -53,6 +53,7 @@ export interface LocalRealizacaoExame {
   endereco: EnderecoLocalExame;
   veterinarios: MedicoVeterinarioExame[];
   situacao: SituacaoLocalExame;
+  ehComercial: boolean;
 }
 
 export const SITUACOES_LOCAL_EXAME: { value: SituacaoLocalExame; label: string }[] = [
@@ -145,7 +146,8 @@ export const LOCAIS_REALIZACAO_EXAME_MOCK: LocalRealizacaoExame[] = [
   {
     id: 1,
     codigo: "3100000001",
-    proprietarios: [PROPRIETARIOS_LOCAL_EXAME[0]],
+  proprietarios: [PROPRIETARIOS_LOCAL_EXAME[0]],
+    ehComercial: true,
     localizadoEmEstabelecimento: true,
     estabelecimento: ESTABELECIMENTOS_LOCAL_EXAME[0],
     endereco: enderecoLavras,
@@ -155,7 +157,8 @@ export const LOCAIS_REALIZACAO_EXAME_MOCK: LocalRealizacaoExame[] = [
   {
     id: 2,
     codigo: "3100000002",
-    proprietarios: [PROPRIETARIOS_LOCAL_EXAME[2]],
+  proprietarios: [PROPRIETARIOS_LOCAL_EXAME[2]],
+    ehComercial: false,
     localizadoEmEstabelecimento: false,
     estabelecimento: null,
     endereco: enderecoUberlandia,
@@ -165,7 +168,8 @@ export const LOCAIS_REALIZACAO_EXAME_MOCK: LocalRealizacaoExame[] = [
   {
     id: 3,
     codigo: "3100000003",
-    proprietarios: [PROPRIETARIOS_LOCAL_EXAME[1]],
+  proprietarios: [PROPRIETARIOS_LOCAL_EXAME[1]],
+    ehComercial: true,
     localizadoEmEstabelecimento: false,
     estabelecimento: null,
     endereco: { ...enderecoLavras, municipio: "Belo Horizonte", bairro: "Floresta" },

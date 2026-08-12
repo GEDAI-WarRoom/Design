@@ -31,6 +31,8 @@ import {
 
 import * as Icons from "../../imports/icons";
 import { listarProfissionaisAnimal } from "../../pages/Animal/ProfissionalAnimal/profissionalAnimalData";
+import { listarPessoasFisicasAtivasParaBusca } from "../../pages/Geral/PessoaFisica/pessoaFisicaData";
+import { useMockDatabaseRevision } from "../../mocks/useMockDatabase";
 
 const GREEN = "#1A7A3C";
 
@@ -511,6 +513,7 @@ interface DomainInputProps {
 	isMulti?: boolean;
 	behavior?: "at-least-one" | "zero-or-more";
 	addButtonLabel?: string;
+	mostrarMunicipio?: boolean;
 }
 
 // MODAL EXPLORAÇÃO
@@ -597,6 +600,7 @@ export function EstabelecimentoAgropecuarioInput({
 	onEyeClick,
 	required = false,
 	data,
+	mostrarMunicipio = false,
 }: DomainInputProps) {
 	const database = data ?? ESTABELECIMENTOS_MOCK;
 	// Encontra pelo nome ou código no mock original para preencher o campo cinza reboque ao lado
@@ -660,6 +664,17 @@ export function EstabelecimentoAgropecuarioInput({
 								className="w-full"
 							/>
 						</div>
+						{mostrarMunicipio && (
+							<div className="flex-1">
+								<FloatInput
+									label="Município do Estabelecimento Agropecuário"
+									value={entidadeSelecionada.municipio || ""}
+									onChange={() => { }}
+									disabled
+									className="w-full"
+								/>
+							</div>
+						)}
 						<EyeAction onClick={onEyeClick} />
 					</div>
 				)}
@@ -674,6 +689,7 @@ export function ProdutorInput({
 	onChange,
 	onEyeClick,
 	required = false,
+	disabled = false,
 }: DomainInputProps) {
 	// Estado local para o filtro que antes ficava na página
 	const [tipoPessoa, setTipoPessoa] = useState<string>("");
@@ -723,6 +739,7 @@ export function ProdutorInput({
 					required={required}
 					value={entidadeSelecionada?.nome || ""} // Exibe o nome amigável no input
 					data={databaseFiltrada} // Passa os dados filtrados dinamicamente
+					disabled={disabled}
 					// 🔥 Suas propriedades exatas de tela:
 					title="Buscar Produtor"
 					subtitle="Busque por um produtor cadastrado no sistema:"
@@ -735,7 +752,7 @@ export function ProdutorInput({
 					}
 					columns={colunasModal}
 					searchKeys={["nome", "documento"]}
-					searchPlaceholder="Buscar Proprietário"
+					searchPlaceholder="Buscar Produtor"
 					confirmLabel="Confirmar"
 					// Intercepta e reseta o filtro do tipo de pessoa ao fechar/confirmar se o EntitySearchInput permitir customização
 					onChange={(p) => {
@@ -743,7 +760,7 @@ export function ProdutorInput({
 						setTipoPessoa(""); // Reseta o select
 					}}
 					// 🔥 Injeta o FloatSelect customizado direto nas ações do cabeçalho do modal base
-					headerActions={
+					headerActions={(
 						<div className="w-48 !mr-4 pr-1 relative z-10 flex-shrink-0">
 							<FloatSelect
 								label="Tipo de Pessoa"
@@ -756,7 +773,7 @@ export function ProdutorInput({
 								]}
 							/>
 						</div>
-					}
+					)}
 				/>
 
 				{/* Campo Extra reboque: CPF/CNPJ do Produtor */}
@@ -1021,11 +1038,19 @@ export function ProprietarioInput({
 	onEyeClick,
 	required = false,
 	disabled = false,
-	data = PRODUTORES_MOCK,
+	label = "Proprietário",
+	data,
 }: DomainInputProps) {
+	const databaseRevision = useMockDatabaseRevision();
+	void databaseRevision;
+	const pessoasFisicas = listarPessoasFisicasAtivasParaBusca().map((pessoa) => ({ ...pessoa, tipo: "PF" }));
+	const database = data ?? [
+		...pessoasFisicas,
+		...PRODUTORES_MOCK.filter((item) => item.tipo === "PJ"),
+	];
 	const [tipoPessoa, setTipoPessoa] = useState<string>("");
 
-	const entidadeSelecionada = data.find(
+	const entidadeSelecionada = database.find(
 		(x) => x.nome === value || x.documento === value,
 	);
 	const entidadeExibida = entidadeSelecionada || (value
@@ -1038,8 +1063,8 @@ export function ProprietarioInput({
 		: null);
 
 	const databaseFiltrada = tipoPessoa
-		? data.filter((p: any) => p.tipo === tipoPessoa)
-		: data;
+		? database.filter((p: any) => p.tipo === tipoPessoa)
+		: database;
 
 	// Definição estrita das colunas baseada no estado atual
 	const colunasModal = [
@@ -1072,28 +1097,28 @@ export function ProprietarioInput({
 						: "w-full"
 				}>
 				<EntitySearchInput
-					label="Proprietário"
+					label={label}
 					placeholder="Buscar pelo nome do proprietário."
 					required={required}
 					value={entidadeExibida?.nome || ""}
 					disabled={disabled}
 					data={databaseFiltrada}
-					title="Buscar Proprietário"
-					subtitle="Busque por um proprietário cadastrado:"
+					title={`Buscar ${label}`}
+					subtitle={`Busque por ${label.toLowerCase()} cadastrada:`}
 					icon={
 						<img
-							src={Icons.iconeProdutorUrl}
-							alt="Proprietário"
+							alt={label}
+							src={label === "Pessoa Jurídica" ? Icons.iconePessoaJuridicaUrl : Icons.iconeProdutorUrl}
 							className="w-5 h-5 object-contain"
 						/>
 					}
 					columns={colunasModal}
 					searchKeys={["nome", "documento"]}
-					searchPlaceholder="Buscar Proprietário"
+					searchPlaceholder={`Buscar ${label}`}
 					confirmLabel="Confirmar"
 					// 💡 APENAS repassa a entidade sem resetar o estado prematuramente aqui
 					onChange={onChange}
-					headerActions={
+					headerActions={label === "Pessoa Jurídica" ? undefined : (
 						<div className="w-48 !mr-4 pr-1 relative z-10 flex-shrink-0">
 							<FloatSelect
 								label="Tipo de Pessoa"
@@ -1106,7 +1131,7 @@ export function ProprietarioInput({
 								]}
 							/>
 						</div>
-					}
+					)}
 				/>
 
 				{/* Campo Extra reboque */}
@@ -1131,7 +1156,7 @@ export function ProprietarioInput({
 }
 
 interface DomainInputProps {
-	label: string;
+	label?: string;
 	value: string; // Nome selecionado
 	documento?: string; // Documento selecionado (CPF/CNPJ)
 	required?: boolean;
@@ -2905,10 +2930,13 @@ export function PessoaFisicaInput({
 	required = false,
 	disabled = false,
 	error = false,
-	data = PESSOAS_FISICAS_MOCK,
+	data,
 }: PessoaFisicaInputProps) {
+	const databaseRevision = useMockDatabaseRevision();
+	void databaseRevision;
+	const database = data ?? listarPessoasFisicasAtivasParaBusca();
 	// Encontra a entidade selecionada para exibir no campo reboque se necessário
-	const entidadeSelecionada = data.find(
+	const entidadeSelecionada = database.find(
 		(x) => x.nome === value || x.documento === value,
 	);
 
@@ -2936,7 +2964,7 @@ export function PessoaFisicaInput({
 						disabled={disabled}
 						error={error}
 						value={entidadeSelecionada?.nome || ""} // Exibe o nome amigável no input principal
-						data={data}
+						data={database}
 						// Configurações do Cabeçalho e comportamento do Modal
 						title="Buscar Pessoa Física"
 						subtitle="Busque por uma pessoa física cadstrada:"

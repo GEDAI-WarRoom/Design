@@ -1,4 +1,6 @@
 import { daeExemploUrl } from "../../../imports/documents";
+import { listarColecaoMock, salvarColecaoMock } from "../../../mocks/mockDatabase";
+import { confirmarTransitoGta, type EmissaoGta, type LocalGta } from "../EmissaoGta/emissaoGtaData";
 
 export interface PendenciaGta {
 	id: number;
@@ -9,11 +11,14 @@ export interface PendenciaGta {
 	municipioDestino: string;
 	dataEmissao: string;
 	documentoDaeUrl: string;
+	emissaoGtaId?: number;
 }
 
 export type RespostaRecebimentoGta = "confirmar" | "negar";
 
-let pendenciasDaSessao: PendenciaGta[] = [
+const COLECAO = "pendencias-confirmacao-gta";
+
+const PENDENCIAS_INICIAIS: PendenciaGta[] = [
 	{
 		id: 1,
 		numero: "768578",
@@ -47,15 +52,53 @@ let pendenciasDaSessao: PendenciaGta[] = [
 ];
 
 export function listarPendenciasConfirmacaoGta() {
-	return [...pendenciasDaSessao];
+	return listarColecaoMock(COLECAO, PENDENCIAS_INICIAIS);
 }
 
 export function responderPendenciaGta(
 	id: number,
-	_resposta: RespostaRecebimentoGta,
+	resposta: RespostaRecebimentoGta,
 ) {
-	pendenciasDaSessao = pendenciasDaSessao.filter(
+	const registros = listarPendenciasConfirmacaoGta();
+	const pendencia = registros.find((item) => item.id === id);
+	if (resposta === "confirmar" && pendencia?.emissaoGtaId != null) {
+		confirmarTransitoGta(pendencia.emissaoGtaId);
+	}
+	const pendencias = registros.filter(
 		(pendencia) => pendencia.id !== id,
 	);
-	return listarPendenciasConfirmacaoGta();
+	salvarColecaoMock(COLECAO, pendencias);
+	return pendencias;
+}
+
+function nomeLocal(local: LocalGta) {
+	return local.estabelecimento?.nome ??
+		local.exploracao?.nome ??
+		local.nucleo?.nome ??
+		local.frigorifico?.nome ??
+		local.evento?.nome ??
+		local.revendedora?.nome ??
+		local.aeroporto?.nome ??
+		local.responsavel?.nome ??
+		"Local não informado";
+}
+
+export function adicionarPendenciaConfirmacaoGta(emissao: EmissaoGta) {
+	const pendencias = listarPendenciasConfirmacaoGta();
+	const existente = pendencias.find((item) => item.emissaoGtaId === emissao.id);
+	if (existente) return existente;
+
+	const nova: PendenciaGta = {
+		id: Math.max(0, ...pendencias.map((item) => item.id)) + 1,
+		emissaoGtaId: emissao.id,
+		numero: emissao.serieNumero,
+		procedencia: nomeLocal(emissao.procedencia),
+		municipioProcedencia: emissao.procedencia.estabelecimento?.municipio ?? "Minas Gerais",
+		destino: nomeLocal(emissao.destino),
+		municipioDestino: emissao.destino.municipio || "Minas Gerais",
+		dataEmissao: emissao.dataEmissao.split("-").reverse().join("/"),
+		documentoDaeUrl: daeExemploUrl,
+	};
+	salvarColecaoMock(COLECAO, [nova, ...pendencias]);
+	return nova;
 }

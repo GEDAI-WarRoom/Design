@@ -18,9 +18,15 @@ import { listarIndices } from "../Indice/indiceIndice";
 import { listarReceitas } from "../Receita/receitaData";
 import { listarUnidadesMedida } from "../../Geral/UnidadeMedida/unidadeMedidaData";
 import {
+  FUNDOS_ARRECADACAO_MOCK,
+  type Convenio,
+  type FundoArrecadacao,
+} from "../FundoArrecadacao/fundoArrecadacaoData";
+import {
   salvarItemReceita,
   type ItemReceitaVisual,
 } from "./itemReceitaData";
+import { ContribuicaoFundoFields } from "./ContribuicaoFundoFields";
 
 const GREEN = "#1A7A3C";
 
@@ -94,6 +100,18 @@ export function AdicionarItemReceitaPage({
   const [contribuicaoFundo, setContribuicaoFundo] = useState(
     data ? data.contribuicaoFundo : "Sim",
   );
+  const [fundoArrecadacao, setFundoArrecadacao] = useState<FundoArrecadacao | null>(
+    () => FUNDOS_ARRECADACAO_MOCK.find((item) => item.id === data?.fundoArrecadacaoId) ?? null,
+  );
+  const [convenio, setConvenio] = useState<Convenio | null>(
+    () => fundoArrecadacao?.convenios.find((item) => item.id === data?.convenioId) ?? null,
+  );
+  const [quantidadeIndiceFundo, setQuantidadeIndiceFundo] = useState(
+    data?.quantidadeIndiceFundoPrivado != null
+      ? String(data.quantidadeIndiceFundoPrivado).replace(".", ",")
+      : "",
+  );
+  const [erroContribuicaoFundo, setErroContribuicaoFundo] = useState(false);
   const [situacao, setSituacao] = useState<string>(
     data?.situacao ?? "Ativo",
   );
@@ -102,6 +120,16 @@ export function AdicionarItemReceitaPage({
   const [registroSalvo, setRegistroSalvo] = useState<ItemReceitaVisual | null>(null);
 
   const salvar = () => {
+    const contribuiFundo = contribuicaoFundo === "Sim";
+    const quantidadeFundo = Number(quantidadeIndiceFundo.replace(",", "."));
+    if (
+      contribuiFundo &&
+      (!fundoArrecadacao || !convenio || !(quantidadeFundo > 0))
+    ) {
+      setErroContribuicaoFundo(true);
+      return;
+    }
+
     const unidade = listarUnidadesMedida().find((item) => item.id === unidadeMedidaId) ?? listarUnidadesMedida().find((item) => item.situacao === "Ativo")!;
     const receitaSelecionada = listarReceitas().find((item) => item.id === receitaId) ?? listarReceitas().find((item) => item.situacao === "Ativo")!;
     const indiceSelecionado = listarIndices().find((item) => item.id === indiceId) ?? listarIndices().find((item) => item.situacao === "Ativo")!;
@@ -113,7 +141,10 @@ export function AdicionarItemReceitaPage({
       receitaId: receitaSelecionada.id,
       indiceId: indiceSelecionado.id,
       quantidadeIndice: Number((quantidadeIndice || "1,50").replace(",", ".")),
-      permiteContribuicaoFundo: contribuicaoFundo === "Sim",
+      permiteContribuicaoFundo: contribuiFundo,
+      fundoArrecadacaoId: contribuiFundo ? fundoArrecadacao?.id ?? null : null,
+      convenioId: contribuiFundo ? convenio?.id ?? null : null,
+      quantidadeIndiceFundoPrivado: contribuiFundo ? quantidadeFundo : null,
       situacao: situacao as "Ativo" | "Inativo",
     });
     setRegistroSalvo(salvo);
@@ -243,7 +274,15 @@ export function AdicionarItemReceitaPage({
               name="possui-venc"
               required
               value={contribuicaoFundo}
-              onChange={setContribuicaoFundo}
+              onChange={(value) => {
+                setContribuicaoFundo(value ? "Sim" : "Não");
+                setErroContribuicaoFundo(false);
+                if (!value) {
+                  setFundoArrecadacao(null);
+                  setConvenio(null);
+                  setQuantidadeIndiceFundo("");
+                }
+              }}
             />
             {isEdicao && (
               <FloatSelect
@@ -255,6 +294,32 @@ export function AdicionarItemReceitaPage({
               />
             )}
           </div>
+
+          {contribuicaoFundo === "Sim" && (
+            <div className="mt-5 border-t border-gray-100 pt-5">
+              <ContribuicaoFundoFields
+                fundo={fundoArrecadacao}
+                convenio={convenio}
+                quantidadeIndice={quantidadeIndiceFundo}
+                error={erroContribuicaoFundo}
+                onFundoChange={(fundo) => {
+                  setFundoArrecadacao(fundo);
+                  setConvenio(null);
+                  setQuantidadeIndiceFundo("");
+                  setErroContribuicaoFundo(false);
+                }}
+                onConvenioChange={(value) => {
+                  setConvenio(value);
+                  setQuantidadeIndiceFundo("");
+                  setErroContribuicaoFundo(false);
+                }}
+                onQuantidadeIndiceChange={(value) => {
+                  setQuantidadeIndiceFundo(value);
+                  setErroContribuicaoFundo(false);
+                }}
+              />
+            </div>
+          )}
         </Section>
       </main>
 

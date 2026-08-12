@@ -6,10 +6,16 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { listarUnidadesMedida } from "../../Geral/UnidadeMedida/unidadeMedidaData";
 import { listarIndices } from "../Indice/indiceIndice";
 import {
+  FUNDOS_ARRECADACAO_MOCK,
+  type Convenio,
+  type FundoArrecadacao,
+} from "../FundoArrecadacao/fundoArrecadacaoData";
+import {
   listarItensReceita,
   salvarItemReceita,
   type ItemReceitaVisual,
 } from "./itemReceitaData";
+import { ContribuicaoFundoFields } from "./ContribuicaoFundoFields";
 
 interface ItemReceitaTabProps {
   receitaId: number;
@@ -49,6 +55,10 @@ export function ItemReceitaTab({ receitaId, isModalOpen, setIsModalOpen }: ItemR
   const [indice, setIndice] = useState<any>(null);
   const [quantidadeIndice, setQuantidadeIndice] = useState("");
   const [contribuicaoFundo, setContribuicaoFundo] = useState<boolean | string>("Sim");
+  const [fundoArrecadacao, setFundoArrecadacao] = useState<FundoArrecadacao | null>(null);
+  const [convenio, setConvenio] = useState<Convenio | null>(null);
+  const [quantidadeIndiceFundo, setQuantidadeIndiceFundo] = useState("");
+  const [erroContribuicaoFundo, setErroContribuicaoFundo] = useState(false);
 
   const itens = listarItensReceita().filter((item) => item.receitaId === receitaId);
 
@@ -60,6 +70,18 @@ export function ItemReceitaTab({ receitaId, isModalOpen, setIsModalOpen }: ItemR
       setIndice(listarIndices().find((item) => item.id === selectedItem.indiceId) ?? null);
       setQuantidadeIndice(String(selectedItem.quantidadeIndice).replace(".", ","));
       setContribuicaoFundo(selectedItem.contribuicaoFundo);
+      const fundo = FUNDOS_ARRECADACAO_MOCK.find(
+        (item) => item.id === selectedItem.fundoArrecadacaoId,
+      ) ?? null;
+      setFundoArrecadacao(fundo);
+      setConvenio(
+        fundo?.convenios.find((item) => item.id === selectedItem.convenioId) ?? null,
+      );
+      setQuantidadeIndiceFundo(
+        selectedItem.quantidadeIndiceFundoPrivado != null
+          ? String(selectedItem.quantidadeIndiceFundoPrivado).replace(".", ",")
+          : "",
+      );
     } else if (!isModalOpen) {
       // Limpar formulário ao fechar e garantir que o próximo state inicie limpo
       setItemReceita("");
@@ -67,6 +89,10 @@ export function ItemReceitaTab({ receitaId, isModalOpen, setIsModalOpen }: ItemR
       setIndice(null);
       setQuantidadeIndice("");
       setContribuicaoFundo("Sim");
+      setFundoArrecadacao(null);
+      setConvenio(null);
+      setQuantidadeIndiceFundo("");
+      setErroContribuicaoFundo(false);
       setSelectedItem(null);
       setModalMode("add");
     }
@@ -75,6 +101,16 @@ export function ItemReceitaTab({ receitaId, isModalOpen, setIsModalOpen }: ItemR
   const isViewOnly = modalMode === "view";
 
   const handleSalvar = () => {
+    const contribuiFundo = contribuicaoFundo === "Sim" || contribuicaoFundo === true;
+    const quantidadeFundo = Number(quantidadeIndiceFundo.replace(",", "."));
+    if (
+      contribuiFundo &&
+      (!fundoArrecadacao || !convenio || !(quantidadeFundo > 0))
+    ) {
+      setErroContribuicaoFundo(true);
+      return;
+    }
+
     const unidadeSelecionada = unidadeMedida ?? listarUnidadesMedida().find((item) => item.situacao === "Ativo");
     const indiceSelecionado = indice ?? listarIndices().find((item) => item.situacao === "Ativo");
     if (!unidadeSelecionada || !indiceSelecionado) return;
@@ -87,7 +123,10 @@ export function ItemReceitaTab({ receitaId, isModalOpen, setIsModalOpen }: ItemR
       receitaId,
       indiceId: indiceSelecionado.id,
       quantidadeIndice: Number((quantidadeIndice || "1,50").replace(",", ".")),
-      permiteContribuicaoFundo: contribuicaoFundo === "Sim" || contribuicaoFundo === true,
+      permiteContribuicaoFundo: contribuiFundo,
+      fundoArrecadacaoId: contribuiFundo ? fundoArrecadacao?.id ?? null : null,
+      convenioId: contribuiFundo ? convenio?.id ?? null : null,
+      quantidadeIndiceFundoPrivado: contribuiFundo ? quantidadeFundo : null,
       situacao: selectedItem?.situacao ?? "Ativo",
     });
     setIsModalOpen(false);
@@ -268,10 +307,46 @@ export function ItemReceitaTab({ receitaId, isModalOpen, setIsModalOpen }: ItemR
                   name="contribuicaoFundo"
                   required={!isViewOnly}
                   value={contribuicaoFundo === "Sim" || contribuicaoFundo === true}
-                  onChange={(v: boolean) => setContribuicaoFundo(v ? "Sim" : "Não")}
+                  onChange={(v: boolean) => {
+                    setContribuicaoFundo(v ? "Sim" : "Não");
+                    setErroContribuicaoFundo(false);
+                    if (!v) {
+                      setFundoArrecadacao(null);
+                      setConvenio(null);
+                      setQuantidadeIndiceFundo("");
+                    }
+                  }}
                   disabled={isViewOnly}
                 />
               </div>
+
+              {(contribuicaoFundo === "Sim" || contribuicaoFundo === true) && (
+                <div className="md:col-span-2 border-t border-gray-100 pt-5">
+                  <ContribuicaoFundoFields
+                    fundo={fundoArrecadacao}
+                    convenio={convenio}
+                    quantidadeIndice={quantidadeIndiceFundo}
+                    indiceNome={indice?.nome}
+                    disabled={isViewOnly}
+                    error={erroContribuicaoFundo}
+                    onFundoChange={(fundo) => {
+                      setFundoArrecadacao(fundo);
+                      setConvenio(null);
+                      setQuantidadeIndiceFundo("");
+                      setErroContribuicaoFundo(false);
+                    }}
+                    onConvenioChange={(value) => {
+                      setConvenio(value);
+                      setQuantidadeIndiceFundo("");
+                      setErroContribuicaoFundo(false);
+                    }}
+                    onQuantidadeIndiceChange={(value) => {
+                      setQuantidadeIndiceFundo(value);
+                      setErroContribuicaoFundo(false);
+                    }}
+                  />
+                </div>
+              )}
             </div>
           </ModalSection>
 

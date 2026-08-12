@@ -186,7 +186,6 @@ export function VisualizarEstabelecimentoAgropecuarioPage({ onLogout, onNavigate
       allowedTypes={["Responsável Técnico Animal", "Responsável Técnico Vegetal"]}
       cadastroContent={cadastroContent}
       onEditCadastro={() => onNavigate("editar-estabelecimento-agropecuario", registro)}
-      heroImage={registro.imagem ? { src: registro.imagem, alt: `Vista de ${registro.nome}` } : undefined}
       historicoCadastros={historico}
       onEdit={() => onNavigate("editar-estabelecimento-agropecuario", registro)}
       fields={[

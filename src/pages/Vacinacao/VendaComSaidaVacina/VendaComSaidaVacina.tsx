@@ -39,6 +39,16 @@ const DOENCAS_MOCK = [
   { id: 3, nome: "Raiva dos Herbívoros", codigo: "D-03" },
 ];
 
+const DOENCAS_INSUMO_MOCK = [
+  { id: 1, nome: "Brucelose", codigo: "D-02" },
+  { id: 2, nome: "Tuberculose", codigo: "D-04" },
+];
+
+const TIPOS_INSUMO_POR_DOENCA: Record<string, string[]> = {
+  Brucelose: ["Antígeno Acidificado Tamponado (AAT)"],
+  Tuberculose: ["Tuberculina PPD Bovina", "Tuberculina PPD Aviária"],
+};
+
 const VENDAS_MOCK = [
   { 
     id: "1", 
@@ -124,7 +134,9 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate, tipoProduto = "v
   const [numeroPartida, setNumeroPartida] = useState("");
   const [laboratorio, setLaboratorio] = useState("");
   const [doenca, setDoenca] = useState("");
+  const [tipoInsumo, setTipoInsumo] = useState("");
   const [situacao, setSituacao] = useState("");
+  const tiposInsumoDisponiveis = isInsumo && doenca ? (TIPOS_INSUMO_POR_DOENCA[doenca] ?? []) : [];
 
   // Estado que guarda os filtros aplicados de fato após clicar em "Pesquisar"
   const [filtrosAplicados, setFiltrosAplicados] = useState<any>(null);
@@ -149,6 +161,7 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate, tipoProduto = "v
       numeroPartida,
       laboratorio,
       doenca,
+      tipoInsumo,
       situacao
     });
     setHasSearched(true);
@@ -161,6 +174,7 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate, tipoProduto = "v
     fornecedor: index % 2 === 0 ? "Laboratório BioDiagnóstico MG" : "Distribuidora VetTest S/A",
     laboratorio: index % 2 === 0 ? "Tecpar Diagnósticos" : "Laboratório Biovet",
     doenca: index % 2 === 0 ? "Brucelose" : "Tuberculose",
+    tipoInsumo: index % 2 === 0 ? "Antígeno Acidificado Tamponado (AAT)" : index === 1 ? "Tuberculina PPD Bovina" : "Tuberculina PPD Aviária",
   }));
   const dadosFiltrados = listarRegistrosMock(
     isInsumo ? "vendas-saida-insumo" : "vendas-saida-vacina",
@@ -176,6 +190,7 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate, tipoProduto = "v
     if (f.numeroPartida && !venda.partida.toLowerCase().includes(f.numeroPartida.toLowerCase())) return false;
     if (f.laboratorio && !venda.laboratorio.toLowerCase().includes(f.laboratorio.toLowerCase())) return false;
     if (f.doenca && !venda.doenca.toLowerCase().includes(f.doenca.toLowerCase())) return false;
+    if (f.tipoInsumo && venda.tipoInsumo !== f.tipoInsumo) return false;
     if (f.situacao && venda.situacao !== f.situacao) return false;
 
     return true;
@@ -278,6 +293,15 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate, tipoProduto = "v
               onClick={() => setModalDoencaOpen(true)}
             />
 
+            {isInsumo && doenca && (
+              <FloatSelect
+                label="Tipo de Insumo"
+                value={tipoInsumo}
+                onChange={setTipoInsumo}
+                options={tiposInsumoDisponiveis.map((tipo) => ({ value: tipo, label: tipo }))}
+              />
+            )}
+
             <FloatSelect
               label="Situação"
               value={situacao}
@@ -290,7 +314,7 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate, tipoProduto = "v
           </div>
 
          {/* Área de Chips de Filtros Ativos */}
-{(fornecedor || tipoDestinatario || destinatario || cpfCnpjDestinatario || notaFiscal || numeroPartida || laboratorio || doenca || situacao) && (
+{(fornecedor || tipoDestinatario || destinatario || cpfCnpjDestinatario || notaFiscal || numeroPartida || laboratorio || doenca || tipoInsumo || situacao) && (
   <div className="flex flex-wrap gap-2 mt-4 animate-fadeIn">
     {fornecedor && (
       <div className="flex items-center gap-1.5 bg-[#1A7A3C] text-white text-xs px-2.5 py-1.5 rounded-md">
@@ -332,7 +356,13 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate, tipoProduto = "v
     {doenca && (
       <div className="flex items-center gap-1.5 bg-[#1A7A3C] text-white text-xs px-2.5 py-1.5 rounded-md">
         <span>Doença: {doenca}</span>
-        <button onClick={() => { setDoenca(""); setFiltrosAplicados(prev => prev ? { ...prev, doenca: "" } : null); }}><X size={12} /></button>
+        <button onClick={() => { setDoenca(""); setTipoInsumo(""); setFiltrosAplicados(prev => prev ? { ...prev, doenca: "", tipoInsumo: "" } : null); }}><X size={12} /></button>
+      </div>
+    )}
+    {tipoInsumo && (
+      <div className="flex items-center gap-1.5 bg-[#1A7A3C] text-white text-xs px-2.5 py-1.5 rounded-md">
+        <span>Tipo de Insumo: {tipoInsumo}</span>
+        <button onClick={() => { setTipoInsumo(""); setFiltrosAplicados(prev => prev ? { ...prev, tipoInsumo: "" } : null); }}><X size={12} /></button>
       </div>
     )}
     {situacao && (
@@ -496,7 +526,7 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate, tipoProduto = "v
         title="Buscar Doença"
         subtitle="Busque por Doença:"
         icon={<img src={iconeDoencaUrl} alt="Doença" className="w-6 h-6 object-contain" />}        
-        data={DOENCAS_MOCK}
+        data={isInsumo ? DOENCAS_INSUMO_MOCK : DOENCAS_MOCK}
         searchKeys={["nome"]}
         searchPlaceholder="Busque por nome da doença."
         columns={[
@@ -504,6 +534,7 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate, tipoProduto = "v
         ]}
         onConfirm={(item) => {
           setDoenca(item.nome);
+          setTipoInsumo("");
           setModalDoencaOpen(false);
         }}
       />

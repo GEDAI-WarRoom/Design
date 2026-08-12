@@ -6,6 +6,11 @@ import {
 } from "../../../components/ui/historicoCadastroStorage";
 import propriedadeSantaHelenaUrl from "../../../imports/images/propriedade-santa-helena.png";
 import propriedadeSaoJoseUrl from "../../../imports/images/propriedade-sao-jose.png";
+import {
+  listarColecaoMock,
+  proximoIdNumerico,
+  salvarColecaoMock,
+} from "../../../mocks/mockDatabase";
 
 export interface EstabelecimentoAgropecuario {
   id: number;
@@ -16,9 +21,33 @@ export interface EstabelecimentoAgropecuario {
   zona: "Rural" | "Urbana";
   municipioUf: string;
   situacao: "Ativo" | "Inativo" | "Suspenso";
+  tipo?: string;
+  cadastroProvisorio?: string;
+  proprietarioNome?: string;
+  proprietarioDocumento?: string;
+  estado?: string;
+  municipio?: string;
+  cep?: string;
+  bairro?: string;
+  endereco?: string;
+  numero?: string;
+  complemento?: string;
+  localidade?: string;
+  distrito?: string;
+  latitude?: string;
+  longitude?: string;
+  unidadeMedida?: string;
+  areaTotal?: string;
+  areaProdutiva?: string;
+  numeroCar?: string;
+  confrontantes?: string;
+  viasAcesso?: string;
+  documento?: string;
+  descricaoDocumento?: string;
+  observacao?: string;
 }
 
-const CHAVE_ESTABELECIMENTOS = "sidagro:estabelecimentos-agropecuarios";
+const COLECAO = "estabelecimentos-agropecuarios";
 
 export const ESTABELECIMENTOS_INICIAIS: EstabelecimentoAgropecuario[] = [
   {
@@ -52,23 +81,8 @@ export const ESTABELECIMENTOS_INICIAIS: EstabelecimentoAgropecuario[] = [
   },
 ];
 
-function storageDisponivel() {
-  return typeof window !== "undefined" && Boolean(window.localStorage);
-}
-
 export function listarEstabelecimentosAgropecuarios() {
-  if (!storageDisponivel()) return ESTABELECIMENTOS_INICIAIS;
-
-  try {
-    const salvo = window.localStorage.getItem(CHAVE_ESTABELECIMENTOS);
-    if (!salvo) return ESTABELECIMENTOS_INICIAIS;
-    const estabelecimentos = JSON.parse(salvo);
-    return Array.isArray(estabelecimentos)
-      ? (estabelecimentos as EstabelecimentoAgropecuario[])
-      : ESTABELECIMENTOS_INICIAIS;
-  } catch {
-    return ESTABELECIMENTOS_INICIAIS;
-  }
+  return listarColecaoMock(COLECAO, ESTABELECIMENTOS_INICIAIS);
 }
 
 export function obterEstabelecimentoAgropecuario(
@@ -189,12 +203,7 @@ export function salvarEdicaoEstabelecimentoAgropecuario(
     item.id === registroAnterior.id ? dadosAtualizados : item,
   );
 
-  if (storageDisponivel()) {
-    window.localStorage.setItem(
-      CHAVE_ESTABELECIMENTOS,
-      JSON.stringify(listaAtualizada),
-    );
-  }
+  salvarColecaoMock(COLECAO, listaAtualizada);
 
   const historico = registrarVersaoCadastro({
     chaveCadastro: chaveHistorico(registroAnterior),
@@ -205,4 +214,23 @@ export function salvarEdicaoEstabelecimentoAgropecuario(
   });
 
   return { registro: dadosAtualizados, historico };
+}
+
+export function salvarEstabelecimentoAgropecuario(
+  dados: Omit<EstabelecimentoAgropecuario, "id" | "codigo"> & Partial<Pick<EstabelecimentoAgropecuario, "id" | "codigo">>,
+) {
+  const registros = listarEstabelecimentosAgropecuarios();
+  const id = dados.id ?? proximoIdNumerico(registros);
+  const registro: EstabelecimentoAgropecuario = {
+    ...dados,
+    id,
+    codigo: dados.codigo ?? `31${String(id).padStart(9, "0")}`,
+  };
+  salvarColecaoMock(
+    COLECAO,
+    registros.some((item) => item.id === id)
+      ? registros.map((item) => item.id === id ? { ...item, ...registro } : item)
+      : [registro, ...registros],
+  );
+  return registro;
 }

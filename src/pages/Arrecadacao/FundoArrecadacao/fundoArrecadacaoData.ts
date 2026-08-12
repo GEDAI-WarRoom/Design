@@ -198,7 +198,12 @@ export const FUNDOS_ARRECADACAO_MOCK: FundoArrecadacao[] = [
     anexos: [],
     observacao: "",
     situacao: "Ativo",
-    convenios: [],
+    convenios: [
+      {
+        id: 1, cadastradoEm: "2026-07-20", nome: "Convênio FUNDEPEC Arrecadação", numero: "2086341", numeroCarteira: "18", variacaoCarteira: "021", tipoTitulo: "Duplicata de serviço",
+        numeroTitulo: "FUNDEPEC-2026-001", descricao: "Arrecadação de contribuições destinadas ao fundo privado", codigoTipoContaCaucao: "2", mensagemBloqueto: "Receber conforme as condições do convênio", situacao: "Ativo",
+      },
+    ],
   },
   {
     id: 3,

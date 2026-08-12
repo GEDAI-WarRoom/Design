@@ -40,7 +40,6 @@ import { EditarProdutoPage } from "./pages/Geral/Produto/EditarProduto";
 
 import { VisualizarProfissionalOficialPage } from "./pages/Geral/ProfissionalOficial/VisualizarProfissionalOficial";
 import { EditarProfissionalOficialPage } from "./pages/Geral/ProfissionalOficial/EditarProfissionalOficial";
-import { EditarVendaPropriedadePage } from "./pages/Geral/VendaPropriedade/EditarVendaPropriedade";
 import { VisualizarDivisaoMunicipalPage } from "./pages/Geral/DivisaoMunicipal/VisualizarDivisaoMunicipal";
 import { EditarDivisaoMunicipalPage } from "./pages/Geral/DivisaoMunicipal/EditarDivisaoMunicipal";
 import { VisualizarAeroportoPortoPage } from "./pages/Geral/AeroportoPorto/VisualizarAeroportoPorto";
@@ -199,6 +198,8 @@ import { AdicionarAutorizacaoVacinacaoPage } from "./pages/Vacinacao/Autorizacao
 import { AutorizacaoVacinacaoPage } from "./pages/Vacinacao/AutorizacaoVacinacao/AutorizacaoVacinacao";
 import { AdicionarDeclaracaoVacinacaoPage } from "./pages/Vacinacao/DeclaracaoVacinacao/AdicionarDeclaracaoVacinacao";
 import { DeclaracaoVacinacaoPage } from "./pages/Vacinacao/DeclaracaoVacinacao/DeclaracaoVacinacao";
+import { VisualizarDeclaracaoVacinacaoPage } from "./pages/Vacinacao/DeclaracaoVacinacao/VisualizarDeclaracaoVacinacao";
+import { EditarDeclaracaoVacinacaoPage } from "./pages/Vacinacao/DeclaracaoVacinacao/EditarDeclaracaoVacinacao";
 import { AdicionarDoencaPage } from "./pages/Vacinacao/Doenca/AdicionarDoenca";
 import { DoencaPage } from "./pages/Vacinacao/Doenca/Doenca";
 import { AdicionarEtapaVacinacaoPage } from "./pages/Vacinacao/EtapaVacinacao/AdicionarEtapaVacinacao";
@@ -243,8 +244,6 @@ import { VisualizarEtapaVacinacaoPage } from "./pages/Vacinacao/EtapaVacinacao/V
 import { EditarEtapaVacinacaoPage } from "./pages/Vacinacao/EtapaVacinacao/EditarEtapaVacinacao";
 import { VisualizarAutorizacaoVacinacaoPage } from "./pages/Vacinacao/AutorizacaoVacinacao/VisualizarAutorizacaoVacinacao";
 import { EditarAutorizacaoVacinacaoPage } from "./pages/Vacinacao/AutorizacaoVacinacao/EditarAutorizacaoVacinacao";
-import { VisualizarDeclaracaoVacinacaoPage } from "./pages/Vacinacao/DeclaracaoVacinacao/VisualizarDeclaracaoVacinacao";
-import { EditarDeclaracaoVacinacaoPage } from "./pages/Vacinacao/DeclaracaoVacinacao/EditarDeclaracaoVacinacao";
 import { VisualizarDoencaPage } from "./pages/Vacinacao/Doenca/VisualizarDoenca";
 import { EditarDoencaPage } from "./pages/Vacinacao/Doenca/EditarDoenca";
 import { VisualizarVacinadorPage } from "./pages/Vacinacao/Vacinador/VisualizarVacinador";
@@ -264,6 +263,7 @@ import { VisualizarAtestadoExameCadastroPage } from "./pages/Exame/AtestadoExame
 import { AdicionarDAEPage } from "./pages/Arrecadacao/DAE/AdicionarDAE";
 import { DAEBuscaPage } from "./pages/Arrecadacao/DAE/DAE";
 import { VisualizarDAEPage } from "./pages/Arrecadacao/DAE/VisualizarDAE";
+import { BoletosBuscaPage } from "./pages/Arrecadacao/Boletos/Boletos";
 import { FundoArrecadacaoPage } from "./pages/Arrecadacao/FundoArrecadacao/FundoArrecadacao";
 import {
   AdicionarFundoArrecadacaoPage,
@@ -332,8 +332,10 @@ import { AdicionarUsuariosPage } from "./pages/Controle/Usuarios/AdicionarUsuari
 import { UsuariosPage } from "./pages/Controle/Usuarios/Usuarios";
 import { VisualizarUsuariosPage } from "./pages/Controle/Usuarios/VisualizarUsuarios";
 import { ParametrosSistemaPage } from "./pages/Controle/ParametrosSistema/ParametrosSistema";
+import { MeuPerfilPage } from "./pages/Geral/MeuPerfil/MeuPerfil";
 // 1. Adicionamos as novas rotas de Pessoa Jurídica no tipo Screen
 export type Screen =
+| "meu-perfil"
 | "visualizar-laboratorio"
   | "editar-laboratorio"
   | "visualizar-venda-saida-vacina"
@@ -354,6 +356,8 @@ export type Screen =
   | "editar-autorizacao-vacinacao"
   | "visualizar-declaracao-vacinacao"
   | "editar-declaracao-vacinacao"
+  | "declaracao-vacinacao"
+  | "adicionar-declaracao-vacinacao"
   | "visualizar-doenca"
   | "editar-doenca"
   | "visualizar-vacinador-brucelose"
@@ -385,7 +389,6 @@ export type Screen =
   | "editar-profissional-oficial"
   | "visualizar-profissional-oficial"
 | "editar-estabelecimento-agropecuario"
-  | "editar-venda-propriedade"
 | "editar-divisao-municipal"
   | "visualizar-divisao-municipal"
   | "emissao-ata"
@@ -432,6 +435,7 @@ export type Screen =
   | "exploracao-pecuaria" // 🚀 Adicionado
   | "adicionar-exploracao-pecuaria" // 🚀 Adicionado
   | "visualizar-exploracao-pecuaria" // 🚀 Adicionado
+  | "editar-exploracao-pecuaria" // 🚀 Adicionado
   | "atualizacao-cadastral-rebanho"
   | "confirmar-dados-produtor-rebanho"
   | "visualizar-atualizacao-cadastral-rebanho"
@@ -459,8 +463,6 @@ export type Screen =
   | "adicionar-etapa-vacinacao"
   | "autorizacao-vacinacao"
   | "adicionar-autorizacao-vacinacao"
-  | "declaracao-vacinacao"
-  | "adicionar-declaracao-vacinacao"
   | "doenca"
   | "adicionar-doenca"
   | "tipo-insumo-exame"
@@ -557,6 +559,8 @@ export type Screen =
   | "isencao-taxa-gta"
   | "adicionar-isencao-taxa-gta"
   | "recolhimento-mensal-gta"
+  | "boletos-gta"
+  | "relatorio-boletos-gta"
   | "adicionar-recolhimento-mensal-gta"
   | "visualizar-recolhimento-mensal-gta"
   | "editar-recolhimento-mensal-gta"
@@ -632,6 +636,7 @@ export type Screen =
 	| "exploracao-pecuaria" // 🚀 Adicionado
 	| "adicionar-exploracao-pecuaria" // 🚀 Adicionado
 	| "visualizar-exploracao-pecuaria" // 🚀 Adicionado
+	| "editar-exploracao-pecuaria" // 🚀 Adicionado
 	| "atualizacao-cadastral-rebanho"
 	| "confirmar-dados-produtor-rebanho"
 	| "visualizar-atualizacao-cadastral-rebanho"
@@ -659,8 +664,6 @@ export type Screen =
 	| "adicionar-etapa-vacinacao"
 	| "autorizacao-vacinacao"
 	| "adicionar-autorizacao-vacinacao"
-	| "declaracao-vacinacao"
-	| "adicionar-declaracao-vacinacao"
 	| "doenca"
 	| "adicionar-doenca"
 	| "tipo-insumo-exame"
@@ -771,7 +774,9 @@ export type Screen =
 	| "editar-instituicao-ensino-pesquisa"
 	| "isencao-taxa-gta"
 	| "adicionar-isencao-taxa-gta"
-	| "recolhimento-mensal-gta"
+  | "recolhimento-mensal-gta"
+  | "boletos-gta"
+	| "relatorio-boletos-gta"
 	| "adicionar-recolhimento-mensal-gta"
 	| "visualizar-recolhimento-mensal-gta"
 	| "editar-recolhimento-mensal-gta"
@@ -854,6 +859,8 @@ export default function App() {
 	};
 
 	switch (screen) {
+		case "meu-perfil":
+			return <MeuPerfilPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 		// LABORATORIO
     case "visualizar-laboratorio":
       return <VisualizarLaboratorioPage key={`visualizar-laboratorio-${screenData?.id ?? "novo"}`} dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
@@ -903,6 +910,9 @@ export default function App() {
     case "editar-declaracao-vacinacao":
       return <EditarDeclaracaoVacinacaoPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "visualizar-doenca":
+		
+
+
       return <VisualizarDoencaPage key={`visualizar-doenca-${screenData?.id ?? "novo"}`} dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "editar-doenca":
       return <EditarDoencaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
@@ -1038,8 +1048,6 @@ export default function App() {
       return <VendaPropriedadePage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-venda-propriedade":
       return <AdicionarVendaPropriedadePage onLogout={handleLogout} onNavigate={handleNavigate} />;
-    case "editar-venda-propriedade":
-      return <EditarVendaPropriedadePage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "visualizar-venda-propriedade":
       return <VisualizarVendaPropriedadePage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
 		case "divisao-municipal":
@@ -1639,6 +1647,15 @@ export default function App() {
 					dados={screenData}
 				/>
 			);
+		case "editar-exploracao-pecuaria":
+			return (
+				<AdicionarExploracaoPecuariaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					dados={screenData}
+					modoEdicao
+				/>
+			);
 		case "atualizacao-cadastral-rebanho":
 			return (
 				<AtualizacaoCadastralRebanhoPage
@@ -2139,6 +2156,21 @@ export default function App() {
 					onNavigate={handleNavigate}
 				/>
 			);
+		case "boletos-gta":
+			return (
+				<BoletosBuscaPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+				/>
+			);
+		case "relatorio-boletos-gta":
+			return (
+				<RecolhimentoMensalGTAPage
+					onLogout={handleLogout}
+					onNavigate={handleNavigate}
+					portalRepresentante
+				/>
+			);
 		case "adicionar-recolhimento-mensal-gta":
 			return (
 				<AdicionarRecolhimentoMensalGTAPage
@@ -2222,6 +2254,7 @@ export default function App() {
 		case "adicionar-lote-pagamento":
 			return (
 				<AdicionarLotePagamentoPage
+					dados={screenData}
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
 				/>

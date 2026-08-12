@@ -1,4 +1,9 @@
 import { salvarResponsabilidadeTecnica } from "./responsabilidadeTecnicaData";
+import {
+  listarColecaoMock,
+  proximoIdNumerico,
+  salvarColecaoMock,
+} from "../../../mocks/mockDatabase";
 
 export type Situacao = "Ativo" | "Inativo";
 
@@ -100,7 +105,9 @@ const enderecoLavras: EnderecoRevendedora = {
   longitude: "-44.9998",
 };
 
-let revendedoras: Revendedora[] = [
+const COLECAO = "revendedoras-agropecuarias";
+
+const REVENDEDORAS_INICIAIS: Revendedora[] = [
   {
     id: 1,
     codigo: "3100000001",
@@ -159,7 +166,62 @@ let revendedoras: Revendedora[] = [
     endereco: { ...enderecoLavras, municipio: "Varginha", localidade: "Varginha", cep: "37002-000" },
     profissionais: [],
   },
+  {
+    id: 3,
+    codigo: "3100000003",
+    nome: "Cooperativa Campo Mineiro",
+    proprietarios: ["98.765.432/0001-10 - Cooperativa Campo Mineiro"],
+    responsaveis: ["444.009.956-40 - Eloiza Silva"],
+    funcionarios: [],
+    areaAtuacao: ["Animal"],
+    atuacoes: ["Revendedora de Vacinas sob Controle Oficial"],
+    registroAnimal: "124556455",
+    atuacoesAnimal: ["Revendedora de Vacinas sob Controle Oficial"],
+    registroVegetal: "",
+    renasem: "",
+    atuacoesVegetal: [],
+    municipio: "Oliveira",
+    uf: "MG",
+    estado: "Minas Gerais",
+    situacao: "Ativo",
+    endereco: { ...enderecoLavras, municipio: "Oliveira", localidade: "Oliveira", cep: "35540-000" },
+    profissionais: [
+      { id: "prof-5", tipo: "Responsável Técnico Animal", nome: "Eloiza Silva", documento: "444.009.956-40", dataArt: "2026-01-15", arquivoArt: "art-eloiza-cooperativa.pdf", situacao: "Ativo", atualizadoEm: "2026-07-15" },
+    ],
+  },
+  {
+    id: 4,
+    codigo: "3100000004",
+    nome: "Agropecuária Serra Azul",
+    proprietarios: ["45.678.901/0001-22 - Agropecuária Serra Azul Ltda"],
+    responsaveis: ["444.009.956-40 - Eloiza Silva"],
+    funcionarios: [],
+    areaAtuacao: ["Animal"],
+    atuacoes: ["Revendedora de Vacinas sob Controle Oficial"],
+    registroAnimal: "124556456",
+    atuacoesAnimal: ["Revendedora de Vacinas sob Controle Oficial"],
+    registroVegetal: "",
+    renasem: "",
+    atuacoesVegetal: [],
+    municipio: "Belo Horizonte",
+    uf: "MG",
+    estado: "Minas Gerais",
+    situacao: "Ativo",
+    endereco: { ...enderecoLavras, municipio: "Belo Horizonte", localidade: "Belo Horizonte", cep: "30130-100" },
+    profissionais: [
+      { id: "prof-6", tipo: "Responsável Técnico Animal", nome: "Eloiza Silva", documento: "444.009.956-40", dataArt: "2026-02-10", arquivoArt: "art-eloiza-serra-azul.pdf", situacao: "Ativo", atualizadoEm: "2026-07-22" },
+    ],
+  },
 ];
+
+function listarRevendedoras() {
+  const registros = listarColecaoMock(COLECAO, REVENDEDORAS_INICIAIS);
+  const faltantes = REVENDEDORAS_INICIAIS.filter((item) => !registros.some((registro) => registro.id === item.id));
+  if (!faltantes.length) return registros;
+  const atualizados = [...registros, ...faltantes];
+  salvarColecaoMock(COLECAO, atualizados);
+  return atualizados;
+}
 
 function formatarProfissional(item: ProfissionalVinculado) {
   return `${item.documento} - ${item.nome}`;
@@ -181,16 +243,18 @@ function sincronizarVinculos(revendedora: Revendedora): Revendedora {
 }
 
 export function getRevendedoras() {
-  return revendedoras.map((item) => ({ ...item }));
+  return listarRevendedoras();
 }
 
 export function getRevendedora(id?: number) {
+  const revendedoras = listarRevendedoras();
   return revendedoras.find((item) => item.id === id) ?? revendedoras[0];
 }
 
 export function adicionarRevendedora(
   dados: Omit<Revendedora, "id" | "codigo" | "responsaveis" | "funcionarios" | "profissionais">,
 ) {
+  const revendedoras = listarRevendedoras();
   const codigoEstado = obterCodigoIbgeEstado(dados.estado);
   if (!codigoEstado) throw new Error("Estado inválido para geração do código da revendedora.");
   const maiorSequencial = revendedoras
@@ -205,7 +269,7 @@ export function adicionarRevendedora(
     funcionarios: [],
     profissionais: [],
   };
-  revendedoras = [...revendedoras, nova];
+  salvarColecaoMock(COLECAO, [...revendedoras, nova]);
   return nova;
 }
 
@@ -253,12 +317,14 @@ export function obterCodigoIbgeEstado(estado: string) {
 }
 
 export function atualizarRevendedora(id: number, dados: Partial<Revendedora>) {
+  const revendedoras = listarRevendedoras();
   let atualizada: Revendedora | undefined;
-  revendedoras = revendedoras.map((item) => {
+  const registrosAtualizados = revendedoras.map((item) => {
     if (item.id !== id) return item;
     atualizada = sincronizarVinculos({ ...item, ...dados });
     return atualizada;
   });
+  salvarColecaoMock(COLECAO, registrosAtualizados);
   return atualizada;
 }
 

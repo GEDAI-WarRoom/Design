@@ -10,6 +10,7 @@ import {
 } from "../../../mocks/mockDatabase";
 import { listarEspecies } from "../../Animal/Especie/especieData";
 import { listarItensReceita, obterItemReceita } from "../../Arrecadacao/ItemReceita/itemReceitaData";
+import { listarPapeis } from "../../Controle/Papeis/papeisData";
 
 export type TipoCobranca =
   | "Por Cabeça"
@@ -41,6 +42,12 @@ export interface FinalidadeTaxa {
   especiesIds: number[];
 }
 
+export interface PapelTaxa {
+  id: number;
+  nome: string;
+  tipo: "Base" | "Complementar";
+}
+
 export interface ItemReceitaTaxa {
   id: string;
   codigo: string;
@@ -55,6 +62,7 @@ export interface TaxaEmissaoGta {
   dataInicioVigencia: string;
   especies: EspecieTaxa[];
   finalidades: FinalidadeTaxa[];
+  papeis: PapelTaxa[];
   cobrancasTaxa: CobrancaTaxa[];
   tipoCobranca: TipoCobranca;
   situacao: "Ativo" | "Inativo";
@@ -171,6 +179,12 @@ export function listarItensReceitaTaxa() {
     }));
 }
 
+export function listarPapeisTaxa() {
+  return listarPapeis()
+    .filter((item) => item.situacao === "Ativo")
+    .map(({ id, nome, tipo }) => ({ id, nome, tipo }));
+}
+
 export const TIPOS_COBRANCA = [
   { value: "Por Cabeça", label: "Por Cabeça" },
   { value: "Por Documento", label: "Por Documento" },
@@ -211,6 +225,7 @@ export const TAXAS_EMISSAO_GTA_MOCK: TaxaEmissaoGta[] = [
     dataInicioVigencia: "2026-01-01",
     especies: [ESPECIES_TAXA_MOCK[0], ESPECIES_TAXA_MOCK[1]],
     finalidades: [FINALIDADES_TAXA_MOCK[0], FINALIDADES_TAXA_MOCK[1]],
+    papeis: listarPapeisTaxa().slice(0, 2),
     cobrancasTaxa: [
       "Documento para Dentro do Estado",
       "Documento para Fora do Estado",
@@ -226,6 +241,7 @@ export const TAXAS_EMISSAO_GTA_MOCK: TaxaEmissaoGta[] = [
     dataInicioVigencia: "2026-02-15",
     especies: [ESPECIES_TAXA_MOCK[2]],
     finalidades: [FINALIDADES_TAXA_MOCK[2]],
+    papeis: listarPapeisTaxa().slice(1, 3),
     cobrancasTaxa: ["Documento para Fora do Estado"],
     tipoCobranca: "Por Lotes",
     situacao: "Ativo",
@@ -239,6 +255,7 @@ export const TAXAS_EMISSAO_GTA_MOCK: TaxaEmissaoGta[] = [
     dataInicioVigencia: "2026-03-01",
     especies: [ESPECIES_TAXA_MOCK[4]],
     finalidades: [FINALIDADES_TAXA_MOCK[0], FINALIDADES_TAXA_MOCK[3]],
+    papeis: listarPapeisTaxa().slice(0, 1),
     cobrancasTaxa: ["Documento para Dentro do Estado"],
     tipoCobranca: "Por Faixas",
     situacao: "Inativo",
@@ -258,6 +275,7 @@ export const criarTaxaVazia = (): TaxaEmissaoGtaDraft => ({
   dataInicioVigencia: "",
   especies: [],
   finalidades: [],
+  papeis: [],
   cobrancasTaxa: [],
   tipoCobranca: "" as TipoCobranca,
   situacao: "Ativo",
@@ -302,6 +320,7 @@ export function listarTaxasEmissaoDocumentoSanitario() {
           especiesAtuais.find((item) => item.id === especie.id) ?? especie,
       ),
       finalidades: Array.isArray(taxa.finalidades) ? taxa.finalidades : [],
+      papeis: Array.isArray(taxa.papeis) ? taxa.papeis : [],
       cobrancasTaxa: Array.isArray(taxa.cobrancasTaxa)
         ? taxa.cobrancasTaxa
         : [],
@@ -367,6 +386,9 @@ function normalizarTaxa(
     finalidades: Array.isArray(dados.finalidades)
       ? dados.finalidades.map((finalidade) => ({ ...finalidade }))
       : referencia.finalidades,
+    papeis: Array.isArray(dados.papeis)
+      ? dados.papeis.map((papel) => ({ ...papel }))
+      : referencia.papeis,
     cobrancasTaxa: Array.isArray(dados.cobrancasTaxa)
       ? dados.cobrancasTaxa
       : referencia.cobrancasTaxa,
