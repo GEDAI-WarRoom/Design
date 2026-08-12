@@ -60,6 +60,7 @@ import {
   NUCLEOS_EXTERNOS_GTA,
   OUTROS_LOCAIS_GTA,
   PESSOAS_GTA,
+  PESSOAS_FISICAS_GTA,
   REVENDEDORAS_ANIMAIS_GTA,
   TIPOS_ATESTADO_EXAME_GTA,
   TIPOS_FORMULARIO_GTA,
@@ -629,58 +630,31 @@ function RequerenteInput({
   onChange: (entidade: EntidadeGta) => void;
   disabled: boolean;
 }) {
-  const [tipoPessoa, setTipoPessoa] = useState<"PF" | "PJ" | "">("");
-  const pessoas = PESSOAS_GTA.map((pessoa) => ({
-    ...pessoa,
-    tipo: pessoa.documento?.includes("/") ? "PJ" : "PF",
-  }));
-  const pessoasFiltradas = tipoPessoa
-    ? pessoas.filter((pessoa) => pessoa.tipo === tipoPessoa)
-    : pessoas;
-  const documentoEhCnpj = value?.documento?.includes("/");
-
   return (
     <div className={value ? "grid grid-cols-1 gap-4 md:grid-cols-2 md:items-end" : "w-full"}>
       <EntitySearchInput
         label="Requerente"
-        placeholder="Buscar pessoa física ou jurídica"
+        placeholder="Buscar pessoa física"
         required
         value={value?.nome ?? ""}
-        data={pessoasFiltradas}
+        data={PESSOAS_FISICAS_GTA}
         searchKeys={["nome", "documento"]}
         columns={[
-          { label: tipoPessoa === "PJ" ? "Razão Social" : tipoPessoa === "PF" ? "Nome" : "Nome/Razão Social", key: "nome" },
-          { label: tipoPessoa === "PJ" ? "CNPJ" : tipoPessoa === "PF" ? "CPF" : "CPF/CNPJ", key: "documento" },
+          { label: "Nome", key: "nome" },
+          { label: "CPF", key: "documento" },
         ]}
         title="Buscar Requerente"
-        subtitle="Busque uma pessoa física ou jurídica cadastrada no sistema:"
-        icon={<img src={Icons.iconeProdutorUrl} alt="" className="h-5 w-5 object-contain" />}
+        subtitle="Busque uma pessoa física cadastrada no sistema:"
+        icon={<User size={18} />}
         confirmLabel="Confirmar"
         disabled={disabled}
-        headerActions={
-          <div className="w-48 pr-1">
-            <FloatSelect
-              label="Tipo de Pessoa"
-              required
-              value={tipoPessoa}
-              onChange={(tipo) => setTipoPessoa(tipo as "PF" | "PJ" | "")}
-              options={[
-                { value: "PF", label: "Pessoa Física" },
-                { value: "PJ", label: "Pessoa Jurídica" },
-              ]}
-            />
-          </div>
-        }
-        onChange={(requerente) => {
-          onChange(requerente);
-          setTipoPessoa("");
-        }}
+        onChange={onChange}
       />
       {value && (
         <div className="flex items-end gap-2">
           <div className="flex-1">
             <FloatInput
-              label={documentoEhCnpj ? "CNPJ" : "CPF"}
+              label="CPF"
               value={value.documento ?? ""}
               disabled
               required

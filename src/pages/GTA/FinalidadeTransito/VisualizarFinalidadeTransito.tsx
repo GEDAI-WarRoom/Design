@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ArrowLeft, ChevronDown, ChevronUp } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
-import { CheckboxGroup, FloatInput } from "../../../components/ui/FormKit";
+import { CheckboxGroup, FloatInput, LargeTextArea } from "../../../components/ui/FormKit";
 import { obterFinalidadeTransito } from "./finalidadeTransitoData";
 
 const GREEN = "#1A7A3C";
@@ -51,9 +51,12 @@ export function VisualizarFinalidadeTransitoPage({ dados, onLogout, onNavigate }
         </div>
 
         <Section title="Informações Básicas">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <FloatInput label="Finalidade de Trânsito" value={finalidade.finalidade} disabled />
-            <FloatInput label="Código do MAPA" value={finalidade.codigoMapa || "01"} disabled />
+          <div className="flex flex-col gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <FloatInput label="Finalidade de Trânsito" value={finalidade.finalidade} disabled />
+              <FloatInput label="Código do MAPA" value={finalidade.codigoMapa || "01"} disabled />
+            </div>
+            <LargeTextArea label="Descrição" value={finalidade.descricao ?? ""} onChange={() => {}} disabled />
           </div>
         </Section>
 
