@@ -803,7 +803,7 @@ export const secondaryCategories: MenuCategory[] = [
       },
 
       {
-        label: "Venda com Entrada de Insumos para Exames",
+        label: "Venda com Entrada de Insumos",
         route: "venda-entrada-insumos-exames",
         icon: <PackagePlus size={16} />,
       },

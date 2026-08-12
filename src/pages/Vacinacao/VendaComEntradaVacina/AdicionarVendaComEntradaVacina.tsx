@@ -318,6 +318,8 @@ export function AdicionarVendaComEntradaVacinaPage({ onLogout, onNavigate, mode 
 
   const totaisPorVacina = useMemo(() => {
     const map = new Map<string, number>();
+  const totaisPorDoenca = useMemo(() => {
+    const map = new Map<string, { doenca: string; tipoVacina: string; total: number }>();
     lotes.forEach((l) => {
       const nome = l.doenca?.nome;
       if (!nome) return;
@@ -332,6 +334,14 @@ export function AdicionarVendaComEntradaVacinaPage({ onLogout, onNavigate, mode 
       const [doenca, tipoVacina] = chave.split("|||");
       return { doenca, tipoVacina, total };
     });
+      const chave = `${nome}::${tipoVacina}`;
+      const totalLote = l.apresentacoes.reduce(
+        (s: number, a: any) => s + totalDosesApresentacao(a.frascos, a.dosesPorFrasco), 0
+      );
+      const atual = map.get(chave);
+      map.set(chave, { doenca: nome, tipoVacina, total: (atual?.total || 0) + totalLote });
+    });
+    return Array.from(map.values());
   }, [lotes]);
 
   const registroAtual = preencherComExemplo({
@@ -530,6 +540,10 @@ export function AdicionarVendaComEntradaVacinaPage({ onLogout, onNavigate, mode 
                       <div key={`${t.doenca}-${t.tipoVacina}`} className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                         <FloatInput label="Doença" disabled value={t.doenca} onChange={() => { }} />
                         <FloatInput label="Tipo de Vacina" disabled value={t.tipoVacina || "Não se aplica"} onChange={() => { }} />
+                    {totaisPorDoenca.map((t) => (
+                      <div key={`${t.doenca}-${t.tipoVacina}`} className={`grid grid-cols-1 gap-4 items-end ${t.tipoVacina ? "md:grid-cols-3" : "md:grid-cols-2"}`}>
+                        <FloatInput label="Doença" disabled value={t.doenca} onChange={() => { }} />
+                        {t.tipoVacina && <FloatInput label="Tipo de Vacina" disabled value={t.tipoVacina} onChange={() => { }} />}
                         <FloatInput label="Total de Doses Adquiridas" disabled value={String(t.total)} onChange={() => { }} />
                       </div>
                     ))}
