@@ -7,8 +7,6 @@ import {
   Eye as ViewIcon,
   Pencil,
   X,
-  Check,
-  Minus,
   Store,
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
@@ -74,23 +72,6 @@ const VENDAS_MOCK: VendaEntrada[] = [
     fornecedor: "Vacinas Imunotech", doenca: "Raiva", tipoVacina: "", situacao: "Gravada",
   },
 ];
-
-function SituacaoBadge({ situacao }: { situacao: "Gravada" | "Cancelada" }) {
-  const map = {
-    Gravada: { bg: "#E6F4EA", border: "#A3E2B8", text: "#1A7A3C", Icon: Check },
-    Cancelada: { bg: "#F3F4F6", border: "#E5E7EB", text: "#6B7280", Icon: Minus },
-  } as const;
-  const { bg, border, text, Icon } = map[situacao];
-  return (
-    <span
-      className="inline-flex items-center gap-1.5 px-3 h-7 rounded-full text-xs font-semibold whitespace-nowrap"
-      style={{ backgroundColor: bg, border: `1px solid ${border}`, color: text }}
-    >
-      <Icon size={13} strokeWidth={3} />
-      {situacao}
-    </span>
-  );
-}
 
 function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
@@ -383,6 +364,9 @@ export function VendaComEntradaVacinaPage({ onLogout, onNavigate }: PageProps) {
                     <thead>
                       <tr className="bg-gray-30 border-b border-gray-100">
                         <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap uppercase text-xs tracking-wider">
+                          Fornecedor
+                        </th>
+                        <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap uppercase text-xs tracking-wider">
                           Revendedora de Produtos <br /> Agropecuários
                         </th>
                         <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap uppercase text-xs tracking-wider">
@@ -390,9 +374,6 @@ export function VendaComEntradaVacinaPage({ onLogout, onNavigate }: PageProps) {
                         </th>
                         <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap uppercase text-xs tracking-wider">
                           Número da <br /> Partida
-                        </th>
-                        <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap uppercase text-xs tracking-wider">
-                          Fornecedor
                         </th>
                         <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap uppercase text-xs tracking-wider">
                           Doença
@@ -406,6 +387,7 @@ export function VendaComEntradaVacinaPage({ onLogout, onNavigate }: PageProps) {
                     <tbody>
                       {pagina.map((v) => (
                         <tr key={v.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/60 transition">
+                          <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{v.fornecedor}</td>
                           <td className="px-4 py-3 whitespace-nowrap">
                             <div className="flex flex-col">
                               <span className="text-sm font-regular text-gray-700">
@@ -418,7 +400,6 @@ export function VendaComEntradaVacinaPage({ onLogout, onNavigate }: PageProps) {
                           </td>
                           <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{v.numeroNotaFiscal}</td>
                           <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{v.numeroPartida}</td>
-                          <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{v.fornecedor}</td>
                           <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
                             {v.doenca}{v.tipoVacina ? ` (${v.tipoVacina})` : ""}
                           </td>
