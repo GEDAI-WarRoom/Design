@@ -20,10 +20,10 @@ const criarParametro = (alteracoes = {}) => ({
   ...alteracoes,
 });
 
-test("mantém os 84 parâmetros mockados nos dois agrupamentos de GTA", () => {
+test("mantém os 87 parâmetros mockados nos dois agrupamentos de GTA", () => {
   const parametros = listarParametrosSistema();
-  assert.equal(parametros.length, 84);
-  assert.equal(parametros.filter((item) => item.cadastroId === "gta-gerais").length, 72);
+  assert.equal(parametros.length, 87);
+  assert.equal(parametros.filter((item) => item.cadastroId === "gta-gerais").length, 75);
   assert.equal(parametros.filter((item) => item.cadastroId === "gta-funcionalidades").length, 12);
 });
 

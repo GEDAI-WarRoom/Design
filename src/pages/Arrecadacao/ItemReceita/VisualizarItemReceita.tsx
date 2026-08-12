@@ -50,6 +50,19 @@ export function VisualizarItemReceitaPage({ onLogout, onNavigate, data }: PagePr
             <FloatInput label="Índice" value={item.indice} disabled onChange={() => {}} />
             <FloatInput label="Quantidade do Índice" value={item.quantidadeIndiceFormatada} disabled onChange={() => {}} />
             <FloatInput label="Possui Contribuição ao Fundo?" value={item.contribuicaoFundo} disabled onChange={() => {}} />
+            {item.permiteContribuicaoFundo && (
+              <>
+                <FloatInput label="Fundo de Arrecadação" value={item.fundoArrecadacao} disabled onChange={() => {}} />
+                <FloatInput label="Convênio" value={item.convenio} disabled onChange={() => {}} />
+                <FloatInput
+                  label="Quantidade do Índice destinada ao Fundo Privado"
+                  value={item.quantidadeIndiceFundoPrivadoFormatada}
+                  disabled
+                  onChange={() => {}}
+                  className="md:col-span-2"
+                />
+              </>
+            )}
             <FloatInput label="Situação" value={item.situacao} disabled onChange={() => {}} />
           </div>
         </section>

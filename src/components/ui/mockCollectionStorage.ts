@@ -25,9 +25,12 @@ export function listarRegistrosMock<T extends RegistroIdentificavel>(
   registrosIniciais: T[],
 ) {
   const alteracoes = carregarAlteracoes<T>(colecao);
-  return registrosIniciais.map(
+  const idsIniciais = new Set(registrosIniciais.map((registro) => registro.id));
+  const registrosAtualizados = registrosIniciais.map(
     (registro) => alteracoes.find((item) => item.id === registro.id) ?? registro,
   );
+  const registrosAdicionados = alteracoes.filter((registro) => !idsIniciais.has(registro.id));
+  return [...registrosAtualizados, ...registrosAdicionados];
 }
 
 export function obterRegistroMock<T extends RegistroIdentificavel>(

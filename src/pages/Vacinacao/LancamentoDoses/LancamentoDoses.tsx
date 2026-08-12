@@ -1,15 +1,11 @@
 import { useState } from "react";
 import {
   ArrowLeft,
-  Search,
   ChevronLeft,
   ChevronRight,
   Eye as ViewIcon,
   Pencil,
   X,
-  Check,
-  Minus,
-  Store,
   Calendar
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
@@ -20,26 +16,17 @@ import * as Icons from "../../../imports/icons";
 
 const GREEN = "#1A7A3C";
 
-// ==========================================================
-// MOCKS DE ENTIDADE
-// ==========================================================
-const REVENDEDORAS_MOCK = [
-  { id: 1, codigo: "3120938028", nome: "Comercial AgroVat", uf: "MG" },
-  { id: 2, codigo: "3120938045", nome: "Agropecuária Vale Verde", uf: "MG" },
-  { id: 3, codigo: "3120938090", nome: "Casa do Produtor Lavras", uf: "MG" },
-];
-
 const DOENCAS_MOCK = [
   { id: 1, codigo: "D-001", nome: "Brucelose", tiposVacina: ["B19", "RB51"] },
   { id: 2, codigo: "D-002", nome: "Raiva", tiposVacina: [] },
   { id: 3, codigo: "D-003", nome: "Febre Aftosa", tiposVacina: ["O1 Campos", "A24 Cruzeiro"] },
 ];
 
-const TIPOS_LANCAMENTO = [
-  { value: "Ajuste de Saldo de Vacina", label: "Ajuste de Saldo de Vacina" },
-  { value: "Entrada Nota Fiscal Revendedora", label: "Entrada Nota Fiscal Revendedora" },
-  { value: "Compra de Vacina Revendedora", label: "Compra de Vacina Revendedora" },
-  { value: "Compra de Vacina Pessoa", label: "Compra de Vacina Pessoa" },
+const TIPOS_DESTINATARIO = [
+  { value: "produtor", label: "Produtor" },
+  { value: "vacinador", label: "Vacinador" },
+  { value: "medico_veterinario", label: "Médico Veterinário" },
+  { value: "revendedora", label: "Revendedora de Produtos Agropecuários" },
 ];
 
 const SITUACOES = [
@@ -49,21 +36,30 @@ const SITUACOES = [
 
 interface Lancamento {
   id: number;
-  revendedoraCodigo: string;
-  revendedoraNome: string;
-  numeroNotaFiscal: string;
+  tipoDestinatario: "produtor" | "vacinador" | "medico_veterinario" | "revendedora";
+  destinatarioDocumento: string;
+  destinatarioNome: string;
   numeroPartida: string;
   doenca: string;
   tipoVacina: string;
-  tipoLancamento: string;
+  dataAjuste: string;
   situacao: "Gravada" | "Cancelada";
 }
 
 const LANCAMENTOS_MOCK: Lancamento[] = [
-  { id: 1, revendedoraCodigo: "3120938028", revendedoraNome: "Comercial AgroVat", numeroNotaFiscal: "1234567", numeroPartida: "025/24", doenca: "Brucelose", tipoVacina: "B19", tipoLancamento: "Ajuste de Saldo de Vacina", situacao: "Gravada" },
-  { id: 2, revendedoraCodigo: "3120938045", revendedoraNome: "Agropecuária Vale Verde", numeroNotaFiscal: "7654321", numeroPartida: "006/23", doenca: "Febre Aftosa", tipoVacina: "O1 Campos", tipoLancamento: "Compra de Vacina Revendedora", situacao: "Cancelada" },
-  { id: 3, revendedoraCodigo: "3120938090", revendedoraNome: "Casa do Produtor Lavras", numeroNotaFiscal: "9080706", numeroPartida: "100/24", doenca: "Raiva", tipoVacina: "", tipoLancamento: "Compra de Vacina Pessoa", situacao: "Gravada" },
+  { id: 1, tipoDestinatario: "revendedora", destinatarioDocumento: "3120938028", destinatarioNome: "Comercial AgroVat", numeroPartida: "025/24", doenca: "Brucelose", tipoVacina: "B19", dataAjuste: "2026-07-03", situacao: "Gravada" },
+  { id: 2, tipoDestinatario: "produtor", destinatarioDocumento: "55566677788", destinatarioNome: "José Aarão Neto", numeroPartida: "006/23", doenca: "Febre Aftosa", tipoVacina: "O1 Campos", dataAjuste: "2026-06-18", situacao: "Cancelada" },
+  { id: 3, tipoDestinatario: "vacinador", destinatarioDocumento: "11122233344", destinatarioNome: "Ana Pereira", numeroPartida: "100/24", doenca: "Raiva", tipoVacina: "", dataAjuste: "2026-08-01", situacao: "Gravada" },
+  { id: 4, tipoDestinatario: "medico_veterinario", destinatarioDocumento: "98765432100", destinatarioNome: "Carlos Mendes", numeroPartida: "041/26", doenca: "Brucelose", tipoVacina: "RB51", dataAjuste: "2026-08-08", situacao: "Gravada" },
 ];
+
+function normalizarTexto(valor: string) {
+  return valor
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase("pt-BR")
+    .trim();
+}
 
 function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
@@ -80,18 +76,17 @@ interface PageProps {
 }
 
 export function LancamentoDosesVacinaPage({ onLogout, onNavigate }: PageProps) {
-  const [revendedora, setRevendedora] = useState<any | null>(null);
-  const [numeroNotaFiscal, setNumeroNotaFiscal] = useState("");
+  const [tipoDestinatario, setTipoDestinatario] = useState("");
+  const [destinatario, setDestinatario] = useState("");
+  const [destinatarioDocumento, setDestinatarioDocumento] = useState("");
   const [numeroPartida, setNumeroPartida] = useState("");
   const [doenca, setDoenca] = useState<any | null>(null);
   const [tipoVacina, setTipoVacina] = useState("");
-  const [tipoLancamento, setTipoLancamento] = useState("");
   const [periodoDe, setPeriodoDe] = useState("");
   const [periodoAte, setPeriodoAte] = useState("");
   const [situacao, setSituacao] = useState("");
 
   const [hasSearched, setHasSearched] = useState(false);
-  const [erroRevendedora, setErroRevendedora] = useState(false);
 
   const [page, setPage] = useState(1);
   const perPage = 10;
@@ -102,24 +97,25 @@ export function LancamentoDosesVacinaPage({ onLogout, onNavigate }: PageProps) {
   const periodoInvalido = periodoDe && periodoAte && periodoAte < periodoDe;
 
   const handlePesquisar = () => {
-    if (!revendedora) {
-      setErroRevendedora(true);
+    if (periodoInvalido) {
       setHasSearched(false);
       return;
     }
-    setErroRevendedora(false);
     setHasSearched(true);
     setPage(1);
   };
 
   const filtrados = listarRegistrosMock("lancamentos-doses-vacina", LANCAMENTOS_MOCK).filter((l) => {
-    const matchRev = !revendedora || l.revendedoraCodigo === revendedora.codigo;
-    const matchNF = numeroNotaFiscal === "" || l.numeroNotaFiscal.includes(numeroNotaFiscal);
+    const matchTipoDestinatario = !tipoDestinatario || l.tipoDestinatario === tipoDestinatario;
+    const matchDestinatario = !destinatario || normalizarTexto(l.destinatarioNome).includes(normalizarTexto(destinatario));
+    const matchDocumento = !destinatarioDocumento || l.destinatarioDocumento.replace(/\D/g, "").includes(destinatarioDocumento);
     const matchPartida = numeroPartida === "" || l.numeroPartida.includes(numeroPartida);
     const matchDoenca = !doenca || l.doenca === doenca.nome;
     const matchTipoVacina = tipoVacina === "" || l.tipoVacina === tipoVacina;
-    const matchTipoLanc = tipoLancamento === "" || l.tipoLancamento === tipoLancamento;
-    return matchRev && matchNF && matchPartida && matchDoenca && matchTipoVacina && matchTipoLanc;
+    const matchPeriodoDe = !periodoDe || l.dataAjuste >= periodoDe;
+    const matchPeriodoAte = !periodoAte || l.dataAjuste <= periodoAte;
+    const matchSituacao = !situacao || l.situacao === situacao;
+    return matchTipoDestinatario && matchDestinatario && matchDocumento && matchPartida && matchDoenca && matchTipoVacina && matchPeriodoDe && matchPeriodoAte && matchSituacao;
   });
 
   const total = filtrados.length;
@@ -129,7 +125,8 @@ export function LancamentoDosesVacinaPage({ onLogout, onNavigate }: PageProps) {
   const fim = Math.min(pageAtual * perPage, total);
   const pagina = filtrados.slice((pageAtual - 1) * perPage, pageAtual * perPage);
 
-  const temFiltroAtivo = revendedora || numeroNotaFiscal || numeroPartida || doenca || tipoVacina || tipoLancamento || periodoDe || periodoAte || situacao;
+  const temFiltroAtivo = Boolean(tipoDestinatario || destinatario || destinatarioDocumento || numeroPartida || doenca || tipoVacina || periodoDe || periodoAte || situacao);
+  const tipoDestinatarioLabel = TIPOS_DESTINATARIO.find((tipo) => tipo.value === tipoDestinatario)?.label;
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
@@ -152,26 +149,19 @@ export function LancamentoDosesVacinaPage({ onLogout, onNavigate }: PageProps) {
         <div className="bg-white rounded-xl shadow-sm mt-5 overflow-hidden">
           <div className="p-6 border-b border-gray-100">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              <EntitySearchInput
-                label="Revendedora de Produtos Agropecuários"
-                required
-                placeholder="Buscar por código ou nome."
-                value={revendedora ? ` ${revendedora.nome}` : ""}
-                data={REVENDEDORAS_MOCK}
-                searchKeys={["codigo", "nome"]}
-                columns={[{ label: "Código", key: "codigo" }, { label: "Nome", key: "nome" }, { label: "UF", key: "uf" }]}
-                icon={<Store size={18} color={GREEN} />}
-                title="Buscar Revendedora"
-                subtitle="Busque por uma revendedora de produtos agropecuários cadastrada:"
-                onChange={(ent) => { setRevendedora(ent); setErroRevendedora(false); }}
+              <FloatSelect
+                label="Tipo de Destinatário"
+                value={tipoDestinatario}
+                onChange={setTipoDestinatario}
+                options={TIPOS_DESTINATARIO}
               />
-              <div className="relative border border-gray-300 rounded-md h-12 flex items-end px-3 pb-1.5 bg-white focus-within:border-[#1A7A3C] focus-within:ring-1 focus-within:ring-[#1A7A3C]">
-                <label className={`absolute left-3 transition-all ${numeroNotaFiscal ? "top-1 text-[10px] text-gray-400 font-medium" : "top-1/2 -translate-y-1/2 text-sm text-gray-400"}`}>Número da Nota Fiscal</label>
-                <input type="text" inputMode="numeric" maxLength={30} value={numeroNotaFiscal} onChange={(e) => setNumeroNotaFiscal(e.target.value.replace(/\D/g, ""))} className="w-full bg-transparent text-sm text-gray-800 outline-none h-6" />
-              </div>
-              <button onClick={handlePesquisar} className="h-11 px-8 rounded-md text-white text-sm font-semibold transition hover:opacity-90 lg:row-span-1" style={{ backgroundColor: GREEN }}>
-                Pesquisar
-              </button>
+              <FloatInput label="Destinatário" value={destinatario} maxLength={255} onChange={setDestinatario} />
+              <FloatInput
+                label="CPF/CNPJ do Destinatário"
+                value={destinatarioDocumento}
+                maxLength={14}
+                onChange={(valor) => setDestinatarioDocumento(valor.replace(/\D/g, "").slice(0, 14))}
+              />
 
               <div className="relative border border-gray-300 rounded-md h-12 flex items-end px-3 pb-1.5 bg-white focus-within:border-[#1A7A3C] focus-within:ring-1 focus-within:ring-[#1A7A3C]">
                 <label className={`absolute left-3 transition-all ${numeroPartida ? "top-1 text-[10px] text-gray-400 font-medium" : "top-1/2 -translate-y-1/2 text-sm text-gray-400"}`}>Número da Partida</label>
@@ -197,23 +187,22 @@ export function LancamentoDosesVacinaPage({ onLogout, onNavigate }: PageProps) {
               <FloatInput label="Período - De" type="date" value={periodoDe} icon={<Calendar size={18} color={GREEN} />} onChange={setPeriodoDe} />
               <FloatInput label="Período - Até" type="date" value={periodoAte} icon={<Calendar size={18} color={GREEN} />} onChange={setPeriodoAte} />
               <FloatSelect label="Situação" value={situacao} onChange={setSituacao} options={SITUACOES} />
+              <button onClick={handlePesquisar} className="h-11 px-8 rounded-md text-white text-sm font-semibold transition hover:opacity-90" style={{ backgroundColor: GREEN }}>
+                Pesquisar
+              </button>
             </div>
 
             {periodoInvalido && (
               <p className="text-sm text-red-500 mt-3">A data "Até" deve ser maior ou igual à data "De".</p>
             )}
-            {erroRevendedora && (
-              <p className="text-sm text-red-500 mt-3">A revendedora de produtos agropecuários é obrigatória para realizar a busca.</p>
-            )}
-
             {temFiltroAtivo && (
               <div className="flex flex-wrap gap-2 mt-4 animate-fadeIn">
-                {revendedora && <Chip label={`Revendedora: ${revendedora.nome}`} onRemove={() => setRevendedora(null)} />}
-                {numeroNotaFiscal && <Chip label={`NF: ${numeroNotaFiscal}`} onRemove={() => setNumeroNotaFiscal("")} />}
+                {tipoDestinatario && <Chip label={`Tipo de Destinatário: ${tipoDestinatarioLabel}`} onRemove={() => setTipoDestinatario("")} />}
+                {destinatario && <Chip label={`Destinatário: ${destinatario}`} onRemove={() => setDestinatario("")} />}
+                {destinatarioDocumento && <Chip label={`CPF/CNPJ: ${destinatarioDocumento}`} onRemove={() => setDestinatarioDocumento("")} />}
                 {numeroPartida && <Chip label={`Partida: ${numeroPartida}`} onRemove={() => setNumeroPartida("")} />}
                 {doenca && <Chip label={`Doença: ${doenca.nome}`} onRemove={() => { setDoenca(null); setTipoVacina(""); }} />}
                 {tipoVacina && <Chip label={`Tipo de Vacina: ${tipoVacina}`} onRemove={() => setTipoVacina("")} />}
-                {tipoLancamento && <Chip label={`Lançamento: ${tipoLancamento}`} onRemove={() => setTipoLancamento("")} />}
                 {periodoDe && <Chip label={`De: ${periodoDe.split("-").reverse().join("/")}`} onRemove={() => setPeriodoDe("")} />}
                 {periodoAte && <Chip label={`Até: ${periodoAte.split("-").reverse().join("/")}`} onRemove={() => setPeriodoAte("")} />}
                 {situacao && <Chip label={`Situação: ${situacao}`} onRemove={() => setSituacao("")} />}
@@ -237,10 +226,7 @@ export function LancamentoDosesVacinaPage({ onLogout, onNavigate }: PageProps) {
                     <thead>
                       <tr className=" border-b border-gray-100">
                         <th className="text-left px-4 py-3 uppercase font-semibold text-gray-600 w-80">
-                          Revendedora de Produtos Agropecuários
-                        </th>
-                        <th className="text-left px-4 py-3 uppercase font-semibold text-gray-600 whitespace-nowrap w-48">
-                          Número da Nota Fiscal
+                          Destinatário
                         </th>
                         <th className="text-left px-4 py-3 uppercase font-semibold text-gray-600 whitespace-nowrap w-44">
                           Número da Partida
@@ -251,16 +237,15 @@ export function LancamentoDosesVacinaPage({ onLogout, onNavigate }: PageProps) {
                         <th className="text-left px-4 py-3 uppercase font-semibold text-gray-600 whitespace-nowrap w-40">
                           Situação
                         </th>
-                        <th className="px-4 py-3 w-16" />
+                        <th className="text-right px-4 py-3 uppercase font-semibold text-gray-600 w-24">Ações</th>
                       </tr>
                     </thead>
                     <tbody>
                       {pagina.map((l) => (
                         <tr key={l.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/60 transition text-sm text-gray-700">
-                          <td className="px-4 py-3 whitespace-pre-line max-w-[220px] leading-relaxed font-normal">
-                            {l.revendedoraCodigo} - <br /> {l.revendedoraNome}
+                          <td className="px-4 py-3 max-w-[300px] leading-relaxed font-normal break-words">
+                            {l.destinatarioDocumento} - {l.destinatarioNome}
                           </td>
-                          <td className="px-4 py-3 font-normal text-gray-700 whitespace-nowrap">{l.numeroNotaFiscal}</td>
                           <td className="px-4 py-3 font-normal text-gray-700 whitespace-nowrap">{l.numeroPartida}</td>
                           <td className="px-4 py-3 font-normal text-gray-700 whitespace-nowrap">{l.doenca}{l.tipoVacina ? ` (${l.tipoVacina})` : ""}</td>
                           <td className="px-4 py-3 font-normal text-gray-700 whitespace-nowrap">{l.situacao}</td>

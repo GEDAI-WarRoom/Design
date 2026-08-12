@@ -39,6 +39,16 @@ const DOENCAS_MOCK = [
   { id: 3, nome: "Raiva dos Herbívoros", codigo: "D-03" },
 ];
 
+const DOENCAS_INSUMO_MOCK = [
+  { id: 1, nome: "Brucelose", codigo: "D-02" },
+  { id: 2, nome: "Tuberculose", codigo: "D-04" },
+];
+
+const TIPOS_INSUMO_POR_DOENCA: Record<string, string[]> = {
+  Brucelose: ["Antígeno Acidificado Tamponado (AAT)"],
+  Tuberculose: ["Tuberculina PPD Bovina", "Tuberculina PPD Aviária"],
+};
+
 const VENDAS_MOCK = [
   { 
     id: "1", 
@@ -100,9 +110,21 @@ const VENDAS_MOCK = [
 interface VendaComSaidaVacinaProps {
   onLogout: () => void;
   onNavigate: (screen: any, data?: any) => void;
+  tipoProduto?: "vacina" | "insumo";
 }
 
-export function VendaComSaidaVacinaPage({ onLogout, onNavigate }: VendaComSaidaVacinaProps) {
+export function VendaComSaidaVacinaPage({ onLogout, onNavigate, tipoProduto = "vacina" }: VendaComSaidaVacinaProps) {
+  const isInsumo = tipoProduto === "insumo";
+  const rotaLista = isInsumo ? "venda-saida-insumo" : "venda-saida-vacina";
+  const rotaAdicionar = isInsumo ? "adicionar-venda-saida-insumo" : "adicionar-venda-saida-vacina";
+  const fornecedoresDisponiveis = isInsumo ? [
+    { id: 101, nome: "Laboratório BioDiagnóstico MG", cnpj: "23.456.789/0001-10" },
+    { id: 102, nome: "Distribuidora VetTest S/A", cnpj: "34.567.890/0001-21" },
+  ] : FORNECEDORES_MOCK;
+  const laboratoriosDisponiveis = isInsumo ? [
+    { id: 101, nome: "Tecpar Diagnósticos", codigo: "LAB-101" },
+    { id: 102, nome: "Laboratório Biovet", codigo: "LAB-102" },
+  ] : LABORATORIOS_MOCK;
   // Estados dos Filtros
   const [fornecedor, setFornecedor] = useState("");
   const [tipoDestinatario, setTipoDestinatario] = useState("");
@@ -112,7 +134,9 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate }: VendaComSaidaV
   const [numeroPartida, setNumeroPartida] = useState("");
   const [laboratorio, setLaboratorio] = useState("");
   const [doenca, setDoenca] = useState("");
+  const [tipoInsumo, setTipoInsumo] = useState("");
   const [situacao, setSituacao] = useState("");
+  const tiposInsumoDisponiveis = isInsumo && doenca ? (TIPOS_INSUMO_POR_DOENCA[doenca] ?? []) : [];
 
   // Estado que guarda os filtros aplicados de fato após clicar em "Pesquisar"
   const [filtrosAplicados, setFiltrosAplicados] = useState<any>(null);
@@ -137,6 +161,7 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate }: VendaComSaidaV
       numeroPartida,
       laboratorio,
       doenca,
+      tipoInsumo,
       situacao
     });
     setHasSearched(true);
@@ -144,7 +169,17 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate }: VendaComSaidaV
   };
 
   // Filtragem dos dados baseando-se no clique do botão
-  const dadosFiltrados = listarRegistrosMock("vendas-saida-vacina", VENDAS_MOCK).filter((venda) => {
+  const vendasInsumo = VENDAS_MOCK.map((venda, index) => ({
+    ...venda,
+    fornecedor: index % 2 === 0 ? "Laboratório BioDiagnóstico MG" : "Distribuidora VetTest S/A",
+    laboratorio: index % 2 === 0 ? "Tecpar Diagnósticos" : "Laboratório Biovet",
+    doenca: index % 2 === 0 ? "Brucelose" : "Tuberculose",
+    tipoInsumo: index % 2 === 0 ? "Antígeno Acidificado Tamponado (AAT)" : index === 1 ? "Tuberculina PPD Bovina" : "Tuberculina PPD Aviária",
+  }));
+  const dadosFiltrados = listarRegistrosMock(
+    isInsumo ? "vendas-saida-insumo" : "vendas-saida-vacina",
+    isInsumo ? vendasInsumo : VENDAS_MOCK,
+  ).filter((venda) => {
     if (!filtrosAplicados) return true;
 
     const f = filtrosAplicados;
@@ -155,6 +190,7 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate }: VendaComSaidaV
     if (f.numeroPartida && !venda.partida.toLowerCase().includes(f.numeroPartida.toLowerCase())) return false;
     if (f.laboratorio && !venda.laboratorio.toLowerCase().includes(f.laboratorio.toLowerCase())) return false;
     if (f.doenca && !venda.doenca.toLowerCase().includes(f.doenca.toLowerCase())) return false;
+    if (f.tipoInsumo && venda.tipoInsumo !== f.tipoInsumo) return false;
     if (f.situacao && venda.situacao !== f.situacao) return false;
 
     return true;
@@ -164,7 +200,7 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate }: VendaComSaidaV
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
-      <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="venda-saida-vacina" hideSearch={true} />
+      <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen={rotaLista} hideSearch={true} />
 
       <main className="max-w-[1088px] mx-auto px-4 md:px-6 py-6 flex flex-col gap-4">
         <div className="mb-1">
@@ -177,9 +213,9 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate }: VendaComSaidaV
             Inicial
           </button>
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-semibold text-gray-900">Venda com Saída de Vacina</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">Venda com Saída de {isInsumo ? "Insumo" : "Vacina"}</h1>
             <button
-              onClick={() => onNavigate("adicionar-venda-saida-vacina")}
+              onClick={() => onNavigate(rotaAdicionar)}
               className="px-5 py-3 rounded-md text-white text-sm font-semibold transition hover:opacity-90 active:scale-[0.98]"
               style={{ backgroundColor: GREEN }}
             >
@@ -257,6 +293,15 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate }: VendaComSaidaV
               onClick={() => setModalDoencaOpen(true)}
             />
 
+            {isInsumo && doenca && (
+              <FloatSelect
+                label="Tipo de Insumo"
+                value={tipoInsumo}
+                onChange={setTipoInsumo}
+                options={tiposInsumoDisponiveis.map((tipo) => ({ value: tipo, label: tipo }))}
+              />
+            )}
+
             <FloatSelect
               label="Situação"
               value={situacao}
@@ -269,7 +314,7 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate }: VendaComSaidaV
           </div>
 
          {/* Área de Chips de Filtros Ativos */}
-{(fornecedor || tipoDestinatario || destinatario || cpfCnpjDestinatario || notaFiscal || numeroPartida || laboratorio || doenca || situacao) && (
+{(fornecedor || tipoDestinatario || destinatario || cpfCnpjDestinatario || notaFiscal || numeroPartida || laboratorio || doenca || tipoInsumo || situacao) && (
   <div className="flex flex-wrap gap-2 mt-4 animate-fadeIn">
     {fornecedor && (
       <div className="flex items-center gap-1.5 bg-[#1A7A3C] text-white text-xs px-2.5 py-1.5 rounded-md">
@@ -311,7 +356,13 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate }: VendaComSaidaV
     {doenca && (
       <div className="flex items-center gap-1.5 bg-[#1A7A3C] text-white text-xs px-2.5 py-1.5 rounded-md">
         <span>Doença: {doenca}</span>
-        <button onClick={() => { setDoenca(""); setFiltrosAplicados(prev => prev ? { ...prev, doenca: "" } : null); }}><X size={12} /></button>
+        <button onClick={() => { setDoenca(""); setTipoInsumo(""); setFiltrosAplicados(prev => prev ? { ...prev, doenca: "", tipoInsumo: "" } : null); }}><X size={12} /></button>
+      </div>
+    )}
+    {tipoInsumo && (
+      <div className="flex items-center gap-1.5 bg-[#1A7A3C] text-white text-xs px-2.5 py-1.5 rounded-md">
+        <span>Tipo de Insumo: {tipoInsumo}</span>
+        <button onClick={() => { setTipoInsumo(""); setFiltrosAplicados(prev => prev ? { ...prev, tipoInsumo: "" } : null); }}><X size={12} /></button>
       </div>
     )}
     {situacao && (
@@ -327,7 +378,7 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate }: VendaComSaidaV
           {!hasSearched ? (
             <div className="text-center py-12 mt-2 border-t border-gray-100">
               <p className="text-sm text-gray-400">
-                Busque por venda de vacina utilizando o campo de busca e os filtros acima.
+                Busque por venda de {isInsumo ? "insumo" : "vacina"} utilizando o campo de busca e os filtros acima.
               </p>
             </div>
           ) : (
@@ -353,7 +404,7 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate }: VendaComSaidaV
   ) : (
     dadosFiltrados.map((row) => {
       // Busca o CNPJ do fornecedor correspondente para exibir na tabela
-      const dadosFornecedor = FORNECEDORES_MOCK.find(f => f.nome === row.fornecedor);
+      const dadosFornecedor = fornecedoresDisponiveis.find(f => f.nome === row.fornecedor);
       const cnpjFornecedor = dadosFornecedor ? dadosFornecedor.cnpj : "---";
 
       return (
@@ -388,10 +439,16 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate }: VendaComSaidaV
           
           <td className="px-4 py-3">
                                      <div className="flex items-center gap-1 justify-end">
-                                       <button onClick={() => onNavigate("visualizar-venda-saida-vacina", row)} className="p-2 rounded-md hover:bg-green-50 transition" style={{ color: GREEN }} title="Visualizar">
+                                       <button onClick={() => {
+                                         if (isInsumo) onNavigate("visualizar-venda-saida-insumo", row);
+                                         else onNavigate("visualizar-venda-saida-vacina", row);
+                                       }} className="p-2 rounded-md hover:bg-green-50 transition" style={{ color: GREEN }} title="Visualizar">
                                          <ViewIcon size={18} />
                                        </button>
-                                       <button onClick={() => onNavigate("editar-venda-saida-vacina", row)} className="p-2 rounded-md hover:bg-green-50 transition" style={{ color: GREEN }} title="Editar">
+                                       <button onClick={() => {
+                                         if (isInsumo) onNavigate("editar-venda-saida-insumo", row);
+                                         else onNavigate("editar-venda-saida-vacina", row);
+                                       }} className="p-2 rounded-md hover:bg-green-50 transition" style={{ color: GREEN }} title="Editar">
                                          <Pencil size={17} />
                                        </button>
                                      </div>
@@ -430,7 +487,7 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate }: VendaComSaidaV
         title="Buscar Fornecedor"
         subtitle="Busque por uma revendedora de produtos agropecuários fornecedora:"
         icon={<Store size={26} color={GREEN} />}
-        data={FORNECEDORES_MOCK}
+        data={fornecedoresDisponiveis}
         searchKeys={["nome", "cnpj"]}
         searchPlaceholder="Busque por nome ou código"
         columns={[
@@ -450,7 +507,7 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate }: VendaComSaidaV
         title="Buscar Laboratório"
         subtitle="Busque por laboratório:"
         icon={<FlaskConical size={26} color={GREEN} />}
-        data={LABORATORIOS_MOCK}
+        data={laboratoriosDisponiveis}
         searchKeys={["nome"]}
         searchPlaceholder="Busque por nome do laboratório."
         columns={[
@@ -469,7 +526,7 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate }: VendaComSaidaV
         title="Buscar Doença"
         subtitle="Busque por Doença:"
         icon={<img src={iconeDoencaUrl} alt="Doença" className="w-6 h-6 object-contain" />}        
-        data={DOENCAS_MOCK}
+        data={isInsumo ? DOENCAS_INSUMO_MOCK : DOENCAS_MOCK}
         searchKeys={["nome"]}
         searchPlaceholder="Busque por nome da doença."
         columns={[
@@ -477,6 +534,7 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate }: VendaComSaidaV
         ]}
         onConfirm={(item) => {
           setDoenca(item.nome);
+          setTipoInsumo("");
           setModalDoencaOpen(false);
         }}
       />

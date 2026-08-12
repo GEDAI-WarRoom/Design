@@ -38,6 +38,10 @@ function camposComparaveis(taxa: TaxaEmissaoGta): CampoHistoricoComparavel[] {
       value: taxa.finalidades.map((item) => item.nome).join(", "),
     },
     {
+      label: "Papéis",
+      value: taxa.papeis.map((item) => item.nome).join(", "),
+    },
+    {
       label: "Cobrança de Taxa",
       value: taxa.cobrancasTaxa.join(", "),
     },

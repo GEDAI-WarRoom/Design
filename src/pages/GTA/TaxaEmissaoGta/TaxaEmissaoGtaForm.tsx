@@ -1,6 +1,7 @@
 import { useMemo, useState, type ReactNode } from "react";
 import {
   Calendar,
+  BriefcaseBusiness,
   ChevronDown,
   ChevronUp,
   Dna,
@@ -21,6 +22,7 @@ import {
   FINALIDADES_TAXA_MOCK,
   listarEspeciesTaxa,
   listarItensReceitaTaxa,
+  listarPapeisTaxa,
   MODALIDADES_FAIXA,
   OPCOES_COBRANCA_TAXA,
   TIPOS_COBRANCA,
@@ -30,6 +32,7 @@ import {
   type FinalidadeTaxa,
   type ItemReceitaTaxa,
   type ModalidadeFaixa,
+  type PapelTaxa,
   type TaxaEmissaoGtaDraft,
   type TipoCobranca,
   type TipoDocumentoSanitario,
@@ -83,34 +86,46 @@ function ItemReceitaField({
   fieldClassName,
 }: ItemReceitaFieldProps) {
   return (
-    <div className="w-full">
-      {mode === "view" ? (
-        <FloatInput
-          label={label}
-          required
-          value={item?.nome ?? ""}
-          disabled
-          className={fieldClassName(label, item?.nome)}
-        />
-      ) : (
-        <EntitySearchInput
-          label={label}
-          placeholder="Buscar item de receita"
-          value={item?.nome ?? ""}
-          data={listarItensReceitaTaxa()}
-          searchKeys={["codigo", "nome", "classificacao", "quantidadeIndice"]}
-          columns={[
-            { label: "Item de Receita", key: "nome" },
-            { label: "Tipo", key: "classificacao" },
-            { label: "Quantidade do Índice", key: "quantidadeIndice" },
-          ]}
-          icon={<ListTree size={18} color="#1A7A3C" />}
-          onChange={onChange}
-          required
-          title="Buscar Item de Receita"
-          subtitle="Busque por um item de receita do tipo 11226600 de taxa de emissão de documentos sanitários."
-        />
-      )}
+    <div className="grid w-full grid-cols-1 gap-5 md:grid-cols-3">
+      <div className="md:col-span-2">
+        {mode === "view" ? (
+          <FloatInput
+            label={label}
+            required
+            value={item?.nome ?? ""}
+            disabled
+            className={fieldClassName(label, item?.nome)}
+          />
+        ) : (
+          <EntitySearchInput
+            label={label}
+            placeholder="Buscar item de receita"
+            value={item?.nome ?? ""}
+            data={listarItensReceitaTaxa()}
+            searchKeys={["codigo", "nome", "classificacao", "quantidadeIndice"]}
+            columns={[
+              { label: "Item de Receita", key: "nome" },
+              { label: "Tipo", key: "classificacao" },
+              { label: "Quantidade do Índice", key: "quantidadeIndice" },
+            ]}
+            icon={<ListTree size={18} color="#1A7A3C" />}
+            onChange={onChange}
+            required
+            title="Buscar Item de Receita"
+            subtitle="Busque por um item de receita do tipo 11226600 de taxa de emissão de documentos sanitários."
+          />
+        )}
+      </div>
+
+      <FloatInput
+        label="Quantidade de UFEMG"
+        value={item?.quantidadeIndice ?? ""}
+        disabled
+        className={fieldClassName(
+          "Quantidade de UFEMG",
+          item?.quantidadeIndice,
+        )}
+      />
     </div>
   );
 }
@@ -205,6 +220,7 @@ export function TaxaEmissaoGtaForm({
   const disabled = mode === "view";
   const [modalEspecies, setModalEspecies] = useState(false);
   const [modalFinalidades, setModalFinalidades] = useState(false);
+  const [modalPapeis, setModalPapeis] = useState(false);
 
   const finalidadesDisponiveis = useMemo(() => {
     const especiesIds = new Set(value.especies.map((especie) => especie.id));
@@ -320,6 +336,24 @@ export function TaxaEmissaoGtaForm({
             update(
               "finalidades",
               value.finalidades.filter((item) => item.id !== id),
+            )
+          }
+          view={disabled}
+        />
+      </Section>
+
+      <Section title="Papéis Aplicáveis">
+        <SelectedItemsBlock<PapelTaxa>
+          title="Papéis"
+          items={value.papeis}
+          emptyText="Nenhum papel selecionado."
+          actionLabel="Adicionar Papéis"
+          editable={!disabled}
+          onOpen={() => setModalPapeis(true)}
+          onRemove={(id) =>
+            update(
+              "papeis",
+              value.papeis.filter((item) => item.id !== id),
             )
           }
           view={disabled}
@@ -520,6 +554,26 @@ export function TaxaEmissaoGtaForm({
           setModalFinalidades(false);
         }}
       />
+
+      <MultiSearchModal<PapelTaxa>
+        open={modalPapeis}
+        onClose={() => setModalPapeis(false)}
+        title="Buscar Papéis"
+        subtitle="Busque e selecione um ou mais papéis aplicáveis:"
+        icon={<BriefcaseBusiness size={18} className="text-[#1A7A3C]" />}
+        data={listarPapeisTaxa()}
+        columns={[
+          { label: "Papel", key: "nome" },
+          { label: "Tipo", key: "tipo" },
+        ]}
+        searchKeys={["nome", "tipo"]}
+        selectedItems={value.papeis}
+        confirmLabel="Salvar Selecionados"
+        onConfirm={(papeis) => {
+          update("papeis", papeis);
+          setModalPapeis(false);
+        }}
+      />
     </>
   );
 }
@@ -578,6 +632,7 @@ export function taxaValida(taxa: TaxaEmissaoGtaDraft) {
     !taxa.dataInicioVigencia ||
     taxa.especies.length === 0 ||
     taxa.finalidades.length === 0 ||
+    taxa.papeis.length === 0 ||
     !taxa.tipoCobranca
   ) {
     return false;

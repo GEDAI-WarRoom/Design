@@ -38,12 +38,13 @@ import iconePragaUrl from "./Ícone=Praga.svg";
 import iconeVinculacoesUrl from "./Ícone=Vinculações.svg";
 import iconeProfissionaisUrl from "./Ícone=Profissionais.svg";
 import iconeHabilitacaoUrl from "./Ícone=Habilitação.svg";
+import iconeHabilitacaoCinzaUrl from "./Ícone=Habilitação Cinza.svg";
 import iconePontuacaoUrl from "./Ícone=Pontuação.svg";
 import iconeInsumoUrl from "./Ícone=Tipo de Insumo.svg";
 import iconeIndiceUrl from "./Ícone=Valor por Indice.svg";
 import iconeStatusUrl from "./Ícone=Status.svg";
 import iconeVendaPropriedadeUrl from "./Ícone=Venda de Propriedade.svg";
-import iconePapéisUrl from "./Ícone=Papéis.svg";
+import iconePapeisUrl from "./Ícone=Papéis.svg";
 import iconeIsencaoTaxaUrl from "./Ícone=Isenção de Taxa.svg";
 import iconeTaxaGTAUrl from "./Ícone=Taxa GTA.svg";
 import iconeAjusteRebanhoUrl from "./Ícone=Ajuste.svg";
@@ -93,12 +94,13 @@ export {
   iconeVinculacoesUrl,
   iconeProfissionaisUrl,
   iconeHabilitacaoUrl,
+  iconeHabilitacaoCinzaUrl,
   iconePontuacaoUrl,
   iconeInsumoUrl,
   iconeIndiceUrl,
   iconeStatusUrl,
   iconeVendaPropriedadeUrl,
-  iconePapéisUrl,
+  iconePapeisUrl,
   iconeIsencaoTaxaUrl,
   iconeTaxaGTAUrl,
   iconeAjusteRebanhoUrl,

@@ -6,6 +6,7 @@ import {
 import { listarIndices } from "../Indice/indiceIndice";
 import { listarReceitas } from "../Receita/receitaData";
 import { listarUnidadesMedida } from "../../Geral/UnidadeMedida/unidadeMedidaData";
+import { FUNDOS_ARRECADACAO_MOCK } from "../FundoArrecadacao/fundoArrecadacaoData";
 
 export interface ItemReceita {
   id: number;
@@ -16,6 +17,9 @@ export interface ItemReceita {
   indiceId: string;
   quantidadeIndice: number;
   permiteContribuicaoFundo: boolean;
+  fundoArrecadacaoId: number | null;
+  convenioId: number | null;
+  quantidadeIndiceFundoPrivado: number | null;
   situacao: "Ativo" | "Inativo";
 }
 
@@ -27,28 +31,41 @@ export interface ItemReceitaVisual extends ItemReceita {
   indice: string;
   contribuicaoFundo: "Sim" | "Não";
   quantidadeIndiceFormatada: string;
+  fundoArrecadacao: string;
+  convenio: string;
+  quantidadeIndiceFundoPrivadoFormatada: string;
 }
 
 const COLECAO = "itens-receita";
 
 const ITENS_RECEITA_INICIAIS: ItemReceita[] = [
-  { id: 1, codigo: "ITR-001", descricao: "Vacina B19", unidadeMedidaId: 7, receitaId: 1, indiceId: "1", quantidadeIndice: 1.5, permiteContribuicaoFundo: true, situacao: "Ativo" },
-  { id: 2, codigo: "ITR-002", descricao: "Ivermectina 1%", unidadeMedidaId: 4, receitaId: 2, indiceId: "1", quantidadeIndice: 1, permiteContribuicaoFundo: false, situacao: "Ativo" },
-  { id: 3, codigo: "ITR-003", descricao: "Suplemento Mineral Bovino", unidadeMedidaId: 1, receitaId: 3, indiceId: "1", quantidadeIndice: 2, permiteContribuicaoFundo: true, situacao: "Ativo" },
-  { id: 4, codigo: "ITR-004", descricao: "Taxa de Emissão GTA - Bovinos", unidadeMedidaId: 6, receitaId: 2, indiceId: "1", quantidadeIndice: 2, permiteContribuicaoFundo: false, situacao: "Ativo" },
-  { id: 5, codigo: "ITR-005", descricao: "Taxa de Emissão GTA - Aves", unidadeMedidaId: 6, receitaId: 2, indiceId: "1", quantidadeIndice: 1, permiteContribuicaoFundo: false, situacao: "Ativo" },
-  { id: 6, codigo: "ITR-006", descricao: "Taxa de Emissão GTA - Equídeos", unidadeMedidaId: 6, receitaId: 2, indiceId: "1", quantidadeIndice: 3, permiteContribuicaoFundo: false, situacao: "Ativo" },
-  { id: 7, codigo: "ITR-007", descricao: "Taxa de Emissão GTA - Suínos", unidadeMedidaId: 6, receitaId: 2, indiceId: "1", quantidadeIndice: 1, permiteContribuicaoFundo: false, situacao: "Ativo" },
+  { id: 1, codigo: "ITR-001", descricao: "Vacina B19", unidadeMedidaId: 7, receitaId: 1, indiceId: "1", quantidadeIndice: 1.5, permiteContribuicaoFundo: true, fundoArrecadacaoId: 2, convenioId: 1, quantidadeIndiceFundoPrivado: 0.5, situacao: "Ativo" },
+  { id: 2, codigo: "ITR-002", descricao: "Ivermectina 1%", unidadeMedidaId: 4, receitaId: 2, indiceId: "1", quantidadeIndice: 1, permiteContribuicaoFundo: false, fundoArrecadacaoId: null, convenioId: null, quantidadeIndiceFundoPrivado: null, situacao: "Ativo" },
+  { id: 3, codigo: "ITR-003", descricao: "Suplemento Mineral Bovino", unidadeMedidaId: 1, receitaId: 3, indiceId: "1", quantidadeIndice: 2, permiteContribuicaoFundo: true, fundoArrecadacaoId: 2, convenioId: 1, quantidadeIndiceFundoPrivado: 0.75, situacao: "Ativo" },
+  { id: 4, codigo: "ITR-004", descricao: "Taxa de Emissão GTA - Bovinos", unidadeMedidaId: 6, receitaId: 2, indiceId: "1", quantidadeIndice: 2, permiteContribuicaoFundo: false, fundoArrecadacaoId: null, convenioId: null, quantidadeIndiceFundoPrivado: null, situacao: "Ativo" },
+  { id: 5, codigo: "ITR-005", descricao: "Taxa de Emissão GTA - Aves", unidadeMedidaId: 6, receitaId: 2, indiceId: "1", quantidadeIndice: 1, permiteContribuicaoFundo: false, fundoArrecadacaoId: null, convenioId: null, quantidadeIndiceFundoPrivado: null, situacao: "Ativo" },
+  { id: 6, codigo: "ITR-006", descricao: "Taxa de Emissão GTA - Equídeos", unidadeMedidaId: 6, receitaId: 2, indiceId: "1", quantidadeIndice: 3, permiteContribuicaoFundo: false, fundoArrecadacaoId: null, convenioId: null, quantidadeIndiceFundoPrivado: null, situacao: "Ativo" },
+  { id: 7, codigo: "ITR-007", descricao: "Taxa de Emissão GTA - Suínos", unidadeMedidaId: 6, receitaId: 2, indiceId: "1", quantidadeIndice: 1, permiteContribuicaoFundo: false, fundoArrecadacaoId: null, convenioId: null, quantidadeIndiceFundoPrivado: null, situacao: "Ativo" },
 ];
 
 function hidratar(item: ItemReceita): ItemReceitaVisual {
   const unidade = listarUnidadesMedida().find((registro) => registro.id === item.unidadeMedidaId);
   const receita = listarReceitas().find((registro) => registro.id === item.receitaId);
   const indice = listarIndices().find((registro) => registro.id === item.indiceId);
+  const fundo = FUNDOS_ARRECADACAO_MOCK.find(
+    (registro) => registro.id === item.fundoArrecadacaoId,
+  );
+  const convenio = fundo?.convenios.find(
+    (registro) => registro.id === item.convenioId,
+  );
   const quantidade = item.quantidadeIndice.toLocaleString("pt-BR", {
     minimumFractionDigits: 0,
     maximumFractionDigits: 4,
   });
+  const quantidadeFundo = item.quantidadeIndiceFundoPrivado?.toLocaleString(
+    "pt-BR",
+    { minimumFractionDigits: 0, maximumFractionDigits: 4 },
+  ) ?? "";
   return {
     ...item,
     itemReceita: item.descricao,
@@ -58,6 +75,11 @@ function hidratar(item: ItemReceita): ItemReceitaVisual {
     indice: indice?.nome ?? "Índice não encontrado",
     contribuicaoFundo: item.permiteContribuicaoFundo ? "Sim" : "Não",
     quantidadeIndiceFormatada: `${quantidade} ${indice?.nome ?? ""}`.trim(),
+    fundoArrecadacao: fundo?.nome ?? "",
+    convenio: convenio?.nome ?? "",
+    quantidadeIndiceFundoPrivadoFormatada: quantidadeFundo
+      ? `${quantidadeFundo} ${indice?.nome ?? ""}`.trim()
+      : "",
   };
 }
 

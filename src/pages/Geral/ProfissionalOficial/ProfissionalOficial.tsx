@@ -47,7 +47,7 @@ interface Profissional {
 }
 
 const PROFISSIONAIS_MOCK: Profissional[] = [
-  { id: 1, nome: "Josephina Arantes", cpf: "444.009.956-40", esfera: "Estadual", unidadeAdministrativa: "Coordenadoria Regional de Belo Horizonte", situacao: "Ativo" },
+  { id: 1, nome: "Eloiza Silva", cpf: "444.009.956-40", esfera: "Estadual", unidadeAdministrativa: "Coordenadoria Regional de Belo Horizonte", situacao: "Ativo" },
   { id: 2, nome: "Carlos Eduardo Silva", cpf: "111.222.333-44", esfera: "Federal", unidadeAdministrativa: "Coordenadoria Regional de Lavras", situacao: "Ativo" },
   { id: 3, nome: "Mariana Souza", cpf: "555.666.777-88", esfera: "Municipal", unidadeAdministrativa: "Escritório Local de Juiz de Fora", situacao: "Inativo" },
 ];

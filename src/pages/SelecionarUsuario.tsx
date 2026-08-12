@@ -1,4 +1,12 @@
-import { ArrowLeft, ChevronRight, RotateCcw, ShieldCheck, Tractor } from "lucide-react";
+import {
+	ArrowLeft,
+	ChevronRight,
+	Factory,
+	RotateCcw,
+	ShieldCheck,
+	Stethoscope,
+	Tractor,
+} from "lucide-react";
 import logo from "../imports/logo.png";
 import type { DemoUserRole } from "../contexts/DemoUserContext";
 import { restaurarDadosDemonstracao } from "../mocks/mockDatabase";
@@ -23,6 +31,18 @@ const perfis = [
 		description: "Acesso aos cadastros do produtor e à emissão de GTA.",
 		icon: Tractor,
 	},
+	{
+		role: "veterinario" as const,
+		title: "Médico Veterinário",
+		description: "Acesso às atividades profissionais, exames, vacinação e emissão habilitada.",
+		icon: Stethoscope,
+	},
+	{
+		role: "responsavel-agroindustria-integradora" as const,
+		title: "Responsável de Agroindústria/Integradora",
+		description: "Acesso ao relatório de boletos das GTAs vinculadas à agroindústria ou integradora.",
+		icon: Factory,
+	},
 ];
 
 export function SelecionarUsuarioPage({ onSelect, onBack }: SelecionarUsuarioProps) {
@@ -34,7 +54,7 @@ export function SelecionarUsuarioPage({ onSelect, onBack }: SelecionarUsuarioPro
 
 	return (
 		<div className="min-h-screen flex items-center justify-center bg-[#eaebee] px-4 py-8">
-			<div className="w-full max-w-[680px] bg-white rounded-2xl shadow-md px-6 sm:px-10 py-9">
+			<div className="w-full max-w-[1120px] bg-white rounded-2xl shadow-md px-6 sm:px-10 py-9">
 				<div className="flex justify-center mb-6">
 					<img src={logo} alt="Logo IMA" className="h-20 w-auto" />
 				</div>
@@ -46,7 +66,7 @@ export function SelecionarUsuarioPage({ onSelect, onBack }: SelecionarUsuarioPro
 					</p>
 				</div>
 
-				<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 					{perfis.map(({ role, title, description, icon: Icon }) => (
 						<button
 							key={role}

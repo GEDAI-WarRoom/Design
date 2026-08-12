@@ -19,6 +19,7 @@ interface PageProps {
 }
 
 const toFormValue = (registro: LocalRealizacaoExame): LocalRealizacaoExameFormValue => ({
+  ehComercial: registro.ehComercial,
   proprietarios: registro.proprietarios.map((entidade, index) => ({
     uid: `proprietario-${registro.id}-${index}`,
     entidade,

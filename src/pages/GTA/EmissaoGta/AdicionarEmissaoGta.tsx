@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { ArrowLeft, Check } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
+import { useDemoUser } from "../../../contexts/DemoUserContext";
 import {
   EmissaoGtaForm,
   RequiredFieldsNotice,
-  emissaoGtaValida,
 } from "./EmissaoGtaForm";
 import {
   adicionarEmissaoGta,
+  atualizarEmissaoGta,
   calcularValorGta,
   criarEmissaoGtaVazia,
   type EmissaoGta,
@@ -19,20 +20,37 @@ export function AdicionarEmissaoGtaPage({
   onLogout,
   onNavigate,
 }: {
-  dados?: EmissaoGtaFormValue | null;
+  dados?: EmissaoGtaFormValue | EmissaoGta | null;
   onLogout: () => void;
   onNavigate: (screen: any, data?: any) => void;
 }) {
+  const { user } = useDemoUser();
   const [emissao, setEmissao] = useState<EmissaoGtaFormValue>(
-    () => dados ?? criarEmissaoGtaVazia(),
+    () => {
+      if (dados) return dados;
+      const vazia = criarEmissaoGtaVazia();
+      return {
+        ...vazia,
+        emitente: user
+          ? {
+              id: user.pessoaFisicaId ?? user.entityId ?? 0,
+              nome: user.name,
+              documento: user.document,
+            }
+          : vazia.emitente,
+      };
+    },
   );
   const [tentouSalvar, setTentouSalvar] = useState(false);
   const [emissaoSalva, setEmissaoSalva] = useState<EmissaoGta | null>(null);
+  const registroEmEdicao = dados && "id" in dados ? dados as EmissaoGta : null;
 
   const salvar = () => {
-    setTentouSalvar(true);
-    if (!emissaoGtaValida(emissao)) return;
-    setEmissaoSalva(adicionarEmissaoGta(emissao));
+    setEmissaoSalva(
+      registroEmEdicao
+        ? atualizarEmissaoGta(registroEmEdicao.id, emissao)
+        : adicionarEmissaoGta(emissao),
+    );
   };
 
   return (
@@ -55,20 +73,20 @@ export function AdicionarEmissaoGtaPage({
           </button>
           <div className="flex items-center justify-between gap-4">
             <h1 className="text-2xl font-semibold text-gray-900">
-              Adicionar GTA
+              {registroEmEdicao ? "Editar GTA" : "Adicionar GTA"}
             </h1>
             <button
               type="button"
               onClick={salvar}
               className="px-5 h-10 text-xs font-bold rounded-md text-white bg-[#1A7A3C] hover:bg-[#15612F]"
             >
-              Adicionar
+              {registroEmEdicao ? "Salvar" : "Adicionar"}
             </button>
           </div>
         </div>
 
         <RequiredFieldsNotice />
-        {tentouSalvar && !emissaoGtaValida(emissao) && (
+        {tentouSalvar && !emissaoGtaValida(emissao, role === "admin") && (
           <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm font-medium text-red-700">
             Preencha os campos obrigatórios e complete todos os itens
             adicionados antes de continuar.
@@ -94,7 +112,7 @@ export function AdicionarEmissaoGtaPage({
               />
             </div>
             <h2 className="text-lg font-bold text-gray-900">
-              GTA cadastrada com sucesso!
+              GTA {registroEmEdicao ? "atualizada" : "cadastrada"} com sucesso!
             </h2>
             <p className="text-sm text-gray-500 mt-1">
               A GTA {emissaoSalva.serieNumero} foi cadastrada para{" "}

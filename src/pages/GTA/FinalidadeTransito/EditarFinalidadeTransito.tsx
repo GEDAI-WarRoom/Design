@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ArrowLeft, ChevronDown, ChevronUp, Dna, Info, PlusCircle, X } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
-import { CheckboxGroup, FloatInput, MultiSearchModal } from "../../../components/ui/FormKit";
+import { CheckboxGroup, FloatInput, LargeTextArea, MultiSearchModal } from "../../../components/ui/FormKit";
 import { listarEspecies } from "../../Animal/Especie/especieData";
 import {
   obterFinalidadeTransito,
@@ -23,6 +23,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 export function EditarFinalidadeTransitoPage({ dados, onLogout, onNavigate }: { dados?: any; onLogout: () => void; onNavigate: (screen: string, data?: any) => void }) {
   const registroOriginal = obterFinalidadeTransito(dados?.id) ?? dados ?? obterFinalidadeTransito(null)!;
   const [finalidade, setFinalidade] = useState(registroOriginal.finalidade || "Abate");
+  const [descricao, setDescricao] = useState(registroOriginal.descricao ?? "");
   const [codigoMapa, setCodigoMapa] = useState(registroOriginal.codigoMapa || "01");
   const [especies, setEspecies] = useState<any[]>(registroOriginal.especies?.length ? registroOriginal.especies : listarEspecies().slice(0, 1));
   const [tiposProcedencia, setTiposProcedencia] = useState<string[]>(registroOriginal.tiposProcedencia?.length ? registroOriginal.tiposProcedencia : [registroOriginal.tipoProcedencia || "Abatedouro Frigorífico"]);
@@ -31,13 +32,15 @@ export function EditarFinalidadeTransitoPage({ dados, onLogout, onNavigate }: { 
   const [modalEspecieAberto, setModalEspecieAberto] = useState(false);
   const [isSucesso, setIsSucesso] = useState(false);
   const [registroSalvo, setRegistroSalvo] = useState<FinalidadeTransitoVisual | null>(null);
-  const finalidadeAtualizada = registroSalvo ?? { ...registroOriginal, finalidade, codigoMapa, especies, tiposProcedencia, tipoProcedencia: tiposProcedencia[0], emiteAcessoExterno, tiposDestino, tipoDestino: tiposDestino[0] };
+  const finalidadeAtualizada = registroSalvo ?? { ...registroOriginal, finalidade, descricao, codigoMapa, especies, tiposProcedencia, tipoProcedencia: tiposProcedencia[0], emiteAcessoExterno, tiposDestino, tipoDestino: tiposDestino[0] };
 
   const salvar = () => {
+    if (!descricao.trim()) return;
     const salvo = salvarFinalidadeTransito({
       id: registroOriginal.id,
       codigo: registroOriginal.codigo,
       finalidade: finalidade.trim() || "Abate",
+      descricao: descricao.trim(),
       codigoMapa: codigoMapa || "01",
       tiposProcedencia,
       emiteAcessoExterno,
@@ -57,7 +60,7 @@ export function EditarFinalidadeTransitoPage({ dados, onLogout, onNavigate }: { 
         <div><button type="button" onClick={() => onNavigate("visualizar-finalidade-transito", registroOriginal)} className="mb-3 flex items-center gap-1 text-sm font-semibold text-[#1A7A3C] hover:opacity-70"><ArrowLeft size={15} />Visualizar Finalidade de Trânsito</button><div className="flex items-center justify-between gap-4"><h1 className="text-2xl font-semibold text-gray-900">Editar Finalidade de Trânsito</h1><button type="button" onClick={salvar} className="h-10 rounded-md bg-[#1A7A3C] px-5 text-xs font-bold text-white hover:bg-[#15612F]">Salvar</button></div></div>
         <div className="flex items-center gap-3 rounded-xl border border-gray-100 bg-white p-5 shadow-sm"><Info size={20} className="text-gray-500" /><p className="text-sm font-medium text-gray-600">Campos indicados com <span className="font-bold text-red-500">*</span> são obrigatórios.</p></div>
 
-        <Section title="Informações Básicas"><div className="grid grid-cols-1 gap-4 md:grid-cols-2"><FloatInput label="Finalidade de Trânsito" required value={finalidade} onChange={setFinalidade} maxLength={100} /><FloatInput label="Código do MAPA" required value={codigoMapa} onChange={(value) => setCodigoMapa(value.replace(/\D/g, "").slice(0, 2))} maxLength={2} /></div></Section>
+        <Section title="Informações Básicas"><div className="flex flex-col gap-4"><div className="grid grid-cols-1 gap-4 md:grid-cols-2"><FloatInput label="Finalidade de Trânsito" required value={finalidade} onChange={setFinalidade} maxLength={100} /><FloatInput label="Código do MAPA" required value={codigoMapa} onChange={(value) => setCodigoMapa(value.replace(/\D/g, "").slice(0, 2))} maxLength={2} /></div><LargeTextArea label="Descrição" required value={descricao} onChange={setDescricao} maxLength={1500} /></div></Section>
 
         <Section title="Espécies aplicáveis"><div className="overflow-hidden rounded-xl border border-gray-200 bg-white"><div className="flex items-center justify-between gap-4 border-b border-gray-200 px-5 py-3"><div className="flex items-center gap-3"><span className="text-sm font-semibold text-gray-500">Espécies Selecionadas <span className="text-red-500">*</span></span><span className="rounded-full bg-[#E6F4EA] px-2.5 py-1 text-xs font-bold text-[#1A7A3C]">{especies.length} {especies.length === 1 ? "Selecionada" : "Selecionadas"}</span></div><button type="button" onClick={() => setModalEspecieAberto(true)} className="flex items-center gap-1.5 rounded-md border border-[#1A7A3C] px-3 py-1.5 text-xs font-bold text-[#1A7A3C] hover:bg-green-50"><PlusCircle size={14} />Adicionar Espécie</button></div><div className="flex flex-wrap gap-4 p-5">{especies.map((especie) => <div key={especie.id} className="flex min-w-[180px] items-center justify-between rounded-xl border border-gray-200 p-3 shadow-sm"><span className="text-sm font-bold text-[#1A7A3C]">{especie.nome}</span><button type="button" onClick={() => setEspecies((items) => items.filter((item) => item.id !== especie.id))} className="text-gray-400 hover:text-red-500"><X size={16} /></button></div>)}</div></div><MultiSearchModal open={modalEspecieAberto} onClose={() => setModalEspecieAberto(false)} title="Buscar Espécies" subtitle="Busque por uma ou mais espécies cadastradas no sistema:" icon={<Dna size={18} color={GREEN} />} data={listarEspecies().filter((item) => item.situacao === "Ativo")} columns={[{ label: "Nome da Espécie", key: "nome" }]} searchKeys={["nome"]} searchPlaceholder="Busque pelo nome da espécie." selectedItems={especies} confirmLabel="Salvar Selecionadas" onConfirm={(selecionadas) => { setEspecies(selecionadas); setModalEspecieAberto(false); }} /></Section>
 

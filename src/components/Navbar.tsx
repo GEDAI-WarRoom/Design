@@ -13,6 +13,7 @@ import {
   listarAtualizacoesCadastrais,
   PRODUTOR_REBANHO_DEMONSTRACAO_DOCUMENTO,
 } from "../pages/Rebanho/AtualizacaoCadastralRebanho/atualizacaoCadastralRebanhoData";
+import { listarPendenciasCentrais } from "../pages/GTA/PendenciasConfirmacao/pendenciasCentralData";
 
 const GREEN = "#1A7A3C";
 
@@ -25,7 +26,7 @@ interface NavbarProps {
 
 export function Navbar({ onLogout, onNavigate, currentScreen, hideSearch = false }: NavbarProps) {
   const [search, setSearch] = useState("");
-  const { role } = useDemoUser();
+  const { role, user } = useDemoUser();
 
   const allItems = [
     ...(cadastrosCategories?.flatMap((c) => c.items.map((i) => ({ ...i, category: c.title }))) || []),
@@ -37,7 +38,7 @@ export function Navbar({ onLogout, onNavigate, currentScreen, hideSearch = false
   const filtered = search.trim()
     ? allItems.filter((i) => i.label.toLowerCase().includes(search.toLowerCase()))
     : [];
-  const totalPendenciasProdutor = role === "produtor"
+  const totalPendencias = role === "produtor"
     ? listarPendenciasConfirmacaoGta().length +
       listarAtualizacoesCadastrais().filter(
         (atualizacao) =>
@@ -45,10 +46,15 @@ export function Navbar({ onLogout, onNavigate, currentScreen, hideSearch = false
             PRODUTOR_REBANHO_DEMONSTRACAO_DOCUMENTO &&
           !atualizacao.concluida,
       ).length
-    : 0;
+    : role === "veterinario"
+      ? listarPendenciasCentrais("veterinario", user?.entityId).length
+      : role === "lider-estabelecimento"
+        ? listarPendenciasCentrais("lider-estabelecimento").length
+        : 0;
   const abaPendenciasAtual = currentScreen.includes("rebanho")
     ? "rebanho"
     : "gta";
+  const totalNotificacoes = role === "admin" ? 2 : totalPendencias;
 
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-30 px-4 md:px-6 py-3">
@@ -60,28 +66,36 @@ export function Navbar({ onLogout, onNavigate, currentScreen, hideSearch = false
             <img src={logo} alt="Logo IMA" className="h-8 w-auto" />
           </div>
           <div className="flex items-center gap-6">
-            {role === "produtor" ? (
+			{role === "produtor" || role === "veterinario" || role === "lider-estabelecimento" ? (
               <button
                 type="button"
                 onClick={() =>
                   onNavigate("pendencias-confirmacao-gta", {
-                    aba: abaPendenciasAtual,
+					...(role === "produtor" ? { aba: abaPendenciasAtual } : {}),
                   })
                 }
-                aria-label={`Abrir Central de Pendências: ${totalPendenciasProdutor} pendências`}
+				aria-label={`Abrir Central de Pendências: ${totalPendencias} pendências`}
                 title="Central de Pendências"
-                className="relative rounded-full p-1 text-gray-500 transition hover:bg-amber-50 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-amber-300"
+                className="relative rounded-full p-1 text-gray-500 transition hover:bg-green-50 hover:text-[#1A7A3C] focus:outline-none focus:ring-2 focus:ring-green-300"
               >
                 <Bell size={20} />
-                <span className="absolute -right-2 -top-2 flex min-h-5 min-w-5 items-center justify-center rounded-full border-2 border-white bg-amber-400 px-1 text-[10px] font-bold leading-none text-amber-950">
-                  {totalPendenciasProdutor}
+				<span className="absolute -right-2 -top-2 flex min-h-5 min-w-5 items-center justify-center rounded-full border-2 border-white bg-[#1A7A3C] px-1 text-[10px] font-bold leading-none text-white">
+				  {totalPendencias}
                 </span>
               </button>
             ) : (
-              <div className="relative text-gray-500">
+              <button
+                type="button"
+                onClick={() => onNavigate("notificacoes-estabelecimentos")}
+				aria-label="Abrir notificações"
+				title="Notificações"
+                className="relative rounded-full p-1 text-gray-500 transition hover:bg-green-50 hover:text-[#1A7A3C]"
+              >
                 <Bell size={20} />
-                <span className="absolute right-0 top-0 h-2 w-2 rounded-full border border-white" style={{ backgroundColor: GREEN }} />
-              </div>
+                <span className="absolute -right-2 -top-2 flex min-h-5 min-w-5 items-center justify-center rounded-full border-2 border-white bg-[#1A7A3C] px-1 text-[10px] font-bold leading-none text-white">
+                  {totalNotificacoes}
+                </span>
+              </button>
             )}
             <button
               onClick={() => onNavigate("dashboard")}
@@ -146,14 +160,19 @@ export function Navbar({ onLogout, onNavigate, currentScreen, hideSearch = false
             </div>
 
             <div className="flex items-center gap-4 flex-shrink-0">
-              <div className="text-right hidden sm:block">
+              <button
+                type="button"
+                onClick={() => onNavigate("meu-perfil")}
+                aria-label="Abrir meu perfil"
+                className="hidden rounded-md px-2 py-1 text-right transition hover:bg-green-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A7A3C] sm:block"
+              >
                 <p className="text-sm font-semibold text-gray-800 leading-tight">
-                  {role === "produtor" ? "Fernando" : "Lucas"}
+                  {user?.name ?? "Usuário"}
                 </p>
                 <p className="text-xs text-gray-400 leading-tight">
-                  {role === "produtor" ? "Produtor" : "Administrador"}
+                  {user?.roleLabel ?? "Perfil não selecionado"}
                 </p>
-              </div>
+              </button>
               <button
                 onClick={onLogout}
                 className="flex items-center gap-1 text-sm font-medium transition hover:opacity-80"

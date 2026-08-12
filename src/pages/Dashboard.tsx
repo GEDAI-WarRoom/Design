@@ -5,12 +5,11 @@ import {
   Calendar,
   CalendarCheck,
   CalendarDays,
-  ChevronLeft,
-  ChevronRight,
   ClipboardList,
   ClipboardPlus,
   Dna,
   DollarSign,
+  Dock,
   Download,
   FileInput,
   FileText,
@@ -45,35 +44,27 @@ import {
   Bell,
   ClipboardType,
 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { Navbar } from "../components/Navbar";
 import { PendenciasConfirmacaoGta } from "../components/PendenciasConfirmacaoGta";
 import * as Icons from "../imports/icons";
 import campanhaVacinacao2026Url from "../imports/images/campanha-vacinacao-2026.png";
 import armazenamentoGraos2026Url from "../imports/images/armazenamento-graos-2026.png";
 import inovacaoDigitalCampoUrl from "../imports/images/inovacao-digital-campo.png";
-import propriedadeSantaHelenaUrl from "../imports/images/propriedade-santa-helena.png";
-import propriedadeSaoJoseUrl from "../imports/images/propriedade-sao-jose.png";
 import {
   isEntryRouteAllowed,
   useDemoUser,
   type DemoUserRole,
 } from "../contexts/DemoUserContext";
+import { DashboardAdmin } from "./Dashboard/Admin/DashboardAdmin";
+import { DashboardLiderEstabelecimento } from "./Dashboard/LiderEstabelecimento/DashboardLiderEstabelecimento";
+import { DashboardProdutor } from "./Dashboard/Produtor/DashboardProdutor";
+import { DashboardVeterinario } from "./Dashboard/Veterinario/DashboardVeterinario";
+import { NoticiasCarousel } from "./Dashboard/shared/NoticiasCarousel";
+import type {
+  MenuCategory,
+  MenuItem,
+} from "./Dashboard/shared/dashboardTypes";
 
 const GREEN = "#1A7A3C";
-
-// Definindo os tipos locais para organização
-export interface MenuItem {
-  label: string;
-  route: string;
-  icon?: React.ReactNode; // O '?' deixa o ícone opcional caso algum link não tenha
-}
-
-export interface MenuCategory {
-  title: string;
-  icon: React.ReactNode;
-  items: MenuItem[];
-}
 
 // Exportamos os dados para que a Navbar consiga importá-los e usá-los na busca
 const cadastrosCategoriesMescladas: any[] = [
@@ -806,7 +797,13 @@ export const secondaryCategories: MenuCategory[] = [
     icon: <BriefcaseMedical size={28} color={GREEN} />,
     items: [
       {
-        label: "Venda com Entrada de Insumos para Exames",
+        label: "Venda com Saída de Insumo",
+        route: "venda-saida-insumo",
+        icon: <PackageMinus size={16} />,
+      },
+
+      {
+        label: "Venda com Entrada de Insumos",
         route: "venda-entrada-insumos-exames",
         icon: <PackagePlus size={16} />,
       },
@@ -915,6 +912,16 @@ export const thirdCategories: MenuCategory[] = [
         icon: <ScanBarcode size={16} />,
       },
       {
+        label: "Boletos",
+        route: "boletos-gta",
+        icon: <Dock size={16} />,
+      },
+      {
+        label: "Relatório de Boletos",
+        route: "relatorio-boletos-gta",
+        icon: <ReceiptText size={16} />,
+      },
+      {
         label: "Fundo de Arrecadação",
         route: "fundo-arrecadacao",
         icon: <Wallet size={16} />,
@@ -975,7 +982,7 @@ export const thirdCategories: MenuCategory[] = [
         icon: <Route size={18} />,
       },
       {
-        label: "Distribuição de Formulários",
+        label: "Distribuição de Formulários de GTA",
         route: "distribuicao-formularios-gta",
         icon: <ClipboardList size={16} />,
       },
@@ -1043,60 +1050,29 @@ function filterCategoriesByRole(
   categories: MenuCategory[],
   role: DemoUserRole | null,
 ) {
+  const produtorRoutesOcultas = new Set([
+    "profissional-oficial",
+    "profissional-vegetal",
+    "cultura",
+    "praga",
+    "finalidade-transito",
+  ]);
+  const rotasOcultasNoMenu = new Set([
+    "pendencias-confirmacao-gta",
+    "recolhimento-mensal-gta",
+  ]);
   return categories
     .map((category) => ({
       ...category,
       items: category.items.filter((item) =>
-        isEntryRouteAllowed(role, item.route),
-      ),
+        isEntryRouteAllowed(role, item.route) &&
+        !(role === "produtor" && produtorRoutesOcultas.has(item.route)) &&
+        !rotasOcultasNoMenu.has(item.route),
+      ).map((item) => role === "veterinario" && item.route === "cadastro-atestado-exame"
+        ? { ...item, label: "Atestado de Exame" }
+        : item).filter((item) => !(role === "veterinario" && item.route === "atestado-exame")),
     }))
     .filter((category) => category.items.length > 0);
-}
-
-// Componente auxiliar de Card interno ajustado para renderizar o ícone do item
-function CategoryCard({
-  cat,
-  onNavigate,
-}: {
-  cat: MenuCategory;
-  onNavigate: (s: any) => void;
-}) {
-  return (
-    <div className="flex flex-col gap-2">
-      <div className="mb-1">{cat.icon}</div>
-      <h3 className="text-base font-semibold text-gray-800 mb-1">
-        {cat.title}
-      </h3>
-      <ul className="flex flex-col gap-1">
-        {cat.items.map((item) => (
-          <li key={item.label}>
-            <a
-              href="#"
-              className="text-sm flex items-center gap-2 hover:underline transition py-0.5"
-              style={{ color: GREEN }}
-              onClick={(e) => {
-                e.preventDefault();
-                if (item.route) onNavigate(item.route);
-              }}
-            >
-              {/* MODIFICADO AQUI: Se houver ícone, renderiza o ícone personalizado, senão mantém a bolinha clássica */}
-              {item.icon ? (
-                <span className="flex-shrink-0 text-[#1A7A3C]">
-                  {item.icon}
-                </span>
-              ) : (
-                <span
-                  className="w-1.5 h-1.5 rounded-full inline-block flex-shrink-0"
-                  style={{ backgroundColor: GREEN }}
-                />
-              )}
-              <span>{item.label}</span>
-            </a>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
 }
 
 const avisosProdutor = [
@@ -1155,253 +1131,117 @@ const avisosProdutor = [
   },
 ];
 
+const noticiasCompartilhadas = avisosProdutor.map((aviso, index) => ({
+	id: `noticia-${index + 1}`,
+	category: aviso.categoria,
+	title: aviso.titulo,
+	description: aviso.descricao,
+	actionLabel: aviso.acao,
+	image: aviso.imagem,
+	imageAlt: aviso.alt,
+	actionIcon:
+		index % 3 === 2 ? (
+			<Download size={18} />
+		) : index % 3 === 1 ? (
+			<FileText size={18} />
+		) : undefined,
+}));
+
 const propriedadesProdutor = [
   {
     id: 1,
-    codigo: "51080590041",
     nome: "Fazenda Santa Helena",
     municipioUf: "Uberlândia - MG",
-    area: "150 hectares",
-    situacao: "Ativo",
-    proprietarios: "Fernando - Produtor titular",
-    zona: "Rural",
-    imagem: propriedadeSantaHelenaUrl,
-    alt: "Pastagem da Fazenda Santa Helena",
-    rebanhos: ["128 bovinos", "54 ovinos"],
   },
   {
     id: 2,
-    codigo: "31001040082",
     nome: "Fazenda São José",
     municipioUf: "Patos de Minas - MG",
-    area: "85 hectares",
-    situacao: "Ativo",
-    proprietarios: "Fernando - Produtor titular",
-    zona: "Rural",
-    imagem: propriedadeSaoJoseUrl,
-    alt: "Área produtiva da Fazenda São José",
-    rebanhos: ["42 bovinos", "12 caprinos"],
   },
 ];
 
-function AvisosNoticias() {
-  const [slideAtivo, setSlideAtivo] = useState(0);
-
-  useEffect(() => {
-    const intervalo = window.setInterval(
-      () => setSlideAtivo((atual) => (atual + 1) % avisosProdutor.length),
-      7000,
-    );
-    return () => window.clearInterval(intervalo);
-  }, []);
-
-  const anterior = () =>
-    setSlideAtivo((atual) =>
-      atual === 0 ? avisosProdutor.length - 1 : atual - 1,
-    );
-  const proximo = () =>
-    setSlideAtivo((atual) => (atual + 1) % avisosProdutor.length);
-
-  return (
-    <section className="mb-6" aria-label="Avisos e Notícias">
-      <div className="mb-3 flex justify-end">
-        <div
-          className="flex gap-2"
-          aria-label={`Notícia ${slideAtivo + 1} de ${avisosProdutor.length}`}
-        >
-          {avisosProdutor.map((aviso, index) => (
-            <button
-              key={aviso.titulo}
-              type="button"
-              onClick={() => setSlideAtivo(index)}
-              aria-label={`Exibir notícia ${index + 1}`}
-              aria-current={index === slideAtivo}
-              className="h-1 w-12 overflow-hidden rounded-full bg-gray-300"
-            >
-              <span
-                className={`block h-full bg-[#1A7A3C] transition-all duration-500 ${index === slideAtivo ? "w-full" : "w-0"}`}
-              />
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="relative h-[420px] overflow-hidden rounded-2xl bg-gray-900 shadow-sm sm:h-[400px]">
-        {avisosProdutor.map((aviso, index) => (
-          <article
-            key={aviso.titulo}
-            aria-hidden={index !== slideAtivo}
-            className={`absolute inset-0 transition-opacity duration-700 ${index === slideAtivo ? "z-10 opacity-100" : "pointer-events-none opacity-0"}`}
-          >
-            <img
-              src={aviso.imagem}
-              alt={aviso.alt}
-              className="absolute inset-0 h-full w-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/55 to-black/10" />
-            <div className="absolute inset-0 flex max-w-3xl flex-col justify-end p-6 sm:p-9 md:p-12">
-              <span className="mb-4 w-fit rounded-full bg-green-100 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-[#1A7A3C]">
-                {aviso.categoria}
-              </span>
-              <h3 className="max-w-2xl text-2xl font-bold leading-tight text-white drop-shadow-lg sm:text-3xl md:text-4xl">
-                {aviso.titulo}
-              </h3>
-              <p className="mt-4 max-w-xl text-sm font-medium leading-6 text-white/85 sm:text-base">
-                {aviso.descricao}
-              </p>
-              <button
-                type="button"
-                className="mt-6 flex w-fit items-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-bold text-gray-900 shadow-xl transition hover:bg-gray-100"
-              >
-                {aviso.acao}
-                {index === 2 ? (
-                  <Download size={18} />
-                ) : index === 1 ? (
-                  <FileText size={18} />
-                ) : (
-                  <ArrowRight size={18} />
-                )}
-              </button>
-            </div>
-          </article>
-        ))}
-
-        <div className="absolute bottom-5 right-5 z-20 flex gap-3 sm:bottom-8 sm:right-8">
-          <button
-            type="button"
-            onClick={anterior}
-            aria-label="Notícia anterior"
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-white/30 bg-black/20 text-white backdrop-blur-md transition hover:bg-white/20"
-          >
-            <ChevronLeft size={22} />
-          </button>
-          <button
-            type="button"
-            onClick={proximo}
-            aria-label="Próxima notícia"
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-white/30 bg-black/20 text-white backdrop-blur-md transition hover:bg-white/20"
-          >
-            <ChevronRight size={22} />
-          </button>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function PropriedadesProdutor({ onNavigate }: { onNavigate: (screen: any, data?: any) => void }) {
-  return (
-    <section className="mb-6" aria-labelledby="propriedades-produtor-title">
-      <div className="mb-4">
-        <div>
-          <h2 id="propriedades-produtor-title" className="text-xl font-semibold text-gray-800">Minhas propriedades</h2>
-          <p className="mt-1 text-sm text-gray-500">Acesse rapidamente os dados e rebanhos de cada propriedade.</p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-        {propriedadesProdutor.map((propriedade, index) => (
-          <article key={propriedade.id} className="group overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg">
-            <div className="relative h-48 overflow-hidden bg-gray-200">
-              <img src={propriedade.imagem} alt={propriedade.alt} loading="lazy" className={`h-full w-full object-cover opacity-90 transition duration-500 group-hover:scale-[1.03] group-hover:opacity-100 ${index === 1 ? "object-[center_65%]" : "object-center"}`} />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
-              <span className="absolute left-4 top-4 rounded-md bg-[#1A7A3C] px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-white shadow-sm">Ativa</span>
-            </div>
-            <div className="p-5">
-              <h3 className="text-lg font-semibold text-gray-900">{propriedade.nome}</h3>
-              <p className="mt-1 text-sm text-gray-500">{propriedade.municipioUf} <span aria-hidden="true">•</span> {propriedade.area}</p>
-              <div className="mt-5 flex flex-wrap items-center justify-between gap-4 border-t border-gray-100 pt-4">
-                <div className="flex flex-wrap gap-2">
-                  {propriedade.rebanhos.map((rebanho, rebanhoIndex) => (
-                    <span key={rebanho} className={`rounded-md px-2.5 py-1 text-xs font-semibold ${rebanhoIndex === 0 ? "bg-amber-50 text-amber-700" : "bg-green-50 text-[#1A7A3C]"}`}>{rebanho}</span>
-                  ))}
-                </div>
-                <button type="button" onClick={() => onNavigate("visualizar-estabelecimento-agropecuario", propriedade)} className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#1A7A3C] transition hover:text-[#15612F]">
-                  Gerenciar <ArrowRight size={16} />
-                </button>
-              </div>
-            </div>
-          </article>
-        ))}
-      </div>
-    </section>
-  );
-}
-
 // Componente Principal do Dashboard
 export function DashboardPage({ onLogout, onNavigate }: any) {
-  const { role } = useDemoUser();
+  const { role, user } = useDemoUser();
   const visibleCadastros = filterCategoriesByRole(cadastrosCategories, role);
   const visibleSecondary = filterCategoriesByRole(secondaryCategories, role);
   const visibleThird = filterCategoriesByRole(thirdCategories, role);
   const visibleFourth = filterCategoriesByRole(fourthCategories, role);
-  const mainCategoryGroups =
-    role === "produtor"
-      ? [[...visibleCadastros, ...visibleSecondary, ...visibleThird]]
-      : [visibleCadastros, visibleSecondary, visibleThird].filter(
-        (group) => group.length > 0,
-      );
 
-  return (
-    <div className="min-h-screen bg-[#f2f3f5]">
-      {/* Importação limpa da Navbar que está na pasta de componentes */}
-      <Navbar
+  if (role === "produtor") {
+    return (
+      <DashboardProdutor
         onLogout={onLogout}
         onNavigate={onNavigate}
-        currentScreen="dashboard"
+        categories={[...visibleCadastros, ...visibleSecondary, ...visibleThird]}
+        userName={user?.name ?? "produtor"}
+        news={<NoticiasCarousel items={noticiasCompartilhadas} />}
+        pendingContent={<PendenciasConfirmacaoGta onNavigate={onNavigate} />}
+        linkedItems={[
+          {
+            id: "fazenda-santa-helena",
+            title: propriedadesProdutor[0].nome,
+            icon: <img src={Icons.iconeExploracaoUrl} alt="" className="h-5 w-5 object-contain" />,
+            details: [
+              { id: "tipo", label: "Tipo", value: "Exploração Pecuária" },
+              { id: "localizacao", label: "Localização", value: propriedadesProdutor[0].municipioUf },
+            ],
+            onView: () => onNavigate("visualizar-estabelecimento-agropecuario", propriedadesProdutor[0]),
+          },
+          {
+            id: "fazenda-sao-jose",
+            title: propriedadesProdutor[1].nome,
+            icon: <img src={Icons.iconeEstabelecimentoUrl} alt="" className="h-5 w-5 object-contain" />,
+            details: [
+              { id: "tipo", label: "Tipo", value: "Estabelecimento Agropecuário" },
+              { id: "localizacao", label: "Localização", value: propriedadesProdutor[1].municipioUf },
+            ],
+            onView: () => onNavigate("visualizar-estabelecimento-agropecuario", propriedadesProdutor[1]),
+          },
+          {
+            id: "fazenda-santa-fe",
+            title: "Fazenda Santa Fé",
+            icon: <img src={Icons.iconeExploracaoUrl} alt="" className="h-5 w-5 object-contain" />,
+            details: [
+              { id: "tipo", label: "Tipo", value: "Exploração Pecuária" },
+              { id: "localizacao", label: "Localização", value: "Uberaba - MG" },
+            ],
+          },
+        ]}
       />
+    );
+  }
 
-      <main className="max-w-5xl mx-auto px-4 md:px-6 py-6">
-        {role === "produtor" && (
-          <>
-            <div className="mb-6">
-              <h1 className="text-2xl font-semibold text-gray-900">
-                Bem-vindo, Fernando
-              </h1>
-              <p className="mt-1 text-sm text-gray-600">
-                Gerencie suas propriedades e movimentações agropecuárias.
-              </p>
-            </div>
-            <AvisosNoticias />
-            <PendenciasConfirmacaoGta onNavigate={onNavigate} />
-          </>
-        )}
+  if (role === "veterinario") {
+    return (
+      <DashboardVeterinario
+        onLogout={onLogout}
+        onNavigate={onNavigate}
+        categories={[...visibleCadastros, ...visibleSecondary, ...visibleThird]}
+        news={<NoticiasCarousel items={noticiasCompartilhadas} />}
+      />
+    );
+  }
 
-        {/* Bloco de Cadastros (Exatamente como estava) */}
-        <div className="flex flex-col bg-white rounded-xl shadow-sm p-6 mb-6 gap-6">
-          <h2 className="text-xl font-semibold text-gray-800">Cadastros</h2>
-          {mainCategoryGroups.map((categories, index) => (
-            <div
-              key={index}
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
-            >
-              {categories.map((cat) => (
-                <CategoryCard
-                  key={cat.title}
-                  cat={cat}
-                  onNavigate={onNavigate}
-                />
-              ))}
-            </div>
-          ))}
-        </div>
+  if (role === "responsavel-agroindustria-integradora") {
+    return (
+      <DashboardLiderEstabelecimento
+        onLogout={onLogout}
+        onNavigate={onNavigate}
+        categories={[...visibleCadastros, ...visibleThird]}
+        news={<NoticiasCarousel items={noticiasCompartilhadas} />}
+      />
+    );
+  }
 
-        {role === "produtor" && <PropriedadesProdutor onNavigate={onNavigate} />}
-
-        {visibleFourth.length > 0 && (
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {visibleFourth.map((cat) => (
-                <CategoryCard
-                  key={cat.title}
-                  cat={cat}
-                  onNavigate={onNavigate}
-                />
-              ))}
-            </div>
-          </div>
-        )}
-      </main>
-    </div>
+  return (
+    <DashboardAdmin
+      onLogout={onLogout}
+      onNavigate={onNavigate}
+      categoryGroups={[visibleCadastros, visibleSecondary, visibleThird].filter(
+        (group) => group.length > 0,
+      )}
+      controlCategories={visibleFourth}
+    />
   );
 }

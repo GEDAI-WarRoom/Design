@@ -10,12 +10,21 @@ export interface ContribuinteRecolhimento {
   nome: string;
   documento: string;
   tipo: "Pessoa Física" | "Pessoa Jurídica";
+  endereco: string;
+  estado: string;
+  municipio: string;
+  telefone: string;
 }
 
 export interface GTARecolhimento {
   numero: string;
+  serie?: string;
   dataEmissao: string;
   finalidade: string;
+  origem?: string;
+  origemTipo?: "Estabelecimento" | "Pessoa";
+  origemDocumento?: string;
+  destino?: string;
   situacao: string;
   especie: string;
   totalAnimais: number;
@@ -27,8 +36,11 @@ export interface BoletoRecolhimento {
   fundoArrecadacao: string;
   convenio: string;
   numero: string;
+  linhaDigitavel: string;
+  codigoBarras: string;
   valor: number;
   situacaoPagamento: string;
+  dataPagamento?: string;
   gtas: GTARecolhimento[];
 }
 
@@ -46,10 +58,10 @@ export interface RecolhimentoMensalGTA {
 }
 
 export const CONTRIBUINTES_RECOLHIMENTO: ContribuinteRecolhimento[] = [
-  { id: 1, nome: "Maria Aparecida de Souza", documento: "123.456.789-00", tipo: "Pessoa Física" },
-  { id: 2, nome: "Agropecuária Campo Verde Ltda.", documento: "12.345.678/0001-90", tipo: "Pessoa Jurídica" },
-  { id: 3, nome: "João Batista Ferreira", documento: "987.654.321-00", tipo: "Pessoa Física" },
-  { id: 4, nome: "Fazenda Horizonte S.A.", documento: "45.678.901/0001-22", tipo: "Pessoa Jurídica" },
+  { id: 1, nome: "Maria Aparecida de Souza", documento: "123.456.789-00", tipo: "Pessoa Física", endereco: "Rua das Acácias, 120", estado: "Minas Gerais", municipio: "Lavras", telefone: "(35) 99999-1234" },
+  { id: 2, nome: "Agropecuária Campo Verde Ltda.", documento: "12.345.678/0001-90", tipo: "Pessoa Jurídica", endereco: "Avenida Brasil, 2450", estado: "Minas Gerais", municipio: "Uberlândia", telefone: "(34) 98888-7777" },
+  { id: 3, nome: "João Batista Ferreira", documento: "987.654.321-00", tipo: "Pessoa Física", endereco: "Rua Vale Bonito, 45", estado: "Minas Gerais", municipio: "Varginha", telefone: "(35) 97777-6666" },
+  { id: 4, nome: "Fazenda Horizonte S.A.", documento: "45.678.901/0001-22", tipo: "Pessoa Jurídica", endereco: "Rodovia MG-050, km 178", estado: "Minas Gerais", municipio: "Divinópolis", telefone: "(37) 98888-2200" },
 ];
 
 export const MESES = [
@@ -76,11 +88,14 @@ const boletosMaria: BoletoRecolhimento[] = [
     fundoArrecadacao: "Fundo de Defesa Sanitária Animal de Minas Gerais",
     convenio: "Convênio IMA/FUNDEPEC",
     numero: "84670000001-8 42500024001-4",
+    linhaDigitavel: "84670.00000 00184.250002 02400.140008 1 000000042050",
+    codigoBarras: "8467100000042050000001842500020240014000",
     valor: 420.5,
     situacaoPagamento: "Pago",
+    dataPagamento: "2026-07-07",
     gtas: [
-      { numero: "GTA-MG-2026-001284", dataEmissao: "2026-06-04", finalidade: "Engorda", situacao: "Emitida", especie: "Bovina", totalAnimais: 35, valorContribuicao: 245.0 },
-      { numero: "GTA-MG-2026-001311", dataEmissao: "2026-06-11", finalidade: "Reprodução", situacao: "Emitida", especie: "Bovina", totalAnimais: 18, valorContribuicao: 175.5 },
+      { numero: "GTA-MG-2026-001284", serie: "AB", dataEmissao: "2026-06-04", finalidade: "Engorda", origem: "Fazenda Santa Clara", destino: "Frigorífico Vale do Rio", situacao: "Emitida", especie: "Bovina", totalAnimais: 35, valorContribuicao: 245.0 },
+      { numero: "GTA-MG-2026-001311", serie: "AB", dataEmissao: "2026-06-11", finalidade: "Reprodução", origem: "Fazenda Santa Clara", destino: "Fazenda Boa Vista", situacao: "Emitida", especie: "Bovina", totalAnimais: 18, valorContribuicao: 175.5 },
     ],
   },
   {
@@ -88,10 +103,13 @@ const boletosMaria: BoletoRecolhimento[] = [
     fundoArrecadacao: "Fundo Estadual de Sanidade Animal",
     convenio: "Convênio IMA/FESA",
     numero: "84670000002-6 42500024002-2",
+    linhaDigitavel: "84670.00000 00226.250002 02400.220006 1 000000025025",
+    codigoBarras: "8467100000025025000002262500020240022000",
     valor: 250.25,
     situacaoPagamento: "Pago",
+    dataPagamento: "2026-07-07",
     gtas: [
-      { numero: "GTA-MG-2026-001402", dataEmissao: "2026-06-19", finalidade: "Abate", situacao: "Emitida", especie: "Suína", totalAnimais: 42, valorContribuicao: 250.25 },
+      { numero: "GTA-MG-2026-001402", serie: "CD", dataEmissao: "2026-06-19", finalidade: "Abate", origem: "Granja Santa Luzia", destino: "Frigorífico Minas Sul", situacao: "Emitida", especie: "Suína", totalAnimais: 42, valorContribuicao: 250.25 },
     ],
   },
 ];
@@ -102,11 +120,13 @@ const boletosCampoVerde: BoletoRecolhimento[] = [
     fundoArrecadacao: "Fundo de Defesa Sanitária Animal de Minas Gerais",
     convenio: "Convênio IMA/FUNDEPEC",
     numero: "84670000003-4 42500024003-0",
+    linhaDigitavel: "84670.00000 00348.250002 02400.300004 1 000000092500",
+    codigoBarras: "8467100000092500000003482500020240030000",
     valor: 925.0,
     situacaoPagamento: "Aguardando pagamento",
     gtas: [
-      { numero: "GTA-MG-2026-001587", dataEmissao: "2026-07-03", finalidade: "Abate", situacao: "Emitida", especie: "Bovina", totalAnimais: 80, valorContribuicao: 560.0 },
-      { numero: "GTA-MG-2026-001633", dataEmissao: "2026-07-09", finalidade: "Engorda", situacao: "Emitida", especie: "Bovina", totalAnimais: 52, valorContribuicao: 365.0 },
+      { numero: "GTA-MG-2026-001587", serie: "EF", dataEmissao: "2026-07-03", finalidade: "Abate", origem: "Agropecuária Campo Verde", destino: "Frigorífico Campo Sul", situacao: "Emitida", especie: "Bovina", totalAnimais: 80, valorContribuicao: 560.0 },
+      { numero: "GTA-MG-2026-001633", serie: "EF", dataEmissao: "2026-07-09", finalidade: "Engorda", origem: "João Batista Ferreira", origemTipo: "Pessoa", origemDocumento: "987.654.321-00", destino: "Unidade de Engorda Horizonte", situacao: "Emitida", especie: "Bovina", totalAnimais: 52, valorContribuicao: 365.0 },
     ],
   },
 ];
@@ -121,7 +141,7 @@ export const RECOLHIMENTOS_MOCK: RecolhimentoMensalGTA[] = [
     anoReferencia: 2026,
     mesReferencia: 6,
     situacao: "Pago",
-    dataVencimento: "2026-07-10",
+    dataVencimento: quintoDiaUtilDoMesSeguinte(2026, 6),
     boletos: copiarBoletos(boletosMaria),
     daeEmitido: true,
     numeroDAE: "DAE-2026-000184",
@@ -133,7 +153,7 @@ export const RECOLHIMENTOS_MOCK: RecolhimentoMensalGTA[] = [
     anoReferencia: 2026,
     mesReferencia: 7,
     situacao: "Pagamento boleto",
-    dataVencimento: "2026-08-10",
+    dataVencimento: quintoDiaUtilDoMesSeguinte(2026, 7),
     boletos: copiarBoletos(boletosCampoVerde),
     daeEmitido: false,
   },
@@ -158,6 +178,17 @@ export const formatarData = (data?: string) => {
   const [ano, mes, dia] = data.split("-");
   return `${dia}/${mes}/${ano}`;
 };
+
+export function quintoDiaUtilDoMesSeguinte(ano: number, mes: number) {
+  const data = new Date(Date.UTC(ano, mes, 1));
+  let uteis = 0;
+  while (uteis < 5) {
+    const dia = data.getUTCDay();
+    if (dia !== 0 && dia !== 6) uteis += 1;
+    if (uteis < 5) data.setUTCDate(data.getUTCDate() + 1);
+  }
+  return data.toISOString().slice(0, 10);
+}
 
 export const valorTotalRecolhimento = (registro: RecolhimentoMensalGTA) =>
   registro.boletos.reduce((total, boleto) => total + boleto.valor, 0);
@@ -186,9 +217,7 @@ export function criarRecolhimento(dados: {
   mesReferencia: number;
 }) {
   const boletos = boletosDisponiveis(dados.contribuinte.id, dados.anoReferencia, dados.mesReferencia);
-  const proximoVencimento = new Date(Date.UTC(dados.anoReferencia, dados.mesReferencia, 10))
-    .toISOString()
-    .slice(0, 10);
+  const proximoVencimento = quintoDiaUtilDoMesSeguinte(dados.anoReferencia, dados.mesReferencia);
   const novo: RecolhimentoMensalGTA = {
     id: proximoId++,
     ...dados,

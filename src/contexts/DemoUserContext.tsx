@@ -1,6 +1,44 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
+import { useMockDatabaseRevision } from "../mocks/useMockDatabase";
+import {
+	PERFIS_USUARIO_INICIAIS,
+	listarPerfisUsuario,
+	type PerfilUsuarioRole,
+} from "../pages/Geral/MeuPerfil/meuPerfilData";
 
-export type DemoUserRole = "admin" | "produtor";
+export type DemoUserRole = PerfilUsuarioRole;
+
+export interface DemoUserIdentity {
+	role: DemoUserRole;
+	name: string;
+	roleLabel: string;
+	document?: string;
+	pessoaFisicaId?: number;
+	entityId?: number;
+	email?: string;
+	phone?: string;
+	avatarDataUrl?: string;
+	acceptedTerms: boolean;
+}
+
+export const DEMO_USERS = PERFIS_USUARIO_INICIAIS.reduce(
+	(usuarios, perfil) => {
+		usuarios[perfil.role] = {
+			role: perfil.role,
+			name: perfil.nome,
+			roleLabel: perfil.perfil,
+			document: perfil.documento,
+			pessoaFisicaId: perfil.pessoaFisicaId,
+			entityId: perfil.entityId,
+			email: perfil.email,
+			phone: perfil.telefone,
+			avatarDataUrl: perfil.avatarDataUrl,
+			acceptedTerms: perfil.aceitouTermos,
+		};
+		return usuarios;
+	},
+	{} as Record<DemoUserRole, DemoUserIdentity>,
+);
 
 const produtorEntryRoutes = new Set([
 	"pessoa-fisica",
@@ -28,7 +66,7 @@ const produtorEntryRoutes = new Set([
 
 const produtorAllowedRoutes = new Set([
 	"dashboard",
-	"pendencias-confirmacao-gta",
+	"meu-perfil",
 	...produtorEntryRoutes,
 	"adicionar-pessoa-fisica",
 	"visualizar-pessoa-fisica",
@@ -41,7 +79,6 @@ const produtorAllowedRoutes = new Set([
 	"visualizar-estabelecimento-agropecuario",
 	"adicionar-venda-propriedade",
 	"visualizar-venda-propriedade",
-	"editar-venda-propriedade",
 	"adicionar-exploracao-pecuaria",
 	"visualizar-exploracao-pecuaria",
 	"adicionar-nucleo-producao",
@@ -95,15 +132,115 @@ const produtorAllowedRoutes = new Set([
 	"adicionar-finalidade-transito",
 	"visualizar-finalidade-transito",
 	"editar-finalidade-transito",
-	"atualizacao-cadastral-rebanho",
 	"confirmar-dados-produtor-rebanho",
 	"visualizar-atualizacao-cadastral-rebanho",
 	"atualizar-cadastro-rebanho",
 	"visualizar-rebanho-atualizado",
 ]);
 
+const veterinarioEntryRoutes = new Set([
+	"declaracao-vacinacao",
+	"partilha-vacina",
+	"vacinador",
+	"atestado-exame",
+	"local-realizacao-exame",
+	"emissao-gta",
+]);
+
+const veterinarioAllowedRoutes = new Set([
+	"dashboard",
+	"meu-perfil",
+	...veterinarioEntryRoutes,
+	"adicionar-declaracao-vacinacao",
+	"visualizar-declaracao-vacinacao",
+	"editar-declaracao-vacinacao",
+	"adicionar-partilha-vacina",
+	"visualizar-partilha-vacina",
+	"editar-partilha-vacina",
+	"adicionar-vacinador",
+	"visualizar-vacinador-brucelose",
+	"editar-vacinador-brucelose",
+	"adicionar-atestado-exame",
+	"visualizar-atestado-exame",
+	"editar-atestado-exame",
+	"visualizar-pessoa-fisica",
+	"adicionar-local-realizacao-exame",
+	"visualizar-local-realizacao-exame",
+	"editar-local-realizacao-exame",
+	"adicionar-emissao-gta",
+	"visualizar-emissao-gta",
+	"documento-emissao-gta",
+	"emitir-emissao-gta",
+	"cancelar-emissao-gta",
+	"pagar-emissao-gta",
+	"pendencias-confirmacao-gta",
+	"visualizar-revendedora-agropecuario",
+	"visualizar-unidade-consolidacao",
+]);
+
+const liderEstabelecimentoEntryRoutes = new Set([
+	"pendencias-confirmacao-gta",
+	"pessoa-fisica",
+	"pessoa-juridica",
+	"agroindustrial-sie",
+	"integradora-cooperativa",
+	"revendedora-animais",
+	"revendedora-agropecuario",
+	"relatorio-boletos-gta",
+]);
+
+const liderEstabelecimentoAllowedRoutes = new Set([
+	"dashboard",
+	"meu-perfil",
+	...liderEstabelecimentoEntryRoutes,
+	"adicionar-pessoa-fisica",
+	"visualizar-pessoa-fisica",
+	"editar-pessoa-fisica",
+	"adicionar-pessoa-juridica",
+	"visualizar-pessoa-juridica",
+	"editar-pessoa-juridica",
+	"adicionar-agroindustrial-sie",
+	"visualizar-estabelecimento-poa",
+	"editar-estabelecimento-poa",
+	"adicionar-integradora-cooperativa",
+	"visualizar-integradora-cooperativa",
+	"editar-integradora-cooperativa",
+	"adicionar-revendedora-animais",
+	"visualizar-revendedora-animais-vivos",
+	"editar-revendedora-animais",
+	"adicionar-revendedora-agropecuario",
+	"visualizar-revendedora-agropecuario",
+	"editar-revendedora-agropecuario",
+]);
+
+const produtorOnlyRoutes = new Set(["pendencias-confirmacao-gta"]);
+const representanteRoutes = new Set([
+	"relatorio-boletos-gta",
+	"visualizar-recolhimento-mensal-gta",
+	"visualizar-boleto-recolhimento-gta",
+	"visualizar-dae-recolhimento-gta",
+	"visualizar-pessoa-fisica",
+	"visualizar-pessoa-juridica",
+	"visualizar-emissao-gta",
+]);
+
+const responsavelEstabelecimentoEntryRoutes = new Set([
+	"agroindustrial-sie",
+	"integradora-cooperativa",
+]);
+
+const responsavelEstabelecimentoRoutes = new Set([
+	...responsavelEstabelecimentoEntryRoutes,
+	"adicionar-agroindustrial-sie",
+	"visualizar-agroindustrial-sie",
+	"editar-agroindustrial-sie",
+	"adicionar-integradora-cooperativa",
+	"visualizar-integradora-cooperativa",
+	"editar-integradora-cooperativa",
+]);
 interface DemoUserContextValue {
 	role: DemoUserRole | null;
+	user: DemoUserIdentity | null;
 	selectRole: (role: DemoUserRole) => void;
 	clearRole: () => void;
 }
@@ -112,11 +249,31 @@ const DemoUserContext = createContext<DemoUserContextValue | undefined>(undefine
 
 export function DemoUserProvider({ children }: { children: ReactNode }) {
 	const [role, setRole] = useState<DemoUserRole | null>(null);
+	const databaseRevision = useMockDatabaseRevision();
+	const perfis = useMemo(() => listarPerfisUsuario(), [databaseRevision]);
+	const user = useMemo(() => {
+		if (!role) return null;
+		const perfil = perfis.find((item) => item.role === role);
+		if (!perfil) return DEMO_USERS[role];
+		return {
+			role: perfil.role,
+			name: perfil.nome,
+			roleLabel: perfil.perfil,
+			document: perfil.documento,
+			pessoaFisicaId: perfil.pessoaFisicaId,
+			entityId: perfil.entityId,
+			email: perfil.email,
+			phone: perfil.telefone,
+			avatarDataUrl: perfil.avatarDataUrl,
+			acceptedTerms: perfil.aceitouTermos,
+		};
+	}, [perfis, role]);
 
 	return (
 		<DemoUserContext.Provider
 			value={{
 				role,
+				user,
 				selectRole: setRole,
 				clearRole: () => setRole(null),
 			}}
@@ -137,15 +294,24 @@ export function useDemoUser() {
 }
 
 export function isEntryRouteAllowed(role: DemoUserRole | null, route: string) {
-	if (route === "pendencias-confirmacao-gta") {
-		return role === "produtor";
-	}
-	return role !== "produtor" || produtorEntryRoutes.has(route);
+	if (!role) return false;
+	if (produtorOnlyRoutes.has(route)) return role === "produtor";
+	if (route === "relatorio-boletos-gta") return role === "responsavel-agroindustria-integradora";
+	if (role === "admin") return true;
+	if (role === "responsavel-agroindustria-integradora") return responsavelEstabelecimentoEntryRoutes.has(route);
+	if (role === "produtor") return produtorEntryRoutes.has(route);
+	if (role === "veterinario") return veterinarioEntryRoutes.has(route);
+	return liderEstabelecimentoEntryRoutes.has(route);
 }
 
 export function isRouteAllowed(role: DemoUserRole | null, route: string) {
-	if (route === "pendencias-confirmacao-gta") {
-		return role === "produtor";
+	if (!role) return false;
+	if (role === "admin") return true;
+	if (produtorOnlyRoutes.has(route)) return role === "produtor";
+	if (role === "responsavel-agroindustria-integradora") {
+		return route === "dashboard" || route === "meu-perfil" || representanteRoutes.has(route) || responsavelEstabelecimentoRoutes.has(route);
 	}
-	return role !== "produtor" || produtorAllowedRoutes.has(route);
+	if (role === "produtor") return produtorAllowedRoutes.has(route);
+	if (role === "veterinario") return veterinarioAllowedRoutes.has(route);
+	return liderEstabelecimentoAllowedRoutes.has(route);
 }

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Code to Canvas Capture"
+  short_description: "Abra interfaces locais no Code to Canvas"
+  default_prompt: "Use $code-to-canvas-capture para abrir este link local no Code to Canvas do Figma."

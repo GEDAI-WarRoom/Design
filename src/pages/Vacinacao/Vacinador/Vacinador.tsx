@@ -51,7 +51,7 @@ interface Vacinador {
 }
 
 const VACINADORES_MOCK: Vacinador[] = [
-  { id: 1, nome: "Josephina Arantes", cpf: "444.009.956-40", aderidoPasa: "Sim", profissionalNome: "José Aarão Neto", profissionalDoc: "555.009.956-40", situacao: "Ativo" },
+  { id: 1, nome: "Eloiza Silva", cpf: "444.009.956-40", aderidoPasa: "Sim", profissionalNome: "José Aarão Neto", profissionalDoc: "555.009.956-40", situacao: "Ativo" },
   { id: 2, nome: "Pedro Alves Moraes", cpf: "222.114.558-70", aderidoPasa: "Não", profissionalNome: "Marina Couto Dias", profissionalDoc: "333.221.115-09", situacao: "Ativo" },
   { id: 3, nome: "Carla Menezes Rocha", cpf: "111.998.775-30", aderidoPasa: "Sim", profissionalNome: "Joaquim da Silva", profissionalDoc: "444.009.956-40", situacao: "Inativo" },
 ];

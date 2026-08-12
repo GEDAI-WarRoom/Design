@@ -21,6 +21,7 @@ interface PageProps {
 }
 
 const toFormValue = (registro: LocalRealizacaoExame): LocalRealizacaoExameFormValue => ({
+  ehComercial: registro.ehComercial,
   proprietarios: registro.proprietarios.map((entidade, index) => ({
     uid: `proprietario-${registro.id}-${index}`,
     entidade,
@@ -65,6 +66,7 @@ export function EditarLocalRealizacaoExamePage({ onLogout, onNavigate, dados }: 
       endereco: form.endereco,
       veterinarios: form.veterinarios,
       situacao: form.situacao,
+      ehComercial: form.ehComercial === true,
     });
 
     if (!atualizado) {

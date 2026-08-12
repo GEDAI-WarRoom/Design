@@ -8,9 +8,10 @@ import {
 } from "../../../components/ui/FormKit";
 import {
   PessoaFisicaInput,
-  PESSOAS_FISICAS_MOCK,
   UnidadeAdministrativaInput,
 } from "../../../components/ui/EntitySearch";
+import { listarPessoasFisicasAtivasParaBusca } from "../PessoaFisica/pessoaFisicaData";
+import { useMockDatabaseRevision } from "../../../mocks/useMockDatabase";
 
 export interface ProfissionalOficialValue {
   id?: number;
@@ -43,7 +44,7 @@ export function normalizarProfissionalOficial(dados?: any): ProfissionalOficialV
     id: typeof dados?.id === "number" ? dados.id : undefined,
     pessoa: {
       id: dados?.pessoa?.id,
-      nome: textoOuPadrao(dados?.pessoa?.nome ?? dados?.nome, "Josephina Arantes"),
+      nome: textoOuPadrao(dados?.pessoa?.nome ?? dados?.nome, "Eloiza Silva"),
       documento: textoOuPadrao(
         dados?.pessoa?.documento ?? dados?.pessoa?.cpf ?? dados?.cpf,
         "444.009.956-40",
@@ -99,11 +100,14 @@ export function ProfissionalOficialCadastroForm({
   disabled = false,
   onNavigate,
 }: Props) {
+  const databaseRevision = useMockDatabaseRevision();
+  void databaseRevision;
   const atualizar = (campos: Partial<ProfissionalOficialValue>) =>
     onChange?.({ ...value, ...campos });
+  const pessoasCadastradas = listarPessoasFisicasAtivasParaBusca();
   const pessoas = [
     value.pessoa,
-    ...PESSOAS_FISICAS_MOCK.filter((pessoa) => pessoa.nome !== value.pessoa.nome),
+    ...pessoasCadastradas.filter((pessoa) => pessoa.nome !== value.pessoa.nome),
   ];
 
   return (

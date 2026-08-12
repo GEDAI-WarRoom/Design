@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { ArrowLeft, Info, ChevronUp, ChevronDown } from "lucide-react";
+import { ArrowLeft, Info, ChevronUp, ChevronDown, Eye, ReceiptText } from "lucide-react";
 
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, LargeTextArea } from "../../../components/ui/FormKit";
+import * as Icons from "../../../imports/icons";
 
 const GREEN = "#1A7A3C";
 
@@ -240,6 +241,8 @@ export function VisualizarDAEPage({ onLogout, onNavigate, dae }: PageProps) {
   );
   const [confirmando, setConfirmando] = useState(false);
   const [erroData, setErroData] = useState("");
+  const [itensExpandidos, setItensExpandidos] = useState(true);
+  const situacao = detalhe.statusDae === "Cancelado" ? "Cancelado" : statusPagamento;
 
   const handleConfirmarPagamento = () => {
     if (!confirmando) {
@@ -264,19 +267,6 @@ export function VisualizarDAEPage({ onLogout, onNavigate, dae }: PageProps) {
     setErroData("");
     setStatusPagamento("Pago");
     setConfirmando(false);
-  };
-
-  const handleCancelarConfirmacao = () => {
-    setStatusPagamento("Aberto");
-    setDataPagamento("");
-    setConfirmando(false);
-    setErroData("");
-  };
-
-  const handleDocumentoRelacionado = () => {
-    alert(
-      "Ir para a visualização do documento relacionado (ex: lote de pagamento) — tela ainda não implementada.",
-    );
   };
 
   return (
@@ -308,26 +298,6 @@ export function VisualizarDAEPage({ onLogout, onNavigate, dae }: PageProps) {
 
             {/* Ações */}
             <div className="flex flex-wrap items-center gap-2">
-              {statusDaePermiteDocumento(detalhe.statusDae) && (
-                <button
-                  type="button"
-                  onClick={handleDocumentoRelacionado}
-                  className="flex items-center gap-2 px-4 h-10 border border-[#1A7A3C] text-[#1A7A3C] hover:bg-green-50/40 text-xs font-bold rounded-md transition"
-                >
-                  Documento Relacionado
-                </button>
-              )}
-
-              {statusPagamento === "Pago" && (
-                <button
-                  type="button"
-                  onClick={handleCancelarConfirmacao}
-                  className="flex items-center gap-2 px-4 h-10 border border-red-500 text-red-500 hover:bg-red-50 text-xs font-bold rounded-md transition"
-                >
-                  Cancelar Confirmação do Pagamento
-                </button>
-              )}
-
               {statusPagamento === "Aberto" && (
                 <button
                   type="button"
@@ -356,8 +326,8 @@ export function VisualizarDAEPage({ onLogout, onNavigate, dae }: PageProps) {
           </div>
         )}
 
-        {/* 1. Informações Gerais */}
-        <Section title="Informações Gerais">
+        {/* 1. Informações Básicas */}
+        <Section title="Informações Básicas">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <FloatInput
               label="Origem do DAE"
@@ -388,33 +358,67 @@ export function VisualizarDAEPage({ onLogout, onNavigate, dae }: PageProps) {
               disabled
               className="md:col-span-2"
             />
+
+            <FloatInput
+              label="Município Arrecadador"
+              value={detalhe.municipioArrecadador}
+              onChange={() => {}}
+              disabled
+            />
+
+            <FloatInput
+              label="Receita"
+              value={detalhe.receita}
+              icon={<ReceiptText size={18} className="text-[#1A7A3C]" />}
+              onChange={() => {}}
+              disabled
+            />
           </div>
+
+          <LargeTextArea
+            label="Histórico"
+            value={detalhe.historico}
+            onChange={() => {}}
+            disabled
+            rows={3}
+          />
         </Section>
 
-        {/* 2. Informações do Contribuinte */}
+        {/* 2. Informações Complementares */}
+        <Section title="Informações Complementares">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {detalhe.tipoReferencia === "Mês-ano referência" && (
+              <>
+                <FloatInput label="Mês para Referência" value={detalhe.mesReferencia || ""} onChange={() => {}} disabled />
+                <FloatInput label="Ano para Referência" value={detalhe.anoReferencia || ""} onChange={() => {}} disabled />
+              </>
+            )}
+            {detalhe.tipoReferencia === "Período referência" && (
+              <FloatInput label="Período de Referência" value={detalhe.periodoReferenciaDe && detalhe.periodoReferenciaAte ? `De ${fmtData(detalhe.periodoReferenciaDe)} até ${fmtData(detalhe.periodoReferenciaAte)}` : ""} onChange={() => {}} className="md:col-span-2" disabled />
+            )}
+            <FloatInput label="Data de Validade do DAE" value={fmtData(detalhe.dataValidade)} onChange={() => {}} disabled />
+            <FloatInput label="Valor" value={fmtValor(detalhe.valor)} onChange={() => {}} disabled />
+            <FloatInput label="Data de Pagamento" required={confirmando} type={confirmando ? "date" : "text"} value={confirmando ? dataPagamento : fmtData(dataPagamento)} onChange={(v) => { setDataPagamento(v); setErroData(""); }} disabled={!confirmando} />
+            <FloatInput label="Situação" value={situacao} onChange={() => {}} disabled />
+          </div>
+          {erroData && <p className="text-sm text-red-500 -mt-2">{erroData}</p>}
+        </Section>
+
+        {/* 3. Informações do Contribuinte */}
         <Section title="Informações do Contribuinte">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <FloatInput
-              label="Tipo de Identificação"
-              value={detalhe.tipoIdentificacao}
-              onChange={() => {}}
-              disabled
-            />
-
-            <FloatInput
-              label="Nº do Contribuinte"
-              value={detalhe.numeroContribuinte}
-              onChange={() => {}}
-              disabled
-            />
-
-            <FloatInput
-              label="Nome do Contribuinte"
+              label="Contribuinte"
               value={detalhe.nomeContribuinte}
+              icon={<img src={Icons.iconeProdutorUrl} alt="" className="h-5 w-5 object-contain" />}
               onChange={() => {}}
               disabled
-              className="md:col-span-2"
             />
+
+            <div className="flex items-end gap-2">
+              <FloatInput label="Documento" value={detalhe.numeroContribuinte} onChange={() => {}} className="min-w-0 flex-1" disabled />
+              <button type="button" title="Visualizar contribuinte" aria-label="Visualizar contribuinte" onClick={() => onNavigate(detalhe.tipoIdentificacao === "CPF" ? "visualizar-pessoa-fisica" : "visualizar-pessoa-juridica", detalhe.tipoIdentificacao === "CPF" ? { nome: detalhe.nomeContribuinte, cpf: detalhe.numeroContribuinte, documento: detalhe.numeroContribuinte } : { razaoSocial: detalhe.nomeContribuinte, nome: detalhe.nomeContribuinte, cnpj: detalhe.numeroContribuinte, documento: detalhe.numeroContribuinte })} className="flex h-12 w-10 shrink-0 items-center justify-center rounded-md text-[#1A7A3C] transition hover:bg-green-50"><Eye size={18} /></button>
+            </div>
 
             <FloatInput
               label="Endereço do Contribuinte"
@@ -447,192 +451,79 @@ export function VisualizarDAEPage({ onLogout, onNavigate, dae }: PageProps) {
           </div>
         </Section>
 
-        {/* 3. Informações do Documento */}
-        <Section title="Informações do Documento">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <FloatInput
-              label="Município Arrecadador"
-              value={detalhe.municipioArrecadador}
-              onChange={() => {}}
-              disabled
-            />
-
-            <FloatInput
-              label="Receita"
-              value={detalhe.receita}
-              onChange={() => {}}
-              disabled
-            />
-          </div>
-
-          <LargeTextArea
-            label="Histórico"
-            value={detalhe.historico}
-            onChange={() => {}}
-            disabled
-            rows={3}
-          />
-        </Section>
-
         {/* 4. Lista de Itens (Um ou mais) */}
-        <Section title="Itens">
-          <div className="overflow-x-auto rounded-lg">
-            <table className="w-full text-sm border-collapse">
+        <section className="rounded-xl bg-white shadow-sm">
+          <div className="border-b border-gray-100 px-6 py-4">
+            <h2 className="text-base font-semibold text-gray-800">Itens</h2>
+          </div>
+          <div className="p-6">
+          <div className="overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm">
+            <table className="w-full table-fixed border-collapse text-xs">
+              <colgroup><col className="w-[18%]" /><col className="w-[24%]" /><col className="w-[13%]" /><col className="w-[10%]" /><col className="w-[9%]" /><col className="w-[9%]" /><col className="w-[13%]" /><col className="w-[4%]" /></colgroup>
               <thead>
-                <tr className="border-b border-gray-100">
-                  <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">
+                <tr className="border-b border-gray-100 bg-gray-50 text-gray-600">
+                  <th className="px-2.5 py-3 text-left font-semibold leading-4">
                     DESCRIÇÃO
                   </th>
-                  <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">
+                  <th className="px-2.5 py-3 text-left font-semibold leading-4">
                     RECEITA
                   </th>
-                  <th className="text-right px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">
+                  <th className="px-2.5 py-3 text-right font-semibold leading-4">
                     VALOR COBRADO
                   </th>
-                  <th className="text-right px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">
+                  <th className="px-2.5 py-3 text-right font-semibold leading-4">
                     DESCONTO
                   </th>
-                  <th className="text-right px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">
+                  <th className="px-2.5 py-3 text-right font-semibold leading-4">
                     MULTA
                   </th>
-                  <th className="text-right px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">
+                  <th className="px-2.5 py-3 text-right font-semibold leading-4">
                     JUROS
                   </th>
-                  <th className="text-right px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">
+                  <th className="px-2.5 py-3 text-right font-semibold leading-4">
                     VALOR TOTAL
                   </th>
+                  <th className="px-1 py-3 text-right font-normal"><button type="button" onClick={() => setItensExpandidos((expandido) => !expandido)} aria-label={itensExpandidos ? "Recolher tabela" : "Expandir tabela"} title={itensExpandidos ? "Recolher" : "Expandir"} className="inline-flex rounded-md p-1 text-gray-500 transition hover:bg-gray-100 hover:text-gray-800">{itensExpandidos ? <ChevronUp size={16} /> : <ChevronDown size={16} />}</button></th>
                 </tr>
               </thead>
-              <tbody>
+              {itensExpandidos && <tbody>
                 {detalhe.itens.map((item, idx) => (
                   <tr
                     key={idx}
                     className="border-b border-gray-50 last:border-0"
                   >
-                    <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
+                    <td className="break-words px-2.5 py-3 text-gray-600">
                       {item.descricao}
                     </td>
-                    <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
+                    <td className="break-words px-2.5 py-3 leading-5 text-gray-600">
                       {item.receita}
                     </td>
-                    <td className="px-4 py-3 text-gray-500 text-right whitespace-nowrap">
+                    <td className="px-2.5 py-3 text-right text-gray-600">
                       {fmtValor(item.valorCobrado)}
                     </td>
-                    <td className="px-4 py-3 text-gray-500 text-right whitespace-nowrap">
+                    <td className="px-2.5 py-3 text-right text-gray-600">
                       {fmtValor(item.desconto)}
                     </td>
-                    <td className="px-4 py-3 text-gray-500 text-right whitespace-nowrap">
+                    <td className="px-2.5 py-3 text-right text-gray-600">
                       {fmtValor(item.multa)}
                     </td>
-                    <td className="px-4 py-3 text-gray-500 text-right whitespace-nowrap">
+                    <td className="px-2.5 py-3 text-right text-gray-600">
                       {fmtValor(item.juros)}
                     </td>
-                    <td className="px-4 py-3 text-gray-800 font-semibold text-right whitespace-nowrap">
+                    <td className="px-2.5 py-3 text-right font-semibold text-gray-800">
                       {fmtValor(item.valorTotal)}
                     </td>
+                    <td className="px-1 py-3 text-right"><button type="button" onClick={() => onNavigate("visualizar-receita", { codigo: item.receita.split(" - ")[0], descricao: item.descricao, situacao: "Ativo" })} title="Visualizar item" aria-label={`Visualizar ${item.descricao}`} className="rounded-md p-2 text-[#1A7A3C] transition hover:bg-green-50"><Eye size={16} /></button></td>
                   </tr>
                 ))}
-              </tbody>
+              </tbody>}
+              <tfoot><tr className="border-t border-gray-100 bg-gray-50/80 font-bold text-gray-800"><td colSpan={6} className="px-4 py-3">Itens ({detalhe.itens.length})</td><td className="px-2.5 py-3 text-right text-[#1A7A3C]">{fmtValor(detalhe.itens.reduce((total, item) => total + item.valorTotal, 0))}</td><td /></tr></tfoot>
             </table>
           </div>
-        </Section>
-
-        {/* 5. Informações Complementares */}
-        <Section title="Informações Complementares">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <FloatInput
-              label="Tipo de Referência"
-              value={detalhe.tipoReferencia}
-              onChange={() => {}}
-              disabled
-            />
-
-            {/* Se for Mês-ano: cria um sub-grid para dividir a 2ª coluna em duas */}
-            {detalhe.tipoReferencia === "Mês-ano referência" && (
-              <div className="grid grid-cols-2 gap-3">
-                <FloatInput
-                  label="Mês para Referência"
-                  value={detalhe.mesReferencia || ""}
-                  onChange={() => {}}
-                  disabled
-                />
-
-                <FloatInput
-                  label="Ano para Referência"
-                  value={detalhe.anoReferencia || ""}
-                  onChange={() => {}}
-                  disabled
-                />
-              </div>
-            )}
-
-            {detalhe.tipoReferencia === "Período referência" && (
-              <FloatInput
-                label="Período de Referência"
-                value={
-                  detalhe.periodoReferenciaDe && detalhe.periodoReferenciaAte
-                    ? `De ${fmtData(detalhe.periodoReferenciaDe)} até ${fmtData(detalhe.periodoReferenciaAte)}`
-                    : ""
-                }
-                onChange={() => {}}
-                disabled
-              />
-            )}
-
-            <FloatInput
-              label="Data de Validade do DAE"
-              value={fmtData(detalhe.dataValidade)}
-              onChange={() => {}}
-              disabled
-            />
-
-            <FloatInput
-              label="Valor"
-              value={fmtValor(detalhe.valor)}
-              onChange={() => {}}
-              disabled
-            />
           </div>
+        </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
-            <div className="flex flex-col gap-1.5">
-              <span className="text-xs text-gray-400 font-medium">
-                Status do Pagamento
-              </span>
-              {statusPagamento}
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <span className="text-xs text-gray-400 font-medium">
-                Status do DAE
-              </span>
-              {detalhe.statusDae}
-            </div>
-          </div>
-
-          {/* Data de Pagamento — só aparece durante/depois da confirmação */}
-          {(confirmando || statusPagamento === "Pago") && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <FloatInput
-                label="Data de Pagamento"
-                required={confirmando}
-                type="date"
-                value={dataPagamento}
-                onChange={(v) => {
-                  setDataPagamento(v);
-                  setErroData("");
-                }}
-                disabled={statusPagamento === "Pago"}
-              />
-            </div>
-          )}
-          {erroData && <p className="text-sm text-red-500 -mt-2">{erroData}</p>}
-        </Section>
       </main>
     </div>
   );
-}
-
-function statusDaePermiteDocumento(status: "Ativo" | "Cancelado") {
-  return status === "Ativo";
 }
