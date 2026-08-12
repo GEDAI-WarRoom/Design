@@ -1,12 +1,11 @@
 import { useState } from "react";
-import { ArrowLeft, Syringe, Calendar, Store, Check, Package, PillBottle, Eye, ChevronUp, ChevronDown, AlertTriangle, Ban } from "lucide-react";
+import { ArrowLeft, Syringe, Calendar, Store, Check, Package, PillBottle, Eye, ChevronUp, ChevronDown } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, CustomRadio } from "../../../components/ui/FormKit";
 import { PieChart, Pie, Cell, Sector } from "recharts";
 import * as Icons from "../../../imports/icons";
 
 const GREEN = "#1A7A3C";
-const MOCK_KEY = "DECLARACOES_VACINA_DB";
 
 // ==========================================================
 // SUBCOMPONENTES (MODO SOMENTE LEITURA)
@@ -235,8 +234,6 @@ const GRUPOS_COM_NUCLEO = ["Abelhas", "Aves", "Suídeos"];
 // ==========================================================
 export function EditarDeclaracaoVacinacaoPage({ onLogout, onNavigate, dados }: { onLogout: () => void; onNavigate: (screen: any, data?: any) => void; dados?: any }) {
   const [graficoAtivo, setGraficoAtivo] = useState<{ loteId: string; index: number } | null>(null);
-  const [modalConfirmacao, setModalConfirmacao] = useState(false);
-  const [modalSucesso, setModalSucesso] = useState(false);
 
   const REGISTROS_RICOS: Record<string, any> = {
     "1": {
@@ -275,8 +272,7 @@ export function EditarDeclaracaoVacinacaoPage({ onLogout, onNavigate, dados }: {
     ? { ...registroOriginal, ...REGISTROS_RICOS[dados.id.toString()] }
     : { ...registroOriginal };
 
-  // O status passa a ser controlado no estado para refletir a mudança instantaneamente
-  const [registro, setRegistro] = useState(registroInicial);
+  const registro = registroInicial;
 
   const isRaiva = registro.doenca === "Raiva";
   const isBrucelose = registro.doenca === "Brucelose";
@@ -297,24 +293,6 @@ export function EditarDeclaracaoVacinacaoPage({ onLogout, onNavigate, dados }: {
   const DOSES_DISPONIVEIS = notasFiscaisOrigem.reduce((sum: number, item: any) => sum + (item.dosesDisponiveisTotais || 0), 0);
   const utilizadas = vacinadosView.reduce((s: number, r: any) => s + r.machos + r.femeas, 0);
   const saldo = DOSES_DISPONIVEIS - utilizadas;
-
-  const isCancelada = registro.situacao === "Cancelada";
-
-  // Lógica de cancelamento da declaração
-  const handleConfirmarCancelamento = () => {
-    const saved = localStorage.getItem(MOCK_KEY);
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      const newData = parsed.map((item: any) => 
-        item.id === registro.id ? { ...item, situacao: "Cancelada" } : item
-      );
-      localStorage.setItem(MOCK_KEY, JSON.stringify(newData));
-    }
-
-    setRegistro((prev: any) => ({ ...prev, situacao: "Cancelada" }));
-    setModalConfirmacao(false);
-    setModalSucesso(true);
-  };
 
   return (
     <div className="min-h-screen bg-[#f2f3f5] pb-24">
@@ -620,87 +598,12 @@ export function EditarDeclaracaoVacinacaoPage({ onLogout, onNavigate, dados }: {
           />
         </SectionCard>
 
-        {/* ============ SITUAÇÃO DO CADASTRO E AÇÕES (AC5) ============ */}
+        {/* ============ SITUAÇÃO DO CADASTRO ============ */}
         <Section title="Situação do Cadastro">
-          <div className="w-full flex items-center gap-4">
-            <div className="flex-1">
-              <FloatInput label="Situação" value={registro.situacao || "Ativo"} readOnly disabled />
-            </div>
-
-            {!isCancelada && (
-              <button
-                type="button"
-                onClick={() => setModalConfirmacao(true)}
-                className="h-12 px-6 rounded-lg font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors shadow-sm flex items-center gap-2 shrink-0"
-              >
-                <Ban size={18} />
-                Cancelar Declaração
-              </button>
-            )}
-          </div>
+          <FloatInput label="Situação" value={registro.situacao || "Ativo"} readOnly disabled />
         </Section>
         
       </main>
-
-      {/* ============ MODAL DE CONFIRMAÇÃO DE CANCELAMENTO ============ */}
-      {modalConfirmacao && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4 animate-fadeIn">
-          <div className="bg-white rounded-3xl shadow-xl max-w-sm w-full p-8 text-center flex flex-col items-center">
-            <div className="w-12 h-12 bg-red-50 text-red-600 rounded-full flex items-center justify-center mb-4">
-              <AlertTriangle size={24} />
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">
-              Cancelar Declaração
-            </h3>
-            <p className="text-sm text-gray-500 mb-8">
-              Tem certeza que deseja cancelar esta declaração de vacinação? Esta ação não poderá ser revertida.
-            </p>
-            <div className="flex items-center justify-center gap-3 w-full">
-              <button
-                type="button"
-                onClick={() => setModalConfirmacao(false)}
-                className="flex-1 px-5 py-3 rounded-xl text-sm font-semibold border-2 border-gray-200 text-gray-500 transition hover:bg-gray-50"
-              >
-                Voltar
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirmarCancelamento}
-                className="flex-1 px-5 py-3 rounded-xl text-white text-sm font-semibold transition hover:opacity-90 shadow-sm bg-red-600"
-              >
-                Confirmar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ============ MODAL DE SUCESSO ============ */}
-      {modalSucesso && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4 animate-fadeIn">
-          <div className="bg-white rounded-3xl shadow-xl max-w-sm w-full p-8 text-center flex flex-col items-center">
-            <div className="w-12 h-12 bg-green-50 text-green-600 rounded-full flex items-center justify-center mb-4">
-              <Check size={24} strokeWidth={3} />
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">
-              Declaração Cancelada
-            </h3>
-            <p className="text-sm text-gray-500 mb-8">
-              A situação desta declaração foi alterada para "Cancelada" com sucesso.
-            </p>
-            <div className="flex items-center justify-center w-full">
-              <button
-                type="button"
-                onClick={() => onNavigate("declaracao-vacinacao")}
-                className="w-full px-5 py-3 rounded-xl text-white text-sm font-semibold transition hover:opacity-90 shadow-sm"
-                style={{ backgroundColor: GREEN }}
-              >
-                Ir para Listagem
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
     </div>
   );

@@ -523,7 +523,6 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
 
   const handleSalvar = () => {
     setTentouSalvar(true);
-    if (!formValido) return;
 
     if (mode === "create") {
       const novoRegistro = {
@@ -1253,6 +1252,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
           setNotasFiscaisOrigem(selectedValues);
         }}
       />
+
       {/* ============ CARD DE SUCESSO ============ */}
       {sucesso && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4 animate-fadeIn">
