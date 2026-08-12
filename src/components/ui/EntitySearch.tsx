@@ -752,7 +752,7 @@ export function ProdutorInput({
 					}
 					columns={colunasModal}
 					searchKeys={["nome", "documento"]}
-					searchPlaceholder={`Buscar ${label}`}
+					searchPlaceholder="Buscar Produtor"
 					confirmLabel="Confirmar"
 					// Intercepta e reseta o filtro do tipo de pessoa ao fechar/confirmar se o EntitySearchInput permitir customização
 					onChange={(p) => {
@@ -760,7 +760,7 @@ export function ProdutorInput({
 						setTipoPessoa(""); // Reseta o select
 					}}
 					// 🔥 Injeta o FloatSelect customizado direto nas ações do cabeçalho do modal base
-					{...(label !== "Pessoa Jurídica" ? { headerActions: (
+					headerActions={(
 						<div className="w-48 !mr-4 pr-1 relative z-10 flex-shrink-0">
 							<FloatSelect
 								label="Tipo de Pessoa"
@@ -773,7 +773,7 @@ export function ProdutorInput({
 								]}
 							/>
 						</div>
-					) } : {})}
+					)}
 				/>
 
 				{/* Campo Extra reboque: CPF/CNPJ do Produtor */}

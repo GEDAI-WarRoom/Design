@@ -54,6 +54,7 @@ export function Navbar({ onLogout, onNavigate, currentScreen, hideSearch = false
   const abaPendenciasAtual = currentScreen.includes("rebanho")
     ? "rebanho"
     : "gta";
+  const totalNotificacoes = role === "admin" ? 2 : totalPendencias;
 
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-30 px-4 md:px-6 py-3">
@@ -75,18 +76,26 @@ export function Navbar({ onLogout, onNavigate, currentScreen, hideSearch = false
                 }
 				aria-label={`Abrir Central de Pendências: ${totalPendencias} pendências`}
                 title="Central de Pendências"
-                className="relative rounded-full p-1 text-gray-500 transition hover:bg-amber-50 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-amber-300"
+                className="relative rounded-full p-1 text-gray-500 transition hover:bg-green-50 hover:text-[#1A7A3C] focus:outline-none focus:ring-2 focus:ring-green-300"
               >
                 <Bell size={20} />
-                <span className="absolute -right-2 -top-2 flex min-h-5 min-w-5 items-center justify-center rounded-full border-2 border-white bg-amber-400 px-1 text-[10px] font-bold leading-none text-amber-950">
+				<span className="absolute -right-2 -top-2 flex min-h-5 min-w-5 items-center justify-center rounded-full border-2 border-white bg-[#1A7A3C] px-1 text-[10px] font-bold leading-none text-white">
 				  {totalPendencias}
                 </span>
               </button>
             ) : (
-              <div className="relative text-gray-500">
+              <button
+                type="button"
+                onClick={() => onNavigate("notificacoes-estabelecimentos")}
+				aria-label="Abrir notificações"
+				title="Notificações"
+                className="relative rounded-full p-1 text-gray-500 transition hover:bg-green-50 hover:text-[#1A7A3C]"
+              >
                 <Bell size={20} />
-                <span className="absolute right-0 top-0 h-2 w-2 rounded-full border border-white" style={{ backgroundColor: GREEN }} />
-              </div>
+                <span className="absolute -right-2 -top-2 flex min-h-5 min-w-5 items-center justify-center rounded-full border-2 border-white bg-[#1A7A3C] px-1 text-[10px] font-bold leading-none text-white">
+                  {totalNotificacoes}
+                </span>
+              </button>
             )}
             <button
               onClick={() => onNavigate("dashboard")}

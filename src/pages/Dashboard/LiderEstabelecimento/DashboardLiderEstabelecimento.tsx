@@ -29,6 +29,8 @@ export function DashboardLiderEstabelecimento({
 	void databaseRevision;
 	const { user } = useDemoUser();
 	const pessoa = obterPessoaFisica(user?.pessoaFisicaId);
+	const email = pessoa?.contatos.find((contato) => contato.tipo === "E-mail")?.valor ?? user?.email ?? "Não informado";
+	const telefone = pessoa?.contatos.find((contato) => contato.tipo === "Telefone")?.valor ?? user?.phone ?? "Não informado";
 	const estabelecimentosVinculados = listarEstabelecimentosDoLider("lider-estabelecimento");
 	const pendencias = listarPendenciasCentrais("lider-estabelecimento");
 
@@ -45,8 +47,9 @@ export function DashboardLiderEstabelecimento({
 					roleLabel={user?.roleLabel ?? "Líder de Estabelecimento"}
 					avatarSrc={user?.avatarDataUrl ?? fotoLiderEstabelecimentoExemploUrl}
 					details={[
-						{ id: "documento", label: "CPF", value: pessoa?.cpf || "Não informado" },
-						{ id: "vinculos", label: "Estabelecimentos", value: estabelecimentosVinculados.length },
+						{ id: "documento", label: "CPF/CNPJ", value: pessoa?.cpf || user?.document || "Não informado" },
+						{ id: "email", label: "E-mail", value: email },
+						{ id: "telefone", label: "Telefone", value: telefone },
 					]}
 				/>
 			}

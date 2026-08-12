@@ -9,6 +9,7 @@ import {
   ClipboardPlus,
   Dna,
   DollarSign,
+  Dock,
   Download,
   FileInput,
   FileText,
@@ -913,7 +914,7 @@ export const thirdCategories: MenuCategory[] = [
       {
         label: "Boletos",
         route: "boletos-gta",
-        icon: <ReceiptText size={16} />,
+        icon: <Dock size={16} />,
       },
       {
         label: "Relatório de Boletos",

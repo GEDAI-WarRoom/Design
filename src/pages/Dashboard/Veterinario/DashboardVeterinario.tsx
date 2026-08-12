@@ -85,6 +85,7 @@ export function DashboardVeterinario({
 						onView: () => onNavigate("visualizar-revendedora-agropecuario", { id: vinculo.id }),
 					}))}
 					count={vinculosAtivos.length}
+					limit={4}
 					onViewAll={() => onNavigate("visualizar-revendedora-agropecuario", { id: vinculosAtivos[0]?.id ?? 1 })}
 				/>
 			}
