@@ -59,6 +59,7 @@ interface FloatInputProps {
 	hasTooltip?: boolean;
 	tooltipText?: string;
 	id?: string;
+	hideNativeDateIcon?: boolean;
 }
 
 export function FloatInput({
@@ -76,6 +77,7 @@ export function FloatInput({
 	hasTooltip,
 	tooltipText,
 	id,
+	hideNativeDateIcon = false,
 }: FloatInputProps) {
 	const [focused, setFocused] = useState(false);
 	const internalRef = useRef<HTMLInputElement>(null);
@@ -162,6 +164,7 @@ export function FloatInput({
           ${disabled ? "text-gray-500 cursor-not-allowed" : ""} 
           ${icon ? "pl-7" : ""} 
           ${onClick && !isCalendar ? "pointer-events-none cursor-pointer" : ""}
+          ${hideNativeDateIcon ? "[&::-webkit-calendar-picker-indicator]:opacity-0" : ""}
           ${isDateVariant && !active ? "[&::-webkit-datetime-edit]:opacity-0 text-transparent" : "[&::-webkit-datetime-edit]:opacity-100 text-gray-800"}`}
 			/>
 		</div>

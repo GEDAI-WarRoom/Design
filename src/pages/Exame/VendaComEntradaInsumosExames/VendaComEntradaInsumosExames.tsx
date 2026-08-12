@@ -200,7 +200,7 @@ export function VendaComEntradaInsumosExamesPage({
           </button>
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-semibold text-gray-900">
-              Venda com Entrada de Insumos para Exame
+              Venda com Entrada de Insumos
             </h1>
             <button
               onClick={() => onNavigate("adicionar-venda-entrada-insumos-exames")}
@@ -410,7 +410,7 @@ export function VendaComEntradaInsumosExamesPage({
             {!hasSearched ? (
               <div className="p-6 text-center bg-white">
                 <p className="text-sm text-gray-500">
-                  Busque por venda com entrada de insumos para exame utilizando os filtros acima.
+                  Busque por venda com entrada de insumos utilizando os filtros acima.
                 </p>
               </div>
             ) : total === 0 ? (
@@ -421,60 +421,62 @@ export function VendaComEntradaInsumosExamesPage({
               </div>
             ) : (
               <div className="bg-white">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm border-collapse">
+                <div className="overflow-visible">
+                  <table className="w-full table-fixed text-xs border-collapse">
                     <thead>
                       <tr className="bg-gray-30 border-b border-gray-100">
-                        <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap uppercase text-xs tracking-wider">
+                        <th className="w-[15%] text-left px-3 py-3 font-semibold text-gray-600 whitespace-normal uppercase text-[11px] leading-tight tracking-wider">
                           Fornecedor
                         </th>
-                        <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap uppercase text-xs tracking-wider">
+                        <th className="w-[19%] text-left px-3 py-3 font-semibold text-gray-600 whitespace-normal uppercase text-[11px] leading-tight tracking-wider">
+                          Revendedora de Produtos<br />Agropecuários
+                        </th>
+                        <th className="w-[12%] text-left px-3 py-3 font-semibold text-gray-600 whitespace-normal uppercase text-[11px] leading-tight tracking-wider">
                           Número da <br /> Nota Fiscal
                         </th>
-                        <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap uppercase text-xs tracking-wider">
+                        <th className="w-[12%] text-left px-3 py-3 font-semibold text-gray-600 whitespace-normal uppercase text-[11px] leading-tight tracking-wider">
                           Número da <br /> Partida
                         </th>
-                        <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap uppercase text-xs tracking-wider">
-                          Destinatário
+                        <th className="w-[22%] text-left px-3 py-3 font-semibold text-gray-600 whitespace-normal uppercase text-[11px] leading-tight tracking-wider">
+                          Insumo - Doença
                         </th>
-                        <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap uppercase text-xs tracking-wider">
-                          Doença
-                        </th>
-                        <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap uppercase text-xs tracking-wider">
+                        <th className="w-[10%] text-left px-3 py-3 font-semibold text-gray-600 whitespace-normal uppercase text-[11px] leading-tight tracking-wider">
                           Situação
                         </th>
-                        <th className="px-4 py-3" />
+                        <th className="w-[10%] px-3 py-3" />
                       </tr>
                     </thead>
                     <tbody>
                       {pagina.map((v) => (
                         <tr key={v.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/60 transition">
-                          <td className="px-4 py-3 whitespace-nowrap">
+                          <td className="break-words px-3 py-3 text-gray-500">
+                            <span className="font-medium">
+                              {v.fornecedor}
+                            </span>
+                          </td>
+                          <td className="break-words px-3 py-3">
                             <div className="flex flex-col">
                               <span className="text-xs text-gray-500 ">
                                 {v.revendedoraCodigo}
                               </span>
-                              <span className="text-sm font-medium text-gray-500">
+                              <span className="font-medium text-gray-500">
                                 {v.revendedoraNome}
                               </span>
                             </div>
                           </td>
-                          <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
+                          <td className="break-words px-3 py-3 text-gray-500">
                             {v.numeroNotaFiscal}
                           </td>
-                          <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
+                          <td className="break-words px-3 py-3 text-gray-500">
                             {v.numeroPartida}
                           </td>
-                          <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
-                            {v.fornecedor}
+                          <td className="break-words px-3 py-3 text-gray-500">
+                            {v.tipoInsumo} - {v.doenca}
                           </td>
-                          <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
-                            {v.doenca}
-                          </td>
-                          <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
+                          <td className="break-words px-3 py-3 text-gray-500">
                             {v.situacao}
                           </td>
-                          <td className="px-4 py-3 text-right whitespace-nowrap">
+                          <td className="px-3 py-3 text-right whitespace-nowrap">
                             <div className="flex items-center justify-end gap-1">
                               {/* AQUI ESTÁ A CORREÇÃO: Passando 'v' no onNavigate */}
                               <button 
