@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, ChevronDown, ChevronUp, Eye, FileText, Handshake, Wallet } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronUp, Download, Eye, FileText, Handshake, Wallet } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput } from "../../../components/ui/FormKit";
 import * as Icons from "../../../imports/icons";
@@ -33,8 +33,15 @@ export function VisualizarBoletoRecolhimentoGTAPage({ onLogout, onNavigate, dado
         <button type="button" onClick={() => veioDaBuscaBoletos ? onNavigate("boletos-gta") : onNavigate("visualizar-recolhimento-mensal-gta", registro)} className="flex items-center gap-1 text-sm font-semibold text-[#1A7A3C] hover:opacity-70">
           <ArrowLeft size={15} /> {veioDaBuscaBoletos ? "Todos os boletos" : "Voltar ao Relatório de Boletos"}
         </button>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between gap-3">
           <h1 className="text-2xl font-semibold text-gray-900">Visualizar Boleto</h1>
+          <button
+            type="button"
+            onClick={() => window.alert(`Boleto ${boleto.numero} preparado para download.`)}
+            className="flex h-10 items-center gap-2 rounded-md bg-[#1A7A3C] px-4 text-sm font-semibold text-white transition hover:bg-[#15612F]"
+          >
+            <Download size={16} /> Baixar Boleto
+          </button>
         </div>
         <section className="rounded-xl bg-white shadow-sm">
           <div className="border-b border-gray-100 px-6 py-4">
@@ -141,9 +148,18 @@ export function VisualizarDAERecolhimentoGTAPage({ onLogout, onNavigate, dados }
         <button type="button" onClick={() => onNavigate("visualizar-recolhimento-mensal-gta", registro)} className="flex items-center gap-1 text-sm font-semibold text-[#1A7A3C] hover:opacity-70">
           <ArrowLeft size={15} /> Voltar ao Recolhimento Mensal de GTAs
         </button>
-        <div className="flex items-center gap-3">
-          <FileText size={28} className="text-[#1A7A3C]" />
-          <h1 className="text-2xl font-semibold text-gray-900">Visualizar DAE</h1>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <FileText size={28} className="text-[#1A7A3C]" />
+            <h1 className="text-2xl font-semibold text-gray-900">Visualizar DAE</h1>
+          </div>
+          <button
+            type="button"
+            onClick={() => window.alert(`DAE ${registro.numeroDAE ?? ""} preparado para download.`)}
+            className="flex h-10 items-center gap-2 rounded-md bg-[#1A7A3C] px-4 text-sm font-semibold text-white transition hover:bg-[#15612F]"
+          >
+            <Download size={16} /> Baixar DAE
+          </button>
         </div>
         <section className="rounded-xl bg-white p-6 shadow-sm">
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">

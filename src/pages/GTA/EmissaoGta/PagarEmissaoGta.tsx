@@ -25,7 +25,7 @@ export function PagarEmissaoGtaPage({
   const [formaPagamento, setFormaPagamento] = useState<"pix" | "boleto" | "dae">("pix");
   if (!emissao) return null;
 
-  const frigorificoAderido = frigorificoAderidoAoFundo(emissao.destino);
+  const frigorificoAderido = frigorificoAderidoAoFundo(emissao.destino, emissao.finalidade);
 
   const confirmar = () => {
     const atualizada = pagarEmissaoGta(emissao.id);
@@ -103,17 +103,19 @@ export function PagarEmissaoGtaPage({
           <p className="mt-1 text-sm text-gray-500">
             {frigorificoAderido
               ? "Para frigorífico aderido ao fundo, escolha PIX ou boleto."
-              : "Escolha PIX, boleto ou DAE."}
+              : "Escolha PIX ou DAE."}
           </p>
           <div className={`mt-5 grid grid-cols-1 gap-3 ${frigorificoAderido ? "md:grid-cols-2" : "md:grid-cols-3"}`}>
             <button type="button" onClick={() => setFormaPagamento("pix")} className={`rounded-lg border p-4 text-left ${formaPagamento === "pix" ? "border-[#1A7A3C] bg-green-50" : "border-gray-200"}`}>
               <span className="flex items-center gap-2 font-semibold text-gray-800"><QrCode size={18} className="text-[#1A7A3C]" /> PIX</span>
               <span className="mt-1 block text-xs text-gray-500">Pagamento imediato após a emissão.</span>
             </button>
-            <button type="button" onClick={() => setFormaPagamento("boleto")} className={`rounded-lg border p-4 text-left ${formaPagamento === "boleto" ? "border-[#1A7A3C] bg-green-50" : "border-gray-200"}`}>
-              <span className="flex items-center gap-2 font-semibold text-gray-800"><Barcode size={18} className="text-[#1A7A3C]" /> Boleto</span>
-              <span className="mt-1 block text-xs text-gray-500">Incluído no boleto mensal do representante.</span>
-            </button>
+            {frigorificoAderido && (
+              <button type="button" onClick={() => setFormaPagamento("boleto")} className={`rounded-lg border p-4 text-left ${formaPagamento === "boleto" ? "border-[#1A7A3C] bg-green-50" : "border-gray-200"}`}>
+                <span className="flex items-center gap-2 font-semibold text-gray-800"><Barcode size={18} className="text-[#1A7A3C]" /> Boleto</span>
+                <span className="mt-1 block text-xs text-gray-500">Incluído no boleto mensal do representante.</span>
+              </button>
+            )}
             {!frigorificoAderido && (
               <button type="button" onClick={() => setFormaPagamento("dae")} className={`rounded-lg border p-4 text-left ${formaPagamento === "dae" ? "border-[#1A7A3C] bg-green-50" : "border-gray-200"}`}>
                 <span className="flex items-center gap-2 font-semibold text-gray-800"><FileText size={18} className="text-[#1A7A3C]" /> DAE</span>

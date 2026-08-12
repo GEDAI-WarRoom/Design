@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { ArrowLeft, Check } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
+import { useDemoUser } from "../../../contexts/DemoUserContext";
 import {
   EmissaoGtaForm,
   RequiredFieldsNotice,
-  emissaoGtaValida,
 } from "./EmissaoGtaForm";
 import {
   adicionarEmissaoGta,
@@ -24,16 +24,28 @@ export function AdicionarEmissaoGtaPage({
   onLogout: () => void;
   onNavigate: (screen: any, data?: any) => void;
 }) {
+  const { user } = useDemoUser();
   const [emissao, setEmissao] = useState<EmissaoGtaFormValue>(
-    () => dados ?? criarEmissaoGtaVazia(),
+    () => {
+      if (dados) return dados;
+      const vazia = criarEmissaoGtaVazia();
+      return {
+        ...vazia,
+        emitente: user
+          ? {
+              id: user.pessoaFisicaId ?? user.entityId ?? 0,
+              nome: user.name,
+              documento: user.document,
+            }
+          : vazia.emitente,
+      };
+    },
   );
   const [tentouSalvar, setTentouSalvar] = useState(false);
   const [emissaoSalva, setEmissaoSalva] = useState<EmissaoGta | null>(null);
   const registroEmEdicao = dados && "id" in dados ? dados as EmissaoGta : null;
 
   const salvar = () => {
-    setTentouSalvar(true);
-    if (!emissaoGtaValida(emissao)) return;
     setEmissaoSalva(
       registroEmEdicao
         ? atualizarEmissaoGta(registroEmEdicao.id, emissao)
@@ -74,7 +86,7 @@ export function AdicionarEmissaoGtaPage({
         </div>
 
         <RequiredFieldsNotice />
-        {tentouSalvar && !emissaoGtaValida(emissao) && (
+        {tentouSalvar && !emissaoGtaValida(emissao, role === "admin") && (
           <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm font-medium text-red-700">
             Preencha os campos obrigatórios e complete todos os itens
             adicionados antes de continuar.
