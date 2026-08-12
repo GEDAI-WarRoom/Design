@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ArrowLeft, ChevronUp, ChevronDown, Check, Info, PlusCircle, Trash2, Package, PillBottle } from "lucide-react";
+import { ArrowLeft, ChevronUp, ChevronDown, Check, Eye, Info, PlusCircle, Trash2, Package, Store, PillBottle } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, FloatSelect, MultiSearchModal } from "../../../components/ui/FormKit";
 import {
@@ -11,6 +11,7 @@ import {
 } from "../../../components/ui/EntitySearch";
 import { PieChart, Pie, Cell, Sector } from "recharts";
 import { CadastroVacinacaoHeader, cadastroVacinacaoPageClass, mensagemSucessoCadastro, preencherComExemplo, type CadastroVacinacaoModeProps } from "../shared/CadastroVacinacaoMode";
+import * as Icons from "../../../imports/icons";
 
 const GREEN = "#1A7A3C";
 
@@ -51,6 +52,22 @@ function destinatariosPorTipo(tipo: TipoDestinatario) {
   if (tipo === "medico_veterinario") return VETERINARIOS_MOCK;
   if (tipo === "revendedora") return REVENDEDORAS_MOCK;
   return [];
+}
+
+function iconeDestinatario(tipo: TipoDestinatario) {
+  const className = "w-5 h-5 object-contain";
+
+  if (tipo === "produtor") return <img src={Icons.iconeProdutorUrl} alt="Produtor" className={className} />;
+  if (tipo === "vacinador") return <img src={Icons.iconeVacinadorUrl} alt="Vacinador" className={className} />;
+  if (tipo === "medico_veterinario") return <img src={Icons.iconeProfissionalAnimalUrl} alt="Profissional da Área Animal" className={className} />;
+  if (tipo === "revendedora") return <Store size={20} color={GREEN} />;
+  return null;
+}
+
+function rotaVisualizacaoDestinatario(tipo: TipoDestinatario) {
+  if (tipo === "revendedora") return "visualizar-revendedora-agropecuario";
+  if (tipo === "vacinador") return "visualizar-vacinador-brucelose";
+  return "visualizar-pessoa-fisica";
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -210,7 +227,7 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate, mode 
 
         {/* 1. Informações Básicas */}
         <Section title="Informações Básicas">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+          <div className="flex flex-col gap-4">
             <div>
               <FloatSelect
                 label="Tipo de Destinatário"
@@ -231,43 +248,55 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate, mode 
             </div>
 
             {tipoDestinatario && (
-              <div>
-                <EntitySearchInput
-                  label="Destinatário"
-                  placeholder="Buscar por nome ou CPF/CNPJ."
-                  value={destinatarioSelecionado?.nome ?? ""}
-                  data={destinatariosDisponiveis}
-                  searchKeys={["nome", "documento", "cpf", "codigo"]}
-                  columns={[
-                    { label: tipoDestinatario === "revendedora" ? "Razão Social" : "Nome", key: "nome" },
-                    { label: tipoDestinatario === "revendedora" ? "CNPJ / Código" : "CPF", key: tipoDestinatario === "medico_veterinario" ? "cpf" : tipoDestinatario === "revendedora" ? "codigo" : "documento" },
-                  ]}
-                  title={`Buscar ${TIPOS_DESTINATARIO.find((tipo) => tipo.value === tipoDestinatario)?.label ?? "Destinatário"}`}
-                  subtitle="Selecione um destinatário cadastrado no sistema:"
-                  icon={<Package size={20} color={GREEN} />}
-                  onChange={(entidadeSelecionada) => {
-                    setDestinatario(entidadeSelecionada);
-                    setNotasFiscaisOrigem([]);
-                    setLancamentos({});
-                    setErrosObrigatorios((atual) => ({ ...atual, destinatario: false, lote: false }));
-                  }}
-                  required
-                  error={errosObrigatorios.destinatario}
-                />
-                {errosObrigatorios.destinatario && (
-                  <p className="mt-1 text-xs text-red-500">Selecione o destinatário.</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+                <div>
+                  <EntitySearchInput
+                    label="Destinatário"
+                    placeholder="Buscar por nome ou CPF/CNPJ."
+                    value={destinatarioSelecionado?.nome ?? ""}
+                    data={destinatariosDisponiveis}
+                    searchKeys={["nome", "documento", "cpf", "codigo"]}
+                    columns={[
+                      { label: tipoDestinatario === "revendedora" ? "Razão Social" : "Nome", key: "nome" },
+                      { label: tipoDestinatario === "revendedora" ? "CNPJ / Código" : "CPF", key: tipoDestinatario === "medico_veterinario" ? "cpf" : tipoDestinatario === "revendedora" ? "codigo" : "documento" },
+                    ]}
+                    title={`Buscar ${TIPOS_DESTINATARIO.find((tipo) => tipo.value === tipoDestinatario)?.label ?? "Destinatário"}`}
+                    subtitle="Selecione um destinatário cadastrado no sistema:"
+                    icon={iconeDestinatario(tipoDestinatario)}
+                    onChange={(entidadeSelecionada) => {
+                      setDestinatario(entidadeSelecionada);
+                      setNotasFiscaisOrigem([]);
+                      setLancamentos({});
+                      setErrosObrigatorios((atual) => ({ ...atual, destinatario: false, lote: false }));
+                    }}
+                    required
+                  />
+                  {errosObrigatorios.destinatario && (
+                    <p className="mt-1 text-xs text-red-500">Selecione o destinatário.</p>
+                  )}
+                </div>
+
+                {destinatarioSelecionado && (
+                  <div className="flex items-end gap-2 animate-fadeIn">
+                    <FloatInput
+                      label="CPF/CNPJ do Destinatário"
+                      value={documentoDestinatario(destinatarioSelecionado)}
+                      disabled
+                      required
+                      className="flex-1"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => onNavigate(rotaVisualizacaoDestinatario(tipoDestinatario), destinatarioSelecionado)}
+                      className="mb-0 flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-md text-[#1A7A3C] transition hover:bg-green-50"
+                      title="Visualizar detalhes do destinatário"
+                      aria-label="Visualizar detalhes do destinatário"
+                    >
+                      <Eye size={20} />
+                    </button>
+                  </div>
                 )}
               </div>
-            )}
-
-            {destinatarioSelecionado && (
-              <FloatInput
-                label="CPF/CNPJ do Destinatário"
-                value={documentoDestinatario(destinatarioSelecionado)}
-                disabled
-                required
-                className="md:col-start-2"
-              />
             )}
           </div>
         </Section>
@@ -275,17 +304,12 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate, mode 
         {/* Seção 2: Saldo de Vacinas */}
         <Section title="Saldo de Vacinas">
           <div className="flex flex-col gap-4">
-              <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-                <div className="flex items-center gap-3">
-                  <div className="flex flex-col">
-                    <span className="text-sm text-gray-700 font-semibold">
-                      Adquiridas <span className="text-red-500">*</span>
-                    </span>
-                    <span className="text-xs text-gray-400">Selecione um ou mais lotes vinculados ao destinatário.</span>
-                  </div>
+            <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+              <div className="flex items-center gap-3">
+                <span className="text-xs font-medium text-gray-500">Saldo de Vacinas</span>
 
                 {notasFiscaisOrigem.length > 0 && (
-                  <div className="flex items-center gap-1.5 bg-green-50 border border-green-200 px-2.5 py-1 rounded-lg animate-fadeIn">
+                  <div className="flex items-center gap-1.5 rounded-lg border border-green-200 bg-green-50 px-2.5 py-1 animate-fadeIn">
                     <span className="text-[11px] font-semibold text-gray-500">DOSES LANÇADAS:</span>
                     <span className="text-[11px] font-black text-[#1A7A3C]">
                       {notasFiscaisOrigem.reduce((sum, item) => sum + (item.quantidadeDoses || 0), 0)} doses
@@ -311,17 +335,6 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate, mode 
                 Adicionar Lote
               </button>
             </div>
-
-            {destinatarioSelecionado && (
-              <FloatInput
-                label="Lote"
-                value={notasFiscaisOrigem.map((lote) => lote.numeroPartida ?? lote.nome).join(", ")}
-                placeholder="Selecione um ou mais lotes de vacina."
-                icon={<Package size={18} color={GREEN} />}
-                onClick={() => setModalNotaOrigemOpen(true)}
-                required
-              />
-            )}
 
             {/* CONDICIONAL 1: Sem destinatário selecionado */}
             {!destinatarioSelecionado && (
