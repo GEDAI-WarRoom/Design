@@ -1,30 +1,25 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   ArrowLeft,
-  Search,
-  SlidersHorizontal,
   ChevronLeft,
   ChevronRight,
   Eye as ViewIcon,
   Pencil,
   X,
-  Check,
-  Ban,
   Dna,
-  Syringe,
-  Layers,
-  Boxes,
   Calendar
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatSelect, FloatCombobox, FloatInput, SearchModal } from "../../../components/ui/FormKit";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
 import * as Icons from "../../../imports/icons";
-import { useDemoUser } from "../../../contexts/DemoUserContext";
 
 const GREEN = "#1A7A3C";
 const MOCK_KEY = "DECLARACOES_VACINA_DB";
 
+// ==========================================================
+// MOCKS DE ENTIDADE (substituir por API)
+// ==========================================================
 interface ProdutorEntidade {
   id: number;
   nome: string;
@@ -44,7 +39,7 @@ const ESTABELECIMENTOS_MOCK = [
   { id: 3, codigo: "42001040005", nome: "Fazenda Vertentes", municipio: "Varginha - MG", proprietario: "56.338.814/0001-95\n- Agropecuária Vale Verde Ltda." },
 ];
 
-const EXPLORACOES_MOCK = [
+const EXPLORACOES_MOCK =  [
   {
     id: 1,
     codigo: "3100104050003",
@@ -52,10 +47,54 @@ const EXPLORACOES_MOCK = [
     grupo: "Aves",
     estabCodigo: "10234567891",
     estabNome: "Fazenda do Rio",
-    produtores: [{ nome: "José Aarão Neto", documento: "555.009.956-40" }],
+    produtores: [
+      { nome: "José Aarão Neto", documento: "555.009.956-40" }
+    ],
     estabelecimentoFormatado: "10234567891\n- Fazenda do Rio",
     grupoEspecieFormatado: "Aves - Codorna",
     produtoresFormatado: "555.009.956-40\n- José Aarão Neto",
+  },
+  {
+    id: 2,
+    codigo: "3100104060012",
+    especie: "Suínos",
+    grupo: "Suídeos",
+    estabCodigo: "20345678902",
+    estabNome: "Granja Vale Verde",
+    produtores: [
+      { nome: "Maria Silva Mendes", documento: "444.111.222-33" }
+    ],
+    estabelecimentoFormatado: "20345678902\n- Granja Vale Verde",
+    grupoEspecieFormatado: "Suídeos - Suínos",
+    produtoresFormatado: "444.111.222-33\n- Maria Silva Mendes",
+  },
+  {
+    id: 3,
+    codigo: "3100104070088",
+    especie: "Abelha com Ferrão",
+    grupo: "Abelhas",
+    estabCodigo: "30456789013",
+    estabNome: "Sítio Mel Dourado",
+    produtores: [
+      { nome: "Carlos Henrique Souza", documento: "333.888.777-11" }
+    ],
+    estabelecimentoFormatado: "30456789013\n- Sítio Mel Dourado",
+    grupoEspecieFormatado: "Abelhas - Abelha com Ferrão",
+    produtoresFormatado: "333.888.777-11\n- Carlos Henrique Souza",
+  },
+  {
+    id: 4,
+    codigo: "3100104070099",
+    especie: "Abelha sem Ferrão",
+    grupo: "Abelhas",
+    estabCodigo: "40567890124",
+    estabNome: "Recanto dos Meliponíneos",
+    produtores: [
+      { nome: "Ana Beatriz Costa", documento: "222.444.777-88" }
+    ],
+    estabelecimentoFormatado: "40567890124\n- Recanto dos Meliponíneos",
+    grupoEspecieFormatado: "Abelhas - Abelha sem Ferrão",
+    produtoresFormatado: "222.444.777-88\n- Ana Beatriz Costa",
   }
 ];
 
@@ -67,59 +106,72 @@ const NUCLEOS_MOCK = [
     nucleoCompleto: "10293-\nNúcleo Central Norte",
     estabelecimentoCompleto: "44021-\nFazenda Boa Vista",
     produtorCompleto: "123.456.789-00-\nJoão da Silva"
+  },
+  {
+    id: "n-2",
+    codigo: "3100104070099",
+    nome: "Núcleo Sul",
+    nucleoCompleto: "10294-\nAnálise Sul",
+    estabelecimentoCompleto: "55012-\nSítio das Flores",
+    produtorCompleto: "98.765.432/0001-99-\nAgropecuária Vale Verde"
   }
 ];
 
 const ESPECIES_MOCK = [
   { id: 1, codigo: "ESP-001", nome: "Bovino", grupo: "Bovídeos" },
   { id: 2, codigo: "ESP-002", nome: "Suíno", grupo: "Suídeos" },
+  { id: 3, codigo: "ESP-003", nome: "Equino", grupo: "Equídeos" },
 ];
 
 const DOENCAS_MOCK = [
   { id: 1, nome: "Brucelose" },
   { id: 2, nome: "Febre Aftosa" },
+  { id: 3, nome: "Raiva" },
 ];
 
 const MUNICIPIOS_MG = [
-  "Belo Horizonte", "Lavras", "Varginha",
+  "Abadia dos Dourados", "Abaeté", "Belo Horizonte", "Campo Belo", "Carrancas",
+  "Divino", "Esmeraldas", "Lavras", "Oliveira", "Varginha",
 ];
 
 const SITUACOES = [
   { value: "Ativo", label: "Ativo" },
-  { value: "Cancelado", label: "Cancelado" },
+  { value: "Cancelada", label: "Cancelada" },
 ];
 
-const TIPOS_DECLARACAO = [
-  { value: "Vacina Oficial", label: "Vacina Oficial" },
-  { value: "Vacina Complementar", label: "Vacina Complementar" },
-];
-
+// ==========================================================
+// DADOS DA LISTAGEM
+// ==========================================================
 interface DeclaracaoVacinacao {
   id: number;
-  tipoDeclaracao: string;
   produtorNome: string;
   produtorDoc: string;
   estabCodigo: string;
   estabNome: string;
-  exploracaoCodigo?: string;
   municipio: string;
   especie: string;
   doenca: string;
-  dataVacinacao: string;
-  situacao: "Ativo" | "Cancelado";
+  dataVacinacao: string; // ISO AAAA-MM-DD
+  situacao: "Ativo" | "Cancelada";
 }
 
-const carregarListaDeclaracoes = (): DeclaracaoVacinacao[] => {
-  const stored = localStorage.getItem(MOCK_KEY);
-  if (stored) {
-    try {
-      return JSON.parse(stored);
-    } catch (e) {
-      console.error(e);
-    }
-  }
-  return [];
-};
+const DECLARACOES_MOCK: DeclaracaoVacinacao[] = [
+  {
+    id: 1, produtorNome: "José Aarão Neto", produtorDoc: "555.009.956-40",
+    estabCodigo: "31234567891", estabNome: "Fazenda do Rio", municipio: "Lavras",
+    especie: "Bovino", doenca: "Brucelose", dataVacinacao: "2026-02-01", situacao: "Ativo",
+  },
+  {
+    id: 2, produtorNome: "Divino de Souza Sobrinho", produtorDoc: "444.009.956-40",
+    estabCodigo: "31001040005", estabNome: "Fazenda Rio Preto", municipio: "Lavras",
+    especie: "Bovino", doenca: "Febre Aftosa", dataVacinacao: "2026-01-15", situacao: "Cancelada",
+  },
+  {
+    id: 3, produtorNome: "Agropecuária Vale Verde Ltda.", produtorDoc: "56.338.814/0001-95",
+    estabCodigo: "42001040005", estabNome: "Fazenda Vertentes", municipio: "Varginha",
+    especie: "Equino", doenca: "Raiva", dataVacinacao: "2026-03-02", situacao: "Ativo",
+  },
+];
 
 function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
@@ -142,11 +194,9 @@ interface PageProps {
 }
 
 export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
-  const { role } = useDemoUser();
-  const produtorEhUsuario = role === "produtor";
+  const [declaracoesDB, setDeclaracoesDB] = useState<DeclaracaoVacinacao[]>([]);
   const [busca, setBusca] = useState("");
-  const [tipoDeclaracao, setTipoDeclaracao] = useState("");
-  const [produtor, setProdutor] = useState<any | null>(() => produtorEhUsuario ? PRODUTORES_MOCK[0] : null);
+  const [produtor, setProdutor] = useState<any | null>(null);
   const [estabelecimento, setEstabelecimento] = useState<any | null>(null);
   const [exploracao, setExploracao] = useState<any | null>(null);
   const [nucleo, setNucleo] = useState<any | null>(null);
@@ -166,15 +216,24 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
   const [page, setPage] = useState(1);
   const perPage = 10;
 
-  const [declaracoesList] = useState<DeclaracaoVacinacao[]>(carregarListaDeclaracoes);
+  // Lógica de Banco de Dados Simulado
+  useEffect(() => {
+    const saved = localStorage.getItem(MOCK_KEY);
+    if (saved) {
+      setDeclaracoesDB(JSON.parse(saved));
+    } else {
+      setDeclaracoesDB(DECLARACOES_MOCK);
+      localStorage.setItem(MOCK_KEY, JSON.stringify(DECLARACOES_MOCK));
+    }
+  }, []);
 
   const hoje = new Date().toISOString().slice(0, 10);
   const erroDeFuturo = periodoDe !== "" && periodoDe > hoje;
   const erroPeriodo = periodoDe !== "" && periodoAte !== "" && periodoAte < periodoDe;
 
   const temFiltroAtivo =
-    Boolean(busca || tipoDeclaracao || produtor || estabelecimento || exploracao || nucleo ||
-    municipio || especie || doenca || periodoDe || periodoAte || situacao);
+    busca || produtor || estabelecimento || exploracao || nucleo ||
+    municipio || especie || doenca || periodoDe || periodoAte || situacao;
 
   const handlePesquisar = () => {
     if (!temFiltroAtivo) {
@@ -190,20 +249,22 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
 
   const databaseFiltrada = PRODUTORES_MOCK.filter((p) => (!tipoPessoa ? true : p.tipo === tipoPessoa));
 
-  const colunasModal =
-    tipoPessoa === "PJ"
-      ? [{ label: "Razão Social", key: "nome" }, { label: "CNPJ", key: "documento" }]
-      : [{ label: "Nome", key: "nome" }, { label: "CPF", key: "documento" }];
+  const colunasModalProdutor = [
+    { label: "Nome", key: "nome" },
+    { label: "Documento", key: "documento" },
+  ];
 
-  const filtrados = declaracoesList.filter((e) => {
+  const colunasModal = tipoPessoa === "PJ"
+    ? [{ label: "Razão Social", key: "nome" }, { label: "CNPJ", key: "documento" }]
+    : [{ label: "Nome", key: "nome" }, { label: "CPF", key: "documento" }];
+
+  const filtrados = declaracoesDB.filter((e) => {
     const termo = busca.trim().toLowerCase();
     const matchBusca =
       termo === "" ||
-      [e.tipoDeclaracao, e.produtorNome, e.produtorDoc, e.estabCodigo, e.estabNome, e.especie, e.doenca]
+      [e.produtorNome, e.produtorDoc, e.estabCodigo, e.estabNome, e.especie, e.doenca]
         .join(" ").toLowerCase().includes(termo);
-    const matchTipoDeclaracao = !tipoDeclaracao || e.tipoDeclaracao === tipoDeclaracao;
     const matchProdutor = !produtor || e.produtorDoc === produtor.documento;
-    const matchProdutorUsuario = !produtorEhUsuario || e.produtorDoc === PRODUTORES_MOCK[0].documento;
     const matchEstab = !estabelecimento || e.estabCodigo === estabelecimento.codigo;
     const matchExplor = !exploracao || e.especie === exploracao.especie;
     const matchMunicipio = municipio === "" || e.municipio === municipio;
@@ -212,7 +273,7 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
     const matchDe = periodoDe === "" || e.dataVacinacao >= periodoDe;
     const matchAte = periodoAte === "" || e.dataVacinacao <= periodoAte;
     const matchSituacao = situacao === "" || e.situacao === situacao;
-    return matchBusca && matchTipoDeclaracao && matchProdutor && matchProdutorUsuario && matchEstab && matchExplor && matchMunicipio &&
+    return matchBusca && matchProdutor && matchEstab && matchExplor && matchMunicipio &&
       matchEspecie && matchDoenca && matchDe && matchAte && matchSituacao;
   });
 
@@ -235,7 +296,7 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
           </button>
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-semibold text-gray-900">Declaração de Vacinação</h1>
-            <button onClick={() => onNavigate("adicionar-declaracao-vacinacao")} className="px-5 py-3 rounded-md text-white text-sm font-semibold transition hover:opacity-95 active:scale-[0.98]" style={{ backgroundColor: GREEN }}>
+            <button onClick={() => onNavigate("adicionar-declaracao-vacinacao")} className="px-5 py-3 rounded-md text-white text-sm font-semibold transition hover:opacity-90 active:scale-[0.98]" style={{ backgroundColor: GREEN }}>
               Adicionar Nova
             </button>
           </div>
@@ -245,17 +306,14 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
           <div className="animate-fadeIn flex flex-col gap-3 w-full">
             <div className="flex flex-col lg:flex-row items-end gap-3 w-full">
               <div className="w-full lg:flex-1">
-                <FloatSelect label="Tipo de Declaração" value={tipoDeclaracao} onChange={setTipoDeclaracao} options={TIPOS_DECLARACAO} />
-              </div>
-              {!produtorEhUsuario && <div className="w-full lg:flex-1">
                 <FloatInput
                   label="Produtor"
-                  value={produtor ? produtor.nome : ""}
-                  icon={<img src={Icons.iconeProdutorUrl} alt="Produtor" className="w-5 h-5 object-contain" />}
+                  value={produtor ? produtor.nome : ""} 
+                  icon={<img src={Icons.iconeProdutorUrl} alt="Produtor" className="w-5 h-5 object-contain" />} 
                   onClick={() => setModalProdutor(true)}
                   readOnly
-                />
-              </div>}
+                />            
+              </div>
 
               <div className="w-full lg:flex-1">
                 <EntitySearchInput
@@ -295,12 +353,12 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
                 icon={<img src={Icons.iconeExploracaoUrl} alt="Exploração" className="w-5 h-5 object-contain" />}
                 onClick={() => setModalExploracao(true)}
               />
-
+              
               <EntitySearchInput
                 label="Núcleo de Produção"
                 placeholder="Buscar por nome ou código"
                 value={nucleo ? nucleo.nome : ""}
-                data={NUCLEOS_MOCK}
+                data={NUCLEOS_MOCK} 
                 searchKeys={["codigo", "nome"]}
                 columns={[
                   { label: "Núcleo de Produção", key: "nucleoCompleto" },
@@ -346,18 +404,14 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
               />
 
               <FloatInput label="Período - De" type="date" max={hoje} value={periodoDe} icon={<Calendar size={18} color={GREEN} />} onChange={setPeriodoDe} />
-              <FloatInput label="Período - Até" type="date" min={periodoDe || undefined} value={periodoAte} icon={<Calendar size={18} color={GREEN} />} onChange={setPeriodoAte} />
+              <FloatInput label="Período - Até" type="date" min={periodoDe || undefined} value={periodoAte}  icon={<Calendar size={18} color={GREEN} />}onChange={setPeriodoAte} />
               <FloatSelect label="Situação" value={situacao} onChange={setSituacao} options={SITUACOES} />
             </div>
 
-            {erroDeFuturo && (
-              <p className="text-sm text-red-500">A data "De" não pode ser maior que a data atual.</p>
-            )}
-            {erroPeriodo && (
-              <p className="text-sm text-red-500">A data "Até" deve ser maior ou igual à data "De".</p>
-            )}
+            {erroDeFuturo && <p className="text-sm text-red-500">A data "De" não pode ser maior que a data atual.</p>}
+            {erroPeriodo && <p className="text-sm text-red-500">A data "Até" deve ser maior ou igual à data "De".</p>}
           </div>
-
+          
           {erroFiltro && (
             <p className="text-sm text-red-500">
               Preencha o campo de busca ou selecione ao menos um filtro para pesquisar.
@@ -367,7 +421,6 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
           {temFiltroAtivo && (
             <div className="flex flex-wrap gap-2 animate-fadeIn">
               {busca && <Chip label={`Busca: ${busca}`} onRemove={() => setBusca("")} />}
-              {tipoDeclaracao && <Chip label={`Tipo: ${tipoDeclaracao}`} onRemove={() => setTipoDeclaracao("")} />}
               {produtor && <Chip label={`Produtor: ${produtor.nome}`} onRemove={() => setProdutor(null)} />}
               {estabelecimento && <Chip label={`Estab.: ${estabelecimento.nome}`} onRemove={() => setEstabelecimento(null)} />}
               {exploracao && <Chip label={`Exploração: ${exploracao.codigo}`} onRemove={() => setExploracao(null)} />}
@@ -397,10 +450,8 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
                 <table className="w-full text-sm border-collapse">
                   <thead>
                     <tr className="border-b">
-                      <th className="text-left px-4 py-3 font-semibold uppercase text-gray-600 whitespace-normal max-w-[140px]">Tipo de Declaração</th>
                       <th className="text-left px-4 py-3 font-semibold uppercase text-gray-600 whitespace-normal max-w-[170px]">Produtor</th>
                       <th className="text-left px-4 py-3 font-semibold uppercase text-gray-600 whitespace-normal max-w-[180px]">Estabelecimento Agropecuário</th>
-                      <th className="text-left px-4 py-3 font-semibold uppercase text-gray-600 whitespace-normal max-w-[150px]">Exploração Pecuária</th>
                       <th className="text-left px-4 py-3 font-semibold uppercase text-gray-600 whitespace-normal max-w-[100px]">Espécie</th>
                       <th className="text-left px-4 py-3 font-semibold uppercase text-gray-600 whitespace-normal max-w-[110px]">Doença</th>
                       <th className="text-left px-4 py-3 font-semibold uppercase text-gray-600 whitespace-normal max-w-[110px]">Data de Vacinação</th>
@@ -411,7 +462,6 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
                   <tbody>
                     {pagina.map((e) => (
                       <tr key={e.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/60 transition">
-                        <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">{e.tipoDeclaracao}</td>
                         <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">
                           <div>{e.produtorDoc}</div>
                           <div>{e.produtorNome}</div>
@@ -420,13 +470,11 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
                           <div>{e.estabCodigo}</div>
                           <div>{e.estabNome}</div>
                         </td>
-                        <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">{e.exploracaoCodigo ?? "—"}</td>
                         <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">{e.especie}</td>
                         <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">{e.doenca}</td>
                         <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">{fmtData(e.dataVacinacao)}</td>
-                        <td className="px-4 py-3 text-gray-900 text-sm font-medium whitespace-normal">
-                          {e.situacao}
-                        </td>
+                        {/* 🚀 Coluna de Situação alterada para texto preto sem contornos */}
+                        <td className="px-4 py-3 text-black text-sm whitespace-normal font-medium">{e.situacao}</td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-1 justify-end">
                             <button onClick={() => onNavigate("visualizar-declaracao-vacinacao", e)} className="p-2 rounded-md hover:bg-green-50 transition" style={{ color: GREEN }} title="Visualizar"><ViewIcon size={18} /></button>
@@ -474,18 +522,18 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
           setModalExploracao(false);
         }}
         confirmLabel="Confirmar"
-        className="max-w-4xl lg:max-w-5xl w-full [&_td]:whitespace-pre-line"
+        className="max-w-4xl lg:max-w-5xl w-full [&_td]:whitespace-pre-line"     
       />
 
       <SearchModal<ProdutorEntidade>
         open={modalProdutor}
         onClose={() => {
           setModalProdutor(false);
-          setTipoPessoa("");
+          setTipoPessoa(""); 
         }}
         title="Buscar Proprietário"
         subtitle="Busque por um proprietário cadastrado no sistema:"
-        icon={<img src={Icons.iconeProdutorUrl} alt="Produtor" className="w-8 h-8 object-contain" />}
+        icon={<img src={Icons.iconeProdutorUrl} alt="Produtor" className="w-8 h-8 object-contain" />} 
         data={databaseFiltrada}
         columns={colunasModal}
         searchKeys={["nome", "documento"]}
@@ -494,7 +542,7 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
         onConfirm={(p) => {
           setProdutor(p);
           setModalProdutor(false);
-          setTipoPessoa("");
+          setTipoPessoa(""); 
         }}
         headerActions={
           <FloatSelect
@@ -512,5 +560,3 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
     </div>
   );
 }
-
-export default DeclaracaoVacinacaoPage;

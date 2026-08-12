@@ -21,12 +21,14 @@ import {
 } from "../../../components/ui/EntitySearch";
 import { PieChart, Pie, Cell, Sector } from "recharts";
 import * as Icons from "../../../imports/icons";
-import { useDemoUser } from "../../../contexts/DemoUserContext";
 import { CadastroVacinacaoHeader, cadastroVacinacaoPageClass, mensagemSucessoCadastro, preencherComExemplo, type CadastroVacinacaoModeProps } from "../shared/CadastroVacinacaoMode";
 
 const GREEN = "#1A7A3C";
 const MOCK_KEY = "DECLARACOES_VACINA_DB";
 
+// ==========================================================
+// MOCKS DE ENTIDADE COM IDS ÚNICOS
+// ==========================================================
 interface ProdutorEntidade {
   id: number;
   nome: string;
@@ -37,6 +39,13 @@ interface ProdutorEntidade {
 const PRODUTORES_MOCK: ProdutorEntidade[] = [
   { id: 1, nome: "José Aarão Neto", documento: "555.009.956-40", tipo: "PF" },
   { id: 2, nome: "Divino de Souza Sobrinho", documento: "444.009.956-40", tipo: "PF" },
+];
+
+const LABORATORIOS_MOCK = [
+  { id: 1, nome: "Laboratório Biovet" },
+  { id: 2, nome: "Boehringer Ingelheim" },
+  { id: 3, nome: "Zoetis" },
+  { id: 4, nome: "MSD Saúde Animal" },
 ];
 
 const ESTABELECIMENTOS_MOCK = [
@@ -52,11 +61,32 @@ const REVENDEDORAS_MOCK = [
 const EXPLORACOES_MOCK = [
   {
     id: 1,
-    codigo: "312345678910109",
+    produtorId: 1, 
+    estabId: 1,    
+    codigo: "420010400050001",
+    especie: "Bovino",
     estabelecimentoFormatado: "31234567891 -\n Fazenda do Rio",
     grupoEspecieFormatado: "Bovinos -\n Bovino",
     produtoresFormatado: "555.009.956-40 -\n  José Aarão Neto"
+  },
+  {
+    id: 2,
+    produtorId: 2, 
+    estabId: 2,    
+    codigo: "420010400050002",
+    especie: "Abelha com Ferrão",
+    estabelecimentoFormatado: "31001040005 -\n Fazenda Rio Preto",
+    grupoEspecieFormatado: "Abelhas -\n Abelha com Ferrão",
+    produtoresFormatado: "444.009.956-40 -\n  Divino de Souza Sobrinho"
   }
+];
+
+const LOTES_MOCK = [
+  { id: 1, nome: "0013225/24", partida: "1", uf: "MG", dosesDisponiveisTotais: 120, fornecedor: "Comercial AgroVet", revendedoraId: 1, compradorTipo: "Produtor", doenca: "Brucelose", tipoVacina: "B19", laboratorio: "BioMed/MG", validade: "20/12/2026" },
+  { id: 2, nome: "0013225/24", partida: "2", uf: "MG", dosesDisponiveisTotais: 80, fornecedor: "Comercial AgroVet", revendedoraId: 1, compradorTipo: "Produtor", doenca: "Brucelose", tipoVacina: "RB51", laboratorio: "BioMed/MG", validade: "20/12/2026" },
+  { id: 3, nome: "0014589/24", partida: "1", uf: "SP", dosesDisponiveisTotais: 250, fornecedor: "AgroInsumos Sul", revendedoraId: 2, compradorTipo: "Médico Veterinário", doenca: "Raiva", tipoVacina: "", laboratorio: "Zoetis", validade: "15/08/2027" },
+  { id: 4, nome: "0014589/24", partida: "1", uf: "GO", dosesDisponiveisTotais: 50, fornecedor: "Comercial AgroVet", revendedoraId: 1, compradorTipo: "Vacinador", doenca: "Raiva", tipoVacina: "", laboratorio: "Biovet", validade: "15/08/2027" },
+  { id: 5, nome: "0099887/25", partida: "3", uf: "MG", dosesDisponiveisTotais: 500, fornecedor: "Comercial AgroVet", revendedoraId: 1, compradorTipo: "Produtor", doenca: "Febre Aftosa", tipoVacina: "", laboratorio: "OuroFino", validade: "10/10/2026" }
 ];
 
 const DOENCAS_MOCK = [
@@ -70,44 +100,17 @@ const VACINADORES_MOCK = [
   { id: 2, vetId: 2, nome: "Carla Menezes", documento: "111.998.775-30" },
 ];
 
-const AGE_RANGES = [
-  "De 3 a 8 meses",
-  "De 13 a 24 meses",
-  "De 25 a 36 meses",
-  "Acima de 36 meses",
-];
+const GRUPOS_COM_NUCLEO = ["Abelhas", "Aves", "Suídeos"];
 
-interface VacinadosRow {
-  machos: number;
-  femeas: number;
+interface FaixaRebanho {
+  faixa: string;
+  machoExistentes: number;
+  femeaExistentes: number;
 }
 
-const INITIAL_VACINADOS: VacinadosRow[] = AGE_RANGES.map(() => ({
-  machos: 0,
-  femeas: 0,
-}));
-
-function derivarFaixas(doencaNome: string | undefined, regime: string): {
-  faixas: any[];
-  mostrarMachos: boolean;
-  mostrarFemeas: boolean;
-} {
-  const isBrucelose = doencaNome === "Brucelose";
-  const linhaPadrao = (label: string) => ({
-    label,
-    machos: { existentes: 100, naoVacinados: 80 },
-    femeas: { existentes: 100, naoVacinados: 80 },
-  });
-
-  if (isBrucelose) {
-    if (regime === "Vacina Oficial") {
-      return { faixas: [linhaPadrao("De 0 a 8 meses")], mostrarMachos: false, mostrarFemeas: true };
-    }
-    return { faixas: AGE_RANGES.slice(1).map(linhaPadrao), mostrarMachos: false, mostrarFemeas: true };
-  }
-  return { faixas: AGE_RANGES.map(linhaPadrao), mostrarMachos: true, mostrarFemeas: true };
-}
-
+// ==========================================================
+// SUBCOMPONENTES
+// ==========================================================
 function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col gap-5">
@@ -130,7 +133,7 @@ function Stepper({ value, onChange, accentColor, max }: { value: number; onChang
       <button
         aria-label="Diminuir"
         onClick={() => onChange(Math.max(0, value - 1))}
-        className="w-8 h-full flex items-center justify-center text-[#64748b] hover:bg-[#f1f5f9] transition-colors text-[16px] font-medium leading-none border-r border-[#e2e8f0]/60"
+        className="w-8 h-full flex items-center justify-center text-[#64748b] hover:bg-[#f1f5f9] active:bg-[#e2e8f0] transition-colors text-[16px] font-medium leading-none border-r border-[#e2e8f0]/60"
       >
         −
       </button>
@@ -146,7 +149,7 @@ function Stepper({ value, onChange, accentColor, max }: { value: number; onChang
         aria-label="Aumentar"
         onClick={() => { if (max !== undefined && value >= max) return; onChange(value + 1); }}
         disabled={max !== undefined && value >= max}
-        className="w-8 h-full flex items-center justify-center text-[#64748b] hover:bg-[#f1f5f9] transition-colors text-[16px] font-medium leading-none border-l border-[#e2e8f0]/60 disabled:opacity-30 disabled:cursor-not-allowed"
+        className="w-8 h-full flex items-center justify-center text-[#64748b] hover:bg-[#f1f5f9] active:bg-[#e2e8f0] transition-colors text-[16px] font-medium leading-none border-l border-[#e2e8f0]/60 disabled:opacity-30 disabled:cursor-not-allowed"
       >
         +
       </button>
@@ -219,6 +222,30 @@ const renderActiveShape = (props: any) => {
   );
 };
 
+// 1º: Declare a lista base
+const AGE_RANGES = [
+  "De 0 a 12 meses",
+  "De 13 a 24 meses",
+  "De 25 a 36 meses",
+  "Acima de 36 meses",
+];
+
+interface VacinadosRow {
+  machos: number;
+  femeas: number;
+}
+
+const INITIAL_VACINADOS: VacinadosRow[] = AGE_RANGES.map(() => ({
+  machos: 0,
+  femeas: 0,
+}));
+
+interface FaixaLinha {
+  label: string;
+  machos: { existentes: number; naoVacinados: number };
+  femeas: { existentes: number; naoVacinados: number };
+}
+
 function VaccinationTable({
   faixas,
   mostrarMachos,
@@ -228,7 +255,7 @@ function VaccinationTable({
   onChange,
   onReset,
 }: {
-  faixas: any[];
+  faixas: FaixaLinha[];
   mostrarMachos: boolean;
   mostrarFemeas: boolean;
   statusLabel: string;
@@ -245,6 +272,7 @@ function VaccinationTable({
 
   const th = "text-[11px] font-semibold text-[#6b7280] text-center py-2.5 px-3 border-b border-r border-[#f1f5f9]";
   const td = "text-[13px] text-[#1d1d1f] text-center py-3.5 px-3 border-b border-r border-[#f1f5f9]";
+
   const generosVisiveis = (mostrarMachos ? 1 : 0) + (mostrarFemeas ? 1 : 0);
 
   return (
@@ -334,57 +362,81 @@ function VaccinationTable({
   );
 }
 
+const FAIXA_BRUCELOSE_OFICIAL = "De 3 a 8 meses";
+
+function derivarFaixas(doencaNome: string | undefined, regime: string): {
+  faixas: FaixaLinha[];
+  mostrarMachos: boolean;
+  mostrarFemeas: boolean;
+} {
+  const isBrucelose = doencaNome === "Brucelose";
+  const linhaPadrao = (label: string): FaixaLinha => ({
+    label,
+    machos: { existentes: 100, naoVacinados: 80 },
+    femeas: { existentes: 100, naoVacinados: 80 },
+  });
+
+  if (isBrucelose) {
+    if (regime === "Vacina Oficial") {
+      return { faixas: [linhaPadrao(FAIXA_BRUCELOSE_OFICIAL)], mostrarMachos: false, mostrarFemeas: true };
+    }
+    return { faixas: AGE_RANGES.map(linhaPadrao), mostrarMachos: false, mostrarFemeas: true };
+  }
+
+  return { faixas: AGE_RANGES.map(linhaPadrao), mostrarMachos: true, mostrarFemeas: true };
+}
+
 interface PageProps extends CadastroVacinacaoModeProps {
   onLogout: () => void;
   onNavigate: (screen: any, data?: any) => void;
 }
 
 export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = "create", dados }: PageProps) {
-  const { role } = useDemoUser();
-  const produtorEhUsuario = role === "produtor";
   const preenchendoRegistro = mode !== "create";
   const nomeDoencaInicial = dados?.doencaEntidade?.nome ?? dados?.doenca ?? "";
   const dataVacinacaoInicial = dados?.dataVacinacao ?? "";
   const produtorInicial = dados?.produtor ?? (dados?.produtorNome
     ? PRODUTORES_MOCK.find((item) => item.documento === dados.produtorDoc) ?? {
-      id: `produtor-${dados?.id ?? "registro"}`,
-      nome: dados.produtorNome,
-      documento: dados.produtorDoc,
-      tipo: dados.produtorDoc?.includes("/") ? "PJ" : "PF",
-    }
-    : produtorEhUsuario ? PRODUTORES_MOCK[0] : null);
+        id: `produtor-${dados?.id ?? "registro"}`,
+        nome: dados.produtorNome,
+        documento: dados.produtorDoc,
+        tipo: dados.produtorDoc?.includes("/") ? "PJ" : "PF",
+      }
+    : null);
   const estabelecimentoInicial = dados?.estabelecimento ?? (dados?.estabNome
     ? ESTABELECIMENTOS_MOCK.find((item) => item.codigo === dados.estabCodigo) ?? {
-      id: `estabelecimento-${dados?.id ?? "registro"}`,
-      produtorId: produtorInicial?.id,
-      codigo: dados.estabCodigo,
-      nome: dados.estabNome,
-      municipio: dados.municipio,
-    }
+        id: `estabelecimento-${dados?.id ?? "registro"}`,
+        produtorId: produtorInicial?.id,
+        codigo: dados.estabCodigo,
+        nome: dados.estabNome,
+        municipio: dados.municipio,
+      }
     : null);
   const exploracaoInicial = dados?.exploracao ?? (dados?.especie
     ? {
-      id: `exploracao-${dados?.id ?? "registro"}`,
-      codigo: dados?.exploracaoCodigo ?? `${dados?.estabCodigo ?? "31001040005"}0001`,
-      estabId: estabelecimentoInicial?.id,
-      produtorId: produtorInicial?.id,
-      especie: dados.especie,
-      grupoEspecieFormatado: `Grupo da espécie - ${dados.especie}`,
-    }
+        id: `exploracao-${dados?.id ?? "registro"}`,
+        codigo: dados?.exploracaoCodigo ?? `${dados?.estabCodigo ?? "31001040005"}0001`,
+        estabId: estabelecimentoInicial?.id,
+        produtorId: produtorInicial?.id,
+        especie: dados.especie,
+        grupoEspecieFormatado: `Grupo da espécie - ${dados.especie}`,
+      }
     : null);
   const doencaInicial = dados?.doencaEntidade ?? (nomeDoencaInicial
     ? DOENCAS_MOCK.find((item) => item.nome === nomeDoencaInicial) ?? {
-      id: `doenca-${dados?.id ?? "registro"}`,
-      nome: nomeDoencaInicial,
-      tiposVacina: [],
-    }
+        id: `doenca-${dados?.id ?? "registro"}`,
+        nome: nomeDoencaInicial,
+        tiposVacina: [],
+      }
     : null);
 
+  // ---- Informações Básicas ----
   const [produtor, setProdutor] = useState<any | null>(produtorInicial);
   const [estabelecimento, setEstabelecimento] = useState<any | null>(estabelecimentoInicial);
   const [exploracao, setExploracao] = useState<any | null>(exploracaoInicial);
   const [nucleo, setNucleo] = useState<any | null>(dados?.nucleo ?? null);
 
+  // ---- Informações de Vacinação ----
   const [doenca, setDoenca] = useState<any | null>(doencaInicial);
   const [tipoVacina, setTipoVacina] = useState(dados?.tipoVacina ?? (nomeDoencaInicial === "Brucelose" && preenchendoRegistro ? "B19" : ""));
   const [dataVacinacao, setDataVacinacao] = useState(dados?.dataVacinacao ?? "");
@@ -392,50 +444,40 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
   const [veterinario, setVeterinario] = useState<any | null>(dados?.veterinario ?? (preenchendoRegistro ? { id: 1, nome: "Dr. Roberto Silva", cpf: "123.456.789-00" } : null));
   const [vacinadorBrucelose, setVacinadorBrucelose] = useState<any | null>(dados?.vacinadorBrucelose ?? (preenchendoRegistro && nomeDoencaInicial === "Brucelose" ? { id: 1, vetId: 1, nome: "Eloiza Silva", documento: "444.009.956-40" } : null));
   const [mordidaMorcego, setMordidaMorcego] = useState(dados?.mordidaMorcego ?? (preenchendoRegistro ? "Não" : ""));
+  const [regime, setRegime] = useState(dados?.regime ?? (preenchendoRegistro ? (nomeDoencaInicial === "Brucelose" ? "Vacina Oficial" : "Primeira Dose") : ""));
 
-  const [regime, setRegime] = useState(dados?.regime ?? dados?.tipoDeclaracao ?? (preenchendoRegistro ? (nomeDoencaInicial === "Brucelose" ? "Vacina Oficial" : "Primeira Dose") : ""));
-
+  // ---- Saldo de Vacinas e Lotes ----
   const [modalNotaOrigemOpen, setModalNotaOrigemOpen] = useState(false);
-  const [notasFiscaisOrigem, setNotasFiscaisOrigem] = useState<any[]>(dados?.notasFiscaisOrigem ?? (preenchendoRegistro ? [{
-    id: `lote-${dados?.id ?? "registro"}`,
-    nome: dados?.numeroPartida ?? "0013225/24",
-    partida: "1",
-    uf: dados?.ufNotaFiscal ?? "MG",
-    dosesDisponiveisTotais: 120,
-    quantidadeDoses: 10,
-    quantidadeFrascos: 1,
-    dosesPerFrasco: 10,
-    fornecedor: "Distribuidora de Vacinas Alfa LTDA",
-    doenca: nomeDoencaInicial || "Brucelose",
-    tipoVacina: dados?.tipoVacina ?? (nomeDoencaInicial === "Brucelose" ? "B19" : ""),
-    laboratorio: "BioMed/MG",
-    validade: "20/12/2026",
-  }] : []));
-
+  const [notasFiscaisOrigem, setNotasFiscaisOrigem] = useState<any[]>(dados?.notasFiscaisOrigem ?? []);
   const [graficoAtivo, setGraficoAtivo] = useState<{ loteId: string; index: number } | null>(null);
   const [notasListasMinimizadas, setNotasListasMinimizadas] = useState<Record<string, boolean>>({});
   const [lotesMinimizados, setLotesMinimizados] = useState<Record<string, boolean>>({});
-
   const [vacinados, setVacinados] = useState<VacinadosRow[]>(dados?.vacinados ?? (preenchendoRegistro ? INITIAL_VACINADOS.map((linha, index) => ({ ...linha, machos: index === 0 ? 4 : 0, femeas: index === 0 ? 6 : 0 })) : INITIAL_VACINADOS));
+  
   const [origemNota, setOrigemNota] = useState(dados?.origemNota ?? (preenchendoRegistro ? "Produtor" : ""));
-  const [revendedora, setRevendedora] = useState<any | null>(dados?.revendedora ?? (preenchendoRegistro ? { codigo: "3120938028", nome: "Comercial AgroVat" } : null));
-  const DOSES_DISPONIVEIS = 70;
+  const [revendedora, setRevendedora] = useState<any | null>(dados?.revendedora ?? (preenchendoRegistro ? { id: 1, codigo: "3120938028", nome: "Comercial AgroVet" } : null));
 
   const [modalProdutor, setModalProdutor] = useState(false);
   const [tipoPessoa, setTipoPessoa] = useState("");
 
   const [tentouSalvar, setTentouSalvar] = useState(false);
   const [sucesso, setSucesso] = useState(false);
+  
+  // 🚀 ESTADO PARA GUARDAR O REGISTRO RECÉM-CRIADO
+  const [registroSalvo, setRegistroSalvo] = useState<any>(null);
 
   const hoje = new Date().toISOString().slice(0, 10);
 
   const exigeNucleo = useMemo(() => {
-    return doenca?.exigeNucleo || false;
-  }, [doenca]);
+    if (!exploracao) return false;
+    const grupo = exploracao.grupoEspecieFormatado || "";
+    return GRUPOS_COM_NUCLEO.some((g) => grupo.includes(g));
+  }, [exploracao]);
 
   const isRaiva = doenca?.nome === "Raiva";
-  const dataAtestadoObrigatoria = doenca?.nome === "Brucelose";
-
+  const isBrucelose = doenca?.nome === "Brucelose";
+  
+  const DOSES_DISPONIVEIS = notasFiscaisOrigem.reduce((sum, item) => sum + (item.dosesDisponiveisTotais || 0), 0);
   const utilizadas = vacinados.reduce((s, r) => s + r.machos + r.femeas, 0);
   const saldo = DOSES_DISPONIVEIS - utilizadas;
 
@@ -445,14 +487,12 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
 
   const formValido =
     !!produtor && !!estabelecimento && !!exploracao && (!exigeNucleo || !!nucleo) &&
-    !!doenca && regime !== "" && dataVacinacao !== "" && (!dataAtestadoObrigatoria || dataAtestado !== "") && !!veterinario &&
+    !!doenca && regime !== "" && dataVacinacao !== "" && dataAtestado !== "" && !!veterinario &&
     (!isRaiva || mordidaMorcego !== "") &&
     origemNota !== "" && !!revendedora &&
     dosesValidas && !erroDataVac && !erroDataAtestado;
 
-  const isBrucelose = doenca?.nome === "Brucelose";
   const tipoVacinaDisponivel = (doenca?.tiposVacina?.length ?? 0) > 0;
-  const tiposVacinaFiltrados = doenca?.tiposVacina ?? [];
   const opcoesRegime = isBrucelose
     ? ["Vacina Oficial", "Vacina Complementar"]
     : ["Primeira Dose", "Dose de Reforço"];
@@ -460,11 +500,13 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
   const mostrarVacinacaoENota = !!produtor && !!doenca;
 
   const { faixas: faixasTabela, mostrarMachos, mostrarFemeas } = derivarFaixas(doenca?.nome, regime);
-  const statusColLabel = regime === "Dose de Reforço" ? "Já Vacinados na Etapa" : "Não Vacinados";
+  const statusColLabel = regime === "Vacina Oficial" || regime === "Primeira Dose" ? "Não Vacinados" : "Já Vacinados";
   const vacinadosView: VacinadosRow[] = faixasTabela.map((_, i) => vacinados[i] ?? { machos: 0, femeas: 0 });
 
   const estabsFiltrados = produtor ? ESTABELECIMENTOS_MOCK.filter((e) => e.produtorId === produtor.id) : [];
-  const exploracoesFiltradas = EXPLORACOES_MOCK;
+  const exploracoesFiltradas = estabelecimento && produtor
+  ? EXPLORACOES_MOCK.filter((e) => e.estabId === estabelecimento.id && e.produtorId === produtor.id)
+  : [];
 
   const databaseProdutor = PRODUTORES_MOCK.filter((p) => (!tipoPessoa ? true : p.tipo === tipoPessoa));
   const colunasModalProdutor = [
@@ -483,40 +525,41 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
     setTentouSalvar(true);
     if (!formValido) return;
 
-    const novaDeclaracao = {
-      id: Date.now(),
-      tipoDeclaracao: regime,
-      produtorNome: produtor?.nome || "",
-      produtorDoc: produtor?.documento || "",
-      estabCodigo: estabelecimento?.codigo || "",
-      estabNome: estabelecimento?.nome || "",
-      municipio: estabelecimento?.municipio || "Lavras",
-      exploracaoCodigo: exploracao?.codigo || "",
-      especie: exploracao?.especie || "Bovino",
-      doenca: doenca?.nome || "",
-      dataVacinacao: dataVacinacao,
-      dataAtestado: dataAtestado,
-      tipoVacina: tipoVacina || "—",
-      situacao: "Ativo" as const,
-      produtor,
-      estabelecimento,
-      exploracao,
-      nucleo,
-      doencaEntidade: doenca,
-      veterinario,
-      vacinadorBrucelose,
-      mordidaMorcego,
-      origemNota,
-      revendedora,
-      notasFiscaisOrigem,
-      vacinados,
-    };
+    if (mode === "create") {
+      const novoRegistro = {
+        id: Date.now(),
+        produtorNome: produtor?.nome || "",
+        produtorDoc: produtor?.documento || "",
+        estabCodigo: estabelecimento?.codigo || "",
+        estabNome: estabelecimento?.nome || "",
+        municipio: estabelecimento?.municipio || "",
+        exploracaoCodigo: exploracao?.codigo || "",
+        especie: exploracao?.especie || "",
+        doenca: doenca?.nome || "",
+        tipoVacina: tipoVacina || "",
+        regime: regime || "",
+        dataVacinacao: dataVacinacao || "",
+        dataAtestado: dataAtestado || "",
+        veterinarioNome: veterinario?.nome || "",
+        vacinadorNome: vacinadorBrucelose?.nome || "",
+        mordidaMorcego: mordidaMorcego || "",
+        origemNota: origemNota || "",
+        revendedoraNome: revendedora?.nome || "",
+        notasFiscaisOrigem: notasFiscaisOrigem || [],
+        vacinados: vacinados || [],
+        nucleo: nucleo ? { nome: nucleo.nome, codigo: nucleo.codigo } : null,
+        situacao: "Ativo"
+      };
 
-    const stored = localStorage.getItem(MOCK_KEY);
-    const db = stored ? JSON.parse(stored) : [];
-    db.unshift(novaDeclaracao);
-    localStorage.setItem(MOCK_KEY, JSON.stringify(db));
-
+      const saved = localStorage.getItem(MOCK_KEY);
+      const parsed = saved ? JSON.parse(saved) : [];
+      const newData = [novoRegistro, ...parsed];
+      localStorage.setItem(MOCK_KEY, JSON.stringify(newData));
+      
+      // 🚀 SALVA O REGISTRO PARA ENVIAR PARA A VISUALIZAÇÃO
+      setRegistroSalvo(novoRegistro);
+    }
+    
     setSucesso(true);
   };
 
@@ -534,36 +577,17 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
   };
   const onChangeDoenca = (ent: any) => {
     setDoenca(ent); setTipoVacina(""); setVacinadorBrucelose(null); setMordidaMorcego(""); setRegime("");
+    setNotasFiscaisOrigem([]); 
   };
 
-  const registroAtual = {
-    id: dados?.id ?? Date.now(),
-    tipoDeclaracao: regime,
-    produtorNome: produtor?.nome || "",
-    produtorDoc: produtor?.documento || "",
-    estabCodigo: estabelecimento?.codigo || "",
-    estabNome: estabelecimento?.nome || "",
-    municipio: estabelecimento?.municipio || "Lavras",
-    exploracaoCodigo: exploracao?.codigo || "",
-    especie: exploracao?.especie || "Bovino",
-    doenca: doenca?.nome || "",
-    dataVacinacao,
-    dataAtestado,
-    tipoVacina,
-    situacao: "Ativo" as const,
-    produtor,
-    estabelecimento,
-    exploracao,
-    nucleo,
-    doencaEntidade: doenca,
-    veterinario,
-    vacinadorBrucelose,
-    mordidaMorcego,
-    origemNota,
-    revendedora,
-    notasFiscaisOrigem,
-    vacinados,
-  };
+  const lotesFiltradosModal = LOTES_MOCK.filter(item => 
+    item.compradorTipo === origemNota && 
+    item.revendedoraId === revendedora?.id &&
+    item.doenca === doenca?.nome
+  ).map(item => ({
+    ...item,
+    doencaComTipo: item.tipoVacina ? `${item.doenca} - ${item.tipoVacina}` : item.doenca
+  }));
 
   return (
     <div className={cadastroVacinacaoPageClass(mode, "min-h-screen bg-[#f2f3f5] pb-24")}>
@@ -575,18 +599,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
             <ArrowLeft size={15} />
             Todas Declarações de Vacinação
           </button>
-          <div className="flex flex-col gap-2">
-            <CadastroVacinacaoHeader mode={mode} nomeCadastro="Declaração de Vacinação" rotaEditar="editar-declaracao-vacinacao" dados={dados} onNavigate={onNavigate} onSubmit={handleSalvar} />
-            {mode === "edit" && dados?.situacao !== "Cancelado" && (
-              <button
-                type="button"
-                onClick={() => onNavigate("declaracao-vacinacao", { ...registroAtual, situacao: "Cancelado" })}
-                className="self-end text-sm font-semibold text-red-600 hover:text-red-700"
-              >
-                Cancelar declaração
-              </button>
-            )}
-          </div>
+          <CadastroVacinacaoHeader mode={mode} nomeCadastro="Declaração de Vacinação" rotaEditar="editar-declaracao-vacinacao" dados={dados} onNavigate={onNavigate} onSubmit={handleSalvar} />
         </div>
 
         <div className="w-full bg-white border border-gray-100 rounded-lg p-5 shadow-sm flex items-center gap-3 mt-4 mb-6">
@@ -598,16 +611,20 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
           </p>
         </div>
 
-        {/* ============ INFORMAÇÕES BÁSICAS ============ */}
+       {/* ============ INFORMAÇÕES BÁSICAS ============ */}
         <SectionCard title="Informações Básicas">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+          <div className="grid grid-cols-1 gap-4 items-end">
+            
             <div className="col-span-full">
               <ProdutorInput
                 value={produtor ? produtor.nome : ""}
                 required
-                disabled={produtorEhUsuario}
                 onChange={onChangeProdutor}
                 error={err(!produtor)}
+                onEyeClick={() => {
+                  if (produtor?.id) alert(`Visualizar detalhes do produtor ID: ${produtor.id}`);
+                  else alert("Por favor, selecione um produtor primeiro.");
+                }}
               />
             </div>
 
@@ -620,6 +637,10 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
                   data={estabsFiltrados}
                   onChange={onChangeEstabelecimento}
                   error={err(!estabelecimento)}
+                  onEyeClick={() => {
+                    if (estabelecimento?.codigo) alert(`Visualizar detalhes: ${estabelecimento.codigo}`);
+                    else alert("Por favor, selecione um estabelecimento primeiro.");
+                  }}
                 />
               </div>
             )}
@@ -632,6 +653,10 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
                   data={exploracoesFiltradas}
                   onChange={onChangeExploracao}
                   error={err(!exploracao)}
+                  onEyeClick={() => {
+                    if (exploracao?.codigo) alert(`Visualizar detalhes: ${exploracao.codigo}`);
+                    else alert("Por favor, selecione uma exploração primeiro.");
+                  }}
                 />
               </div>
             )}
@@ -652,6 +677,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
         {/* ============ INFORMAÇÕES DE VACINAÇÃO ============ */}
         <SectionCard title="Informações de Vacinação">
           <div className="flex flex-wrap gap-4 items-end w-full">
+
             <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
               <EntitySearchInput
                 label="Doença"
@@ -674,11 +700,8 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
                 <FloatSelect
                   label="Tipo de Vacina"
                   value={tipoVacina}
-                  onChange={(v: string) => {
-                    setTipoVacina(v);
-                    if (isBrucelose) setRegime(v === "B19" ? "Vacina Oficial" : "Vacina Complementar");
-                  }}
-                  options={tiposVacinaFiltrados.map((t: string) => ({ value: t, label: t }))}
+                  onChange={setTipoVacina}
+                  options={(doenca?.tiposVacina ?? []).map((t: string) => ({ value: t, label: t }))}
                 />
               </div>
             )}
@@ -686,7 +709,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
             {doenca && (
               <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
                 <FloatSelect
-                  label="Tipo de Declaração"
+                  label="Vacinação"
                   required
                   value={regime}
                   onChange={(v: string) => {
@@ -694,7 +717,6 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
                     setVacinados(AGE_RANGES.map(() => ({ machos: 0, femeas: 0 })));
                   }}
                   options={opcoesRegime.map((o) => ({ value: o, label: o }))}
-                  disabled={isBrucelose && (tipoVacina === "B19" || tipoVacina === "RB51")}
                   error={err(regime === "")}
                 />
               </div>
@@ -716,14 +738,14 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
             <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
               <FloatInput
                 label="Data de Atestado de Vacinação"
-                required={dataAtestadoObrigatoria}
+                required
                 type="date"
                 icon={<Calendar size={18} color={GREEN} />}
                 min={dataVacinacao || undefined}
                 max={hoje}
                 value={dataAtestado}
                 onChange={setDataAtestado}
-                error={err(dataAtestadoObrigatoria && dataAtestado === "") || (erroDataAtestado ? "Entre a Data de Vacinação e hoje." : undefined)}
+                error={err(dataAtestado === "") || (erroDataAtestado ? "Entre a Data de Vacinação e hoje." : undefined)}
               />
             </div>
 
@@ -733,6 +755,10 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
                 required
                 onChange={(entidadeSelecionada) => setVeterinario(entidadeSelecionada)}
                 error={err(!veterinario)}
+                onEyeClick={() => {
+                  if (veterinario?.cpf) alert(`Visualizar detalhes do veterinário CPF: ${veterinario.cpf}`);
+                  else alert("Por favor, selecione um médico veterinário primeiro.");
+                }}
               />
             </div>
 
@@ -744,14 +770,18 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
                   data={veterinario ? VACINADORES_MOCK.filter((v: any) => v.vetId === veterinario.id) : []}
                   onChange={(entidadeSelecionada) => setVacinadorBrucelose(entidadeSelecionada)}
                   error={err(isBrucelose && !vacinadorBrucelose)}
+                  onEyeClick={() => {
+                    if (vacinadorBrucelose?.documento) alert(`Visualizar detalhes do vacinador CPF: ${vacinadorBrucelose.documento}`);
+                    else alert("Por favor, selecione um vacinador primeiro.");
+                  }}
                 />
               </div>
             )}
 
             {isRaiva && (
-              <div className="w-full flex flex-col gap-2 mt-2 p-3 rounded-lg">
+              <div className="w-full flex flex-col gap-2 mt-2 p-3 rounded-lg ">
                 <span className="text-xs font-semibold text-gray-700">
-                  Observou mordidas de morcegos no rebanho recentemente? <span className="text-red-500">*</span>
+                  Recentemente, tem observado mordidas de morcegos nos animais do rebanho? <span className="text-red-500">*</span>
                 </span>
                 <div className="flex items-center gap-6 mt-1">
                   <CustomRadio
@@ -771,19 +801,26 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
                 </div>
               </div>
             )}
+
           </div>
         </SectionCard>
 
-        {/* ============ SALDO DE VACINAS (COM GRÁFICO DE ROSCA E LOTES) ============ */}
+
+        {/* Seção 2: Saldo de Vacinas */}
         {mostrarVacinacaoENota && (
           <Section title="Saldo de Vacinas">
             <div className="flex flex-col gap-4">
+
+              {/* Origem e Revendedora */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FloatSelect
                   label="Origem do Saldo"
                   required
                   value={origemNota}
-                  onChange={setOrigemNota}
+                  onChange={(v: string) => {
+                    setOrigemNota(v);
+                    setNotasFiscaisOrigem([]); // Limpa as notas se a origem mudar
+                  }}
                   options={[
                     { value: "Produtor", label: "Produtor" },
                     { value: "Médico Veterinário", label: "Médico Veterinário" },
@@ -791,27 +828,36 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
                   ]}
                   error={err(origemNota === "")}
                 />
+                
                 <EntitySearchInput
                   label="Revendedora de Insumos"
                   required
-                  placeholder="Buscar revendedora"
-                  value={revendedora?.nome ?? ""}
+                  placeholder="Buscar revendedora..."
+                  value={revendedora ? revendedora.nome : ""}
                   data={REVENDEDORAS_MOCK}
                   searchKeys={["nome", "documento"]}
-                  columns={[{ label: "Nome", key: "nome" }, { label: "CNPJ", key: "documento" }]}
+                  columns={[
+                    { label: "Nome", key: "nome" },
+                    { label: "CNPJ", key: "documento" }
+                  ]}
                   icon={<Store size={18} color={GREEN} />}
-                  title="Buscar Revendedora de Insumos"
+                  title="Buscar Revendedora"
                   subtitle="Busque por uma revendedora cadastrada:"
-                  onChange={setRevendedora}
+                  onChange={(ent) => {
+                    setRevendedora(ent);
+                    setNotasFiscaisOrigem([]); // Limpa as notas se a revendedora mudar
+                  }}
                   error={err(!revendedora)}
                 />
               </div>
 
-              <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+              {/* Título interno, Total de Doses e o Botão */}
+              <div className="flex items-center justify-between border-b border-gray-100 pb-3 mt-2">
                 <div className="flex items-center gap-3">
                   <div className="flex flex-col">
                     <span className="text-xs text-gray-500 font-medium">Saldo de doses</span>
                   </div>
+
                   {notasFiscaisOrigem.length > 0 && (
                     <div className="flex items-center gap-1.5 bg-green-50 border border-green-200 px-2.5 py-1 rounded-lg animate-fadeIn">
                       <span className="text-[11px] font-semibold text-gray-500">DOSES UTILIZADAS:</span>
@@ -824,27 +870,35 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
 
                 <button
                   type="button"
-                  disabled={!produtor}
+                  disabled={!origemNota || !revendedora}
                   onClick={(e) => {
                     e.preventDefault();
+                    e.stopPropagation();
                     setModalNotaOrigemOpen(true);
                   }}
-                  className={`flex items-center gap-2 text-sm font-semibold px-4 h-11 rounded-lg border w-fit transition shadow-sm ${
-                    produtor ? "border-[#1A7A3C] text-[#1A7A3C] hover:bg-green-50 cursor-pointer" : "border-gray-200 text-gray-300 bg-gray-100 cursor-not-allowed"
-                  }`}
+                  className={`flex items-center gap-2 text-sm font-semibold px-4 h-11 rounded-lg border w-fit transition shadow-sm ${origemNota && revendedora
+                    ? "border-[#1A7A3C] text-[#1A7A3C] hover:bg-green-50 cursor-pointer"
+                    : "border-gray-200 text-gray-300 bg-gray-100 cursor-not-allowed"
+                    }`}
                 >
                   <PlusCircle size={18} />
                   Adicionar Saldo
                 </button>
               </div>
 
-              {notasFiscaisOrigem.length === 0 && (
+              {/* Lotes vinculados e Dashboard */}
+              {(!origemNota || !revendedora) && (
+                <div className="text-left py-4">
+                  <p className="text-xs text-gray-400 italic">É necessário selecionar a Origem do Saldo e a Revendedora para pesquisar notas fiscais.</p>
+                </div>
+              )}
+
+              {(origemNota && revendedora && notasFiscaisOrigem.length === 0) && (
                 <div className="w-full border border-dashed border-gray-200 rounded-xl py-8 px-4 text-center bg-gray-50/20">
                   <p className="text-sm text-gray-400 italic">Nenhum lote vinculado até o momento.</p>
                 </div>
               )}
 
-              {/* LISTA DE LOTES VINCULADOS COM GRÁFICO DONUT INTERATIVO */}
               {notasFiscaisOrigem.length > 0 && (
                 <div className="flex flex-col gap-6 animate-fadeIn">
                   {Object.values(
@@ -860,6 +914,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
 
                     return (
                       <div key={`grupo-${grupo.nome}`} className="border border-gray-200 rounded-xl p-4 bg-gray-50/30 relative">
+
                         <div className="flex items-center justify-between mb-4 px-1">
                           <div className="flex items-center gap-2">
                             <div
@@ -867,17 +922,66 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
                               onClick={() => setNotasListasMinimizadas(prev => ({ ...prev, [grupo.nome]: !isNotaMinimizada }))}
                             >
                               <Package size={24} color={GREEN} />
-                              <span className="text-sm font-bold text-gray-600">Lote:</span>
-                              <span className="text-sm font-bold text-gray-800">{grupo.nome}</span>
+                              <span className="text-sm font-bold text-gray-600 group-hover/title:text-gray-600 transition-colors">Lote:</span>
+                              <span className="text-sm font-bold text-gray-800 group-hover/title:text-gray-600 transition-colors">{grupo.nome}</span>
                             </div>
+
+                            <div className="relative group/info overflow-visible flex items-center">
+                              <div className="relative cursor-help text-gray-400 hover:text-gray-600 transition z-20 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></svg>
+                                <div className="fixed inset-0 bg-black/15 hidden group-hover/info:block pointer-events-none z-[998] animate-fadeIn" />
+
+                                <div className="absolute left-0 top-full mt-2 w-60 bg-white border border-gray-100 rounded-xl shadow-xl hidden group-hover/info:block animate-fadeIn z-[999] text-left overflow-hidden">
+                                  <div className="flex items-center gap-1.5 bg-gray-50 border-b border-gray-100 p-3">
+                                    <Package size={13} className="text-gray-500" />
+                                    <span className="text-[11px] font-extrabold text-gray-800">Nº de Partida:{" "}{grupo.nome}</span>                                  
+                                  </div>
+                                  <div className="p-3 flex flex-col gap-2 text-[11px] text-gray-500 bg-white">
+                                    <div className="flex justify-between items-center gap-3">
+                                      <span>Doença:</span>
+                                      <span className="font-bold text-gray-700 text-right">{[...new Set(grupo.partidas.map((p: any) => p.doenca).filter(Boolean))].join(", ") || "—"}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center gap-3">
+                                      <span>Tipo de Vacina:</span>
+                                      <span className="font-bold text-gray-700 text-right">{[...new Set(grupo.partidas.map((p: any) => p.tipoVacina).filter(Boolean))].join(", ") || "—"}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center gap-3">
+                                      <span>Laboratório:</span>
+                                      <span className="font-bold text-gray-700 text-right">{[...new Set(grupo.partidas.map((p: any) => p.laboratorio).filter(Boolean))].join(", ") || "—"}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center gap-3">
+                                      <span>Validade:</span>
+                                      <span className="font-bold text-gray-700 text-right">{[...new Set(grupo.partidas.map((p: any) => p.validade).filter(Boolean))].join(", ") || "—"}</span>
+                                    </div>
+                                  </div>
+                                  <div className="bg-gray-50 border-t border-gray-100 p-3 flex justify-between items-center text-[11px] font-bold text-green-700">
+                                    <span>Doses Totais Lote:</span>
+                                    <span>{grupo.partidas.reduce((soma: number, p: any) => soma + (p.dosesDisponiveisTotais || 0), 0)}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            {isNotaMinimizada && (
+                              <span className="text-[11px] text-gray-400 font-medium normal-case">
+                                ({grupo.partidas.length} {grupo.partidas.length === 1 ? 'partida oculta' : 'partidas ocultas'})
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => setNotasListasMinimizadas(prev => ({ ...prev, [grupo.nome]: !isNotaMinimizada }))}
+                              className="text-gray-400 hover:text-gray-600 p-1 rounded transition hover:bg-gray-100"
+                            >
+                              {isNotaMinimizada ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
+                            </button>
 
                             <button
                               type="button"
-                              onClick={() => {
-                                setNotasFiscaisOrigem(notasFiscaisOrigem.filter(item => item.nome !== grupo.nome));
-                              }}
-                              className="text-gray-400 hover:text-red-500 p-1 rounded transition hover:bg-red-50 ml-2"
-                              title="Remover Lote"
+                              onClick={() => setNotasFiscaisOrigem(notasFiscaisOrigem.filter(item => item.nome !== grupo.nome))}
+                              className="text-gray-400 hover:text-red-500 p-1 rounded transition hover:bg-red-50"
                             >
                               <Trash2 size={16} />
                             </button>
@@ -889,16 +993,34 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
                             {grupo.partidas.map((nfItem: any) => {
                               const DOSES_POR_FRASCO = nfItem.dosesPerFrasco || 20;
                               const TOTAL_DISPONIVEL = nfItem.dosesDisponiveisTotais || 100;
+                              const validadeLote = nfItem.validade || "20/12/2026";
+
                               const isLoteExpandido = lotesMinimizados[nfItem.id] !== undefined ? lotesMinimizados[nfItem.id] : true;
                               const isLoteMinimizado = !isLoteExpandido;
 
-                              const dadosGrafico = [
-                                { name: "Vencidas", value: 0, color: "#ef4444" },
-                                { name: "Descartadas", value: 10, color: "#9ca3af" },
-                                { name: "Partilhadas", value: 20, color: "#3b82f6" },
-                                { name: "Utilizadas", value: nfItem.quantidadeDoses || 0, color: "#f59e0b" },
-                                { name: "Disponíveis", value: TOTAL_DISPONIVEL - (nfItem.quantidadeDoses || 0), color: "#22c55e" },
-                              ];
+                              const verificarVencimento = (dataStr: string) => {
+                                if (!dataStr) return false;
+                                const [dia, mes, ano] = dataStr.split("/").map(Number);
+                                const dataValidade = new Date(ano, mes - 1, dia);
+                                return dataValidade < new Date();
+                              };
+                              const isVencido = verificarVencimento(validadeLote);
+
+                              const dadosGrafico = isVencido
+                                ? [
+                                  { name: "Vencidas", value: TOTAL_DISPONIVEL, color: "#ef4444" },
+                                  { name: "Descartadas", value: 0, color: "#9ca3af" },
+                                  { name: "Partilhadas", value: 0, color: "#3b82f6" },
+                                  { name: "Utilizadas", value: 0, color: "#f59e0b" },
+                                  { name: "Disponíveis", value: 0, color: "#22c55e" },
+                                ]
+                                : [
+                                  { name: "Vencidas", value: 0, color: "#ef4444" },
+                                  { name: "Descartadas", value: 10, color: "#9ca3af" },
+                                  { name: "Partilhadas", value: 20, color: "#3b82f6" },
+                                  { name: "Utilizadas", value: 30, color: "#f59e0b" },
+                                  { name: "Disponíveis", value: TOTAL_DISPONIVEL >= 60 ? TOTAL_DISPONIVEL - 60 : 40, color: "#22c55e" },
+                                ];
 
                               const estaAtivoNesteLote = graficoAtivo?.loteId === nfItem.id;
                               const fatiaAtiva = estaAtivoNesteLote ? dadosGrafico[graficoAtivo.index] : null;
@@ -908,7 +1030,10 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
                               const FRASCOS_DISPONIVEIS = Math.floor(DOSES_DISPONIVEIS / DOSES_POR_FRASCO);
 
                               return (
-                                <div key={`lote-${nfItem.id}`} className="border border-gray-200 rounded-xl bg-white shadow-sm flex flex-col p-4 relative">
+                                <div
+                                  key={`lote-${nfItem.id}`}
+                                  className={`border border-gray-200 rounded-xl bg-white shadow-sm flex flex-col overflow-visible relative group transition-all duration-200 h-auto ${isLoteMinimizado ? "p-2.5 pb-2 justify-start" : "p-4 justify-between"}`}
+                                >
                                   <div className="absolute top-2.5 right-2.5 flex items-center gap-1 z-10">
                                     <button
                                       type="button"
@@ -917,104 +1042,132 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
                                     >
                                       {isLoteMinimizado ? <ChevronDown size={15} /> : <ChevronUp size={15} />}
                                     </button>
+
+                                    <button
+                                      type="button"
+                                      onClick={() => setNotasFiscaisOrigem(notasFiscaisOrigem.filter(item => item.id !== nfItem.id))}
+                                      className="text-gray-400 hover:text-red-500 p-1 rounded-lg transition hover:bg-red-50"
+                                    >
+                                      <Trash2 size={15} />
+                                    </button>
                                   </div>
 
-                                  <div className="flex items-center gap-1.5 pb-2 mb-3 border-b border-gray-100">
-                                    <span className="text-xs font-semibold text-gray-800">Apresentação</span>
-                                    <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-600 text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-                                      <PillBottle size={10} className="text-gray-400" />
-                                      {DOSES_POR_FRASCO} doses/frasco
-                                    </span>
+                                  <div className={`flex items-center justify-between border-gray-100 overflow-visible pr-14 ${isLoteMinimizado ? "border-none pb-0 mb-0" : "border-b pb-2 mb-3"}`}>
+                                    <div className="flex items-center gap-1.5 relative group/info overflow-visible">
+                                      <span className="text-xs font-semibold text-gray-800 select-none">
+                                        Apresentação
+                                      </span>
+                                      <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-600 text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">
+                                        <PillBottle size={10} className="text-gray-400" />
+                                        {DOSES_POR_FRASCO} doses/frasco
+                                      </span>
+                                      {isLoteMinimizado && (
+                                        <span className="text-[11px] text-gray-400 font-medium ml-2 animate-fadeIn">
+                                          ({DOSES_DISPONIVEIS} disp. · {nfItem.quantidadeDoses || 0} utilizadas)
+                                        </span>
+                                      )}
+                                    </div>
                                   </div>
 
                                   {!isLoteMinimizado && (
-                                    <div className="flex items-center gap-4 z-10 mt-1">
-                                      {/* GRÁFICO DONUT INTERATIVO */}
-                                      <div className="w-24 h-24 flex items-center justify-center relative select-none">
-                                        <PieChart width={96} height={96} margin={{ top: 2, right: 2, bottom: 2, left: 2 }}>
-                                          <Pie
-                                            data={dadosGrafico}
-                                            cx="50%" cy="50%" innerRadius={26} outerRadius={35} paddingAngle={2} dataKey="value" stroke="none"
-                                            activeIndex={estaAtivoNesteLote ? graficoAtivo.index : undefined}
-                                            activeShape={renderActiveShape}
-                                            onMouseEnter={(_, index) => setGraficoAtivo({ loteId: nfItem.id, index })}
-                                            onMouseLeave={() => setGraficoAtivo(null)}
-                                          >
-                                            {dadosGrafico.map((entry, idx) => (
-                                              <Cell key={`cell-${idx}`} fill={entry.color} className="cursor-pointer transition-all duration-200 outline-none" />
-                                            ))}
-                                          </Pie>
-                                        </PieChart>
-                                        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
-                                          {fatiaAtiva ? (
-                                            <div className="flex flex-col items-center justify-center">
-                                              <span className="text-xs font-bold leading-none" style={{ color: fatiaAtiva.color }}>{fatiaAtiva.value}</span>
-                                              <span className="text-[7px] text-gray-500 font-semibold uppercase truncate max-w-[50px] mt-0.5">{fatiaAtiva.name}</span>
-                                              <span className="text-[8px] font-bold mt-0.5" style={{ color: fatiaAtiva.color }}>{porcentagem}%</span>
+                                    <div className="animate-slideDown">
+                                      <div className="flex items-center gap-4 z-10 mt-3">
+                                        <div className="w-24 h-24 flex items-center justify-center relative select-none">
+                                          <PieChart width={96} height={96} margin={{ top: 2, right: 2, bottom: 2, left: 2 }}>
+                                            <Pie
+                                              data={dadosGrafico}
+                                              cx="50%" cy="50%" innerRadius={26} outerRadius={35} paddingAngle={2} dataKey="value" stroke="none"
+                                              activeIndex={estaAtivoNesteLote ? graficoAtivo.index : undefined}
+                                              activeShape={renderActiveShape}
+                                              onMouseEnter={(_, index) => setGraficoAtivo({ loteId: nfItem.id, index })}
+                                              onMouseLeave={() => setGraficoAtivo(null)}
+                                            >
+                                              {dadosGrafico.map((entry, idx) => (
+                                                <Cell key={`cell-${idx}`} fill={entry.color} className="cursor-pointer transition-all duration-200 outline-none" />
+                                              ))}
+                                            </Pie>
+                                          </PieChart>
+                                          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
+                                            {fatiaAtiva ? (
+                                              <div className="flex flex-col items-center justify-center">
+                                                <span className="text-xs font-bold leading-none animate-fadeIn" style={{ color: fatiaAtiva.color }}>{fatiaAtiva.value}</span>
+                                                <span className="text-[7px] text-gray-500 font-semibold leading-tight uppercase truncate max-w-[50px] mt-0.5 animate-fadeIn">{fatiaAtiva.name}</span>
+                                                <span className="text-[8px] font-bold mt-0.5 animate-fadeIn" style={{ color: fatiaAtiva.color }}>{porcentagem}%</span>
+                                              </div>
+                                            ) : (
+                                              <div className="flex flex-col items-center justify-center">
+                                                <span className="text-base font-black text-gray-800 leading-none">{totalDosesGrafico}</span>
+                                                <span className="text-[7px] font-bold text-gray-400 mt-0.5 uppercase tracking-wider">Total</span>
+                                              </div>
+                                            )}
+                                          </div>
+                                        </div>
+
+                                        <div className="flex gap-2 flex-1 justify-start items-stretch">
+                                          <div className="flex flex-col border border-gray-200 rounded-xl px-2.5 py-2 w-full max-w-[130px] gap-1 bg-gray-50/80 justify-between">
+                                            <span className="text-[11px] text-gray-600 font-medium text-center">Disponíveis</span>
+                                            <div className="flex gap-2 items-end justify-center py-0.5">
+                                              <div className="flex flex-col items-center flex-1">
+                                                <span className="text-sm font-bold text-gray-700 leading-none">{FRASCOS_DISPONIVEIS}</span>
+                                                <span className="text-[9px] text-gray-400 font-medium mt-0.5">Frascos</span>
+                                              </div>
+                                              <div className="flex flex-col items-center flex-1">
+                                                <span className="text-sm font-bold text-gray-700 leading-none">{DOSES_DISPONIVEIS}</span>
+                                                <span className="text-[9px] text-gray-400 font-medium mt-0.5">Doses</span>
+                                              </div>
                                             </div>
-                                          ) : (
-                                            <div className="flex flex-col items-center justify-center">
-                                              <span className="text-base font-black text-gray-800 leading-none">{totalDosesGrafico}</span>
-                                              <span className="text-[7px] font-bold text-gray-400 mt-0.5 uppercase tracking-wider">Total</span>
+                                          </div>
+
+                                          <div className="flex flex-col border border-gray-200 rounded-xl px-2.5 py-2 w-full max-w-[130px] gap-1 bg-white justify-between">
+                                            <span className="text-[11px] text-gray-500 font-medium text-center">Utilizadas</span>
+                                            <div className="flex gap-1.5 items-end justify-center">
+                                              <div className="flex flex-col flex-1 min-w-[40px]">
+                                                <input
+                                                  type="number"
+                                                  min="0"
+                                                  value={nfItem.quantidadeFrascos || ""}
+                                                  placeholder="0"
+                                                  onChange={(e) => {
+                                                    const f = Number(e.target.value);
+                                                    const d = f * DOSES_POR_FRASCO;
+                                                    setNotasFiscaisOrigem(notasFiscaisOrigem.map(item =>
+                                                      item.id === nfItem.id ? { ...item, quantidadeDoses: d, quantidadeFrascos: f } : item
+                                                    ));
+                                                  }}
+                                                  className="w-full text-center bg-white border border-gray-200 rounded-lg text-xs font-black p-1 focus:outline-none focus:border-[#1A7A3C] text-gray-800 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                />
+                                                <span className="text-[9px] text-gray-400 font-semibold text-center mt-0.5">Frascos</span>
+                                              </div>
+                                              <div className="flex flex-col flex-1 min-w-[40px]">
+                                                <input
+                                                  type="number"
+                                                  min="0"
+                                                  value={nfItem.quantidadeDoses || ""}
+                                                  placeholder="0"
+                                                  onChange={(e) => {
+                                                    const d = Number(e.target.value);
+                                                    const f = Math.ceil(d / DOSES_POR_FRASCO);
+                                                    setNotasFiscaisOrigem(notasFiscaisOrigem.map(item =>
+                                                      item.id === nfItem.id ? { ...item, quantidadeDoses: d, quantidadeFrascos: f } : item
+                                                    ));
+                                                  }}
+                                                  className="w-full text-center bg-white border border-gray-200 rounded-lg text-xs font-black p-1 focus:outline-none focus:border-[#1A7A3C] text-gray-800 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                />
+                                                <span className="text-[9px] text-gray-400 font-semibold text-center mt-0.5">Doses</span>
+                                              </div>
                                             </div>
-                                          )}
+                                          </div>
                                         </div>
                                       </div>
 
-                                      <div className="flex gap-2 flex-1 justify-start items-stretch">
-                                        <div className="flex flex-col border border-gray-200 rounded-xl px-2.5 py-2 w-full max-w-[130px] gap-1 bg-gray-50/80 justify-between">
-                                          <span className="text-[11px] text-gray-600 font-medium text-center">Disponíveis</span>
-                                          <div className="flex gap-2 items-end justify-center py-0.5">
-                                            <div className="flex flex-col items-center flex-1">
-                                              <span className="text-sm font-bold text-gray-700 leading-none">{FRASCOS_DISPONIVEIS}</span>
-                                              <span className="text-[9px] text-gray-400 font-medium mt-0.5">Frascos</span>
-                                            </div>
-                                            <div className="flex flex-col items-center flex-1">
-                                              <span className="text-sm font-bold text-gray-700 leading-none">{DOSES_DISPONIVEIS}</span>
-                                              <span className="text-[9px] text-gray-400 font-medium mt-0.5">Doses</span>
-                                            </div>
+                                      <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 mt-3 pt-2 border-t border-gray-100 text-[9px] z-10">
+                                        {dadosGrafico.filter((item) => item.name).map((item) => (
+                                          <div key={item.name} className="flex items-center gap-1 bg-gray-50 px-1 py-0.5 rounded border border-gray-100">
+                                            <span className="w-1 h-1 rounded-full" style={{ backgroundColor: item.color }} />
+                                            <span className="text-gray-400 font-medium">{item.name}:</span>
+                                            <span className="font-bold text-gray-600">{item.value}</span>
                                           </div>
-                                        </div>
-
-                                        <div className="flex flex-col border border-gray-200 rounded-xl px-2.5 py-2 w-full max-w-[130px] gap-1 bg-white justify-between">
-                                          <span className="text-[11px] text-gray-500 font-medium text-center">Utilizadas</span>
-                                          <div className="flex gap-1.5 items-end justify-center">
-                                            <div className="flex flex-col flex-1 min-w-[40px]">
-                                              <input
-                                                type="number"
-                                                min="0"
-                                                value={nfItem.quantidadeFrascos || ""}
-                                                placeholder="0"
-                                                onChange={(e) => {
-                                                  const f = Number(e.target.value);
-                                                  const d = f * DOSES_POR_FRASCO;
-                                                  setNotasFiscaisOrigem(notasFiscaisOrigem.map(item =>
-                                                    item.id === nfItem.id ? { ...item, quantidadeDoses: d, quantidadeFrascos: f } : item
-                                                  ));
-                                                }}
-                                                className="w-full text-center bg-white border border-gray-200 rounded-lg text-xs font-black p-1 focus:outline-none focus:border-[#1A7A3C] text-gray-800 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                              />
-                                              <span className="text-[9px] text-gray-400 font-semibold text-center mt-0.5">Frascos</span>
-                                            </div>
-                                            <div className="flex flex-col flex-1 min-w-[40px]">
-                                              <input
-                                                type="number"
-                                                min="0"
-                                                value={nfItem.quantidadeDoses || ""}
-                                                placeholder="0"
-                                                onChange={(e) => {
-                                                  const d = Number(e.target.value);
-                                                  const f = Math.ceil(d / DOSES_POR_FRASCO);
-                                                  setNotasFiscaisOrigem(notasFiscaisOrigem.map(item =>
-                                                    item.id === nfItem.id ? { ...item, quantidadeDoses: d, quantidadeFrascos: f } : item
-                                                  ));
-                                                }}
-                                                className="w-full text-center bg-white border border-gray-200 rounded-lg text-xs font-black p-1 focus:outline-none focus:border-[#1A7A3C] text-gray-800 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                              />
-                                              <span className="text-[9px] text-gray-400 font-semibold text-center mt-0.5">Doses</span>
-                                            </div>
-                                          </div>
-                                        </div>
+                                        ))}
                                       </div>
                                     </div>
                                   )}
@@ -1032,7 +1185,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
           </Section>
         )}
 
-        {/* ============ VACINAÇÃO (REBANHO) ============ */}
+        {/* ── VACINAÇÃO ── */}
         {mostrarVacinacaoENota && regime !== "" && (() => {
           const totalDisponivel = notasFiscaisOrigem.reduce((sum, item) => sum + (item.dosesDisponiveisTotais || 0), 0);
           const saldoRestante = totalDisponivel - (utilizadas || 0);
@@ -1054,7 +1207,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
         })()}
       </main>
 
-      {/* MODAL DE PRODUTOR */}
+      {/* ============ SEARCHMODAL DO PRODUTOR ============ */}
       <SearchModal<ProdutorEntidade>
         open={modalProdutor}
         onClose={() => { setModalProdutor(false); setTipoPessoa(""); }}
@@ -1067,18 +1220,26 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
         searchPlaceholder="Buscar Produtor"
         confirmLabel="Confirmar"
         onConfirm={(p) => { onChangeProdutor(p); setModalProdutor(false); setTipoPessoa(""); }}
+        className="max-w-5xl w-full [&_td]:whitespace-pre-line"
+        headerActions={
+          <FloatSelect
+            label="Tipo de Pessoa"
+            required
+            value={tipoPessoa}
+            onChange={(v) => setTipoPessoa(v)}
+            options={[{ value: "PF", label: "Pessoa Física" }, { value: "PJ", label: "Pessoa Jurídica" }]}
+          />
+        }
       />
 
-      {/* MODAL DE SELEÇÃO DE LOTES */}
+      {/* Modal de Notas Fiscais - Agora com dados dinâmicos da pesquisa */}
       <MultiSearchModal
         open={modalNotaOrigemOpen}
         onClose={() => setModalNotaOrigemOpen(false)}
         title="Buscar Lotes de Vacinas"
         subtitle="Selecione os lotes de vacina desejados para vincular a este ajuste:"
         icon={<Package size={24} color={GREEN} />}
-        data={[
-          { id: 1, nome: "0013225/24", partida: "1", uf: "MG", dosesDisponiveisTotais: 120, fornecedor: "Distribuidora de Vacinas Alfa LTDA", doenca: "Brucelose", tipoVacina: "B19", laboratorio: "BioMed/MG", validade: "20/12/2026" },
-        ].map((item) => ({ ...item, doencaComTipo: `${item.doenca} - ${item.tipoVacina}` }))}
+        data={lotesFiltradosModal}
         searchKeys={["nome", "partida", "doenca", "tipoVacina", "fornecedor", "uf"]}
         searchPlaceholder="Busque por lote ou doença."
         columns={[
@@ -1088,32 +1249,33 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
           { label: "UF", key: "uf" }
         ]}
         selectedItems={notasFiscaisOrigem}
-        onConfirm={(selectedValues) => setNotasFiscaisOrigem(selectedValues)}
+        onConfirm={(selectedValues) => {
+          setNotasFiscaisOrigem(selectedValues);
+        }}
       />
-
-      {/* ============ MODAL DE SUCESSO ============ */}
+      {/* ============ CARD DE SUCESSO ============ */}
       {sucesso && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 text-center">
-            <div className="flex justify-center mb-4">
-              <CheckCircle2 size={48} style={{ color: GREEN }} />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-1">
-              {mensagemSucessoCadastro(mode, "Declaração de Vacinação")}
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4 animate-fadeIn">
+          <div className="bg-white rounded-3xl shadow-xl max-w-md w-full p-8 text-center flex flex-col items-center">
+            <h3 className="text-xl font-bold text-gray-900 mb-2">
+              Declaração de Vacinação adicionada com sucesso!
             </h3>
-            <p className="text-sm text-gray-500 mb-6">
-              A vacinação foi declarada e o rebanho da exploração foi atualizado.
+            <p className="text-sm text-gray-500 mb-8">
+              A declaração de vacinação foi adicionada como um novo registro no sistema.
             </p>
-            <div className="flex items-center justify-center gap-3">
+            <div className="flex items-center justify-center gap-3 w-full">
               <button
+                type="button"
                 onClick={() => onNavigate("declaracao-vacinacao")}
-                className="px-5 py-2.5 rounded-md text-sm font-semibold border border-gray-300 text-gray-700 transition hover:bg-gray-50"
+                className="flex-1 px-5 py-3 rounded-xl text-sm font-semibold border-2 border-[#1A7A3C] text-[#1A7A3C] transition hover:bg-green-50/50"
               >
                 Voltar
               </button>
               <button
-                onClick={() => onNavigate("visualizar-declaracao-vacinacao", registroAtual)}
-                className="px-5 py-2.5 rounded-md text-white text-sm font-semibold transition hover:opacity-90"
+                type="button"
+                // 🚀 MUDEI A ROTA PARA A VISUALIZAÇÃO PASSANDO O REGISTRO SALVO
+                onClick={() => onNavigate("visualizar-declaracao-vacinacao", registroSalvo)}
+                className="flex-1 px-5 py-3 rounded-xl text-white text-sm font-semibold transition hover:opacity-90 shadow-sm"
                 style={{ backgroundColor: GREEN }}
               >
                 Visualizar
@@ -1122,6 +1284,10 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
           </div>
         </div>
       )}
-    </div>
+
+    </div>  
+
   );
 }
+
+export default AdicionarDeclaracaoVacinacaoPage;

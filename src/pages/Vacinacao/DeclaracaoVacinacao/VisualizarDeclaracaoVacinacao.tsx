@@ -1,54 +1,27 @@
-import React, { useState } from "react";
-import { ArrowLeft, ChevronUp, ChevronDown, Pencil, Package, Check, Syringe, Calendar, Store, RotateCcw } from "lucide-react";
+import { useState } from "react";
+import { ArrowLeft, Syringe, Calendar, Store, Check, Package, PillBottle, Eye, ChevronUp, ChevronDown } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
-import { FloatInput, FloatSelect, CustomRadio } from "../../../components/ui/FormKit";
-import { 
-  ProdutorInput, 
-  EstabelecimentoAgropecuarioInput, 
-  ExploracaoPecuariaInput, 
-  NucleoInput,
-  EntitySearchInput,
-  MedicoVeterinarioInput,
-  VacinadorBruceloseInput
-} from "../../../components/ui/EntitySearch";
+import { FloatInput, CustomRadio } from "../../../components/ui/FormKit";
 import { PieChart, Pie, Cell, Sector } from "recharts";
 import * as Icons from "../../../imports/icons";
 
-// IMPORTS DO HISTÓRICO
-import { carregarHistoricoCadastro } from "../../../components/ui/historicoCadastroStorage";
-import {
-  CLASSE_CAMPO_ALTERADO_HISTORICO,
-  HistoricoCadastroLayout
-} from "../../../components/ui/HistoricoCadastroLayout";
-
 const GREEN = "#1A7A3C";
-const MOCK_KEY = "DECLARACOES_VACINA_DB";
 
 // ==========================================================
-// FUNÇÕES E COMPONENTES AUXILIARES
+// SUBCOMPONENTES (MODO SOMENTE LEITURA)
 // ==========================================================
-const AGE_RANGES = ["De 3 a 8 meses", "De 13 a 24 meses", "De 25 a 36 meses", "Acima de 36 meses"];
-
-function derivarFaixas(doencaNome: string | undefined, regime: string) {
-  const isBrucelose = doencaNome === "Brucelose";
-  const linhaPadrao = (label: string) => ({
-    label,
-    machos: { existentes: 100, naoVacinados: 80 },
-    femeas: { existentes: 100, naoVacinados: 80 },
-  });
-
-  if (isBrucelose) {
-    if (regime === "Vacina Oficial") {
-      return { faixas: [linhaPadrao("De 0 a 8 meses")], mostrarMachos: false, mostrarFemeas: true };
-    }
-    return { faixas: AGE_RANGES.slice(1).map(linhaPadrao), mostrarMachos: false, mostrarFemeas: true };
-  }
-  return { faixas: AGE_RANGES.map(linhaPadrao), mostrarMachos: true, mostrarFemeas: true };
+function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col gap-5">
+      <h2 className="text-base font-semibold text-gray-800">{title}</h2>
+      {children}
+    </div>
+  );
 }
 
 function SummaryCards({ disponiveis, utilizadas, saldo }: { disponiveis: number; utilizadas: number; saldo: number }) {
   return (
-    <div className="flex flex-col sm:flex-row border border-[#e0e0e0] rounded-xl overflow-hidden bg-white divide-y sm:divide-y-0 sm:divide-x divide-[#e0e0e0] mb-6">
+    <div className="flex flex-col sm:flex-row border border-[#e0e0e0] rounded-xl overflow-hidden bg-white divide-y sm:divide-y-0 sm:divide-x divide-[#e0e0e0]">
       <div className="flex-1 px-6 py-5">
         <div className="flex items-center gap-2 mb-2">
           <div className="w-6 h-6 rounded bg-[#f0fdf4] border border-[#bbf7d0] flex items-center justify-center shrink-0">
@@ -58,6 +31,7 @@ function SummaryCards({ disponiveis, utilizadas, saldo }: { disponiveis: number;
         </div>
         <p className="text-[28px] font-bold text-[#1d1d1f] leading-none tabular-nums">{disponiveis}</p>
       </div>
+
       <div className="flex-1 px-6 py-5">
         <div className="flex items-center gap-2 mb-2">
           <div className="w-6 h-6 rounded bg-[#fff7ed] border border-[#fed7aa] flex items-center justify-center shrink-0">
@@ -67,6 +41,7 @@ function SummaryCards({ disponiveis, utilizadas, saldo }: { disponiveis: number;
         </div>
         <p className="text-[28px] font-bold text-[#1d1d1f] leading-none tabular-nums">{utilizadas}</p>
       </div>
+
       <div className="flex-1 px-6 py-5">
         <div className="flex items-center gap-2 mb-2">
           <div className="w-6 h-6 rounded bg-[#f0fdf4] border border-[#bbf7d0] flex items-center justify-center shrink-0">
@@ -74,21 +49,27 @@ function SummaryCards({ disponiveis, utilizadas, saldo }: { disponiveis: number;
           </div>
           <span className="text-[12px] text-[#5f6368]">Saldo Restante</span>
         </div>
-        <p className={`text-[28px] font-bold leading-none tabular-nums ${saldo < 0 ? "text-red-600" : "text-[#1d1d1f]"}`}>{saldo}</p>
+        <p className={`text-[28px] font-bold leading-none tabular-nums ${saldo < 0 ? "text-red-600" : "text-[#1d1d1f]"}`}>
+          {saldo}
+        </p>
       </div>
     </div>
   );
 }
 
-function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
-  const [open, setOpen] = useState(true);
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  const [isOpen, setIsOpen] = useState(true);
   return (
-    <div className="bg-white rounded-xl shadow-sm mb-4 border border-gray-100">
-      <button type="button" onClick={() => setOpen(!open)} className="w-full flex items-center justify-between px-6 py-4 bg-gray-50/70 text-left hover:bg-gray-100/70 transition border-b border-gray-100">
-        <span className="text-base font-semibold text-gray-800">{title}</span>
-        {open ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-visible mb-4">
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between px-6 py-4 bg-gray-50/70 border-b border-gray-100 select-none text-left transition-colors"
+      >
+        <span className="text-sm font-bold text-gray-700">{title}</span>
+        {isOpen ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
       </button>
-      {open && <div className="p-6 flex flex-col gap-5">{children}</div>}
+      {isOpen && <div className="p-6">{children}</div>}
     </div>
   );
 }
@@ -98,42 +79,48 @@ const renderActiveShape = (props: any) => {
   return (
     <g>
       <Sector cx={cx} cy={cy} innerRadius={innerRadius} outerRadius={outerRadius} startAngle={startAngle} endAngle={endAngle} fill={fill} />
-      <Sector cx={cx} cy={cy} innerRadius={outerRadius + 2} outerRadius={outerRadius + 5} startAngle={startAngle} endAngle={endAngle} fill={fill} opacity={0.8} />
+      <Sector cx={cx} cy={cy} innerRadius={outerRadius + 2} outerRadius={outerRadius + 5} startAngle={startAngle} endAngle={endAngle} fill={fill} />
     </g>
   );
 };
 
-// Stepper Visual - 100% bloqueado
-function DisabledStepper({ value, accentColor }: { value: number; accentColor: string }) {
-  return (
-    <div className="inline-flex items-center h-8 border border-[#e2e8f0] rounded-xl bg-[#f8fafc] overflow-hidden select-none opacity-60">
-      <div className="w-8 h-full flex items-center justify-center text-[#64748b] text-[16px] font-medium leading-none border-r border-[#e2e8f0]/60 bg-gray-100 cursor-not-allowed">−</div>
-      <div className="w-12 h-full flex items-center justify-center text-[14px] font-bold tabular-nums bg-white" style={{ color: accentColor }}>{value}</div>
-      <div className="w-8 h-full flex items-center justify-center text-[#64748b] text-[16px] font-medium leading-none border-l border-[#e2e8f0]/60 bg-gray-100 cursor-not-allowed">+</div>
-    </div>
-  );
+const AGE_RANGES = [
+  "De 0 a 12 meses",
+  "De 13 a 24 meses",
+  "De 25 a 36 meses",
+  "Acima de 36 meses",
+];
+
+interface VacinadosRow {
+  machos: number;
+  femeas: number;
 }
 
-// Tabela de Vacinação Idêntica ao Cadastro (Somente Leitura)
-function ReadOnlyVaccinationTable({
+interface FaixaLinha {
+  label: string;
+  machos: { existentes: number; naoVacinados: number };
+  femeas: { existentes: number; naoVacinados: number };
+}
+
+function VaccinationTableReadOnly({
   faixas,
   mostrarMachos,
   mostrarFemeas,
   statusLabel,
   vacinados,
 }: {
-  faixas: any[];
+  faixas: FaixaLinha[];
   mostrarMachos: boolean;
   mostrarFemeas: boolean;
   statusLabel: string;
-  vacinados: any[];
+  vacinados: VacinadosRow[];
 }) {
-  const totalMachosExist = faixas.reduce((s: number, r: any) => s + r.machos.existentes, 0);
-  const totalMachosNaoVac = faixas.reduce((s: number, r: any) => s + r.machos.naoVacinados, 0);
-  const totalFemeaExist = faixas.reduce((s: number, r: any) => s + r.femeas.existentes, 0);
-  const totalFemeaNaoVac = faixas.reduce((s: number, r: any) => s + r.femeas.naoVacinados, 0);
-  const totalVacMachos = vacinados.reduce((s: number, r: any) => s + (r.machos || 0), 0);
-  const totalVacFemeas = vacinados.reduce((s: number, r: any) => s + (r.femeas || 0), 0);
+  const totalMachosExist = faixas.reduce((s, r) => s + r.machos.existentes, 0);
+  const totalMachosNaoVac = faixas.reduce((s, r) => s + r.machos.naoVacinados, 0);
+  const totalFemeaExist = faixas.reduce((s, r) => s + r.femeas.existentes, 0);
+  const totalFemeaNaoVac = faixas.reduce((s, r) => s + r.femeas.naoVacinados, 0);
+  const totalVacMachos = vacinados.reduce((s, r) => s + r.machos, 0);
+  const totalVacFemeas = vacinados.reduce((s, r) => s + r.femeas, 0);
 
   const th = "text-[11px] font-semibold text-[#6b7280] text-center py-2.5 px-3 border-b border-r border-[#f1f5f9]";
   const td = "text-[13px] text-[#1d1d1f] text-center py-3.5 px-3 border-b border-r border-[#f1f5f9]";
@@ -142,15 +129,8 @@ function ReadOnlyVaccinationTable({
 
   return (
     <div className="bg-white border border-[#e2e8f0] rounded-2xl overflow-hidden shadow-sm">
-      <div className="flex items-center justify-between px-6 py-4 border-b border-[#f1f5f9]">
-        <h3 className="text-[16px] font-medium text-[#1d1d1f]">Vacinação</h3>
-        <button
-          disabled
-          className="flex items-center gap-1.5 text-gray-400 text-[13px] font-semibold select-none leading-none cursor-not-allowed opacity-60"
-        >
-          <RotateCcw size={13} className="shrink-0 mt-[-1px]" />
-          <span>Restaurar Valores</span>
-        </button>
+      <div className="flex items-center justify-between px-6 py-4 border-b border-[#f1f5f9] bg-gray-50/50">
+        <h3 className="text-[16px] font-medium text-[#1d1d1f]">Vacinação (Somente Leitura)</h3>
       </div>
 
       <div className="overflow-x-auto">
@@ -181,7 +161,7 @@ function ReadOnlyVaccinationTable({
             </tr>
           </thead>
           <tbody>
-            {faixas.map((row: any, i: number) => {
+            {faixas.map((row, i) => {
               const vac = vacinados[i] ?? { machos: 0, femeas: 0 };
               return (
                 <tr key={row.label} className="hover:bg-[#fafafa]/40 transition-colors">
@@ -190,18 +170,14 @@ function ReadOnlyVaccinationTable({
                     <td className={td}>{row.machos.existentes}</td>
                     <td className={td}>{row.machos.naoVacinados}</td>
                     <td className={td}>
-                      <div className="flex justify-center">
-                        <DisabledStepper value={vac.machos} accentColor="#2563eb" />
-                      </div>
+                      <div className="flex justify-center font-bold text-[#2563eb] text-[15px]">{vac.machos}</div>
                     </td>
                   </>)}
                   {mostrarFemeas && (<>
                     <td className={td}>{row.femeas.existentes}</td>
                     <td className={td}>{row.femeas.naoVacinados}</td>
                     <td className={`${td} border-r-0`}>
-                      <div className="flex justify-center">
-                        <DisabledStepper value={vac.femeas} accentColor="#be185d" />
-                      </div>
+                      <div className="flex justify-center font-bold text-[#be185d] text-[15px]">{vac.femeas}</div>
                     </td>
                   </>)}
                 </tr>
@@ -227,445 +203,418 @@ function ReadOnlyVaccinationTable({
   );
 }
 
+const FAIXA_BRUCELOSE_OFICIAL = "De 3 a 8 meses";
+
+function derivarFaixas(doencaNome: string | undefined, regime: string): {
+  faixas: FaixaLinha[];
+  mostrarMachos: boolean;
+  mostrarFemeas: boolean;
+} {
+  const isBrucelose = doencaNome === "Brucelose";
+  const linhaPadrao = (label: string): FaixaLinha => ({
+    label,
+    machos: { existentes: 100, naoVacinados: 80 },
+    femeas: { existentes: 100, naoVacinados: 80 },
+  });
+
+  if (isBrucelose) {
+    if (regime === "Vacina Oficial") {
+      return { faixas: [linhaPadrao(FAIXA_BRUCELOSE_OFICIAL)], mostrarMachos: false, mostrarFemeas: true };
+    }
+    return { faixas: AGE_RANGES.map(linhaPadrao), mostrarMachos: false, mostrarFemeas: true };
+  }
+
+  return { faixas: AGE_RANGES.map(linhaPadrao), mostrarMachos: true, mostrarFemeas: true };
+}
+
+const GRUPOS_COM_NUCLEO = ["Abelhas", "Aves", "Suídeos"];
+
 // ==========================================================
-// COMPONENTE PRINCIPAL DE VISUALIZAÇÃO
+// TELA PRINCIPAL DE VISUALIZAÇÃO
 // ==========================================================
-export function VisualizarDeclaracaoVacinacaoPage({ onLogout, onNavigate, dados, data }: any) {
-  const [notasListasMinimizadas, setNotasListasMinimizadas] = useState<Record<string, boolean>>({});
-  const [lotesMinimizados, setLotesMinimizados] = useState<Record<string, boolean>>({});
+export function VisualizarDeclaracaoVacinacaoPage({ onLogout, onNavigate, dados }: { onLogout: () => void; onNavigate: (screen: any, data?: any) => void; dados?: any }) {
   const [graficoAtivo, setGraficoAtivo] = useState<{ loteId: string; index: number } | null>(null);
 
-  const getSelectedItem = () => {
-    let rawData = dados || data;
-
-    if (!rawData || !rawData.id) {
-      const currentId = localStorage.getItem("CURRENT_DECLARACAO_ID");
-      const stored = localStorage.getItem(MOCK_KEY);
-      const db = stored ? JSON.parse(stored) : [];
-      const found = db.find((x: any) => x.id.toString() === currentId?.toString());
-      if (found) rawData = found;
-    }
-
-    if (!rawData || !rawData.id) {
-      return {
-        id: 1,
-        situacao: "Ativo",
-        produtorNome: "Maria Silva Mendes",
-        produtorDoc: "444.111.222-33",
-        estabNome: "Fazenda Rio Preto",
-        estabCodigo: "31001040005",
-        municipio: "Varginha",
-        exploracaoCodigo: "312345678910109",
-        especie: "Bovino",
-        doenca: "Brucelose",
-        tipoVacina: "B19",
-        tipoDeclaracao: "Vacina Oficial",
-        regime: "Vacina Oficial",
-        dataVacinacao: "2026-02-01",
-        dataAtestado: "2026-02-01",
-        veterinarioNome: "Dr. Roberto Silva",
-        vacinadorNome: "Eloiza Silva",
-        mordidaMorcego: "—",
-        origemNota: "Produtor",
-        revendedora: { nome: "Comercial AgroVat" },
-        notasFiscaisOrigem: [],
-        vacinados: []
-      };
-    }
-
-    const doencaNome = rawData.doenca || rawData.doencaEntidade?.nome || "";
-    const regimeNome = rawData.regime || rawData.tipoDeclaracao || "";
-    const produtorNomeVal = rawData.produtorNome || rawData.produtor?.nome || "";
-    const produtorDocVal = rawData.produtorDoc || rawData.produtor?.documento || "";
-    const estabNomeVal = rawData.estabNome || rawData.estabelecimento?.nome || "";
-    const estabCodigoVal = rawData.estabCodigo || rawData.estabelecimento?.codigo || "";
-    const municipioVal = rawData.municipio || rawData.estabelecimento?.municipio || "";
-    const exploracaoCodigoVal = rawData.exploracaoCodigo || rawData.exploracao?.codigo || "";
-    const especieVal = rawData.especie || rawData.exploracao?.especie || "Bovino";
-    const veterinarioVal = rawData.veterinario?.nome || rawData.veterinarioNome || "Dr. Roberto Silva";
-    const vacinadorVal = rawData.vacinadorBrucelose?.nome || rawData.vacinadorNome || "";
-
-    return {
-      ...rawData,
-      id: rawData.id,
-      situacao: rawData.situacao || "Ativo",
-      produtorNome: produtorNomeVal,
-      produtorDoc: produtorDocVal,
-      estabNome: estabNomeVal,
-      estabCodigo: estabCodigoVal,
-      municipio: municipioVal,
-      exploracaoCodigo: exploracaoCodigoVal,
-      especie: especieVal,
-      doenca: doencaNome,
-      tipoVacina: rawData.tipoVacina || (doencaNome === "Brucelose" ? "B19" : "—"),
-      tipoDeclaracao: regimeNome,
-      regime: regimeNome,
-      dataVacinacao: rawData.dataVacinacao || "",
-      dataAtestado: rawData.dataAtestado || (doencaNome === "Brucelose" ? rawData.dataVacinacao : "—"),
-      veterinarioNome: veterinarioVal,
-      vacinadorNome: vacinadorVal,
-      mordidaMorcego: rawData.mordidaMorcego || (doencaNome === "Raiva" ? "Não" : "—"),
-      origemNota: rawData.origemNota || "Produtor",
-      revendedora: rawData.revendedora || { nome: "Comercial AgroVat" },
-      notasFiscaisOrigem: rawData.notasFiscaisOrigem?.length ? rawData.notasFiscaisOrigem : [{
-        id: `lote-${rawData.id || 1}`, nome: "0013225/24", doenca: doencaNome, tipoVacina: doencaNome === "Brucelose" ? "B19" : "—", laboratorio: "BioMed/MG", validade: "20/12/2026",
-        dosesDisponiveisTotais: 120, quantidadeDoses: 15, quantidadeFrascos: 1, dosesPerFrasco: 15
-      }],
-      vacinados: rawData.vacinados?.length ? rawData.vacinados : [
-        { machos: doencaNome === "Brucelose" ? 0 : 5, femeas: 10 }, 
-        { machos: 0, femeas: 0 }, 
-        { machos: 0, femeas: 0 }, 
-        { machos: 0, femeas: 0 }
-      ]
-    };
+  // 1. Base Rica de Fallback para os 3 itens de exemplo da Listagem.
+  const REGISTROS_RICOS: Record<string, any> = {
+    "1": {
+      tipoVacina: "B19", regime: "Vacina Oficial", dataAtestado: "2026-02-05", 
+      veterinarioNome: "Dr. Roberto Silva", vacinadorNome: "Eloiza Silva",
+      origemNota: "Produtor", revendedoraNome: "Comercial AgroVet",
+      notasFiscaisOrigem: [
+        { id: 1, nome: "0013225/24", partida: "1", uf: "MG", dosesDisponiveisTotais: 120, fornecedor: "Comercial AgroVet", doenca: "Brucelose", tipoVacina: "B19", laboratorio: "BioMed/MG", validade: "20/12/2026", quantidadeDoses: 10, quantidadeFrascos: 1, dosesPerFrasco: 10 }
+      ],
+      vacinados: [{ machos: 0, femeas: 10 }]
+    },
+    "2": {
+      tipoVacina: "", regime: "Primeira Dose", dataAtestado: "2026-01-20", 
+      veterinarioNome: "Dr. Carlos Mendes", vacinadorNome: "",
+      origemNota: "Médico Veterinário", revendedoraNome: "AgroInsumos Sul",
+      situacao: "Cancelada",
+      notasFiscaisOrigem: [
+        { id: 5, nome: "0099887/25", partida: "3", uf: "MG", dosesDisponiveisTotais: 500, fornecedor: "Comercial AgroVet", doenca: "Febre Aftosa", tipoVacina: "", laboratorio: "OuroFino", validade: "10/10/2026", quantidadeDoses: 30, quantidadeFrascos: 3, dosesPerFrasco: 10 }
+      ],
+      vacinados: [{ machos: 5, femeas: 15 }, { machos: 2, femeas: 8 }, { machos: 0, femeas: 0 }, { machos: 0, femeas: 0 }]
+    },
+    "3": {
+      tipoVacina: "", regime: "Dose de Reforço", dataAtestado: "2026-03-02", 
+      veterinarioNome: "Dra. Ana Paula", vacinadorNome: "", mordidaMorcego: "Não",
+      origemNota: "Produtor", revendedoraNome: "Comercial AgroVet",
+      notasFiscaisOrigem: [
+        { id: 3, nome: "0014589/24", partida: "1", uf: "SP", dosesDisponiveisTotais: 250, fornecedor: "AgroInsumos Sul", doenca: "Raiva", tipoVacina: "", laboratorio: "Zoetis", validade: "15/08/2027", quantidadeDoses: 5, quantidadeFrascos: 1, dosesPerFrasco: 5 }
+      ],
+      vacinados: [{ machos: 2, femeas: 3 }, { machos: 0, femeas: 0 }, { machos: 0, femeas: 0 }, { machos: 0, femeas: 0 }]
+    },
   };
 
-  const dadosAtuais = getSelectedItem();
-  if (!dadosAtuais) return null;
+  // 2. Mescla os dados reais com os dados ricos (se for um mock da lista inicial)
+  const isMockPadrao = dados?.id && REGISTROS_RICOS[dados.id.toString()];
+  const registroOriginal = dados || {};
+  const registro = isMockPadrao 
+    ? { ...registroOriginal, ...REGISTROS_RICOS[dados.id.toString()] }
+    : { ...registroOriginal };
 
-  const historicoKey = `declaracao-vacina:${dadosAtuais.id}`;
-  const histStored = localStorage.getItem(historicoKey);
-  let historico = histStored ? JSON.parse(histStored) : [];
-  if (historico.length === 0) {
-    historico = [{ id: `inicial-${dadosAtuais.id}`, data: new Date().toLocaleDateString('pt-BR'), alteradoPor: "Sistema (Criação)", atual: true, dados: dadosAtuais }];
-  }
+  // Condicionais
+  const isRaiva = registro.doenca === "Raiva";
+  const isBrucelose = registro.doenca === "Brucelose";
+  
+  const grupoMock = registro.especie === "Abelha com Ferrão" ? "Abelhas" : (registro.especie === "Codorna" ? "Aves" : (registro.especie === "Suíno" ? "Suídeos" : "Bovinos"));
+  const exigeNucleo = GRUPOS_COM_NUCLEO.some((g) => grupoMock.includes(g));
+
+  const { faixas: faixasTabela, mostrarMachos, mostrarFemeas } = derivarFaixas(registro.doenca, registro.regime);
+  const statusColLabel = registro.regime === "Vacina Oficial" || registro.regime === "Primeira Dose" ? "Não Vacinados" : "Já Vacinados";
+  
+  // Tratamento de Arrays
+  const vacinadosView = faixasTabela.map((_, i) => (registro.vacinados && registro.vacinados[i]) ? registro.vacinados[i] : { machos: 0, femeas: 0 });
+  const notasFiscaisOrigem = registro.notasFiscaisOrigem && registro.notasFiscaisOrigem.length > 0 
+    ? registro.notasFiscaisOrigem 
+    : [
+        { id: 999, nome: "Lote Genérico (Fallback)", partida: "1", uf: "MG", dosesDisponiveisTotais: 100, fornecedor: "Fornecedor", doenca: registro.doenca, tipoVacina: registro.tipoVacina, laboratorio: "Laboratório", validade: "20/12/2026", quantidadeDoses: 0, quantidadeFrascos: 0, dosesPerFrasco: 10 }
+      ];
+
+  const DOSES_DISPONIVEIS = notasFiscaisOrigem.reduce((sum: number, item: any) => sum + (item.dosesDisponiveisTotais || 0), 0);
+  const utilizadas = vacinadosView.reduce((s: number, r: any) => s + r.machos + r.femeas, 0);
+  const saldo = DOSES_DISPONIVEIS - utilizadas;
 
   return (
     <div className="min-h-screen bg-[#f2f3f5] pb-24">
       <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="declaracao-vacinacao" hideSearch />
 
-      <HistoricoCadastroLayout<any>
-        itens={historico}
-        ativo={true}
-        resetKey={dadosAtuais.id}
-        conteudoClassName="flex flex-col gap-4 max-w-[1088px] mx-auto px-4 py-6 md:px-6"
-      >
-        {({ botaoHistorico, avisoVersao, dadosSelecionados, versaoAtual, visualizandoVersaoAntiga }) => {
-          const r = dadosSelecionados ?? dadosAtuais;
+      <main className="max-w-[1088px] mx-auto px-4 md:px-6 py-6 flex flex-col gap-4">
+        
+        {/* ============ HEADER ============ */}
+        <div className="mb-4">
+          <button onClick={() => onNavigate("declaracao-vacinacao")} className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70" style={{ color: GREEN }}>
+            <ArrowLeft size={15} /> Todas Declarações de Vacinação
+          </button>
           
-          const getClasseAlterado = (campo: string) => {
-            if (!visualizandoVersaoAntiga) return "";
-            const valAntigo = JSON.stringify(dadosSelecionados?.[campo] || "");
-            const valAtual = JSON.stringify(versaoAtual?.dados?.[campo] || "");
-            return valAntigo !== valAtual ? CLASSE_CAMPO_ALTERADO_HISTORICO : "";
-          };
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-semibold text-gray-900">Visualizar Declaração de Vacinação</h1>
+            <button
+              onClick={() => onNavigate("editar-declaracao-vacinacao", registro)}
+              className="px-5 py-3 rounded-md text-white text-sm font-semibold transition hover:opacity-90 active:scale-[0.98]"
+              style={{ backgroundColor: GREEN }}
+            >
+              Editar
+            </button>
+          </div>
+        </div>
 
-          const doencaNome = r.doenca || r.doencaEntidade?.nome || "";
-          const regimeNome = r.regime || r.tipoDeclaracao || "";
-          
-          const { faixas: faixasTabela, mostrarMachos, mostrarFemeas } = derivarFaixas(doencaNome, regimeNome);
-          const vacinadosView = r.vacinados || [];
-          
-          const statusColLabel = regimeNome === "Dose de Reforço" ? "Já Vacinados na Etapa" : "Não Vacinados";
-          
-          const utilizadas = vacinadosView.reduce((s: number, rv: any) => s + (rv.machos || 0) + (rv.femeas || 0), 0);
-          const notasFiscais = r.notasFiscaisOrigem || [];
-          const totalDisponivel = notasFiscais.reduce((sum: number, item: any) => sum + (item.dosesDisponiveisTotais || 0), 0);
-          const saldoRestante = totalDisponivel - utilizadas;
-
-          return (
-            <>
-              <div>
-                <button onClick={() => onNavigate("declaracao-vacinacao")} className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70" style={{ color: GREEN }}>
-                  <ArrowLeft size={15} /> Todas as Declarações
-                </button>
-                <div className="flex justify-between items-center gap-4 w-full">
-                  <h1 className="text-2xl font-semibold text-gray-900">Visualizar Declaração de Vacinação</h1>
-                  <div className="flex items-center gap-3">
-                    {!visualizandoVersaoAntiga && r.situacao !== "Cancelado" && (
-                      <button onClick={() => { localStorage.setItem("CURRENT_DECLARACAO_ID", r.id.toString()); onNavigate("editar-declaracao-vacinacao", r); }} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2">
-                        <Pencil size={16} /> Editar
-                      </button>
-                    )}
-                    {botaoHistorico}
-                  </div>
-                </div>
+        {/* ============ INFORMAÇÕES BÁSICAS ============ */}
+        <SectionCard title="Informações Básicas">
+          <div className="flex flex-col gap-4">
+            
+            {/* Linha 1: Produtor */}
+            <div className="flex items-center gap-3 w-full">
+              <div className="flex-1">
+                <FloatInput label="Produtor *" value={registro.produtorNome || "—"} readOnly disabled icon={<img src={Icons.iconeProdutorUrl} alt="Produtor" className="w-5 h-5 object-contain" />} />
               </div>
+              <div className="flex-1">
+                <FloatInput label="CPF / CNPJ *" value={registro.produtorDoc || "—"} readOnly disabled />
+              </div>
+              <button type="button" className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-full transition-colors flex-shrink-0" onClick={() => {}}>
+                <Eye size={22} strokeWidth={2.5} />
+              </button>
+            </div>
 
-              {avisoVersao}
+            {/* Linha 2: Estabelecimento */}
+            <div className="flex items-center gap-3 w-full">
+              <div className="flex-1">
+                <FloatInput label="Estabelecimento Agropecuário *" value={registro.estabNome || "—"} readOnly disabled icon={<img src={Icons.iconeEstabelecimentoUrl} alt="Estabelecimento" className="w-[24px] h-[24px] object-contain mr-2 -ml-1" />} />
+              </div>
+              <div className="flex-1 grid grid-cols-2 gap-3">
+                <FloatInput label="Código do Estabelecimento Agropecuário *" value={registro.estabCodigo || "—"} readOnly disabled />
+                <FloatInput label="Município do Estabelecimento Agropecuário" value={registro.municipio || "—"} readOnly disabled />
+              </div>
+              <button type="button" className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-full transition-colors flex-shrink-0" onClick={() => {}}>
+                <Eye size={22} strokeWidth={2.5} />
+              </button>
+            </div>
 
-              {/* INFORMAÇÕES BÁSICAS */}
-              <SectionCard title="Informações Básicas">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-                  <div className={`col-span-full md:col-span-2 ${getClasseAlterado('produtorNome')}`}>
-                    <FloatInput label="Produtor" value={r.produtorNome || ""} readOnly disabled onChange={() => {}} icon={<img src={Icons.iconeProdutorUrl} alt="Produtor" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />} />
-                  </div>
-                  <div className={`col-span-full md:col-span-1 ${getClasseAlterado('produtorDoc')}`}>
-                    <FloatInput label="CPF" value={r.produtorDoc || ""} readOnly disabled onChange={() => {}} />
-                  </div>
-                  <div className={`col-span-full md:col-span-1 ${getClasseAlterado('estabNome')}`}>
-                    <FloatInput label="Estabelecimento Agropecuário" value={r.estabNome || ""} readOnly disabled onChange={() => {}} icon={<img src={Icons.iconeEstabelecimentoUrl} alt="Estabelecimento" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />} />
-                  </div>
-                  <div className={`col-span-full md:col-span-1 ${getClasseAlterado('estabCodigo')}`}>
-                    <FloatInput label="Código do Estabelecimento Agropecuário" value={r.estabCodigo || ""} readOnly disabled onChange={() => {}} />
-                  </div>
-                  <div className={`col-span-full md:col-span-1 ${getClasseAlterado('municipio')}`}>
-                    <FloatInput label="Município do Estabelecimento Agropecuário" value={r.municipio || ""} readOnly disabled onChange={() => {}} />
-                  </div>
-                  <div className={`col-span-full md:col-span-1 ${getClasseAlterado('exploracaoCodigo')}`}>
-                    <FloatInput label="Exploração Pecuária" value={r.exploracaoCodigo || ""} readOnly disabled onChange={() => {}} icon={<img src={Icons.iconeExploracaoUrl} alt="Exploração" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />} />
-                  </div>
-                  <div className={`col-span-full md:col-span-2 ${getClasseAlterado('especie')}`}>
-                    <FloatInput label="Espécie Explorada" value={r.especie || "Bovino"} readOnly disabled onChange={() => {}} />
-                  </div>
-                </div>
-              </SectionCard>
+            {/* Linha 3: Exploração */}
+            <div className="flex items-center gap-3 w-full">
+              <div className="flex-1">
+                <FloatInput label="Exploração Pecuária *" value={registro.exploracaoCodigo || `${registro.estabCodigo || "—"}0001`} readOnly disabled icon={<img src={Icons.iconeExploracaoUrl} alt="Exploração" className="w-5 h-5 object-contain" />} />
+              </div>
+              <div className="flex-1">
+                <FloatInput label="Espécie Explorada *" value={registro.especie || "—"} readOnly disabled />
+              </div>
+              <button type="button" className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-full transition-colors flex-shrink-0" onClick={() => {}}>
+                <Eye size={22} strokeWidth={2.5} />
+              </button>
+            </div>
 
-              {/* INFORMAÇÕES DE VACINAÇÃO */}
-              <SectionCard title="Informações de Vacinação">
-                <div className="flex flex-wrap gap-4 items-end w-full">
-                  <div className={`flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)] ${getClasseAlterado('doencaEntidade')}`}>
-                    <FloatInput label="Doença" value={doencaNome} readOnly disabled onChange={() => {}} icon={<img src={Icons.iconeDoencaUrl} alt="Doença" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />} />
-                  </div>
-                  {r.tipoVacina && r.tipoVacina !== "—" && (
-                    <div className={`flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)] ${getClasseAlterado('tipoVacina')}`}>
-                      <FloatInput label="Tipo de Vacina" value={r.tipoVacina} readOnly disabled onChange={() => {}} />
-                    </div>
-                  )}
-                  <div className={`flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)] ${getClasseAlterado('regime')}`}>
-                    <FloatInput label="Tipo de Declaração" value={regimeNome} readOnly disabled onChange={() => {}} />
-                  </div>
-                  <div className={`flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)] ${getClasseAlterado('dataVacinacao')}`}>
-                    <FloatInput label="Data da Vacinação" type="date" icon={<Calendar size={18} color={GREEN} />} value={r.dataVacinacao || ""} readOnly disabled onChange={() => {}} />
-                  </div>
-                  <div className={`flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)] ${getClasseAlterado('dataAtestado')}`}>
-                    <FloatInput label="Data de Atestado de Vacinação" type="date" icon={<Calendar size={18} color={GREEN} />} value={r.dataAtestado || ""} readOnly disabled onChange={() => {}} />
-                  </div>
-                  <div className={`w-full mt-2 ${getClasseAlterado('veterinario')}`}>
-                    <FloatInput label="Médico Veterinário Responsável" value={r.veterinarioNome || ""} readOnly disabled onChange={() => {}} />
-                  </div>
-                  {doencaNome === "Brucelose" && r.vacinadorNome && (
-                    <div className={`w-full mt-1 ${getClasseAlterado('vacinadorBrucelose')}`}>
-                      <FloatInput label="Vacinador Contra Brucelose" value={r.vacinadorNome || ""} readOnly disabled onChange={() => {}} />
-                    </div>
-                  )}
-                  {doencaNome === "Raiva" && (
-                    <div className={`w-full flex flex-col gap-2 mt-2 p-3 rounded-lg ${getClasseAlterado('mordidaMorcego')}`}>
-                      <span className="text-xs font-semibold text-gray-700">Observou mordidas de morcegos nos animais do rebanho recentemente?</span>
-                      <div className="flex items-center gap-6 mt-1">
-                        <CustomRadio label="Sim" name="mordidaMorcego" checked={r.mordidaMorcego === "Sim"} readOnly disabled onChange={() => {}} />
-                        <CustomRadio label="Não" name="mordidaMorcego" checked={r.mordidaMorcego === "Não"} readOnly disabled onChange={() => {}} />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </SectionCard>
-
-              {/* SALDO DE VACINAS */}
-              <SectionCard title="Saldo de Vacinas">
-                <div className={`flex flex-col gap-4 ${getClasseAlterado('notasFiscaisOrigem')}`}>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FloatInput label="Origem do Saldo" value={r.origemNota || ""} readOnly disabled onChange={() => {}} />
-                    <FloatInput label="Revendedora de Insumos" value={r.revendedora?.nome ?? ""} readOnly disabled icon={<Store size={18} color={GREEN} />} onChange={() => {}} />
-                  </div>
-
-                  <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="flex flex-col">
-                        <span className="text-xs text-gray-500 font-medium">Saldo de doses</span>
-                      </div>
-                      {notasFiscais.length > 0 && (
-                        <div className="flex items-center gap-1.5 bg-green-50 border border-green-200 px-2.5 py-1 rounded-lg animate-fadeIn">
-                          <span className="text-[11px] font-semibold text-gray-500">DOSES UTILIZADAS:</span>
-                          <span className="text-[11px] font-black text-[#1A7A3C]">{notasFiscais.reduce((sum: number, item: any) => sum + (item.quantidadeDoses || 0), 0)} doses</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {notasFiscais.length > 0 && (
-                    <div className="flex flex-col gap-6 animate-fadeIn">
-                      {Object.values(
-                        notasFiscais.reduce((acc: Record<string, any>, item: any) => {
-                          if (!acc[item.nome]) {
-                            acc[item.nome] = { nome: item.nome, partidas: [] };
-                          }
-                          acc[item.nome].partidas.push(item);
-                          return acc;
-                        }, {})
-                      ).map((grupo: any) => {
-                        const isNotaMinimizada = notasListasMinimizadas[grupo.nome] || false;
-
-                        return (
-                          <div key={`grupo-${grupo.nome}`} className="border border-gray-200 rounded-xl p-4 bg-gray-50/30 relative">
-                            <div className="flex items-center justify-between mb-4 px-1">
-                              <div className="flex items-center gap-2">
-                                <div className="flex items-center gap-2 cursor-pointer select-none group/title" onClick={() => setNotasListasMinimizadas(prev => ({ ...prev, [grupo.nome]: !isNotaMinimizada }))}>
-                                  <Package size={24} color={GREEN} />
-                                  <span className="text-sm font-bold text-gray-600">Lote:</span>
-                                  <span className="text-sm font-bold text-gray-800">{grupo.nome}</span>
-                                </div>
-                              </div>
-                              <button
-                                type="button"
-                                onClick={() => setNotasListasMinimizadas(prev => ({ ...prev, [grupo.nome]: !isNotaMinimizada }))}
-                                className="text-gray-400 hover:text-gray-600 p-1 rounded transition hover:bg-gray-100"
-                              >
-                                {isNotaMinimizada ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
-                              </button>
-                            </div>
-
-                            {!isNotaMinimizada && (
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start animate-slideDown">
-                                {grupo.partidas.map((nfItem: any) => {
-                                  const DOSES_POR_FRASCO = nfItem.dosesPerFrasco || 20;
-                                  const TOTAL_DISPONIVEL = nfItem.dosesDisponiveisTotais || 100;
-                                  const isLoteExpandido = lotesMinimizados[nfItem.id] !== undefined ? lotesMinimizados[nfItem.id] : true;
-                                  const isLoteMinimizado = !isLoteExpandido;
-                                  
-                                  const dadosGrafico = [
-                                    { name: "Vencidas", value: 0, color: "#ef4444" },
-                                    { name: "Descartadas", value: 0, color: "#9ca3af" },
-                                    { name: "Partilhadas", value: 0, color: "#3b82f6" },
-                                    { name: "Utilizadas", value: nfItem.quantidadeDoses || 0, color: "#f59e0b" },
-                                    { name: "Disponíveis", value: TOTAL_DISPONIVEL - (nfItem.quantidadeDoses || 0), color: "#22c55e" },
-                                  ];
-
-                                  const estaAtivoNesteLote = graficoAtivo?.loteId === nfItem.id;
-                                  const fatiaAtiva = estaAtivoNesteLote ? dadosGrafico[graficoAtivo.index] : null;
-                                  const totalDosesGrafico = dadosGrafico.reduce((s, d) => s + d.value, 0);
-                                  const porcentagem = fatiaAtiva ? ((fatiaAtiva.value / totalDosesGrafico) * 100).toFixed(1) : null;
-
-                                  const DOSES_DISPONIVEIS = dadosGrafico.find(d => d.name === "Disponíveis")?.value ?? 0;
-                                  const FRASCOS_DISPONIVEIS = Math.floor(DOSES_DISPONIVEIS / DOSES_POR_FRASCO);
-
-                                  return (
-                                    <div key={`lote-${nfItem.id}`} className={`border border-gray-200 rounded-xl bg-white shadow-sm flex flex-col overflow-visible relative group transition-all duration-200 h-auto ${isLoteMinimizado ? "p-2.5 pb-2 justify-start" : "p-4 justify-between"}`}>
-                                      <div className="absolute top-2.5 right-2.5 flex items-center gap-1 z-10">
-                                        <button
-                                          type="button"
-                                          onClick={() => setLotesMinimizados(prev => ({ ...prev, [nfItem.id]: !isLoteExpandido }))}
-                                          className="text-gray-400 hover:text-gray-600 p-1 rounded-lg transition hover:bg-gray-100"
-                                        >
-                                          {isLoteMinimizado ? <ChevronDown size={15} /> : <ChevronUp size={15} />}
-                                        </button>
-                                      </div>
-
-                                      <div className={`flex items-center justify-between border-gray-100 overflow-visible pr-14 ${isLoteMinimizado ? "border-none pb-0 mb-0" : "border-b pb-2 mb-3"}`}>
-                                        <div className="flex items-center gap-1.5 relative group/info overflow-visible">
-                                          <span className="text-xs font-semibold text-gray-800 select-none">Apresentação</span>
-                                          <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-600 text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">
-                                            {DOSES_POR_FRASCO} doses/frasco
-                                          </span>
-                                        </div>
-                                      </div>
-
-                                      {!isLoteMinimizado && (
-                                        <div className="animate-slideDown">
-                                          <div className="flex items-center gap-4 z-10 mt-3">
-                                            <div className="w-24 h-24 flex items-center justify-center relative select-none">
-                                              <PieChart width={96} height={96} margin={{ top: 2, right: 2, bottom: 2, left: 2 }}>
-                                                <Pie
-                                                  data={dadosGrafico}
-                                                  cx="50%" cy="50%" innerRadius={26} outerRadius={35} paddingAngle={2} dataKey="value" stroke="none"
-                                                  activeIndex={estaAtivoNesteLote ? graficoAtivo.index : undefined}
-                                                  activeShape={renderActiveShape}
-                                                  onMouseEnter={(_, index) => setGraficoAtivo({ loteId: nfItem.id, index })}
-                                                  onMouseLeave={() => setGraficoAtivo(null)}
-                                                >
-                                                  {dadosGrafico.map((entry, idx) => (
-                                                    <Cell key={`cell-${idx}`} fill={entry.color} className="cursor-pointer transition-all duration-200 outline-none" />
-                                                  ))}
-                                                </Pie>
-                                              </PieChart>
-                                              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
-                                                {fatiaAtiva ? (
-                                                  <div className="flex flex-col items-center justify-center">
-                                                    <span className="text-xs font-bold leading-none animate-fadeIn" style={{ color: fatiaAtiva.color }}>{fatiaAtiva.value}</span>
-                                                    <span className="text-[7px] text-gray-500 font-semibold leading-tight uppercase truncate max-w-[50px] mt-0.5 animate-fadeIn">{fatiaAtiva.name}</span>
-                                                    <span className="text-[8px] font-bold mt-0.5 animate-fadeIn" style={{ color: fatiaAtiva.color }}>{porcentagem}%</span>
-                                                  </div>
-                                                ) : (
-                                                  <div className="flex flex-col items-center justify-center">
-                                                    <span className="text-base font-black text-gray-800 leading-none">{totalDosesGrafico}</span>
-                                                    <span className="text-[7px] font-bold text-gray-400 mt-0.5 uppercase tracking-wider">Total</span>
-                                                  </div>
-                                                )}
-                                              </div>
-                                            </div>
-
-                                            <div className="flex gap-2 flex-1 justify-start items-stretch">
-                                              <div className="flex flex-col border border-gray-200 rounded-xl px-2.5 py-2 w-full max-w-[130px] gap-1 bg-gray-50/80 justify-between">
-                                                <span className="text-[11px] text-gray-600 font-medium text-center">Disponíveis</span>
-                                                <div className="flex gap-2 items-end justify-center py-0.5">
-                                                  <div className="flex flex-col items-center flex-1">
-                                                    <span className="text-sm font-bold text-gray-700 leading-none">{FRASCOS_DISPONIVEIS}</span>
-                                                    <span className="text-[9px] text-gray-400 font-medium mt-0.5">Frascos</span>
-                                                  </div>
-                                                  <div className="flex flex-col items-center flex-1">
-                                                    <span className="text-sm font-bold text-gray-700 leading-none">{DOSES_DISPONIVEIS}</span>
-                                                    <span className="text-[9px] text-gray-400 font-medium mt-0.5">Doses</span>
-                                                  </div>
-                                                </div>
-                                              </div>
-
-                                              <div className="flex flex-col border border-gray-200 rounded-xl px-2.5 py-2 w-full max-w-[130px] gap-1 bg-white justify-between">
-                                                <span className="text-[11px] text-gray-500 font-medium text-center">Utilizadas</span>
-                                                <div className="flex gap-1.5 items-end justify-center">
-                                                  <div className="flex flex-col flex-1 min-w-[40px]">
-                                                    <input
-                                                      type="number"
-                                                      value={nfItem.quantidadeFrascos || 0}
-                                                      disabled
-                                                      readOnly
-                                                      className="w-full text-center bg-gray-50 border border-gray-200 rounded-lg text-xs font-black p-1 text-gray-500 cursor-not-allowed [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                                    />
-                                                    <span className="text-[9px] text-gray-400 font-semibold text-center mt-0.5">Frascos</span>
-                                                  </div>
-                                                  <div className="flex flex-col flex-1 min-w-[40px]">
-                                                    <input
-                                                      type="number"
-                                                      value={nfItem.quantidadeDoses || 0}
-                                                      disabled
-                                                      readOnly
-                                                      className="w-full text-center bg-gray-50 border border-gray-200 rounded-lg text-xs font-black p-1 text-gray-500 cursor-not-allowed [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                                    />
-                                                    <span className="text-[9px] text-gray-400 font-semibold text-center mt-0.5">Doses</span>
-                                                  </div>
-                                                </div>
-                                              </div>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      )}
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })
-                    }
-                    </div>
-                  )}
-                </div>
-              </SectionCard>
-
-              {/* VACINAÇÃO (Rebanho) */}
-              <SectionCard title="Vacinação (Rebanho)">
-                <div className={getClasseAlterado('vacinados')}>
-                  <SummaryCards disponiveis={totalDisponivel} utilizadas={utilizadas} saldo={saldoRestante} />
-                  <ReadOnlyVaccinationTable faixas={faixasTabela} mostrarMachos={mostrarMachos} mostrarFemeas={mostrarFemeas} statusLabel={statusColLabel} vacinados={vacinadosView} />
-                </div>
-              </SectionCard>
-
-              {/* SITUAÇÃO DA DECLARAÇÃO DE VACINAÇÃO (Somente Leitura - No final da página) */}
-              <SectionCard title="Situação da Declaração de Vacinação">
-                <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 ${getClasseAlterado('situacao')}`}>
-                  <FloatSelect 
-                    label="Situação" 
-                    value={r.situacao || "Ativo"} 
-                    options={[{ value: r.situacao || "Ativo", label: r.situacao || "Ativo" }]} 
+            {/* Linha 4: Núcleo Condicional */}
+            {exigeNucleo && (
+              <div className="flex items-center gap-3 w-full">
+                <div className="flex-1">
+                  <FloatInput 
+                    label="Núcleo de Produção *" 
+                    value={registro.nucleo?.nome || "Núcleo Central"} 
+                    readOnly 
                     disabled 
-                    onChange={() => {}} 
+                    icon={<img src={Icons.iconeNucleoProducaoUrl} alt="Núcleo" className="w-[24px] h-[24px] object-contain mr-2 -ml-1" />} 
                   />
                 </div>
-              </SectionCard>
-            </>
-          );
-        }}
-      </HistoricoCadastroLayout>
+                <div className="flex-1">
+                  <FloatInput 
+                    label="Código do Núcleo *" 
+                    value={registro.nucleo?.codigo || "450010400050003"} 
+                    readOnly 
+                    disabled 
+                  />
+                </div>
+                <button type="button" className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-full transition-colors flex-shrink-0" onClick={() => {}}>
+                  <Eye size={22} strokeWidth={2.5} />
+                </button>
+              </div>
+            )}
+            
+          </div>
+        </SectionCard>
+
+        {/* ============ INFORMAÇÕES DE VACINAÇÃO ============ */}
+        <SectionCard title="Informações de Vacinação">
+          <div className="flex flex-wrap gap-4 items-end w-full">
+            <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
+              <FloatInput label="Doença" value={registro.doenca || "—"} readOnly disabled icon={<img src={Icons.iconeDoencaUrl} alt="Doença" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />} />
+            </div>
+
+            {registro.tipoVacina && (
+              <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
+                <FloatInput label="Tipo de Vacina" value={registro.tipoVacina || "—"} readOnly disabled />
+              </div>
+            )}
+
+            <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
+              <FloatInput label="Vacinação" value={registro.regime || "—"} readOnly disabled />
+            </div>
+
+            <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
+              <FloatInput label="Data da Vacinação" value={registro.dataVacinacao || "—"} readOnly disabled icon={<Calendar size={18} color={GREEN} />} />
+            </div>
+
+            <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
+              <FloatInput label="Data de Atestado de Vacinação" value={registro.dataAtestado || "—"} readOnly disabled icon={<Calendar size={18} color={GREEN} />} />
+            </div>
+
+            <div className="w-full mt-2">
+              <FloatInput label="Médico Veterinário Responsável" value={registro.veterinarioNome || "—"} readOnly disabled />
+            </div>
+
+            {isBrucelose && (
+              <div className="w-full mt-1">
+                <FloatInput label="Vacinador Contra Brucelose" value={registro.vacinadorNome || "—"} readOnly disabled />
+              </div>
+            )}
+
+            {isRaiva && (
+              <div className="w-full flex flex-col gap-2 mt-2 p-3 rounded-lg pointer-events-none opacity-80">
+                <span className="text-xs font-semibold text-gray-700">
+                  Recentemente, tem observado mordidas de morcegos nos animais do rebanho?
+                </span>
+                <div className="flex items-center gap-6 mt-1">
+                  <CustomRadio label="Sim" name="mordidaMorcego" checked={registro.mordidaMorcego === "Sim"} onChange={() => {}} />
+                  <CustomRadio label="Não" name="mordidaMorcego" checked={registro.mordidaMorcego === "Não"} onChange={() => {}} />
+                </div>
+              </div>
+            )}
+          </div>
+        </SectionCard>
+
+
+        {/* ============ SALDO DE VACINAS ============ */}
+        <Section title="Saldo de Vacinas">
+          <div className="flex flex-col gap-4">
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
+              <FloatInput label="Origem do Saldo" value={registro.origemNota || "—"} readOnly disabled />
+              <FloatInput label="Revendedora de Insumos" value={registro.revendedoraNome || "—"} readOnly disabled icon={<Store size={18} color={GREEN} />} />
+            </div>
+
+            <div className="flex flex-col gap-6">
+              {Object.values(
+                notasFiscaisOrigem.reduce((acc: Record<string, any>, item: any) => {
+                  if (!acc[item.nome]) acc[item.nome] = { nome: item.nome, partidas: [] };
+                  acc[item.nome].partidas.push(item);
+                  return acc;
+                }, {})
+              ).map((grupo: any) => {
+                return (
+                  <div key={`grupo-${grupo.nome}`} className="border border-gray-200 rounded-xl p-4 bg-gray-50/30 relative">
+
+                    <div className="flex items-center justify-between mb-4 px-1">
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 select-none">
+                          <Package size={24} color={GREEN} />
+                          <span className="text-sm font-bold text-gray-600">Lote:</span>
+                          <span className="text-sm font-bold text-gray-800">{grupo.nome}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                      {grupo.partidas.map((nfItem: any) => {
+                        const DOSES_POR_FRASCO = nfItem.dosesPerFrasco || 10;
+                        const TOTAL_DISPONIVEL = nfItem.dosesDisponiveisTotais || 100;
+                        const validadeLote = nfItem.validade || "20/12/2026";
+
+                        const verificarVencimento = (dataStr: string) => {
+                          if (!dataStr) return false;
+                          const [dia, mes, ano] = dataStr.split("/").map(Number);
+                          const dataValidade = new Date(ano, mes - 1, dia);
+                          return dataValidade < new Date();
+                        };
+                        const isVencido = verificarVencimento(validadeLote);
+
+                        const dadosGrafico = isVencido
+                          ? [
+                            { name: "Vencidas", value: TOTAL_DISPONIVEL, color: "#ef4444" },
+                            { name: "Descartadas", value: 0, color: "#9ca3af" },
+                            { name: "Partilhadas", value: 0, color: "#3b82f6" },
+                            { name: "Utilizadas", value: 0, color: "#f59e0b" },
+                            { name: "Disponíveis", value: 0, color: "#22c55e" },
+                          ]
+                          : [
+                            { name: "Vencidas", value: 0, color: "#ef4444" },
+                            { name: "Descartadas", value: 10, color: "#9ca3af" },
+                            { name: "Partilhadas", value: 20, color: "#3b82f6" },
+                            { name: "Utilizadas", value: nfItem.quantidadeDoses || 10, color: "#f59e0b" },
+                            { name: "Disponíveis", value: Math.max(0, TOTAL_DISPONIVEL - (nfItem.quantidadeDoses || 10)), color: "#22c55e" },
+                          ];
+
+                        const estaAtivoNesteLote = graficoAtivo?.loteId === nfItem.id;
+                        const fatiaAtiva = estaAtivoNesteLote ? dadosGrafico[graficoAtivo.index] : null;
+                        const totalDosesGrafico = dadosGrafico.reduce((s, d) => s + d.value, 0);
+                        const porcentagem = fatiaAtiva ? ((fatiaAtiva.value / totalDosesGrafico) * 100).toFixed(1) : null;
+                        const DOSES_DISP = dadosGrafico.find(d => d.name === "Disponíveis")?.value ?? 0;
+                        const FRASCOS_DISP = Math.floor(DOSES_DISP / DOSES_POR_FRASCO);
+
+                        return (
+                          <div key={`lote-${nfItem.id}`} className="border border-gray-200 rounded-xl bg-white shadow-sm flex flex-col overflow-visible relative group transition-all duration-200 h-auto p-4 justify-between pointer-events-none">
+                            <div className="flex items-center justify-between border-gray-100 overflow-visible border-b pb-2 mb-3">
+                              <div className="flex items-center gap-1.5 relative group/info overflow-visible">
+                                <span className="text-xs font-semibold text-gray-800 select-none">Apresentação</span>
+                                <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-600 text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">
+                                  <PillBottle size={10} className="text-gray-400" />
+                                  {DOSES_POR_FRASCO} doses/frasco
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="animate-slideDown">
+                              <div className="flex items-center gap-4 z-10 mt-3">
+                                <div className="w-24 h-24 flex items-center justify-center relative select-none">
+                                  <PieChart width={96} height={96} margin={{ top: 2, right: 2, bottom: 2, left: 2 }}>
+                                    <Pie
+                                      data={dadosGrafico} cx="50%" cy="50%" innerRadius={26} outerRadius={35} paddingAngle={2} dataKey="value" stroke="none"
+                                      activeIndex={estaAtivoNesteLote ? graficoAtivo.index : undefined} activeShape={renderActiveShape}
+                                    >
+                                      {dadosGrafico.map((entry, idx) => (
+                                        <Cell key={`cell-${idx}`} fill={entry.color} className="outline-none" />
+                                      ))}
+                                    </Pie>
+                                  </PieChart>
+                                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
+                                    <div className="flex flex-col items-center justify-center">
+                                      <span className="text-base font-black text-gray-800 leading-none">{totalDosesGrafico}</span>
+                                      <span className="text-[7px] font-bold text-gray-400 mt-0.5 uppercase tracking-wider">Total</span>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div className="flex gap-2 flex-1 justify-start items-stretch">
+                                  <div className="flex flex-col border border-gray-200 rounded-xl px-2.5 py-2 w-full max-w-[130px] gap-1 bg-gray-50/80 justify-between">
+                                    <span className="text-[11px] text-gray-600 font-medium text-center">Disponíveis</span>
+                                    <div className="flex gap-2 items-end justify-center py-0.5">
+                                      <div className="flex flex-col items-center flex-1">
+                                        <span className="text-sm font-bold text-gray-700 leading-none">{FRASCOS_DISP}</span>
+                                        <span className="text-[9px] text-gray-400 font-medium mt-0.5">Frascos</span>
+                                      </div>
+                                      <div className="flex flex-col items-center flex-1">
+                                        <span className="text-sm font-bold text-gray-700 leading-none">{DOSES_DISP}</span>
+                                        <span className="text-[9px] text-gray-400 font-medium mt-0.5">Doses</span>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div className="flex flex-col border border-gray-200 rounded-xl px-2.5 py-2 w-full max-w-[130px] gap-1 bg-white justify-between">
+                                    <span className="text-[11px] text-gray-500 font-medium text-center">Utilizadas</span>
+                                    <div className="flex gap-1.5 items-end justify-center">
+                                      <div className="flex flex-col items-center flex-1">
+                                        <span className="text-sm font-bold text-gray-800 leading-none pt-1 pb-1">{nfItem.quantidadeFrascos || 1}</span>
+                                        <span className="text-[9px] text-gray-400 font-semibold text-center mt-0.5">Frascos</span>
+                                      </div>
+                                      <div className="flex flex-col items-center flex-1">
+                                        <span className="text-sm font-bold text-[#1A7A3C] leading-none pt-1 pb-1">{nfItem.quantidadeDoses || 10}</span>
+                                        <span className="text-[9px] text-gray-400 font-semibold text-center mt-0.5">Doses</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 mt-3 pt-2 border-t border-gray-100 text-[9px] z-10">
+                                {dadosGrafico.filter((item) => item.name).map((item) => (
+                                  <div key={item.name} className="flex items-center gap-1 bg-gray-50 px-1 py-0.5 rounded border border-gray-100">
+                                    <span className="w-1 h-1 rounded-full" style={{ backgroundColor: item.color }} />
+                                    <span className="text-gray-400 font-medium">{item.name}:</span>
+                                    <span className="font-bold text-gray-600">{item.value}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </Section>
+
+        {/* ── VACINAÇÃO ── */}
+        <SectionCard title="Vacinação">
+          <SummaryCards disponiveis={DOSES_DISPONIVEIS} utilizadas={utilizadas} saldo={saldo} />
+          <VaccinationTableReadOnly
+            faixas={faixasTabela}
+            mostrarMachos={mostrarMachos}
+            mostrarFemeas={mostrarFemeas}
+            statusLabel={statusColLabel}
+            vacinados={vacinadosView}
+          />
+        </SectionCard>
+
+        {/* ============ SITUAÇÃO DO CADASTRO (Ao Final) ============ */}
+        <Section title="Situação do Cadastro">
+          <div className="w-full">
+             <FloatInput label="Situação" value={registro.situacao || "Ativo"} readOnly disabled />
+          </div>
+        </Section>
+        
+      </main>
     </div>
   );
 }

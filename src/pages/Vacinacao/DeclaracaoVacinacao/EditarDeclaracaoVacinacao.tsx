@@ -1,86 +1,28 @@
-import React, { useState, useEffect } from "react";
-import { ArrowLeft, CheckCircle2, Info, Calendar, Store, PlusCircle, ChevronUp, ChevronDown, Trash2, Package, PillBottle, Syringe, Check, RotateCcw, Pencil, Ban } from "lucide-react";
+import { useState } from "react";
+import { ArrowLeft, Syringe, Calendar, Store, Check, Package, PillBottle, Eye, ChevronUp, ChevronDown, AlertTriangle, Ban } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
-import { FloatInput, FloatSelect, SearchModal, CustomRadio, MultiSearchModal } from "../../../components/ui/FormKit";
-import { 
-  ProdutorInput, 
-  EstabelecimentoAgropecuarioInput, 
-  ExploracaoPecuariaInput, 
-  NucleoInput,
-  EntitySearchInput,
-  MedicoVeterinarioInput,
-  VacinadorBruceloseInput
-} from "../../../components/ui/EntitySearch";
+import { FloatInput, CustomRadio } from "../../../components/ui/FormKit";
 import { PieChart, Pie, Cell, Sector } from "recharts";
 import * as Icons from "../../../imports/icons";
-import { useDemoUser } from "../../../contexts/DemoUserContext";
-import { CadastroVacinacaoHeader, cadastroVacinacaoPageClass, mensagemSucessoCadastro, preencherComExemplo, type CadastroVacinacaoModeProps } from "../shared/CadastroVacinacaoMode";
 
 const GREEN = "#1A7A3C";
 const MOCK_KEY = "DECLARACOES_VACINA_DB";
 
-const AGE_RANGES = ["De 3 a 8 meses", "De 13 a 24 meses", "De 25 a 36 meses", "Acima de 36 meses"];
-
-interface VacinadosRow {
-  machos: number;
-  femeas: number;
-}
-
-const INITIAL_VACINADOS: VacinadosRow[] = AGE_RANGES.map(() => ({
-  machos: 0,
-  femeas: 0,
-}));
-
-function derivarFaixas(doencaNome: string | undefined, regime: string) {
-  const isBrucelose = doencaNome === "Brucelose";
-  const linhaPadrao = (label: string) => ({
-    label,
-    machos: { existentes: 100, naoVacinados: 80 },
-    femeas: { existentes: 100, naoVacinados: 80 },
-  });
-
-  if (isBrucelose) {
-    if (regime === "Vacina Oficial") {
-      return { faixas: [linhaPadrao("De 0 a 8 meses")], mostrarMachos: false, mostrarFemeas: true };
-    }
-    return { faixas: AGE_RANGES.slice(1).map(linhaPadrao), mostrarMachos: false, mostrarFemeas: true };
-  }
-  return { faixas: AGE_RANGES.map(linhaPadrao), mostrarMachos: true, mostrarFemeas: true };
-}
-
+// ==========================================================
+// SUBCOMPONENTES (MODO SOMENTE LEITURA)
+// ==========================================================
 function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col gap-5 border border-gray-100 mb-4">
+    <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col gap-5">
       <h2 className="text-base font-semibold text-gray-800">{title}</h2>
       {children}
     </div>
   );
 }
 
-const renderActiveShape = (props: any) => {
-  const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } = props;
-  return (
-    <g>
-      <Sector cx={cx} cy={cy} innerRadius={innerRadius} outerRadius={outerRadius} startAngle={startAngle} endAngle={endAngle} fill={fill} />
-      <Sector cx={cx} cy={cy} innerRadius={outerRadius + 2} outerRadius={outerRadius + 5} startAngle={startAngle} endAngle={endAngle} fill={fill} opacity={0.8} />
-    </g>
-  );
-};
-
-// Stepper Visual - 100% bloqueado para leitura na edição
-function DisabledStepper({ value, accentColor }: { value: number; accentColor: string }) {
-  return (
-    <div className="inline-flex items-center h-8 border border-[#e2e8f0] rounded-xl bg-[#f8fafc] overflow-hidden select-none opacity-60">
-      <div className="w-8 h-full flex items-center justify-center text-[#64748b] text-[16px] font-medium leading-none border-r border-[#e2e8f0]/60 bg-gray-100 cursor-not-allowed">−</div>
-      <div className="w-12 h-full flex items-center justify-center text-[14px] font-bold tabular-nums bg-white" style={{ color: accentColor }}>{value}</div>
-      <div className="w-8 h-full flex items-center justify-center text-[#64748b] text-[16px] font-medium leading-none border-l border-[#e2e8f0]/60 bg-gray-100 cursor-not-allowed">+</div>
-    </div>
-  );
-}
-
 function SummaryCards({ disponiveis, utilizadas, saldo }: { disponiveis: number; utilizadas: number; saldo: number }) {
   return (
-    <div className="flex flex-col sm:flex-row border border-[#e0e0e0] rounded-xl overflow-hidden bg-white divide-y sm:divide-y-0 sm:divide-x divide-[#e0e0e0] mb-6">
+    <div className="flex flex-col sm:flex-row border border-[#e0e0e0] rounded-xl overflow-hidden bg-white divide-y sm:divide-y-0 sm:divide-x divide-[#e0e0e0]">
       <div className="flex-1 px-6 py-5">
         <div className="flex items-center gap-2 mb-2">
           <div className="w-6 h-6 rounded bg-[#f0fdf4] border border-[#bbf7d0] flex items-center justify-center shrink-0">
@@ -108,20 +50,67 @@ function SummaryCards({ disponiveis, utilizadas, saldo }: { disponiveis: number;
           </div>
           <span className="text-[12px] text-[#5f6368]">Saldo Restante</span>
         </div>
-        <p className={`text-[28px] font-bold leading-none tabular-nums ${saldo < 0 ? "text-red-600" : "text-[#1d1d1f]"}`}>{saldo}</p>
+        <p className={`text-[28px] font-bold leading-none tabular-nums ${saldo < 0 ? "text-red-600" : "text-[#1d1d1f]"}`}>
+          {saldo}
+        </p>
       </div>
     </div>
   );
 }
 
-function ReadOnlyVaccinationTable({
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  const [isOpen, setIsOpen] = useState(true);
+  return (
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-visible mb-4">
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between px-6 py-4 bg-gray-50/70 border-b border-gray-100 select-none text-left transition-colors"
+      >
+        <span className="text-sm font-bold text-gray-700">{title}</span>
+        {isOpen ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
+      </button>
+      {isOpen && <div className="p-6">{children}</div>}
+    </div>
+  );
+}
+
+const renderActiveShape = (props: any) => {
+  const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } = props;
+  return (
+    <g>
+      <Sector cx={cx} cy={cy} innerRadius={innerRadius} outerRadius={outerRadius} startAngle={startAngle} endAngle={endAngle} fill={fill} />
+      <Sector cx={cx} cy={cy} innerRadius={outerRadius + 2} outerRadius={outerRadius + 5} startAngle={startAngle} endAngle={endAngle} fill={fill} />
+    </g>
+  );
+};
+
+const AGE_RANGES = [
+  "De 0 a 12 meses",
+  "De 13 a 24 meses",
+  "De 25 a 36 meses",
+  "Acima de 36 meses",
+];
+
+interface VacinadosRow {
+  machos: number;
+  femeas: number;
+}
+
+interface FaixaLinha {
+  label: string;
+  machos: { existentes: number; naoVacinados: number };
+  femeas: { existentes: number; naoVacinados: number };
+}
+
+function VaccinationTableReadOnly({
   faixas,
   mostrarMachos,
   mostrarFemeas,
   statusLabel,
   vacinados,
 }: {
-  faixas: any[];
+  faixas: FaixaLinha[];
   mostrarMachos: boolean;
   mostrarFemeas: boolean;
   statusLabel: string;
@@ -136,19 +125,13 @@ function ReadOnlyVaccinationTable({
 
   const th = "text-[11px] font-semibold text-[#6b7280] text-center py-2.5 px-3 border-b border-r border-[#f1f5f9]";
   const td = "text-[13px] text-[#1d1d1f] text-center py-3.5 px-3 border-b border-r border-[#f1f5f9]";
+
   const generosVisiveis = (mostrarMachos ? 1 : 0) + (mostrarFemeas ? 1 : 0);
 
   return (
     <div className="bg-white border border-[#e2e8f0] rounded-2xl overflow-hidden shadow-sm">
-      <div className="flex items-center justify-between px-6 py-4 border-b border-[#f1f5f9]">
-        <h3 className="text-[16px] font-medium text-[#1d1d1f]">Vacinação</h3>
-        <button
-          disabled
-          className="flex items-center gap-1.5 text-gray-400 text-[13px] font-semibold select-none leading-none cursor-not-allowed opacity-60"
-        >
-          <RotateCcw size={13} className="shrink-0 mt-[-1px]" />
-          <span>Restaurar Valores</span>
-        </button>
+      <div className="flex items-center justify-between px-6 py-4 border-b border-[#f1f5f9] bg-gray-50/50">
+        <h3 className="text-[16px] font-medium text-[#1d1d1f]">Vacinação (Somente Leitura)</h3>
       </div>
 
       <div className="overflow-x-auto">
@@ -188,18 +171,14 @@ function ReadOnlyVaccinationTable({
                     <td className={td}>{row.machos.existentes}</td>
                     <td className={td}>{row.machos.naoVacinados}</td>
                     <td className={td}>
-                      <div className="flex justify-center">
-                        <DisabledStepper value={vac.machos} accentColor="#2563eb" />
-                      </div>
+                      <div className="flex justify-center font-bold text-[#2563eb] text-[15px]">{vac.machos}</div>
                     </td>
                   </>)}
                   {mostrarFemeas && (<>
                     <td className={td}>{row.femeas.existentes}</td>
                     <td className={td}>{row.femeas.naoVacinados}</td>
                     <td className={`${td} border-r-0`}>
-                      <div className="flex justify-center">
-                        <DisabledStepper value={vac.femeas} accentColor="#be185d" />
-                      </div>
+                      <div className="flex justify-center font-bold text-[#be185d] text-[15px]">{vac.femeas}</div>
                     </td>
                   </>)}
                 </tr>
@@ -225,67 +204,116 @@ function ReadOnlyVaccinationTable({
   );
 }
 
-export function EditarDeclaracaoVacinacaoPage({ onLogout, onNavigate, dados, data }: any) {
-  const [notasListasMinimizadas, setNotasListasMinimizadas] = useState<Record<string, boolean>>({});
-  const [lotesMinimizados, setLotesMinimizados] = useState<Record<string, boolean>>({});
+const FAIXA_BRUCELOSE_OFICIAL = "De 3 a 8 meses";
+
+function derivarFaixas(doencaNome: string | undefined, regime: string): {
+  faixas: FaixaLinha[];
+  mostrarMachos: boolean;
+  mostrarFemeas: boolean;
+} {
+  const isBrucelose = doencaNome === "Brucelose";
+  const linhaPadrao = (label: string): FaixaLinha => ({
+    label,
+    machos: { existentes: 100, naoVacinados: 80 },
+    femeas: { existentes: 100, naoVacinados: 80 },
+  });
+
+  if (isBrucelose) {
+    if (regime === "Vacina Oficial") {
+      return { faixas: [linhaPadrao(FAIXA_BRUCELOSE_OFICIAL)], mostrarMachos: false, mostrarFemeas: true };
+    }
+    return { faixas: AGE_RANGES.map(linhaPadrao), mostrarMachos: false, mostrarFemeas: true };
+  }
+
+  return { faixas: AGE_RANGES.map(linhaPadrao), mostrarMachos: true, mostrarFemeas: true };
+}
+
+const GRUPOS_COM_NUCLEO = ["Abelhas", "Aves", "Suídeos"];
+
+// ==========================================================
+// TELA PRINCIPAL DE EDIÇÃO (CANCELAMENTO)
+// ==========================================================
+export function EditarDeclaracaoVacinacaoPage({ onLogout, onNavigate, dados }: { onLogout: () => void; onNavigate: (screen: any, data?: any) => void; dados?: any }) {
   const [graficoAtivo, setGraficoAtivo] = useState<{ loteId: string; index: number } | null>(null);
+  const [modalConfirmacao, setModalConfirmacao] = useState(false);
+  const [modalSucesso, setModalSucesso] = useState(false);
 
-  const registro = dados || data || (() => {
-    const currentId = localStorage.getItem("CURRENT_DECLARACAO_ID");
-    const stored = localStorage.getItem(MOCK_KEY);
-    const db = stored ? JSON.parse(stored) : [];
-    return db.find((x: any) => x.id.toString() === currentId?.toString()) || {};
-  })();
+  const REGISTROS_RICOS: Record<string, any> = {
+    "1": {
+      tipoVacina: "B19", regime: "Vacina Oficial", dataAtestado: "2026-02-05", 
+      veterinarioNome: "Dr. Roberto Silva", vacinadorNome: "Eloiza Silva",
+      origemNota: "Produtor", revendedoraNome: "Comercial AgroVet",
+      notasFiscaisOrigem: [
+        { id: 1, nome: "0013225/24", partida: "1", uf: "MG", dosesDisponiveisTotais: 120, fornecedor: "Comercial AgroVet", doenca: "Brucelose", tipoVacina: "B19", laboratorio: "BioMed/MG", validade: "20/12/2026", quantidadeDoses: 10, quantidadeFrascos: 1, dosesPerFrasco: 10 }
+      ],
+      vacinados: [{ machos: 0, femeas: 10 }]
+    },
+    "2": {
+      tipoVacina: "", regime: "Primeira Dose", dataAtestado: "2026-01-20", 
+      veterinarioNome: "Dr. Carlos Mendes", vacinadorNome: "",
+      origemNota: "Médico Veterinário", revendedoraNome: "AgroInsumos Sul",
+      situacao: "Cancelada",
+      notasFiscaisOrigem: [
+        { id: 5, nome: "0099887/25", partida: "3", uf: "MG", dosesDisponiveisTotais: 500, fornecedor: "Comercial AgroVet", doenca: "Febre Aftosa", tipoVacina: "", laboratorio: "OuroFino", validade: "10/10/2026", quantidadeDoses: 30, quantidadeFrascos: 3, dosesPerFrasco: 10 }
+      ],
+      vacinados: [{ machos: 5, femeas: 15 }, { machos: 2, femeas: 8 }, { machos: 0, femeas: 0 }, { machos: 0, femeas: 0 }]
+    },
+    "3": {
+      tipoVacina: "", regime: "Dose de Reforço", dataAtestado: "2026-03-02", 
+      veterinarioNome: "Dra. Ana Paula", vacinadorNome: "", mordidaMorcego: "Não",
+      origemNota: "Produtor", revendedoraNome: "Comercial AgroVet",
+      notasFiscaisOrigem: [
+        { id: 3, nome: "0014589/24", partida: "1", uf: "SP", dosesDisponiveisTotais: 250, fornecedor: "AgroInsumos Sul", doenca: "Raiva", tipoVacina: "", laboratorio: "Zoetis", validade: "15/08/2027", quantidadeDoses: 5, quantidadeFrascos: 1, dosesPerFrasco: 5 }
+      ],
+      vacinados: [{ machos: 2, femeas: 3 }, { machos: 0, femeas: 0 }, { machos: 0, femeas: 0 }, { machos: 0, femeas: 0 }]
+    },
+  };
 
-  const [situacao, setSituacao] = useState(registro.situacao || "Ativo");
+  const isMockPadrao = dados?.id && REGISTROS_RICOS[dados.id.toString()];
+  const registroOriginal = dados || {};
+  const registroInicial = isMockPadrao 
+    ? { ...registroOriginal, ...REGISTROS_RICOS[dados.id.toString()] }
+    : { ...registroOriginal };
+
+  // O status passa a ser controlado no estado para refletir a mudança instantaneamente
+  const [registro, setRegistro] = useState(registroInicial);
+
+  const isRaiva = registro.doenca === "Raiva";
+  const isBrucelose = registro.doenca === "Brucelose";
   
-  const produtorNomeVal = registro.produtorNome || registro.produtor?.nome || "";
-  const produtorDocVal = registro.produtorDoc || registro.produtor?.documento || "";
+  const grupoMock = registro.especie === "Abelha com Ferrão" ? "Abelhas" : (registro.especie === "Codorna" ? "Aves" : (registro.especie === "Suíno" ? "Suídeos" : "Bovinos"));
+  const exigeNucleo = GRUPOS_COM_NUCLEO.some((g) => grupoMock.includes(g));
+
+  const { faixas: faixasTabela, mostrarMachos, mostrarFemeas } = derivarFaixas(registro.doenca, registro.regime);
+  const statusColLabel = registro.regime === "Vacina Oficial" || registro.regime === "Primeira Dose" ? "Não Vacinados" : "Já Vacinados";
   
-  const estabNomeVal = registro.estabNome || registro.estabelecimento?.nome || "";
-  const estabCodigoVal = registro.estabCodigo || registro.estabelecimento?.codigo || "";
-  const municipioVal = registro.municipio || registro.estabelecimento?.municipio || "";
-  
-  const exploracaoCodigoVal = registro.exploracaoCodigo || registro.exploracao?.codigo || "";
-  const especieVal = registro.especie || registro.exploracao?.especie || "Bovino";
-  
-  const doencaNomeVal = registro.doenca || registro.doencaEntidade?.nome || "";
-  const tipoVacinaVal = registro.tipoVacina || "";
-  const regimeVal = registro.regime || registro.tipoDeclaracao || "Vacina Oficial";
-  const dataVacinacaoVal = registro.dataVacinacao || "";
-  const dataAtestadoVal = registro.dataAtestado || "";
-  const veterinarioVal = registro.veterinario?.nome || registro.veterinarioNome || "Dr. Roberto Silva";
-  const vacinadorVal = registro.vacinadorBrucelose?.nome || registro.vacinadorNome || "";
-  const mordidaMorcegoVal = registro.mordidaMorcego || "Não";
-  const origemNotaVal = registro.origemNota || "Produtor";
-  const revendedoraVal = registro.revendedora?.nome || "Comercial AgroVat";
-  const notasFiscaisVal = registro.notasFiscaisOrigem?.length ? registro.notasFiscaisOrigem : [{
-    id: `lote-${registro.id || 1}`, nome: "0013225/24", doenca: doencaNomeVal, tipoVacina: doencaNomeVal === "Brucelose" ? "B19" : "—", laboratorio: "BioMed/MG", validade: "20/12/2026",
-    dosesDisponiveisTotais: 120, quantidadeDoses: 15, quantidadeFrascos: 1, dosesPerFrasco: 15
-  }];
-  const vacinadosVal: VacinadosRow[] = registro.vacinados || INITIAL_VACINADOS;
+  const vacinadosView = faixasTabela.map((_, i) => (registro.vacinados && registro.vacinados[i]) ? registro.vacinados[i] : { machos: 0, femeas: 0 });
+  const notasFiscaisOrigem = registro.notasFiscaisOrigem && registro.notasFiscaisOrigem.length > 0 
+    ? registro.notasFiscaisOrigem 
+    : [
+        { id: 999, nome: "Lote Genérico (Fallback)", partida: "1", uf: "MG", dosesDisponiveisTotais: 100, fornecedor: "Fornecedor", doenca: registro.doenca, tipoVacina: registro.tipoVacina, laboratorio: "Laboratório", validade: "20/12/2026", quantidadeDoses: 0, quantidadeFrascos: 0, dosesPerFrasco: 10 }
+      ];
 
-  const [sucesso, setSucesso] = useState(false);
+  const DOSES_DISPONIVEIS = notasFiscaisOrigem.reduce((sum: number, item: any) => sum + (item.dosesDisponiveisTotais || 0), 0);
+  const utilizadas = vacinadosView.reduce((s: number, r: any) => s + r.machos + r.femeas, 0);
+  const saldo = DOSES_DISPONIVEIS - utilizadas;
 
-  const { faixas: faixasTabela, mostrarMachos, mostrarFemeas } = derivarFaixas(doencaNomeVal, regimeVal);
-  const statusColLabel = regimeVal === "Dose de Reforço" ? "Já Vacinados na Etapa" : "Não Vacinados";
+  const isCancelada = registro.situacao === "Cancelada";
 
-  const utilizadas = vacinadosVal.reduce((s, r) => s + (r.machos || 0) + (r.femeas || 0), 0);
-  const totalDisponivel = notasFiscaisVal.reduce((sum: number, item: any) => sum + (item.dosesDisponiveisTotais || 0), 0);
-  const saldoRestante = totalDisponivel - utilizadas;
+  // Lógica de cancelamento da declaração
+  const handleConfirmarCancelamento = () => {
+    const saved = localStorage.getItem(MOCK_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      const newData = parsed.map((item: any) => 
+        item.id === registro.id ? { ...item, situacao: "Cancelada" } : item
+      );
+      localStorage.setItem(MOCK_KEY, JSON.stringify(newData));
+    }
 
-  const handleSalvarEdicao = () => {
-    const atualizado = {
-      ...registro,
-      situacao,
-    };
-
-    const stored = localStorage.getItem(MOCK_KEY);
-    let db = stored ? JSON.parse(stored) : [];
-    db = db.map((item: any) => (item.id.toString() === registro.id.toString() ? atualizado : item));
-    localStorage.setItem(MOCK_KEY, JSON.stringify(db));
-
-    setSucesso(true);
+    setRegistro((prev: any) => ({ ...prev, situacao: "Cancelada" }));
+    setModalConfirmacao(false);
+    setModalSucesso(true);
   };
 
   return (
@@ -293,329 +321,387 @@ export function EditarDeclaracaoVacinacaoPage({ onLogout, onNavigate, dados, dat
       <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="declaracao-vacinacao" hideSearch />
 
       <main className="max-w-[1088px] mx-auto px-4 md:px-6 py-6 flex flex-col gap-4">
-        <div>
+        
+        {/* ============ HEADER ============ */}
+        <div className="mb-4">
           <button onClick={() => onNavigate("declaracao-vacinacao")} className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70" style={{ color: GREEN }}>
-            <ArrowLeft size={15} /> Todas as Declarações
+            <ArrowLeft size={15} /> Todas Declarações de Vacinação
           </button>
-          <div className="flex justify-between items-center gap-4 w-full">
+          
+          <div className="flex items-center justify-between">
             <h1 className="text-2xl font-semibold text-gray-900">Editar Declaração de Vacinação</h1>
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={handleSalvarEdicao}
-                className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2"
-              >
-                <Pencil size={16} /> Salvar Alterações
-              </button>
-            </div>
           </div>
         </div>
 
-        {/* Informações Básicas (Somente Leitura) */}
+        {/* ============ INFORMAÇÕES BÁSICAS ============ */}
         <SectionCard title="Informações Básicas">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-            <div className="col-span-full md:col-span-2">
-              <FloatInput label="Produtor" value={produtorNomeVal} readOnly disabled onChange={() => {}} icon={<img src={Icons.iconeProdutorUrl} alt="Produtor" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />} />
+          <div className="flex flex-col gap-4">
+            
+            {/* Linha 1: Produtor */}
+            <div className="flex items-center gap-3 w-full">
+              <div className="flex-1">
+                <FloatInput label="Produtor *" value={registro.produtorNome || "—"} readOnly disabled icon={<img src={Icons.iconeProdutorUrl} alt="Produtor" className="w-5 h-5 object-contain" />} />
+              </div>
+              <div className="flex-1">
+                <FloatInput label="CPF *" value={registro.produtorDoc || "—"} readOnly disabled />
+              </div>
+              <button type="button" className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-full transition-colors flex-shrink-0" onClick={() => {}}>
+                <Eye size={22} strokeWidth={2.5} />
+              </button>
             </div>
-            <div className="col-span-full md:col-span-1">
-              <FloatInput label="CPF" value={produtorDocVal} readOnly disabled onChange={() => {}} />
+
+            {/* Linha 2: Estabelecimento */}
+            <div className="flex items-center gap-3 w-full">
+              <div className="flex-1">
+                <FloatInput label="Estabelecimento Agropecuário *" value={registro.estabNome || "—"} readOnly disabled icon={<img src={Icons.iconeEstabelecimentoUrl} alt="Estabelecimento" className="w-[24px] h-[24px] object-contain mr-2 -ml-1" />} />
+              </div>
+              <div className="flex-1 grid grid-cols-2 gap-3">
+                <FloatInput label="Código do Estabelecimento Agropecuário *" value={registro.estabCodigo || "—"} readOnly disabled />
+                <FloatInput label="Município do Estabelecimento Agropecuário" value={registro.municipio || "—"} readOnly disabled />
+              </div>
+              <button type="button" className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-full transition-colors flex-shrink-0" onClick={() => {}}>
+                <Eye size={22} strokeWidth={2.5} />
+              </button>
             </div>
-            <div className="col-span-full md:col-span-1">
-              <FloatInput label="Estabelecimento Agropecuário" value={estabNomeVal} readOnly disabled onChange={() => {}} icon={<img src={Icons.iconeEstabelecimentoUrl} alt="Estabelecimento" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />} />
+
+            {/* Linha 3: Exploração */}
+            <div className="flex items-center gap-3 w-full">
+              <div className="flex-1">
+                <FloatInput label="Exploração Pecuária *" value={registro.exploracaoCodigo || `${registro.estabCodigo || "—"}0001`} readOnly disabled icon={<img src={Icons.iconeExploracaoUrl} alt="Exploração" className="w-5 h-5 object-contain" />} />
+              </div>
+              <div className="flex-1">
+                <FloatInput label="Espécie Explorada *" value={registro.especie || "—"} readOnly disabled />
+              </div>
+              <button type="button" className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-full transition-colors flex-shrink-0" onClick={() => {}}>
+                <Eye size={22} strokeWidth={2.5} />
+              </button>
             </div>
-            <div className="col-span-full md:col-span-1">
-              <FloatInput label="Código do Estabelecimento Agropecuário" value={estabCodigoVal} readOnly disabled onChange={() => {}} />
-            </div>
-            <div className="col-span-full md:col-span-1">
-              <FloatInput label="Município do Estabelecimento Agropecuário" value={municipioVal} readOnly disabled onChange={() => {}} />
-            </div>
-            <div className="col-span-full md:col-span-1">
-              <FloatInput label="Exploração Pecuária" value={exploracaoCodigoVal} readOnly disabled onChange={() => {}} icon={<img src={Icons.iconeExploracaoUrl} alt="Exploração" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />} />
-            </div>
-            <div className="col-span-full md:col-span-2">
-              <FloatInput label="Espécie Explorada" value={especieVal} readOnly disabled onChange={() => {}} />
-            </div>
+
+            {/* Linha 4: Núcleo Condicional */}
+            {exigeNucleo && (
+              <div className="flex items-center gap-3 w-full">
+                <div className="flex-1">
+                  <FloatInput 
+                    label="Núcleo de Produção *" 
+                    value={registro.nucleo?.nome || "Núcleo Central"} 
+                    readOnly 
+                    disabled 
+                    icon={<img src={Icons.iconeNucleoProducaoUrl} alt="Núcleo" className="w-[24px] h-[24px] object-contain mr-2 -ml-1" />} 
+                  />
+                </div>
+                <div className="flex-1">
+                  <FloatInput 
+                    label="Código do Núcleo *" 
+                    value={registro.nucleo?.codigo || "450010400050003"} 
+                    readOnly 
+                    disabled 
+                  />
+                </div>
+                <button type="button" className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-full transition-colors flex-shrink-0" onClick={() => {}}>
+                  <Eye size={22} strokeWidth={2.5} />
+                </button>
+              </div>
+            )}
+            
           </div>
         </SectionCard>
 
-        {/* Informações de Vacinação (Somente Leitura) */}
+        {/* ============ INFORMAÇÕES DE VACINAÇÃO ============ */}
         <SectionCard title="Informações de Vacinação">
           <div className="flex flex-wrap gap-4 items-end w-full">
             <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
-              <FloatInput label="Doença" value={doencaNomeVal} readOnly disabled onChange={() => {}} icon={<img src={Icons.iconeDoencaUrl} alt="Doença" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />} />
+              <FloatInput label="Doença" value={registro.doenca || "—"} readOnly disabled icon={<img src={Icons.iconeDoencaUrl} alt="Doença" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />} />
             </div>
-            {tipoVacinaVal && tipoVacinaVal !== "—" && (
+
+            {registro.tipoVacina && (
               <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
-                <FloatInput label="Tipo de Vacina" value={tipoVacinaVal} readOnly disabled onChange={() => {}} />
+                <FloatInput label="Tipo de Vacina" value={registro.tipoVacina || "—"} readOnly disabled />
               </div>
             )}
+
             <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
-              <FloatInput label="Tipo de Declaração" value={regimeVal} readOnly disabled onChange={() => {}} />
+              <FloatInput label="Vacinação" value={registro.regime || "—"} readOnly disabled />
             </div>
+
             <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
-              <FloatInput label="Data da Vacinação" type="date" icon={<Calendar size={18} color={GREEN} />} value={dataVacinacaoVal} readOnly disabled onChange={() => {}} />
+              <FloatInput label="Data da Vacinação" value={registro.dataVacinacao || "—"} readOnly disabled icon={<Calendar size={18} color={GREEN} />} />
             </div>
+
             <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
-              <FloatInput label="Data de Atestado de Vacinação" type="date" icon={<Calendar size={18} color={GREEN} />} value={dataAtestadoVal} readOnly disabled onChange={() => {}} />
+              <FloatInput label="Data de Atestado de Vacinação" value={registro.dataAtestado || "—"} readOnly disabled icon={<Calendar size={18} color={GREEN} />} />
             </div>
+
             <div className="w-full mt-2">
-              <FloatInput label="Médico Veterinário Responsável" value={veterinarioVal} readOnly disabled onChange={() => {}} />
+              <FloatInput label="Médico Veterinário Responsável" value={registro.veterinarioNome || "—"} readOnly disabled />
             </div>
-            {doencaNomeVal === "Brucelose" && vacinadorVal && (
+
+            {isBrucelose && (
               <div className="w-full mt-1">
-                <FloatInput label="Vacinador Contra Brucelose" value={vacinadorVal} readOnly disabled onChange={() => {}} />
+                <FloatInput label="Vacinador Contra Brucelose" value={registro.vacinadorNome || "—"} readOnly disabled />
               </div>
             )}
-            {doencaNomeVal === "Raiva" && (
-              <div className="w-full flex flex-col gap-2 mt-2 p-3 rounded-lg">
-                <span className="text-xs font-semibold text-gray-700">Observou mordidas de morcegos nos animais do rebanho recentemente?</span>
+
+            {isRaiva && (
+              <div className="w-full flex flex-col gap-2 mt-2 p-3 rounded-lg pointer-events-none opacity-80">
+                <span className="text-xs font-semibold text-gray-700">
+                  Recentemente, tem observado mordidas de morcegos nos animais do rebanho?
+                </span>
                 <div className="flex items-center gap-6 mt-1">
-                  <CustomRadio label="Sim" name="mordidaMorcego" checked={mordidaMorcegoVal === "Sim"} readOnly disabled onChange={() => {}} />
-                  <CustomRadio label="Não" name="mordidaMorcego" checked={mordidaMorcegoVal === "Não"} readOnly disabled onChange={() => {}} />
+                  <CustomRadio label="Sim" name="mordidaMorcego" checked={registro.mordidaMorcego === "Sim"} onChange={() => {}} />
+                  <CustomRadio label="Não" name="mordidaMorcego" checked={registro.mordidaMorcego === "Não"} onChange={() => {}} />
                 </div>
               </div>
             )}
           </div>
         </SectionCard>
 
-        {/* Saldo de Vacinas (Com o Gráfico Donut Interativo restaurado) */}
-        <SectionCard title="Saldo de Vacinas">
+
+        {/* ============ SALDO DE VACINAS ============ */}
+        <Section title="Saldo de Vacinas">
           <div className="flex flex-col gap-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FloatInput label="Origem do Saldo" value={origemNotaVal} readOnly disabled onChange={() => {}} />
-              <FloatInput label="Revendedora de Insumos" value={revendedoraVal} readOnly disabled icon={<Store size={18} color={GREEN} />} onChange={() => {}} />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
+              <FloatInput label="Origem do Saldo" value={registro.origemNota || "—"} readOnly disabled />
+              <FloatInput label="Revendedora de Insumos" value={registro.revendedoraNome || "—"} readOnly disabled icon={<Store size={18} color={GREEN} />} />
             </div>
 
-            <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-              <div className="flex items-center gap-3">
-                <div className="flex flex-col">
-                  <span className="text-xs text-gray-500 font-medium">Saldo de doses</span>
-                </div>
-                {notasFiscaisVal.length > 0 && (
-                  <div className="flex items-center gap-1.5 bg-green-50 border border-green-200 px-2.5 py-1 rounded-lg animate-fadeIn">
-                    <span className="text-[11px] font-semibold text-gray-500">DOSES UTILIZADAS:</span>
-                    <span className="text-[11px] font-black text-[#1A7A3C]">{notasFiscaisVal.reduce((sum: number, item: any) => sum + (item.quantidadeDoses || 0), 0)} doses</span>
-                  </div>
-                )}
-              </div>
-            </div>
+            <div className="flex flex-col gap-6">
+              {Object.values(
+                notasFiscaisOrigem.reduce((acc: Record<string, any>, item: any) => {
+                  if (!acc[item.nome]) acc[item.nome] = { nome: item.nome, partidas: [] };
+                  acc[item.nome].partidas.push(item);
+                  return acc;
+                }, {})
+              ).map((grupo: any) => {
+                return (
+                  <div key={`grupo-${grupo.nome}`} className="border border-gray-200 rounded-xl p-4 bg-gray-50/30 relative">
 
-            {notasFiscaisVal.length > 0 && (
-              <div className="flex flex-col gap-6 animate-fadeIn">
-                {Object.values(
-                  notasFiscaisVal.reduce((acc: Record<string, any>, item: any) => {
-                    if (!acc[item.nome]) {
-                      acc[item.nome] = { nome: item.nome, partidas: [] };
-                    }
-                    acc[item.nome].partidas.push(item);
-                    return acc;
-                  }, {})
-                ).map((grupo: any) => {
-                  const isNotaMinimizada = notasListasMinimizadas[grupo.nome] || false;
-
-                  return (
-                    <div key={`grupo-${grupo.nome}`} className="border border-gray-200 rounded-xl p-4 bg-gray-50/30 relative">
-                      <div className="flex items-center justify-between mb-4 px-1">
-                        <div className="flex items-center gap-2">
-                          <div className="flex items-center gap-2 cursor-pointer select-none group/title" onClick={() => setNotasListasMinimizadas(prev => ({ ...prev, [grupo.nome]: !isNotaMinimizada }))}>
-                            <Package size={24} color={GREEN} />
-                            <span className="text-sm font-bold text-gray-600">Lote:</span>
-                            <span className="text-sm font-bold text-gray-800">{grupo.nome}</span>
-                          </div>
+                    <div className="flex items-center justify-between mb-4 px-1">
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 select-none">
+                          <Package size={24} color={GREEN} />
+                          <span className="text-sm font-bold text-gray-600">Lote:</span>
+                          <span className="text-sm font-bold text-gray-800">{grupo.nome}</span>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => setNotasListasMinimizadas(prev => ({ ...prev, [grupo.nome]: !isNotaMinimizada }))}
-                          className="text-gray-400 hover:text-gray-600 p-1 rounded transition hover:bg-gray-100"
-                        >
-                          {isNotaMinimizada ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
-                        </button>
                       </div>
+                    </div>
 
-                      {!isNotaMinimizada && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start animate-slideDown">
-                          {grupo.partidas.map((nfItem: any) => {
-                            const DOSES_POR_FRASCO = nfItem.dosesPerFrasco || 20;
-                            const TOTAL_DISPONIVEL = nfItem.dosesDisponiveisTotais || 100;
-                            const isLoteExpandido = lotesMinimizados[nfItem.id] !== undefined ? lotesMinimizados[nfItem.id] : true;
-                            const isLoteMinimizado = !isLoteExpandido;
-                            
-                            const dadosGrafico = [
-                              { name: "Vencidas", value: 0, color: "#ef4444" },
-                              { name: "Descartadas", value: 0, color: "#9ca3af" },
-                              { name: "Partilhadas", value: 0, color: "#3b82f6" },
-                              { name: "Utilizadas", value: nfItem.quantidadeDoses || 0, color: "#f59e0b" },
-                              { name: "Disponíveis", value: TOTAL_DISPONIVEL - (nfItem.quantidadeDoses || 0), color: "#22c55e" },
-                            ];
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                      {grupo.partidas.map((nfItem: any) => {
+                        const DOSES_POR_FRASCO = nfItem.dosesPerFrasco || 20;
+                        const TOTAL_DISPONIVEL = nfItem.dosesDisponiveisTotais || 100;
+                        const validadeLote = nfItem.validade || "20/12/2026";
 
-                            const estaAtivoNesteLote = graficoAtivo?.loteId === nfItem.id;
-                            const fatiaAtiva = estaAtivoNesteLote ? dadosGrafico[graficoAtivo.index] : null;
-                            const totalDosesGrafico = dadosGrafico.reduce((s, d) => s + d.value, 0);
-                            const porcentagem = fatiaAtiva ? ((fatiaAtiva.value / totalDosesGrafico) * 100).toFixed(1) : null;
+                        const verificarVencimento = (dataStr: string) => {
+                          if (!dataStr) return false;
+                          const [dia, mes, ano] = dataStr.split("/").map(Number);
+                          const dataValidade = new Date(ano, mes - 1, dia);
+                          return dataValidade < new Date();
+                        };
+                        const isVencido = verificarVencimento(validadeLote);
 
-                            const DOSES_DISPONIVEIS = dadosGrafico.find(d => d.name === "Disponíveis")?.value ?? 0;
-                            const FRASCOS_DISPONIVEIS = Math.floor(DOSES_DISPONIVEIS / DOSES_POR_FRASCO);
+                        const dadosGrafico = isVencido
+                          ? [
+                            { name: "Vencidas", value: TOTAL_DISPONIVEL, color: "#ef4444" },
+                            { name: "Descartadas", value: 0, color: "#9ca3af" },
+                            { name: "Partilhadas", value: 0, color: "#3b82f6" },
+                            { name: "Utilizadas", value: 0, color: "#f59e0b" },
+                            { name: "Disponíveis", value: 0, color: "#22c55e" },
+                          ]
+                          : [
+                            { name: "Vencidas", value: 0, color: "#ef4444" },
+                            { name: "Descartadas", value: 10, color: "#9ca3af" },
+                            { name: "Partilhadas", value: 20, color: "#3b82f6" },
+                            { name: "Utilizadas", value: nfItem.quantidadeDoses || 10, color: "#f59e0b" },
+                            { name: "Disponíveis", value: Math.max(0, TOTAL_DISPONIVEL - (nfItem.quantidadeDoses || 10)), color: "#22c55e" },
+                          ];
 
-                            return (
-                              <div key={`lote-${nfItem.id}`} className={`border border-gray-200 rounded-xl bg-white shadow-sm flex flex-col overflow-visible relative group transition-all duration-200 h-auto ${isLoteMinimizado ? "p-2.5 pb-2 justify-start" : "p-4 justify-between"}`}>
-                                <div className="absolute top-2.5 right-2.5 flex items-center gap-1 z-10">
-                                  <button
-                                    type="button"
-                                    onClick={() => setLotesMinimizados(prev => ({ ...prev, [nfItem.id]: !isLoteExpandido }))}
-                                    className="text-gray-400 hover:text-gray-600 p-1 rounded-lg transition hover:bg-gray-100"
-                                  >
-                                    {isLoteMinimizado ? <ChevronDown size={15} /> : <ChevronUp size={15} />}
-                                  </button>
-                                </div>
+                        const estaAtivoNesteLote = graficoAtivo?.loteId === nfItem.id;
+                        const fatiaAtiva = estaAtivoNesteLote ? dadosGrafico[graficoAtivo.index] : null;
+                        const totalDosesGrafico = dadosGrafico.reduce((s, d) => s + d.value, 0);
+                        const porcentagem = fatiaAtiva ? ((fatiaAtiva.value / totalDosesGrafico) * 100).toFixed(1) : null;
+                        const DOSES_DISP = dadosGrafico.find(d => d.name === "Disponíveis")?.value ?? 0;
+                        const FRASCOS_DISP = Math.floor(DOSES_DISP / DOSES_POR_FRASCO);
 
-                                <div className={`flex items-center justify-between border-gray-100 overflow-visible pr-14 ${isLoteMinimizado ? "border-none pb-0 mb-0" : "border-b pb-2 mb-3"}`}>
-                                  <div className="flex items-center gap-1.5 relative group/info overflow-visible">
-                                    <span className="text-xs font-semibold text-gray-800 select-none">Apresentação</span>
-                                    <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-600 text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">
-                                      {DOSES_POR_FRASCO} doses/frasco
-                                    </span>
+                        return (
+                          <div key={`lote-${nfItem.id}`} className="border border-gray-200 rounded-xl bg-white shadow-sm flex flex-col overflow-visible relative group transition-all duration-200 h-auto p-4 justify-between pointer-events-none">
+                            <div className="flex items-center justify-between border-gray-100 overflow-visible border-b pb-2 mb-3">
+                              <div className="flex items-center gap-1.5 relative group/info overflow-visible">
+                                <span className="text-xs font-semibold text-gray-800 select-none">Apresentação</span>
+                                <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-600 text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">
+                                  <PillBottle size={10} className="text-gray-400" />
+                                  {DOSES_POR_FRASCO} doses/frasco
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="animate-slideDown">
+                              <div className="flex items-center gap-4 z-10 mt-3">
+                                <div className="w-24 h-24 flex items-center justify-center relative select-none">
+                                  <PieChart width={96} height={96} margin={{ top: 2, right: 2, bottom: 2, left: 2 }}>
+                                    <Pie
+                                      data={dadosGrafico} cx="50%" cy="50%" innerRadius={26} outerRadius={35} paddingAngle={2} dataKey="value" stroke="none"
+                                      activeIndex={estaAtivoNesteLote ? graficoAtivo.index : undefined} activeShape={renderActiveShape}
+                                    >
+                                      {dadosGrafico.map((entry, idx) => (
+                                        <Cell key={`cell-${idx}`} fill={entry.color} className="outline-none" />
+                                      ))}
+                                    </Pie>
+                                  </PieChart>
+                                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
+                                    <div className="flex flex-col items-center justify-center">
+                                      <span className="text-base font-black text-gray-800 leading-none">{totalDosesGrafico}</span>
+                                      <span className="text-[7px] font-bold text-gray-400 mt-0.5 uppercase tracking-wider">Total</span>
+                                    </div>
                                   </div>
                                 </div>
 
-                                {!isLoteMinimizado && (
-                                  <div className="animate-slideDown">
-                                    <div className="flex items-center gap-4 z-10 mt-3">
-                                      <div className="w-24 h-24 flex items-center justify-center relative select-none">
-                                        <PieChart width={96} height={96} margin={{ top: 2, right: 2, bottom: 2, left: 2 }}>
-                                          <Pie
-                                            data={dadosGrafico}
-                                            cx="50%" cy="50%" innerRadius={26} outerRadius={35} paddingAngle={2} dataKey="value" stroke="none"
-                                            activeIndex={estaAtivoNesteLote ? graficoAtivo.index : undefined}
-                                            activeShape={renderActiveShape}
-                                            onMouseEnter={(_, index) => setGraficoAtivo({ loteId: nfItem.id, index })}
-                                            onMouseLeave={() => setGraficoAtivo(null)}
-                                          >
-                                            {dadosGrafico.map((entry, idx) => (
-                                              <Cell key={`cell-${idx}`} fill={entry.color} className="cursor-pointer transition-all duration-200 outline-none" />
-                                            ))}
-                                          </Pie>
-                                        </PieChart>
-                                        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
-                                          {fatiaAtiva ? (
-                                            <div className="flex flex-col items-center justify-center">
-                                              <span className="text-xs font-bold leading-none animate-fadeIn" style={{ color: fatiaAtiva.color }}>{fatiaAtiva.value}</span>
-                                              <span className="text-[7px] text-gray-500 font-semibold leading-tight uppercase truncate max-w-[50px] mt-0.5 animate-fadeIn">{fatiaAtiva.name}</span>
-                                              <span className="text-[8px] font-bold mt-0.5 animate-fadeIn" style={{ color: fatiaAtiva.color }}>{porcentagem}%</span>
-                                            </div>
-                                          ) : (
-                                            <div className="flex flex-col items-center justify-center">
-                                              <span className="text-base font-black text-gray-800 leading-none">{totalDosesGrafico}</span>
-                                              <span className="text-[7px] font-bold text-gray-400 mt-0.5 uppercase tracking-wider">Total</span>
-                                            </div>
-                                          )}
-                                        </div>
+                                <div className="flex gap-2 flex-1 justify-start items-stretch">
+                                  <div className="flex flex-col border border-gray-200 rounded-xl px-2.5 py-2 w-full max-w-[130px] gap-1 bg-gray-50/80 justify-between">
+                                    <span className="text-[11px] text-gray-600 font-medium text-center">Disponíveis</span>
+                                    <div className="flex gap-2 items-end justify-center py-0.5">
+                                      <div className="flex flex-col items-center flex-1">
+                                        <span className="text-sm font-bold text-gray-700 leading-none">{FRASCOS_DISP}</span>
+                                        <span className="text-[9px] text-gray-400 font-medium mt-0.5">Frascos</span>
                                       </div>
-
-                                      <div className="flex gap-2 flex-1 justify-start items-stretch">
-                                        <div className="flex flex-col border border-gray-200 rounded-xl px-2.5 py-2 w-full max-w-[130px] gap-1 bg-gray-50/80 justify-between">
-                                          <span className="text-[11px] text-gray-600 font-medium text-center">Disponíveis</span>
-                                          <div className="flex gap-2 items-end justify-center py-0.5">
-                                            <div className="flex flex-col items-center flex-1">
-                                              <span className="text-sm font-bold text-gray-700 leading-none">{FRASCOS_DISPONIVEIS}</span>
-                                              <span className="text-[9px] text-gray-400 font-medium mt-0.5">Frascos</span>
-                                            </div>
-                                            <div className="flex flex-col items-center flex-1">
-                                              <span className="text-sm font-bold text-gray-700 leading-none">{DOSES_DISPONIVEIS}</span>
-                                              <span className="text-[9px] text-gray-400 font-medium mt-0.5">Doses</span>
-                                            </div>
-                                          </div>
-                                        </div>
-
-                                        <div className="flex flex-col border border-gray-200 rounded-xl px-2.5 py-2 w-full max-w-[130px] gap-1 bg-white justify-between">
-                                          <span className="text-[11px] text-gray-500 font-medium text-center">Utilizadas</span>
-                                          <div className="flex gap-1.5 items-end justify-center">
-                                            <div className="flex flex-col flex-1 min-w-[40px]">
-                                              <input
-                                                type="number"
-                                                value={nfItem.quantidadeFrascos || 0}
-                                                disabled
-                                                readOnly
-                                                className="w-full text-center bg-gray-50 border border-gray-200 rounded-lg text-xs font-black p-1 text-gray-500 cursor-not-allowed [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                              />
-                                              <span className="text-[9px] text-gray-400 font-semibold text-center mt-0.5">Frascos</span>
-                                            </div>
-                                            <div className="flex flex-col flex-1 min-w-[40px]">
-                                              <input
-                                                type="number"
-                                                value={nfItem.quantidadeDoses || 0}
-                                                disabled
-                                                readOnly
-                                                className="w-full text-center bg-gray-50 border border-gray-200 rounded-lg text-xs font-black p-1 text-gray-500 cursor-not-allowed [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                              />
-                                              <span className="text-[9px] text-gray-400 font-semibold text-center mt-0.5">Doses</span>
-                                            </div>
-                                          </div>
-                                        </div>
+                                      <div className="flex flex-col items-center flex-1">
+                                        <span className="text-sm font-bold text-gray-700 leading-none">{DOSES_DISP}</span>
+                                        <span className="text-[9px] text-gray-400 font-medium mt-0.5">Doses</span>
                                       </div>
                                     </div>
                                   </div>
-                                )}
+
+                                  <div className="flex flex-col border border-gray-200 rounded-xl px-2.5 py-2 w-full max-w-[130px] gap-1 bg-white justify-between">
+                                    <span className="text-[11px] text-gray-500 font-medium text-center">Utilizadas</span>
+                                    <div className="flex gap-1.5 items-end justify-center">
+                                      <div className="flex flex-col items-center flex-1">
+                                        <span className="text-sm font-bold text-gray-800 leading-none pt-1 pb-1">{nfItem.quantidadeFrascos || 1}</span>
+                                        <span className="text-[9px] text-gray-400 font-semibold text-center mt-0.5">Frascos</span>
+                                      </div>
+                                      <div className="flex flex-col items-center flex-1">
+                                        <span className="text-sm font-bold text-[#1A7A3C] leading-none pt-1 pb-1">{nfItem.quantidadeDoses || 10}</span>
+                                        <span className="text-[9px] text-gray-400 font-semibold text-center mt-0.5">Doses</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
                               </div>
-                            );
-                          })}
-                        </div>
-                      )}
+
+                              <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 mt-3 pt-2 border-t border-gray-100 text-[9px] z-10">
+                                {dadosGrafico.filter((item) => item.name).map((item) => (
+                                  <div key={item.name} className="flex items-center gap-1 bg-gray-50 px-1 py-0.5 rounded border border-gray-100">
+                                    <span className="w-1 h-1 rounded-full" style={{ backgroundColor: item.color }} />
+                                    <span className="text-gray-400 font-medium">{item.name}:</span>
+                                    <span className="font-bold text-gray-600">{item.value}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
-                  );
-                })}
-              </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </Section>
+
+        {/* ── VACINAÇÃO ── */}
+        <SectionCard title="Vacinação">
+          <SummaryCards disponiveis={DOSES_DISPONIVEIS} utilizadas={utilizadas} saldo={saldo} />
+          <VaccinationTableReadOnly
+            faixas={faixasTabela}
+            mostrarMachos={mostrarMachos}
+            mostrarFemeas={mostrarFemeas}
+            statusLabel={statusColLabel}
+            vacinados={vacinadosView}
+          />
+        </SectionCard>
+
+        {/* ============ SITUAÇÃO DO CADASTRO E AÇÕES (AC5) ============ */}
+        <Section title="Situação do Cadastro">
+          <div className="w-full flex items-center gap-4">
+            <div className="flex-1">
+              <FloatInput label="Situação" value={registro.situacao || "Ativo"} readOnly disabled />
+            </div>
+
+            {!isCancelada && (
+              <button
+                type="button"
+                onClick={() => setModalConfirmacao(true)}
+                className="h-12 px-6 rounded-lg font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors shadow-sm flex items-center gap-2 shrink-0"
+              >
+                <Ban size={18} />
+                Cancelar Declaração
+              </button>
             )}
           </div>
-        </SectionCard>
-
-        {/* Vacinação (Rebanho - Somente Leitura) */}
-        <SectionCard title="Vacinação (Rebanho)">
-          <div>
-            <SummaryCards disponiveis={totalDisponivel} utilizadas={utilizadas} saldo={saldoRestante} />
-            <ReadOnlyVaccinationTable
-              faixas={faixasTabela}
-              mostrarMachos={mostrarMachos}
-              mostrarFemeas={mostrarFemeas}
-              statusLabel={statusColLabel}
-              vacinados={vacinadosVal}
-            />
-          </div>
-        </SectionCard>
-
-        {/* Acordeon Situação da Declaração de Vacinação (No final da página) */}
-        <SectionCard title="Situação da Declaração de Vacinação">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FloatSelect 
-              label="Situação" 
-              value={situacao} 
-              options={[{ value: "Ativo", label: "Ativo" }, { value: "Cancelado", label: "Cancelado" }]} 
-              onChange={setSituacao} 
-            />
-          </div>
-        </SectionCard>
+        </Section>
+        
       </main>
 
-      {/* Modal de Sucesso */}
-      {sucesso && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 text-center">
-            <div className="flex justify-center mb-4">
-              <CheckCircle2 size={48} style={{ color: GREEN }} />
+      {/* ============ MODAL DE CONFIRMAÇÃO DE CANCELAMENTO ============ */}
+      {modalConfirmacao && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4 animate-fadeIn">
+          <div className="bg-white rounded-3xl shadow-xl max-w-sm w-full p-8 text-center flex flex-col items-center">
+            <div className="w-12 h-12 bg-red-50 text-red-600 rounded-full flex items-center justify-center mb-4">
+              <AlertTriangle size={24} />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-1">Declaração de Vacinação Atualizada</h3>
-            <p className="text-sm text-gray-500 mb-6">As alterações foram salvas com sucesso no sistema.</p>
-            <div className="flex items-center justify-center gap-3">
+            <h3 className="text-xl font-bold text-gray-900 mb-2">
+              Cancelar Declaração
+            </h3>
+            <p className="text-sm text-gray-500 mb-8">
+              Tem certeza que deseja cancelar esta declaração de vacinação? Esta ação não poderá ser revertida.
+            </p>
+            <div className="flex items-center justify-center gap-3 w-full">
               <button
-                onClick={() => onNavigate("declaracao-vacinacao")}
-                className="px-5 py-2.5 rounded-md text-white text-sm font-semibold transition hover:opacity-90"
-                style={{ backgroundColor: GREEN }}
+                type="button"
+                onClick={() => setModalConfirmacao(false)}
+                className="flex-1 px-5 py-3 rounded-xl text-sm font-semibold border-2 border-gray-200 text-gray-500 transition hover:bg-gray-50"
               >
-                Concluir
+                Voltar
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmarCancelamento}
+                className="flex-1 px-5 py-3 rounded-xl text-white text-sm font-semibold transition hover:opacity-90 shadow-sm bg-red-600"
+              >
+                Confirmar
               </button>
             </div>
           </div>
         </div>
       )}
+
+      {/* ============ MODAL DE SUCESSO ============ */}
+      {modalSucesso && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4 animate-fadeIn">
+          <div className="bg-white rounded-3xl shadow-xl max-w-sm w-full p-8 text-center flex flex-col items-center">
+            <div className="w-12 h-12 bg-green-50 text-green-600 rounded-full flex items-center justify-center mb-4">
+              <Check size={24} strokeWidth={3} />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">
+              Declaração Cancelada
+            </h3>
+            <p className="text-sm text-gray-500 mb-8">
+              A situação desta declaração foi alterada para "Cancelada" com sucesso.
+            </p>
+            <div className="flex items-center justify-center w-full">
+              <button
+                type="button"
+                onClick={() => onNavigate("declaracao-vacinacao")}
+                className="w-full px-5 py-3 rounded-xl text-white text-sm font-semibold transition hover:opacity-90 shadow-sm"
+                style={{ backgroundColor: GREEN }}
+              >
+                Ir para Listagem
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
