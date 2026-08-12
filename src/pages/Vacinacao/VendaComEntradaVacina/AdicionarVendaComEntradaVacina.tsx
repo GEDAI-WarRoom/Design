@@ -317,23 +317,11 @@ export function AdicionarVendaComEntradaVacinaPage({ onLogout, onNavigate, mode 
       : l)));
 
   const totaisPorVacina = useMemo(() => {
-    const map = new Map<string, number>();
-  const totaisPorDoenca = useMemo(() => {
     const map = new Map<string, { doenca: string; tipoVacina: string; total: number }>();
     lotes.forEach((l) => {
       const nome = l.doenca?.nome;
       if (!nome) return;
       const tipoVacina = l.tipoVacina || "";
-      const chave = `${nome}|||${tipoVacina}`;
-      const totalLote = l.apresentacoes.reduce(
-        (s: number, a: any) => s + totalDosesApresentacao(a.frascos, a.dosesPorFrasco), 0
-      );
-      map.set(chave, (map.get(chave) || 0) + totalLote);
-    });
-    return Array.from(map, ([chave, total]) => {
-      const [doenca, tipoVacina] = chave.split("|||");
-      return { doenca, tipoVacina, total };
-    });
       const chave = `${nome}::${tipoVacina}`;
       const totalLote = l.apresentacoes.reduce(
         (s: number, a: any) => s + totalDosesApresentacao(a.frascos, a.dosesPorFrasco), 0
@@ -537,10 +525,6 @@ export function AdicionarVendaComEntradaVacinaPage({ onLogout, onNavigate, mode 
                 ) : (
                   <div className="flex flex-col gap-3">
                     {totaisPorVacina.map((t) => (
-                      <div key={`${t.doenca}-${t.tipoVacina}`} className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-                        <FloatInput label="Doença" disabled value={t.doenca} onChange={() => { }} />
-                        <FloatInput label="Tipo de Vacina" disabled value={t.tipoVacina || "Não se aplica"} onChange={() => { }} />
-                    {totaisPorDoenca.map((t) => (
                       <div key={`${t.doenca}-${t.tipoVacina}`} className={`grid grid-cols-1 gap-4 items-end ${t.tipoVacina ? "md:grid-cols-3" : "md:grid-cols-2"}`}>
                         <FloatInput label="Doença" disabled value={t.doenca} onChange={() => { }} />
                         {t.tipoVacina && <FloatInput label="Tipo de Vacina" disabled value={t.tipoVacina} onChange={() => { }} />}

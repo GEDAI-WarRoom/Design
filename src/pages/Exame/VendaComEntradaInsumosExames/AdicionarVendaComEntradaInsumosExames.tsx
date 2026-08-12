@@ -657,23 +657,7 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
 								}}
 							/>
 						</div>
-						<div
-							className={`grid grid-cols-1 gap-4`}>
-							<div className="flex flex-col gap-3">
-									<RevendedoraInput
-										value={revendedora ? revendedora.codigo : ""}
-										required
-										onChange={(entidadeSelecionada) => setRevendedora(entidadeSelecionada)}
-										onEyeClick={() => {
-											if (revendedora?.codigo)
-												alert(`Visualizar detalhes: ${revendedora.codigo}`);
-											else
-												alert("Por favor, digite ou selecione uma revendedora primeiro.");
-										}}
-									/>
-							</div>
-					</div>
-					</Section>
+						</Section>
 					<Section title="Nota Fiscal">
 						<div className="flex flex-col gap-6">
 							<div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
@@ -701,13 +685,6 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
 									hideNativeDateIcon
 									value={dataVenda}
 									onChange={setDataVenda}
-									label="Data da Nota Fiscal"
-									required
-									type="date"
-									max={new Date().toISOString().slice(0, 10)}
-									icon={<Calendar size={18} />}
-									value={dataNotaFiscal}
-									onChange={setDataNotaFiscal}
 								/>
 							</div>
 
@@ -745,20 +722,18 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
 											<div
 											key={`${t.doenca}-${t.tipoInsumo}`}
 											className={`grid grid-cols-1 gap-4 items-end ${t.tipoInsumo ? "md:grid-cols-3" : "md:grid-cols-2"}`}>
-																		key={t.tipoInsumo}
-												className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
-												<FloatInput
-																		label="Tipo de Insumo"
-																		disabled
-																		value={t.tipoInsumo}
-													onChange={() => { }}
-												/>
-												{t.tipoInsumo && (
 													<FloatInput
-														label="Tipo de Insumo"
+														label="Doença"
 														disabled
-														value={t.tipoInsumo}
+														value={t.doenca}
 														onChange={() => { }}
+													/>
+													{t.tipoInsumo && (
+													<FloatInput
+															label="Tipo de Insumo"
+															disabled
+															value={t.tipoInsumo}
+															onChange={() => { }}
 													/>
 												)}
 												<FloatInput

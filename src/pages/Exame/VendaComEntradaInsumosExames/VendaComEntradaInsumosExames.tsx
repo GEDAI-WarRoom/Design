@@ -411,17 +411,6 @@ export function VendaComEntradaInsumosExamesPage({
                         </th>
                         <th className="w-[22%] text-left px-3 py-3 font-semibold text-gray-600 whitespace-normal uppercase text-[11px] leading-tight tracking-wider">
                           Insumo - Doença
-                        <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap uppercase text-xs tracking-wider">
-                          Revendedora de Produtos Agropecuários
-                        </th>
-                        <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap uppercase text-xs tracking-wider">
-                          Número da <br /> Nota Fiscal
-                        </th>
-                        <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap uppercase text-xs tracking-wider">
-                          Número da <br /> Partida
-                        </th>
-                        <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap uppercase text-xs tracking-wider">
-                          Tipo de Insumo
                         </th>
                         <th className="w-[10%] text-left px-3 py-3 font-semibold text-gray-600 whitespace-normal uppercase text-[11px] leading-tight tracking-wider">
                           Situação
@@ -438,8 +427,6 @@ export function VendaComEntradaInsumosExamesPage({
                             </span>
                           </td>
                           <td className="break-words px-3 py-3">
-                          <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{v.fornecedor}</td>
-                          <td className="px-4 py-3 whitespace-nowrap">
                             <div className="flex flex-col">
                               <span className="text-xs text-gray-500 ">
                                 {v.revendedoraCodigo}
@@ -457,8 +444,6 @@ export function VendaComEntradaInsumosExamesPage({
                           </td>
                           <td className="break-words px-3 py-3 text-gray-500">
                             {v.tipoInsumo} - {v.doenca}
-                          <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
-                            {v.tipoInsumo}
                           </td>
                           <td className="break-words px-3 py-3 text-gray-500">
                             {v.situacao}
