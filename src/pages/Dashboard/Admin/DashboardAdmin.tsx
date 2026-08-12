@@ -1,9 +1,10 @@
 import { BriefcaseBusiness, ShieldCheck } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
-import { ProfileCard } from "../../../components/ProfileCard";
 import { useDemoUser } from "../../../contexts/DemoUserContext";
 import fotoAdministradorExemploUrl from "../../../imports/images/perfil-admin.exemplo.png";
+import { CadastrosVinculados } from "../shared/CadastrosVinculados";
 import { DashboardMenu } from "../shared/DashboardMenu";
+import { MeuPerfilCard } from "../shared/MeuPerfilCard";
 import type { MenuCategory } from "../shared/dashboardTypes";
 
 interface DashboardAdminProps {
@@ -40,34 +41,45 @@ export function DashboardAdmin({
 
 				<div className="mb-6">
 					{user ? (
-						<ProfileCard
-							name={user.name}
-							subtitle={user.roleLabel}
-							avatarSrc={user.avatarDataUrl ?? fotoAdministradorExemploUrl}
-							avatarAlt={`Foto de ${user.name}`}
-							showActiveIndicator
-							details={[
-								{ label: "Esfera do Serviço Oficial", value: "Estadual" },
-								{ label: "MASP", value: "1017185-8" },
-								{
-									label: "Unidade administrativa",
-									value: "Coordenadoria Regional de Belo Horizonte",
-								},
-							]}
-							highlights={[
-								"Administrador do Sistema",
-								"Profissional do Serviço Oficial",
-							]}
-							highlightsTitle="Papéis"
-							emptyHighlightsMessage="Nenhum papel atribuído."
-							ariaLabel="Perfil do administrador"
-							linkedItemsTitle="Papéis"
-							showDetailsWithLinked
-							linkedItems={[
-								{ title: "Administrador do Sistema", subtitle: "Papel administrativo", location: "Serviço oficial estadual", status: "Ativo", icon: <ShieldCheck size={20} /> },
-								{ title: "Profissional do Serviço Oficial", subtitle: "Papel institucional", location: "Coordenadoria Regional de Belo Horizonte", status: "Ativo", icon: <BriefcaseBusiness size={20} /> },
-							]}
-						/>
+						<div className="grid grid-cols-1 gap-5 lg:grid-cols-[280px_1fr] lg:items-stretch">
+							<MeuPerfilCard
+								name={user.name}
+								roleLabel={user.roleLabel}
+								avatarSrc={user.avatarDataUrl ?? fotoAdministradorExemploUrl}
+								avatarAlt={`Foto de ${user.name}`}
+								details={[
+									{ id: "esfera", label: "Esfera do Serviço Oficial", value: "Estadual" },
+									{ id: "masp", label: "MASP", value: "1017185-8" },
+									{ id: "unidade-administrativa", label: "Unidade administrativa", value: "Coordenadoria Regional de Belo Horizonte" },
+								]}
+							/>
+							<CadastrosVinculados
+								title="Papéis"
+								items={[
+									{
+										id: "administrador-sistema",
+										title: "Administrador do Sistema",
+										icon: <ShieldCheck size={19} />,
+										details: [
+											{ id: "papel", label: "Papel", value: "Administrativo" },
+											{ id: "situacao", label: "Situação", value: "Ativo" },
+										],
+										onView: () => onNavigate("meu-perfil"),
+									},
+									{
+										id: "profissional-servico-oficial",
+										title: "Profissional do Serviço Oficial",
+										icon: <BriefcaseBusiness size={19} />,
+										details: [
+											{ id: "unidade", label: "Unidade administrativa", value: "Coordenadoria Regional de Belo Horizonte" },
+											{ id: "situacao", label: "Situação", value: "Ativo" },
+										],
+										onView: () => onNavigate("meu-perfil"),
+									},
+								]}
+								onViewAll={() => onNavigate("meu-perfil")}
+							/>
+						</div>
 					) : (
 						<section
 							className="w-full rounded-xl border border-green-100 bg-white p-6 text-sm text-gray-500 shadow-sm"

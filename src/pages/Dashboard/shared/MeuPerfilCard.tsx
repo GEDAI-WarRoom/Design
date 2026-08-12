@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { ClipboardCheck } from "lucide-react";
+import { ClipboardCheck, Pencil } from "lucide-react";
 import type {
 	DashboardProfileDetail,
 	DashboardProfileHighlight,
@@ -15,6 +15,7 @@ interface MeuPerfilCardProps {
 	details: DashboardProfileDetail[];
 	highlights?: DashboardProfileHighlight[];
 	highlightsTitle?: string;
+	onEdit?: () => void;
 	className?: string;
 }
 
@@ -34,6 +35,7 @@ export function MeuPerfilCard({
 	details,
 	highlights = [],
 	highlightsTitle = "Habilitações vigentes",
+	onEdit,
 	className = "",
 }: MeuPerfilCardProps) {
 	return (
@@ -49,17 +51,30 @@ export function MeuPerfilCard({
 			</div>
 
 			<div className="p-5 text-center">
-				<span className="mx-auto flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-[#EEF2F1] text-base font-semibold text-[#1A7A3C] ring-4 ring-blue-50">
-					{avatarSrc ? (
-						<img
-							src={avatarSrc}
-							alt={avatarAlt ?? `Foto de ${name}`}
-							className="h-full w-full object-cover"
-						/>
-					) : (
-						avatarFallback ?? <span aria-hidden="true">{getInitials(name)}</span>
+				<div className="relative mx-auto h-16 w-16">
+					<span className="flex h-full w-full items-center justify-center overflow-hidden rounded-full bg-[#EEF2F1] text-base font-semibold text-[#1A7A3C] ring-4 ring-blue-50">
+						{avatarSrc ? (
+							<img
+								src={avatarSrc}
+								alt={avatarAlt ?? `Foto de ${name}`}
+								className="h-full w-full object-cover"
+							/>
+						) : (
+							avatarFallback ?? <span aria-hidden="true">{getInitials(name)}</span>
+						)}
+					</span>
+					{onEdit && (
+						<button
+							type="button"
+							onClick={onEdit}
+							className="absolute -bottom-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full border border-gray-200 bg-white text-[#1A7A3C]/70 shadow-sm transition hover:bg-green-50 hover:text-[#1A7A3C]"
+							title="Editar perfil"
+							aria-label="Editar perfil"
+						>
+							<Pencil size={10} />
+						</button>
 					)}
-				</span>
+				</div>
 				<h3 className="mt-3 text-base font-semibold text-gray-900">{name}</h3>
 				<p className="text-xs text-gray-600">{roleLabel}</p>
 

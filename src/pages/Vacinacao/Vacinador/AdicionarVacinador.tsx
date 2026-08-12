@@ -1,320 +1,284 @@
-import React, { useState } from "react";
-import { ArrowLeft, Check, User, FileText, Briefcase } from "lucide-react";
-import { FloatInput, FloatSelect, SimNao, CheckboxGroup } from "../../../components/ui/FormKit";
-import { EntitySearchInput, DynamicListWrapper } from "../../../components/ui/EntitySearch";
-import * as Icons from "../../../imports/icons";
-import { CadastroVacinacaoHeader, cadastroVacinacaoPageClass, mensagemSucessoCadastro, preencherComExemplo, type CadastroVacinacaoModeProps } from "../shared/CadastroVacinacaoMode";
-
+import React, { useState, type ReactNode } from "react";
+import { ArrowLeft, Check, Info } from "lucide-react";
+import { Navbar } from "../../../components/Navbar";
+import { FloatSelect, SimNao } from "../../../components/ui/FormKit";
+import {
+  DynamicListWrapper,
+  PessoaFisicaInput,
+  ProfissionalAnimalInput,
+} from "../../../components/ui/EntitySearch";
+import {
+  CadastroVacinacaoHeader,
+  cadastroVacinacaoPageClass,
+  mensagemSucessoCadastro,
+  preencherComExemplo,
+  type CadastroVacinacaoModeProps,
+} from "../shared/CadastroVacinacaoMode";
 
 const GREEN = "#1A7A3C";
 
-// Mocks de dados exigidos pelas especificações da US069
-const PROFISSIONAIS_RESPONSAVEIS_MOCK = [
-  { id: 1, nome: "Dr. Roberto Silva (CRV-MG 1234)", uf: "MG" },
-  { id: 2, nome: "Dra. Maria Carmo (CRV-MG 5678)", uf: "MG" },
+const PESSOAS_MOCK = [
+  { id: 1, nome: "Eloiza Silva", documento: "444.009.956-40" },
+  { id: 2, nome: "Pedro Alves Moraes", documento: "222.114.558-70" },
+  { id: 3, nome: "Carla Menezes Rocha", documento: "111.998.775-30" },
+  { id: 4, nome: "Carlos Andrade", documento: "111.222.333-44" },
 ];
 
-const AUXILIARES_MOCK = [
-  { id: 1, cpf: "111.222.333-44", nome: "Carlos Andrade" },
-  { id: 2, cpf: "555.666.777-88", nome: "Pedro Souza" },
+const PROFISSIONAIS_RESPONSAVEIS_MOCK = [
+  { id: 1, nome: "José Aarão Neto", documento: "555.009.956-40", oficial: true },
+  { id: 2, nome: "Joaquim da Silva", documento: "444.009.956-40", oficial: true },
+  { id: 3, nome: "Marina Couto Dias", documento: "333.221.115-09", oficial: false },
 ];
+
+type TipoVinculo = "Produtor" | "Veterinário Cadastrado" | "Auxiliar" | "";
+
+interface PessoaSelecionada {
+  id?: number | string;
+  nome: string;
+  documento: string;
+}
+
+interface AuxiliarFormItem {
+  uid: string;
+  profissional: PessoaSelecionada | null;
+}
 
 interface PageProps extends CadastroVacinacaoModeProps {
   onLogout?: () => void;
-  onNavigate: (tela: string, data?: any) => void;
+  onNavigate: (screen: string, data?: any) => void;
 }
 
-export function AdicionarVacinadorPage({ onNavigate, mode = "create", dados }: PageProps) {
+function Section({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <section className="overflow-visible rounded-xl border border-gray-100 bg-white shadow-sm">
+      <div className="px-6 py-4">
+        <h2 className="text-base font-semibold text-gray-800">{title}</h2>
+      </div>
+      <div className="border-t border-gray-100 p-6">{children}</div>
+    </section>
+  );
+}
+
+const criarUid = () => `auxiliar-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+
+export function AdicionarVacinadorPage({ onLogout, onNavigate, mode = "create", dados }: PageProps) {
   const preenchendoRegistro = mode !== "create";
-  const vinculoInicial = dados?.vinculo ?? (preenchendoRegistro ? "Auxiliar" : "");
-  const profissionalInicial = dados?.profissionalResponsavel ?? (dados?.profissionalNome ? {
-    id: dados?.profissionalId ?? dados?.profissionalDoc,
-    nome: dados.profissionalNome,
-    documento: dados.profissionalDoc,
-  } : null);
-  const vacinadorInicial = dados?.vacinadorSelecionado ?? (preenchendoRegistro && dados?.nome ? {
-    id: dados?.id ?? dados?.cpf,
-    nome: dados.nome,
-    cpf: dados?.cpf ?? "",
-  } : null);
+  const pessoaInicial: PessoaSelecionada | null = dados?.vacinadorSelecionado ??
+    (preenchendoRegistro && dados?.nome
+      ? { id: dados?.id, nome: dados.nome, documento: dados?.cpf ?? "" }
+      : null);
+  const profissionalInicial: PessoaSelecionada | null = dados?.profissionalResponsavel ??
+    (dados?.profissionalNome
+      ? {
+          id: dados?.profissionalId ?? dados?.profissionalDoc,
+          nome: dados.profissionalNome,
+          documento: dados?.profissionalDoc ?? "",
+        }
+      : null);
 
-  // --- Estados do Formulário ---
-  const [vinculo, setVinculo] = useState<"Produtor" | "Veterinário Cadastrado" | "Auxiliar" | "">(vinculoInicial);
+  const [vinculo, setVinculo] = useState<TipoVinculo>(dados?.vinculo ?? (preenchendoRegistro ? "Auxiliar" : ""));
+  const [vacinadorSelecionado, setVacinadorSelecionado] = useState<PessoaSelecionada | null>(pessoaInicial);
   const [aderidoPasa, setAderidoPasa] = useState<"Sim" | "Não" | "">(dados?.aderidoPasa ?? "");
-  const [profissionalResponsavel, setProfissionalResponsavel] = useState<any>(profissionalInicial);
-  
-  // Dados do Vacinador (Carregados via EntitySearch se for Produtor/Auxiliar ou digitados)
-  const [vacinadorSelecionado, setVacinadorSelecionado] = useState<any>(vacinadorInicial);
-  const [cpf, setCpf] = useState(dados?.cpf ?? "");
-  const [nome, setNome] = useState(dados?.nome ?? "");
-  
-  // Lista Dinâmica de Auxiliares (Apenas se o Vínculo for Veterinário Cadastrado)
-  const [auxiliares, setAuxiliares] = useState<Array<{ uid: string; profissional: any }>>(dados?.auxiliares ?? []);
-
+  const [profissionalResponsavel, setProfissionalResponsavel] = useState<PessoaSelecionada | null>(profissionalInicial);
+  const [auxiliares, setAuxiliares] = useState<AuxiliarFormItem[]>(dados?.auxiliares ?? []);
   const [isSucesso, setIsSucesso] = useState(false);
 
-  // --- Funções Auxiliares de Modificação da Lista ---
-  const addAuxiliar = () => {
-    setAuxiliares([...auxiliares, { uid: crypto.randomUUID(), profissional: null }]);
-  };
-
-  const removeAuxiliar = (uid: string) => {
-    setAuxiliares(auxiliares.filter((item) => item.uid !== uid));
-  };
-
-  const patchAuxiliar = (uid: string, changes: any) => {
-    setAuxiliares(auxiliares.map((item) => (item.uid === uid ? { ...item, ...changes } : item)));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Lógica de validação e salvamento...
-    setIsSucesso(true);
-  };
+  const pessoasDisponiveis = pessoaInicial && !PESSOAS_MOCK.some((pessoa) => pessoa.id === pessoaInicial.id)
+    ? [pessoaInicial, ...PESSOAS_MOCK]
+    : PESSOAS_MOCK;
+  const profissionaisDisponiveis = profissionalInicial &&
+    !PROFISSIONAIS_RESPONSAVEIS_MOCK.some((profissional) => profissional.id === profissionalInicial.id)
+    ? [profissionalInicial, ...PROFISSIONAIS_RESPONSAVEIS_MOCK]
+    : PROFISSIONAIS_RESPONSAVEIS_MOCK;
 
   const registroAtual = preencherComExemplo({
     ...(dados ?? {}),
     id: dados?.id ?? `vacinador-${Date.now()}`,
     vinculo,
     aderidoPasa,
-    profissionalResponsavel,
-    profissionalNome: profissionalResponsavel?.nome,
-    profissionalDoc: profissionalResponsavel?.documento,
     vacinadorSelecionado,
-    cpf,
-    nome,
+    nome: vacinadorSelecionado?.nome ?? "",
+    cpf: vacinadorSelecionado?.documento ?? "",
+    profissionalResponsavel,
+    profissionalNome: profissionalResponsavel?.nome ?? "",
+    profissionalDoc: profissionalResponsavel?.documento ?? "",
     auxiliares,
     situacao: dados?.situacao ?? "Ativo",
   }, {
     id: "vacinador-exemplo",
     vinculo: "Auxiliar",
     aderidoPasa: "Sim",
-    profissionalResponsavel: { id: 1, nome: "Dr. Roberto Silva (CRV-MG 1234)", documento: "CRV-MG 1234" },
-    profissionalNome: "Dr. Roberto Silva (CRV-MG 1234)",
-    profissionalDoc: "CRV-MG 1234",
-    vacinadorSelecionado: { id: 1, cpf: "111.222.333-44", nome: "Carlos Andrade" },
-    cpf: "111.222.333-44",
-    nome: "Carlos Andrade",
+    vacinadorSelecionado: PESSOAS_MOCK[0],
+    nome: PESSOAS_MOCK[0].nome,
+    cpf: PESSOAS_MOCK[0].documento,
+    profissionalResponsavel: PROFISSIONAIS_RESPONSAVEIS_MOCK[0],
+    profissionalNome: PROFISSIONAIS_RESPONSAVEIS_MOCK[0].nome,
+    profissionalDoc: PROFISSIONAIS_RESPONSAVEIS_MOCK[0].documento,
     auxiliares: [],
     situacao: "Ativo",
   });
 
-  return (
-    <div className={cadastroVacinacaoPageClass(mode, "min-h-screen bg-gray-50 flex flex-col font-sans antialiased text-gray-900")}>
-      {/* Header Padrão */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-40 px-4 lg:px-8 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3 w-full">
-          <button 
-            type="button" 
-            onClick={() => onNavigate("vacinador")}
-            className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition"
-          >
-            <ArrowLeft size={20} />
-          </button>
-          <div className="flex-1">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Brucelose</span>
-            <CadastroVacinacaoHeader mode={mode} nomeCadastro="Vacinador Contra Brucelose" rotaEditar="editar-vacinador-brucelose" dados={dados} onNavigate={onNavigate} onSubmit={() => setIsSucesso(true)} />
-          </div>
-        </div>
-      </header>
+  const trocarVinculo = (novoVinculo: string) => {
+    setVinculo(novoVinculo as TipoVinculo);
+    setVacinadorSelecionado(null);
+    if (novoVinculo !== "Veterinário Cadastrado") setAuxiliares([]);
+  };
 
-      {/* Conteúdo Principal */}
-      <main className="flex-1 max-w-5xl w-full mx-auto p-4 lg:p-8 flex flex-col gap-6">
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col gap-6 p-6">
-          
-          {/* Seção 1: Dados do Vínculo */}
-          <div className="flex flex-col gap-4">
-            <h2 className="text-base font-bold text-gray-800 flex items-center gap-2 border-b border-gray-100 pb-2">
-              <Briefcase size={18} className="text-[#1A7A3C]" /> Dados do Vínculo
-            </h2>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+  const selecionarVacinador = (pessoa: PessoaSelecionada | null) => {
+    setVacinadorSelecionado(pessoa);
+  };
+
+  const salvar = () => setIsSucesso(true);
+
+  return (
+    <div className={cadastroVacinacaoPageClass(mode, "min-h-screen bg-[#f2f3f5] pb-16")}>
+      <Navbar
+        onLogout={onLogout}
+        onNavigate={onNavigate}
+        currentScreen="vacinador-brucelose"
+        hideSearch
+      />
+
+      <main className="mx-auto flex max-w-[1088px] flex-col gap-5 px-4 py-6 md:px-6">
+        <div>
+          <button
+            type="button"
+            onClick={() => onNavigate("vacinador")}
+            className="mb-3 flex items-center gap-1 text-sm text-[#1A7A3C] transition hover:opacity-70"
+          >
+            <ArrowLeft size={15} /> Todos os Vacinadores Contra Brucelose
+          </button>
+          <CadastroVacinacaoHeader
+            mode={mode}
+            nomeCadastro="Vacinador Contra Brucelose"
+            rotaEditar="editar-vacinador-brucelose"
+            dados={registroAtual}
+            onNavigate={onNavigate}
+            onSubmit={salvar}
+          />
+        </div>
+
+        <div className="flex w-full items-center gap-3 rounded-lg border border-gray-100 bg-white p-5 shadow-sm">
+          <Info size={20} className="shrink-0 text-gray-500 stroke-[2.5]" />
+          <p className="text-sm font-medium text-gray-600">
+            Campos indicados com <span className="font-bold text-red-500">*</span> são obrigatórios.
+          </p>
+        </div>
+
+        <Section title="Informações Básicas">
+          <div className="flex flex-col gap-6">
+            <div className="w-full md:w-1/2">
               <FloatSelect
                 label="Tipo de Vínculo"
                 required
                 value={vinculo}
-                onChange={(v: string) => {
-                  setVinculo(v as any);
-                  setVacinadorSelecionado(null);
-                  setCpf("");
-                  setNome("");
-                  if (v !== "Veterinário Cadastrado") setAuxiliares([]);
-                }}
+                onChange={trocarVinculo}
                 options={[
                   { value: "Produtor", label: "Produtor" },
                   { value: "Veterinário Cadastrado", label: "Veterinário Cadastrado" },
-                  { value: "Auxiliar", label: "Auxiliar" }
+                  { value: "Auxiliar", label: "Auxiliar" },
                 ]}
               />
+            </div>
 
+            <div className="border-t border-gray-100 pt-5">
+              <PessoaFisicaInput
+                value={vacinadorSelecionado?.nome ?? ""}
+                data={pessoasDisponiveis}
+                required
+                onChange={selecionarVacinador}
+                onEyeClick={() => vacinadorSelecionado && onNavigate("visualizar-pessoa-fisica", vacinadorSelecionado)}
+              />
+            </div>
+          </div>
+        </Section>
+
+        <Section title="Programa de Apoio à Saúde Agropecuária (PASA)">
+          <div className="flex flex-col gap-6">
+            <div className="w-full md:w-1/2">
               <SimNao
                 label="É Aderido ao PASA?"
+                name="aderido-pasa"
                 required
-                name="aderidoPasa"
                 value={aderidoPasa}
-                onChange={(bool: boolean) => setAderidoPasa(bool ? "Sim" : "Não")}
-              />
-            </div>
-
-            {/* Condicional: Profissional Responsável (Apenas se aderido ao PASA ou se for Auxiliar) */}
-            {(aderidoPasa === "Sim" || vinculo === "Auxiliar") && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
-                <EntitySearchInput
-                  label="Profissional Responsável"
-                  required
-                  placeholder="Buscar profissional."
-                  value={profissionalResponsavel ? profissionalResponsavel.nome : ""}
-                  data={PROFISSIONAIS_RESPONSAVEIS_MOCK}
-                  searchKeys={["nome"]}
-                  columns={[{ label: "Nome do Profissional", key: "nome" }]}
-                   icon={<img src={Icons.iconeProfissionalAnimalUrl} alt="Médico Veterinário" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}              
-                  title="Selecionar Profissional Responsável"
-                  subtitle="Busque pelo profissional habilitado:"
-                  onChange={(ent: any) => setProfissionalResponsavel(ent)}
-                />
-              </div>
-            )}
-          </div>
-
-          {/* Seção 2: Identificação do Vacinador */}
-          <div className="flex flex-col gap-4 border-t border-gray-100 pt-4">
-            <h2 className="text-base font-bold text-gray-800 flex items-center gap-2 border-b border-gray-100 pb-2">
-              <User size={18} className="text-[#1A7A3C]" /> Identificação do Vacinador
-            </h2>
-
-            {/* Se o vínculo for Produtor ou Auxiliar, busca de entidade cadastrada */}
-            {(vinculo === "Produtor" || vinculo === "Auxiliar") && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <EntitySearchInput
-                  label={vinculo === "Produtor" ? "Buscar Produtor" : "Buscar Auxiliar"}
-                  required
-                  placeholder="Digite o nome ou CPF..."
-                  value={vacinadorSelecionado ? vacinadorSelecionado.nome : ""}
-                  data={AUXILIARES_MOCK}
-                  searchKeys={["nome", "cpf"]}
-                  columns={[
-                    { label: "CPF", key: "cpf" },
-                    { label: "Nome", key: "nome" }
-                  ]}
-                  icon={<User size={18} color={GREEN} />}
-                  title={`Selecionar ${vinculo}`}
-                  subtitle={`Busque por um ${vinculo?.toLowerCase()} ativo:`}
-                  onChange={(ent: any) => {
-                    setVacinadorSelecionado(ent);
-                    setCpf(ent?.cpf || "");
-                    setNome(ent?.nome || "");
-                  }}
-                />
-              </div>
-            )}
-
-            {/* Campos de leitura/escrita baseados na seleção */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <FloatInput
-                label="CPF"
-                required
-                disabled={vinculo === "Produtor" || vinculo === "Auxiliar"}
-                value={cpf}
-                onChange={(v) => setCpf(v)}
-                mask="999.999.999-99"
-              />
-              <FloatInput
-                label="Nome Completo"
-                required
-                disabled={vinculo === "Produtor" || vinculo === "Auxiliar"}
-                value={nome}
-                onChange={(v) => setNome(v)}
-                maxLength={255}
-              />
-            </div>
-          </div>
-
-          {/* Seção Condicional 3: Vínculo de Auxiliares (Apenas para Veterinário Cadastrado) */}
-          {vinculo === "Veterinário Cadastrado" && (
-            <div className="flex flex-col gap-4 border-t border-gray-100 pt-4">
-              <h2 className="text-base font-bold text-gray-800 flex items-center gap-2 border-b border-gray-100 pb-2">
-                <FileText size={18} className="text-[#1A7A3C]" /> Auxiliares Vinculados
-              </h2>
-
-              <DynamicListWrapper
-                items={auxiliares}
-                behavior="optional"
-                addButtonLabel="Vincular Auxiliar"
-                itemLabel="Auxiliar"
-                onAddItem={addAuxiliar}
-                onRemoveItem={(index: number) => {
-                  const target = auxiliares[index];
-                  if (target) removeAuxiliar(target.uid);
+                onChange={(valor) => {
+                  setAderidoPasa(valor ? "Sim" : "Não");
+                  if (!valor && vinculo !== "Auxiliar") setProfissionalResponsavel(null);
                 }}
-                showCounter={true}
-              >
-                {(item: any) => (
-                  <div className="w-full mb-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <EntitySearchInput
-                        label="Selecionar Auxiliar"
-                        required
-                        placeholder="Buscar por nome ou CPF..."
-                        value={item.profissional ? item.profissional.nome : ""}
-                        data={AUXILIARES_MOCK}
-                        searchKeys={["nome", "cpf"]}
-                        columns={[
-                          { label: "CPF", key: "cpf" },
-                          { label: "Nome", key: "nome" }
-                        ]}
-                        icon={<User size={18} color={GREEN} />}
-                        title="Vincular Auxiliar"
-                        subtitle="Busque por um auxiliar habilitado:"
-                        onChange={(ent: any) => patchAuxiliar(item.uid, { profissional: ent })}
-                      />
-                    </div>
-                  </div>
-                )}
-              </DynamicListWrapper>
+              />
             </div>
-          )}
 
-          {/* Barra de Ações Inferior */}
-          {mode !== "view" && <div className="flex justify-end items-center gap-3 border-t border-gray-100 pt-4 mt-4">
-            <button
-              type="button"
-              onClick={() => onNavigate("vacinador")}
-              className="h-11 px-5 border border-gray-300 rounded-md text-sm font-semibold text-gray-700 hover:bg-gray-50 transition"
+            {(aderidoPasa === "Sim" || vinculo === "Auxiliar") && (
+              <div className="border-t border-gray-100 pt-5">
+                <ProfissionalAnimalInput
+                  value={profissionalResponsavel?.nome ?? ""}
+                  data={profissionaisDisponiveis}
+                  required
+                  onChange={setProfissionalResponsavel}
+                  onEyeClick={() => profissionalResponsavel && onNavigate("visualizar-profissional-animal", profissionalResponsavel)}
+                />
+              </div>
+            )}
+          </div>
+        </Section>
+
+        {vinculo === "Veterinário Cadastrado" && (
+          <Section title="Auxiliares Vinculados">
+            <DynamicListWrapper
+              items={auxiliares}
+              behavior="optional"
+              addButtonLabel="Adicionar Auxiliar"
+              itemLabel="Auxiliar"
+              onAddItem={() => setAuxiliares((atuais) => [
+                ...atuais,
+                { uid: criarUid(), profissional: null },
+              ])}
+              onRemoveItem={(indice) => setAuxiliares((atuais) =>
+                atuais.filter((_, indiceAtual) => indiceAtual !== indice)
+              )}
+              variant="plain"
+              showCounter
             >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              className="h-11 px-6 rounded-md text-sm font-semibold text-white hover:bg-opacity-90 transition shadow-sm"
-              style={{ backgroundColor: GREEN }}
-            >
-              {mode === "edit" ? "Salvar Alterações" : "Salvar Vacinador"}
-            </button>
-          </div>}
-        </form>
+              {(item: AuxiliarFormItem) => (
+                <PessoaFisicaInput
+                  value={item.profissional?.nome ?? ""}
+                  data={PESSOAS_MOCK}
+                  required
+                  onChange={(profissional) => setAuxiliares((atuais) =>
+                    atuais.map((atual) => atual.uid === item.uid ? { ...atual, profissional } : atual)
+                  )}
+                  onEyeClick={() => item.profissional && onNavigate("visualizar-pessoa-fisica", item.profissional)}
+                />
+              )}
+            </DynamicListWrapper>
+          </Section>
+        )}
       </main>
 
-      {/* Modal de Sucesso Customizado (Igual ao AdicionarVenda) */}
       {isSucesso && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
-            <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 text-center shadow-xl">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#E6F4EA]">
               <Check size={28} className="text-[#1A7A3C]" strokeWidth={3} />
             </div>
-            <h3 className="text-lg font-bold text-gray-900">{mensagemSucessoCadastro(mode, "Vacinador Contra Brucelose")}</h3>
-            <p className="text-sm text-gray-500 mt-1">
-              O registro do vacinador contra brucelose foi inserido no sistema.
+            <h3 className="text-lg font-bold text-gray-900">
+              {mensagemSucessoCadastro(mode, "Vacinador Contra Brucelose")}
+            </h3>
+            <p className="mt-1 text-sm text-gray-500">
+              O registro foi {mode === "edit" ? "atualizado" : "inserido"} no sistema.
             </p>
-            <div className="flex gap-3 justify-center mt-6">
-              <button 
-                onClick={() => { setIsSucesso(false); onNavigate("vacinador"); }} 
-                className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition"
+            <div className="mt-6 flex justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => { setIsSucesso(false); onNavigate("vacinador"); }}
+                className="h-11 rounded-md border border-[#1A7A3C] px-5 text-sm font-semibold text-[#1A7A3C] transition hover:bg-green-50/40"
               >
                 Ir para Listagem
               </button>
               <button
+                type="button"
                 onClick={() => { setIsSucesso(false); onNavigate("visualizar-vacinador-brucelose", registroAtual); }}
-                className="px-5 h-11 rounded-md bg-[#1A7A3C] text-white text-sm font-semibold hover:bg-[#15612F] transition"
+                className="h-11 rounded-md bg-[#1A7A3C] px-5 text-sm font-semibold text-white transition hover:bg-[#15612F]"
               >
                 Visualizar
               </button>

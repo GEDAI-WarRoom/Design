@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   ArrowLeft,
   Search,
@@ -10,9 +10,13 @@ import {
   Ban,
   Clock,
   CircleDollarSign,
+  ReceiptText,
+  Calendar,
 } from "lucide-react";
 
 import { Navbar } from "../../../components/Navbar";
+import { EntitySearchInput } from "../../../components/ui/EntitySearch";
+import * as Icons from "../../../imports/icons";
 import {
   FloatSelect,
   FloatInput,
@@ -47,14 +51,11 @@ const RECEITAS = [
   { value: "48", label: "48 - Permissão de Trânsito Vegetal" },
 ];
 
-const STATUS_PAGAMENTO = [
+const SITUACOES_DAE = [
   { value: "Aberto", label: "Aberto" },
   { value: "Pago", label: "Pago" },
-];
-
-const STATUS_DAE = [
-  { value: "Ativo", label: "Ativo" },
   { value: "Cancelado", label: "Cancelado" },
+  { value: "Ativo", label: "Ativo" },
 ];
 
 // ==========================================================
@@ -120,6 +121,27 @@ const DAES_MOCK: Dae[] = [
   },
 ];
 
+interface ContribuinteDae {
+  id: number;
+  nome: string;
+  documento: string;
+  tipo: "Pessoa Física" | "Pessoa Jurídica";
+}
+
+const CONTRIBUINTES_DAE: ContribuinteDae[] = DAES_MOCK.map((dae) => ({
+  id: dae.id,
+  nome: dae.nomeContribuinte,
+  documento: dae.numeroContribuinte,
+  tipo: dae.numeroContribuinte.replace(/\D/g, "").length > 11 ? "Pessoa Jurídica" : "Pessoa Física",
+}));
+
+const RECEITAS_ENTIDADES = RECEITAS.map((receita, indice) => ({
+  id: indice + 1,
+  codigo: receita.value,
+  nome: receita.label.replace(`${receita.value} - `, ""),
+  descricao: receita.label,
+}));
+
 // ==========================================================
 // HELPERS DE UI
 // ==========================================================
@@ -143,6 +165,13 @@ const fmtData = (iso: string) => {
   return d && m && a ? `${d}/${m}/${a}` : iso;
 };
 
+const obterSituacao = (dae: Dae) => {
+  if (dae.statusDae === "Cancelado") return "Cancelado";
+  if (dae.statusPagamento === "Pago") return "Pago";
+  if (dae.statusPagamento === "Aberto") return "Aberto";
+  return "Ativo";
+};
+
 // ==========================================================
 // PÁGINA: BUSCAR DAE
 // ==========================================================
@@ -153,12 +182,12 @@ interface PageProps {
 
 export function DAEBuscaPage({ onLogout, onNavigate }: PageProps) {
   const [busca, setBusca] = useState("");
-  const [numeroContribuinte, setNumeroContribuinte] = useState("");
+  const [tipoPessoa, setTipoPessoa] = useState("Pessoa Física");
+  const [contribuinte, setContribuinte] = useState<ContribuinteDae | null>(null);
   const [dataEmissao, setDataEmissao] = useState("");
   const [municipio, setMunicipio] = useState("");
-  const [receita, setReceita] = useState("");
-  const [statusPagamento, setStatusPagamento] = useState("");
-  const [statusDae, setStatusDae] = useState("");
+  const [receita, setReceita] = useState<(typeof RECEITAS_ENTIDADES)[number] | null>(null);
+  const [situacao, setSituacao] = useState("");
   const [dataPagamentoUsuario, setDataPagamentoUsuario] = useState("");
   const [dataPagamentoProdemge, setDataPagamentoProdemge] = useState("");
 
@@ -168,36 +197,31 @@ export function DAEBuscaPage({ onLogout, onNavigate }: PageProps) {
   const [page, setPage] = useState(1);
   const perPage = 10;
 
+  const contribuintesFiltrados = useMemo(() => CONTRIBUINTES_DAE.filter((item) => item.tipo === tipoPessoa), [tipoPessoa]);
+
   const handlePesquisar = () => {
     setHasSearched(true);
     setPage(1);
   };
 
   const filtrados = DAES_MOCK.filter((d) => {
-    const termo = busca.toLowerCase().trim();
+    const termo = busca.replace(/\D/g, "");
 
     const matchBusca =
       termo === "" ||
-      d.numeroDae.includes(termo.replace(/\D/g, "")) ||
-      d.nomeContribuinte.toLowerCase().includes(termo);
+      d.numeroDae.includes(termo);
 
     const matchContribuinte =
-      numeroContribuinte === "" ||
-      d.numeroContribuinte
-        .replace(/\D/g, "")
-        .includes(numeroContribuinte.replace(/\D/g, ""));
+      !contribuinte || d.numeroContribuinte === contribuinte.documento;
 
     const matchDataEmissao =
       dataEmissao === "" || d.dataEmissao === dataEmissao;
 
     const matchMunicipio = municipio === "" || d.municipio === municipio;
 
-    const matchReceita = receita === "" || d.receita.startsWith(`${receita} -`);
+    const matchReceita = !receita || d.receita.startsWith(`${receita.codigo} -`);
 
-    const matchStatusPagamento =
-      statusPagamento === "" || d.statusPagamento === statusPagamento;
-
-    const matchStatusDae = statusDae === "" || d.statusDae === statusDae;
+    const matchSituacao = situacao === "" || obterSituacao(d) === situacao;
 
     const matchPagUsuario =
       dataPagamentoUsuario === "" ||
@@ -213,8 +237,7 @@ export function DAEBuscaPage({ onLogout, onNavigate }: PageProps) {
       matchDataEmissao &&
       matchMunicipio &&
       matchReceita &&
-      matchStatusPagamento &&
-      matchStatusDae &&
+      matchSituacao &&
       matchPagUsuario &&
       matchPagProdemge
     );
@@ -231,12 +254,11 @@ export function DAEBuscaPage({ onLogout, onNavigate }: PageProps) {
   );
 
   const temFiltroAtivo = !!(
-    numeroContribuinte ||
+    contribuinte ||
     dataEmissao ||
     municipio ||
     receita ||
-    statusPagamento ||
-    statusDae ||
+    situacao ||
     dataPagamentoUsuario ||
     dataPagamentoProdemge
   );
@@ -283,7 +305,7 @@ export function DAEBuscaPage({ onLogout, onNavigate }: PageProps) {
               <label
                 className={`absolute left-3 transition-all duration-200 pointer-events-none ${focusBusca || busca ? "top-1 text-[10px] text-gray-400 font-medium" : "top-1/2 -translate-y-1/2 text-sm text-gray-400"}`}
               >
-                Nº do DAE ou Nome do Contribuinte
+                Número do DAE
               </label>
 
               <div className="flex items-center w-full">
@@ -321,12 +343,19 @@ export function DAEBuscaPage({ onLogout, onNavigate }: PageProps) {
             <div className="animate-fadeIn flex flex-col gap-3 w-full">
               {/* FILEIRA 1 */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 w-full items-end">
-                <FloatInput
-                  label="Nº do Contribuinte"
-                  placeholder="CPF ou CNPJ"
-                  value={numeroContribuinte}
-                  onChange={(v) => setNumeroContribuinte(v.slice(0, 18))}
-                  maxLength={18}
+                <EntitySearchInput
+                  label="Contribuinte"
+                  placeholder="Buscar por nome ou documento"
+                  value={contribuinte?.nome ?? ""}
+                  data={contribuintesFiltrados}
+                  searchKeys={["nome", "documento"]}
+                  columns={[{ label: "Nome / Razão Social", key: "nome" }, { label: "Documento", key: "documento" }]}
+                  icon={<img src={Icons.iconeProdutorUrl} alt="" className="h-5 w-5 object-contain" />}
+                  onChange={setContribuinte}
+                  title="Buscar Contribuinte"
+                  subtitle="Busque por uma pessoa física ou jurídica cadastrada:"
+                  confirmLabel="Selecionar"
+                  headerActions={<FloatSelect label="Tipo de Pessoa" value={tipoPessoa} onChange={(valor) => { setTipoPessoa(valor); setContribuinte(null); }} options={[{ value: "Pessoa Física", label: "Pessoa Física" }, { value: "Pessoa Jurídica", label: "Pessoa Jurídica" }]} />}
                 />
 
                 <FloatCombobox
@@ -336,11 +365,18 @@ export function DAEBuscaPage({ onLogout, onNavigate }: PageProps) {
                   options={MUNICIPIOS_MG}
                 />
 
-                <FloatSelect
+                <EntitySearchInput
                   label="Receita"
-                  value={receita}
+                  placeholder="Buscar receita"
+                  value={receita?.descricao ?? ""}
+                  data={RECEITAS_ENTIDADES}
+                  searchKeys={["codigo", "nome", "descricao"]}
+                  columns={[{ label: "Código", key: "codigo" }, { label: "Receita", key: "nome" }]}
+                  icon={<ReceiptText size={18} className="text-[#1A7A3C]" />}
                   onChange={setReceita}
-                  options={RECEITAS}
+                  title="Buscar Receita"
+                  subtitle="Busque por uma receita cadastrada:"
+                  confirmLabel="Selecionar"
                 />
 
                 <FloatInput
@@ -348,6 +384,8 @@ export function DAEBuscaPage({ onLogout, onNavigate }: PageProps) {
                   type="date"
                   value={dataEmissao}
                   onChange={setDataEmissao}
+                  icon={<Calendar size={18} className="text-[#1A7A3C]" />}
+                  className="[&>input::-webkit-calendar-picker-indicator]:hidden"
                 />
 
                 <button
@@ -362,17 +400,10 @@ export function DAEBuscaPage({ onLogout, onNavigate }: PageProps) {
               {/* FILEIRA 2 */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 w-full items-end">
                 <FloatSelect
-                  label="Status do Pagamento"
-                  value={statusPagamento}
-                  onChange={setStatusPagamento}
-                  options={STATUS_PAGAMENTO}
-                />
-
-                <FloatSelect
-                  label="Status do DAE"
-                  value={statusDae}
-                  onChange={setStatusDae}
-                  options={STATUS_DAE}
+                  label="Situação"
+                  value={situacao}
+                  onChange={setSituacao}
+                  options={SITUACOES_DAE}
                 />
 
                 <FloatInput
@@ -380,6 +411,8 @@ export function DAEBuscaPage({ onLogout, onNavigate }: PageProps) {
                   type="date"
                   value={dataPagamentoUsuario}
                   onChange={setDataPagamentoUsuario}
+                  icon={<Calendar size={18} className="text-[#1A7A3C]" />}
+                  className="[&>input::-webkit-calendar-picker-indicator]:hidden"
                 />
 
                 <FloatInput
@@ -387,6 +420,8 @@ export function DAEBuscaPage({ onLogout, onNavigate }: PageProps) {
                   type="date"
                   value={dataPagamentoProdemge}
                   onChange={setDataPagamentoProdemge}
+                  icon={<Calendar size={18} className="text-[#1A7A3C]" />}
+                  className="[&>input::-webkit-calendar-picker-indicator]:hidden"
                 />
               </div>
             </div>
@@ -395,10 +430,10 @@ export function DAEBuscaPage({ onLogout, onNavigate }: PageProps) {
           {/* Chips de Filtros Ativos */}
           {temFiltroAtivo && (
             <div className="flex flex-wrap gap-2 animate-fadeIn">
-              {numeroContribuinte && (
+              {contribuinte && (
                 <Chip
-                  label={`Nº Contribuinte: ${numeroContribuinte}`}
-                  onRemove={() => setNumeroContribuinte("")}
+                  label={`Contribuinte: ${contribuinte.nome}`}
+                  onRemove={() => setContribuinte(null)}
                 />
               )}
 
@@ -418,22 +453,15 @@ export function DAEBuscaPage({ onLogout, onNavigate }: PageProps) {
 
               {receita && (
                 <Chip
-                  label={`Receita: ${RECEITAS.find((r) => r.value === receita)?.label}`}
-                  onRemove={() => setReceita("")}
+                  label={`Receita: ${receita.descricao}`}
+                  onRemove={() => setReceita(null)}
                 />
               )}
 
-              {statusPagamento && (
+              {situacao && (
                 <Chip
-                  label={`Pagamento: ${statusPagamento}`}
-                  onRemove={() => setStatusPagamento("")}
-                />
-              )}
-
-              {statusDae && (
-                <Chip
-                  label={`Status DAE: ${statusDae}`}
-                  onRemove={() => setStatusDae("")}
+                  label={`Situação: ${situacao}`}
+                  onRemove={() => setSituacao("")}
                 />
               )}
 
@@ -471,41 +499,36 @@ export function DAEBuscaPage({ onLogout, onNavigate }: PageProps) {
             </div>
           ) : (
             <div className="w-full">
-              <div className="overflow-x-auto rounded-lg">
-                <table className="w-full text-sm border-collapse">
+              <div className="overflow-hidden rounded-lg">
+                <table className="w-full table-fixed border-collapse text-xs">
+                  <colgroup><col className="w-[13%]" /><col className="w-[18%]" /><col className="w-[10%]" /><col className="w-[9%]" /><col className="w-[18%]" /><col className="w-[10%]" /><col className="w-[10%]" /><col className="w-[8%]" /><col className="w-[4%]" /></colgroup>
                   <thead>
                     <tr className="border-b border-gray-100">
-                      <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">
+                      <th className="px-2.5 py-3 text-left font-semibold leading-4 text-gray-600">
                         Nº DO DAE
                       </th>
-                      <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">
-                        NOME DO CONTRIBUINTE
+                      <th className="px-2.5 py-3 text-left font-semibold leading-4 text-gray-600">
+                        CONTRIBUINTE
                       </th>
-                      <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">
-                        Nº DO CONTRIBUINTE
-                      </th>
-                      <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">
+                      <th className="px-2.5 py-3 text-left font-semibold leading-4 text-gray-600">
                         DATA DE EMISSÃO
                       </th>
-                      <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">
-                        MUNÍCIPIO DO CONTRIBUINTE
+                      <th className="px-2.5 py-3 text-left font-semibold leading-4 text-gray-600">
+                        MUNICÍPIO
                       </th>
-                      <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">
+                      <th className="px-2.5 py-3 text-left font-semibold leading-4 text-gray-600">
                         RECEITA
                       </th>
-                      <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">
-                        STATU DO PAGAMENTO
-                      </th>
-                      <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">
-                        STATUS DO DAE
-                      </th>
-                      <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">
+                      <th className="px-2.5 py-3 text-left font-semibold leading-4 text-gray-600">
                         DATA PAG. USUÁRIO
                       </th>
-                      <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap">
+                      <th className="px-2.5 py-3 text-left font-semibold leading-4 text-gray-600">
                         DATA PAG. PRODEMGE
                       </th>
-                      <th className="px-4 py-3 w-[60px]" />
+                      <th className="px-2.5 py-3 text-left font-semibold leading-4 text-gray-600">
+                        SITUAÇÃO
+                      </th>
+                      <th className="px-2 py-3" />
                     </tr>
                   </thead>
 
@@ -515,37 +538,32 @@ export function DAEBuscaPage({ onLogout, onNavigate }: PageProps) {
                         key={d.id}
                         className="border-b border-gray-50 last:border-0 hover:bg-gray-50/60 transition"
                       >
-                        <td className="px-4 py-3 text-gray-500 text-sm whitespace-nowrap">
+                        <td className="whitespace-nowrap px-2.5 py-3 text-gray-500">
                           {d.numeroDae}
                         </td>
-                        <td className="px-4 py-3 text-gray-500 text-sm whitespace-nowrap">
-                          {d.nomeContribuinte}
+                        <td className="break-words px-2.5 py-3 leading-5 text-gray-500">
+                          <span className="block">{d.nomeContribuinte} -</span>
+                          <span className="block whitespace-nowrap">{d.numeroContribuinte}</span>
                         </td>
-                        <td className="px-4 py-3 text-gray-500 text-sm whitespace-nowrap">
-                          {d.numeroContribuinte}
-                        </td>
-                        <td className="px-4 py-3 text-gray-500 text-sm whitespace-nowrap">
+                        <td className="px-2.5 py-3 text-gray-500">
                           {fmtData(d.dataEmissao)}
                         </td>
-                        <td className="px-4 py-3 text-gray-500 text-sm whitespace-nowrap">
+                        <td className="break-words px-2.5 py-3 text-gray-500">
                           {d.municipio} - {d.uf}
                         </td>
-                        <td className="px-4 py-3 text-gray-500 text-sm whitespace-nowrap">
+                        <td className="break-words px-2.5 py-3 leading-5 text-gray-500">
                           {d.receita}
                         </td>
-                        <td className="px-4 py-3 text-sm whitespace-nowrap">
-                          {d.statusPagamento}
-                        </td>
-                        <td className="px-4 py-3 text-sm whitespace-nowrap">
-                          {d.statusDae}
-                        </td>
-                        <td className="px-4 py-3 text-gray-500 text-sm whitespace-nowrap">
+                        <td className="px-2.5 py-3 text-gray-500">
                           {fmtData(d.dataPagamentoUsuario)}
                         </td>
-                        <td className="px-4 py-3 text-gray-500 text-sm whitespace-nowrap">
+                        <td className="px-2.5 py-3 text-gray-500">
                           {fmtData(d.dataPagamentoProdemge)}
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="break-words px-2.5 py-3 text-gray-700">
+                          {obterSituacao(d)}
+                        </td>
+                        <td className="px-1 py-3">
                           <div className="flex items-center gap-1 justify-end">
                             <button
                               onClick={() => onNavigate("visualizar-dae", d)}
@@ -553,7 +571,7 @@ export function DAEBuscaPage({ onLogout, onNavigate }: PageProps) {
                               style={{ color: GREEN }}
                               title="Visualizar"
                             >
-                              <ViewIcon size={18} />
+                              <ViewIcon size={16} />
                             </button>
                           </div>
                         </td>

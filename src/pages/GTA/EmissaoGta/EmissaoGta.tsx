@@ -2,7 +2,6 @@ import { useMemo, useState, type ReactNode } from "react";
 import {
   ArrowLeft,
   ArrowRight,
-  Building2,
   Calendar,
   CalendarDays,
   ChevronDown,
@@ -10,7 +9,6 @@ import {
   ChevronRight,
   ChevronUp,
   ClipboardCopy,
-  ContactRound,
   Copy,
   Dna,
   DollarSign,
@@ -18,12 +16,13 @@ import {
   Factory,
   FileCheck2,
   FileDown,
-  Landmark,
   Plane,
+  Pencil,
   Search,
   SlidersHorizontal,
   Store,
   Truck,
+  User,
   Warehouse,
   X,
 } from "lucide-react";
@@ -37,23 +36,27 @@ import {
   EXPLORACOES_GTA,
   FRIGORIFICOS_GTA,
   NUCLEOS_GTA,
+  OUTROS_LOCAIS_GTA,
   PESSOAS_GTA,
   REVENDEDORAS_ANIMAIS_GTA,
   SITUACOES_GTA,
   TIPOS_FORMULARIO_GTA,
   TIPOS_LOCAL_OPTIONS,
+  TIPOS_PROCEDENCIA_OPTIONS,
   copiarEmissaoGta,
   listarEmissoesGta,
   listarEspeciesGta,
   listarFinalidadesGta,
   criarLocalVazio,
   formatarDataGta,
+  frigorificoAderidoAoFundo,
   type EmissaoGta,
   type EntidadeGta,
   type LocalGta,
   type TipoLocalGta,
 } from "./emissaoGtaData";
 import * as Icons from "../../../imports/icons";
+import { LocalGtaIcon } from "./LocalGtaIcon";
 
 type SortKey =
   | "serieNumero"
@@ -215,8 +218,17 @@ function LocalFilters({
             label="Estabelecimento Genérico"
             value={local.aeroporto}
             data={AEROPORTOS_GTA}
-            icon={<Building2 size={20} />}
+            icon={<LocalGtaIcon tipo={local.tipo} size={20} />}
             onChange={(aeroporto) => update({ aeroporto })}
+          />
+        )}
+        {OUTROS_LOCAIS_GTA[local.tipo] && (
+          <SearchEntityField
+            label={local.tipo}
+            value={local.outroLocal}
+            data={OUTROS_LOCAIS_GTA[local.tipo]}
+            icon={<LocalGtaIcon tipo={local.tipo} size={20} />}
+            onChange={(outroLocal) => update({ outroLocal })}
           />
         )}
       </div>
@@ -232,7 +244,8 @@ function entidadeLocal(local: LocalGta) {
     local.frigorifico ??
     local.evento ??
     local.revendedora ??
-    local.aeroporto
+    local.aeroporto ??
+    local.outroLocal
   );
 }
 
@@ -291,6 +304,7 @@ export function EmissaoGtaPage({
   const [tipoFormulario, setTipoFormulario] = useState("");
   const [especie, setEspecie] = useState<EntidadeGta | null>(null);
   const [finalidade, setFinalidade] = useState<EntidadeGta | null>(null);
+  const [emitente, setEmitente] = useState<EntidadeGta | null>(null);
   const [dataEmissao, setDataEmissao] = useState("");
   const [procedencia, setProcedencia] = useState(criarLocalVazio);
   const [destino, setDestino] = useState(criarLocalVazio);
@@ -308,6 +322,7 @@ export function EmissaoGtaPage({
     tipoFormulario ||
     especie ||
     finalidade ||
+    emitente ||
     dataEmissao ||
     procedencia.tipo ||
     procedencia.responsavel ||
@@ -327,6 +342,7 @@ export function EmissaoGtaPage({
         (!tipoFormulario || item.tipoFormulario === tipoFormulario) &&
         (!especie || item.especie?.id === especie.id) &&
         (!finalidade || item.finalidade?.id === finalidade.id) &&
+        (!emitente || (item.emitente ?? PESSOAS_GTA[1] ?? PESSOAS_GTA[0])?.id === emitente.id) &&
         (!dataEmissao || item.dataEmissao === dataEmissao) &&
         localCompativel(item.procedencia, procedencia) &&
         localCompativel(item.destino, destino) &&
@@ -345,6 +361,7 @@ export function EmissaoGtaPage({
     tipoFormulario,
     especie,
     finalidade,
+    emitente,
     dataEmissao,
     procedencia,
     destino,
@@ -483,7 +500,7 @@ export function EmissaoGtaPage({
                         tipo: tipo as TipoLocalGta,
                       })
                     }
-                    options={TIPOS_LOCAL_OPTIONS}
+                    options={TIPOS_PROCEDENCIA_OPTIONS}
                   />
                   <FloatSelect
                     label="Tipo de Destino"
@@ -505,7 +522,7 @@ export function EmissaoGtaPage({
                   </button>
                 </div>
 
-                <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-5">
                   <SearchEntityField
                     label="Espécie"
                     value={especie}
@@ -520,11 +537,20 @@ export function EmissaoGtaPage({
                     icon={<Truck size={20} />}
                     onChange={setFinalidade}
                   />
+                  <SearchEntityField
+                    label="Emitente"
+                    value={emitente}
+                    data={PESSOAS_GTA}
+                    codeKey="documento"
+                    icon={<User size={20} />}
+                    onChange={setEmitente}
+                  />
                   <FloatInput
                     label="Data da Emissão"
                     type="date"
                     value={dataEmissao}
                     icon={<Calendar size={20} />}
+                    hideNativeDateIcon
                     onChange={setDataEmissao}
                   />
                   <FloatSelect
@@ -613,7 +639,9 @@ export function EmissaoGtaPage({
                           {formatarDataGta(item.dataEmissao)}
                         </td>
                         <td className="px-3 py-3 text-gray-600">
-                          {item.situacao}
+                          <span className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${item.situacao === "Cancelada" ? "bg-red-50 text-red-700" : item.situacao === "Transitada" ? "bg-emerald-100 text-emerald-800" : item.situacao === "Emitida" ? "bg-blue-50 text-blue-700" : item.situacao === "Paga" ? "bg-green-50 text-green-700" : item.situacao === "Aguardando Pagamento" ? "bg-amber-50 text-amber-800" : "bg-gray-100 text-gray-700"}`}>
+                            {item.situacao}
+                          </span>
                         </td>
                         <td className="px-2 py-3">
                           <div className="flex items-center justify-end gap-0.5">
@@ -625,6 +653,14 @@ export function EmissaoGtaPage({
                             >
                               <Eye size={16} />
                             </ActionButton>
+                            {item.situacao === "Gravada" && (
+                              <ActionButton
+                                title="Editar GTA"
+                                onClick={() => onNavigate("adicionar-emissao-gta", item)}
+                              >
+                                <Pencil size={15} />
+                              </ActionButton>
+                            )}
                             <ActionButton
                               title="Copiar GTA"
                               onClick={() =>
@@ -636,7 +672,7 @@ export function EmissaoGtaPage({
                             >
                               <Copy size={15} />
                             </ActionButton>
-                            {item.situacao === "Gravada" &&
+                            {item.situacao === "Aguardando Pagamento" &&
                               item.necessitaPagamento && (
                                 <ActionButton
                                   title="Pagar"
@@ -647,17 +683,15 @@ export function EmissaoGtaPage({
                                   <DollarSign size={16} />
                                 </ActionButton>
                               )}
-                            {["Gravada", "Paga"].includes(item.situacao) && (
+                            {["Aguardando Pagamento", "Paga", "Emitida"].includes(item.situacao) && (
                               <ActionButton
-                                title="Baixar Boleto/DAE"
-                                onClick={() => downloadMock("Boleto/DAE", item)}
+                                title={frigorificoAderidoAoFundo(item.destino, item.finalidade) ? "Baixar boleto" : "Baixar DAE"}
+                                onClick={() => downloadMock(frigorificoAderidoAoFundo(item.destino, item.finalidade) ? "Boleto" : "DAE", item)}
                               >
                                 <FileDown size={16} />
                               </ActionButton>
                             )}
-                            {(item.situacao === "Paga" ||
-                              (item.situacao === "Gravada" &&
-                                !item.necessitaPagamento)) && (
+                            {item.situacao === "Paga" && (
                                 <ActionButton
                                   title="Emitir"
                                   onClick={() =>
@@ -667,7 +701,7 @@ export function EmissaoGtaPage({
                                   <ArrowRight size={17} />
                                 </ActionButton>
                               )}
-                            {item.situacao === "Emitida" && (
+                            {["Emitida", "Transitada"].includes(item.situacao) && (
                               <ActionButton
                                 title="Baixar GTA"
                                 onClick={() => onNavigate("documento-emissao-gta", item)}
@@ -675,7 +709,7 @@ export function EmissaoGtaPage({
                                 <FileCheck2 size={16} />
                               </ActionButton>
                             )}
-                            {item.situacao !== "Cancelada" && (
+                            {!['Cancelada', 'Transitada'].includes(item.situacao) && (
                               <ActionButton
                                 title="Cancelar"
                                 onClick={() =>
