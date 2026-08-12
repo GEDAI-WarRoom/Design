@@ -487,7 +487,7 @@ export function AdicionarVendaComEntradaVacinaPage({ onLogout, onNavigate, mode 
                 />
                 <FloatCombobox label="UF da Nota Fiscal" required value={ufNotaFiscal} onChange={setUfNotaFiscal} options={ESTADOS_BR} />
                 <FloatInput
-                  label="Data da Nota Fiscal"
+                  label="Data"
                   required
                   type="date"
                   max={HOJE}
