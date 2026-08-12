@@ -198,6 +198,8 @@ import { AdicionarAutorizacaoVacinacaoPage } from "./pages/Vacinacao/Autorizacao
 import { AutorizacaoVacinacaoPage } from "./pages/Vacinacao/AutorizacaoVacinacao/AutorizacaoVacinacao";
 import { AdicionarDeclaracaoVacinacaoPage } from "./pages/Vacinacao/DeclaracaoVacinacao/AdicionarDeclaracaoVacinacao";
 import { DeclaracaoVacinacaoPage } from "./pages/Vacinacao/DeclaracaoVacinacao/DeclaracaoVacinacao";
+import { VisualizarDeclaracaoVacinacaoPage } from "./pages/Vacinacao/DeclaracaoVacinacao/VisualizarDeclaracaoVacinacao";
+import { EditarDeclaracaoVacinacaoPage } from "./pages/Vacinacao/DeclaracaoVacinacao/EditarDeclaracaoVacinacao";
 import { AdicionarDoencaPage } from "./pages/Vacinacao/Doenca/AdicionarDoenca";
 import { DoencaPage } from "./pages/Vacinacao/Doenca/Doenca";
 import { AdicionarEtapaVacinacaoPage } from "./pages/Vacinacao/EtapaVacinacao/AdicionarEtapaVacinacao";
@@ -242,8 +244,6 @@ import { VisualizarEtapaVacinacaoPage } from "./pages/Vacinacao/EtapaVacinacao/V
 import { EditarEtapaVacinacaoPage } from "./pages/Vacinacao/EtapaVacinacao/EditarEtapaVacinacao";
 import { VisualizarAutorizacaoVacinacaoPage } from "./pages/Vacinacao/AutorizacaoVacinacao/VisualizarAutorizacaoVacinacao";
 import { EditarAutorizacaoVacinacaoPage } from "./pages/Vacinacao/AutorizacaoVacinacao/EditarAutorizacaoVacinacao";
-import { VisualizarDeclaracaoVacinacaoPage } from "./pages/Vacinacao/DeclaracaoVacinacao/VisualizarDeclaracaoVacinacao";
-import { EditarDeclaracaoVacinacaoPage } from "./pages/Vacinacao/DeclaracaoVacinacao/EditarDeclaracaoVacinacao";
 import { VisualizarDoencaPage } from "./pages/Vacinacao/Doenca/VisualizarDoenca";
 import { EditarDoencaPage } from "./pages/Vacinacao/Doenca/EditarDoenca";
 import { VisualizarVacinadorPage } from "./pages/Vacinacao/Vacinador/VisualizarVacinador";
@@ -356,6 +356,8 @@ export type Screen =
   | "editar-autorizacao-vacinacao"
   | "visualizar-declaracao-vacinacao"
   | "editar-declaracao-vacinacao"
+  | "declaracao-vacinacao"
+  | "adicionar-declaracao-vacinacao"
   | "visualizar-doenca"
   | "editar-doenca"
   | "visualizar-vacinador-brucelose"
@@ -461,8 +463,6 @@ export type Screen =
   | "adicionar-etapa-vacinacao"
   | "autorizacao-vacinacao"
   | "adicionar-autorizacao-vacinacao"
-  | "declaracao-vacinacao"
-  | "adicionar-declaracao-vacinacao"
   | "doenca"
   | "adicionar-doenca"
   | "tipo-insumo-exame"
@@ -664,8 +664,6 @@ export type Screen =
 	| "adicionar-etapa-vacinacao"
 	| "autorizacao-vacinacao"
 	| "adicionar-autorizacao-vacinacao"
-	| "declaracao-vacinacao"
-	| "adicionar-declaracao-vacinacao"
 	| "doenca"
 	| "adicionar-doenca"
 	| "tipo-insumo-exame"
@@ -912,6 +910,9 @@ export default function App() {
     case "editar-declaracao-vacinacao":
       return <EditarDeclaracaoVacinacaoPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "visualizar-doenca":
+		
+
+
       return <VisualizarDoencaPage key={`visualizar-doenca-${screenData?.id ?? "novo"}`} dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "editar-doenca":
       return <EditarDoencaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
