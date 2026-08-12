@@ -15,7 +15,7 @@ export function CadastrosVinculados({
 	title = "Cadastros vinculados",
 	items,
 	count = items.length,
-	limit = 4,
+	limit = 2,
 	onViewAll,
 	viewAllLabel = "Ver todos",
 	emptyMessage = "Nenhum cadastro vinculado.",

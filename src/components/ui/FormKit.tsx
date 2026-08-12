@@ -53,6 +53,8 @@ interface FloatInputProps {
 	type?: string;
 	placeholder?: string;
 	maxLength?: number;
+	min?: string;
+	max?: string;
 	icon?: React.ReactNode;
 	onClick?: () => void;
 	className?: string;
@@ -71,6 +73,8 @@ export function FloatInput({
 	type = "text",
 	placeholder,
 	maxLength,
+	min,
+	max,
 	icon,
 	onClick,
 	className = "",
@@ -153,6 +157,8 @@ export function FloatInput({
 				disabled={disabled}
 				// Se for month, o tamanho máximo com a barra é 7 (MM/AAAA)
 				maxLength={isMonthVariant ? 7 : maxLength}
+				min={min}
+				max={max}
 				placeholder={
 					focused ? placeholder || (isMonthVariant ? "mm/aaaa" : "") : ""
 				}
@@ -165,6 +171,7 @@ export function FloatInput({
           ${icon ? "pl-7" : ""} 
           ${onClick && !isCalendar ? "pointer-events-none cursor-pointer" : ""}
           ${hideNativeDateIcon ? "[&::-webkit-calendar-picker-indicator]:opacity-0" : ""}
+          ${hideNativeDateIcon ? "[&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none" : ""}
           ${isDateVariant && !active ? "[&::-webkit-datetime-edit]:opacity-0 text-transparent" : "[&::-webkit-datetime-edit]:opacity-100 text-gray-800"}`}
 			/>
 		</div>

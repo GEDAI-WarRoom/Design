@@ -35,16 +35,7 @@ export function VisualizarVendaPropriedadePage({ onLogout, onNavigate, dados }: 
           >
             <ArrowLeft size={15} /> Todas as Vendas de Propriedade
           </button>
-          <div className="flex items-center justify-between gap-4">
-            <h1 className="text-2xl font-semibold text-gray-900">Visualizar Venda de Propriedade</h1>
-            <button
-              type="button"
-              onClick={() => onNavigate("editar-venda-propriedade", venda)}
-              className="px-5 h-10 rounded-md text-white text-xs font-bold bg-[#1A7A3C] hover:bg-[#15612F] transition shadow-sm"
-            >
-              Editar
-            </button>
-          </div>
+          <h1 className="text-2xl font-semibold text-gray-900">Visualizar Venda de Propriedade</h1>
         </div>
 
         <VendaPropriedadeForm

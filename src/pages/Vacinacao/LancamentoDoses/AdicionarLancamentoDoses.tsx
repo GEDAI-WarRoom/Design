@@ -1,37 +1,74 @@
 import React, { useState } from "react";
-import { ArrowLeft, ChevronUp, ChevronDown, Check, Info, PlusCircle, Trash2, Package, PillBottle } from "lucide-react";
+import { ArrowLeft, ChevronUp, ChevronDown, Check, Eye, Info, PlusCircle, Trash2, Package, Store, PillBottle } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
-import { FloatInput, MultiSearchModal } from "../../../components/ui/FormKit";
-import { RevendedoraInput } from "../../../components/ui/EntitySearch";
+import { FloatInput, FloatSelect, MultiSearchModal } from "../../../components/ui/FormKit";
+import {
+  EntitySearchInput,
+  PRODUTORES_MOCK,
+  REVENDEDORAS_MOCK,
+  VETERINARIOS_MOCK,
+  VACINADORES_BRUCELOSE_MOCK,
+} from "../../../components/ui/EntitySearch";
 import { PieChart, Pie, Cell, Sector } from "recharts";
 import { CadastroVacinacaoHeader, cadastroVacinacaoPageClass, mensagemSucessoCadastro, preencherComExemplo, type CadastroVacinacaoModeProps } from "../shared/CadastroVacinacaoMode";
+import * as Icons from "../../../imports/icons";
 
 const GREEN = "#1A7A3C";
 
 // ==========================================================
 // MOCKS
 // ==========================================================
-const NOTAS_FISCAIS_MOCK = [
-  {
-    id: "nf-1", numero: "28568", revendedoraCodigo: "3120938028", uf: "Minas Gerais",
-    partidas: [
-      { id: "pt-1", numeroPartida: "006/19", validade: "03/2025", laboratorio: "Laboratório BioMed", doenca: "Brucelose", tipoVacina: "B19", dosesDisponiveis: "10" },
-      { id: "pt-2", numeroPartida: "007/19", validade: "05/2025", laboratorio: "Laboratório BioMed", doenca: "Brucelose", tipoVacina: "RB51", dosesDisponiveis: "25" },
-    ],
-  },
-  {
-    id: "nf-2", numero: "1234567", revendedoraCodigo: "3120938028", uf: "Minas Gerais",
-    partidas: [
-      { id: "pt-3", numeroPartida: "025/24", validade: "12/2026", laboratorio: "Vacinas Imunotech", doenca: "Febre Aftosa", tipoVacina: "O1 Campos", dosesDisponiveis: "100" },
-    ],
-  },
-  {
-    id: "nf-3", numero: "7654321", revendedoraCodigo: "3120938045", uf: "Minas Gerais",
-    partidas: [
-      { id: "pt-4", numeroPartida: "100/24", validade: "01/2027", laboratorio: "ImunoVet Biológicos", doenca: "Raiva", tipoVacina: "", dosesDisponiveis: "40" },
-    ],
-  },
+type TipoDestinatario = "" | "produtor" | "vacinador" | "medico_veterinario" | "revendedora";
+
+const TIPOS_DESTINATARIO: Array<{ value: Exclude<TipoDestinatario, "">; label: string }> = [
+  { value: "produtor", label: "Produtor" },
+  { value: "vacinador", label: "Vacinador" },
+  { value: "medico_veterinario", label: "Médico Veterinário" },
+  { value: "revendedora", label: "Revendedora de Produtos Agropecuários" },
 ];
+
+const LOTES_VACINA_MOCK = [
+  { id: 1, nome: "0013225/24", numeroPartida: "0013225/24", partida: "1", uf: "MG", dosesDisponiveisTotais: 120, fornecedor: "Distribuidora de Vacinas Alfa LTDA", doenca: "Brucelose", tipoVacina: "B19", laboratorio: "BioMed/MG", validade: "20/12/2026", dosesPerFrasco: 20, quantidadeDoses: 0, quantidadeFrascos: 0, destinatarios: ["produtor:1", "revendedora:1", "vacinador:1"] },
+  { id: 2, nome: "0013225/24", numeroPartida: "0013225/24", partida: "2", uf: "MG", dosesDisponiveisTotais: 80, fornecedor: "Distribuidora de Vacinas Alfa LTDA", doenca: "Brucelose", tipoVacina: "RB51", laboratorio: "BioMed/MG", validade: "20/12/2026", dosesPerFrasco: 20, quantidadeDoses: 0, quantidadeFrascos: 0, destinatarios: ["produtor:1", "produtor:2", "medico_veterinario:1"] },
+  { id: 3, nome: "0014589/24", numeroPartida: "0014589/24", partida: "1", uf: "SP", dosesDisponiveisTotais: 250, fornecedor: "Comercial Agropecuária Beta S/A", doenca: "Raiva dos Herbívoros", tipoVacina: "", laboratorio: "Zoetis", validade: "15/08/2027", dosesPerFrasco: 25, quantidadeDoses: 0, quantidadeFrascos: 0, destinatarios: ["produtor:2", "revendedora:2", "vacinador:2"] },
+  { id: 4, nome: "0015890/25", numeroPartida: "0015890/25", partida: "1", uf: "GO", dosesDisponiveisTotais: 50, fornecedor: "Laboratório Biovet Saúde Animal", doenca: "Febre Aftosa", tipoVacina: "O1 Campos", laboratorio: "Biovet", validade: "15/08/2027", dosesPerFrasco: 10, quantidadeDoses: 0, quantidadeFrascos: 0, destinatarios: ["produtor:3", "revendedora:1", "medico_veterinario:1", "vacinador:3"] },
+];
+
+function normalizarTipoDestinatario(valor: unknown): TipoDestinatario {
+  if (valor === "Médico Veterinário" || valor === "vetarinario" || valor === "veterinario") return "medico_veterinario";
+  if (valor === "Produtor") return "produtor";
+  if (valor === "Vacinador") return "vacinador";
+  if (valor === "Revendedora de Produtos Agropecuários") return "revendedora";
+  return TIPOS_DESTINATARIO.some((tipo) => tipo.value === valor) ? valor as TipoDestinatario : "";
+}
+
+function documentoDestinatario(entidade: any) {
+  return entidade?.documento ?? entidade?.cpf ?? entidade?.cnpj ?? entidade?.codigo ?? "";
+}
+
+function destinatariosPorTipo(tipo: TipoDestinatario) {
+  if (tipo === "produtor") return PRODUTORES_MOCK;
+  if (tipo === "vacinador") return VACINADORES_BRUCELOSE_MOCK;
+  if (tipo === "medico_veterinario") return VETERINARIOS_MOCK;
+  if (tipo === "revendedora") return REVENDEDORAS_MOCK;
+  return [];
+}
+
+function iconeDestinatario(tipo: TipoDestinatario) {
+  const className = "w-5 h-5 object-contain";
+
+  if (tipo === "produtor") return <img src={Icons.iconeProdutorUrl} alt="Produtor" className={className} />;
+  if (tipo === "vacinador") return <img src={Icons.iconeVacinadorUrl} alt="Vacinador" className={className} />;
+  if (tipo === "medico_veterinario") return <img src={Icons.iconeProfissionalAnimalUrl} alt="Profissional da Área Animal" className={className} />;
+  if (tipo === "revendedora") return <Store size={20} color={GREEN} />;
+  return null;
+}
+
+function rotaVisualizacaoDestinatario(tipo: TipoDestinatario) {
+  if (tipo === "revendedora") return "visualizar-revendedora-agropecuario";
+  if (tipo === "vacinador") return "visualizar-vacinador-brucelose";
+  return "visualizar-pessoa-fisica";
+}
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(true);
@@ -68,11 +105,25 @@ interface PageProps extends CadastroVacinacaoModeProps {
 export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate, mode = "create", dados }: PageProps) {
   const preenchendoRegistro = mode !== "create";
   const idPartidaInicial = `partida-${dados?.id ?? "registro"}`;
-  const [revendedora, setRevendedora] = useState<any | null>(dados?.revendedora ?? (dados?.revendedoraNome ? { codigo: dados.revendedoraCodigo, nome: dados.revendedoraNome } : preenchendoRegistro ? { codigo: "3120938028", nome: "Comercial AgroVat" } : null));
+  const tipoInicial = normalizarTipoDestinatario(
+    dados?.tipoDestinatario ?? (dados?.revendedoraNome ? "revendedora" : ""),
+  ) || (preenchendoRegistro ? "produtor" : "");
+  const destinatarioInicial = dados?.destinatarioEntidade
+    ?? (typeof dados?.destinatario === "object" ? dados.destinatario : null)
+    ?? ((dados?.destinatarioNome || dados?.revendedoraNome) ? {
+      id: dados?.destinatarioId ?? dados?.id ?? 1,
+      nome: dados?.destinatarioNome ?? dados?.revendedoraNome,
+      documento: dados?.destinatarioDocumento,
+      codigo: dados?.destinatarioDocumento ?? dados?.revendedoraCodigo,
+    } : null)
+    ?? (preenchendoRegistro ? PRODUTORES_MOCK[0] : null);
+  const [tipoDestinatario, setTipoDestinatario] = useState<TipoDestinatario>(tipoInicial);
+  const [destinatario, setDestinatario] = useState<any | null>(destinatarioInicial);
   const [lancamentos, setLancamentos] = useState<Record<string, { dosesLancadas: string; justificativa: string }>>(dados?.lancamentos ?? (preenchendoRegistro ? {
     [idPartidaInicial]: { dosesLancadas: String(dados?.quantidadeDoses ?? 20), justificativa: dados?.justificativa ?? `Ajuste referente a ${dados?.tipoLancamento ?? "conferência de estoque"}.` }
   } : {}));
   const [isSucesso, setIsSucesso] = useState(false);
+  const [errosObrigatorios, setErrosObrigatorios] = useState({ tipo: false, destinatario: false, lote: false });
 
   const [modalNotaOrigemOpen, setModalNotaOrigemOpen] = useState(false);
   const [notasFiscaisOrigem, setNotasFiscaisOrigem] = useState<any[]>(dados?.notasFiscaisOrigem ?? (preenchendoRegistro ? [{
@@ -92,21 +143,58 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate, mode 
   const [notasListasMinimizadas, setNotasListasMinimizadas] = useState<Record<string, boolean>>({});
   const [lotesMinimizados, setLotesMinimizados] = useState<Record<string, boolean>>({});
 
+  const destinatariosDisponiveis = destinatariosPorTipo(tipoDestinatario);
+  const destinatarioSelecionado = destinatario;
+  const chaveDestinatario = tipoDestinatario && destinatarioSelecionado
+    ? `${tipoDestinatario}:${destinatarioSelecionado.id}`
+    : "";
+  const lotesDisponiveis = LOTES_VACINA_MOCK
+    .filter((lote) => chaveDestinatario && lote.destinatarios.includes(chaveDestinatario))
+    .map((lote) => ({
+      ...lote,
+      doencaComTipo: lote.tipoVacina ? `${lote.doenca} (${lote.tipoVacina})` : lote.doenca,
+    }));
+
+  const validarEGravar = () => {
+    const erros = {
+      tipo: !tipoDestinatario,
+      destinatario: !destinatarioSelecionado,
+      lote: notasFiscaisOrigem.length === 0,
+    };
+    setErrosObrigatorios(erros);
+    if (Object.values(erros).some(Boolean)) return;
+    setIsSucesso(true);
+  };
+
   const registroAtual = preencherComExemplo({
     ...(dados ?? {}),
     id: dados?.id ?? `ajuste-dose-${Date.now()}`,
-    revendedora,
-    revendedoraCodigo: revendedora?.codigo,
-    revendedoraNome: revendedora?.nome,
+    tipoDestinatario,
+    destinatario: destinatarioSelecionado,
+    destinatarioEntidade: destinatarioSelecionado,
+    destinatarioId: destinatarioSelecionado?.id,
+    destinatarioNome: destinatarioSelecionado?.nome,
+    destinatarioDocumento: documentoDestinatario(destinatarioSelecionado),
+    numeroPartida: notasFiscaisOrigem[0]?.numeroPartida ?? notasFiscaisOrigem[0]?.nome,
+    doenca: notasFiscaisOrigem[0]?.doenca,
+    tipoVacina: notasFiscaisOrigem[0]?.tipoVacina,
+    situacao: dados?.situacao ?? "Gravada",
     notasFiscaisOrigem,
     lancamentos,
   }, {
     id: "ajuste-dose-exemplo",
-    revendedora: { id: 1, codigo: "3120938028", nome: "Comercial AgroVat" },
-    revendedoraCodigo: "3120938028",
-    revendedoraNome: "Comercial AgroVat",
+    tipoDestinatario: "produtor",
+    destinatario: PRODUTORES_MOCK[0],
+    destinatarioEntidade: PRODUTORES_MOCK[0],
+    destinatarioId: PRODUTORES_MOCK[0].id,
+    destinatarioNome: PRODUTORES_MOCK[0].nome,
+    destinatarioDocumento: PRODUTORES_MOCK[0].documento,
+    numeroPartida: "0013225/24",
+    doenca: "Brucelose",
+    tipoVacina: "B19",
+    situacao: "Gravada",
     notasFiscaisOrigem: [{
-      id: "partida-exemplo", nome: "025/24", numeroPartida: "025/24", laboratorio: "Laboratório BioMed",
+      id: "partida-exemplo", nome: "0013225/24", numeroPartida: "0013225/24", laboratorio: "Laboratório BioMed",
       doenca: "Brucelose", tipoVacina: "B19", validade: "20/12/2026", dosesDisponiveisTotais: 100,
       dosesPerFrasco: 20, quantidadeDoses: 20, quantidadeFrascos: 1,
     }],
@@ -124,7 +212,7 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate, mode 
             <ArrowLeft size={15} />
             Todos Ajustes de Doses de Vacina
           </button>
-          <CadastroVacinacaoHeader mode={mode} nomeCadastro="Ajuste de Doses de Vacina" rotaEditar="editar-lancamento-doses-vacina" dados={dados} onNavigate={onNavigate} onSubmit={() => setIsSucesso(true)} />
+          <CadastroVacinacaoHeader mode={mode} nomeCadastro="Ajuste de Doses de Vacina" rotaEditar="editar-lancamento-doses-vacina" dados={dados} onNavigate={onNavigate} onSubmit={validarEGravar} />
         </div>
 
         {/* ALERTA */}
@@ -139,30 +227,89 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate, mode 
 
         {/* 1. Informações Básicas */}
         <Section title="Informações Básicas">
-          <div className="flex flex-col gap-3">
-            <RevendedoraInput
-              value={revendedora ? revendedora.codigo : ""}
-              required
-              onChange={(entidadeSelecionada) => setRevendedora(entidadeSelecionada)}
-              onEyeClick={() => {
-                if (revendedora?.codigo) alert(`Visualizar detalhes: ${revendedora.codigo}`);
-                else alert("Por favor, digite ou selecione uma revendedora primeiro.");
-              }}
-            />
+          <div className="flex flex-col gap-4">
+            <div>
+              <FloatSelect
+                label="Tipo de Destinatário"
+                value={tipoDestinatario}
+                options={TIPOS_DESTINATARIO}
+                onChange={(valor) => {
+                  setTipoDestinatario(valor as TipoDestinatario);
+                  setDestinatario(null);
+                  setNotasFiscaisOrigem([]);
+                  setLancamentos({});
+                  setErrosObrigatorios((atual) => ({ ...atual, tipo: false, destinatario: false, lote: false }));
+                }}
+                required
+              />
+              {errosObrigatorios.tipo && (
+                <p className="mt-1 text-xs text-red-500">Informe o tipo de destinatário.</p>
+              )}
+            </div>
+
+            {tipoDestinatario && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+                <div>
+                  <EntitySearchInput
+                    label="Destinatário"
+                    placeholder="Buscar por nome ou CPF/CNPJ."
+                    value={destinatarioSelecionado?.nome ?? ""}
+                    data={destinatariosDisponiveis}
+                    searchKeys={["nome", "documento", "cpf", "codigo"]}
+                    columns={[
+                      { label: tipoDestinatario === "revendedora" ? "Razão Social" : "Nome", key: "nome" },
+                      { label: tipoDestinatario === "revendedora" ? "CNPJ / Código" : "CPF", key: tipoDestinatario === "medico_veterinario" ? "cpf" : tipoDestinatario === "revendedora" ? "codigo" : "documento" },
+                    ]}
+                    title={`Buscar ${TIPOS_DESTINATARIO.find((tipo) => tipo.value === tipoDestinatario)?.label ?? "Destinatário"}`}
+                    subtitle="Selecione um destinatário cadastrado no sistema:"
+                    icon={iconeDestinatario(tipoDestinatario)}
+                    onChange={(entidadeSelecionada) => {
+                      setDestinatario(entidadeSelecionada);
+                      setNotasFiscaisOrigem([]);
+                      setLancamentos({});
+                      setErrosObrigatorios((atual) => ({ ...atual, destinatario: false, lote: false }));
+                    }}
+                    required
+                  />
+                  {errosObrigatorios.destinatario && (
+                    <p className="mt-1 text-xs text-red-500">Selecione o destinatário.</p>
+                  )}
+                </div>
+
+                {destinatarioSelecionado && (
+                  <div className="flex items-end gap-2 animate-fadeIn">
+                    <FloatInput
+                      label="CPF/CNPJ do Destinatário"
+                      value={documentoDestinatario(destinatarioSelecionado)}
+                      disabled
+                      required
+                      className="flex-1"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => onNavigate(rotaVisualizacaoDestinatario(tipoDestinatario), destinatarioSelecionado)}
+                      className="mb-0 flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-md text-[#1A7A3C] transition hover:bg-green-50"
+                      title="Visualizar detalhes do destinatário"
+                      aria-label="Visualizar detalhes do destinatário"
+                    >
+                      <Eye size={20} />
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </Section>
 
-        {/* Seção 2: Nota Fiscal de Origem */}
-        <Section title="Nota Fiscal">
+        {/* Seção 2: Saldo de Vacinas */}
+        <Section title="Saldo de Vacinas">
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between border-b border-gray-100 pb-3">
               <div className="flex items-center gap-3">
-                <div className="flex flex-col">
-                  <span className="text-xs text-gray-500 font-medium">Saldo de doses</span>
-                </div>
+                <span className="text-xs font-medium text-gray-500">Saldo de Vacinas</span>
 
                 {notasFiscaisOrigem.length > 0 && (
-                  <div className="flex items-center gap-1.5 bg-green-50 border border-green-200 px-2.5 py-1 rounded-lg animate-fadeIn">
+                  <div className="flex items-center gap-1.5 rounded-lg border border-green-200 bg-green-50 px-2.5 py-1 animate-fadeIn">
                     <span className="text-[11px] font-semibold text-gray-500">DOSES LANÇADAS:</span>
                     <span className="text-[11px] font-black text-[#1A7A3C]">
                       {notasFiscaisOrigem.reduce((sum, item) => sum + (item.quantidadeDoses || 0), 0)} doses
@@ -173,34 +320,38 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate, mode 
 
               <button
                 type="button"
-                disabled={!revendedora}
+                disabled={!destinatarioSelecionado}
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
                   setModalNotaOrigemOpen(true);
                 }}
-                className={`flex items-center gap-2 text-sm font-semibold px-4 h-11 rounded-lg border w-fit transition shadow-sm ${revendedora
+                className={`flex items-center gap-2 text-sm font-semibold px-4 h-11 rounded-lg border w-fit transition shadow-sm ${destinatarioSelecionado
                   ? "border-[#1A7A3C] text-[#1A7A3C] hover:bg-green-50 cursor-pointer"
                   : "border-gray-200 text-gray-300 bg-gray-100 cursor-not-allowed"
                   }`}
               >
                 <PlusCircle size={18} />
-                Adicionar Saldo
+                Adicionar Lote
               </button>
             </div>
 
-            {/* CONDICIONAL 1: Sem revendedora selecionada */}
-            {!revendedora && (
+            {/* CONDICIONAL 1: Sem destinatário selecionado */}
+            {!destinatarioSelecionado && (
               <div className="text-left py-4">
-                <p className="text-xs text-gray-400 italic">É necessário selecionar uma Revendedora para pesquisar notas fiscais.</p>
+                <p className="text-xs text-gray-400 italic">É necessário selecionar um destinatário para pesquisar os lotes de vacina disponíveis.</p>
               </div>
             )}
 
-            {/* CONDICIONAL 2: Revendedora selecionada, mas nenhum lote adicionado */}
-            {revendedora && notasFiscaisOrigem.length === 0 && (
+            {/* CONDICIONAL 2: Destinatário selecionado, mas nenhum lote adicionado */}
+            {destinatarioSelecionado && notasFiscaisOrigem.length === 0 && (
               <div className="w-full border border-dashed border-gray-200 rounded-xl py-8 px-4 text-center bg-gray-50/20">
-                <p className="text-sm text-gray-400 italic">Nenhum lote vinculado a este lançamento até o momento.</p>
+                <p className="text-sm text-gray-400 italic">Nenhum lote vinculado a este ajuste até o momento.</p>
               </div>
+            )}
+
+            {errosObrigatorios.lote && (
+              <p className="text-xs text-red-500">Selecione ao menos um lote de vacina.</p>
             )}
 
             {notasFiscaisOrigem.length > 0 && (
@@ -311,20 +462,20 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate, mode 
                             };
                             const isVencido = verificarVencimento(validadeLote);
 
+                            const dosesDescartadas = Math.min(10, TOTAL_DISPONIVEL);
+                            const dosesVendidas = Math.min(30, Math.max(0, TOTAL_DISPONIVEL - dosesDescartadas));
                             const dadosGrafico = isVencido
                               ? [
+                                { name: "Disponíveis", value: 0, color: "#22c55e" },
+                                { name: "Vendidas", value: 0, color: "#3b82f6" },
                                 { name: "Vencidas", value: TOTAL_DISPONIVEL, color: "#ef4444" },
                                 { name: "Descartadas", value: 0, color: "#9ca3af" },
-                                { name: "Partilhadas", value: 0, color: "#3b82f6" },
-                                { name: "Utilizadas", value: 0, color: "#f59e0b" },
-                                { name: "Disponíveis", value: 0, color: "#22c55e" },
                               ]
                               : [
+                                { name: "Disponíveis", value: Math.max(0, TOTAL_DISPONIVEL - dosesVendidas - dosesDescartadas), color: "#22c55e" },
+                                { name: "Vendidas", value: dosesVendidas, color: "#3b82f6" },
                                 { name: "Vencidas", value: 0, color: "#ef4444" },
-                                { name: "Descartadas", value: 10, color: "#9ca3af" },
-                                { name: "Partilhadas", value: 20, color: "#3b82f6" },
-                                { name: "Utilizadas", value: 30, color: "#f59e0b" },
-                                { name: "Disponíveis", value: TOTAL_DISPONIVEL >= 60 ? TOTAL_DISPONIVEL - 60 : 40, color: "#22c55e" },
+                                { name: "Descartadas", value: dosesDescartadas, color: "#9ca3af" },
                               ];
 
                             const estaAtivoNesteLote = graficoAtivo?.loteId === nfItem.id;
@@ -556,31 +707,24 @@ export function AdicionarLancamentoDosesVacinaPage({ onLogout, onNavigate, mode 
       <MultiSearchModal
         open={modalNotaOrigemOpen}
         onClose={() => setModalNotaOrigemOpen(false)}
-        title="Buscar Lotes de Vacinas"
-        subtitle="Selecione os lotes de vacina desejados para vincular a este ajuste:"
+        title="Buscar Lotes de Vacina"
+        subtitle={`Selecione os lotes de vacina disponíveis para ${destinatarioSelecionado?.nome ?? "o destinatário"}:`}
         icon={<Package size={24} color={GREEN} />}
-        data={[
-          { id: 1, nome: "0013225/24", partida: "1", uf: "MG", dosesDisponiveisTotais: 120, fornecedor: "Distribuidora de Vacinas Alfa LTDA", doenca: "Brucelose", tipoVacina: "B19", laboratorio: "BioMed/MG", validade: "20/12/2026" },
-          { id: 2, nome: "0013225/24", partida: "2", uf: "MG", dosesDisponiveisTotais: 80, fornecedor: "Distribuidora de Vacinas Alfa LTDA", doenca: "Brucelose", tipoVacina: "Oleosa", laboratorio: "BioMed/MG", validade: "20/12/2026" },
-          { id: 3, nome: "0014589/24", partida: "1", uf: "SP", dosesDisponiveisTotais: 250, fornecedor: "Comercial Agropecuária Beta S/A", doenca: "Raiva dos Herbívoros", tipoVacina: "", laboratorio: "Zoetis", validade: "15/08/2027" },
-          { id: 4, nome: "0014589/24", partida: "1", uf: "GO", dosesDisponiveisTotais: 50, fornecedor: "Laboratório Biovet Saúde Animal", doenca: "Raiva dos Herbívoros", tipoVacina: "", laboratorio: "Biovet", validade: "15/08/2027" }
-        ].map((item) => ({
-          ...item,
-          // Cria um campo combinado para a coluna exibir
-          doencaComTipo: `${item.doenca} - ${item.tipoVacina}`,
-        }))}
+        data={lotesDisponiveis}
         searchKeys={["nome", "partida", "doenca", "tipoVacina", "fornecedor", "uf"]}
         searchPlaceholder="Busque por lote ou doença."
         columns={[
           { label: "Lote/ Nº de Partida", key: "nome" },
-          { label: "Vacina", key: "doencaComTipo" }, // <-- Usando a chave combinada aqui
+          { label: "Vacina", key: "doencaComTipo" },
           { label: "Saldo da Apresentação", key: "dosesDisponiveisTotais" },
           { label: "UF", key: "uf" }
         ]}
         selectedItems={notasFiscaisOrigem}
         onConfirm={(selectedValues) => {
           setNotasFiscaisOrigem(selectedValues);
+          setErrosObrigatorios((atual) => ({ ...atual, lote: selectedValues.length === 0 }));
         }}
+        showResultsOnOpen
       />
 
       {/* Modal de Sucesso */}

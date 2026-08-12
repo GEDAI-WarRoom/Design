@@ -13,6 +13,7 @@ import { Navbar } from "../../../components/Navbar";
 import {
   CheckboxGroup,
   FloatInput,
+  LargeTextArea,
   MultiSearchModal,
 } from "../../../components/ui/FormKit";
 import { listarEspecies, type Especie } from "../../Animal/Especie/especieData";
@@ -114,6 +115,7 @@ export function AdicionarFinalidadeTransitoPage({
 }: PageProps) {
   // --- informações basicas ---
   const [finalidadeTransito, setFinalidadeTransito] = useState("");
+  const [descricao, setDescricao] = useState("");
   const [tiposProcedencia, setTiposProcedencia] = useState<string[]>([]);
   const [codigoMapa, setCodigoMapa] = useState("");
   const [emiteAcessoExterno, setEmiteAcessoExterno] = useState<string[]>([]);
@@ -140,11 +142,13 @@ export function AdicionarFinalidadeTransitoPage({
   };
 
   const salvar = () => {
+    if (!descricao.trim()) return;
     const especiesSelecionadas = especies.length
       ? especies
       : listarEspecies().filter((item) => item.situacao === "Ativo").slice(0, 1);
     const salvo = salvarFinalidadeTransito({
       finalidade: finalidadeTransito.trim() || "Abate",
+      descricao: descricao.trim(),
       codigoMapa: codigoMapa || "01",
       tiposProcedencia: tiposProcedencia.length ? tiposProcedencia : ["Estabelecimento Agropecuário"],
       emiteAcessoExterno,
@@ -223,6 +227,13 @@ export function AdicionarFinalidadeTransitoPage({
                 maxLength={2}
               />
             </div>
+            <LargeTextArea
+              label="Descrição"
+              value={descricao}
+              onChange={setDescricao}
+              required
+              maxLength={1500}
+            />
           </div>
         </Section>
 

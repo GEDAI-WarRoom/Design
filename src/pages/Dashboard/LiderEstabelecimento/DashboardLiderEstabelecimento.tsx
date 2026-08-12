@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Building2 } from "lucide-react";
+import { Building2, CreditCard } from "lucide-react";
 import { useDemoUser } from "../../../contexts/DemoUserContext";
 import fotoLiderEstabelecimentoExemploUrl from "../../../imports/images/perfil-estabelecimento-exemplo.png";
 import { CadastrosVinculados } from "../shared/CadastrosVinculados";
@@ -29,6 +29,8 @@ export function DashboardLiderEstabelecimento({
 	void databaseRevision;
 	const { user } = useDemoUser();
 	const pessoa = obterPessoaFisica(user?.pessoaFisicaId);
+	const email = pessoa?.contatos.find((contato) => contato.tipo === "E-mail")?.valor ?? user?.email ?? "Não informado";
+	const telefone = pessoa?.contatos.find((contato) => contato.tipo === "Telefone")?.valor ?? user?.phone ?? "Não informado";
 	const estabelecimentosVinculados = listarEstabelecimentosDoLider("lider-estabelecimento");
 	const pendencias = listarPendenciasCentrais("lider-estabelecimento");
 
@@ -45,8 +47,9 @@ export function DashboardLiderEstabelecimento({
 					roleLabel={user?.roleLabel ?? "Líder de Estabelecimento"}
 					avatarSrc={user?.avatarDataUrl ?? fotoLiderEstabelecimentoExemploUrl}
 					details={[
-						{ id: "documento", label: "CPF", value: pessoa?.cpf || "Não informado" },
-						{ id: "vinculos", label: "Estabelecimentos", value: estabelecimentosVinculados.length },
+						{ id: "documento", label: "CPF/CNPJ", value: pessoa?.cpf || user?.document || "Não informado" },
+						{ id: "email", label: "E-mail", value: email },
+						{ id: "telefone", label: "Telefone", value: telefone },
 					]}
 				/>
 			}
@@ -67,14 +70,25 @@ export function DashboardLiderEstabelecimento({
 			}
 			pendingContent={
 				<PendenciasResumo
-					items={pendencias.map((pendencia) => ({
-						id: String(pendencia.id),
-						title: pendencia.titulo || "Pendência de estabelecimento",
-						description: pendencia.descricao || "Solicitação que precisa da sua atenção",
-						icon: <Building2 size={18} />,
-						actionLabel: "Resolver pendência",
-						onAction: () => onNavigate("pendencias-confirmacao-gta"),
-					}))}
+					title="Pendências"
+					items={[
+						{
+							id: "boleto-julho-pendente",
+							title: "Pagamento de boleto pendente",
+							description: "Integradora Vale do Campo · vencimento em 07/08/2026",
+							icon: <CreditCard size={18} />,
+							actionLabel: "Ver boletos",
+							onAction: () => onNavigate("relatorio-boletos-gta"),
+						},
+						...pendencias.map((pendencia) => ({
+							id: String(pendencia.id),
+							title: pendencia.titulo || "Pendência de estabelecimento",
+							description: pendencia.descricao || "Solicitação que precisa da sua atenção",
+							icon: <Building2 size={18} />,
+							actionLabel: "Resolver pendência",
+							onAction: () => onNavigate("pendencias-confirmacao-gta"),
+						})),
+					]}
 					onViewAll={() => onNavigate("pendencias-confirmacao-gta")}
 				/>
 			}

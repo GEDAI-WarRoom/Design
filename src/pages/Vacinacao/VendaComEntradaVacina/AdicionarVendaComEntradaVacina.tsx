@@ -8,6 +8,8 @@ import * as Icons from "../../../imports/icons";
 import { CadastroVacinacaoHeader, cadastroVacinacaoPageClass, mensagemSucessoCadastro, preencherComExemplo, type CadastroVacinacaoModeProps } from "../shared/CadastroVacinacaoMode";
 
 const GREEN = "#1A7A3C";
+const HOJE = new Date().toISOString().slice(0, 10);
+const MES_ATUAL = HOJE.slice(0, 7);
 
 // ==========================================================
 // MOCKS DE ENTIDADE (substituir por API)
@@ -120,23 +122,34 @@ export function LoteCardItem({
           required
           placeholder="0013225/19"
           value={lote.numeroPartida}
-          onChange={(v) => updateLote(lote.uid, { numeroPartida: v })}
+          onChange={(v) => updateLote(lote.uid, { numeroPartida: v.replace(/[^0-9/]/g, "").slice(0, 10) })}
           maxLength={10}
         />
 
-        <EntitySearchInput
-          label="Laboratório"
-          placeholder="Buscar laboratório..."
-          required
-          value={lote.laboratorio ? lote.laboratorio.nome : ""}
-          data={LABORATORIOS_MOCK}
-          searchKeys={["nome"]}
-          columns={[{ label: "Nome do Laboratório", key: "nome" }]}
-          icon={<FlaskConical size={18} color={GREEN} />}
-          title="Buscar Laboratório"
-          subtitle="Busque por um laboratório cadastrado:"
-          onChange={(ent) => updateLote(lote.uid, { laboratorio: ent })}
-        />
+        {fornecedorEhLaboratorio ? (
+          <FloatInput
+            label="Laboratório (fornecedor)"
+            required
+            disabled
+            value={fornecedor?.nome || lote.laboratorio?.nome || ""}
+            onChange={() => {}}
+            icon={<FlaskConical size={18} />}
+          />
+        ) : (
+          <EntitySearchInput
+            label="Laboratório"
+            placeholder="Buscar laboratório..."
+            required
+            value={lote.laboratorio ? lote.laboratorio.nome : ""}
+            data={LABORATORIOS_MOCK}
+            searchKeys={["nome"]}
+            columns={[{ label: "Nome do Laboratório", key: "nome" }]}
+            icon={<FlaskConical size={18} color={GREEN} />}
+            title="Buscar Laboratório"
+            subtitle="Busque por um laboratório cadastrado:"
+            onChange={(ent) => updateLote(lote.uid, { laboratorio: ent })}
+          />
+        )}
       </div>
 
       {/* Grid contendo Doença, Tipo de Vacina (se houver) e Validade alinhados */}
@@ -149,12 +162,14 @@ export function LoteCardItem({
           icon={<Calendar size={18} />}
           type="month"
           placeholder="mm/aaaa"
+          min={MES_ATUAL}
           value={lote.validade || ""}
           onChange={(v) => updateLote(lote.uid, { validade: v })}
         />
         <EntitySearchInput
           label="Doença"
           placeholder="Buscar doença..."
+          required
           value={lote.doenca ? lote.doenca.nome : ""}
           data={DOENCAS_MOCK}
           searchKeys={["nome"]}
@@ -168,6 +183,7 @@ export function LoteCardItem({
         {doencaTemTipo ? (
           <FloatSelect
             label="Tipo de Vacina"
+            required
             value={lote.tipoVacina}
             onChange={(v) => updateLote(lote.uid, { tipoVacina: v })}
             options={lote.doenca.tiposVacina.map((t: string) => ({ value: t, label: t }))}
@@ -243,6 +259,8 @@ export function AdicionarVendaComEntradaVacinaPage({ onLogout, onNavigate, mode 
   const [fornecedor, setFornecedor] = useState<any | null>(dados?.fornecedorEntidade ?? (dados?.fornecedor ? { codigo: `FOR-${dados.id ?? "001"}`, nome: dados.fornecedor, tipo: "Laboratório" } : preenchendoRegistro ? { codigo: "FOR-001", nome: "Laboratório BioMed", tipo: "Laboratório" } : null));
   const [numeroNotaFiscal, setNumeroNotaFiscal] = useState(dados?.numeroNotaFiscal ?? "");
   const [ufNotaFiscal, setUfNotaFiscal] = useState(dados?.ufNotaFiscal ?? (preenchendoRegistro ? "MG" : ""));
+  const [dataNotaFiscal, setDataNotaFiscal] = useState(dados?.dataNotaFiscal ?? (preenchendoRegistro ? "2026-08-01" : ""));
+  const [situacao, setSituacao] = useState<"Gravada" | "Cancelada">(dados?.situacao ?? "Gravada");
   const [lotes, setLotes] = useState<any[]>(dados?.lotes?.length
     ? dados.lotes
     : dados?.numeroPartida
@@ -300,6 +318,8 @@ export function AdicionarVendaComEntradaVacinaPage({ onLogout, onNavigate, mode 
     fornecedor: fornecedor?.nome,
     numeroNotaFiscal,
     ufNotaFiscal,
+    dataNotaFiscal,
+    situacao,
     lotes,
   }, {
     id: "venda-entrada-exemplo",
@@ -310,6 +330,8 @@ export function AdicionarVendaComEntradaVacinaPage({ onLogout, onNavigate, mode 
     fornecedor: "Laboratório BioMed",
     numeroNotaFiscal: "1234567",
     ufNotaFiscal: "MG",
+    dataNotaFiscal: "2026-08-01",
+    situacao: "Gravada",
     lotes: [{
       uid: "lote-exemplo", numeroPartida: "0013225/24", laboratorio: { id: 1, nome: "Laboratório Biovet" },
       doenca: { id: 1, nome: "Brucelose", tiposVacina: ["B19", "RB51"] }, tipoVacina: "B19", validade: "2026-12",
@@ -341,6 +363,7 @@ export function AdicionarVendaComEntradaVacinaPage({ onLogout, onNavigate, mode 
             </p>
           </div>
 
+          <div className={`flex flex-col gap-6 ${mode === "edit" ? "pointer-events-none opacity-75" : ""}`}>
           <Section title="Emitente">
             <div className="flex flex-col gap-3">
               <FornecedorVacinaInput
@@ -372,7 +395,7 @@ export function AdicionarVendaComEntradaVacinaPage({ onLogout, onNavigate, mode 
 
           <Section title="Nota Fiscal">
             <div className="flex flex-col gap-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                 <FloatInput
                   label="Número da Nota Fiscal"
                   required
@@ -381,6 +404,15 @@ export function AdicionarVendaComEntradaVacinaPage({ onLogout, onNavigate, mode 
                   onChange={(v) => setNumeroNotaFiscal(v.replace(/\D/g, "").slice(0, 10))}
                 />
                 <FloatCombobox label="UF da Nota Fiscal" required value={ufNotaFiscal} onChange={setUfNotaFiscal} options={ESTADOS_BR} />
+                <FloatInput
+                  label="Data da Nota Fiscal"
+                  required
+                  type="date"
+                  max={HOJE}
+                  icon={<Calendar size={18} />}
+                  value={dataNotaFiscal}
+                  onChange={setDataNotaFiscal}
+                />
               </div>
 
               <DynamicListWrapper
@@ -422,6 +454,22 @@ export function AdicionarVendaComEntradaVacinaPage({ onLogout, onNavigate, mode 
                   </div>
                 )}
               </SubGrupo>
+            </div>
+          </Section>
+          </div>
+
+          <Section title="Situação do cadastro">
+            <div className="max-w-sm">
+              <FloatSelect
+                label="Situação"
+                value={situacao}
+                onChange={(v) => setSituacao(v as "Gravada" | "Cancelada")}
+                options={[{ value: "Gravada", label: "Gravada" }, { value: "Cancelada", label: "Cancelada" }]}
+                disabled={mode === "view" || mode === "create"}
+              />
+              {mode === "edit" && situacao === "Cancelada" && (
+                <p className="mt-2 text-xs text-amber-700">O cancelamento é irreversível e só pode ser realizado se não houver venda posterior.</p>
+              )}
             </div>
           </Section>
         </div>

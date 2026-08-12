@@ -363,6 +363,7 @@ export function LoteCardItem({
 				<EntitySearchInput
 					label="Doença"
 					placeholder="Buscar doença..."
+					required
 					value={lote.doenca ? lote.doenca.nome : ""}
 					data={DOENCAS_MOCK}
 					searchKeys={["nome"]}
@@ -388,6 +389,7 @@ export function LoteCardItem({
 							label: item.name,
 						}))}
 						value={lote.tipoInsumoExame || ""}
+						required
 						onChange={(v) => updateLote(lote.uid, { tipoInsumoExame: v })}
 					/>
 				)}
@@ -480,6 +482,7 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
 	const [numeroNotaFiscal, setNumeroNotaFiscal] = useState("");
 	const [ufNotaFiscal, setUfNotaFiscal] = useState("");
 	const [dataVenda, setDataVenda] = useState("");
+	const [dataNotaFiscal, setDataNotaFiscal] = useState("");
 	const [lotes, setLotes] = useState<any[]>([novoLote()]);
 	const [isSucesso, setIsSucesso] = useState(false);
 
@@ -548,7 +551,7 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
 	const totaisPorDoenca = useMemo(() => {
 		const map = new Map<string, { doenca: string; tipoInsumo: string; total: number }>();
 		lotes.forEach((l) => {
-			const nome = l.doenca?.nome;
+			const nome = l.tipoInsumoExame;
 			if (!nome) return;
 			const tipoInsumo = obterNomeTipoInsumoExame(l.tipoInsumoExame || "");
 			const chave = `${nome}::${tipoInsumo}`;
@@ -561,6 +564,7 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
 			map.set(chave, { doenca: nome, tipoInsumo, total: (atual?.total || 0) + totalLote });
 		});
 		return Array.from(map.values());
+		return Array.from(map, ([tipoInsumo, total]) => ({ tipoInsumo, total }));
 		}, [lotes]);
 	const vendaCadastrada = {
 		fornecedor,
@@ -569,6 +573,7 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
 		numeroNotaFiscal,
 		ufNotaFiscal,
 		dataVenda,
+		dataNotaFiscal,
 		lotes,
 	};
 
@@ -635,8 +640,8 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
 											"Por favor, digite ou selecione um fornecedor primeiro.",
 										);
 								}}
-							/>
-						</div>
+									/>
+							</div>
 					</Section>
 					<Section title="Destinatário">
 						<div className="flex flex-col gap-3">
@@ -652,6 +657,22 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
 								}}
 							/>
 						</div>
+						<div
+							className={`grid grid-cols-1 gap-4`}>
+							<div className="flex flex-col gap-3">
+									<RevendedoraInput
+										value={revendedora ? revendedora.codigo : ""}
+										required
+										onChange={(entidadeSelecionada) => setRevendedora(entidadeSelecionada)}
+										onEyeClick={() => {
+											if (revendedora?.codigo)
+												alert(`Visualizar detalhes: ${revendedora.codigo}`);
+											else
+												alert("Por favor, digite ou selecione uma revendedora primeiro.");
+										}}
+									/>
+							</div>
+					</div>
 					</Section>
 					<Section title="Nota Fiscal">
 						<div className="flex flex-col gap-6">
@@ -680,6 +701,13 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
 									hideNativeDateIcon
 									value={dataVenda}
 									onChange={setDataVenda}
+									label="Data da Nota Fiscal"
+									required
+									type="date"
+									max={new Date().toISOString().slice(0, 10)}
+									icon={<Calendar size={18} />}
+									value={dataNotaFiscal}
+									onChange={setDataNotaFiscal}
 								/>
 							</div>
 
@@ -717,10 +745,12 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
 											<div
 											key={`${t.doenca}-${t.tipoInsumo}`}
 											className={`grid grid-cols-1 gap-4 items-end ${t.tipoInsumo ? "md:grid-cols-3" : "md:grid-cols-2"}`}>
+																		key={t.tipoInsumo}
+												className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
 												<FloatInput
-													label="Doença"
-													disabled
-													value={t.doenca}
+																		label="Tipo de Insumo"
+																		disabled
+																		value={t.tipoInsumo}
 													onChange={() => { }}
 												/>
 												{t.tipoInsumo && (

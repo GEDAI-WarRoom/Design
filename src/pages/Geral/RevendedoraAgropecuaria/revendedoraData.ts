@@ -166,10 +166,61 @@ const REVENDEDORAS_INICIAIS: Revendedora[] = [
     endereco: { ...enderecoLavras, municipio: "Varginha", localidade: "Varginha", cep: "37002-000" },
     profissionais: [],
   },
+  {
+    id: 3,
+    codigo: "3100000003",
+    nome: "Cooperativa Campo Mineiro",
+    proprietarios: ["98.765.432/0001-10 - Cooperativa Campo Mineiro"],
+    responsaveis: ["444.009.956-40 - Eloiza Silva"],
+    funcionarios: [],
+    areaAtuacao: ["Animal"],
+    atuacoes: ["Revendedora de Vacinas sob Controle Oficial"],
+    registroAnimal: "124556455",
+    atuacoesAnimal: ["Revendedora de Vacinas sob Controle Oficial"],
+    registroVegetal: "",
+    renasem: "",
+    atuacoesVegetal: [],
+    municipio: "Oliveira",
+    uf: "MG",
+    estado: "Minas Gerais",
+    situacao: "Ativo",
+    endereco: { ...enderecoLavras, municipio: "Oliveira", localidade: "Oliveira", cep: "35540-000" },
+    profissionais: [
+      { id: "prof-5", tipo: "Responsável Técnico Animal", nome: "Eloiza Silva", documento: "444.009.956-40", dataArt: "2026-01-15", arquivoArt: "art-eloiza-cooperativa.pdf", situacao: "Ativo", atualizadoEm: "2026-07-15" },
+    ],
+  },
+  {
+    id: 4,
+    codigo: "3100000004",
+    nome: "Agropecuária Serra Azul",
+    proprietarios: ["45.678.901/0001-22 - Agropecuária Serra Azul Ltda"],
+    responsaveis: ["444.009.956-40 - Eloiza Silva"],
+    funcionarios: [],
+    areaAtuacao: ["Animal"],
+    atuacoes: ["Revendedora de Vacinas sob Controle Oficial"],
+    registroAnimal: "124556456",
+    atuacoesAnimal: ["Revendedora de Vacinas sob Controle Oficial"],
+    registroVegetal: "",
+    renasem: "",
+    atuacoesVegetal: [],
+    municipio: "Belo Horizonte",
+    uf: "MG",
+    estado: "Minas Gerais",
+    situacao: "Ativo",
+    endereco: { ...enderecoLavras, municipio: "Belo Horizonte", localidade: "Belo Horizonte", cep: "30130-100" },
+    profissionais: [
+      { id: "prof-6", tipo: "Responsável Técnico Animal", nome: "Eloiza Silva", documento: "444.009.956-40", dataArt: "2026-02-10", arquivoArt: "art-eloiza-serra-azul.pdf", situacao: "Ativo", atualizadoEm: "2026-07-22" },
+    ],
+  },
 ];
 
 function listarRevendedoras() {
-  return listarColecaoMock(COLECAO, REVENDEDORAS_INICIAIS);
+  const registros = listarColecaoMock(COLECAO, REVENDEDORAS_INICIAIS);
+  const faltantes = REVENDEDORAS_INICIAIS.filter((item) => !registros.some((registro) => registro.id === item.id));
+  if (!faltantes.length) return registros;
+  const atualizados = [...registros, ...faltantes];
+  salvarColecaoMock(COLECAO, atualizados);
+  return atualizados;
 }
 
 function formatarProfissional(item: ProfissionalVinculado) {

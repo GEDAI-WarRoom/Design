@@ -41,10 +41,12 @@ const SITUACOES = [
   { value: "Cancelada", label: "Cancelada" },
 ];
 
-const TIPOS_DESTINATARIOS = [
-  { value: "REVENDEDORA", label: "Revendedora de Produtos Agropecuários" },
-  { value: "MEDICO_VETERINARIO", label: "Médico Veterinário" },
-];
+const TIPOS_INSUMOS = [
+  "Antígeno Acidificado Tamponado (AAT)", "Teste do Anel em Leite (TAL)", "2-Mercaptoetanol (2-ME)",
+  "Fixação de Complemento (FC)", "Antígeno para Teste de Polarização Fluorescente (FPA)",
+  "Tuberculina PPD Bovina", "Tuberculina PPD Aviária", "Antígeno para IDGA (Imunodifusão em Gel de Ágar)",
+  "Kits / Antígenos para ELISA", "Maleína PPD", "Conjugado Antirrábico para Imunofluorescência Direta (IFD)",
+].map((value) => ({ value, label: value }));
 
 interface VendaEntrada {
   id: number;
@@ -116,7 +118,7 @@ export function VendaComEntradaInsumosExamesPage({
 }: PageProps) {
   // Estados dos Filtros
   const [fornecedor, setFornecedor] = useState<any | null>(null);
-  const [tipoDestinatario, setTipoDestinatario] = useState("");
+  const [tipoInsumo, setTipoInsumo] = useState("");
   const [destinatario, setDestinatario] = useState<any | null>(null);
   const [numeroNotaFiscal, setNumeroNotaFiscal] = useState("");
   const [numeroPartida, setNumeroPartida] = useState("");
@@ -130,11 +132,11 @@ export function VendaComEntradaInsumosExamesPage({
 
   const algumFiltroPreenchido =
     !!fornecedor ||
-    !!tipoDestinatario ||
     !!destinatario ||
     numeroNotaFiscal !== "" ||
     numeroPartida !== "" ||
     !!doenca ||
+    tipoInsumo !== "" ||
     situacao !== "";
 
   const handlePesquisar = () => {
@@ -155,13 +157,11 @@ export function VendaComEntradaInsumosExamesPage({
   // Lógica de Filtragem dos Dados
   const filtrados = VENDAS_MOCK.filter((v) => {
     const matchFornecedor = !fornecedor || v.fornecedor === fornecedor.nome;
-    const matchDestinatario =
-      !destinatario ||
-      v.revendedoraCodigo === destinatario.codigo ||
-      v.revendedoraNome === destinatario.nome;
+    const matchDestinatario = !destinatario || v.revendedoraCodigo === destinatario.codigo || v.revendedoraNome === destinatario.nome;
     const matchNF = numeroNotaFiscal === "" || v.numeroNotaFiscal.includes(numeroNotaFiscal);
     const matchPartida = numeroPartida === "" || v.numeroPartida.includes(numeroPartida);
     const matchDoenca = !doenca || v.doenca === doenca.nome;
+    const matchTipoInsumo = !tipoInsumo || v.tipoInsumo === tipoInsumo;
     const matchSituacao = situacao === "" || v.situacao === situacao;
 
     return (
@@ -170,6 +170,7 @@ export function VendaComEntradaInsumosExamesPage({
       matchNF &&
       matchPartida &&
       matchDoenca &&
+      matchTipoInsumo &&
       matchSituacao
     );
   });
@@ -245,21 +246,8 @@ export function VendaComEntradaInsumosExamesPage({
                 }}
               />
 
-              {/* 2. Tipo de Destinatário */}
-              <FloatSelect
-                label="Tipo de Destinatário"
-                value={tipoDestinatario}
-                onChange={(val) => {
-                  setTipoDestinatario(val);
-                  setDestinatario(null); // Limpa o destinatário anterior ao mudar de tipo
-                  limparErro();
-                }}
-                options={TIPOS_DESTINATARIOS}
-              />
-
-              {/* 3. Destinatário Condicional (Revendedora ou Médico Veterinário) */}
-              {tipoDestinatario === "REVENDEDORA" ? (
-                <EntitySearchInput
+              {/* 2. Revendedora de Produtos Agropecuários */}
+              <EntitySearchInput
                   label="Revendedora de Insumos"
                   placeholder="Buscar por código ou nome."
                   value={destinatario ? destinatario.nome : ""}
@@ -279,27 +267,6 @@ export function VendaComEntradaInsumosExamesPage({
                     limparErro();
                   }}
                 />
-              ) : tipoDestinatario === "MEDICO_VETERINARIO" ? (
-                <EntitySearchInput
-                  label="Médico Veterinário"
-                  placeholder="Buscar por CPF ou nome."
-                  value={destinatario ? destinatario.nome : ""}
-                  data={MEDICOS_VETERINARIOS_MOCK}
-                  searchKeys={["codigo", "nome"]}
-                  columns={[
-                    { label: "CPF", key: "codigo" },
-                    { label: "Nome", key: "nome" },
-                  ]}
-                  icon={<img src={Icons.iconeProfissionalAnimalUrl} alt="Médico Veterinário" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}
-                  title="Buscar Médico Veterinário"
-                  subtitle="Busque por médicos veterinários cadastrados:"
-                  confirmLabel="Selecionar"
-                  onChange={(item) => {
-                    setDestinatario(item);
-                    limparErro();
-                  }}
-                />
-              ) : null}
 
               {/* 4. Número da Nota Fiscal */}
               <FloatInput
@@ -346,6 +313,13 @@ export function VendaComEntradaInsumosExamesPage({
                 }}
               />
 
+              <FloatSelect
+                label="Tipo de Insumo"
+                value={tipoInsumo}
+                onChange={(val) => { setTipoInsumo(val); limparErro(); }}
+                options={TIPOS_INSUMOS}
+              />
+
               {/* 7. Situação */}
               <FloatSelect
                 label="Situação"
@@ -361,7 +335,7 @@ export function VendaComEntradaInsumosExamesPage({
               <button
                 type="button"
                 onClick={handlePesquisar}
-                className={`${tipoDestinatario ? "md:col-span-1" : "md:col-span-2"} w-full h-12 px-5 rounded-md text-white text-sm font-semibold transition hover:opacity-90 flex items-center justify-center flex-shrink-0`}
+                className="md:col-span-1 w-full h-12 px-5 rounded-md text-white text-sm font-semibold transition hover:opacity-90 flex items-center justify-center flex-shrink-0"
                 style={{ backgroundColor: GREEN }}
               >
                 Pesquisar
@@ -376,13 +350,10 @@ export function VendaComEntradaInsumosExamesPage({
             )}
 
             {/* Chips dos Filtros Ativos */}
-            {(fornecedor || tipoDestinatario || destinatario || numeroNotaFiscal || numeroPartida || doenca || situacao) && (
+            {(fornecedor || destinatario || numeroNotaFiscal || numeroPartida || doenca || tipoInsumo || situacao) && (
               <div className="flex flex-wrap gap-2 mt-4 animate-fadeIn">
                 {fornecedor && (
                   <Chip label={`Fornecedor: ${fornecedor.nome}`} onRemove={() => setFornecedor(null)} />
-                )}
-                {tipoDestinatario && (
-                  <Chip label={`Tipo: ${TIPOS_DESTINATARIOS.find((t) => t.value === tipoDestinatario)?.label}`} onRemove={() => { setTipoDestinatario(""); setDestinatario(null); }} />
                 )}
                 {destinatario && (
                   <Chip label={`Destinatário: ${destinatario.nome}`} onRemove={() => setDestinatario(null)} />
@@ -396,6 +367,7 @@ export function VendaComEntradaInsumosExamesPage({
                 {doenca && (
                   <Chip label={`Doença: ${doenca.nome}`} onRemove={() => setDoenca(null)} />
                 )}
+                {tipoInsumo && <Chip label={`Tipo de Insumo: ${tipoInsumo}`} onRemove={() => setTipoInsumo("")} />}
                 {situacao && (
                   <Chip label={`Situação: ${situacao}`} onRemove={() => setSituacao("")} />
                 )}
@@ -439,6 +411,17 @@ export function VendaComEntradaInsumosExamesPage({
                         </th>
                         <th className="w-[22%] text-left px-3 py-3 font-semibold text-gray-600 whitespace-normal uppercase text-[11px] leading-tight tracking-wider">
                           Insumo - Doença
+                        <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap uppercase text-xs tracking-wider">
+                          Revendedora de Produtos Agropecuários
+                        </th>
+                        <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap uppercase text-xs tracking-wider">
+                          Número da <br /> Nota Fiscal
+                        </th>
+                        <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap uppercase text-xs tracking-wider">
+                          Número da <br /> Partida
+                        </th>
+                        <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap uppercase text-xs tracking-wider">
+                          Tipo de Insumo
                         </th>
                         <th className="w-[10%] text-left px-3 py-3 font-semibold text-gray-600 whitespace-normal uppercase text-[11px] leading-tight tracking-wider">
                           Situação
@@ -455,6 +438,8 @@ export function VendaComEntradaInsumosExamesPage({
                             </span>
                           </td>
                           <td className="break-words px-3 py-3">
+                          <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{v.fornecedor}</td>
+                          <td className="px-4 py-3 whitespace-nowrap">
                             <div className="flex flex-col">
                               <span className="text-xs text-gray-500 ">
                                 {v.revendedoraCodigo}
@@ -472,6 +457,8 @@ export function VendaComEntradaInsumosExamesPage({
                           </td>
                           <td className="break-words px-3 py-3 text-gray-500">
                             {v.tipoInsumo} - {v.doenca}
+                          <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
+                            {v.tipoInsumo}
                           </td>
                           <td className="break-words px-3 py-3 text-gray-500">
                             {v.situacao}

@@ -3,6 +3,8 @@ import {
   ArrowLeft,
   ChevronLeft,
   ChevronRight,
+  Mail,
+  Search,
   X,
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
@@ -230,7 +232,65 @@ export function NotificacoesEstabelecimentosPage({
   const [pesquisaRealizada, setPesquisaRealizada] = useState(false);
   const [erroAno, setErroAno] = useState(false);
   const [paginaAtual, setPaginaAtual] = useState(1);
+  const [busca, setBusca] = useState("");
   const itensPorPagina = 10;
+
+  const notificacoesDaTela = [
+    { id: 1, titulo: "Cadastro de Estabelecimento Agropecuário", descricao: "Solicitação de aprovação do cadastro do Estabelecimento Agropecuário Fazenda Rio Preto.", data: "18/02/2025 12:32", nova: true },
+    { id: 2, titulo: "Cadastro de Agroindústria Vegetal", descricao: "Solicitação de aprovação de vinculação do estabelecimento no cadastro da Agroindústria Vegetal da Fazenda Rio Preto.", data: "18/02/2025 12:32", nova: true },
+    { id: 3, titulo: "Cadastro de Estabelecimento Agropecuário", descricao: "Solicitação de aprovação de edição do Estabelecimento Agropecuário Fazenda Rio Preto.", data: "18/02/2025 12:32", nova: false },
+  ].filter((notificacao) => `${notificacao.titulo} ${notificacao.descricao}`.toLowerCase().includes(busca.toLowerCase()));
+
+  return (
+    <div className="min-h-screen bg-[#f2f3f5]">
+      <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="notificacoes-estabelecimentos" hideSearch />
+
+      <main className="mx-auto max-w-[980px] px-4 py-6 md:px-6">
+        <button type="button" onClick={() => onNavigate("dashboard")} className="mb-3 flex items-center gap-1 text-sm font-semibold text-[#1A7A3C] transition hover:opacity-70">
+          <ArrowLeft size={15} /> Inicial
+        </button>
+
+        <section className="rounded-2xl bg-white p-5 shadow-sm md:p-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-3">
+              <h1 className="text-xl font-semibold text-gray-900">Notificações</h1>
+              <span className="rounded-full bg-[#1A7A3C] px-2.5 py-1 text-[11px] font-semibold text-white">02 novas</span>
+            </div>
+            <div className="relative w-full sm:w-60">
+              <input value={busca} onChange={(event) => setBusca(event.target.value)} placeholder="Pesquisar Notificação" className="h-10 w-full rounded-md border border-gray-200 py-2 pl-3 pr-9 text-xs text-gray-700 outline-none transition focus:border-[#1A7A3C] focus:ring-1 focus:ring-[#1A7A3C]" />
+              <Search size={15} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300" />
+            </div>
+          </div>
+
+          <div className="mt-6 flex items-center justify-between text-xs text-gray-500">
+            <label className="flex items-center gap-2"><input type="checkbox" className="h-4 w-4 rounded border-gray-200 accent-[#1A7A3C]" /> Selecionar Todas</label>
+            <span className="flex items-center gap-3">1 de 1 <ChevronLeft size={15} className="text-[#1A7A3C]" /><ChevronRight size={15} className="text-[#1A7A3C]" /></span>
+          </div>
+
+          <div className="mt-5 space-y-2">
+            {notificacoesDaTela.length ? notificacoesDaTela.map((notificacao) => (
+              <article key={notificacao.id} className="rounded-lg border border-gray-200 px-3 py-3 transition hover:bg-gray-50">
+                <div className="flex gap-3">
+                  <input type="checkbox" className="mt-1 h-4 w-4 rounded border-gray-200 accent-[#1A7A3C]" aria-label={`Selecionar ${notificacao.titulo}`} />
+                  <Mail size={18} className="mt-0.5 flex-shrink-0 text-[#1A7A3C]" />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                      <h2 className="text-xs font-semibold text-gray-800">{notificacao.titulo}</h2>
+                      <span className="text-[10px] text-gray-500">{notificacao.data}</span>
+                    </div>
+                    <div className="mt-2 flex items-end justify-between gap-3">
+                      <p className="text-[10px] leading-relaxed text-gray-600">{notificacao.descricao}</p>
+                      <button type="button" onClick={() => onNavigate("dashboard")} className="flex-shrink-0 text-xs font-semibold text-[#1A7A3C] hover:underline">Visualizar</button>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            )) : <p className="py-10 text-center text-sm text-gray-500">Nenhuma notificação encontrada.</p>}
+          </div>
+        </section>
+      </main>
+    </div>
+  );
 
   const resultados = useMemo(
     () =>

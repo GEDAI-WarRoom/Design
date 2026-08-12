@@ -165,7 +165,7 @@ export function MeuPerfilPage({ onLogout, onNavigate }: MeuPerfilPageProps) {
       ? fotoAdministradorExemploUrl
       : role === "veterinario"
         ? fotoVeterinariaExemploUrl
-        : role === "lider-estabelecimento"
+        : role === "responsavel-agroindustria-integradora"
           ? fotoLiderEstabelecimentoExemploUrl
           : null;
   const perfilAlterado =

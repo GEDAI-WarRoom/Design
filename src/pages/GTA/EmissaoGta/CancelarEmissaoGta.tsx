@@ -33,10 +33,11 @@ export function CancelarEmissaoGtaPage({
 
   if (!emissao) return null;
   const cancelada = emissao.situacao === "Cancelada";
+  const bloqueada = cancelada || emissao.situacao === "Transitada";
 
   const cancelar = () => {
     setTentouCancelar(true);
-    if (!motivo || cancelada) return;
+    if (!motivo || bloqueada) return;
     const atualizada = cancelarEmissaoGta(emissao.id, motivo, observacao);
     if (!atualizada) return;
     setEmissao({ ...atualizada });
@@ -65,7 +66,7 @@ export function CancelarEmissaoGtaPage({
             <h1 className="text-2xl font-semibold text-gray-900">
               Cancelar GTA
             </h1>
-            {!cancelada && (
+            {!bloqueada && (
               <button
                 type="button"
                 onClick={cancelar}

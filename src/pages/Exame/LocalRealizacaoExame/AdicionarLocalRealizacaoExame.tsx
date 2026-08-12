@@ -22,6 +22,7 @@ interface PageProps {
 }
 
 const criarEstadoInicial = (): LocalRealizacaoExameFormValue => ({
+  ehComercial: "",
   proprietarios: [criarProprietarioVazio()],
   localizadoEmEstabelecimento: "",
   estabelecimento: null,
@@ -62,6 +63,7 @@ export function AdicionarLocalRealizacaoExamePage({ onLogout, onNavigate }: Page
         endereco: form.endereco,
         veterinarios: form.veterinarios,
         situacao: "Ativo",
+        ehComercial: form.ehComercial === true,
       });
       setErro("");
       setRegistroSalvo(criado);

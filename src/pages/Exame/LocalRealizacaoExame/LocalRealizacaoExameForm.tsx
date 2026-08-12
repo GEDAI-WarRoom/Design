@@ -10,6 +10,7 @@ import {
 import * as Icons from "../../../imports/icons";
 import {
   listarVeterinariosHabilitados,
+  PROPRIETARIOS_LOCAL_EXAME,
   SITUACOES_LOCAL_EXAME,
   type EnderecoLocalExame,
   type EstabelecimentoLocalExame,
@@ -53,6 +54,7 @@ export interface ProprietarioFormItem {
 }
 
 export interface LocalRealizacaoExameFormValue {
+  ehComercial: boolean | "";
   proprietarios: ProprietarioFormItem[];
   localizadoEmEstabelecimento: boolean | "";
   estabelecimento: EstabelecimentoLocalExame | null;
@@ -144,14 +146,16 @@ export function LocalRealizacaoExameForm({
     <>
       <Section title="Informações Básicas">
         <div className="flex flex-col gap-5">
-          <div>
-            <h3 className="text-sm font-semibold text-gray-700 mb-4">Proprietários</h3>
+          {isView && <div className="grid grid-cols-1 md:grid-cols-2 gap-4"><FloatInput label="Código" value={codigo ?? ""} disabled /><FloatInput label="Situação" value={value.situacao} disabled /></div>}
+          {isView ? <FloatInput label="É um local comercial?" value={value.ehComercial ? "Sim" : "Não"} disabled /> : <SimNao label="É um local comercial?" name="local-comercial" required value={value.ehComercial} onChange={(ehComercial) => onChange({ ...value, ehComercial })} />}
+          {mode === "edit" && <FloatSelect label="Situação" value={value.situacao} onChange={(situacao) => onChange({ ...value, situacao: situacao as SituacaoLocalExame })} options={SITUACOES_LOCAL_EXAME} />}
+          {value.ehComercial && <div>
             {isView ? (
               <div className="flex flex-col gap-4">
                 {value.proprietarios.map((item, index) => (
                   <div key={item.uid} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FloatInput label={`Proprietário ${index + 1}`} value={item.entidade?.nome ?? ""} disabled />
-                    <FloatInput label="CPF/CNPJ" value={item.entidade?.documento ?? ""} disabled />
+                    <FloatInput label="Razão Social" value={item.entidade?.nome ?? ""} disabled />
+                    <FloatInput label="CNPJ" value={item.entidade?.documento ?? ""} disabled />
                   </div>
                 ))}
               </div>
@@ -159,8 +163,8 @@ export function LocalRealizacaoExameForm({
               <DynamicListWrapper
                 items={value.proprietarios}
                 behavior="at-least-one"
-                addButtonLabel="Adicionar Proprietário"
-                itemLabel="Proprietário"
+                addButtonLabel="Adicionar Pessoa Jurídica"
+                itemLabel="CNPJ"
                 variant="plain"
                 onAddItem={() => onChange({
                   ...value,
@@ -174,6 +178,8 @@ export function LocalRealizacaoExameForm({
                 {(item: ProprietarioFormItem, index: number) => (
                   <ProprietarioInput
                     value={item.entidade?.nome ?? ""}
+                    label="Pessoa Jurídica"
+                    data={PROPRIETARIOS_LOCAL_EXAME.filter((entidade) => entidade.tipo === "PJ")}
                     required
                     onChange={(entidade) => onChange({
                       ...value,
@@ -185,7 +191,7 @@ export function LocalRealizacaoExameForm({
                 )}
               </DynamicListWrapper>
             )}
-          </div>
+          </div>}
         </div>
       </Section>
 
