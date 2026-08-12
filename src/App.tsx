@@ -143,6 +143,7 @@ import { VisualizarPassaporteEquestrePage } from "./pages/Animal/PassaporteEques
 import { PrevisaoMigracaoDetalhePage } from "./pages/Animal/PrevisaoMigracao/PrevisaoMigracaoDetalhe";
 import { AdicionarProfissionalAnimalPage } from "./pages/Animal/ProfissionalAnimal/AdicionarProfissionalAnimal";
 import { ProfissionalAnimalPage } from "./pages/Animal/ProfissionalAnimal/ProfissionalAnimal";
+import { EditarProfissionalAnimalPage, VisualizarProfissionalAnimalPage } from "./pages/Animal/ProfissionalAnimal/ProfissionalAnimalDetalhe";
 import { AdicionarPromotoraEventosPage } from "./pages/Animal/PromotoraEventos/AdicionarPromotoraEventos";
 import { PromotoraEventosPage } from "./pages/Animal/PromotoraEventos/PromotoraEventos";
 import { EditarPromotoraEventosPage } from "./pages/Animal/PromotoraEventos/EditarPromotoraEventos";
@@ -517,6 +518,8 @@ export type Screen =
   | "visualizar-integradora-cooperativa"
   | "profissional-animal"
   | "adicionar-profissional-animal"
+  | "visualizar-profissional-area-animal"
+  | "editar-profissional-area-animal"
   | "promotora-eventos"
   | "adicionar-promotora-eventos"
   | "revendedora-animais"
@@ -729,6 +732,8 @@ export type Screen =
 	| "editar-integradora-cooperativa"
 	| "profissional-animal"
 	| "adicionar-profissional-animal"
+	| "visualizar-profissional-area-animal"
+	| "editar-profissional-area-animal"
 	| "promotora-eventos"
 	| "adicionar-promotora-eventos"
 	| "editar-promotora-eventos"
@@ -2055,6 +2060,12 @@ export default function App() {
 					onNavigate={handleNavigate}
 				/>
 			);
+
+		case "visualizar-profissional-area-animal":
+			return <VisualizarProfissionalAnimalPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+
+		case "editar-profissional-area-animal":
+			return <EditarProfissionalAnimalPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
 
 		case "promotora-eventos":
 			return (
