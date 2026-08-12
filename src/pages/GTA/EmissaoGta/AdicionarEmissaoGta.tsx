@@ -5,7 +5,6 @@ import { useDemoUser } from "../../../contexts/DemoUserContext";
 import {
   EmissaoGtaForm,
   RequiredFieldsNotice,
-  emissaoGtaValida,
 } from "./EmissaoGtaForm";
 import {
   adicionarEmissaoGta,
@@ -25,7 +24,7 @@ export function AdicionarEmissaoGtaPage({
   onLogout: () => void;
   onNavigate: (screen: any, data?: any) => void;
 }) {
-  const { user, role } = useDemoUser();
+  const { user } = useDemoUser();
   const [emissao, setEmissao] = useState<EmissaoGtaFormValue>(
     () => {
       if (dados) return dados;
@@ -47,8 +46,6 @@ export function AdicionarEmissaoGtaPage({
   const registroEmEdicao = dados && "id" in dados ? dados as EmissaoGta : null;
 
   const salvar = () => {
-    setTentouSalvar(true);
-    if (!emissaoGtaValida(emissao, role === "admin")) return;
     setEmissaoSalva(
       registroEmEdicao
         ? atualizarEmissaoGta(registroEmEdicao.id, emissao)

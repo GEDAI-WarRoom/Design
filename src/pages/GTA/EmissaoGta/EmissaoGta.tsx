@@ -2,7 +2,6 @@ import { useMemo, useState, type ReactNode } from "react";
 import {
   ArrowLeft,
   ArrowRight,
-  Building2,
   Calendar,
   CalendarDays,
   ChevronDown,
@@ -17,7 +16,6 @@ import {
   Factory,
   FileCheck2,
   FileDown,
-  Landmark,
   Plane,
   Pencil,
   Search,
@@ -25,7 +23,6 @@ import {
   Store,
   Truck,
   User,
-  TowerControl,
   Warehouse,
   X,
 } from "lucide-react";
@@ -59,6 +56,7 @@ import {
   type TipoLocalGta,
 } from "./emissaoGtaData";
 import * as Icons from "../../../imports/icons";
+import { LocalGtaIcon } from "./LocalGtaIcon";
 
 type SortKey =
   | "serieNumero"
@@ -220,7 +218,7 @@ function LocalFilters({
             label="Estabelecimento Genérico"
             value={local.aeroporto}
             data={AEROPORTOS_GTA}
-            icon={local.tipo === "Unidade de Vigilância Agropecuária" ? <TowerControl size={20} /> : <Building2 size={20} />}
+            icon={<LocalGtaIcon tipo={local.tipo} size={20} />}
             onChange={(aeroporto) => update({ aeroporto })}
           />
         )}
@@ -229,7 +227,7 @@ function LocalFilters({
             label={local.tipo}
             value={local.outroLocal}
             data={OUTROS_LOCAIS_GTA[local.tipo]}
-            icon={<Building2 size={20} />}
+            icon={<LocalGtaIcon tipo={local.tipo} size={20} />}
             onChange={(outroLocal) => update({ outroLocal })}
           />
         )}

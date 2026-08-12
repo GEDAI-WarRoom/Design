@@ -28,7 +28,6 @@ import {
   copiarEmissaoGta,
   dataPadraoValidade,
   emitirEmissaoGta,
-  estenderValidadeEmissaoGta,
   formatarDataGta,
   formatarMoedaGta,
   frigorificoAderidoAoFundo,
@@ -258,13 +257,14 @@ export function VisualizarEmissaoGtaPage({
 
   // Regras de exibição das opções do menu
   const aguardaGeracaoPagamento = emissao.situacao === "Gravada";
-  const temPagamentoPendente = emissao.necessitaPagamento && emissao.situacao === "Aguardando Pagamento";
+  const temPagamentoPendente = emissao.situacao === "Aguardando Pagamento";
   const frigorificoAderido = frigorificoAderidoAoFundo(emissao.destino, emissao.finalidade);
   const pagamentoConcluido = ["Paga", "Emitida", "Transitada"].includes(emissao.situacao);
   const documentoPagamentoDisponivel = ["Aguardando Pagamento", "Paga", "Emitida"].includes(emissao.situacao);
   const foiEmitida = ["Emitida", "Transitada"].includes(emissao.situacao);
+  const podeBaixarGta = ["Aguardando Pagamento", "Paga", "Emitida"].includes(emissao.situacao);
   const podeEmitir = emissao.situacao === "Paga";
-  const podeEstenderValidade = emissao.situacao === "Emitida" && dataEmissaoHoje <= emissao.dataValidade;
+  const podeEstenderValidade = emissao.situacao === "Paga";
   const podeCancelar = !["Cancelada", "Transitada"].includes(emissao.situacao);
 
   const executarAcao = (acao: () => void) => {
@@ -284,9 +284,7 @@ export function VisualizarEmissaoGtaPage({
     if (!atualizada) return;
 
     setEmissao({ ...atualizada });
-    if (atualizada.situacao === "Aguardando Pagamento") {
-      abrirModalPagamento();
-    }
+    abrirModalPagamento();
   };
 
   const simularPagamentoPix = () => {
@@ -360,7 +358,7 @@ export function VisualizarEmissaoGtaPage({
   const confirmarExtensaoValidade = () => {
     setTentouEstenderValidade(true);
     if (!podeEstenderValidade || !extensaoValidadeValida) return;
-    const atualizada = estenderValidadeEmissaoGta(
+    const atualizada = emitirEmissaoGta(
       emissao.id,
       novaDataValidadeIso,
       justificativaValidade,
@@ -379,7 +377,7 @@ export function VisualizarEmissaoGtaPage({
   };
 
   const baixarGta = () => {
-    if (!foiEmitida) {
+    if (!podeBaixarGta) {
       window.alert("A GTA estará disponível para download após a emissão.");
       return;
     }
@@ -447,7 +445,7 @@ export function VisualizarEmissaoGtaPage({
                           onClick={() => executarAcao(gerarDadosPagamento)}
                           className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition text-left"
                         >
-                          <ReceiptText size={15} className="text-gray-400" /> Gerar dados de pagamento
+                        <ReceiptText size={15} className="text-gray-400" /> Emitir dados de pagamento
                         </button>
                         <div className="my-1 border-t border-gray-100" />
                       </>
@@ -461,12 +459,12 @@ export function VisualizarEmissaoGtaPage({
                           onClick={() => executarAcao(pagar)}
                           className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition text-left"
                         >
-                          <DollarSign size={15} className="text-gray-400" /> Pagar Taxa
+                          <DollarSign size={15} className="text-gray-400" /> Realizar pagamento
                         </button>
 
                         <button
                           type="button"
-                          onClick={() => executarAcao(frigorificoAderido ? abrirVisualizadorBoleto : abrirVisualizadorDae)}
+                      onClick={() => executarAcao(frigorificoAderido ? abrirVisualizadorBoleto : abrirVisualizadorDae)}
                           className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition text-left"
                         >
                           <ReceiptText size={15} className="text-gray-400" /> {frigorificoAderido ? "Visualizar Boleto" : "Visualizar DAE"}
@@ -516,7 +514,7 @@ export function VisualizarEmissaoGtaPage({
                     </button>
 
                     {/* BAIXAR GTA */}
-                    {foiEmitida && (
+                    {podeBaixarGta && (
                       <button
                         type="button"
                         onClick={() => executarAcao(baixarGta)}

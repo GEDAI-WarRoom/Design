@@ -165,6 +165,9 @@ export interface EmissaoGtaFormValue {
   dataRaivaPrimeiraEtapa: string;
   dataRaivaSegundaEtapa: string;
   dataBrucelose: string;
+  lacreSantaCatarina: string;
+  descricaoRotaSantaCatarina: string;
+  autorizacaoSantaCatarina: string;
   motivoIsencaoVacinacao: EntidadeGta | null;
   outrasVacinas: VacinaAdicionalGta[];
   atestadoSanitario: string;
@@ -644,6 +647,9 @@ export function criarEmissaoGtaVazia(): EmissaoGtaFormValue {
     dataRaivaPrimeiraEtapa: "2025-03-25",
     dataRaivaSegundaEtapa: "2025-09-25",
     dataBrucelose: "2025-06-18",
+    lacreSantaCatarina: "",
+    descricaoRotaSantaCatarina: "",
+    autorizacaoSantaCatarina: "",
     motivoIsencaoVacinacao: null,
     outrasVacinas: [],
     atestadoSanitario: "",
@@ -888,14 +894,6 @@ export function gerarDadosPagamentoGta(id: number) {
   const registro = obterEmissaoGta(id);
   if (!registro || registro.situacao !== "Gravada") return null;
   const hoje = new Date().toISOString().slice(0, 10);
-  if (!registro.necessitaPagamento) {
-    return salvarEmissaoGta({
-      ...registro,
-      situacao: "Paga",
-      dataGeracaoPagamento: hoje,
-      dataPagamento: hoje,
-    });
-  }
   return salvarEmissaoGta({
     ...registro,
     situacao: "Aguardando Pagamento",
@@ -905,7 +903,7 @@ export function gerarDadosPagamentoGta(id: number) {
 
 export function pagarEmissaoGta(id: number) {
   const registro = obterEmissaoGta(id);
-  if (!registro || registro.situacao !== "Aguardando Pagamento" || !registro.necessitaPagamento)
+  if (!registro || registro.situacao !== "Aguardando Pagamento")
     return registro;
   return salvarEmissaoGta({
     ...registro,
