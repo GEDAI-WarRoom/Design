@@ -57,10 +57,10 @@ export function EditarTipoInsumoExamePage({ onLogout, onNavigate, dados }: PageP
             style={{ color: GREEN }}
           >
             <ArrowLeft size={15} />
-            Todos os Tipos de Insumo de Exame
+            Todos os Tipos de Insumo
           </button>
           <div className="flex items-center justify-between gap-4">
-            <h1 className="text-2xl font-semibold text-gray-900">Editar Tipo de Insumo de Exame</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">Editar Tipo de Insumo</h1>
             <button
               type="button"
               onClick={handleSalvar}

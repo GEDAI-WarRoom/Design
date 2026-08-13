@@ -67,7 +67,7 @@ export function TipoInsumoExameForm({
     <Section title="Informações Básicas">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <FloatInput
-          label="Nome do Tipo de Insumo de Exame"
+          label="Nome do Tipo de Insumo"
           required
           value={value.nome}
           onChange={(nome) => onChange({ ...value, nome })}

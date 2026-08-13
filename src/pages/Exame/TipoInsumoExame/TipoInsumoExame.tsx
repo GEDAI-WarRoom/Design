@@ -93,7 +93,7 @@ export function TipoInsumoExamePage({ onLogout, onNavigate }: PageProps) {
             Inicial
           </button>
           <div className="flex items-center justify-between gap-4">
-            <h1 className="text-2xl font-semibold text-gray-900">Tipo de Insumo de Exame</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">Tipo de Insumo</h1>
             <button
               type="button"
               onClick={() => onNavigate("adicionar-tipo-insumo-exame")}
@@ -109,7 +109,7 @@ export function TipoInsumoExamePage({ onLogout, onNavigate }: PageProps) {
           <div className="flex gap-3 items-stretch">
             <div className="flex-1 bg-white border border-gray-200 rounded-md px-3 h-12 transition-all relative flex items-end pb-1.5 focus-within:border-[#1A7A3C] focus-within:ring-1 focus-within:ring-[#1A7A3C]">
               <label className={`absolute left-3 transition-all duration-200 pointer-events-none ${nome ? "top-1 text-[10px] text-gray-400 font-medium" : "top-1/2 -translate-y-1/2 text-sm text-gray-400"}`}>
-                Nome do Tipo de Insumo de Exame
+                Nome do Tipo de Insumo
               </label>
               <div className="flex items-center w-full">
                 <input
@@ -206,7 +206,7 @@ export function TipoInsumoExamePage({ onLogout, onNavigate }: PageProps) {
               <table className="w-full text-sm border-collapse">
                 <thead>
                   <tr className="border-b border-gray-100">
-                    <th className="text-left px-4 py-3 font-semibold uppercase text-gray-600 whitespace-nowrap">Nome do Tipo de Insumo de Exame</th>
+                    <th className="text-left px-4 py-3 font-semibold uppercase text-gray-600 whitespace-nowrap">Nome do Tipo de Insumo</th>
                     <th className="text-left px-4 py-3 font-semibold uppercase text-gray-600 whitespace-nowrap">Doença</th>
                     <th className="text-left px-4 py-3 font-semibold uppercase text-gray-600 whitespace-nowrap">Situação</th>
                     <th className="px-4 py-3 w-[100px]" />

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Navbar } from "../../../components/Navbar";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
 import { FloatSelect, FloatInput } from "../../../components/ui/FormKit";
+import { mockExamSupplyTypes } from "./AdicionarVendaComEntradaInsumosExames";
 import * as Icons from "../../../imports/icons";
 
 const GREEN = "#1A7A3C";
@@ -40,13 +41,6 @@ const SITUACOES = [
   { value: "Gravada", label: "Gravada" },
   { value: "Cancelada", label: "Cancelada" },
 ];
-
-const TIPOS_INSUMOS = [
-  "Antígeno Acidificado Tamponado (AAT)", "Teste do Anel em Leite (TAL)", "2-Mercaptoetanol (2-ME)",
-  "Fixação de Complemento (FC)", "Antígeno para Teste de Polarização Fluorescente (FPA)",
-  "Tuberculina PPD Bovina", "Tuberculina PPD Aviária", "Antígeno para IDGA (Imunodifusão em Gel de Ágar)",
-  "Kits / Antígenos para ELISA", "Maleína PPD", "Conjugado Antirrábico para Imunofluorescência Direta (IFD)",
-].map((value) => ({ value, label: value }));
 
 interface VendaEntrada {
   id: number;
@@ -118,7 +112,7 @@ export function VendaComEntradaInsumosExamesPage({
 }: PageProps) {
   // Estados dos Filtros
   const [fornecedor, setFornecedor] = useState<any | null>(null);
-  const [tipoInsumo, setTipoInsumo] = useState("");
+  const [tipoInsumo, setTipoInsumo] = useState<any | null>(null);
   const [destinatario, setDestinatario] = useState<any | null>(null);
   const [numeroNotaFiscal, setNumeroNotaFiscal] = useState("");
   const [numeroPartida, setNumeroPartida] = useState("");
@@ -136,7 +130,7 @@ export function VendaComEntradaInsumosExamesPage({
     numeroNotaFiscal !== "" ||
     numeroPartida !== "" ||
     !!doenca ||
-    tipoInsumo !== "" ||
+    !!tipoInsumo ||
     situacao !== "";
 
   const handlePesquisar = () => {
@@ -161,7 +155,7 @@ export function VendaComEntradaInsumosExamesPage({
     const matchNF = numeroNotaFiscal === "" || v.numeroNotaFiscal.includes(numeroNotaFiscal);
     const matchPartida = numeroPartida === "" || v.numeroPartida.includes(numeroPartida);
     const matchDoenca = !doenca || v.doenca === doenca.nome;
-    const matchTipoInsumo = !tipoInsumo || v.tipoInsumo === tipoInsumo;
+    const matchTipoInsumo = !tipoInsumo || v.tipoInsumo === tipoInsumo.name;
     const matchSituacao = situacao === "" || v.situacao === situacao;
 
     return (
@@ -201,7 +195,7 @@ export function VendaComEntradaInsumosExamesPage({
           </button>
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-semibold text-gray-900">
-              Venda com Entrada de Insumos
+              Venda com Entrada de Insumo
             </h1>
             <button
               onClick={() => onNavigate("adicionar-venda-entrada-insumos-exames")}
@@ -313,11 +307,18 @@ export function VendaComEntradaInsumosExamesPage({
                 }}
               />
 
-              <FloatSelect
+              <EntitySearchInput
                 label="Tipo de Insumo"
-                value={tipoInsumo}
-                onChange={(val) => { setTipoInsumo(val); limparErro(); }}
-                options={TIPOS_INSUMOS}
+                placeholder="Buscar tipo de insumo"
+                value={tipoInsumo ? tipoInsumo.name : ""}
+                data={mockExamSupplyTypes}
+                searchKeys={["name"]}
+                columns={[{ label: "Tipo de Insumo", key: "name" }]}
+                icon={<Stethoscope size={18} color={GREEN} />}
+                title="Buscar Tipo de Insumo"
+                subtitle="Busque por um tipo de insumo cadastrado:"
+                confirmLabel="Selecionar"
+                onChange={(entidade) => { setTipoInsumo(entidade); limparErro(); }}
               />
 
               {/* 7. Situação */}
@@ -367,7 +368,7 @@ export function VendaComEntradaInsumosExamesPage({
                 {doenca && (
                   <Chip label={`Doença: ${doenca.nome}`} onRemove={() => setDoenca(null)} />
                 )}
-                {tipoInsumo && <Chip label={`Tipo de Insumo: ${tipoInsumo}`} onRemove={() => setTipoInsumo("")} />}
+                {tipoInsumo && <Chip label={`Tipo de Insumo: ${tipoInsumo.name}`} onRemove={() => setTipoInsumo(null)} />}
                 {situacao && (
                   <Chip label={`Situação: ${situacao}`} onRemove={() => setSituacao("")} />
                 )}
@@ -382,7 +383,7 @@ export function VendaComEntradaInsumosExamesPage({
             {!hasSearched ? (
               <div className="p-6 text-center bg-white">
                 <p className="text-sm text-gray-500">
-                  Busque por venda com entrada de insumos utilizando os filtros acima.
+                  Busque por venda com entrada de insumo utilizando os filtros acima.
                 </p>
               </div>
             ) : total === 0 ? (
