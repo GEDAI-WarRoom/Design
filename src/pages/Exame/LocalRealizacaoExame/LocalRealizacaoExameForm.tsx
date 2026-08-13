@@ -145,7 +145,7 @@ export function LocalRealizacaoExameForm({
     <>
       <Section title="Informações Básicas">
         <div className="flex flex-col gap-5">
-          {isView && <div className="grid grid-cols-1 md:grid-cols-2 gap-4"><FloatInput label="Código" value={codigo ?? ""} disabled /><FloatInput label="Situação" value={value.situacao} disabled /></div>}
+          {isView && <FloatInput label="Código" value={codigo ?? ""} disabled />}
           {isView ? <FloatInput label="É um local comercial?" value={value.ehComercial ? "Sim" : "Não"} disabled /> : <SimNao label="É um local comercial?" name="local-comercial" required value={value.ehComercial} onChange={(ehComercial) => onChange({
             ...value,
             ehComercial,
@@ -206,7 +206,9 @@ export function LocalRealizacaoExameForm({
               <button
                 type="button"
                 onClick={() => setModalVeterinariosAberto(true)}
-                className="flex items-center gap-2 px-4 h-10 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50 transition"
+                disabled={value.veterinarios.length >= 5}
+                title={value.veterinarios.length >= 5 ? "Limite de cinco profissionais atingido" : "Adicionar médicos veterinários"}
+                className="flex items-center gap-2 px-4 h-10 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50 transition disabled:cursor-not-allowed disabled:border-gray-300 disabled:text-gray-400 disabled:hover:bg-transparent"
               >
                 <PlusCircle size={16} /> Adicionar Médicos Veterinários
               </button>
@@ -223,13 +225,6 @@ export function LocalRealizacaoExameForm({
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
                       <FloatInput label="Médico Veterinário" required value={veterinario.nome} disabled />
                       <FloatInput label="CPF do Veterinário" required value={veterinario.cpf} disabled />
-                      <FloatInput
-                        label="Exames que Realiza"
-                        required
-                        value={veterinario.examesFormatados}
-                        disabled
-                        className="md:col-span-2"
-                      />
                     </div>
                     {!profissionaisBloqueados && (
                       <button
@@ -313,7 +308,7 @@ export function LocalRealizacaoExameForm({
         open={modalVeterinariosAberto}
         onClose={() => setModalVeterinariosAberto(false)}
         title="Buscar Médicos Veterinários"
-        subtitle="Busque e selecione de um a cinco médicos veterinários cadastrados."
+        subtitle="Busque por médico veterinário para realização de exame."
         icon={<img src={Icons.iconeProfissionalAnimalUrl} alt="Médico Veterinário" className="w-6 h-6 object-contain" />}
         data={veterinariosDisponiveis}
         columns={[

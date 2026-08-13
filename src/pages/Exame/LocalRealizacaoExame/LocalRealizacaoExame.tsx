@@ -174,7 +174,7 @@ export function LocalRealizacaoExamePage({ onLogout, onNavigate }: PageProps) {
                 ]}
                 icon={<img src={Icons.iconeProfissionalAnimalUrl} alt="Médico Veterinário" className="w-5 h-5 object-contain" />}
                 title="Buscar Médico Veterinário"
-                subtitle="Busque por um médico veterinário habilitado para realização de exame:"
+                subtitle="Busque por médico veterinário para realização de exame."
                 onChange={(entidade) => {
                   setVeterinario(entidade);
                   setErroFiltro(false);
