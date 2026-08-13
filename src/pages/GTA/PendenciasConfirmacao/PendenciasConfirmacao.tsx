@@ -14,6 +14,9 @@ import {
 	MapPin,
 	RefreshCw,
 	Search,
+	Syringe,
+	UserCheck,
+	CreditCard,
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { RecebimentoGtaModal } from "../../../components/PendenciasConfirmacaoGta";
@@ -44,10 +47,13 @@ const ITENS_POR_PAGINA = 10;
 
 function rotuloTipoPendencia(tipo: PendenciaCentral["tipo"]) {
 	switch (tipo) {
-		case "habilitacao": return "Habilitação profissional";
+		case "habilitacao": return "Atualização de habilitação";
 		case "atestado-exame": return "Atestado de exame";
 		case "vinculo-profissional": return "Vínculo profissional";
-		case "renovacao-responsabilidade": return "Renovação de responsabilidade";
+		case "declaracao-partilha-vacina": return "Declaração/Doação ou Partilha de Vacina";
+		case "vacinador-brucelose": return "Vacinador de Brucelose";
+		case "declaracao-vacinacao": return "Declaração de vacinação";
+		case "boleto": return "Boleto";
 	}
 }
 
@@ -56,7 +62,10 @@ function IconeTipoPendencia({ tipo, size = 20 }: { tipo: PendenciaCentral["tipo"
 		case "habilitacao": return <BadgeCheck size={size} />;
 		case "atestado-exame": return <FileText size={size} />;
 		case "vinculo-profissional": return <Link2 size={size} />;
-		case "renovacao-responsabilidade": return <RefreshCw size={size} />;
+		case "declaracao-partilha-vacina": return <Syringe size={size} />;
+		case "vacinador-brucelose": return <UserCheck size={size} />;
+		case "declaracao-vacinacao": return <Syringe size={size} />;
+		case "boleto": return <CreditCard size={size} />;
 	}
 }
 
@@ -104,7 +113,7 @@ export function PendenciasConfirmacaoPage({
 }: {
 	onLogout: () => void;
 	onNavigate: (screen: any, data?: any) => void;
-	dados?: { aba?: "gta" | "rebanho" };
+	dados?: { aba?: "gta" | "rebanho" | "declaracao" };
 }) {
 	const databaseRevision = useMockDatabaseRevision();
 	void databaseRevision;
@@ -114,10 +123,11 @@ export function PendenciasConfirmacaoPage({
 	const [buscaAplicada, setBuscaAplicada] = useState("");
 	const [pendenciaAberta, setPendenciaAberta] = useState<PendenciaGta | null>(null);
 	const [paginaPerfil, setPaginaPerfil] = useState(1);
+	const [tipoPerfilSelecionado, setTipoPerfilSelecionado] = useState<PendenciaCentral["tipo"] | null>(null);
 	const [pendenciaParaConcluir, setPendenciaParaConcluir] = useState<PendenciaCentral | null>(null);
 	const [pendenciaConcluida, setPendenciaConcluida] = useState<PendenciaCentral | null>(null);
 	const [abaAtiva, setAbaAtiva] = useState(
-		dados?.aba === "rebanho" ? "rebanho" : "gta",
+		dados?.aba === "rebanho" || dados?.aba === "declaracao" ? dados.aba : "gta",
 	);
 
 	const resultadosGta = useMemo(() => {
@@ -140,6 +150,15 @@ export function PendenciasConfirmacaoPage({
 				PRODUTOR_REBANHO_DEMONSTRACAO_DOCUMENTO &&
 			!atualizacao.concluida,
 	);
+	const pendenciasDeclaracao = listarPendenciasCentrais("produtor");
+	const termoDeclaracao = buscaAplicada.trim().toLocaleLowerCase("pt-BR");
+	const resultadosDeclaracao = termoDeclaracao
+		? pendenciasDeclaracao.filter((pendencia) =>
+			[pendencia.titulo, pendencia.descricao].some((valor) =>
+				valor.toLocaleLowerCase("pt-BR").includes(termoDeclaracao),
+			),
+		)
+		: pendenciasDeclaracao;
 	const termoRebanho = buscaAplicada.trim().toLocaleLowerCase("pt-BR");
 	const resultadosRebanho = termoRebanho
 		? pendenciasRebanho.filter((atualizacao) =>
@@ -154,11 +173,17 @@ export function PendenciasConfirmacaoPage({
 				),
 			)
 		: pendenciasRebanho;
-	const quantidadeResultados =
-		abaAtiva === "gta" ? resultadosGta.length : resultadosRebanho.length;
-	const quantidadePendencias =
-		abaAtiva === "gta" ? pendencias.length : pendenciasRebanho.length;
-	const totalPendencias = pendencias.length + pendenciasRebanho.length;
+	const quantidadeResultados = abaAtiva === "gta"
+		? resultadosGta.length
+		: abaAtiva === "rebanho"
+			? resultadosRebanho.length
+			: resultadosDeclaracao.length;
+	const quantidadePendencias = abaAtiva === "gta"
+		? pendencias.length
+		: abaAtiva === "rebanho"
+			? pendenciasRebanho.length
+			: pendenciasDeclaracao.length;
+	const totalPendencias = pendencias.length + pendenciasRebanho.length + pendenciasDeclaracao.length;
 
 	const salvarResposta = (resposta: RespostaRecebimentoGta) => {
 		if (!pendenciaAberta) return;
@@ -186,19 +211,40 @@ export function PendenciasConfirmacaoPage({
 		return dia && mes && ano ? `${dia}/${mes}/${ano}` : data;
 	};
 
-	if (role === "veterinario" || role === "lider-estabelecimento") {
+	if (role === "veterinario" || role === "responsavel-agroindustria-integradora") {
 		const pendenciasPerfil = listarPendenciasCentrais(
-			role,
+			role === "veterinario" ? "veterinario" : "lider-estabelecimento",
 			role === "veterinario" ? user?.entityId : undefined,
+		);
+		const topicosPerfil: Array<{
+			tipo: PendenciaCentral["tipo"];
+			descricao: string;
+		}> = role === "veterinario"
+			? [
+				{ tipo: "habilitacao", descricao: "Documentação e habilitações profissionais" },
+				{ tipo: "atestado-exame", descricao: "Atestados que precisam da sua atenção" },
+				{ tipo: "vinculo-profissional", descricao: "Solicitações de vínculo profissional" },
+				{ tipo: "declaracao-partilha-vacina", descricao: "Declaração, doação e partilha de vacinas" },
+				{ tipo: "vacinador-brucelose", descricao: "Cadastro para vacinação contra Brucelose" },
+			]
+			: [
+				{ tipo: "vinculo-profissional", descricao: "Solicitações de vínculo profissional" },
+				{ tipo: "boleto", descricao: "Pagamentos que precisam da sua atenção" },
+			];
+		const tipoPerfilAtivo = topicosPerfil.some((topico) => topico.tipo === tipoPerfilSelecionado)
+			? tipoPerfilSelecionado!
+			: topicosPerfil[0].tipo;
+		const pendenciasDoTopico = pendenciasPerfil.filter(
+			(pendencia) => pendencia.tipo === tipoPerfilAtivo,
 		);
 		const termoPerfil = buscaAplicada.trim().toLocaleLowerCase("pt-BR");
 		const resultadosPerfil = termoPerfil
-			? pendenciasPerfil.filter((pendencia) =>
+			? pendenciasDoTopico.filter((pendencia) =>
 				[pendencia.titulo, pendencia.descricao, rotuloTipoPendencia(pendencia.tipo), pendencia.situacao].some((valor) =>
 					valor.toLocaleLowerCase("pt-BR").includes(termoPerfil),
 				),
 			)
-			: pendenciasPerfil;
+			: pendenciasDoTopico;
 		const totalPaginasPerfil = Math.max(1, Math.ceil(resultadosPerfil.length / ITENS_POR_PAGINA));
 		const paginaAtualPerfil = Math.min(paginaPerfil, totalPaginasPerfil);
 		const inicioPerfil = resultadosPerfil.length ? (paginaAtualPerfil - 1) * ITENS_POR_PAGINA + 1 : 0;
@@ -238,12 +284,28 @@ export function PendenciasConfirmacaoPage({
 					</header>
 					<section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
 						<div className="border-b border-gray-100 p-4 md:p-5">
-							<div className="grid gap-2 rounded-xl bg-gray-100 p-1.5">
-								<div className="flex min-h-14 items-center gap-3 rounded-lg bg-white px-4 text-[#1A7A3C] shadow-sm ring-1 ring-black/5">
-									<span className="flex h-9 w-9 items-center justify-center rounded-lg bg-green-50"><FileInput size={18} /></span>
-									<span className="min-w-0 flex-1"><span className="block text-sm font-semibold">Pendências de confirmação</span><span className="mt-0.5 block text-xs font-normal text-gray-500">Solicitações que precisam da sua atenção</span></span>
-									<span className="rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold">{pendenciasPerfil.length}</span>
-								</div>
+							<div className="grid gap-2 rounded-xl bg-gray-100 p-1.5 md:grid-cols-2 xl:grid-cols-3">
+								{topicosPerfil.map((topico) => {
+									const ativo = topico.tipo === tipoPerfilAtivo;
+									const quantidade = pendenciasPerfil.filter((pendencia) => pendencia.tipo === topico.tipo).length;
+									return (
+										<button
+											type="button"
+											key={topico.tipo}
+											onClick={() => {
+												setTipoPerfilSelecionado(topico.tipo);
+												setBusca("");
+												setBuscaAplicada("");
+												setPaginaPerfil(1);
+											}}
+											className={`flex min-h-14 items-center gap-3 rounded-lg px-4 text-left transition ${ativo ? "bg-white text-[#1A7A3C] shadow-sm ring-1 ring-black/5" : "text-gray-500 hover:bg-white/60 hover:text-gray-700"}`}
+										>
+											<span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${ativo ? "bg-green-50" : "bg-white/70"}`}><IconeTipoPendencia tipo={topico.tipo} size={18} /></span>
+											<span className="min-w-0 flex-1"><span className="block text-sm font-semibold">{rotuloTipoPendencia(topico.tipo)}</span><span className="mt-0.5 block text-xs font-normal text-gray-500">{topico.descricao}</span></span>
+											<span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${ativo ? "bg-green-100 text-[#1A7A3C]" : "bg-white text-gray-500"}`}>{quantidade}</span>
+										</button>
+									);
+								})}
 							</div>
 						</div>
 						<form onSubmit={(event) => { event.preventDefault(); setBuscaAplicada(busca); setPaginaPerfil(1); }} className="flex flex-col gap-3 border-b border-gray-100 bg-white px-4 py-5 sm:flex-row md:px-6">
@@ -252,7 +314,7 @@ export function PendenciasConfirmacaoPage({
 						</form>
 						<div className="bg-[#fafafa] p-4 md:p-6">
 							<div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-								<div><h2 className="text-sm font-semibold text-gray-800">Solicitações aguardando confirmação</h2><p className="mt-0.5 text-xs text-gray-500">{resultadosPerfil.length} de {pendenciasPerfil.length} {pendenciasPerfil.length === 1 ? "pendência" : "pendências"}</p></div>
+								<div><h2 className="text-sm font-semibold text-gray-800">{rotuloTipoPendencia(tipoPerfilAtivo)} aguardando resolução</h2><p className="mt-0.5 text-xs text-gray-500">{resultadosPerfil.length} de {pendenciasDoTopico.length} {pendenciasDoTopico.length === 1 ? "pendência" : "pendências"}</p></div>
 								{buscaAplicada && <button type="button" onClick={() => { setBusca(""); setBuscaAplicada(""); setPaginaPerfil(1); }} className="text-xs font-semibold text-[#1A7A3C] hover:text-[#15612F]">Limpar busca</button>}
 							</div>
 							{resultadosPerfil.length ? <div className="grid w-full grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
@@ -346,7 +408,20 @@ export function PendenciasConfirmacaoPage({
 
 				<section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
 					<div className="border-b border-gray-100 p-4 md:p-5">
-						<div className="grid gap-2 rounded-xl bg-gray-100 p-1.5 sm:grid-cols-2">
+						<div className="grid gap-2 rounded-xl bg-gray-100 p-1.5 sm:grid-cols-3">
+							<button
+								type="button"
+								onClick={() => trocarAba("declaracao")}
+								className={`flex min-h-14 items-center gap-3 rounded-lg px-4 text-left transition ${
+									abaAtiva === "declaracao"
+										? "bg-white text-[#1A7A3C] shadow-sm ring-1 ring-black/5"
+										: "text-gray-500 hover:bg-white/60 hover:text-gray-700"
+								}`}
+							>
+								<span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${abaAtiva === "declaracao" ? "bg-green-50" : "bg-white/70"}`}><Syringe size={18} /></span>
+								<span className="min-w-0 flex-1"><span className="block text-sm font-semibold">Declaração de vacinação</span><span className="mt-0.5 block text-xs font-normal text-gray-500">Regularize a declaração da campanha</span></span>
+								<span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${abaAtiva === "declaracao" ? "bg-green-100 text-[#1A7A3C]" : "bg-white text-gray-500"}`}>{pendenciasDeclaracao.length}</span>
+							</button>
 							<button
 								type="button"
 								onClick={() => trocarAba("gta")}
@@ -402,7 +477,9 @@ export function PendenciasConfirmacaoPage({
 							label={
 								abaAtiva === "gta"
 									? "Buscar por número da GTA, procedência ou destino"
-									: "Buscar por etapa, estabelecimento, município ou situação"
+									: abaAtiva === "rebanho"
+										? "Buscar por etapa, estabelecimento, município ou situação"
+										: "Buscar por título ou descrição"
 							}
 							value={busca}
 							onChange={setBusca}
@@ -421,7 +498,7 @@ export function PendenciasConfirmacaoPage({
 						<div className="mb-4 flex flex-wrap items-center justify-between gap-2">
 							<div>
 								<h2 className="text-sm font-semibold text-gray-800">
-									{abaAtiva === "gta" ? "GTAs aguardando confirmação" : "Cadastros aguardando atualização"}
+									{abaAtiva === "gta" ? "GTAs aguardando confirmação" : abaAtiva === "rebanho" ? "Cadastros aguardando atualização" : "Declarações aguardando regularização"}
 								</h2>
 								<p className="mt-0.5 text-xs text-gray-500">
 									{quantidadeResultados} de {quantidadePendencias} {quantidadePendencias === 1 ? "pendência" : "pendências"}
@@ -440,6 +517,25 @@ export function PendenciasConfirmacaoPage({
 								</button>
 							)}
 						</div>
+
+							{abaAtiva === "declaracao" && (resultadosDeclaracao.length > 0 ? (
+								<div className="grid w-full grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+									{resultadosDeclaracao.map((pendencia) => (
+										<article key={pendencia.id} className="group relative flex min-w-0 flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition duration-200 hover:-translate-y-1 hover:border-green-200 hover:shadow-lg">
+											<div className="flex items-start gap-3 p-5 pb-4">
+												<span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-green-50 text-[#1A7A3C]"><Syringe size={20} /></span>
+												<div className="min-w-0 flex-1"><p className="text-xs font-medium text-gray-500">Declaração de vacinação</p><h3 className="mt-1 text-base font-semibold text-gray-900">{pendencia.titulo}</h3></div>
+												<span className="inline-flex shrink-0 items-center rounded-full bg-[#FEF3D6] px-2.5 py-1 text-xs font-semibold text-[#B45309]">Pendente</span>
+											</div>
+											<div className="mx-5 flex-1 space-y-4 rounded-xl bg-gray-50 p-4">
+												<div className="flex items-start gap-3"><Syringe size={18} className="mt-0.5 shrink-0 text-[#1A7A3C]" /><div><p className="text-[11px] font-medium uppercase tracking-wide text-gray-400">Campanha</p><p className="mt-0.5 text-sm font-medium text-gray-800">Vacinação contra Brucelose 2026</p></div></div>
+												<div className="flex items-start gap-3"><CalendarClock size={18} className="mt-0.5 shrink-0 text-[#1A7A3C]" /><div><p className="text-[11px] font-medium uppercase tracking-wide text-gray-400">Descrição</p><p className="mt-0.5 text-sm font-medium text-gray-800">{pendencia.descricao}</p><p className="mt-0.5 text-xs text-gray-500">Prazo: 31/08/2026</p></div></div>
+											</div>
+											<div className="mt-4 flex items-center justify-end border-t border-gray-100 px-5 py-4"><button type="button" onClick={() => onNavigate("declaracao-vacinacao")} className="inline-flex h-9 items-center gap-2 rounded-lg bg-[#1A7A3C] px-4 text-sm font-semibold text-white transition hover:bg-[#15612F]">Declarar vacinação <ArrowRight size={15} /></button></div>
+										</article>
+									))}
+								</div>
+							) : <div className="py-12 text-center text-sm text-gray-400">Nenhuma pendência encontrada para a busca informada.</div>)}
 
               {abaAtiva === "gta" && (resultadosGta.length > 0 ? (
                 <div className="grid w-full grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">

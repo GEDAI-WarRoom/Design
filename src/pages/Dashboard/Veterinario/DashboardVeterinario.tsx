@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Building2, Clock3, FileCheck2, Store } from "lucide-react";
+import { Building2, Clock3, FileCheck2, Store, Syringe, UserCheck } from "lucide-react";
 import { useDemoUser } from "../../../contexts/DemoUserContext";
 import fotoVeterinariaExemploUrl from "../../../imports/images/perfil-veterinaria-exemplo.png";
 import { obterProfissionalAnimal } from "../../Animal/ProfissionalAnimal/profissionalAnimalData";
@@ -19,11 +19,37 @@ interface DashboardVeterinarioProps {
 	news: ReactNode;
 }
 
-const textoPadraoPendencia: Record<string, { titulo: string; descricao: string }> = {
-	"habilitacao": { titulo: "Atualização de habilitação", descricao: "Documentação aguardando análise" },
-	"atestado-exame": { titulo: "Atestado de exame", descricao: "Rascunho não finalizado" },
-	"vinculo-profissional": { titulo: "Vínculo profissional", descricao: "Confirmação solicitada pela revendedora" },
-	"renovacao-responsabilidade": { titulo: "Renovação de responsabilidade", descricao: "Prazo de renovação se aproxima" },
+const textoPadraoPendencia: Record<string, { titulo: string; descricao: string; detalhes: string[]; acao: string }> = {
+	"habilitacao": {
+		titulo: "Atualização de habilitação",
+		descricao: "Documentação aguardando análise",
+		detalhes: ["Registro: CRMV-MG 12345", "Situação: Documentação em análise"],
+		acao: "Revisar habilitação",
+	},
+	"atestado-exame": {
+		titulo: "Atestado de exame",
+		descricao: "Rascunho não finalizado",
+		detalhes: ["Atestado: Nº 0001/2026", "Situação: Rascunho"],
+		acao: "Continuar atestado",
+	},
+	"vinculo-profissional": {
+		titulo: "Vínculo profissional",
+		descricao: "Casa do Produtor Lavras solicita a confirmação do vínculo",
+		detalhes: ["Estabelecimento: Casa do Produtor Lavras", "Solicitado em: 12/08/2026"],
+		acao: "Confirmar vínculo",
+	},
+	"declaracao-partilha-vacina": {
+		titulo: "Declaração/Doação ou Partilha de Vacina",
+		descricao: "Movimentação de vacina aguardando regularização",
+		detalhes: ["Produto: Vacina contra Brucelose", "Situação: Pendente"],
+		acao: "Ver movimentação",
+	},
+	"vacinador-brucelose": {
+		titulo: "Vacinador de Brucelose",
+		descricao: "Cadastro de vacinador aguardando atualização",
+		detalhes: ["Habilitação: Vacinação contra Brucelose", "Situação: Pendente"],
+		acao: "Atualizar cadastro",
+	},
 };
 
 export function DashboardVeterinario({
@@ -37,6 +63,9 @@ export function DashboardVeterinario({
 	const { user } = useDemoUser();
 	const profissional = obterProfissionalAnimal(user?.entityId);
 	const pendencias = listarPendenciasCentrais("veterinario", user?.entityId);
+	const dadosProfissionais = profissional?.numeroConselho
+		? `Registro: CRMV-MG ${profissional.numeroConselho}`
+		: "Registro: Não informado";
 	const revendedoras = getRevendedoras();
 	const vinculosAtivos = revendedoras.filter((revendedora) =>
 		revendedora.situacao === "Ativo" &&
@@ -91,14 +120,21 @@ export function DashboardVeterinario({
 			}
 			pendingContent={
 				<PendenciasResumo
+					title="Central de Pendências"
 					items={pendencias.map((pendencia) => ({
 						...pendencia,
 						title: pendencia.titulo || textoPadraoPendencia[pendencia.tipo]?.titulo || "Pendência de confirmação",
 						description: pendencia.descricao || textoPadraoPendencia[pendencia.tipo]?.descricao || "Solicitação que precisa da sua atenção",
+						details: pendencia.tipo === "habilitacao"
+							? [dadosProfissionais, textoPadraoPendencia[pendencia.tipo].detalhes[1]]
+							: textoPadraoPendencia[pendencia.tipo]?.detalhes,
 						icon:
 							pendencia.tipo === "atestado-exame" ? <Clock3 size={18} /> :
 							pendencia.tipo === "vinculo-profissional" ? <Building2 size={18} /> :
+							pendencia.tipo === "declaracao-partilha-vacina" ? <Syringe size={18} /> :
+							pendencia.tipo === "vacinador-brucelose" ? <UserCheck size={18} /> :
 							<FileCheck2 size={18} />,
+						actionLabel: textoPadraoPendencia[pendencia.tipo]?.acao ?? "Resolver pendência",
 						onAction: () => onNavigate("pendencias-confirmacao-gta"),
 					}))}
 					onViewAll={() => onNavigate("pendencias-confirmacao-gta")}

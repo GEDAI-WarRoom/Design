@@ -148,10 +148,10 @@ export function Navbar({ onLogout, onNavigate, currentScreen }: NavbarProps) {
           atualizacao.produtor.documento ===
             PRODUTOR_REBANHO_DEMONSTRACAO_DOCUMENTO &&
           !atualizacao.concluida,
-      ).length
+      ).length + listarPendenciasCentrais("produtor").length
     : role === "veterinario"
       ? listarPendenciasCentrais("veterinario", user?.entityId).length
-      : role === "lider-estabelecimento"
+      : role === "responsavel-agroindustria-integradora"
         ? listarPendenciasCentrais("lider-estabelecimento").length
         : 0;
   const abaPendenciasAtual = currentScreen.includes("rebanho")
@@ -285,7 +285,7 @@ export function Navbar({ onLogout, onNavigate, currentScreen }: NavbarProps) {
             </div>
 
             <div className="flex items-center gap-4 flex-shrink-0">
-              {role === "produtor" || role === "veterinario" || role === "lider-estabelecimento" ? (
+              {role === "produtor" || role === "veterinario" || role === "responsavel-agroindustria-integradora" ? (
                 <button
                   type="button"
                   onClick={() =>

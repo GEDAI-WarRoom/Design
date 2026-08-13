@@ -139,6 +139,9 @@ const produtorAllowedRoutes = new Set([
 ]);
 
 const veterinarioEntryRoutes = new Set([
+	"pendencias-confirmacao-gta",
+	"pessoa-fisica",
+	"profissional-animal",
 	"declaracao-vacinacao",
 	"partilha-vacina",
 	"vacinador",
@@ -164,6 +167,9 @@ const veterinarioAllowedRoutes = new Set([
 	"visualizar-atestado-exame",
 	"editar-atestado-exame",
 	"visualizar-pessoa-fisica",
+	"editar-pessoa-fisica",
+	"visualizar-profissional-area-animal",
+	"editar-profissional-area-animal",
 	"adicionar-local-realizacao-exame",
 	"visualizar-local-realizacao-exame",
 	"editar-local-realizacao-exame",
@@ -213,7 +219,6 @@ const liderEstabelecimentoAllowedRoutes = new Set([
 	"editar-revendedora-agropecuario",
 ]);
 
-const produtorOnlyRoutes = new Set(["pendencias-confirmacao-gta"]);
 const representanteRoutes = new Set([
 	"relatorio-boletos-gta",
 	"visualizar-recolhimento-mensal-gta",
@@ -225,12 +230,19 @@ const representanteRoutes = new Set([
 ]);
 
 const responsavelEstabelecimentoEntryRoutes = new Set([
+	"pendencias-confirmacao-gta",
+	"pessoa-fisica",
+	"profissional-animal",
 	"agroindustrial-sie",
 	"integradora-cooperativa",
 ]);
 
 const responsavelEstabelecimentoRoutes = new Set([
 	...responsavelEstabelecimentoEntryRoutes,
+	"visualizar-pessoa-fisica",
+	"editar-pessoa-fisica",
+	"visualizar-profissional-area-animal",
+	"editar-profissional-area-animal",
 	"adicionar-agroindustrial-sie",
 	"visualizar-agroindustrial-sie",
 	"editar-agroindustrial-sie",
@@ -295,7 +307,6 @@ export function useDemoUser() {
 
 export function isEntryRouteAllowed(role: DemoUserRole | null, route: string) {
 	if (!role) return false;
-	if (produtorOnlyRoutes.has(route)) return role === "produtor";
 	if (route === "relatorio-boletos-gta") return role === "responsavel-agroindustria-integradora";
 	if (role === "admin") return true;
 	if (role === "responsavel-agroindustria-integradora") return responsavelEstabelecimentoEntryRoutes.has(route);
@@ -307,7 +318,6 @@ export function isEntryRouteAllowed(role: DemoUserRole | null, route: string) {
 export function isRouteAllowed(role: DemoUserRole | null, route: string) {
 	if (!role) return false;
 	if (role === "admin") return true;
-	if (produtorOnlyRoutes.has(route)) return role === "produtor";
 	if (role === "responsavel-agroindustria-integradora") {
 		return route === "dashboard" || route === "meu-perfil" || representanteRoutes.has(route) || responsavelEstabelecimentoRoutes.has(route);
 	}

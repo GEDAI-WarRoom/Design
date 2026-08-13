@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ArrowLeft, Eye as ViewIcon, Pencil, PlusCircle, Search, SlidersHorizontal } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatSelect } from "../../../components/ui/FormKit";
+import { useDemoUser } from "../../../contexts/DemoUserContext";
 import { useMockDatabaseRevision } from "../../../mocks/useMockDatabase";
 import { listarPessoasFisicas } from "./pessoaFisicaData";
 
@@ -10,7 +11,11 @@ const GREEN = "#1A7A3C";
 export function PessoaFisicaPage({ onLogout, onNavigate }: { onLogout: () => void; onNavigate: (s: string, d?: any) => void; }) {
   const databaseRevision = useMockDatabaseRevision();
   void databaseRevision;
-  const pessoas = listarPessoasFisicas();
+  const { role, user } = useDemoUser();
+  const acessoAoProprioCadastro = role === "veterinario" || role === "responsavel-agroindustria-integradora";
+  const pessoas = acessoAoProprioCadastro
+    ? listarPessoasFisicas().filter((pessoa) => pessoa.id === user?.pessoaFisicaId)
+    : listarPessoasFisicas();
   const [busca, setBusca] = useState("");
   const [situacao, setSituacao] = useState("");
   const [showFilters, setShowFilters] = useState(false);
@@ -34,9 +39,11 @@ export function PessoaFisicaPage({ onLogout, onNavigate }: { onLogout: () => voi
           </button>
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-semibold text-gray-900">Pessoa Física</h1>
-            <button onClick={() => onNavigate("adicionar-pessoa-fisica")} className="px-5 py-3 rounded-md bg-[#1A7A3C] text-white text-sm font-semibold hover:opacity-90 shadow-sm flex items-center gap-2">
-              Adicionar Nova
-            </button>
+            {!acessoAoProprioCadastro && (
+              <button onClick={() => onNavigate("adicionar-pessoa-fisica")} className="px-5 py-3 rounded-md bg-[#1A7A3C] text-white text-sm font-semibold hover:opacity-90 shadow-sm flex items-center gap-2">
+                Adicionar Nova
+              </button>
+            )}
           </div>
         </div>
 
