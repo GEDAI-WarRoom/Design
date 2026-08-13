@@ -845,6 +845,7 @@ export interface MultiSearchModalProps<T extends { id: string | number }> {
 	onConfirm: (selected: T[]) => void;
 	confirmLabel?: string;
 	showResultsOnOpen?: boolean;
+	maxSelection?: number;
 }
 
 export function MultiSearchModal<T extends { id: string | number }>({
@@ -861,6 +862,7 @@ export function MultiSearchModal<T extends { id: string | number }>({
 	onConfirm,
 	confirmLabel = "Confirmar",
 	showResultsOnOpen = false,
+	maxSelection,
 }: MultiSearchModalProps<T>) {
 	const [busca, setBusca] = useState("");
 	const [tempSelected, setTempSelected] = useState<T[]>([]);
@@ -926,7 +928,7 @@ export function MultiSearchModal<T extends { id: string | number }>({
 			setTempSelected(
 				tempSelected.filter((selected) => selected.id !== item.id),
 			);
-		} else {
+		} else if (maxSelection == null || tempSelected.length < maxSelection) {
 			setTempSelected([...tempSelected, item]);
 		}
 	};
@@ -1002,14 +1004,18 @@ export function MultiSearchModal<T extends { id: string | number }>({
 									</thead>
 									<tbody>
 										{itensPagina.map((item) => {
-											const isChecked = tempSelected.some(
-												(selected) => selected.id === item.id,
-											);
-											return (
-												<tr
-													key={`row-${item.id}`}
-													onClick={() => handleToggle(item)}
-													className={`border-b border-gray-50 cursor-pointer transition-colors ${isChecked ? "bg-green-50/40" : "hover:bg-gray-50"}`}>
+								const isChecked = tempSelected.some(
+									(selected) => selected.id === item.id,
+								);
+								const selectionLimitReached = !isChecked
+									&& maxSelection != null
+									&& tempSelected.length >= maxSelection;
+								return (
+									<tr
+										key={`row-${item.id}`}
+										onClick={() => !selectionLimitReached && handleToggle(item)}
+										aria-disabled={selectionLimitReached}
+										className={`border-b border-gray-50 transition-colors ${selectionLimitReached ? "cursor-not-allowed opacity-50" : "cursor-pointer"} ${isChecked ? "bg-green-50/40" : "hover:bg-gray-50"}`}>
 													<td className="py-3 pr-2">
 														<div className="flex items-center justify-center">
 															<div

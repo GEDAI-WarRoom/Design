@@ -10,7 +10,6 @@ import {
 } from "./LocalRealizacaoExameForm";
 import {
   criarLocalRealizacaoExame,
-  obterLocalRealizacaoExame,
   type LocalRealizacaoExame,
 } from "./localRealizacaoExameData";
 
@@ -48,16 +47,18 @@ export function AdicionarLocalRealizacaoExamePage({ onLogout, onNavigate }: Page
       && (!form.localizadoEmEstabelecimento || !!form.estabelecimento)
       && !!enderecoBasicoValido;
 
-    if (proprietarios.length !== form.proprietarios.length || !localizacaoValida || form.veterinarios.length === 0) {
-      const exemplo = obterLocalRealizacaoExame();
-      if (exemplo) setRegistroSalvo({ ...exemplo, id: Date.now(), codigo: "3100000099" });
-      setErro("");
+    const pessoaJuridicaValida = form.ehComercial === false
+      || (form.ehComercial === true && proprietarios.length === 1);
+    const profissionaisValidos = form.veterinarios.length >= 1 && form.veterinarios.length <= 5;
+
+    if (form.ehComercial === "" || !pessoaJuridicaValida || !localizacaoValida || !profissionaisValidos) {
+      setErro("Preencha todos os campos obrigatórios e selecione de um a cinco médicos veterinários para continuar.");
       return;
     }
 
     try {
       const criado = criarLocalRealizacaoExame({
-        proprietarios,
+        proprietarios: form.ehComercial ? proprietarios : [],
         localizadoEmEstabelecimento: form.localizadoEmEstabelecimento === true,
         estabelecimento: form.estabelecimento,
         endereco: form.endereco,

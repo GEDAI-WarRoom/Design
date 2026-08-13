@@ -46,6 +46,7 @@ export function LocalRealizacaoExamePage({ onLogout, onNavigate }: PageProps) {
   const [situacao, setSituacao] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [erroFiltro, setErroFiltro] = useState(false);
   const [page, setPage] = useState(1);
   const perPage = 10;
 
@@ -62,9 +63,15 @@ export function LocalRealizacaoExamePage({ onLogout, onNavigate }: PageProps) {
   const start = resultados.length ? (currentPage - 1) * perPage + 1 : 0;
   const end = Math.min(currentPage * perPage, resultados.length);
   const rows = resultados.slice((currentPage - 1) * perPage, currentPage * perPage);
-  const temFiltroAtivo = !!proprietario || !!veterinario || !!situacao;
+  const temFiltroAtivo = codigo.trim() !== "" || !!proprietario || !!veterinario || !!situacao;
 
   const pesquisar = () => {
+    if (!temFiltroAtivo) {
+      setErroFiltro(true);
+      setHasSearched(false);
+      return;
+    }
+    setErroFiltro(false);
     setHasSearched(true);
     setPage(1);
   };
@@ -108,7 +115,10 @@ export function LocalRealizacaoExamePage({ onLogout, onNavigate }: PageProps) {
                   inputMode="numeric"
                   maxLength={10}
                   value={codigo}
-                  onChange={(event) => setCodigo(event.target.value.replace(/\D/g, "").slice(0, 10))}
+                  onChange={(event) => {
+                    setCodigo(event.target.value.replace(/\D/g, "").slice(0, 10));
+                    setErroFiltro(false);
+                  }}
                   onKeyDown={(event) => event.key === "Enter" && pesquisar()}
                   className="w-full bg-transparent text-sm text-gray-800 outline-none h-6"
                 />
@@ -134,19 +144,22 @@ export function LocalRealizacaoExamePage({ onLogout, onNavigate }: PageProps) {
           {showFilters && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 items-end animate-fadeIn">
               <EntitySearchInput
-                label="CNPJ"
-                placeholder="Buscar por nome ou CPF/CNPJ"
+                label="Pessoa Jurídica"
+                placeholder="Buscar por razão social ou CNPJ"
                 value={proprietario?.nome ?? ""}
                 data={PROPRIETARIOS_LOCAL_EXAME.filter((item) => item.tipo === "PJ")}
                 searchKeys={["nome", "documento"]}
                 columns={[
-                  { label: "Nome / Razão Social", key: "nome" },
-                  { label: "CPF / CNPJ", key: "documento" },
+                  { label: "CNPJ", key: "documento" },
+                  { label: "Razão Social", key: "nome" },
                 ]}
-                icon={<img src={Icons.iconeProdutorUrl} alt="Proprietário" className="w-5 h-5 object-contain" />}
-                title="Buscar CNPJ"
+                icon={<img src={Icons.iconePessoaJuridicaUrl} alt="Pessoa Jurídica" className="w-5 h-5 object-contain" />}
+                title="Buscar Pessoa Jurídica"
                 subtitle="Busque por uma pessoa jurídica cadastrada no sistema:"
-                onChange={setProprietario}
+                onChange={(entidade) => {
+                  setProprietario(entidade);
+                  setErroFiltro(false);
+                }}
               />
 
               <EntitySearchInput
@@ -162,13 +175,19 @@ export function LocalRealizacaoExamePage({ onLogout, onNavigate }: PageProps) {
                 icon={<img src={Icons.iconeProfissionalAnimalUrl} alt="Médico Veterinário" className="w-5 h-5 object-contain" />}
                 title="Buscar Médico Veterinário"
                 subtitle="Busque por um médico veterinário habilitado para realização de exame:"
-                onChange={setVeterinario}
+                onChange={(entidade) => {
+                  setVeterinario(entidade);
+                  setErroFiltro(false);
+                }}
               />
 
               <FloatSelect
                 label="Situação"
                 value={situacao}
-                onChange={setSituacao}
+                onChange={(valor) => {
+                  setSituacao(valor);
+                  setErroFiltro(false);
+                }}
                 options={SITUACOES_LOCAL_EXAME}
               />
 
@@ -183,9 +202,15 @@ export function LocalRealizacaoExamePage({ onLogout, onNavigate }: PageProps) {
             </div>
           )}
 
+          {erroFiltro && (
+            <p className="text-sm text-red-500 font-medium">
+              Preencha o código ou selecione ao menos um filtro para pesquisar.
+            </p>
+          )}
+
           {temFiltroAtivo && (
             <div className="flex flex-wrap gap-2 animate-fadeIn">
-              {proprietario && <Chip label={`Proprietário: ${proprietario.nome}`} onRemove={() => setProprietario(null)} />}
+              {proprietario && <Chip label={`Pessoa Jurídica: ${proprietario.nome}`} onRemove={() => setProprietario(null)} />}
               {veterinario && <Chip label={`Médico Veterinário: ${veterinario.nome}`} onRemove={() => setVeterinario(null)} />}
               {situacao && <Chip label={`Situação: ${situacao}`} onRemove={() => setSituacao("")} />}
             </div>
@@ -207,7 +232,7 @@ export function LocalRealizacaoExamePage({ onLogout, onNavigate }: PageProps) {
                 <thead>
                   <tr className="border-b border-gray-100">
                     <th className="text-left px-4 py-3 font-semibold uppercase text-gray-600">Código</th>
-                    <th className="text-left px-4 py-3 font-semibold uppercase text-gray-600">CNPJ</th>
+                    <th className="text-left px-4 py-3 font-semibold uppercase text-gray-600">Pessoa Jurídica</th>
                     <th className="text-left px-4 py-3 font-semibold uppercase text-gray-600">Médicos Veterinários</th>
                     <th className="text-left px-4 py-3 font-semibold uppercase text-gray-600">Situação</th>
                     <th className="px-4 py-3 w-[100px]" />
