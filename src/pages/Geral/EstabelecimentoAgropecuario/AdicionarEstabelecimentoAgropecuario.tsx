@@ -188,7 +188,7 @@ export function AdicionarEstabelecimentoAgropecuarioPage({ onLogout, onNavigate 
           <div className="flex flex-col gap-5 overflow-visible pb-10">
 
             {/* Primeira Linha do Formulário */}
-            <div className="flex flex-col md:flex-row gap-5 w-full relative z-50">
+            <div className="flex flex-col md:flex-row gap-5 w-full relative z-20">
               <div className="w-full md:w-1/3">
                 <FloatSelect
                   label="Tipo de Estabelecimento"
@@ -211,7 +211,7 @@ export function AdicionarEstabelecimentoAgropecuarioPage({ onLogout, onNavigate 
             </div>
 
             {/* Segunda Linha do Formulário */}
-            <div className="flex flex-col md:flex-row gap-5 w-full relative z-40">
+            <div className="flex flex-col md:flex-row gap-5 w-full relative z-10">
               <div className="w-full md:w-1/3">
                 <SimNao
                   label="Cadastro Provisório?"

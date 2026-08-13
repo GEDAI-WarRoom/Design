@@ -1046,7 +1046,7 @@ export const fourthCategories: MenuCategory[] = [
   },
 ];
 
-function filterCategoriesByRole(
+export function filterCategoriesByRole(
   categories: MenuCategory[],
   role: DemoUserRole | null,
 ) {
