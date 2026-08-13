@@ -14,6 +14,7 @@ interface PageProps {
 
 const toFormValue = (dados: TipoInsumoExame | null): TipoInsumoExameFormValue => ({
   nome: dados?.nome ?? "",
+  resultadosPossiveis: dados?.resultadosPossiveis ?? [],
   doencas: dados?.doencas ?? [],
   situacao: dados?.situacao ?? "Ativo",
 });
@@ -34,10 +35,10 @@ export function VisualizarTipoInsumoExamePage({ onLogout, onNavigate, dados }: P
             style={{ color: GREEN }}
           >
             <ArrowLeft size={15} />
-            Todos os Tipos de Insumo de Exame
+            Todos os Tipos de Insumo
           </button>
           <div className="flex items-center justify-between gap-4">
-          <h1 className="text-2xl font-semibold text-gray-900">Visualizar Tipo de Insumo de Exame</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">Visualizar Tipo de Insumo</h1>
          <CustomButton onClick={() => onNavigate("editar-tipo-insumo-exame", registro)}>
             Editar
           </CustomButton>
@@ -46,7 +47,12 @@ export function VisualizarTipoInsumoExamePage({ onLogout, onNavigate, dados }: P
 
         <RequiredFieldsNotice />
 
-        <TipoInsumoExameForm value={toFormValue(registro)} onChange={() => {}} disabled  />
+        <TipoInsumoExameForm
+          value={toFormValue(registro)}
+          onChange={() => {}}
+          disabled
+          showSituacao
+        />
 
         
       </main>

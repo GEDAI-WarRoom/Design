@@ -803,7 +803,7 @@ export const secondaryCategories: MenuCategory[] = [
       },
 
       {
-        label: "Venda com Entrada de Insumos",
+        label: "Venda com Entrada de Insumo",
         route: "venda-entrada-insumos-exames",
         icon: <PackagePlus size={16} />,
       },
@@ -821,7 +821,7 @@ export const secondaryCategories: MenuCategory[] = [
       },
 
       {
-        label: "Tipo de Insumo de Exame",
+        label: "Tipo de Insumo",
         route: "tipo-insumo-exame",
         icon: <PillBottle size={16} />,
       },

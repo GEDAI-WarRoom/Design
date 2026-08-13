@@ -93,7 +93,7 @@ export function TipoInsumoExamePage({ onLogout, onNavigate }: PageProps) {
             Inicial
           </button>
           <div className="flex items-center justify-between gap-4">
-            <h1 className="text-2xl font-semibold text-gray-900">Tipo de Insumo de Exame</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">Tipo de Insumo</h1>
             <button
               type="button"
               onClick={() => onNavigate("adicionar-tipo-insumo-exame")}

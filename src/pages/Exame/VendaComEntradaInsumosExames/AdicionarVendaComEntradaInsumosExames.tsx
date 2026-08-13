@@ -18,7 +18,6 @@ import {
 import {
 	FloatCombobox,
 	FloatInput,
-	FloatSelect,
 } from "../../../components/ui/FormKit";
 
 import * as Icons from "../../../imports/icons";
@@ -40,6 +39,7 @@ const FORNECEDORES_INSUMO_MOCK = [
 		nome: "Laboratório BioMed",
 		tipo: "Laboratório",
 		uf: "SP",
+		doencasProduzidas: ["brucelose", "tuberculose"],
 	},
 	{
 		id: 2,
@@ -47,6 +47,7 @@ const FORNECEDORES_INSUMO_MOCK = [
 		nome: "Insumos Diagnósticos Imunotech",
 		tipo: "Laboratório",
 		uf: "PR",
+		doencasProduzidas: ["aie", "mormo"],
 	},
 	{
 		id: 3,
@@ -140,14 +141,16 @@ export const mockExamSupplyTypes: MockExamSupplyType[] = [
 	},
 ];
 
-export function obterNomeTipoInsumoExame(tipoInsumo: string) {
+export function obterNomeTipoInsumoExame(tipoInsumo: string | MockExamSupplyType | null) {
+	if (!tipoInsumo) return "";
+	if (typeof tipoInsumo === "object") return tipoInsumo.name;
 	return mockExamSupplyTypes.find((item) => item.id === tipoInsumo)?.name ?? tipoInsumo;
 }
 
 const LABORATORIOS_MOCK = [
-	{ id: 1, codigo: "LAB-0001", nome: "Laboratório BioMed" },
-	{ id: 2, codigo: "LAB-0002", nome: "Insumos Diagnósticos Imunotech" },
-	{ id: 3, codigo: "LAB-0003", nome: "ImunoVet Biológicos" },
+	{ id: 1, codigo: "LAB-0001", nome: "Laboratório BioMed", doencasProduzidas: ["brucelose", "tuberculose"] },
+	{ id: 2, codigo: "LAB-0002", nome: "Insumos Diagnósticos Imunotech", doencasProduzidas: ["aie", "mormo"] },
+	{ id: 3, codigo: "LAB-0003", nome: "ImunoVet Biológicos", doencasProduzidas: ["brucelose"] },
 ];
 
 const DOENCAS_MOCK = [
@@ -280,7 +283,7 @@ const novoLote = () => ({
 	numeroPartida: "",
 	laboratorio: null as any,
 	doenca: null as any,
-	tipoInsumoExame: "",
+	tipoInsumoExame: null as MockExamSupplyType | null,
 	validade: "",
 	apresentacoes: [novaApresentacao()],
 });
@@ -318,6 +321,13 @@ export function LoteCardItem({
 
 	const examSupplyTypes = mockExamSupplyTypes.filter(
 		(item) => item.diseaseId === lote.doenca?.diseaseId,
+	);
+	const laboratorioEfetivo = fornecedorEhLaboratorio ? fornecedor : lote.laboratorio;
+	const laboratorioNaoProduzDoenca = Boolean(
+		lote.doenca &&
+		laboratorioEfetivo &&
+		Array.isArray(laboratorioEfetivo.doencasProduzidas) &&
+		!laboratorioEfetivo.doencasProduzidas.includes(lote.doenca.diseaseId),
 	);
 	return (
 		<div className="flex flex-col gap-4 w-full pb-4">
@@ -357,9 +367,7 @@ export function LoteCardItem({
 			</div>
 
 			{/* Grid contendo Doença, Tipo de Insumo (se houver) e Validade alinhados */}
-			<div
-				className={`grid grid-cols-1 ${examSupplyTypes.length > 0 ? "md:grid-cols-3" : "md:grid-cols-2"
-					} gap-4 items-end`}>
+			<div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
 				<EntitySearchInput
 					label="Doença"
 					placeholder="Buscar doença..."
@@ -377,20 +385,33 @@ export function LoteCardItem({
 					}
 					title="Buscar Doença"
 					subtitle="Busque por uma doença cadastrada:"
-						onChange={(ent) =>
-							updateLote(lote.uid, { doenca: ent, tipoInsumoExame: "" })
+					onChange={(ent) =>
+						updateLote(lote.uid, { doenca: ent, tipoInsumoExame: null })
 					}
 				/>
-				{examSupplyTypes.length > 0 && (
-					<FloatSelect
+				{lote.doenca ? (
+					<EntitySearchInput
 						label="Tipo de Insumo"
-						options={examSupplyTypes.map((item) => ({
-							value: item.name,
-							label: item.name,
-						}))}
-						value={lote.tipoInsumoExame || ""}
+						placeholder="Buscar tipo de insumo..."
 						required
-						onChange={(v) => updateLote(lote.uid, { tipoInsumoExame: v })}
+						value={obterNomeTipoInsumoExame(lote.tipoInsumoExame)}
+						data={examSupplyTypes}
+						searchKeys={["name"]}
+						columns={[{ label: "Tipo de Insumo", key: "name" }]}
+						icon={<FlaskConical size={18} color={GREEN} />}
+						title="Buscar Tipo de Insumo"
+						subtitle="Busque por um tipo de insumo aplicável à doença selecionada:"
+						confirmLabel="Selecionar"
+						onChange={(tipoInsumoExame) => updateLote(lote.uid, { tipoInsumoExame })}
+					/>
+				) : (
+					<FloatInput
+						label="Tipo de Insumo"
+						required
+						disabled
+						placeholder="Selecione uma doença primeiro"
+						value=""
+						onChange={() => { }}
 					/>
 				)}
 				<FloatInput
@@ -399,10 +420,17 @@ export function LoteCardItem({
 					icon={<Calendar size={18} />}
 					type="month"
 					placeholder="mm/aaaa"
+					min={new Date().toISOString().slice(0, 7)}
 					value={lote.validade || ""}
 					onChange={(v) => updateLote(lote.uid, { validade: v })}
 				/>
 			</div>
+
+			{laboratorioNaoProduzDoenca && (
+				<p className="text-xs text-amber-700" role="alert">
+					O laboratório selecionado não está cadastrado como produtor de insumos para esta doença. O cadastro ainda pode ser concluído.
+				</p>
+			)}
 
 			<SubGrupo titulo="Apresentação de Insumos" comDivisor>
 				<DynamicListWrapper
@@ -551,9 +579,9 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
 	const totaisPorDoenca = useMemo(() => {
 		const map = new Map<string, { doenca: string; tipoInsumo: string; total: number }>();
 		lotes.forEach((l) => {
-			const nome = l.tipoInsumoExame;
-			if (!nome) return;
+			const nome = l.doenca?.nome || "";
 			const tipoInsumo = obterNomeTipoInsumoExame(l.tipoInsumoExame || "");
+			if (!nome || !tipoInsumo) return;
 			const chave = `${nome}::${tipoInsumo}`;
 			const totalLote = l.apresentacoes.reduce(
 				(s: number, a: any) =>
@@ -564,8 +592,7 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
 			map.set(chave, { doenca: nome, tipoInsumo, total: (atual?.total || 0) + totalLote });
 		});
 		return Array.from(map.values());
-		return Array.from(map, ([tipoInsumo, total]) => ({ tipoInsumo, total }));
-		}, [lotes]);
+	}, [lotes]);
 	const vendaCadastrada = {
 		fornecedor,
 		destinatario: "Revendedora de Produtos Agropecuários",
@@ -594,11 +621,11 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
 						className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70"
 						style={{ color: GREEN }}>
 						<ArrowLeft size={15} />
-						Todas Vendas com Entrada de Insumos
+						Todas as Vendas com Entrada de Insumo
 					</button>
 					<div className="flex justify-between items-center w-full">
 						<h1 className="text-2xl font-semibold text-gray-900">
-							Adicionar Venda com Entrada de Insumos
+							Adicionar Venda com Entrada de Insumo
 						</h1>
 						<button
 							type="button"
@@ -720,22 +747,20 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
 									<div className="flex flex-col gap-3">
 										{totaisPorDoenca.map((t) => (
 											<div
-											key={`${t.doenca}-${t.tipoInsumo}`}
-											className={`grid grid-cols-1 gap-4 items-end ${t.tipoInsumo ? "md:grid-cols-3" : "md:grid-cols-2"}`}>
-													<FloatInput
-														label="Doença"
-														disabled
-														value={t.doenca}
-														onChange={() => { }}
-													/>
-													{t.tipoInsumo && (
-													<FloatInput
-															label="Tipo de Insumo"
-															disabled
-															value={t.tipoInsumo}
-															onChange={() => { }}
-													/>
-												)}
+												key={`${t.doenca}-${t.tipoInsumo}`}
+												className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+												<FloatInput
+													label="Doença"
+													disabled
+													value={t.doenca}
+													onChange={() => { }}
+												/>
+												<FloatInput
+													label="Tipo de Insumo"
+													disabled
+													value={t.tipoInsumo}
+													onChange={() => { }}
+												/>
 												<FloatInput
 													label="Total de Doses Adquiridas"
 													disabled
@@ -760,7 +785,7 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
 							<Check size={28} className="text-[#1A7A3C]" strokeWidth={3} />
 						</div>
 						<h3 className="text-lg font-bold text-gray-900">
-							Venda com entrada de insumos adicionada com sucesso!
+							Venda com entrada de insumo cadastrada com sucesso!
 						</h3>
 						<p className="text-sm text-gray-500 mt-1">
 							{numeroNotaFiscal

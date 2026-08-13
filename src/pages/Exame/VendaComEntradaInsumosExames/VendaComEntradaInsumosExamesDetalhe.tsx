@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Calendar, ChevronDown, ChevronUp, Info, PlusCircle, Trash2 } from "lucide-react";
-import { FloatInput, FloatSelect } from "../../../components/ui/FormKit";
+import { FloatInput } from "../../../components/ui/FormKit";
 import { obterNomeTipoInsumoExame } from "./AdicionarVendaComEntradaInsumosExames";
 
 const GREEN = "#1A7A3C";
@@ -9,6 +9,10 @@ const UFS = ["AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "
 const uid = (prefix: string) => `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 const novaApresentacao = () => ({ uid: uid("ap"), dosesPorFrasco: "", frascos: "" });
 const novoLote = () => ({ uid: uid("lote"), numeroPartida: "", laboratorio: { nome: "" }, doenca: { nome: "" }, tipoInsumoExame: "", validade: "", apresentacoes: [novaApresentacao()] });
+const formatarMesAno = (valor: string) => {
+  const resultado = /^(\d{4})-(\d{2})$/.exec(valor || "");
+  return resultado ? `${resultado[2]}/${resultado[1]}` : valor;
+};
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   const [open, setOpen] = useState(true);
@@ -75,7 +79,6 @@ export function normalizarVendaInsumos(dados?: any) {
     ufNotaFiscal: origem.ufNotaFiscal || exemplo.ufNotaFiscal,
     dataVenda: origem.dataVenda || exemplo.dataVenda,
     dataNotaFiscal: origem.dataNotaFiscal || exemplo.dataNotaFiscal,
-    situacao: origem.situacao || exemplo.situacao,
     lotes,
   };
 }
@@ -84,7 +87,7 @@ interface Props { dados?: any; mode: "view" | "edit"; onSalvar?: (dados: any) =>
 
 export function VendaComEntradaInsumosExamesDetalhe({ dados, mode, onSalvar }: Props) {
   const [form, setForm] = useState(() => normalizarVendaInsumos(dados));
-  // Na edição, todos os campos permanecem somente leitura; apenas a situação é editável.
+  // A visualização deste protótipo reaproveita os campos em modo somente leitura.
   const disabled = true;
   useEffect(() => {
     if (mode === "edit") onSalvar?.(form);
@@ -116,7 +119,7 @@ export function VendaComEntradaInsumosExamesDetalhe({ dados, mode, onSalvar }: P
             {!disabled && form.lotes.length > 1 && <button type="button" onClick={() => setForm({ ...form, lotes: form.lotes.filter((_: any, i: number) => i !== loteIndex) })} className="p-2 text-red-600 hover:bg-red-50 rounded-md"><Trash2 size={18} /></button>}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4"><FloatInput label="Número de Partida" required value={lote.numeroPartida} disabled={disabled} onChange={(numeroPartida) => alterarLote(loteIndex, { numeroPartida })} /><FloatInput label="Laboratório" required value={lote.laboratorio?.nome || ""} disabled={disabled} onChange={(nome) => alterarLote(loteIndex, { laboratorio: { ...lote.laboratorio, nome } })} /></div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4"><FloatInput label="Doença" value={lote.doenca?.nome || ""} disabled={disabled} onChange={(nome) => alterarLote(loteIndex, { doenca: { ...lote.doenca, nome } })} /><FloatInput label="Tipo de Insumo" value={lote.tipoInsumoExame || ""} disabled={disabled} onChange={(tipoInsumoExame) => alterarLote(loteIndex, { tipoInsumoExame })} /><FloatInput label="Data de validade" required value={lote.validade || ""} disabled={disabled} icon={<Calendar size={18} />} onChange={(validade) => alterarLote(loteIndex, { validade })} /></div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4"><FloatInput label="Doença" value={lote.doenca?.nome || ""} disabled={disabled} onChange={(nome) => alterarLote(loteIndex, { doenca: { ...lote.doenca, nome } })} /><FloatInput label="Tipo de Insumo" value={obterNomeTipoInsumoExame(lote.tipoInsumoExame)} disabled={disabled} onChange={(tipoInsumoExame) => alterarLote(loteIndex, { tipoInsumoExame })} /><FloatInput label="Data de validade" required value={formatarMesAno(lote.validade || "")} disabled={disabled} icon={<Calendar size={18} />} onChange={(validade) => alterarLote(loteIndex, { validade })} /></div>
           <div className="border-t border-gray-100 pt-4 flex flex-col gap-4">
             <span className="text-sm font-semibold text-gray-700">Apresentação de Insumos</span>
             {lote.apresentacoes.map((ap: any, apIndex: number) => <div key={ap.uid || apIndex} className="flex items-center gap-3 w-full">
@@ -131,10 +134,6 @@ export function VendaComEntradaInsumosExamesDetalhe({ dados, mode, onSalvar }: P
       {!disabled && <button type="button" onClick={() => setForm({ ...form, lotes: [...form.lotes, novoLote()] })} className="inline-flex self-start items-center gap-2 px-4 h-10 border border-[#1A7A3C] text-[#1A7A3C] rounded-md text-sm font-semibold"><PlusCircle size={16} /> Adicionar Lote</button>}
       <div className="border-t border-gray-100 pt-5 flex flex-col gap-3"><span className="text-sm font-semibold text-gray-700">Total da Nota</span>{totais.map(({ doenca, tipoInsumo, total }) => <div key={`${doenca}-${tipoInsumo}`} className={`grid grid-cols-1 gap-4 ${tipoInsumo ? "md:grid-cols-3" : "md:grid-cols-2"}`}><FloatInput label="Doença" value={doenca} disabled onChange={() => {}} />{tipoInsumo && <FloatInput label="Tipo de Insumo" value={tipoInsumo} disabled onChange={() => {}} />}<FloatInput label="Total de Doses Adquiridas" value={String(total)} disabled onChange={() => {}} /></div>)}</div>
     </div></Section>
-
-    <Section title="Situação do cadastro">
-      <div className="max-w-sm"><FloatSelect label="Situação" value={form.situacao || "Gravada"} disabled={mode === "view" ? true : false} onChange={(situacao) => setForm({ ...form, situacao })} options={[{ value: "Gravada", label: "Gravada" }, { value: "Cancelada", label: "Cancelada" }]} /></div>
-    </Section>
 
   </>;
 }

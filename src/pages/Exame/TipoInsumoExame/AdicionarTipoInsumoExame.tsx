@@ -3,7 +3,6 @@ import { ArrowLeft, Check } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import {
   criarTipoInsumoExame,
-  obterTipoInsumoExame,
   type TipoInsumoExame,
 } from "./tipoInsumoExameData";
 import { RequiredFieldsNotice, TipoInsumoExameForm, type TipoInsumoExameFormValue } from "./TipoInsumoExameForm";
@@ -17,20 +16,25 @@ interface PageProps {
 
 const criarEstadoInicial = (): TipoInsumoExameFormValue => ({
   nome: "",
+  resultadosPossiveis: [],
   doencas: [],
   situacao: "Ativo",
 });
 
 export function AdicionarTipoInsumoExamePage({ onLogout, onNavigate }: PageProps) {
   const [form, setForm] = useState<TipoInsumoExameFormValue>(criarEstadoInicial());
+  const [tentouSalvar, setTentouSalvar] = useState(false);
   const [registroSalvo, setRegistroSalvo] = useState<TipoInsumoExame | null>(null);
+  const formValido = form.nome.trim() !== "" && form.resultadosPossiveis.length > 0;
 
   const handleSalvar = () => {
-    const exemplo = obterTipoInsumoExame(null);
+    setTentouSalvar(true);
+    if (!formValido) return;
 
     const novo: Omit<TipoInsumoExame, "id"> = {
-      nome: form.nome.trim() || "Antígeno para Diagnóstico de Brucelose",
-      doencas: form.doencas.length ? form.doencas : (exemplo?.doencas ?? []),
+      nome: form.nome.trim(),
+      resultadosPossiveis: form.resultadosPossiveis,
+      doencas: form.doencas,
       situacao: "Ativo",
     };
 
@@ -53,10 +57,10 @@ export function AdicionarTipoInsumoExamePage({ onLogout, onNavigate }: PageProps
             style={{ color: GREEN }}
           >
             <ArrowLeft size={15} />
-            Todos os Tipos de Insumo de Exame
+            Todos os Tipos de Insumo
           </button>
           <div className="flex items-center justify-between gap-4">
-            <h1 className="text-2xl font-semibold text-gray-900">Adicionar Tipo de Insumo de Exame</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">Adicionar Tipo de Insumo</h1>
             <button
               type="button"
               onClick={handleSalvar}
@@ -75,12 +79,20 @@ export function AdicionarTipoInsumoExamePage({ onLogout, onNavigate }: PageProps
           onChange={setForm}
         />
 
+        {tentouSalvar && !formValido && (
+          <p className="text-sm text-red-500 font-medium">
+            Preencha todos os campos obrigatórios para continuar.
+          </p>
+        )}
+
       </main>
 
       {registroSalvo && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999] p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center">
-           
+            <div className="w-14 h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center mx-auto mb-4">
+              <Check size={28} className="text-[#1A7A3C]" strokeWidth={3} />
+            </div>
             <h3 className="text-lg font-bold text-gray-900">Tipo de insumo de exame cadastrado com sucesso!</h3>
             <p className="text-sm text-gray-500 mt-1">
               O tipo de insumo de <span className="font-medium text-gray-700">{registroSalvo.nome}</span> foi cadastrado.
