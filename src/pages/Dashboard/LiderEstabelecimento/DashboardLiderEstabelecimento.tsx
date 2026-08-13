@@ -33,6 +33,14 @@ export function DashboardLiderEstabelecimento({
 	const telefone = pessoa?.contatos.find((contato) => contato.tipo === "Telefone")?.valor ?? user?.phone ?? "Não informado";
 	const estabelecimentosVinculados = listarEstabelecimentosDoLider("lider-estabelecimento");
 	const pendencias = listarPendenciasCentrais("lider-estabelecimento");
+	const detalhesPendencia = {
+		"vinculo-profissional": ["Estabelecimento: Frigorífico São José", "Solicitado em: 12/08/2026"],
+		boleto: ["Referência: Julho/2026", "Valor: R$ 1.284,50"],
+	};
+	const acaoPendencia = {
+		"vinculo-profissional": "Confirmar vínculo",
+		boleto: "Ver boletos",
+	};
 
 	return (
 		<DashboardPerfilPadrao
@@ -70,25 +78,16 @@ export function DashboardLiderEstabelecimento({
 			}
 			pendingContent={
 				<PendenciasResumo
-					title="Pendências"
-					items={[
-						{
-							id: "boleto-julho-pendente",
-							title: "Pagamento de boleto pendente",
-							description: "Integradora Vale do Campo · vencimento em 07/08/2026",
-							icon: <CreditCard size={18} />,
-							actionLabel: "Ver boletos",
-							onAction: () => onNavigate("relatorio-boletos-gta"),
-						},
-						...pendencias.map((pendencia) => ({
+					title="Central de Pendências"
+					items={pendencias.map((pendencia) => ({
 							id: String(pendencia.id),
 							title: pendencia.titulo || "Pendência de estabelecimento",
 							description: pendencia.descricao || "Solicitação que precisa da sua atenção",
-							icon: <Building2 size={18} />,
-							actionLabel: "Resolver pendência",
+							icon: pendencia.tipo === "boleto" ? <CreditCard size={18} /> : <Building2 size={18} />,
+							details: detalhesPendencia[pendencia.tipo],
+							actionLabel: acaoPendencia[pendencia.tipo],
 							onAction: () => onNavigate("pendencias-confirmacao-gta"),
-						})),
-					]}
+						}))}
 					onViewAll={() => onNavigate("pendencias-confirmacao-gta")}
 				/>
 			}

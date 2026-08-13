@@ -5,6 +5,7 @@ import {
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatSelect, FloatMultiSelect } from "../../../components/ui/FormKit";
+import { useDemoUser } from "../../../contexts/DemoUserContext";
 import {
   listarProfissionaisAnimal,
   type ProfissionalAnimal,
@@ -66,7 +67,11 @@ interface PageProps {
 }
 
 export function ProfissionalAnimalPage({ onLogout, onNavigate }: PageProps) {
-  const profissionais = listarProfissionaisAnimal();
+  const { role, user } = useDemoUser();
+  const acessoAoProprioCadastro = role === "veterinario" || role === "responsavel-agroindustria-integradora";
+  const profissionais = acessoAoProprioCadastro
+    ? listarProfissionaisAnimal().filter((profissional) => profissional.id === user?.entityId)
+    : listarProfissionaisAnimal();
   // ---- Busca principal ----
   const [busca, setBusca] = useState(""); // Nome ou CPF
 
@@ -143,9 +148,11 @@ export function ProfissionalAnimalPage({ onLogout, onNavigate }: PageProps) {
           </button>
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-semibold text-gray-900">Profissional da Área Animal</h1>
-            <button onClick={() => onNavigate("adicionar-profissional-animal")} className="px-5 py-3 rounded-md text-white text-sm font-semibold transition hover:opacity-90 active:scale-[0.98]" style={{ backgroundColor: GREEN }}>
-              Adicionar Novo
-            </button>
+            {!acessoAoProprioCadastro && (
+              <button onClick={() => onNavigate("adicionar-profissional-animal")} className="px-5 py-3 rounded-md text-white text-sm font-semibold transition hover:opacity-90 active:scale-[0.98]" style={{ backgroundColor: GREEN }}>
+                Adicionar Novo
+              </button>
+            )}
           </div>
         </div>
 

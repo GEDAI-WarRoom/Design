@@ -1,11 +1,9 @@
 import { useMemo, useState } from "react";
 import {
   ArrowLeft,
-  Check,
   ChevronLeft,
   ChevronRight,
   Eye,
-  Minus,
   Pencil,
   Search,
   SlidersHorizontal,
@@ -17,7 +15,6 @@ import * as Icons from "../../../imports/icons";
 import {
   PROPRIETARIOS_UNIDADE_MOCK,
   listarUnidadesVigilancia,
-  registrarUnidadeVigilancia,
   type ProprietarioUnidadeVigilancia,
 } from "./unidadeVigilanciaData";
 
@@ -51,7 +48,7 @@ export function AeroportoPorto({
   onLogout: () => void;
   onNavigate: (screen: string, data?: any) => void;
 }) {
-  const [registros, setRegistros] = useState(() => [...listarUnidadesVigilancia()]);
+  const [registros] = useState(() => [...listarUnidadesVigilancia()]);
   const [busca, setBusca] = useState("");
   const [tipoPessoa, setTipoPessoa] = useState("Pessoa física");
   const [proprietario, setProprietario] = useState<ProprietarioUnidadeVigilancia | null>(null);
@@ -106,18 +103,6 @@ export function AeroportoPorto({
     setPagina(1);
   };
 
-  const alternarSituacao = (id: number) => {
-    setRegistros((atuais) => atuais.map((item) => {
-      if (item.id !== id) return item;
-      const atualizado = {
-        ...item,
-        situacao: item.situacao === "Ativo" ? "Inativo" as const : "Ativo" as const,
-      };
-      registrarUnidadeVigilancia(atualizado);
-      return atualizado;
-    }));
-  };
-
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
       <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="aeroporto-porto" hideSearch />
@@ -148,13 +133,12 @@ export function AeroportoPorto({
             <button type="button" onClick={() => setFiltrosAbertos((aberto) => !aberto)} title="Exibir filtros" className={`flex h-12 w-12 items-center justify-center rounded-md border transition ${filtrosAbertos ? "border-[#1A7A3C] bg-white text-[#1A7A3C]" : "border-[#1A7A3C] bg-[#1A7A3C] text-white"}`}>
               <SlidersHorizontal size={17} />
             </button>
-            <button type="button" onClick={pesquisar} className="h-12 rounded-md bg-[#1A7A3C] px-6 text-sm font-semibold text-white transition hover:bg-[#15612F]">Pesquisar</button>
           </div>
 
           {erroFiltro && <p className="text-sm font-medium text-red-600">Informe o código, o nome ou ao menos um filtro para pesquisar.</p>}
 
           {filtrosAbertos && (
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 animate-fadeIn">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5 animate-fadeIn">
               <FloatInput
                 label="Proprietário"
                 value={proprietario ? `${proprietario.documento} - ${proprietario.nome}` : ""}
@@ -165,6 +149,9 @@ export function AeroportoPorto({
               <FloatCombobox label="Estado" value={estado} onChange={(valor) => { setEstado(valor); setMunicipio(""); setPesquisou(false); }} options={ESTADOS_BR} />
               <FloatCombobox label="Município" value={municipio} onChange={(valor) => { setMunicipio(valor); setPesquisou(false); }} options={estado ? MUNICIPIOS_POR_ESTADO[estado] || [] : []} disabled={!estado} />
               <FloatSelect label="Situação" value={situacao} onChange={(valor) => { setSituacao(valor); setPesquisou(false); }} options={SITUACOES} />
+              <button type="button" onClick={pesquisar} className="h-12 rounded-md bg-[#1A7A3C] px-6 text-sm font-semibold text-white transition hover:bg-[#15612F]">
+                Pesquisar
+              </button>
             </div>
           )}
 
@@ -200,16 +187,11 @@ export function AeroportoPorto({
                         <td className="px-4 py-3.5 font-medium text-gray-800">{item.nome}</td>
                         <td className="px-4 py-3.5 text-gray-700">{item.proprietarios.map((prop) => `${prop.documento} - ${prop.nome}`).join(", ")}</td>
                         <td className="px-4 py-3.5 text-gray-700">{item.endereco.municipio} - MG</td>
-                        <td className="px-4 py-3.5">
-                          <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${item.situacao === "Ativo" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"}`}>{item.situacao}</span>
-                        </td>
+                        <td className="px-4 py-3.5 text-gray-700">{item.situacao}</td>
                         <td className="px-4 py-3.5">
                           <div className="flex justify-end gap-1 text-[#1A7A3C]">
                             <button type="button" onClick={() => onNavigate("visualizar-aeroporto-porto", item)} className="rounded-md p-2 hover:bg-green-50" title="Visualizar"><Eye size={18} /></button>
                             <button type="button" onClick={() => onNavigate("editar-aeroporto-porto", item)} className="rounded-md p-2 hover:bg-green-50" title="Editar"><Pencil size={17} /></button>
-                            <button type="button" onClick={() => alternarSituacao(item.id)} className="rounded-md p-2 hover:bg-green-50" title={item.situacao === "Ativo" ? "Inativar" : "Ativar"}>
-                              {item.situacao === "Ativo" ? <Minus size={18} /> : <Check size={18} />}
-                            </button>
                           </div>
                         </td>
                       </tr>

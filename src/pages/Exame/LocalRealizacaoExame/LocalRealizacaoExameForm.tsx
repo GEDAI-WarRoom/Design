@@ -3,9 +3,8 @@ import { ChevronDown, ChevronUp, Info, PlusCircle, Trash2 } from "lucide-react";
 import { FloatInput, FloatSelect, MultiSearchModal, SimNao } from "../../../components/ui/FormKit";
 import {
   BlocoEnderecoFields,
-  DynamicListWrapper,
+  EntitySearchInput,
   EstabelecimentoAgropecuarioInput,
-  ProprietarioInput,
 } from "../../../components/ui/EntitySearch";
 import * as Icons from "../../../imports/icons";
 import {
@@ -146,8 +145,14 @@ export function LocalRealizacaoExameForm({
     <>
       <Section title="Informações Básicas">
         <div className="flex flex-col gap-5">
-          {isView && <div className="grid grid-cols-1 md:grid-cols-2 gap-4"><FloatInput label="Código" value={codigo ?? ""} disabled /><FloatInput label="Situação" value={value.situacao} disabled /></div>}
-          {isView ? <FloatInput label="É um local comercial?" value={value.ehComercial ? "Sim" : "Não"} disabled /> : <SimNao label="É um local comercial?" name="local-comercial" required value={value.ehComercial} onChange={(ehComercial) => onChange({ ...value, ehComercial })} />}
+          {isView && <FloatInput label="Código" value={codigo ?? ""} disabled />}
+          {isView ? <FloatInput label="É um local comercial?" value={value.ehComercial ? "Sim" : "Não"} disabled /> : <SimNao label="É um local comercial?" name="local-comercial" required value={value.ehComercial} onChange={(ehComercial) => onChange({
+            ...value,
+            ehComercial,
+            proprietarios: ehComercial
+              ? (value.proprietarios.length ? [value.proprietarios[0]] : [criarProprietarioVazio()])
+              : [criarProprietarioVazio()],
+          })} />}
           {mode === "edit" && <FloatSelect label="Situação" value={value.situacao} onChange={(situacao) => onChange({ ...value, situacao: situacao as SituacaoLocalExame })} options={SITUACOES_LOCAL_EXAME} />}
           {value.ehComercial && <div>
             {isView ? (
@@ -160,38 +165,85 @@ export function LocalRealizacaoExameForm({
                 ))}
               </div>
             ) : (
-              <DynamicListWrapper
-                items={value.proprietarios}
-                behavior="at-least-one"
-                addButtonLabel="Adicionar Pessoa Jurídica"
-                itemLabel="CNPJ"
-                variant="plain"
-                onAddItem={() => onChange({
-                  ...value,
-                  proprietarios: [...value.proprietarios, { uid: uid(), entidade: null }],
-                })}
-                onRemoveItem={(index) => onChange({
-                  ...value,
-                  proprietarios: value.proprietarios.filter((_, itemIndex) => itemIndex !== index),
-                })}
-              >
-                {(item: ProprietarioFormItem, index: number) => (
-                  <ProprietarioInput
-                    value={item.entidade?.nome ?? ""}
-                    label="Pessoa Jurídica"
-                    data={PROPRIETARIOS_LOCAL_EXAME.filter((entidade) => entidade.tipo === "PJ")}
-                    required
-                    onChange={(entidade) => onChange({
-                      ...value,
-                      proprietarios: value.proprietarios.map((proprietario, itemIndex) => (
-                        itemIndex === index ? { ...proprietario, entidade } : proprietario
-                      )),
-                    })}
-                  />
-                )}
-              </DynamicListWrapper>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <EntitySearchInput
+                  label="Pessoa Jurídica"
+                  placeholder="Buscar por razão social ou CNPJ"
+                  value={value.proprietarios[0]?.entidade?.nome ?? ""}
+                  data={PROPRIETARIOS_LOCAL_EXAME.filter((entidade) => entidade.tipo === "PJ")}
+                  searchKeys={["documento", "nome"]}
+                  columns={[
+                    { label: "CNPJ", key: "documento" },
+                    { label: "Razão Social", key: "nome" },
+                  ]}
+                  icon={<img src={Icons.iconePessoaJuridicaUrl} alt="Pessoa Jurídica" className="w-5 h-5 object-contain" />}
+                  title="Buscar Pessoa Jurídica"
+                  subtitle="Busque por uma pessoa jurídica cadastrada no sistema:"
+                  required
+                  onChange={(entidade) => onChange({
+                    ...value,
+                    proprietarios: [{
+                      uid: value.proprietarios[0]?.uid ?? uid(),
+                      entidade,
+                    }],
+                  })}
+                />
+                <FloatInput
+                  label="CNPJ"
+                  value={value.proprietarios[0]?.entidade?.documento ?? ""}
+                  disabled
+                />
+              </div>
             )}
           </div>}
+        </div>
+      </Section>
+
+      <Section title="Profissionais Habilitados">
+        <div className="flex flex-col gap-5">
+          {!profissionaisBloqueados && (
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => setModalVeterinariosAberto(true)}
+                disabled={value.veterinarios.length >= 5}
+                title={value.veterinarios.length >= 5 ? "Limite de cinco profissionais atingido" : "Adicionar médicos veterinários"}
+                className="flex items-center gap-2 px-4 h-10 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50 transition disabled:cursor-not-allowed disabled:border-gray-300 disabled:text-gray-400 disabled:hover:bg-transparent"
+              >
+                <PlusCircle size={16} /> Adicionar Médicos Veterinários
+              </button>
+            </div>
+          )}
+          {value.veterinarios.length === 0 ? null : (
+            <div className="flex flex-col gap-4">
+              {value.veterinarios.map((veterinario, index) => (
+                <article key={veterinario.id} className="rounded-xl p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-7 h-7 rounded-full bg-[#1A7A3C] text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-2">
+                      {index + 1}
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
+                      <FloatInput label="Médico Veterinário" required value={veterinario.nome} disabled />
+                      <FloatInput label="CPF do Veterinário" required value={veterinario.cpf} disabled />
+                    </div>
+                    {!profissionaisBloqueados && (
+                      <button
+                        type="button"
+                        onClick={() => onChange({
+                          ...value,
+                          veterinarios: value.veterinarios.filter((item) => item.id !== veterinario.id),
+                        })}
+                        className="p-2 text-red-500 hover:bg-red-50 rounded-md transition mt-2"
+                        title="Remover médico veterinário"
+                      >
+                        <Trash2 size={17} />
+                      </button>
+                    )}
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
         </div>
       </Section>
 
@@ -252,64 +304,11 @@ export function LocalRealizacaoExameForm({
         </div>
       </Section>
 
-      <Section title="Profissionais Habilitados">
-        <div className="flex flex-col gap-5">
-          {!profissionaisBloqueados && (
-            <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={() => setModalVeterinariosAberto(true)}
-                className="flex items-center gap-2 px-4 h-10 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50 transition"
-              >
-                <PlusCircle size={16} /> Adicionar Médicos Veterinários
-              </button>
-            </div>
-          )}
-          {value.veterinarios.length === 0 ? null : (
-            <div className="flex flex-col gap-4">
-              {value.veterinarios.map((veterinario, index) => (
-                <article key={veterinario.id} className="rounded-xl p-4">
-                  <div className="flex items-start gap-3">
-                    <div className="w-7 h-7 rounded-full bg-[#1A7A3C] text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-2">
-                      {index + 1}
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
-                      <FloatInput label="Médico Veterinário" required value={veterinario.nome} disabled />
-                      <FloatInput label="CPF do Veterinário" required value={veterinario.cpf} disabled />
-                      <FloatInput
-                        label="Exames que Realiza"
-                        required
-                        value={veterinario.examesFormatados}
-                        disabled
-                        className="md:col-span-2"
-                      />
-                    </div>
-                    {!profissionaisBloqueados && (
-                      <button
-                        type="button"
-                        onClick={() => onChange({
-                          ...value,
-                          veterinarios: value.veterinarios.filter((item) => item.id !== veterinario.id),
-                        })}
-                        className="p-2 text-red-500 hover:bg-red-50 rounded-md transition mt-2"
-                        title="Remover médico veterinário"
-                      >
-                        <Trash2 size={17} />
-                      </button>
-                    )}
-                  </div>
-                </article>
-              ))}
-            </div>
-          )}
-        </div>
-      </Section>
-
       <MultiSearchModal<MedicoVeterinarioExame>
         open={modalVeterinariosAberto}
         onClose={() => setModalVeterinariosAberto(false)}
         title="Buscar Médicos Veterinários"
-        subtitle="Busque por médicos veterinários cadastrados."
+        subtitle="Busque por médico veterinário para realização de exame."
         icon={<img src={Icons.iconeProfissionalAnimalUrl} alt="Médico Veterinário" className="w-6 h-6 object-contain" />}
         data={veterinariosDisponiveis}
         columns={[
@@ -319,6 +318,7 @@ export function LocalRealizacaoExameForm({
         searchKeys={["nome", "cpf"]}
         searchPlaceholder="Buscar por nome ou CPF"
         selectedItems={value.veterinarios}
+        maxSelection={5}
         confirmLabel="Salvar Selecionados"
         onConfirm={(veterinarios) => {
           onChange({ ...value, veterinarios });

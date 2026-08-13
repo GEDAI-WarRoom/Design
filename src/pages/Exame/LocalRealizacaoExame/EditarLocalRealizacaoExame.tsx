@@ -54,13 +54,17 @@ export function EditarLocalRealizacaoExamePage({ onLogout, onNavigate, dados }: 
       && (!form.localizadoEmEstabelecimento || !!form.estabelecimento)
       && !!enderecoBasicoValido;
 
-    if (proprietarios.length !== form.proprietarios.length || !localizacaoValida) {
-      setErro("Preencha os proprietários e a localização para continuar.");
+    const pessoaJuridicaValida = form.ehComercial === false
+      || (form.ehComercial === true && proprietarios.length === 1);
+    const profissionaisValidos = form.veterinarios.length >= 1 && form.veterinarios.length <= 5;
+
+    if (!pessoaJuridicaValida || !localizacaoValida || !profissionaisValidos) {
+      setErro("Preencha os campos obrigatórios e mantenha de um a cinco médicos veterinários para continuar.");
       return;
     }
 
     const atualizado = atualizarLocalRealizacaoExame(registroInicial.id, {
-      proprietarios,
+      proprietarios: form.ehComercial ? proprietarios : [],
       localizadoEmEstabelecimento: form.localizadoEmEstabelecimento === true,
       estabelecimento: form.estabelecimento,
       endereco: form.endereco,

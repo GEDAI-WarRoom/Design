@@ -3,6 +3,7 @@ import {
 	Check,
 	FileInput,
 	RefreshCw,
+	Syringe,
 	X,
 } from "lucide-react";
 import {
@@ -18,6 +19,7 @@ import {
 	type AtualizacaoCadastralRebanho,
 } from "../pages/Rebanho/AtualizacaoCadastralRebanho/atualizacaoCadastralRebanhoData";
 import { PendenciasResumo } from "../pages/Dashboard/shared/PendenciasResumo";
+import { listarPendenciasCentrais } from "../pages/GTA/PendenciasConfirmacao/pendenciasCentralData";
 
 type RespostaRecebimento = RespostaRecebimentoGta | null;
 
@@ -165,6 +167,7 @@ export function PendenciasConfirmacaoGta({
 				PRODUTOR_REBANHO_DEMONSTRACAO_DOCUMENTO &&
 			!atualizacao.concluida,
 	);
+	const pendenciasDeclaracao = listarPendenciasCentrais("produtor");
 
 	const salvarResposta = (resposta: Exclude<RespostaRecebimento, null>) => {
 		if (!pendenciaAberta) return;
@@ -172,7 +175,7 @@ export function PendenciasConfirmacaoGta({
 		setPendenciaAberta(null);
 	};
 
-	const quantidadePendencias = pendencias.length + pendenciasRebanho.length;
+	const quantidadePendencias = pendencias.length + pendenciasRebanho.length + pendenciasDeclaracao.length;
 	const abrirAtualizacaoRebanho = (
 		atualizacao: AtualizacaoCadastralRebanho,
 	) => {
@@ -186,17 +189,17 @@ export function PendenciasConfirmacaoGta({
 		return dia && mes && ano ? `${dia}/${mes}/${ano}` : data;
 	};
 	const itensResumo = [
-		...pendencias.slice(0, 1).map((pendencia) => ({ id: `gta-${pendencia.id}`, title: `GTA NR - ${pendencia.numero}`, description: "Confirmação de recebimento dos animais", icon: <FileInput size={18} />, details: [`Proprietário ${pendencia.procedencia}`, `Destino: ${pendencia.destino} • ${pendencia.municipioDestino}`], actionLabel: "Confirmar GTA", onAction: () => setPendenciaAberta(pendencia) })),
+		...pendenciasDeclaracao.slice(0, 1).map((pendencia) => ({ id: `declaracao-${pendencia.id}`, title: pendencia.titulo, description: pendencia.descricao, icon: <Syringe size={18} />, details: ["Campanha: Brucelose 2026", "Prazo: 31/08/2026"], actionLabel: "Declarar vacinação", onAction: () => onNavigate("declaracao-vacinacao") })),
 		...pendenciasRebanho.slice(0, 1).map((atualizacao) => ({ id: `rebanho-${atualizacao.id}`, title: "Atualização Cadastral", description: "Revisão periódica dos dados da propriedade", icon: <RefreshCw size={18} />, details: [`Referência: ${atualizacao.etapa}`, `Prazo: ${formatarData(atualizacao.dataFimEtapa)}`], actionLabel: "Atualizar Agora", onAction: () => abrirAtualizacaoRebanho(atualizacao) })),
-		...pendencias.slice(1, 2).map((pendencia) => ({ id: `gta-${pendencia.id}`, title: `GTA NR - ${pendencia.numero}`, description: "Confirmação de recebimento dos animais", icon: <FileInput size={18} />, details: [`Proprietário ${pendencia.procedencia}`, `Destino: ${pendencia.destino} • ${pendencia.municipioDestino}`], actionLabel: "Confirmar GTA", onAction: () => setPendenciaAberta(pendencia) })),
+		...pendencias.slice(0, 1).map((pendencia) => ({ id: `gta-${pendencia.id}`, title: `GTA NR - ${pendencia.numero}`, description: "Confirmação de recebimento dos animais", icon: <FileInput size={18} />, details: [`Proprietário ${pendencia.procedencia}`, `Destino: ${pendencia.destino} • ${pendencia.municipioDestino}`], actionLabel: "Confirmar GTA", onAction: () => setPendenciaAberta(pendencia) })),
 	];
 	return (
 		<>
 			<PendenciasResumo
-				title="Pendências de Confirmação"
+				title="Central de Pendências"
 				items={itensResumo}
 				totalCount={quantidadePendencias}
-				onViewAll={() => onNavigate("pendencias-confirmacao-gta", { aba: "gta" })}
+				onViewAll={() => onNavigate("pendencias-confirmacao-gta", { aba: "declaracao" })}
 			/>
 
 			{pendenciaAberta && (

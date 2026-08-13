@@ -34,9 +34,9 @@ const LABORATORIOS_MOCK = [
 ];
 
 const DOENCAS_MOCK = [
-  { id: 1, nome: "Febre Aftosa", codigo: "D-01" },
-  { id: 2, nome: "Brucelose", codigo: "D-02" },
-  { id: 3, nome: "Raiva dos Herbívoros", codigo: "D-03" },
+  { id: 1, nome: "Febre Aftosa", codigo: "D-01", tiposVacina: ["O1 Campos", "A24 Cruzeiro"] },
+  { id: 2, nome: "Brucelose", codigo: "D-02", tiposVacina: ["B19", "RB51"] },
+  { id: 3, nome: "Raiva dos Herbívoros", codigo: "D-03", tiposVacina: [] },
 ];
 
 const DOENCAS_INSUMO_MOCK = [
@@ -53,59 +53,115 @@ const VENDAS_MOCK = [
   { 
     id: "1", 
     fornecedor: "Distribuidora de Vacinas Alfa LTDA", 
+    codigoRevendedora: "31.909.877/0001-53",
     destinatario: "João da Silva Sauro", 
+    codigoDestinatario: "000.111.222-33",
     tipoDestinatario: "produtor", 
     notaFiscal: "15420", 
     partida: "0013225/24",
     laboratorio: "Laboratório Biovet",
     doenca: "Febre Aftosa",
+    tipoVacina: "O1 Campos",
+    lotes: [
+      { numeroPartida: "0013225/24", laboratorio: "Laboratório Biovet", doenca: "Febre Aftosa", tipoVacina: "O1 Campos" },
+      { numeroPartida: "0013378/24", laboratorio: "Zoetis Indústria Química", doenca: "Febre Aftosa", tipoVacina: "A24 Cruzeiro" },
+    ],
     situacao: "Ativo" 
   },
   { 
     id: "2", 
     fornecedor: "Comercial Agropecuária Beta S/A", 
+    codigoRevendedora: "31.909.877/0001-45",
     destinatario: "Carlos Antunes Medeiros", 
+    codigoDestinatario: "222.333.444-55",
     tipoDestinatario: "vacinador", 
     notaFiscal: "15421", 
     partida: "0013225/24",
     laboratorio: "Zoetis Indústria Química",
     doenca: "Brucelose",
+    tipoVacina: "B19",
+    lotes: [
+      { numeroPartida: "0013225/24", laboratorio: "Zoetis Indústria Química", doenca: "Brucelose", tipoVacina: "B19" },
+    ],
     situacao: "Ativo" 
   },
   { 
     id: "3", 
     fornecedor: "Distribuidora de Vacinas Alfa LTDA", 
+    codigoRevendedora: "31.909.877/0001-53",
     destinatario: "Mariana Costa Silva", 
+    codigoDestinatario: "333.444.555-66",
     tipoDestinatario: "Médico Veterinário", 
     notaFiscal: "16890", 
     partida: "0013225/24",
     laboratorio: "Laboratório Biovet",
     doenca: "Raiva dos Herbívoros",
+    tipoVacina: "",
+    lotes: [
+      { numeroPartida: "0014589/24", laboratorio: "Laboratório Biovet", doenca: "Raiva dos Herbívoros", tipoVacina: "" },
+    ],
     situacao: "Inativo" 
   },
   { 
     id: "4", 
     fornecedor: "Comercial Agropecuária Beta S/A", 
+    codigoRevendedora: "31.909.877/0001-45",
     destinatario: "AgroForte Produtos Rurais", 
+    codigoDestinatario: "11.222.333/0001-44",
     tipoDestinatario: "revendedora", 
     notaFiscal: "17200", 
     partida: "0013225/24",
     laboratorio: "Zoetis Indústria Química",
     doenca: "Febre Aftosa",
+    tipoVacina: "A24 Cruzeiro",
+    lotes: [
+      { numeroPartida: "0013225/24", laboratorio: "Zoetis Indústria Química", doenca: "Febre Aftosa", tipoVacina: "A24 Cruzeiro" },
+      { numeroPartida: "0015890/25", laboratorio: "Laboratório Biovet", doenca: "Febre Aftosa", tipoVacina: "O1 Campos" },
+    ],
     situacao: "Ativo" 
   },
   { 
     id: "5", 
     fornecedor: "Distribuidora de Vacinas Alfa LTDA", 
+    codigoRevendedora: "31.909.877/0001-53",
     destinatario: "Pedro Pedreira", 
+    codigoDestinatario: "444.555.666-77",
     tipoDestinatario: "produtor", 
     notaFiscal: "18102", 
     partida: "0013225/24",
     laboratorio: "Laboratório Biovet",
     doenca: "Brucelose",
+    tipoVacina: "RB51",
+    lotes: [
+      { numeroPartida: "0013225/24", laboratorio: "Laboratório Biovet", doenca: "Brucelose", tipoVacina: "RB51" },
+    ],
     situacao: "Inativo" 
   }
 ];
+
+function obterLotesVenda(venda: any) {
+  const lotesInformados = Array.isArray(venda.lotes) && venda.lotes.length > 0
+    ? venda.lotes
+    : Array.isArray(venda.notasFiscaisOrigem) && venda.notasFiscaisOrigem.length > 0
+      ? venda.notasFiscaisOrigem
+      : null;
+
+  if (lotesInformados) {
+    return lotesInformados.map((lote: any) => ({
+      numeroPartida: lote.numeroPartida ?? lote.partida ?? lote.nome ?? "—",
+      laboratorio: lote.laboratorio ?? "—",
+      doenca: lote.doenca ?? "—",
+      tipoVacina: lote.tipoVacina ?? lote.tipoInsumo ?? "",
+    }));
+  }
+
+  return [{
+    numeroPartida: venda.numeroPartida ?? venda.partida ?? "—",
+    laboratorio: venda.laboratorio ?? "—",
+    doenca: venda.doenca ?? "—",
+    tipoVacina: venda.tipoVacina ?? venda.tipoInsumo ?? "",
+  }];
+}
 
 interface VendaComSaidaVacinaProps {
   onLogout: () => void;
@@ -115,16 +171,29 @@ interface VendaComSaidaVacinaProps {
 
 export function VendaComSaidaVacinaPage({ onLogout, onNavigate, tipoProduto = "vacina" }: VendaComSaidaVacinaProps) {
   const isInsumo = tipoProduto === "insumo";
+  const rotuloFornecedor = "Revendedora de Produtos Agropecuários";
   const rotaLista = isInsumo ? "venda-saida-insumo" : "venda-saida-vacina";
   const rotaAdicionar = isInsumo ? "adicionar-venda-saida-insumo" : "adicionar-venda-saida-vacina";
   const fornecedoresDisponiveis = isInsumo ? [
-    { id: 101, nome: "Laboratório BioDiagnóstico MG", cnpj: "23.456.789/0001-10" },
-    { id: 102, nome: "Distribuidora VetTest S/A", cnpj: "34.567.890/0001-21" },
+    { id: 101, nome: "AgroDiagnóstico Minas", cnpj: "23.456.789/0001-10", atuacao: "Revendedora de Insumos para Exames de Brucelose/Tuberculose" },
+    { id: 102, nome: "VetTest Produtos Agropecuários", cnpj: "34.567.890/0001-21", atuacao: "Revendedora de Insumos para Exames de Brucelose/Tuberculose" },
   ] : FORNECEDORES_MOCK;
   const laboratoriosDisponiveis = isInsumo ? [
-    { id: 101, nome: "Tecpar Diagnósticos", codigo: "LAB-101" },
-    { id: 102, nome: "Laboratório Biovet", codigo: "LAB-102" },
+    { id: 101, nome: "Tecpar Diagnósticos", codigo: "LAB-101", atuacao: "Realiza produção de insumos de diagnóstico" },
+    { id: 102, nome: "Laboratório Biovet", codigo: "LAB-102", atuacao: "Realiza produção de insumos de diagnóstico" },
   ] : LABORATORIOS_MOCK;
+  const tiposDestinatario = isInsumo ? [
+    { value: "medico_pncebt", label: "Médico Veterinário Habilitado PNCEBT" },
+    { value: "instituicao_ensino_pesquisa", label: "Instituição de ensino e pesquisa" },
+    { value: "laboratorio", label: "Laboratório" },
+    { value: "responsavel_tecnico_grsc", label: "Responsável Técnico GRSC" },
+    { value: "revendedora", label: "Revendedora de Produtos Agropecuários" },
+  ] : [
+    { value: "produtor", label: "Produtor" },
+    { value: "vacinador", label: "Vacinador" },
+    { value: "medico_veterinario", label: "Médico Veterinário" },
+    { value: "revendedora", label: "Revendedora de Produtos Agropecuários" },
+  ];
   // Estados dos Filtros
   const [fornecedor, setFornecedor] = useState("");
   const [tipoDestinatario, setTipoDestinatario] = useState("");
@@ -134,9 +203,18 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate, tipoProduto = "v
   const [numeroPartida, setNumeroPartida] = useState("");
   const [laboratorio, setLaboratorio] = useState("");
   const [doenca, setDoenca] = useState("");
+  const [tipoVacina, setTipoVacina] = useState("");
   const [tipoInsumo, setTipoInsumo] = useState("");
   const [situacao, setSituacao] = useState("");
-  const tiposInsumoDisponiveis = isInsumo && doenca ? (TIPOS_INSUMO_POR_DOENCA[doenca] ?? []) : [];
+  const tiposVacinaDisponiveis = !isInsumo && doenca
+    ? (DOENCAS_MOCK.find((item) => item.nome === doenca)?.tiposVacina ?? [])
+    : [];
+  const tiposInsumoDisponiveis = isInsumo
+    ? doenca
+      ? (TIPOS_INSUMO_POR_DOENCA[doenca] ?? [])
+      : [...new Set(Object.values(TIPOS_INSUMO_POR_DOENCA).flat())]
+    : [];
+  const exibirFiltroTipo = isInsumo || tiposVacinaDisponiveis.length > 0;
 
   // Estado que guarda os filtros aplicados de fato após clicar em "Pesquisar"
   const [filtrosAplicados, setFiltrosAplicados] = useState<any>(null);
@@ -161,6 +239,7 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate, tipoProduto = "v
       numeroPartida,
       laboratorio,
       doenca,
+      tipoVacina,
       tipoInsumo,
       situacao
     });
@@ -171,10 +250,18 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate, tipoProduto = "v
   // Filtragem dos dados baseando-se no clique do botão
   const vendasInsumo = VENDAS_MOCK.map((venda, index) => ({
     ...venda,
-    fornecedor: index % 2 === 0 ? "Laboratório BioDiagnóstico MG" : "Distribuidora VetTest S/A",
+    fornecedor: index % 2 === 0 ? "AgroDiagnóstico Minas" : "VetTest Produtos Agropecuários",
+    tipoDestinatario: ["medico_pncebt", "instituicao_ensino_pesquisa", "laboratorio", "responsavel_tecnico_grsc", "revendedora"][index % 5],
     laboratorio: index % 2 === 0 ? "Tecpar Diagnósticos" : "Laboratório Biovet",
     doenca: index % 2 === 0 ? "Brucelose" : "Tuberculose",
     tipoInsumo: index % 2 === 0 ? "Antígeno Acidificado Tamponado (AAT)" : index === 1 ? "Tuberculina PPD Bovina" : "Tuberculina PPD Aviária",
+    situacao: index % 2 === 0 ? "Gravada" : "Cancelada",
+    lotes: [{
+      numeroPartida: venda.partida,
+      laboratorio: index % 2 === 0 ? "Tecpar Diagnósticos" : "Laboratório Biovet",
+      doenca: index % 2 === 0 ? "Brucelose" : "Tuberculose",
+      tipoInsumo: index % 2 === 0 ? "Antígeno Acidificado Tamponado (AAT)" : index === 1 ? "Tuberculina PPD Bovina" : "Tuberculina PPD Aviária",
+    }],
   }));
   const dadosFiltrados = listarRegistrosMock(
     isInsumo ? "vendas-saida-insumo" : "vendas-saida-vacina",
@@ -183,14 +270,17 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate, tipoProduto = "v
     if (!filtrosAplicados) return true;
 
     const f = filtrosAplicados;
+    const lotesVenda = obterLotesVenda(venda);
     if (f.fornecedor && !venda.fornecedor.toLowerCase().includes(f.fornecedor.toLowerCase())) return false;
     if (f.tipoDestinatario && venda.tipoDestinatario !== f.tipoDestinatario) return false;
     if (f.destinatario && !venda.destinatario.toLowerCase().includes(f.destinatario.toLowerCase())) return false;
+    if (f.cpfCnpjDestinatario && !String(venda.codigoDestinatario ?? "").includes(f.cpfCnpjDestinatario)) return false;
     if (f.notaFiscal && !venda.notaFiscal.includes(f.notaFiscal)) return false;
-    if (f.numeroPartida && !venda.partida.toLowerCase().includes(f.numeroPartida.toLowerCase())) return false;
-    if (f.laboratorio && !venda.laboratorio.toLowerCase().includes(f.laboratorio.toLowerCase())) return false;
-    if (f.doenca && !venda.doenca.toLowerCase().includes(f.doenca.toLowerCase())) return false;
-    if (f.tipoInsumo && venda.tipoInsumo !== f.tipoInsumo) return false;
+    if (f.numeroPartida && !lotesVenda.some((lote) => lote.numeroPartida.toLowerCase().includes(f.numeroPartida.toLowerCase()))) return false;
+    if (f.laboratorio && !lotesVenda.some((lote) => lote.laboratorio.toLowerCase().includes(f.laboratorio.toLowerCase()))) return false;
+    if (f.doenca && !lotesVenda.some((lote) => lote.doenca.toLowerCase().includes(f.doenca.toLowerCase()))) return false;
+    if (f.tipoVacina && !lotesVenda.some((lote) => lote.tipoVacina === f.tipoVacina)) return false;
+    if (f.tipoInsumo && !lotesVenda.some((lote) => lote.tipoVacina === f.tipoInsumo)) return false;
     if (f.situacao && venda.situacao !== f.situacao) return false;
 
     return true;
@@ -225,100 +315,130 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate, tipoProduto = "v
         </div>
 
        <div className="bg-white rounded-xl shadow-sm p-6 mt-5">
-  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
-            
-            <FloatInput
-              label="Fornecedor"
-              value={fornecedor}
-              icon={<Store size={16} />}
-              onClick={() => setModalFornecedorOpen(true)}
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4 items-end">
+            <div className="lg:col-span-4">
+              <FloatInput
+                label={rotuloFornecedor}
+                value={fornecedor}
+                icon={<Store size={16} />}
+                onClick={() => setModalFornecedorOpen(true)}
+              />
+            </div>
 
-            <FloatSelect
-              label="Tipo de Destinatário"
-              value={tipoDestinatario}
-              onChange={setTipoDestinatario}
-              options={[
-                { value: "produtor", label: "Produtor" },
-                { value: "vacinador", label: "Vacinador" },
-                { value: "medico_veterinario", label: "Médico Veterinário" },
-                { value: "revendedora", label: "Revendedora de Produtos Agropecuários" },
-              ]}
-            />
+            <div className="lg:col-span-4">
+              <FloatSelect
+                label="Tipo de Destinatário"
+                value={tipoDestinatario}
+                onChange={setTipoDestinatario}
+                options={tiposDestinatario}
+              />
+            </div>
 
-            <FloatInput
-              label="Destinatário"
-              value={destinatario}
-              onChange={setDestinatario}
-            />
+            <div className="lg:col-span-4">
+              <FloatInput
+                label="Destinatário"
+                value={destinatario}
+                onChange={setDestinatario}
+                maxLength={255}
+              />
+            </div>
 
-            <FloatInput
-              label="CPF/CNPJ do Destinatário"
-              value={cpfCnpjDestinatario}
-              onChange={setCpfCnpjDestinatario}
-            />
+            <div className="lg:col-span-3">
+              <FloatInput
+                label="CPF/CNPJ do Destinatário"
+                value={cpfCnpjDestinatario}
+                onChange={setCpfCnpjDestinatario}
+                maxLength={14}
+              />
+            </div>
+
+            <div className="lg:col-span-3">
+              <FloatInput
+                label="Número da Nota Fiscal"
+                value={notaFiscal}
+                type={isInsumo ? "number" : "text"}
+                maxLength={10}
+                onChange={(valor) => setNotaFiscal(isInsumo ? valor.replace(/\D/g, "").slice(0, 10) : valor)}
+              />
+            </div>
+
+            <div className="lg:col-span-3">
+              <FloatInput
+                label={isInsumo ? "Número de Partida" : "Número da Partida"}
+                value={numeroPartida}
+                type={isInsumo ? "number" : "text"}
+                maxLength={20}
+                onChange={(valor) => setNumeroPartida(isInsumo ? valor.replace(/\D/g, "").slice(0, 20) : valor)}
+              />
+            </div>
+
+            <div className="lg:col-span-3">
+              <FloatInput
+                label="Laboratório"
+                value={laboratorio}
+                icon={<FlaskConical size={16} />}
+                onClick={() => setModalLaboratorioOpen(true)}
+              />
+            </div>
+
+            <div className={exibirFiltroTipo ? "lg:col-span-3" : "lg:col-span-4"}>
+              <FloatInput
+                label="Doença"
+                value={doenca}
+                icon={<img src={iconeDoencaUrl} alt="Doença" className="w-4 h-4 object-contain" />}
+                onClick={() => setModalDoencaOpen(true)}
+              />
+            </div>
+
+            {exibirFiltroTipo && (
+              <div className="lg:col-span-3">
+                {isInsumo ? (
+                  <FloatSelect
+                    label="Tipo de Insumo"
+                    value={tipoInsumo}
+                    onChange={setTipoInsumo}
+                    options={tiposInsumoDisponiveis.map((tipo) => ({ value: tipo, label: tipo }))}
+                  />
+                ) : (
+                  <FloatSelect
+                    label="Tipo de Vacina"
+                    value={tipoVacina}
+                    onChange={setTipoVacina}
+                    options={tiposVacinaDisponiveis.map((tipo) => ({ value: tipo, label: tipo }))}
+                  />
+                )}
+              </div>
+            )}
+
+            <div className={exibirFiltroTipo ? "lg:col-span-3" : "lg:col-span-4"}>
+              <FloatSelect
+                label="Situação"
+                value={situacao}
+                onChange={setSituacao}
+                options={[
+                  ...(isInsumo
+                    ? [{ value: "Gravada", label: "Gravada" }, { value: "Cancelada", label: "Cancelada" }]
+                    : [{ value: "Ativo", label: "Ativo" }, { value: "Inativo", label: "Inativo" }]),
+                ]}
+              />
+            </div>
 
             <button
               type="button"
               onClick={handlePesquisar}
-              className="px-6 py-2 rounded-md text-white text-sm font-semibold hover:opacity-90 transition"
+              className={`${exibirFiltroTipo ? "lg:col-span-3" : "lg:col-span-4"} h-11 px-6 rounded-md text-white text-sm font-semibold hover:opacity-90 transition`}
               style={{ backgroundColor: GREEN }}
             >
               Pesquisar
             </button>
-
-            <FloatInput
-              label="Número da Nota Fiscal"
-              value={notaFiscal}
-              onChange={setNotaFiscal}
-            />
-
-            <FloatInput
-              label="Número da Partida"
-              value={numeroPartida}
-              onChange={setNumeroPartida}
-            />
-
-            <FloatInput
-              label="Laboratório"
-              value={laboratorio}
-              icon={<FlaskConical size={16} />}
-              onClick={() => setModalLaboratorioOpen(true)}
-            />
-
-            <FloatInput
-              label="Doença"
-              value={doenca}
-              icon={<img src={iconeDoencaUrl} alt="Doença" className="w-4 h-4 object-contain" />} 
-              onClick={() => setModalDoencaOpen(true)}
-            />
-
-            {isInsumo && doenca && (
-              <FloatSelect
-                label="Tipo de Insumo"
-                value={tipoInsumo}
-                onChange={setTipoInsumo}
-                options={tiposInsumoDisponiveis.map((tipo) => ({ value: tipo, label: tipo }))}
-              />
-            )}
-
-            <FloatSelect
-              label="Situação"
-              value={situacao}
-              onChange={setSituacao}
-              options={[
-                { value: "Ativo", label: "Ativo" },
-                { value: "Inativo", label: "Inativo" },
-              ]}
-            />
           </div>
 
          {/* Área de Chips de Filtros Ativos */}
-{(fornecedor || tipoDestinatario || destinatario || cpfCnpjDestinatario || notaFiscal || numeroPartida || laboratorio || doenca || tipoInsumo || situacao) && (
+{(fornecedor || tipoDestinatario || destinatario || cpfCnpjDestinatario || notaFiscal || numeroPartida || laboratorio || doenca || tipoVacina || tipoInsumo || situacao) && (
   <div className="flex flex-wrap gap-2 mt-4 animate-fadeIn">
     {fornecedor && (
       <div className="flex items-center gap-1.5 bg-[#1A7A3C] text-white text-xs px-2.5 py-1.5 rounded-md">
-        <span>Fornecedor: {fornecedor}</span>
+        <span>{rotuloFornecedor}: {fornecedor}</span>
         <button onClick={() => { setFornecedor(""); setFiltrosAplicados(prev => prev ? { ...prev, fornecedor: "" } : null); }}><X size={12} /></button>
       </div>
     )}
@@ -356,7 +476,13 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate, tipoProduto = "v
     {doenca && (
       <div className="flex items-center gap-1.5 bg-[#1A7A3C] text-white text-xs px-2.5 py-1.5 rounded-md">
         <span>Doença: {doenca}</span>
-        <button onClick={() => { setDoenca(""); setTipoInsumo(""); setFiltrosAplicados(prev => prev ? { ...prev, doenca: "", tipoInsumo: "" } : null); }}><X size={12} /></button>
+        <button onClick={() => { setDoenca(""); setTipoVacina(""); setTipoInsumo(""); setFiltrosAplicados(prev => prev ? { ...prev, doenca: "", tipoVacina: "", tipoInsumo: "" } : null); }}><X size={12} /></button>
+      </div>
+    )}
+    {tipoVacina && (
+      <div className="flex items-center gap-1.5 bg-[#1A7A3C] text-white text-xs px-2.5 py-1.5 rounded-md">
+        <span>Tipo de Vacina: {tipoVacina}</span>
+        <button onClick={() => { setTipoVacina(""); setFiltrosAplicados(prev => prev ? { ...prev, tipoVacina: "" } : null); }}><X size={12} /></button>
       </div>
     )}
     {tipoInsumo && (
@@ -384,11 +510,21 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate, tipoProduto = "v
           ) : (
             <div className="mt-4 pt-4 border-t border-gray-100">
               <div className="overflow-x-auto">
-                <table className="w-full text-sm text-left">
+                <table className="w-full min-w-[860px] text-sm text-left table-fixed">
                   <thead>
                     <tr className="border-b border-gray-200">
-                      {["FORNECEDOR", "DESTINATÁRIO", "NÚMERO DA NOTA FISCAL", "NÚMERO DA PARTIDA", "DOENÇA", "SITUAÇÃO", "AÇÕES"].map((h) => (
-                        <th key={h} className="text-xs font-semibold text-gray-500 pb-2 pr-4 whitespace-nowrap">
+                      {[
+                        "REVENDEDORA DE PRODUTOS AGROPECUÁRIOS",
+                        "DESTINATÁRIO",
+                        "NÚMERO DA NOTA FISCAL",
+                        "LOTES",
+                        "SITUAÇÃO",
+                        "AÇÕES",
+                      ].map((h) => (
+                        <th
+                          key={h}
+                          className={`text-[11px] leading-4 font-semibold text-gray-500 pb-2 pr-4 whitespace-normal ${h === "LOTES" ? "w-[34%]" : h === "AÇÕES" ? "w-[8%] text-right" : ""}`}
+                        >
                           {h}
                         </th>
                       ))}
@@ -397,7 +533,7 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate, tipoProduto = "v
                  <tbody>
   {dadosFiltrados.length === 0 ? (
     <tr>
-      <td colSpan={7} className="text-center py-8 text-gray-400 text-sm">
+      <td colSpan={6} className="text-center py-8 text-gray-400 text-sm">
         Nenhum registro encontrado.
       </td>
     </tr>
@@ -405,37 +541,52 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate, tipoProduto = "v
     dadosFiltrados.map((row) => {
       // Busca o CNPJ do fornecedor correspondente para exibir na tabela
       const dadosFornecedor = fornecedoresDisponiveis.find(f => f.nome === row.fornecedor);
-      const cnpjFornecedor = dadosFornecedor ? dadosFornecedor.cnpj : "---";
+      const codigoRevendedora = row.codigoRevendedora ?? row.cnpjRevendedora ?? dadosFornecedor?.cnpj ?? "—";
+      const codigoDestinatario = row.codigoDestinatario ?? row.cpfCnpjDestinatario ?? row.documentoDestinatario ?? "—";
+      const lotesVenda = obterLotesVenda(row);
 
       return (
         <tr key={row.id} className="border-b border-gray-100 hover:bg-gray-50 transition align-top">
-          {/* COLUNA FORNECEDOR: Código/CNPJ em cima, Nome embaixo */}
-          <td className="py-3 pr-4 text-gray-500 max-w-[180px]">
+          <td className="py-3 pr-4 text-gray-500 align-top break-words">
             <div className="flex flex-col">
-              <span className="text-xs font-semibold text-gray-400">{cnpjFornecedor}</span>
-              <span className="truncate text-sm text-gray-400 font-medium" title={row.fornecedor}>
+              <span className="text-[11px] leading-4 font-semibold text-gray-400">{codigoRevendedora}</span>
+              <span className="text-[11px] leading-4 text-gray-500 font-medium" title={row.fornecedor}>
                 {row.fornecedor}
               </span>
             </div>
           </td>
 
-          {/* COLUNA DESTINATÁRIO: CPF/CNPJ fictício (ou estático) em cima, Nome embaixo */}
-          <td className="py-3 pr-4 text-gray-400">
-            <div className="flex flex-col">
-              {/* Como o mock de vendas não possui CPF próprio, simulamos um baseado no ID ou usamos um padrão */}
-              <span className="text-xs font-semibold text-gray-400">
-                {row.id === "1" ? "000.111.222-33" : "11.222.333/0001-44"}
-              </span>
-              <span className="text-sm text-gray-400 font-medium">
-                {row.destinatario}
-              </span>
+          <td className="py-3 pr-4 text-gray-500 align-top break-words">
+            <span className="text-[11px] leading-4">
+              <span className="font-semibold text-gray-500">{codigoDestinatario}</span>
+              <span className="text-gray-400"> - </span>
+              <span>{row.destinatario}</span>
+            </span>
+          </td>
+
+          <td className="py-3 pr-4 text-[11px] leading-4 text-gray-500 align-top break-words">{row.notaFiscal ?? row.numeroNotaFiscal ?? "—"}</td>
+
+          <td className="py-3 pr-4 text-gray-500 align-top">
+            <div className="flex flex-col gap-1">
+              {lotesVenda.map((lote, indice) => (
+                <div key={`${row.id}-lote-${indice}`} className={`${indice > 0 ? "pt-1 border-t border-gray-100" : ""} text-[11px] leading-4 break-words`}>
+                    <span className="font-semibold text-gray-500">{lote.numeroPartida}</span>
+                    <span className="text-gray-400"> - </span>
+                    <span>{lote.laboratorio}</span>
+                    <span className="text-gray-400"> - </span>
+                    <span>{lote.doenca}</span>
+                    {lote.tipoVacina && (
+                      <>
+                        <span className="text-gray-400"> - </span>
+                        <span>{lote.tipoVacina}</span>
+                      </>
+                    )}
+                </div>
+              ))}
             </div>
           </td>
 
-          <td className="py-3 pr-4 text-gray-500 vertical-inherit">{row.notaFiscal}</td>
-          <td className="py-3 pr-4 text-gray-500 vertical-inherit">{row.partida}</td>
-          <td className="py-3 pr-4 text-gray-500 vertical-inherit">{row.doenca}</td>
-          <td className="py-3 pr-4 text-gray-500 vertical-inherit">{row.situacao}</td>
+          <td className="py-3 pr-4 text-[11px] leading-4 text-gray-500 align-top break-words">{row.situacao}</td>
           
           <td className="px-4 py-3">
                                      <div className="flex items-center gap-1 justify-end">
@@ -484,11 +635,13 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate, tipoProduto = "v
       <SearchModal
         open={modalFornecedorOpen}
         onClose={() => setModalFornecedorOpen(false)}
-        title="Buscar Fornecedor"
-        subtitle="Busque por uma revendedora de produtos agropecuários fornecedora:"
+        title={`Buscar ${rotuloFornecedor}`}
+        subtitle={isInsumo
+          ? "Busque por revendedoras com atuação em insumos para exames de Brucelose/Tuberculose:"
+          : "Busque por uma revendedora de produtos agropecuários fornecedora:"}
         icon={<Store size={26} color={GREEN} />}
         data={fornecedoresDisponiveis}
-        searchKeys={["nome", "cnpj"]}
+        searchKeys={isInsumo ? ["nome", "cnpj", "atuacao"] : ["nome", "cnpj"]}
         searchPlaceholder="Busque por nome ou código"
         columns={[
           { label: "Nome", key: "nome" },
@@ -505,10 +658,12 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate, tipoProduto = "v
         open={modalLaboratorioOpen}
         onClose={() => setModalLaboratorioOpen(false)}
         title="Buscar Laboratório"
-        subtitle="Busque por laboratório:"
+        subtitle={isInsumo
+          ? "Busque por laboratórios que realizam produção de insumos de diagnóstico:"
+          : "Busque por laboratório:"}
         icon={<FlaskConical size={26} color={GREEN} />}
         data={laboratoriosDisponiveis}
-        searchKeys={["nome"]}
+        searchKeys={isInsumo ? ["nome", "atuacao"] : ["nome"]}
         searchPlaceholder="Busque por nome do laboratório."
         columns={[
           { label: "Nome", key: "nome" },
@@ -524,7 +679,9 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate, tipoProduto = "v
         open={modalDoencaOpen}
         onClose={() => setModalDoencaOpen(false)}
         title="Buscar Doença"
-        subtitle="Busque por Doença:"
+        subtitle={isInsumo
+          ? "Busque por doenças cadastradas no sistema que possuem vacina:"
+          : "Busque por Doença:"}
         icon={<img src={iconeDoencaUrl} alt="Doença" className="w-6 h-6 object-contain" />}        
         data={isInsumo ? DOENCAS_INSUMO_MOCK : DOENCAS_MOCK}
         searchKeys={["nome"]}
@@ -534,6 +691,7 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate, tipoProduto = "v
         ]}
         onConfirm={(item) => {
           setDoenca(item.nome);
+          setTipoVacina("");
           setTipoInsumo("");
           setModalDoencaOpen(false);
         }}
