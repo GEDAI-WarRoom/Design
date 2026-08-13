@@ -14,6 +14,7 @@ interface PageProps {
 
 const toFormValue = (dados: TipoInsumoExame | null): TipoInsumoExameFormValue => ({
   nome: dados?.nome ?? "",
+  resultadosPossiveis: dados?.resultadosPossiveis ?? [],
   doencas: dados?.doencas ?? [],
   situacao: dados?.situacao ?? "Ativo",
 });
@@ -46,7 +47,12 @@ export function VisualizarTipoInsumoExamePage({ onLogout, onNavigate, dados }: P
 
         <RequiredFieldsNotice />
 
-        <TipoInsumoExameForm value={toFormValue(registro)} onChange={() => {}} disabled  />
+        <TipoInsumoExameForm
+          value={toFormValue(registro)}
+          onChange={() => {}}
+          disabled
+          showSituacao
+        />
 
         
       </main>

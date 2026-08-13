@@ -18,6 +18,7 @@ interface PageProps {
 
 const toFormValue = (dados: TipoInsumoExame | null): TipoInsumoExameFormValue => ({
   nome: dados?.nome ?? "",
+  resultadosPossiveis: dados?.resultadosPossiveis ?? [],
   doencas: dados?.doencas ?? [],
   situacao: dados?.situacao ?? "Ativo",
 });
@@ -27,7 +28,7 @@ export function EditarTipoInsumoExamePage({ onLogout, onNavigate, dados }: PageP
   const [form, setForm] = useState<TipoInsumoExameFormValue>(toFormValue(registroInicial));
   const [tentouSalvar, setTentouSalvar] = useState(false);
 
-  const formValido = form.nome.trim() !== "";
+  const formValido = form.nome.trim() !== "" && form.resultadosPossiveis.length > 0;
 
   const handleSalvar = () => {
     setTentouSalvar(true);
@@ -35,6 +36,7 @@ export function EditarTipoInsumoExamePage({ onLogout, onNavigate, dados }: PageP
 
     atualizarTipoInsumoExame(registroInicial.id, {
       nome: form.nome.trim(),
+      resultadosPossiveis: form.resultadosPossiveis,
       doencas: form.doencas,
       situacao: form.situacao,
     });
@@ -75,11 +77,11 @@ export function EditarTipoInsumoExamePage({ onLogout, onNavigate, dados }: PageP
         <TipoInsumoExameForm
           value={form}
           onChange={setForm}
-        
+          showSituacao
         />
 
         {tentouSalvar && !formValido && (
-          <p className="text-sm text-red-500 font-medium">Preencha o nome do tipo de insumo para continuar.</p>
+          <p className="text-sm text-red-500 font-medium">Preencha todos os campos obrigatórios para continuar.</p>
         )}
       </main>
     </div>

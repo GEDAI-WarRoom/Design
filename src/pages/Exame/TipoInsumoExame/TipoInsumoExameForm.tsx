@@ -1,9 +1,11 @@
 import { useState, type ReactNode } from "react";
 import { ChevronDown, ChevronUp, Info, PlusCircle, X } from "lucide-react";
-import { FloatInput, FloatSelect, MultiSearchModal } from "../../../components/ui/FormKit";
+import { CheckboxGroup, FloatInput, FloatSelect, MultiSearchModal } from "../../../components/ui/FormKit";
 import {
+  RESULTADOS_POSSIVEIS_TIPO_INSUMO_EXAME,
   SITUACOES_TIPO_INSUMO_EXAME,
   type DoencaReferencia,
+  type ResultadoPossivelTipoInsumoExame,
   type SituacaoTipoInsumoExame,
 } from "./tipoInsumoExameData";
 import { DOENCAS_MOCK } from "../../../components/ui/EntitySearch";
@@ -40,6 +42,7 @@ export function RequiredFieldsNotice() {
 
 export interface TipoInsumoExameFormValue {
   nome: string;
+  resultadosPossiveis: ResultadoPossivelTipoInsumoExame[];
   doencas: DoencaReferencia[];
   situacao: SituacaoTipoInsumoExame;
 }
@@ -64,11 +67,26 @@ export function TipoInsumoExameForm({
     <Section title="Informações Básicas">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <FloatInput
-          label="Nome do Tipo de Insumo"
+          label="Nome do Tipo de Insumo de Exame"
           required
           value={value.nome}
           onChange={(nome) => onChange({ ...value, nome })}
           maxLength={255}
+          disabled={disabled}
+        />
+
+        <CheckboxGroup
+          title="Resultados possíveis"
+          required
+          options={RESULTADOS_POSSIVEIS_TIPO_INSUMO_EXAME}
+          defaultValue={value.resultadosPossiveis}
+          onChange={(resultadosPossiveis) =>
+            onChange({
+              ...value,
+              resultadosPossiveis: resultadosPossiveis as ResultadoPossivelTipoInsumoExame[],
+            })
+          }
+          orientation="horizontal"
           disabled={disabled}
         />
 
