@@ -170,6 +170,7 @@ export function FloatInput({
           ${disabled ? "text-gray-500 cursor-not-allowed" : ""} 
           ${icon ? "pl-7" : ""} 
           ${onClick && !isCalendar ? "pointer-events-none cursor-pointer" : ""}
+          ${hideNativeDateIcon ? "[&::-webkit-calendar-picker-indicator]:opacity-0" : ""}
           ${hideNativeDateIcon ? "[&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none" : ""}
           ${isDateVariant && !active ? "[&::-webkit-datetime-edit]:opacity-0 text-transparent" : "[&::-webkit-datetime-edit]:opacity-100 text-gray-800"}`}
 			/>

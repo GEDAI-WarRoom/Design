@@ -9,6 +9,7 @@ export interface FinalidadeTransito {
   id: number;
   codigo: string;
   finalidade: string;
+  descricao?: string;
   codigoMapa: string;
   tiposProcedencia: string[];
   emiteAcessoExterno: string[];

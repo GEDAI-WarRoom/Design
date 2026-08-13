@@ -94,6 +94,7 @@ export function DashboardAdmin({
 					categoryGroups={categoryGroups}
 					controlCategories={controlCategories}
 					onNavigate={onNavigate}
+					title="Área de trabalho"
 				/>
 			</main>
 		</div>

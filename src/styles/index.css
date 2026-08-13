@@ -40,9 +40,28 @@
   }
 }
 
+@keyframes navbar-dropdown-open {
+  from {
+    clip-path: inset(0 0 100% 0 round 0.5rem);
+  }
+
+  to {
+    clip-path: inset(0 0 0 0 round 0.5rem);
+  }
+}
+
+.navbar-dropdown-open {
+  animation: navbar-dropdown-open 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: top;
+}
+
 @media (prefers-reduced-motion: reduce) {
   [style*='progresso-slide-aviso'] {
     animation: none !important;
     transform: scaleX(1);
+  }
+
+  .navbar-dropdown-open {
+    animation: none;
   }
 }

@@ -323,6 +323,13 @@ export const PESSOAS_GTA: EntidadeGta[] = [
   },
 ];
 
+/** Pessoas elegíveis como requerente na emissão de GTA. */
+export function requerenteEhPessoaFisica(requerente: EntidadeGta | null) {
+  return (requerente?.documento?.replace(/\D/g, "").length ?? 0) === 11;
+}
+
+export const PESSOAS_FISICAS_GTA = PESSOAS_GTA.filter(requerenteEhPessoaFisica);
+
 export const ESTABELECIMENTOS_GTA: EntidadeGta[] = [
   { id: 1, codigo: "31002030039", nome: "[INTERDITADO] Fazenda Recanto dos Pássaros", municipio: "Lavras - MG", proprietarios: "Carlos Henrique Souza" },
   { id: 2, codigo: "31002030040", nome: "Granja Vale Verde", municipio: "Nepomuceno - MG", proprietarios: "Marcos Silva, Ana Paula Nunes" },
@@ -809,6 +816,9 @@ export function calcularValorGta(form: EmissaoGtaFormValue) {
 }
 
 export function adicionarEmissaoGta(form: EmissaoGtaFormValue): EmissaoGta {
+  if (form.requerente && !requerenteEhPessoaFisica(form.requerente)) {
+    throw new Error("O requerente da GTA deve ser uma pessoa física.");
+  }
   const emissoes = listarEmissoesGta();
   const proximoNumero = Math.max(
     184530,
@@ -844,6 +854,9 @@ export function adicionarEmissaoGta(form: EmissaoGtaFormValue): EmissaoGta {
 export function atualizarEmissaoGta(id: number, form: EmissaoGtaFormValue) {
   const registro = obterEmissaoGta(id);
   if (!registro || registro.situacao !== "Gravada") return null;
+  if (form.requerente && !requerenteEhPessoaFisica(form.requerente)) {
+    throw new Error("O requerente da GTA deve ser uma pessoa física.");
+  }
   const valorGta = calcularValorGta(form);
   return salvarEmissaoGta({
     ...registro,
