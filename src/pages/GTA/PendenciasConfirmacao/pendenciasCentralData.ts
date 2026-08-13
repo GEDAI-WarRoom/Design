@@ -10,14 +10,21 @@ export interface PendenciaCentral {
   id: number;
   destinatario: DestinatarioPendencia;
   destinatarioEntidadeId?: number;
-  tipo: "habilitacao" | "atestado-exame" | "vinculo-profissional" | "renovacao-responsabilidade";
+  tipo:
+    | "habilitacao"
+    | "atestado-exame"
+    | "vinculo-profissional"
+    | "declaracao-partilha-vacina"
+    | "vacinador-brucelose"
+    | "declaracao-vacinacao"
+    | "boleto";
   titulo: string;
   descricao: string;
   situacao: SituacaoPendenciaCentral;
   entidadeRelacionada?: { rota: string; id?: number };
 }
 
-const COLECAO = "pendencias-central";
+const COLECAO = "pendencias-central-v2";
 
 function normalizarPendenciaCentral(pendencia: PendenciaCentral): PendenciaCentral {
   if (pendencia.tipo === "habilitacao" && pendencia.destinatario === "veterinario" && !pendencia.entidadeRelacionada) {
@@ -37,6 +44,15 @@ function normalizarPendenciaCentral(pendencia: PendenciaCentral): PendenciaCentr
 const PENDENCIAS_INICIAIS: PendenciaCentral[] = [
   {
     id: 1,
+		destinatario: "produtor",
+		tipo: "declaracao-vacinacao",
+		titulo: "Declaração de vacinação",
+		descricao: "Declaração da campanha aguardando preenchimento",
+		situacao: "Pendente",
+		entidadeRelacionada: { rota: "declaracao-vacinacao" },
+	},
+  {
+    id: 2,
     destinatario: "veterinario",
     destinatarioEntidadeId: 1,
     tipo: "habilitacao",
@@ -46,7 +62,7 @@ const PENDENCIAS_INICIAIS: PendenciaCentral[] = [
     entidadeRelacionada: { rota: "meu-perfil" },
   },
   {
-    id: 2,
+    id: 3,
     destinatario: "veterinario",
     destinatarioEntidadeId: 1,
     tipo: "atestado-exame",
@@ -56,42 +72,52 @@ const PENDENCIAS_INICIAIS: PendenciaCentral[] = [
     entidadeRelacionada: { rota: "visualizar-atestado-exame", id: 1 },
   },
   {
-    id: 3,
+    id: 4,
     destinatario: "veterinario",
     destinatarioEntidadeId: 1,
     tipo: "vinculo-profissional",
     titulo: "Vínculo profissional",
-    descricao: "Confirmação solicitada pela revendedora",
+    descricao: "Casa do Produtor Lavras solicita a confirmação do vínculo",
     situacao: "Pendente",
     entidadeRelacionada: { rota: "visualizar-revendedora-agropecuario", id: 1 },
   },
   {
-    id: 4,
+    id: 5,
     destinatario: "veterinario",
     destinatarioEntidadeId: 1,
-    tipo: "renovacao-responsabilidade",
-    titulo: "Renovação de responsabilidade",
-    descricao: "Prazo de renovação se aproxima",
+    tipo: "declaracao-partilha-vacina",
+    titulo: "Declaração/Doação ou Partilha de Vacina",
+    descricao: "Movimentação de vacina aguardando regularização",
     situacao: "Pendente",
-    entidadeRelacionada: { rota: "visualizar-revendedora-agropecuario", id: 1 },
+		entidadeRelacionada: { rota: "partilha-vacina" },
   },
 	{
-		id: 5,
+		id: 6,
+		destinatario: "veterinario",
+		destinatarioEntidadeId: 1,
+		tipo: "vacinador-brucelose",
+		titulo: "Vacinador de Brucelose",
+		descricao: "Cadastro de vacinador aguardando atualização",
+		situacao: "Pendente",
+		entidadeRelacionada: { rota: "visualizar-vacinador-brucelose", id: 1 },
+	},
+	{
+		id: 7,
 		destinatario: "lider-estabelecimento",
-		tipo: "habilitacao",
-		titulo: "Atualização de estabelecimento",
-		descricao: "Dados cadastrais aguardando revisão",
+		tipo: "vinculo-profissional",
+		titulo: "Vínculo profissional",
+		descricao: "Frigorífico São José solicita a confirmação do vínculo",
 		situacao: "Pendente",
 		entidadeRelacionada: { rota: "visualizar-estabelecimento-poa", id: 1 },
 	},
 	{
-		id: 6,
+		id: 8,
 		destinatario: "lider-estabelecimento",
-		tipo: "renovacao-responsabilidade",
-		titulo: "Renovação de responsabilidade",
-		descricao: "Confirmação necessária para o estabelecimento",
+		tipo: "boleto",
+		titulo: "Pagamento de boleto pendente",
+		descricao: "Integradora Vale do Campo · vencimento em 07/08/2026",
 		situacao: "Pendente",
-		entidadeRelacionada: { rota: "visualizar-estabelecimento-poa", id: 2 },
+		entidadeRelacionada: { rota: "relatorio-boletos-gta" },
 	},
 ];
 

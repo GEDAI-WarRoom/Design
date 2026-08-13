@@ -56,8 +56,8 @@ export function ClassificacaoSanitariaEstadoPage({
     item.classificacao === classificacao
     && (!estado || item.estado === estado)
     && (!tipo || item.tipo === tipo)
-    && (!doenca || item.doenca === doenca)
-    && (!praga || item.praga === praga),
+    && (!doenca || item.doenca === doenca.nome)
+    && (!praga || item.praga === praga.nome),
   ), [classificacao, estado, tipo, doenca, praga, searched]);
 
   const totalPages = Math.max(1, Math.ceil(results.length / perPage));
@@ -75,8 +75,8 @@ export function ClassificacaoSanitariaEstadoPage({
 
   const alterarTipo = (next: string) => {
     setTipo(next);
-    setDoenca("");
-    setPraga("");
+    setDoenca(null);
+    setPraga(null);
     setError(false);
   };
 
@@ -169,8 +169,8 @@ export function ClassificacaoSanitariaEstadoPage({
               {classificacao && <Chip label={`Classificação: ${classificacaoSanitariaLabel(classificacao)}`} onRemove={() => setClassificacao("")} />}
               {estado && <Chip label={`Estado: ${estado}`} onRemove={() => setEstado("")} />}
               {tipo && <Chip label={`Tipo: ${tipo}`} onRemove={() => alterarTipo("")} />}
-              {doenca && <Chip label={`Doença: ${doenca}`} onRemove={() => setDoenca("")} />}
-              {praga && <Chip label={`Praga: ${praga}`} onRemove={() => setPraga("")} />}
+              {doenca && <Chip label={`Doença: ${doenca.nome}`} onRemove={() => setDoenca(null)} />}
+              {praga && <Chip label={`Praga: ${praga.nome}`} onRemove={() => setPraga(null)} />}
             </div>
           )}
 

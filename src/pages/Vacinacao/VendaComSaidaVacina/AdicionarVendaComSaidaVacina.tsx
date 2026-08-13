@@ -46,6 +46,10 @@ import { CadastroVacinacaoHeader, cadastroVacinacaoPageClass, mensagemSucessoCad
 
 
 const GREEN = "#1A7A3C";
+const UFS = [
+  "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG",
+  "PA", "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO",
+];
 
 // Mocks para os Modais de Busca
 const FORNECEDORES_MOCK = [
@@ -73,6 +77,29 @@ const DESTINATARIOS_MOCK = [
   { id: 1, nome: "João da Silva Sauro", codigo: "123.456.789-00" },
   { id: 2, nome: "Fazenda Recanto Verde", codigo: "12.345.678/0001-90" },
 ];
+
+const DESTINATARIOS_INSUMO_MOCK: Record<string, Array<{ id: number; nome: string; codigo: string }>> = {
+  medico_pncebt: [
+    { id: 101, nome: "Dra. Mariana Costa Silva", codigo: "123.456.789-01" },
+    { id: 102, nome: "Dr. Carlos Henrique Alves", codigo: "987.654.321-00" },
+  ],
+  revendedora: [
+    { id: 201, nome: "AgroDiagnóstico Minas", codigo: "23.456.789/0001-10" },
+    { id: 202, nome: "VetTest Produtos Agropecuários", codigo: "34.567.890/0001-21" },
+  ],
+  instituicao_ensino_pesquisa: [
+    { id: 301, nome: "Universidade Federal de Lavras", codigo: "22.078.679/0001-74" },
+    { id: 302, nome: "Instituto de Pesquisa Veterinária de Minas", codigo: "18.455.321/0001-09" },
+  ],
+  laboratorio: [
+    { id: 401, nome: "Tecpar Diagnósticos", codigo: "76.170.959/0001-10" },
+    { id: 402, nome: "Laboratório Biovet", codigo: "12.345.987/0001-44" },
+  ],
+  responsavel_tecnico_grsc: [
+    { id: 501, nome: "Dra. Ana Paula Ribeiro", codigo: "321.654.987-10" },
+    { id: 502, nome: "Dr. Roberto Mendes", codigo: "456.789.123-55" },
+  ],
+};
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(true);
@@ -329,6 +356,8 @@ interface ContatoAdicional {
 
 export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = "create", dados, tipoProduto = "vacina" }: AdicionarVendaVacinaProps) {
   const isInsumo = tipoProduto === "insumo";
+  const nomeDocumentoObrigatorio = isInsumo ? "Requerimento" : "Receituário";
+  const nomeDocumentoObrigatorioMinusculo = nomeDocumentoObrigatorio.toLowerCase();
   const rotaLista = isInsumo ? "venda-saida-insumo" : "venda-saida-vacina";
   const rotaEditar = isInsumo ? "editar-venda-saida-insumo" : "editar-venda-saida-vacina";
   const nomeCadastro = `Venda com Saída de ${isInsumo ? "Insumo" : "Vacina"}`;
@@ -336,13 +365,31 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
     { id: 101, nome: "Tecpar Diagnósticos", codigo: "LAB-101" },
     { id: 102, nome: "Laboratório Biovet", codigo: "LAB-102" },
   ] : LABORATORIOS_MOCK;
+  const tiposDestinatarioDisponiveis = isInsumo ? [
+    { label: "Médico Veterinário Habilitado PNCEBT", value: "medico_pncebt" },
+    { label: "Instituição de Ensino e Pesquisa", value: "instituicao_ensino_pesquisa" },
+    { label: "Laboratório", value: "laboratorio" },
+    { label: "Responsável Técnico GRSC", value: "responsavel_tecnico_grsc" },
+    { label: "Revendedora de Produtos Agropecuários", value: "revendedora" },
+    { label: "Outro", value: "outro" },
+  ] : [
+    { label: "Produtor", value: "produtor" },
+    { label: "Vacinador", value: "vacinador" },
+    { label: "Médico Veterinário", value: "vetarinario" },
+    { label: "Revendedora de Produtos Agropecuários", value: "revendedora" },
+  ];
   const preenchendoRegistro = mode !== "create";
   // Estados da Seção 1: Informações Básicas
   const [notaFiscal, setNotaFiscal] = useState(dados?.notaFiscal ?? dados?.numeroNotaFiscal ?? "");
-  const [dataVenda, setDataVenda] = useState(dados?.dataVenda ?? (preenchendoRegistro ? "2026-05-15" : ""));
+  const [ufNotaFiscal, setUfNotaFiscal] = useState(isInsumo ? "MG" : dados?.ufNotaFiscal ?? (preenchendoRegistro ? "MG" : ""));
+  const [dataNotaFiscal, setDataNotaFiscal] = useState(dados?.dataNotaFiscal ?? dados?.dataVenda ?? (preenchendoRegistro ? "2026-05-15" : ""));
   const [revendedora, setRevendedora] = useState(dados?.revendedora ?? dados?.fornecedor ?? "");
   const [cnpjRevendedora, setCnpjRevendedora] = useState(dados?.cnpjRevendedora ?? (preenchendoRegistro ? "12.345.678/0001-99" : ""));
-  const [tipoDestinatario, setTipoDestinatario] = useState(dados?.tipoDestinatario === "Médico Veterinário" ? "medico_veterinario" : dados?.tipoDestinatario ?? (preenchendoRegistro ? "produtor" : ""));
+  const [tipoDestinatario, setTipoDestinatario] = useState(
+    dados?.tipoDestinatario === "Médico Veterinário"
+      ? "medico_veterinario"
+      : dados?.tipoDestinatario ?? (preenchendoRegistro ? (isInsumo ? "medico_pncebt" : "produtor") : ""),
+  );
   const [destinatario, setDestinatario] = useState(dados?.destinatario ?? "");
   const [isDentroEstado, setIsDentroEstado] = useState<"sim" | "não" | "">(dados?.isDentroEstado ?? (preenchendoRegistro ? "sim" : ""));
   const [codigoDestinatario, setCodigoDestinatario] = useState(dados?.codigoDestinatario ?? dados?.cpfCnpjDestinatario ?? (preenchendoRegistro ? "555.009.956-40" : ""));
@@ -404,6 +451,30 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
   const [doencaExigeReceituario, setDoencaExigeReceituario] = useState<boolean>(false);
   const [modalExploracao, setModalExploracao] = useState(false);
   const [idItemSendoEditado, setIdItemSendoEditado] = useState<any>(null);
+  const destinatariosInsumoDisponiveis = DESTINATARIOS_INSUMO_MOCK[tipoDestinatario] ?? [];
+  const configuracaoDestinatarioInsumo: Record<string, { entidade: string; descricao: string }> = {
+    medico_pncebt: {
+      entidade: "Profissional da Área Animal",
+      descricao: "Busque profissionais habilitados para realização de exame de brucelose/tuberculose:",
+    },
+    revendedora: {
+      entidade: "Revendedora de Produtos Agropecuários",
+      descricao: "Busque revendedoras com atuação em insumos para exames de Brucelose/Tuberculose:",
+    },
+    instituicao_ensino_pesquisa: {
+      entidade: "Instituição de Ensino e Pesquisa",
+      descricao: "Busque instituições de ensino e pesquisa cadastradas no sistema:",
+    },
+    laboratorio: {
+      entidade: "Laboratório",
+      descricao: "Busque laboratórios cadastrados no sistema:",
+    },
+    responsavel_tecnico_grsc: {
+      entidade: "Profissional da Área Animal",
+      descricao: "Busque profissionais responsáveis técnicos de uma GRSC:",
+    },
+  };
+  const destinatarioInsumoConfig = configuracaoDestinatarioInsumo[tipoDestinatario];
 
   // Sucesso
   const [isSucesso, setIsSucesso] = useState(false);
@@ -413,7 +484,9 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
     e.preventDefault();
     const payload = {
       notaFiscal,
-      dataVenda,
+      ufNotaFiscal,
+      dataNotaFiscal,
+      dataVenda: dataNotaFiscal,
       revendedora,
       tipoDestinatario,
       isDentroEstado,
@@ -436,7 +509,9 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
     id: dados?.id ?? `venda-saida-${Date.now()}`,
     notaFiscal,
     numeroNotaFiscal: notaFiscal,
-    dataVenda,
+    ufNotaFiscal,
+    dataNotaFiscal,
+    dataVenda: dataNotaFiscal,
     revendedora,
     cnpjRevendedora,
     tipoDestinatario,
@@ -455,6 +530,8 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
     id: "venda-saida-exemplo",
     notaFiscal: "15420",
     numeroNotaFiscal: "15420",
+    ufNotaFiscal: "MG",
+    dataNotaFiscal: "2026-05-15",
     dataVenda: "2026-05-15",
     revendedora: "Distribuidora de Vacinas Alfa LTDA",
     cnpjRevendedora: "12.345.678/0001-99",
@@ -568,18 +645,13 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
                     setDestinatario("");
                     setCodigoDestinatario("");
                   }}
-                  options={[
-                    { label: "Produtor", value: "produtor" },
-                    { label: "Vacinador", value: "vacinador" },
-                    { label: "Médico Veterinário", value: "vetarinario" },
-                    { label: "Revendedora de Produtos Agropecuários", value: "revendedora" }
-                  ]}
+                  options={tiposDestinatarioDisponiveis}
                   className="w-full"
                 />
               </div>
 
               {/* Radio Button (Sem Tooltip) */}
-              <div className="flex flex-col gap-1 justify-center">
+              {!isInsumo && <div className="flex flex-col gap-1 justify-center">
                 <div className="flex items-center gap-1 ml-1 select-none">
                   <span className="text-[11px] text-gray-400 font-medium">
                     Destinatário tem cadastro no IMA? <span className="text-red-500">*</span>
@@ -609,11 +681,53 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
                     }}
                   />
                 </div>
-              </div>
+              </div>}
             </div>
 
+            {isInsumo && tipoDestinatario && tipoDestinatario !== "outro" && (
+              <div className="flex gap-3 items-end w-full pt-2 animate-fadeIn">
+                <div className="flex-1">
+                  <FloatInput
+                    label="Destinatário"
+                    required
+                    value={destinatario}
+                    icon={<img src={iconeDestinatarioUrl} alt="Destinatário" className="w-5 h-5 object-contain" />}
+                    onClick={() => setModalDestinatarioOpen(true)}
+                    className="w-full"
+                  />
+                </div>
+                {codigoDestinatario && (
+                  <FloatInput
+                    label="CPF/CNPJ do Destinatário"
+                    value={codigoDestinatario}
+                    disabled
+                    className="w-[280px]"
+                  />
+                )}
+              </div>
+            )}
+
+            {isInsumo && tipoDestinatario === "outro" && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 items-end w-full pt-2 animate-fadeIn">
+                <FloatInput
+                  label="Destinatário"
+                  required
+                  value={destinatario}
+                  onChange={setDestinatario}
+                  maxLength={255}
+                />
+                <FloatInput
+                  label="CPF/CNPJ do Destinatário"
+                  required
+                  value={codigoDestinatario}
+                  onChange={setCodigoDestinatario}
+                  maxLength={14}
+                />
+              </div>
+            )}
+
             {/* Linha B (CASO CADASTRO NO IMA = SIM): Campo de Pesquisa por Modal */}
-            {isDentroEstado === "sim" && (
+            {!isInsumo && isDentroEstado === "sim" && (
               <div className="flex gap-3 items-end w-full pt-2 animate-fadeIn relative" style={{ overflow: "visible" }}>
                 <div className="flex-1">
                   <FloatInput
@@ -654,7 +768,7 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
             )}
 
             {/* Linha B (CASO CADASTRO NO IMA = NÃO): Campos de Digitação Livre + Contatos Dinâmicos */}
-            {isDentroEstado === "não" && (
+            {!isInsumo && isDentroEstado === "não" && (
               <div className="flex flex-col gap-4 w-full pt-2 animate-fadeIn relative" style={{ overflow: "visible", zIndex: 10 }}>
 
                 {/* Inputs Principais: Destinatário e Documento */}
@@ -759,23 +873,36 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
 
 
           <div className="flex flex-col gap-4">
-            {/* Linha 1: Nota Fiscal, Data da Venda */}
-            <div className="flex gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
               <FloatInput
                 label="Número da Nota Fiscal"
                 required
                 value={notaFiscal}
                 onChange={setNotaFiscal}
-                className="flex-1"
               />
+              {isInsumo ? (
+                <FloatInput
+                  label="UF da Nota Fiscal"
+                  required
+                  value="MG"
+                  disabled
+                />
+              ) : (
+                <FloatSelect
+                  label="UF da Nota Fiscal"
+                  required
+                  value={ufNotaFiscal}
+                  onChange={setUfNotaFiscal}
+                  options={UFS.map((uf) => ({ value: uf, label: uf }))}
+                />
+              )}
               <FloatInput
-                label="Data da Venda"
+                label="Data da Nota Fiscal"
                 type="date"
                 required
-                value={dataVenda}
+                value={dataNotaFiscal}
                 icon={<Calendar size={16} />}
-                onChange={setDataVenda}
-                className="w-[220px] flex-shrink-0"
+                onChange={setDataNotaFiscal}
               />
             </div>
             {/* Topo da seção: Título interno, Total de Doses Adquiridas e o Botão Padronizado */}
@@ -1175,14 +1302,10 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
                                                 min="0"
                                                 value={nfItem.quantidadeDoses || ""}
                                                 placeholder="0"
-                                                onChange={(e) => {
-                                                  const d = Number(e.target.value);
-                                                  const f = Math.ceil(d / DOSES_POR_FRASCO);
-                                                  setNotasFiscaisOrigem(notasFiscaisOrigem.map(item =>
-                                                    item.id === nfItem.id ? { ...item, quantidadeDoses: d, quantidadeFrascos: f } : item
-                                                  ));
-                                                }}
-                                                className="w-full text-center bg-white border border-gray-200 rounded-lg text-xs font-black p-1 focus:outline-none focus:border-[#1A7A3C] text-gray-800 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                readOnly
+                                                disabled
+                                                aria-label="Quantidade de doses calculada automaticamente"
+                                                className="w-full text-center bg-gray-100 border border-gray-200 rounded-lg text-xs font-black p-1 text-gray-500 cursor-not-allowed [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                               />
                                               <span className="text-[9px] text-gray-400 font-semibold text-center mt-0.5">Doses</span>
                                             </div>
@@ -1229,13 +1352,13 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
 
 
         {/* ====== Coleta de Informações Adicionais ====== */}
-        <Section title="Receituário">
+        <Section title={nomeDocumentoObrigatorio}>
           <div className="flex flex-col gap-5">
 
             {/* 1. Receituário — um para cada Doença das partidas que exigem receituário */}
             {doencasQueExigemReceituario.length === 0 ? (
               <p className="text-sm text-gray-500">
-                Nenhuma das partidas selecionadas exige receituário para venda de {isInsumo ? "insumo" : "vacina"}.
+                Nenhuma das partidas selecionadas exige {nomeDocumentoObrigatorioMinusculo} para venda de {isInsumo ? "insumo" : "vacina"}.
               </p>
             ) : (
               <div className="flex flex-col gap-6">
@@ -1268,18 +1391,18 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
                           <img src={iconeDoencaUrl} alt="Doença" className="w-4 h-4 object-contain" />
                           <span className="text-sm font-semibold text-gray-800">{nomeDoenca}</span>
                           <span className="text-[11px] font-medium text-amber-700 px-2 py-0.5">
-                            * Exige receituário
+                            * Exige {nomeDocumentoObrigatorioMinusculo}
                           </span>
                         </div>
 
                         <div className="flex gap-3 items-start w-full">
                           <div className="flex-1">
                             <UploadField
-                              label="Receituário"
+                              label={nomeDocumentoObrigatorio}
                               required
                               fileName={atual?.nome || ""}
                               onSelectFile={() =>
-                                setArquivo(`receituario_${nomeDoenca.toLowerCase().replace(/\s+/g, "_")}.pdf`)
+                                setArquivo(`${isInsumo ? "requerimento" : "receituario"}_${nomeDoenca.toLowerCase().replace(/\s+/g, "_")}.pdf`)
                               }
                             />
                           </div>
@@ -1301,7 +1424,7 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
                                   onClick={() => alert(`Fazendo download de: ${atual.nome}`)}
                                   className="p-2.5 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"
                                   title={`Baixar ${atual.nome}`}
-                                  aria-label={`Baixar receituário de ${nomeDoenca}`}
+                                  aria-label={`Baixar ${nomeDocumentoObrigatorioMinusculo} de ${nomeDoenca}`}
                                 >
                                   <Download size={20} />
                                 </button>
@@ -1320,6 +1443,7 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
         </Section>
 
         {/* ====== Coleta de Informações Adicionais ====== */}
+        {!isInsumo && (
         <Section title="Informações Adicionais">
           <div className="flex flex-col gap-5">
 
@@ -1390,6 +1514,7 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
 
           </div>
         </Section>
+        )}
 
 
 
@@ -1468,14 +1593,14 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
       <SearchModal
         open={modalDestinatarioOpen}
         onClose={() => setModalDestinatarioOpen(false)}
-        title="Buscar Destinatário"
-        subtitle="Buscar destinatário para o cadastro:"
+        title={isInsumo && destinatarioInsumoConfig ? `Buscar ${destinatarioInsumoConfig.entidade}` : "Buscar Destinatário"}
+        subtitle={isInsumo && destinatarioInsumoConfig ? destinatarioInsumoConfig.descricao : "Buscar destinatário para o cadastro:"}
         icon={<img src={iconeDestinatarioUrl} alt="Destinatário" className="w-6 h-6 object-contain" />}
-        data={DESTINATARIOS_MOCK}
+        data={isInsumo ? destinatariosInsumoDisponiveis : DESTINATARIOS_MOCK}
         searchKeys={["nome", "codigo"]}
         searchPlaceholder="Busque por nome/razão social ou CPF/CNPJ."
         columns={[
-          { label: "Nome / Razão Social", key: "nome" },
+          { label: isInsumo && destinatarioInsumoConfig ? destinatarioInsumoConfig.entidade : "Nome / Razão Social", key: "nome" },
           { label: "CPF / CNPJ", key: "codigo" }
         ]}
         onConfirm={(item) => {

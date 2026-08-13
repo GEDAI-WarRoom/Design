@@ -1050,6 +1050,14 @@ export function filterCategoriesByRole(
   categories: MenuCategory[],
   role: DemoUserRole | null,
 ) {
+	const perfilComCadastrosPessoais =
+		role === "veterinario" ||
+		role === "responsavel-agroindustria-integradora";
+	const profissionalAnimal = perfilComCadastrosPessoais
+		? categories
+			.flatMap((category) => category.items)
+			.find((item) => item.route === "profissional-animal")
+		: undefined;
   const produtorRoutesOcultas = new Set([
     "profissional-oficial",
     "profissional-vegetal",
@@ -1058,20 +1066,31 @@ export function filterCategoriesByRole(
     "finalidade-transito",
   ]);
   const rotasOcultasNoMenu = new Set([
-    "pendencias-confirmacao-gta",
     "recolhimento-mensal-gta",
   ]);
   return categories
-    .map((category) => ({
+    .map((category) => {
+		const itemsReposicionados = perfilComCadastrosPessoais
+			? category.title === "Geral" && profissionalAnimal
+				? [
+					...category.items.filter((item) => item.route !== "profissional-animal"),
+					profissionalAnimal,
+				]
+				: category.items.filter((item) => item.route !== "profissional-animal")
+			: category.items;
+
+		return {
       ...category,
-      items: category.items.filter((item) =>
+      items: itemsReposicionados.filter((item) =>
         isEntryRouteAllowed(role, item.route) &&
         !(role === "produtor" && produtorRoutesOcultas.has(item.route)) &&
+        !(role === "admin" && item.route === "pendencias-confirmacao-gta") &&
         !rotasOcultasNoMenu.has(item.route),
       ).map((item) => role === "veterinario" && item.route === "cadastro-atestado-exame"
         ? { ...item, label: "Atestado de Exame" }
         : item).filter((item) => !(role === "veterinario" && item.route === "atestado-exame")),
-    }))
+		};
+	})
     .filter((category) => category.items.length > 0);
 }
 

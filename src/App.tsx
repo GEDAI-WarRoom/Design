@@ -1663,16 +1663,6 @@ export default function App() {
 					dados={screenData}
 				/>
 			);
-			
-		case "editar-exploracao-pecuaria":
-			return (
-				<AdicionarExploracaoPecuariaPage
-					onLogout={handleLogout}
-					onNavigate={handleNavigate}
-					dados={screenData}
-					modoEdicao
-				/>
-			);
 		case "atualizacao-cadastral-rebanho":
 			return (
 				<AtualizacaoCadastralRebanhoPage
