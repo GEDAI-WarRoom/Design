@@ -73,12 +73,25 @@ export const RESPONSAVEIS_GRSC: EntidadeVendaSaidaInsumo[] = [
   { id: "grsc-2", codigo: "CRMV-MG 15690", nome: "Marina Couto Dias", documento: "444.555.666-77" },
 ];
 
-export const DOENCAS = ["Brucelose", "Tuberculose"];
+export interface DoencaVendaSaidaInsumo {
+  id: string;
+  nome: string;
+}
+
+export interface TipoInsumoVendaSaidaInsumo {
+  id: string;
+  name: string;
+}
+
+export const DOENCAS: DoencaVendaSaidaInsumo[] = [
+  { id: "brucelose", nome: "Brucelose" },
+  { id: "tuberculose", nome: "Tuberculose" },
+];
 export const TIPOS_INSUMO = [
-  "Antígeno Acidificado Tamponado (AAT)",
-  "2-Mercaptoetanol (2-ME)",
-  "Tuberculina PPD Aviária",
-  "Tuberculina PPD Bovina",
+  { id: "aat", name: "Antígeno Acidificado Tamponado (AAT)" },
+  { id: "2-me", name: "2-Mercaptoetanol (2-ME)" },
+  { id: "ppd-aviaria", name: "Tuberculina PPD Aviária" },
+  { id: "ppd-bovina", name: "Tuberculina PPD Bovina" },
 ];
 
 export const LOTES_DISPONIVEIS: LoteVendaSaidaInsumo[] = [

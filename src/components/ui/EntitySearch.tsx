@@ -232,6 +232,7 @@ interface EntitySearchInputProps {
 	className?: string;
 	headerActions?: React.ReactNode;
 	especiesPermitidas?: any[];
+	disabled?: boolean;
 }
 
 export function EntitySearchInput({
@@ -252,6 +253,7 @@ export function EntitySearchInput({
 	hasTooltip,
 	tooltipText,
 	especiesPermitidas,
+	disabled = false,
 }: EntitySearchInputProps) {
 	const [modalAberto, setModalAberto] = useState(false);
 
@@ -259,8 +261,8 @@ export function EntitySearchInput({
 		<>
 			<div
 				data-form-control
-				className="w-full cursor-pointer"
-				onClick={() => setModalAberto(true)}>
+				className={`w-full ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`}
+				onClick={() => !disabled && setModalAberto(true)}>
 				<div className="pointer-events-none">
 					<FloatInput
 						label={label}
@@ -273,12 +275,13 @@ export function EntitySearchInput({
 						placeholder={placeholder}
 						className="w-full"
 						readOnly
+						disabled={disabled}
 					/>
 				</div>
 			</div>
 
 			<SearchModal
-				open={modalAberto}
+				open={!disabled && modalAberto}
 				onClose={() => setModalAberto(false)}
 				title={title || `Buscar ${label}`}
 				subtitle={subtitle || `Busque por ${label.toLowerCase()} cadastradas:`}
@@ -291,6 +294,7 @@ export function EntitySearchInput({
 				className={className}
 				headerActions={headerActions} // 🔥 Repassa o nó de ações/filtros para o SearchModal real da biblioteca
 				onConfirm={(entidadeSelecionada) => {
+					if (disabled) return;
 					onChange(entidadeSelecionada);
 					setModalAberto(false);
 				}}
@@ -806,6 +810,7 @@ interface RevendedoraInputProps {
 	onEyeClick?: (entidade: any) => void;
 	required?: boolean;
 	data?: any[]; // <-- Adicionado
+	disabled?: boolean;
 }
 
 export function RevendedoraInput({
@@ -814,6 +819,7 @@ export function RevendedoraInput({
 	onEyeClick,
 	required = false,
 	data = REVENDEDORAS_MOCK,
+	disabled = false,
 }: RevendedoraInputProps) {
 	// Busca a entidade baseando-se no array fornecido por propriedade ou pelo mock padrão interno
 	const entidadeSelecionada = data.find((x) => x.codigo === value);
@@ -830,6 +836,7 @@ export function RevendedoraInput({
 					label="Revendedora de Produtos Agropecuários"
 					placeholder="Buscar por código ou nome."
 					required={required}
+					disabled={disabled}
 					value={entidadeSelecionada?.nome || ""}
 					data={data} // <-- Passando a lista correta
 					searchKeys={["codigo", "nome"]}
@@ -873,6 +880,7 @@ interface FornecedorVacinaInputProps {
 	tooltipText?: string;
 	data?: any[]; // <-- Recebe os dados de fora de forma limpa
 	produtoLabel?: string;
+	disabled?: boolean;
 }
 
 export function FornecedorVacinaInput({
@@ -883,6 +891,7 @@ export function FornecedorVacinaInput({
 	tooltipText,
 	data = FORNECEDORES_VACINA_MOCK, // <-- Fallback usando o mock local se nenhum dado for passado
 	produtoLabel = "Vacina",
+	disabled = false,
 }: FornecedorVacinaInputProps) {
 	const entidadeSelecionada = data.find((x: any) => x.codigo === value);
 
@@ -900,6 +909,7 @@ export function FornecedorVacinaInput({
 						label="Fornecedor"
 						placeholder="Buscar por nome..."
 						required={required}
+						disabled={disabled}
 						value={entidadeSelecionada?.nome || ""}
 						data={data}
 						searchKeys={["codigo", "nome", "tipo"]}

@@ -6,6 +6,7 @@ import {
 	ChevronUp,
 	FlaskConical,
 	Info,
+	PillBottle,
 } from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
 import { Navbar } from "../../../components/Navbar";
@@ -26,13 +27,13 @@ const GREEN = "#1A7A3C";
 
 // --- mock ---
 
-const REVENDEDORAS_MG_MOCK = [
+export const REVENDEDORAS_MG_MOCK = [
 	{ id: 1, codigo: "3120938028", nome: "Comercial AgroVat", uf: "MG" },
 	{ id: 2, codigo: "3120938045", nome: "Agropecuária Vale Verde", uf: "MG" },
 	{ id: 3, codigo: "3120938090", nome: "Casa do Produtor Lavras", uf: "MG" },
 ];
 
-const FORNECEDORES_INSUMO_MOCK = [
+export const FORNECEDORES_INSUMO_MOCK = [
 	{
 		id: 1,
 		codigo: "LAB-0001",
@@ -300,6 +301,7 @@ interface LoteCardItemProps {
 	addApresentacao: (loteUid: string) => void;
 	removeApresentacao: (loteUid: string, index: number) => void;
 	updateApresentacao: (loteUid: string, apUid: string, patch: any) => void;
+	disabled?: boolean;
 }
 
 // --- LoteCardItem ---
@@ -313,6 +315,7 @@ export function LoteCardItem({
 	addApresentacao,
 	removeApresentacao,
 	updateApresentacao,
+	disabled = false,
 }: LoteCardItemProps) {
 	const totalDosesLote =
 		lote.apresentacoes?.reduce((sum: number, ap: any) => {
@@ -336,6 +339,7 @@ export function LoteCardItem({
 					label="Número de Partida"
 					required
 					value={lote.numeroPartida}
+					disabled={disabled}
 					onChange={(v) => updateLote(lote.uid, { numeroPartida: v })}
 					maxLength={10}
 				/>
@@ -354,6 +358,7 @@ export function LoteCardItem({
 						label="Laboratório"
 						placeholder="Buscar laboratório..."
 						required
+						disabled={disabled}
 						value={lote.laboratorio ? lote.laboratorio.nome : ""}
 						data={LABORATORIOS_MOCK}
 						searchKeys={["nome"]}
@@ -372,6 +377,7 @@ export function LoteCardItem({
 					label="Doença"
 					placeholder="Buscar doença..."
 					required
+					disabled={disabled}
 					value={lote.doenca ? lote.doenca.nome : ""}
 					data={DOENCAS_MOCK}
 					searchKeys={["nome"]}
@@ -389,29 +395,21 @@ export function LoteCardItem({
 						updateLote(lote.uid, { doenca: ent, tipoInsumoExame: null })
 					}
 				/>
-				{lote.doenca ? (
+				{lote.doenca && (
 					<EntitySearchInput
 						label="Tipo de Insumo"
 						placeholder="Buscar tipo de insumo..."
 						required
+						disabled={disabled}
 						value={obterNomeTipoInsumoExame(lote.tipoInsumoExame)}
 						data={examSupplyTypes}
 						searchKeys={["name"]}
 						columns={[{ label: "Tipo de Insumo", key: "name" }]}
-						icon={<FlaskConical size={18} color={GREEN} />}
+						icon={<PillBottle size={18} color={GREEN} />}
 						title="Buscar Tipo de Insumo"
 						subtitle="Busque por um tipo de insumo aplicável à doença selecionada:"
 						confirmLabel="Selecionar"
 						onChange={(tipoInsumoExame) => updateLote(lote.uid, { tipoInsumoExame })}
-					/>
-				) : (
-					<FloatInput
-						label="Tipo de Insumo"
-						required
-						disabled
-						placeholder="Selecione uma doença primeiro"
-						value=""
-						onChange={() => { }}
 					/>
 				)}
 				<FloatInput
@@ -422,13 +420,16 @@ export function LoteCardItem({
 					placeholder="mm/aaaa"
 					min={new Date().toISOString().slice(0, 7)}
 					value={lote.validade || ""}
+					disabled={disabled}
 					onChange={(v) => updateLote(lote.uid, { validade: v })}
 				/>
 			</div>
 
 			{laboratorioNaoProduzDoenca && (
 				<p className="text-xs text-amber-700" role="alert">
-					O laboratório selecionado não está cadastrado como produtor de insumos para esta doença. O cadastro ainda pode ser concluído.
+					O laboratório selecionado não está cadastrado como produtor de insumos para esta doença.
+					<br />
+					É possível prosseguir com o cadastro mas recomenda-se entrar em contato com o IMA para a atualização do cadastro do laboratório.
 				</p>
 			)}
 
@@ -442,7 +443,8 @@ export function LoteCardItem({
 					onRemoveItem={(i: number) => removeApresentacao(lote.uid, i)}
 					variant="plain"
 					showCounter={true}
-					smallCounter={true}>
+					smallCounter={true}
+					disabled={disabled}>
 					{(ap: any) => (
 						// Grid de apresentações agora possui apenas 3 colunas, ficando visualmente mais limpo e espaçoso!
 						<div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end w-full">
@@ -451,6 +453,7 @@ export function LoteCardItem({
 								required
 								type="text"
 								value={ap.dosesPorFrasco}
+								disabled={disabled}
 								onChange={(v) =>
 									updateApresentacao(lote.uid, ap.uid, {
 										dosesPorFrasco: v.replace(/\D/g, "").slice(0, 10),
@@ -462,6 +465,7 @@ export function LoteCardItem({
 								required
 								type="text"
 								value={ap.frascos}
+								disabled={disabled}
 								onChange={(v) =>
 									updateApresentacao(lote.uid, ap.uid, {
 										frascos: v.replace(/\D/g, "").slice(0, 10),
@@ -705,7 +709,7 @@ export function AdicionarVendaComEntradaInsumosExamesPage({
 									options={ESTADOS_BR}
 								/>
 								<FloatInput
-									label="Data da Venda"
+									label="Data da Nota Fiscal"
 									required
 									type="date"
 									icon={<Calendar size={18} />}
