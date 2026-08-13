@@ -1,4 +1,4 @@
-import { ArrowLeft, X, ChevronLeft, ChevronRight, Pencil, Store, Eye as ViewIcon, Stethoscope, } from "lucide-react";
+import { ArrowLeft, X, ChevronLeft, ChevronRight, Pencil, PillBottle, Store, Eye as ViewIcon } from "lucide-react";
 import { useState } from "react";
 import { Navbar } from "../../../components/Navbar";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
@@ -314,7 +314,7 @@ export function VendaComEntradaInsumosExamesPage({
                 data={mockExamSupplyTypes}
                 searchKeys={["name"]}
                 columns={[{ label: "Tipo de Insumo", key: "name" }]}
-                icon={<Stethoscope size={18} color={GREEN} />}
+                icon={<PillBottle size={18} color={GREEN} />}
                 title="Buscar Tipo de Insumo"
                 subtitle="Busque por um tipo de insumo cadastrado:"
                 confirmLabel="Selecionar"

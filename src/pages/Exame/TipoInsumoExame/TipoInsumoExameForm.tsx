@@ -64,37 +64,55 @@ export function TipoInsumoExameForm({
   const doencasSelecionadas = value.doencas;
 
   return (
-    <Section title="Informações Básicas">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <FloatInput
-          label="Nome do Tipo de Insumo"
-          required
-          value={value.nome}
-          onChange={(nome) => onChange({ ...value, nome })}
-          maxLength={255}
-          disabled={disabled}
-        />
+    <>
+      <Section title="Informações Básicas">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <FloatInput
+            label="Nome do Tipo de Insumo"
+            required
+            value={value.nome}
+            onChange={(nome) => onChange({ ...value, nome })}
+            maxLength={255}
+            disabled={disabled}
+          />
 
-        <CheckboxGroup
-          title="Resultados possíveis"
-          required
-          options={RESULTADOS_POSSIVEIS_TIPO_INSUMO_EXAME}
-          defaultValue={value.resultadosPossiveis}
-          onChange={(resultadosPossiveis) =>
-            onChange({
-              ...value,
-              resultadosPossiveis: resultadosPossiveis as ResultadoPossivelTipoInsumoExame[],
-            })
-          }
-          orientation="horizontal"
-          disabled={disabled}
-        />
+          <CheckboxGroup
+            title="Resultados possíveis"
+            required
+            options={RESULTADOS_POSSIVEIS_TIPO_INSUMO_EXAME}
+            defaultValue={value.resultadosPossiveis}
+            onChange={(resultadosPossiveis) =>
+              onChange({
+                ...value,
+                resultadosPossiveis: resultadosPossiveis as ResultadoPossivelTipoInsumoExame[],
+              })
+            }
+            orientation="horizontal"
+            disabled={disabled}
+          />
 
-        <div className="md:col-span-2">
+          {showSituacao && (
+            <FloatSelect
+              label="Situação"
+              required
+              value={value.situacao}
+              onChange={(situacao) => onChange({ ...value, situacao: situacao as SituacaoTipoInsumoExame })}
+              options={SITUACOES_TIPO_INSUMO_EXAME}
+              disabled={disabled}
+              className="md:col-span-2"
+            />
+          )}
+        </div>
+      </Section>
+
+      <Section title="Doenças Identificáveis">
+        <div>
           <div className="w-full border border-gray-200 rounded-xl bg-[#f9fafb]/50 overflow-hidden">
             <div className="flex items-center justify-between px-5 py-3 border-b border-gray-200 bg-white gap-4">
               <div className="flex items-center gap-3">
-                <span className="text-sm font-semibold text-gray-500">Doença Selecionada</span>
+                <span className="text-sm font-semibold text-gray-500">
+                  Doenças <span className="text-red-500 font-bold" aria-hidden="true">*</span>
+                </span>
                 {doencasSelecionadas.length > 0 && (
                   <span className="text-xs font-bold bg-[#E6F4EA] text-[#1A7A3C] px-2.5 py-1 rounded-full">
                     {doencasSelecionadas.length} {doencasSelecionadas.length === 1 ? "Selecionada" : "Selecionadas"}
@@ -144,18 +162,7 @@ export function TipoInsumoExameForm({
           </div>
         </div>
 
-        {showSituacao && (
-          <FloatSelect
-            label="Situação"
-            required
-            value={value.situacao}
-            onChange={(situacao) => onChange({ ...value, situacao: situacao as SituacaoTipoInsumoExame })}
-            options={SITUACOES_TIPO_INSUMO_EXAME}
-            disabled={disabled}
-            className="md:col-span-2"
-          />
-        )}
-      </div>
+      </Section>
 
       <MultiSearchModal<DoencaReferencia>
         open={modalDoencaAberto}
@@ -174,6 +181,6 @@ export function TipoInsumoExameForm({
           setModalDoencaAberto(false);
         }}
       />
-    </Section>
+    </>
   );
 }

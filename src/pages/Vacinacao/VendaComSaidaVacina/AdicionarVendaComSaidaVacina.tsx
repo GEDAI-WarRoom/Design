@@ -697,12 +697,23 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
                   />
                 </div>
                 {codigoDestinatario && (
-                  <FloatInput
-                    label="CPF/CNPJ do Destinatário"
-                    value={codigoDestinatario}
-                    disabled
-                    className="w-[280px]"
-                  />
+                  <div className="flex items-center gap-1 mt-auto">
+                    <FloatInput
+                      label="CPF/CNPJ do Destinatário"
+                      value={codigoDestinatario}
+                      disabled
+                      className="w-[280px]"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => alert(`Visualizar destinatário: ${destinatario}`)}
+                      className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-lg transition"
+                      title="Visualizar Destinatário"
+                      aria-label={`Visualizar destinatário ${destinatario}`}
+                    >
+                      <Eye size={20} />
+                    </button>
+                  </div>
                 )}
               </div>
             )}

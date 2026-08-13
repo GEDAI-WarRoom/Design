@@ -1,5 +1,5 @@
 import { ArrowLeft, Check } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Navbar } from "../../../components/Navbar";
 import { VendaComSaidaInsumoForm } from "./VendaComSaidaInsumoForm";
 import { obterVendaSaidaInsumo, salvarVendaSaidaInsumo, type VendaSaidaInsumo } from "./vendaComSaidaInsumoData";
@@ -8,6 +8,16 @@ export function EditarVendaComSaidaInsumoPage({ dados, onLogout, onNavigate }: a
   const [form, setForm] = useState(() => obterVendaSaidaInsumo(dados));
   const [confirmar, setConfirmar] = useState(false);
   const [salvo, setSalvo] = useState<VendaSaidaInsumo | null>(null);
+  useEffect(() => {
+    const atualizarSituacao = (event: Event) => {
+      const detalhe = (event as CustomEvent<{ currentScreen: string; situacao: VendaSaidaInsumo["situacao"] }>).detail;
+      if (detalhe.currentScreen === "venda-saida-insumo") {
+        setForm((atual) => ({ ...atual, situacao: detalhe.situacao }));
+      }
+    };
+    window.addEventListener("situacao-cadastro-alterada", atualizarSituacao);
+    return () => window.removeEventListener("situacao-cadastro-alterada", atualizarSituacao);
+  }, []);
   const salvar = () => { setConfirmar(false); setSalvo(salvarVendaSaidaInsumo(form)); };
   return <div className="min-h-screen bg-[#f2f3f5] pb-20"><Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="venda-saida-insumo" hideSearch /><main className="mx-auto flex max-w-[1200px] flex-col gap-5 px-4 py-6 md:px-6"><header><button type="button" onClick={() => onNavigate("visualizar-venda-saida-insumo", form)} className="mb-3 flex items-center gap-1 text-sm text-[#1A7A3C]"><ArrowLeft size={15} /> Visualizar Venda com Saída de Insumo</button><div className="flex items-center justify-between gap-4"><h1 className="text-2xl font-semibold text-gray-900">Editar Venda com Saída de Insumo</h1><button type="button" onClick={() => setConfirmar(true)} className="h-11 rounded-md bg-[#1A7A3C] px-6 text-sm font-semibold text-white">Salvar</button></div></header><VendaComSaidaInsumoForm value={form} onChange={setForm} mode="edit" /></main>{confirmar && <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 p-4"><div className="w-full max-w-md rounded-2xl bg-white p-6 text-center shadow-xl"><h2 className="text-lg font-bold text-gray-900">Salvar alterações?</h2><p className="mt-2 text-sm text-gray-500">A situação da venda será atualizada.</p><div className="mt-6 flex justify-center gap-3"><button type="button" onClick={() => setConfirmar(false)} className="h-11 rounded-md border border-[#1A7A3C] px-6 text-sm font-semibold text-[#1A7A3C]">Voltar</button><button type="button" onClick={salvar} className="h-11 rounded-md bg-[#1A7A3C] px-6 text-sm font-semibold text-white">Salvar</button></div></div></div>}{salvo && <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 p-4"><div className="w-full max-w-md rounded-2xl bg-white p-6 text-center shadow-xl"><div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#E6F4EA]"><Check size={28} className="text-[#1A7A3C]" strokeWidth={3} /></div><h2 className="text-lg font-bold text-gray-900">Venda com saída de insumo atualizada com sucesso!</h2><div className="mt-6 flex justify-center gap-3"><button type="button" onClick={() => onNavigate("venda-saida-insumo")} className="h-11 rounded-md border border-[#1A7A3C] px-6 text-sm font-semibold text-[#1A7A3C]">Voltar</button><button type="button" onClick={() => onNavigate("visualizar-venda-saida-insumo", salvo)} className="h-11 rounded-md bg-[#1A7A3C] px-6 text-sm font-semibold text-white">Visualizar</button></div></div></div>}</div>;
 }

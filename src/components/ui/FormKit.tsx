@@ -845,7 +845,9 @@ export interface MultiSearchModalProps<T extends { id: string | number }> {
 	onConfirm: (selected: T[]) => void;
 	confirmLabel?: string;
 	showResultsOnOpen?: boolean;
+	pageSize?: number;
 	maxSelection?: number;
+	maxSelectionMessage?: string;
 }
 
 export function MultiSearchModal<T extends { id: string | number }>({
@@ -862,7 +864,9 @@ export function MultiSearchModal<T extends { id: string | number }>({
 	onConfirm,
 	confirmLabel = "Confirmar",
 	showResultsOnOpen = false,
+	pageSize = 5,
 	maxSelection,
+	maxSelectionMessage,
 }: MultiSearchModalProps<T>) {
 	const [busca, setBusca] = useState("");
 	const [tempSelected, setTempSelected] = useState<T[]>([]);
@@ -870,7 +874,8 @@ export function MultiSearchModal<T extends { id: string | number }>({
 	const [sortKey, setSortKey] = useState<keyof T | null>(null);
 	const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
-	const PAGE_SIZE = 5;
+	const PAGE_SIZE = pageSize;
+	const limiteSelecaoAtingido = Boolean(maxSelection && tempSelected.length >= maxSelection);
 
 	// Garante a sincronização limpa do estado ao abrir
 	useEffect(() => {
@@ -928,7 +933,8 @@ export function MultiSearchModal<T extends { id: string | number }>({
 			setTempSelected(
 				tempSelected.filter((selected) => selected.id !== item.id),
 			);
-		} else if (maxSelection == null || tempSelected.length < maxSelection) {
+		} else {
+			if (maxSelection && tempSelected.length >= maxSelection) return;
 			setTempSelected([...tempSelected, item]);
 		}
 	};
@@ -1082,6 +1088,12 @@ export function MultiSearchModal<T extends { id: string | number }>({
 								<span className="font-medium text-gray-600">{busca}</span>".
 							</div>
 						)}
+					</div>
+				)}
+
+				{limiteSelecaoAtingido && (
+					<div role="alert" className="rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-center text-xs font-medium text-amber-800">
+						{maxSelectionMessage ?? `O limite de ${maxSelection} seleções foi atingido. Remova um item para selecionar outro.`}
 					</div>
 				)}
 

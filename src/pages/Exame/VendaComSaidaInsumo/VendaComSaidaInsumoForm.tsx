@@ -60,7 +60,7 @@ export function VendaComSaidaInsumoForm({ value, onChange, mode }: { value: Vend
   const atualizar = (patch: Partial<VendaSaidaInsumo>) => onChange({ ...value, ...patch });
   const maxDate = new Date().toISOString().slice(0, 10);
 
-  return <div className="flex flex-col gap-4">
+  return <div data-current-situacao={value.situacao} className="flex flex-col gap-4">
     {mode !== "view" && <div className="rounded-lg border border-gray-100 bg-white p-5 text-sm text-gray-600 shadow-sm">Campos indicados com <span className="font-bold text-red-500">*</span> são obrigatórios.</div>}
 
     <Section title="Emitente">
@@ -93,8 +93,6 @@ export function VendaComSaidaInsumoForm({ value, onChange, mode }: { value: Vend
       <input ref={fileRef} type="file" accept=".pdf,.png,.jpg,.jpeg" className="hidden" onChange={(event) => atualizar({ requerimento: event.target.files?.[0]?.name ?? "" })} />
       <UploadField label="Requerimento" required fileName={value.requerimento} disabled={camposFixos} subtitle="Formatos permitidos: PDF, PNG ou JPG de até 50 MB." onSelectFile={() => fileRef.current?.click()} />
     </Section>
-
-    {mode === "edit" && <Section title="Situação"><div className="max-w-sm"><FloatSelect label="Situação" required value={value.situacao} onChange={(situacao) => atualizar({ situacao: situacao as VendaSaidaInsumo["situacao"] })} options={[{ value: "Gravada", label: "Gravada" }, { value: "Cancelada", label: "Cancelada" }]} /></div></Section>}
 
     <MultiSearchModal open={lotesAbertos} onClose={() => setLotesAbertos(false)} title="Buscar Saldo de Insumos de Exame" subtitle="Pesquise diretamente, sem precisar selecionar uma doença antes." icon={<FlaskConical size={22} className="text-[#1A7A3C]" />} data={LOTES_DISPONIVEIS} columns={[{ label: "Partida", key: "numeroPartida" }, { label: "Laboratório", key: "laboratorio" }, { label: "Doença", key: "doenca" }, { label: "Tipo de Insumo", key: "tipoInsumo" }]} searchKeys={["numeroPartida", "laboratorio", "doenca", "tipoInsumo"]} selectedItems={value.lotes} onConfirm={(lotes) => atualizar({ lotes })} confirmLabel="Selecionar" />
   </div>;

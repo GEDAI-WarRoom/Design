@@ -1,18 +1,28 @@
-import { ArrowLeft, ChevronLeft, ChevronRight, Eye, FlaskConical, Pencil, Search, Store } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, Eye, FlaskConical, Pencil, PillBottle, Store, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Navbar } from "../../../components/Navbar";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
-import { FloatCombobox, FloatInput, FloatSelect } from "../../../components/ui/FormKit";
+import { FloatInput, FloatSelect } from "../../../components/ui/FormKit";
+import * as Icons from "../../../imports/icons";
 import {
   DOENCAS,
   LABORATORIOS,
   listarVendasSaidaInsumo,
   REVENDEDORAS_INSUMO,
   TIPOS_INSUMO,
+  type DoencaVendaSaidaInsumo,
   type EntidadeVendaSaidaInsumo,
+  type TipoInsumoVendaSaidaInsumo,
 } from "./vendaComSaidaInsumoData";
 
-const VAZIO = { emitente: null as EntidadeVendaSaidaInsumo | null, tipoDestinatario: "", destinatario: "", documento: "", notaFiscal: "", partida: "", laboratorio: null as EntidadeVendaSaidaInsumo | null, doenca: "", tipoInsumo: "", situacao: "" };
+const VAZIO = { emitente: null as EntidadeVendaSaidaInsumo | null, tipoDestinatario: "", destinatario: "", documento: "", notaFiscal: "", partida: "", laboratorio: null as EntidadeVendaSaidaInsumo | null, doenca: null as DoencaVendaSaidaInsumo | null, tipoInsumo: null as TipoInsumoVendaSaidaInsumo | null, situacao: "" };
+
+function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
+  return <div className="flex max-w-full items-center gap-2 rounded-md bg-[#1A7A3C] px-3 py-1.5 text-xs font-medium text-white shadow-sm">
+    <span className="truncate">{label}</span>
+    <button type="button" onClick={onRemove} className="flex-shrink-0 transition hover:opacity-80" aria-label={`Remover filtro ${label}`}><X size={14} className="stroke-[2.5]" /></button>
+  </div>;
+}
 
 export function VendaComSaidaInsumoPage({ onLogout, onNavigate }: any) {
   const [filtros, setFiltros] = useState(VAZIO);
@@ -35,8 +45,8 @@ export function VendaComSaidaInsumoPage({ onLogout, onNavigate }: any) {
         && (!aplicados.notaFiscal || venda.numeroNotaFiscal.includes(aplicados.notaFiscal))
         && (!aplicados.partida || lotes.some((lote) => texto(lote.numeroPartida).includes(texto(aplicados.partida))))
         && (!aplicados.laboratorio || lotes.some((lote) => lote.laboratorio === aplicados.laboratorio?.nome))
-        && (!aplicados.doenca || lotes.some((lote) => lote.doenca === aplicados.doenca))
-        && (!aplicados.tipoInsumo || lotes.some((lote) => lote.tipoInsumo === aplicados.tipoInsumo))
+        && (!aplicados.doenca || lotes.some((lote) => lote.doenca === aplicados.doenca?.nome))
+        && (!aplicados.tipoInsumo || lotes.some((lote) => lote.tipoInsumo === aplicados.tipoInsumo?.name))
         && (!aplicados.situacao || venda.situacao === aplicados.situacao);
     }).sort((a, b) => a.destinatario.nome.localeCompare(b.destinatario.nome, "pt-BR"));
   }, [aplicados]);
@@ -65,12 +75,24 @@ export function VendaComSaidaInsumoPage({ onLogout, onNavigate }: any) {
           <FloatInput label="Número da Nota Fiscal" maxLength={10} value={filtros.notaFiscal} onChange={(notaFiscal) => atualizar({ notaFiscal: notaFiscal.replace(/\D/g, "").slice(0, 10) })} />
           <FloatInput label="Número de Partida" maxLength={20} value={filtros.partida} onChange={(partida) => atualizar({ partida })} />
           <EntitySearchInput label="Laboratório" placeholder="Buscar por nome ou código" value={filtros.laboratorio?.nome ?? ""} data={LABORATORIOS} searchKeys={["nome", "codigo"]} columns={[{ label: "Código", key: "codigo" }, { label: "Nome", key: "nome" }]} icon={<FlaskConical size={18} />} onChange={(laboratorio) => atualizar({ laboratorio })} />
-          <FloatCombobox label="Doença" value={filtros.doenca} onChange={(doenca) => atualizar({ doenca })} options={DOENCAS} />
-          <FloatCombobox label="Tipo de Insumo" value={filtros.tipoInsumo} onChange={(tipoInsumo) => atualizar({ tipoInsumo })} options={TIPOS_INSUMO} />
+          <EntitySearchInput label="Doença" placeholder="Buscar pelo nome da doença" value={filtros.doenca?.nome ?? ""} data={DOENCAS} searchKeys={["nome"]} columns={[{ label: "Nome da Doença", key: "nome" }]} icon={<img src={Icons.iconeDoencaUrl} alt="Doença" className="h-5 w-5 object-contain" />} title="Buscar Doença" subtitle="Busque por uma doença cadastrada:" onChange={(doenca) => atualizar({ doenca })} />
+          <EntitySearchInput label="Tipo de Insumo" placeholder="Buscar tipo de insumo" value={filtros.tipoInsumo?.name ?? ""} data={TIPOS_INSUMO} searchKeys={["name"]} columns={[{ label: "Tipo de Insumo", key: "name" }]} icon={<PillBottle size={18} />} title="Buscar Tipo de Insumo" subtitle="Busque por um tipo de insumo cadastrado:" confirmLabel="Selecionar" onChange={(tipoInsumo) => atualizar({ tipoInsumo })} />
           <FloatSelect label="Situação" value={filtros.situacao} onChange={(situacao) => atualizar({ situacao })} options={[{ value: "Gravada", label: "Gravada" }, { value: "Cancelada", label: "Cancelada" }]} />
-          <button type="button" onClick={pesquisar} className="flex h-12 items-center justify-center gap-2 rounded-md bg-[#1A7A3C] px-6 text-sm font-semibold text-white md:col-start-4"><Search size={17} /> Pesquisar</button>
+          <button type="button" onClick={pesquisar} className="flex h-12 items-center justify-center rounded-md bg-[#1A7A3C] px-6 text-sm font-semibold text-white md:col-start-4">Pesquisar</button>
         </div>
         {erro && <p className="mt-3 text-sm text-red-600">Preencha pelo menos um filtro para pesquisar.</p>}
+        {temFiltro && <div className="mt-4 flex flex-wrap gap-2 animate-fadeIn">
+          {filtros.emitente && <Chip label={`Revendedora: ${filtros.emitente.nome}`} onRemove={() => atualizar({ emitente: null })} />}
+          {filtros.tipoDestinatario && <Chip label={`Tipo de Destinatário: ${filtros.tipoDestinatario}`} onRemove={() => atualizar({ tipoDestinatario: "" })} />}
+          {filtros.destinatario && <Chip label={`Destinatário: ${filtros.destinatario}`} onRemove={() => atualizar({ destinatario: "" })} />}
+          {filtros.documento && <Chip label={`CPF/CNPJ: ${filtros.documento}`} onRemove={() => atualizar({ documento: "" })} />}
+          {filtros.notaFiscal && <Chip label={`NF: ${filtros.notaFiscal}`} onRemove={() => atualizar({ notaFiscal: "" })} />}
+          {filtros.partida && <Chip label={`Partida: ${filtros.partida}`} onRemove={() => atualizar({ partida: "" })} />}
+          {filtros.laboratorio && <Chip label={`Laboratório: ${filtros.laboratorio.nome}`} onRemove={() => atualizar({ laboratorio: null })} />}
+          {filtros.doenca && <Chip label={`Doença: ${filtros.doenca.nome}`} onRemove={() => atualizar({ doenca: null })} />}
+          {filtros.tipoInsumo && <Chip label={`Tipo de Insumo: ${filtros.tipoInsumo.name}`} onRemove={() => atualizar({ tipoInsumo: null })} />}
+          {filtros.situacao && <Chip label={`Situação: ${filtros.situacao}`} onRemove={() => atualizar({ situacao: "" })} />}
+        </div>}
 
         {aplicados && <div className="mt-7 overflow-x-auto border-t border-gray-100 pt-5">
           <table className="w-full min-w-[960px] border-collapse text-left">

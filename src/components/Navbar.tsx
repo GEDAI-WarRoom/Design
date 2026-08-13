@@ -15,6 +15,7 @@ import {
   PRODUTOR_REBANHO_DEMONSTRACAO_DOCUMENTO,
 } from "../pages/Rebanho/AtualizacaoCadastralRebanho/atualizacaoCadastralRebanhoData";
 import { listarPendenciasCentrais } from "../pages/GTA/PendenciasConfirmacao/pendenciasCentralData";
+import { SituacaoVisualizacao } from "./SituacaoVisualizacao";
 
 const GREEN = "#1A7A3C";
 
@@ -160,6 +161,7 @@ export function Navbar({ onLogout, onNavigate, currentScreen }: NavbarProps) {
   const totalNotificacoes = role === "admin" ? 2 : totalPendencias;
 
   return (
+    <>
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-30 px-4 md:px-6 py-3">
       <div className="max-w-[1300px] mx-auto flex flex-col gap-3">
         
@@ -342,5 +344,7 @@ export function Navbar({ onLogout, onNavigate, currentScreen }: NavbarProps) {
 
       </div>
     </nav>
+    <SituacaoVisualizacao currentScreen={currentScreen} />
+    </>
   );
 }

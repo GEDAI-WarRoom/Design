@@ -206,7 +206,9 @@ export function LoteCardItem({
 
       {laboratorioNaoProduzDoenca && (
         <p className="-mt-2 text-xs text-amber-700" role="alert">
-          O laboratório selecionado não está cadastrado como produtor de vacinas para esta doença. O cadastro ainda pode ser concluído.
+          O laboratório selecionado não está cadastrado como produtor de vacinas para esta doença.
+          <br />
+          É possível prosseguir com o cadastro mas recomenda-se entrar em contato com o IMA para a atualização do cadastro do laboratório.
         </p>
       )}
 
@@ -485,7 +487,7 @@ export function AdicionarVendaComEntradaVacinaPage({ onLogout, onNavigate, mode 
                 />
                 <FloatCombobox label="UF da Nota Fiscal" required value={ufNotaFiscal} onChange={setUfNotaFiscal} options={ESTADOS_BR} />
                 <FloatInput
-                  label="Data"
+                  label="Data da Nota Fiscal"
                   required
                   type="date"
                   max={HOJE}
