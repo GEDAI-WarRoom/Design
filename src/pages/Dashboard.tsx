@@ -1028,7 +1028,7 @@ export const fourthCategories: MenuCategory[] = [
     icon: <Settings size={28} color={GREEN} />, // Altere o ícone se precisar
     items: [
       {
-        label: "Parâmetros do sistema",
+        label: "Parâmetros",
         route: "parametros-sistema",
         icon: <Settings2 size={16} />,
       },
@@ -1257,10 +1257,10 @@ export function DashboardPage({ onLogout, onNavigate }: any) {
     <DashboardAdmin
       onLogout={onLogout}
       onNavigate={onNavigate}
-      categoryGroups={[visibleCadastros, visibleSecondary, visibleThird].filter(
+      categoryGroups={[visibleCadastros, visibleSecondary, [...visibleThird, ...visibleFourth]].filter(
         (group) => group.length > 0,
       )}
-      controlCategories={visibleFourth}
+      controlCategories={[]}
     />
   );
 }

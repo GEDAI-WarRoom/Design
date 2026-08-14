@@ -12,9 +12,9 @@ import {
   Copy,
   Dna,
   DollarSign,
+	Download,
   Eye,
   Factory,
-  FileCheck2,
   FileDown,
   Plane,
   Pencil,
@@ -706,7 +706,7 @@ export function EmissaoGtaPage({
                                 title="Baixar GTA"
                                 onClick={() => onNavigate("documento-emissao-gta", item)}
                               >
-                                <FileCheck2 size={16} />
+								<Download size={16} />
                               </ActionButton>
                             )}
                             {!['Cancelada', 'Transitada'].includes(item.situacao) && (

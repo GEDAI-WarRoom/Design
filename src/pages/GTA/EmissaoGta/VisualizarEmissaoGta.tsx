@@ -28,6 +28,7 @@ import {
   copiarEmissaoGta,
   dataPadraoValidade,
   emitirEmissaoGta,
+  estenderValidadeEmissaoGta,
   formatarDataGta,
   formatarMoedaGta,
   frigorificoAderidoAoFundo,
@@ -264,7 +265,7 @@ export function VisualizarEmissaoGtaPage({
   const foiEmitida = ["Emitida", "Transitada"].includes(emissao.situacao);
   const podeBaixarGta = ["Aguardando Pagamento", "Paga", "Emitida"].includes(emissao.situacao);
   const podeEmitir = emissao.situacao === "Paga";
-  const podeEstenderValidade = emissao.situacao === "Paga";
+  const podeEstenderValidade = emissao.situacao === "Emitida";
   const podeCancelar = !["Cancelada", "Transitada"].includes(emissao.situacao);
 
   const executarAcao = (acao: () => void) => {
@@ -358,7 +359,7 @@ export function VisualizarEmissaoGtaPage({
   const confirmarExtensaoValidade = () => {
     setTentouEstenderValidade(true);
     if (!podeEstenderValidade || !extensaoValidadeValida) return;
-    const atualizada = emitirEmissaoGta(
+    const atualizada = estenderValidadeEmissaoGta(
       emissao.id,
       novaDataValidadeIso,
       justificativaValidade,
