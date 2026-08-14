@@ -135,6 +135,7 @@ export function AdicionarIntegradoraCooperativaPage({ onLogout, onNavigate }: Pa
               <ProprietarioInput
                 value={item.entidade ? item.entidade.nome : ""}
                 required
+				clearInitialValue
                 onChange={(ent: any) => setProprietarios((prev) => prev.map((p, i) => (i === index ? { ...p, entidade: ent } : p)))}
                 onEyeClick={() => item.entidade && onNavigate("visualizar-pessoa", item.entidade)}
               />

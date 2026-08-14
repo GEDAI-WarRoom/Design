@@ -222,6 +222,7 @@ export function AdicionarInstituicaoEnsinoPesquisaPage({
                   value={item.proprietario ? item.proprietario.nome : ""}
                   label="Proprietário"
                   required
+				  clearInitialValue
                   onChange={(entidadeSelecionada) =>
                     setProprietarios((p) =>
                       p.map((x) =>

@@ -19,6 +19,13 @@ import { SituacaoVisualizacao } from "./SituacaoVisualizacao";
 
 const GREEN = "#1A7A3C";
 
+function isRouteActive(itemRoute: string, currentScreen: string) {
+  const normalizeRoute = (route: string) =>
+    route.replace(/^(adicionar|editar|visualizar)-/, "");
+
+  return itemRoute === currentScreen || normalizeRoute(itemRoute) === normalizeRoute(currentScreen);
+}
+
 interface PointerPosition {
   x: number;
   y: number;
@@ -181,7 +188,7 @@ export function Navbar({ onLogout, onNavigate, currentScreen }: NavbarProps) {
             <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-2">
               {workAreaCategories.map((category) => {
                 const isOpen = openCategory === category.title;
-                const isActive = category.items.some((item) => item.route === currentScreen);
+                const isActive = category.items.some((item) => isRouteActive(item.route, currentScreen));
 
                 return (
                   <div
@@ -223,16 +230,19 @@ export function Navbar({ onLogout, onNavigate, currentScreen }: NavbarProps) {
                         <p className="border-b border-gray-200 bg-[#F1F3F2] px-4 py-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
                           {category.title}
                         </p>
-                        {category.items.map((item) => (
-                          <button
+                        {category.items.map((item) => {
+                          const isActiveItem = isRouteActive(item.route, currentScreen);
+
+                          return <button
                             key={`${category.title}-${item.route}`}
                             type="button"
                             role="menuitem"
+							aria-current={isActiveItem ? "page" : undefined}
                             onClick={() => {
                               onNavigate(item.route);
                               setOpenCategory(null);
                             }}
-                            className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-gray-700 transition hover:bg-green-50 hover:text-[#1A7A3C] focus-visible:bg-green-50 focus-visible:outline-none"
+                            className={`flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm transition hover:bg-green-50 hover:text-[#1A7A3C] focus-visible:bg-green-50 focus-visible:outline-none ${isActiveItem ? "bg-green-50 font-semibold text-[#1A7A3C]" : "text-gray-700"}`}
                           >
                             {item.icon && (
                               <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center text-[#1A7A3C]">
@@ -241,7 +251,7 @@ export function Navbar({ onLogout, onNavigate, currentScreen }: NavbarProps) {
                             )}
                             <span>{item.label}</span>
                           </button>
-                        ))}
+                        })}
                       </div>
                     )}
                   </div>

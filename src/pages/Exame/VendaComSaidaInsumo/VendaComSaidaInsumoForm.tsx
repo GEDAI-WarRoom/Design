@@ -18,7 +18,6 @@ const TIPOS_DESTINATARIO: TipoDestinatarioVendaSaidaInsumo[] = [
   "Laboratório",
   "Responsável Técnico GRSC",
   "Revendedora de Produtos Agropecuários",
-  "Outro",
 ];
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -70,7 +69,7 @@ export function VendaComSaidaInsumoForm({ value, onChange, mode }: { value: Vend
     <Section title="Destinatário">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <FloatSelect label="Tipo de Destinatário" required value={value.tipoDestinatario} disabled={camposFixos} onChange={(tipoDestinatario) => atualizar({ tipoDestinatario: tipoDestinatario as TipoDestinatarioVendaSaidaInsumo, destinatario: { id: "", codigo: "", nome: "" } })} options={TIPOS_DESTINATARIO.map((tipo) => ({ value: tipo, label: tipo }))} />
-        {value.tipoDestinatario === "Outro" ? <FloatInput label="Destinatário" required value={value.destinatario.nome} disabled={camposFixos} maxLength={255} onChange={(nome) => atualizar({ destinatario: { id: "outro", codigo: "", nome } })} /> : <EntityField label="Destinatário" value={value.destinatario} data={destinatarios} disabled={camposFixos} onChange={(destinatario) => atualizar({ destinatario })} />}
+        <EntityField label="Destinatário" value={value.destinatario} data={destinatarios} disabled={camposFixos} onChange={(destinatario) => atualizar({ destinatario })} />
       </div>
       {value.destinatario.nome && <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2"><FloatInput label="Código" value={value.destinatario.codigo} disabled onChange={() => {}} /><FloatInput label="CPF/CNPJ" value={value.destinatario.documento ?? "Não informado"} disabled onChange={() => {}} /></div>}
     </Section>

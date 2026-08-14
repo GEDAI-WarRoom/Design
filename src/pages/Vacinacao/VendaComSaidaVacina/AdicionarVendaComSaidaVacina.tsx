@@ -371,7 +371,6 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
     { label: "Laboratório", value: "laboratorio" },
     { label: "Responsável Técnico GRSC", value: "responsavel_tecnico_grsc" },
     { label: "Revendedora de Produtos Agropecuários", value: "revendedora" },
-    { label: "Outro", value: "outro" },
   ] : [
     { label: "Produtor", value: "produtor" },
     { label: "Vacinador", value: "vacinador" },
@@ -684,7 +683,7 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
               </div>}
             </div>
 
-            {isInsumo && tipoDestinatario && tipoDestinatario !== "outro" && (
+            {isInsumo && tipoDestinatario && (
               <div className="flex gap-3 items-end w-full pt-2 animate-fadeIn">
                 <div className="flex-1">
                   <FloatInput
@@ -715,25 +714,6 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
                     </button>
                   </div>
                 )}
-              </div>
-            )}
-
-            {isInsumo && tipoDestinatario === "outro" && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 items-end w-full pt-2 animate-fadeIn">
-                <FloatInput
-                  label="Destinatário"
-                  required
-                  value={destinatario}
-                  onChange={setDestinatario}
-                  maxLength={255}
-                />
-                <FloatInput
-                  label="CPF/CNPJ do Destinatário"
-                  required
-                  value={codigoDestinatario}
-                  onChange={setCodigoDestinatario}
-                  maxLength={14}
-                />
               </div>
             )}
 

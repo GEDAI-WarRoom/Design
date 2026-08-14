@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
 	Eye,
 	PlusCircle,
@@ -1050,6 +1050,7 @@ export function ProprietarioInput({
 	disabled = false,
 	label = "Proprietário",
 	data,
+	clearInitialValue = false,
 }: DomainInputProps) {
 	const databaseRevision = useMockDatabaseRevision();
 	void databaseRevision;
@@ -1059,6 +1060,13 @@ export function ProprietarioInput({
 		...PRODUTORES_MOCK.filter((item) => item.tipo === "PJ"),
 	];
 	const [tipoPessoa, setTipoPessoa] = useState<string>("");
+	const clearInitialValueRef = useRef(clearInitialValue);
+
+	useEffect(() => {
+		if (!clearInitialValueRef.current || !value) return;
+		clearInitialValueRef.current = false;
+		onChange(null);
+	}, []);
 
 	const entidadeSelecionada = database.find(
 		(x) => x.nome === value || x.documento === value,
@@ -1071,6 +1079,7 @@ export function ProprietarioInput({
 			tipo: documento?.includes("/") ? "PJ" : "PF",
 		}
 		: null);
+	const ocultarValorInicial = clearInitialValue && clearInitialValueRef.current;
 
 	const databaseFiltrada = tipoPessoa
 		? database.filter((p: any) => p.tipo === tipoPessoa)
@@ -1110,7 +1119,7 @@ export function ProprietarioInput({
 					label={label}
 					placeholder="Buscar pelo nome do proprietário."
 					required={required}
-					value={entidadeExibida?.nome || ""}
+					value={ocultarValorInicial ? "" : entidadeExibida?.nome || ""}
 					disabled={disabled}
 					data={databaseFiltrada}
 					title={`Buscar ${label}`}
@@ -1145,7 +1154,7 @@ export function ProprietarioInput({
 				/>
 
 				{/* Campo Extra reboque */}
-				{value && entidadeExibida && (
+				{!ocultarValorInicial && value && entidadeExibida && (
 					<div className="flex items-center gap-2 animate-fadeIn w-full">
 						<div className="flex-1">
 							<FloatInput
@@ -1171,6 +1180,7 @@ interface DomainInputProps {
 	documento?: string; // Documento selecionado (CPF/CNPJ)
 	required?: boolean;
 	disabled?: boolean;
+	clearInitialValue?: boolean;
 	data?: any[];
 	onChange: (selectedEntity: any) => void;
 	onEyeClick?: () => void;

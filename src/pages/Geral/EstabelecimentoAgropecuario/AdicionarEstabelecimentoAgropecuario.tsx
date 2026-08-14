@@ -241,6 +241,7 @@ export function AdicionarEstabelecimentoAgropecuarioPage({ onLogout, onNavigate 
                 <ProprietarioInput
                   label="Proprietário"
                   required
+				  clearInitialValue
                   value={item.proprietario ? item.proprietario.nome : ""}
                   onChange={(ent: any) =>
                     setProprietarios((p) =>
