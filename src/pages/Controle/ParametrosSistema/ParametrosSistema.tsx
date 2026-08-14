@@ -636,7 +636,7 @@ export function ParametrosSistemaPage({ onLogout, onNavigate }: ParametrosSistem
 
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h1 className="text-2xl font-semibold text-gray-900">Parâmetros do sistema</h1>
+              <h1 className="text-2xl font-semibold text-gray-900">Parâmetros</h1>
               <p className="text-sm text-gray-500 mt-1">
                 Configure os valores utilizados pelas funcionalidades do Sidagro.
               </p>
@@ -885,7 +885,7 @@ export function ParametrosSistemaPage({ onLogout, onNavigate }: ParametrosSistem
               <Check size={28} className="text-[#1A7A3C]" strokeWidth={3} />
             </div>
             <h2 className="text-lg font-bold text-gray-900">
-              Parâmetros do sistema atualizados com sucesso!
+              Parâmetros atualizados com sucesso!
             </h2>
             <p className="text-sm text-gray-500 mt-2">
               {quantidadeSalva} {quantidadeSalva === 1 ? "parâmetro foi atualizado" : "parâmetros foram atualizados"}.

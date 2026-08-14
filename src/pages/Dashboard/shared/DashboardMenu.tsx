@@ -9,6 +9,10 @@ function CategoryCard({
 	category: MenuCategory;
 	onNavigate: (screen: any) => void;
 }) {
+	const itemsOrdenados = [...category.items].sort((primeiro, segundo) =>
+		primeiro.label.localeCompare(segundo.label, "pt-BR"),
+	);
+
 	return (
 		<div className="flex flex-col gap-2">
 			<div className="mb-1">{category.icon}</div>
@@ -16,7 +20,7 @@ function CategoryCard({
 				{category.title}
 			</h3>
 			<ul className="flex flex-col gap-1">
-				{category.items.map((item) => (
+				{itemsOrdenados.map((item) => (
 					<li key={`${category.title}-${item.route}`}>
 						<button
 							type="button"
