@@ -9,6 +9,7 @@
     "test:evento-pecuario": "node tests/eventoPecuarioUS066.test.mjs",
     "test:parametros": "node tests/parametrosSistema.test.mjs",
     "test:vacinacao": "node tests/vacinacaoTelas.test.mjs",
+    "test:tipo-vacina": "node tests/tipoVacina.test.mjs",
     "test:tipo-atestado": "node tests/tipoAtestado.test.mjs",
     "test:atestado-exame": "node tests/atestadoExameCadastro.test.mjs",
     "test:meu-perfil": "node tests/meuPerfilData.test.mjs"

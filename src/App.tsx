@@ -204,6 +204,10 @@ import { VisualizarDeclaracaoVacinacaoPage } from "./pages/Vacinacao/DeclaracaoV
 import { EditarDeclaracaoVacinacaoPage } from "./pages/Vacinacao/DeclaracaoVacinacao/EditarDeclaracaoVacinacao";
 import { AdicionarDoencaPage } from "./pages/Vacinacao/Doenca/AdicionarDoenca";
 import { DoencaPage } from "./pages/Vacinacao/Doenca/Doenca";
+import { AdicionarTipoVacinaPage } from "./pages/Vacinacao/TipoVacina/AdicionarTipoVacina";
+import { EditarTipoVacinaPage } from "./pages/Vacinacao/TipoVacina/EditarTipoVacina";
+import { TipoVacinaPage } from "./pages/Vacinacao/TipoVacina/TipoVacina";
+import { VisualizarTipoVacinaPage } from "./pages/Vacinacao/TipoVacina/VisualizarTipoVacina";
 import { AdicionarEtapaVacinacaoPage } from "./pages/Vacinacao/EtapaVacinacao/AdicionarEtapaVacinacao";
 import { EtapaVacinacaoPage } from "./pages/Vacinacao/EtapaVacinacao/EtapaVacinacao";
 import { AdicionarLaboratorioPage } from "./pages/Vacinacao/Laboratorio/AdicionarLaboratorio";
@@ -362,6 +366,10 @@ export type Screen =
   | "adicionar-declaracao-vacinacao"
   | "visualizar-doenca"
   | "editar-doenca"
+  | "tipo-vacina"
+  | "adicionar-tipo-vacina"
+  | "visualizar-tipo-vacina"
+  | "editar-tipo-vacina"
   | "visualizar-vacinador-brucelose"
   | "editar-vacinador-brucelose"
   | "editar-usuario"
@@ -926,6 +934,10 @@ export default function App() {
       return <VisualizarDoencaPage key={`visualizar-doenca-${screenData?.id ?? "novo"}`} dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "editar-doenca":
       return <EditarDoencaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-tipo-vacina":
+      return <VisualizarTipoVacinaPage key={`visualizar-tipo-vacina-${screenData?.id ?? "novo"}`} dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-tipo-vacina":
+      return <EditarTipoVacinaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "visualizar-vacinador-brucelose":
       return <VisualizarVacinadorPage key={`visualizar-vacinador-brucelose-${screenData?.id ?? "novo"}`} dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "editar-vacinador-brucelose":
@@ -1368,6 +1380,10 @@ export default function App() {
 					onNavigate={handleNavigate}
 				/>
 			);
+		case "tipo-vacina":
+			return <TipoVacinaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+		case "adicionar-tipo-vacina":
+			return <AdicionarTipoVacinaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 		case "tipo-insumo-exame":
 			return (
 				<TipoInsumoExamePage
