@@ -224,11 +224,11 @@ export const FUNDOS_ARRECADACAO_MOCK: FundoArrecadacao[] = [
   },
 ];
 
-export function adicionarFundo(dados: Omit<FundoArrecadacao, "id" | "nome">): FundoArrecadacao {
+export function adicionarFundo(dados: Omit<FundoArrecadacao, "id">): FundoArrecadacao {
   const novo: FundoArrecadacao = {
     ...dados,
     id: Math.max(0, ...FUNDOS_ARRECADACAO_MOCK.map((item) => item.id)) + 1,
-    nome: dados.pessoaJuridica.nomeFantasia || dados.pessoaJuridica.razaoSocial,
+    nome: (dados.nome ?? "").trim() || dados.pessoaJuridica.nomeFantasia || dados.pessoaJuridica.razaoSocial,
   };
   FUNDOS_ARRECADACAO_MOCK.unshift(novo);
   return novo;

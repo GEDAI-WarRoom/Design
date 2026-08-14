@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { ArrowLeft, ChevronDown, ChevronUp } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { CheckboxGroup, FloatInput, LargeTextArea } from "../../../components/ui/FormKit";
+import { listarPapeis } from "../../Controle/Papeis/papeisData";
 import { obterFinalidadeTransito } from "./finalidadeTransitoData";
 
 const GREEN = "#1A7A3C";
@@ -37,6 +38,9 @@ export function VisualizarFinalidadeTransitoPage({ dados, onLogout, onNavigate }
   const emiteAcessoExterno = finalidade.emiteAcessoExterno?.length
     ? finalidade.emiteAcessoExterno
     : tiposProcedencia.includes("Estabelecimento Agropecuário") ? [EMITE_ACESSO[0]] : [];
+  const papeis = finalidade.papeis?.length
+    ? finalidade.papeis
+    : listarPapeis().filter((papel) => finalidade.papelIds?.includes(papel.id));
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
@@ -46,7 +50,7 @@ export function VisualizarFinalidadeTransitoPage({ dados, onLogout, onNavigate }
           <button type="button" onClick={() => onNavigate("finalidade-transito")} className="mb-3 flex items-center gap-1 text-sm font-semibold text-[#1A7A3C] hover:opacity-70"><ArrowLeft size={15} />Todas as Finalidades de Trânsito</button>
           <div className="flex items-center justify-between gap-4">
             <h1 className="text-2xl font-semibold text-gray-900">Visualizar Finalidade de Trânsito</h1>
-            <button type="button" onClick={() => onNavigate("editar-finalidade-transito", { ...finalidade, tiposProcedencia, tiposDestino, emiteAcessoExterno })} className="h-10 rounded-md bg-[#1A7A3C] px-5 text-xs font-bold text-white hover:bg-[#15612F]">Editar</button>
+            <button type="button" onClick={() => onNavigate("editar-finalidade-transito", { ...finalidade, tiposProcedencia, tiposDestino, emiteAcessoExterno, papeis })} className="h-10 rounded-md bg-[#1A7A3C] px-5 text-xs font-bold text-white hover:bg-[#15612F]">Editar</button>
           </div>
         </div>
 
@@ -60,7 +64,7 @@ export function VisualizarFinalidadeTransitoPage({ dados, onLogout, onNavigate }
           </div>
         </Section>
 
-        <Section title="Espécies aplicáveis">
+        <Section title="Espécies Aplicáveis (Uma ou mais)">
           <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
             <div className="flex items-center gap-3 border-b border-gray-200 px-5 py-3">
               <span className="text-sm font-semibold text-gray-500">Espécies Selecionadas</span>
@@ -68,6 +72,18 @@ export function VisualizarFinalidadeTransitoPage({ dados, onLogout, onNavigate }
             </div>
             <div className="flex flex-wrap gap-4 p-5">
               {finalidade.especies.map((especie: any) => <div key={especie.id || especie.nome} className="min-w-[180px] rounded-xl border border-gray-200 p-3 text-sm font-bold text-[#1A7A3C] shadow-sm">{especie.nome}</div>)}
+            </div>
+          </div>
+        </Section>
+
+        <Section title="Papéis Aplicáveis (Uma ou mais)">
+          <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+            <div className="flex items-center gap-3 border-b border-gray-200 px-5 py-3">
+              <span className="text-sm font-semibold text-gray-500">Papéis Selecionados</span>
+              <span className="rounded-full bg-[#E6F4EA] px-2.5 py-1 text-xs font-bold text-[#1A7A3C]">{papeis.length} {papeis.length === 1 ? "Selecionado" : "Selecionados"}</span>
+            </div>
+            <div className="flex flex-wrap gap-4 p-5">
+              {papeis.map((papel: any) => <div key={papel.id || papel.nome} className="min-w-[180px] rounded-xl border border-gray-200 p-3 text-sm font-bold text-[#1A7A3C] shadow-sm">{papel.nome}</div>)}
             </div>
           </div>
         </Section>

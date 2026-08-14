@@ -1,21 +1,27 @@
 import { useMemo, useState } from "react";
-import { ArrowLeft, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Dna, Eye, Pencil, X } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Dna, Eye, Pencil, Route, X } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
 import { FloatSelect } from "../../../components/ui/FormKit";
+import * as Icons from "../../../imports/icons";
+import { listarFinalidadesTransito } from "../FinalidadeTransito/finalidadeTransitoData";
 import {
   listarEspeciesTaxa,
-  TIPOS_COBRANCA,
-  formatarData,
+  listarPapeisTaxa,
+  OPCOES_COBRANCA_TAXA,
+  TIPOS_DOCUMENTO_SANITARIO,
   listarTaxasEmissaoDocumentoSanitario,
   type EspecieTaxa,
+  type FinalidadeTaxa,
+  type PapelTaxa,
   type TaxaEmissaoGta,
 } from "./taxaEmissaoGtaData";
 
 type SortKey =
+  | "tipoDocumentoSanitario"
   | "especie"
-  | "tipoCobranca"
-  | "dataInicioVigencia"
+  | "finalidades"
+  | "papeis"
   | "situacao";
 
 const SITUACAO_OPTIONS = [
@@ -36,7 +42,10 @@ function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
 
 export function TaxaEmissaoGtaPage({ onLogout, onNavigate }: { onLogout: () => void; onNavigate: (screen: any, data?: any) => void }) {
   const [especie, setEspecie] = useState<EspecieTaxa | null>(null);
-  const [tipoCobranca, setTipoCobranca] = useState("");
+  const [tipoDocumentoSanitario, setTipoDocumentoSanitario] = useState("");
+  const [finalidade, setFinalidade] = useState<FinalidadeTaxa | null>(null);
+  const [papel, setPapel] = useState<PapelTaxa | null>(null);
+  const [cobrancaTaxa, setCobrancaTaxa] = useState("");
   const [situacao, setSituacao] = useState("");
   const [searched, setSearched] = useState(false);
   const [error, setError] = useState(false);
@@ -46,20 +55,32 @@ export function TaxaEmissaoGtaPage({ onLogout, onNavigate }: { onLogout: () => v
   const perPage = 10;
 
   const hasFilter = Boolean(
-    especie || tipoCobranca || situacao,
+    tipoDocumentoSanitario || especie || finalidade || papel || cobrancaTaxa || situacao,
   );
+
+  const finalidadesDisponiveis: FinalidadeTaxa[] = listarFinalidadesTransito().map((item) => ({
+    id: item.id,
+    codigo: item.codigo,
+    nome: item.finalidade,
+    especiesIds: item.especieIds,
+  }));
 
   const results = useMemo(() => {
     const filtered = listarTaxasEmissaoDocumentoSanitario().filter((item) => {
       const matchEspecie =
         !especie || item.especies.some((itemEspecie) => itemEspecie.id === especie.id);
-      const matchTipoCobranca = !tipoCobranca || item.tipoCobranca === tipoCobranca;
-
+      const matchTipoDocumento = !tipoDocumentoSanitario || item.tipoDocumentoSanitario === tipoDocumentoSanitario;
+      const matchFinalidade = !finalidade || item.finalidades.some((itemFinalidade) => itemFinalidade.id === finalidade.id);
+      const matchPapel = !papel || item.papeis.some((itemPapel) => itemPapel.id === papel.id);
+      const matchCobrancaTaxa = !cobrancaTaxa || item.cobrancasTaxa.includes(cobrancaTaxa as typeof item.cobrancasTaxa[number]);
       const matchSituacao = !situacao || item.situacao === situacao;
 
       return (
+        matchTipoDocumento &&
         matchEspecie &&
-        matchTipoCobranca &&
+        matchFinalidade &&
+        matchPapel &&
+        matchCobrancaTaxa &&
         matchSituacao
       );
     });
@@ -72,6 +93,12 @@ export function TaxaEmissaoGtaPage({ onLogout, onNavigate }: { onLogout: () => v
       if (sortKey === "especie") {
         first = a.especies.map((item) => item.nome).join(", ");
         second = b.especies.map((item) => item.nome).join(", ");
+      } else if (sortKey === "finalidades") {
+        first = a.finalidades.map((item) => item.nome).join(", ");
+        second = b.finalidades.map((item) => item.nome).join(", ");
+      } else if (sortKey === "papeis") {
+        first = a.papeis.map((item) => item.nome).join(", ");
+        second = b.papeis.map((item) => item.nome).join(", ");
       } else if (sortKey === "situacao") {
         first = a.situacao;
         second = b.situacao;
@@ -84,7 +111,10 @@ export function TaxaEmissaoGtaPage({ onLogout, onNavigate }: { onLogout: () => v
     });
   }, [
     especie,
-    tipoCobranca,
+    tipoDocumentoSanitario,
+    finalidade,
+    papel,
+    cobrancaTaxa,
     situacao,
     sortKey,
     sortAsc,
@@ -109,9 +139,10 @@ export function TaxaEmissaoGtaPage({ onLogout, onNavigate }: { onLogout: () => v
 
   const label = (key: SortKey) =>
   ({
-    especie: "Espécie",
-    tipoCobranca: "Tipo de Cobrança",
-    dataInicioVigencia: "Data Início de Vigência",
+    tipoDocumentoSanitario: "Tipo de Documento Sanitário",
+    especie: "Espécies",
+    finalidades: "Finalidades",
+    papeis: "Papéis",
     situacao: "Situação",
   }[key]);
 
@@ -137,7 +168,20 @@ export function TaxaEmissaoGtaPage({ onLogout, onNavigate }: { onLogout: () => v
         </div>
 
         <section className="bg-white rounded-xl shadow-sm p-6 flex flex-col gap-5">
-          <div className="grid w-full grid-cols-1 items-end gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid w-full grid-cols-1 items-end gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <div className="w-full">
+              <FloatSelect
+                label="Tipo de Documento Sanitário"
+                value={tipoDocumentoSanitario}
+                onChange={(next) => {
+                  setTipoDocumentoSanitario(next);
+                  setError(false);
+                  setSearched(false);
+                }}
+                options={TIPOS_DOCUMENTO_SANITARIO}
+              />
+            </div>
+
             {/* Filtro: Espécie */}
             <div className="w-full">
               <EntitySearchInput
@@ -160,17 +204,52 @@ export function TaxaEmissaoGtaPage({ onLogout, onNavigate }: { onLogout: () => v
               />
             </div>
 
-            {/* Filtro: Tipo de Cobrança */}
             <div className="w-full">
-              <FloatSelect
-                label="Tipo de Cobrança"
-                value={tipoCobranca}
-                onChange={(next) => {
-                  setTipoCobranca(next);
+              <EntitySearchInput
+                label="Finalidade"
+                placeholder="Busque por finalidade de trânsito"
+                value={finalidade?.nome ?? ""}
+                data={finalidadesDisponiveis}
+                searchKeys={["codigo", "nome"]}
+                columns={[{ label: "Código", key: "codigo" }, { label: "Finalidade", key: "nome" }]}
+                icon={<Route size={18} color="#1A7A3C" />}
+                onChange={(item) => {
+                  setFinalidade(item);
                   setError(false);
                   setSearched(false);
                 }}
-                options={TIPOS_COBRANCA}
+                title="Buscar Finalidade de Trânsito"
+              />
+            </div>
+
+            <div className="w-full">
+              <EntitySearchInput
+                label="Papel"
+                placeholder="Busque por papel"
+                value={papel?.nome ?? ""}
+                data={listarPapeisTaxa()}
+                searchKeys={["nome", "tipo"]}
+                columns={[{ label: "Papel", key: "nome" }, { label: "Tipo", key: "tipo" }]}
+                icon={<img src={Icons.iconePapeisUrl} alt="" className="h-[18px] w-[18px] object-contain" />}
+                onChange={(item) => {
+                  setPapel(item);
+                  setError(false);
+                  setSearched(false);
+                }}
+                title="Buscar Papel"
+              />
+            </div>
+
+            <div className="w-full">
+              <FloatSelect
+                label="Cobrança de Taxa"
+                value={cobrancaTaxa}
+                onChange={(next) => {
+                  setCobrancaTaxa(next);
+                  setError(false);
+                  setSearched(false);
+                }}
+                options={OPCOES_COBRANCA_TAXA.map((item) => ({ value: item, label: item }))}
               />
             </div>
 
@@ -203,7 +282,10 @@ export function TaxaEmissaoGtaPage({ onLogout, onNavigate }: { onLogout: () => v
           {hasFilter && (
             <div className="flex flex-wrap gap-2 animate-fadeIn">
               {especie && <Chip label={`Espécie: ${especie.nome}`} onRemove={() => { setEspecie(null); setSearched(false); }} />}
-              {tipoCobranca && <Chip label={`Tipo de Cobrança: ${tipoCobranca}`} onRemove={() => { setTipoCobranca(""); setSearched(false); }} />}
+              {tipoDocumentoSanitario && <Chip label={`Tipo de Documento Sanitário: ${tipoDocumentoSanitario}`} onRemove={() => { setTipoDocumentoSanitario(""); setSearched(false); }} />}
+              {finalidade && <Chip label={`Finalidade: ${finalidade.nome}`} onRemove={() => { setFinalidade(null); setSearched(false); }} />}
+              {papel && <Chip label={`Papel: ${papel.nome}`} onRemove={() => { setPapel(null); setSearched(false); }} />}
+              {cobrancaTaxa && <Chip label={`Cobrança de Taxa: ${cobrancaTaxa}`} onRemove={() => { setCobrancaTaxa(""); setSearched(false); }} />}
               {situacao && <Chip label={`Situação: ${situacao}`} onRemove={() => { setSituacao(""); setSearched(false); }} />}
             </div>
           )}
@@ -217,7 +299,7 @@ export function TaxaEmissaoGtaPage({ onLogout, onNavigate }: { onLogout: () => v
               <table className="w-full text-sm border-collapse">
                 <thead>
                   <tr className="border-b border-gray-100">
-                    {(["especie", "tipoCobranca", "dataInicioVigencia", "situacao"] as SortKey[]).map((key) => (
+                    {(["tipoDocumentoSanitario", "especie", "finalidades", "papeis", "situacao"] as SortKey[]).map((key) => (
                       <th key={key} onClick={() => sort(key)} className="text-left px-4 py-3 font-semibold text-gray-600 uppercase cursor-pointer">
                         <span className="inline-flex items-center gap-1">
                           {label(key)}
@@ -233,10 +315,13 @@ export function TaxaEmissaoGtaPage({ onLogout, onNavigate }: { onLogout: () => v
                     return (
                       <tr key={item.id} className="hover:bg-gray-50/50 transition-colors">
                         <td className="px-4 py-3.5 text-gray-800 font-medium">
+                          {item.tipoDocumentoSanitario}
+                        </td>
+                        <td className="px-4 py-3.5 text-gray-800 font-medium">
                           {item.especies.map((itemEspecie) => itemEspecie.nome).join(", ")}
                         </td>
-                        <td className="px-4 py-3.5 text-gray-700">{item.tipoCobranca}</td>
-                        <td className="px-4 py-3.5 text-gray-700">{formatarData(item.dataInicioVigencia)}</td>
+                        <td className="px-4 py-3.5 text-gray-700">{item.finalidades.map((finalidade) => finalidade.nome).join(", ")}</td>
+                        <td className="px-4 py-3.5 text-gray-700">{item.papeis.map((papel) => papel.nome).join(", ")}</td>
                         <td className="px-4 py-3.5 text-gray-700">
                           {item.situacao}
                         </td>

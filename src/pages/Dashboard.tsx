@@ -1,6 +1,5 @@
 import {
   ArrowRight,
-  BriefcaseBusiness,
   BriefcaseMedical,
   Calendar,
   CalendarCheck,
@@ -1040,7 +1039,7 @@ export const fourthCategories: MenuCategory[] = [
       {
         label: "Papéis",
         route: "papeis",
-        icon: <BriefcaseBusiness size={16} />,
+        icon: <img src={Icons.iconePapeisUrl} alt="Papéis" className="w-4 h-4" />,
       },
     ],
   },
