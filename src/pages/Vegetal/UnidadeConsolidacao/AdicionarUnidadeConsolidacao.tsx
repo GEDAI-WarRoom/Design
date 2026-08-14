@@ -202,6 +202,7 @@ export function AdicionarUnidadeConsolidacaoPage({ onLogout, onNavigate }: PageP
               <ProprietarioInput
                 label="Proprietário"
                 required
+				clearInitialValue
                 value={item.entidade ? item.entidade.nome : ""}
                 onChange={(ent: any) => setProprietarios((prev) => prev.map((p, i) => (i === index ? { ...p, entidade: ent } : p)))}
                 onEyeClick={() => item.entidade && onNavigate("visualizar-pessoa", item.entidade)}

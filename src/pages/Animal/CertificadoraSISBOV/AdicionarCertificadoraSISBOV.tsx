@@ -143,6 +143,7 @@ export function AdicionarCertificadoraSISBOVPage({ onLogout, onNavigate }: PageP
             <ProprietarioInput
               label="Proprietário"
               required
+			  clearInitialValue
               value={proprietario ? proprietario.nome : ""}
               onChange={(ent: any) => setProprietario(ent)}
               onEyeClick={() => proprietario && onNavigate("visualizar-pessoa-juridica", proprietario)}

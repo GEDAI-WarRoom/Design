@@ -11,8 +11,7 @@ export type TipoDestinatarioVendaSaidaInsumo =
   | "Instituição de Ensino e Pesquisa"
   | "Laboratório"
   | "Responsável Técnico GRSC"
-  | "Revendedora de Produtos Agropecuários"
-  | "Outro";
+  | "Revendedora de Produtos Agropecuários";
 
 export interface EntidadeVendaSaidaInsumo {
   id: string | number;

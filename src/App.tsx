@@ -861,6 +861,9 @@ export default function App() {
 
 		if (data !== undefined) {
 			setScreenData(data);
+		} else if (targetScreen.startsWith("adicionar-")) {
+			// Um novo cadastro não deve herdar dados da última tela acessada.
+			setScreenData(null);
 		}
 		setScreen(targetScreen);
 	};

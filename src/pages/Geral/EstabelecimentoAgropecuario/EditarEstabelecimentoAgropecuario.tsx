@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { ArrowLeft, Check, Download, Info, PlusCircle, Trash2 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import {
@@ -78,6 +78,9 @@ export function EditarEstabelecimentoAgropecuarioPage({ dados, onLogout, onNavig
   const [tipo, setTipo] = useState(dados?.tipo || "Fazenda");
   const [nome, setNome] = useState(dados?.nome || "Fazenda Rio Verde");
   const [provisorio, setProvisorio] = useState(dados?.cadastroProvisorio || "Não");
+  const [situacao, setSituacao] = useState<"Ativo" | "Inativo" | "Suspenso">(
+    registroInicial.situacao ?? "Ativo",
+  );
   const [proprietarios, setProprietarios] = useState<ProprietarioFormItem[]>([
     {
       uid: "proprietario-1",
@@ -124,6 +127,16 @@ export function EditarEstabelecimentoAgropecuarioPage({ dados, onLogout, onNavig
     dados?.observacao || "Estabelecimento rural destinado à criação de bovinos e produção agrícola.",
   );
 
+  useEffect(() => {
+    const atualizarSituacao = (event: Event) => {
+      const detalhe = (event as CustomEvent<{ currentScreen: string; situacao: "Ativo" | "Inativo" | "Suspenso" }>).detail;
+      if (detalhe?.currentScreen === "estabelecimento-agropecuario") setSituacao(detalhe.situacao);
+    };
+
+    window.addEventListener("situacao-cadastro-alterada", atualizarSituacao);
+    return () => window.removeEventListener("situacao-cadastro-alterada", atualizarSituacao);
+  }, []);
+
   const registroAtualizado = {
     ...registroInicial,
     id: registroInicial.id || 1,
@@ -131,6 +144,7 @@ export function EditarEstabelecimentoAgropecuarioPage({ dados, onLogout, onNavig
     tipo,
     nome,
     cadastroProvisorio: provisorio,
+    situacao,
     proprietarios: proprietarios
       .filter((item) => item.proprietario)
       .map((item) => `${item.proprietario!.nome} - ${item.proprietario!.documento}`)
@@ -158,7 +172,7 @@ export function EditarEstabelecimentoAgropecuarioPage({ dados, onLogout, onNavig
     <div className="min-h-screen bg-[#f2f3f5] pb-16">
       <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="estabelecimento-agropecuario" hideSearch />
 
-      <main className="mx-auto flex max-w-[1088px] flex-col gap-5 px-4 py-6 md:px-6">
+      <main data-situacao={situacao} className="mx-auto flex max-w-[1088px] flex-col gap-5 px-4 py-6 md:px-6">
         <header>
           <button
             type="button"

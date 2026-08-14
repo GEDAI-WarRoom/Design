@@ -524,6 +524,7 @@ export function AdicionarEstabelecimentoAgroindustrialSIEMGPage({ onLogout, onNa
             {(item) => (
               <ProprietarioInput
                 value={item.proprietario ? item.proprietario.nome : ""} required
+				clearInitialValue={modo === "adicionar"}
                 onChange={(ent) => setProprietarios((p) => p.map((x) => x.uid === item.uid ? { ...x, proprietario: ent } : x))}
                 onEyeClick={() => item.proprietario && alert(`Visualizar: ${item.proprietario.nome}`)}
               />

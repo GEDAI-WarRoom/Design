@@ -389,6 +389,7 @@ export function AdicionarPromotoraEventosPage({
               <ProprietarioInput
                 value={item.entidade?.nome ?? ""}
                 documento={item.entidade?.documento ?? ""}
+				clearInitialValue={mode === "create"}
                 required
                 onChange={(entidade: any) =>
                   setProprietarios((atuais) =>

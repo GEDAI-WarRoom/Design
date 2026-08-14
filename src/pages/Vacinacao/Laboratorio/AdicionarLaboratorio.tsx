@@ -333,6 +333,7 @@ export function AdicionarLaboratorioPage({ onLogout, onNavigate, mode = "create"
               <div className="w-full">
                 <ProprietarioInput
                   required
+				  clearInitialValue={mode === "create"}
                   value={item.proprietario ? item.proprietario.nome : ""}
                   onChange={(ent: any) => 
                     setProprietarios((p) => 

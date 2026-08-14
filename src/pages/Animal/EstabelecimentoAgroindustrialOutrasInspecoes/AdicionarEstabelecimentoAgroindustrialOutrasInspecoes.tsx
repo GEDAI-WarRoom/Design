@@ -260,6 +260,7 @@ export function AdicionarEstabelecimentoAgroindustrialOutrasInspecoesPage({
               {(item) => (
                 <ProprietarioInput
                   required value={item.proprietario?.nome || ""}
+				  clearInitialValue={modo === "adicionar"}
                   onChange={(proprietario) => setProprietarios((itens) => itens.map((atual) => atual.uid === item.uid ? { ...atual, proprietario } : atual))}
                   onEyeClick={() => item.proprietario && alert(`Visualizar: ${item.proprietario.nome}`)}
                 />

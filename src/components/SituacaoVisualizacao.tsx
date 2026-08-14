@@ -13,7 +13,7 @@ import {
   AlertDialogTitle,
 } from "./ui-1/alert-dialog";
 
-type Situacao = "Ativo" | "Inativo" | "Gravada" | "Cancelada";
+type Situacao = "Ativo" | "Inativo" | "Suspenso" | "Gravada" | "Cancelada";
 type ModoPagina = "visualizar" | "editar";
 
 interface SituacaoVisualizacaoProps {
@@ -77,7 +77,7 @@ export function SituacaoVisualizacao({ currentScreen }: SituacaoVisualizacaoProp
       const ehVendaInsumo = ["venda-entrada-insumos-exames", "venda-saida-insumo"].includes(currentScreen);
       const situacaoInicial = ehVendaInsumo
         ? valorAtual === "Cancelada" ? "Cancelada" : "Gravada"
-        : valorAtual === "Inativo" ? "Inativo" : "Ativo";
+        : valorAtual === "Suspenso" ? "Suspenso" : valorAtual === "Inativo" ? "Inativo" : "Ativo";
 
       setSituacao(situacaoInicial);
       setProximaSituacao(null);
@@ -101,6 +101,7 @@ export function SituacaoVisualizacao({ currentScreen }: SituacaoVisualizacaoProp
   };
 
   const ehVendaInsumo = ["venda-entrada-insumos-exames", "venda-saida-insumo"].includes(currentScreen);
+  const permiteSuspensao = currentScreen === "estabelecimento-agropecuario";
   const tipoMovimentacao = currentScreen === "venda-saida-insumo" ? "saída" : "entrada";
   const opcoesSituacao = ehVendaInsumo
     ? [
@@ -110,9 +111,12 @@ export function SituacaoVisualizacao({ currentScreen }: SituacaoVisualizacaoProp
     : [
         { value: "Ativo", label: "Ativo" },
         { value: "Inativo", label: "Inativo" },
+        ...(permiteSuspensao ? [{ value: "Suspenso", label: "Suspenso" }] : []),
       ];
   const rotuloAcao = proximaSituacao === "Inativo"
     ? "Inativar"
+    : proximaSituacao === "Suspenso"
+      ? "Suspender"
     : proximaSituacao === "Ativo"
       ? "Ativar"
       : proximaSituacao === "Cancelada"
@@ -169,10 +173,12 @@ export function SituacaoVisualizacao({ currentScreen }: SituacaoVisualizacaoProp
               {proximaSituacao === "Cancelada"
                 ? `Deseja cancelar a ${tipoMovimentacao} de insumo?`
                 : proximaSituacao === "Gravada"
-                  ? `Deseja gravar a ${tipoMovimentacao} de insumo?`
-                  : proximaSituacao === "Inativo"
-                    ? "Deseja inativar o cadastro?"
-                    : "Deseja ativar o cadastro?"}
+                    ? `Deseja gravar a ${tipoMovimentacao} de insumo?`
+                    : proximaSituacao === "Inativo"
+                      ? "Deseja inativar o cadastro?"
+                      : proximaSituacao === "Suspenso"
+                        ? "Deseja suspender o cadastro?"
+                      : "Deseja ativar o cadastro?"}
             </AlertDialogTitle>
             <AlertDialogDescription className="text-gray-600">
               Tem certeza de que deseja alterar a situação de {situacao.toLowerCase()} para{" "}
