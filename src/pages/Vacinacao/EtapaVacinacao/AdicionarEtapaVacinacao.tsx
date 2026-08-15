@@ -48,6 +48,8 @@ export function AdicionarEtapaVacinacaoPage({ onLogout, onNavigate, mode = "crea
       dataInicio: form.dataInicio,
       dataFim: form.dataFim,
       doenca: form.doenca,
+      necessitaAtestadoDeclaracao: form.necessitaAtestadoDeclaracao as EtapaVacinacao["necessitaAtestadoDeclaracao"],
+      permiteDeclararMaisAnimais: form.permiteDeclararMaisAnimais as EtapaVacinacao["permiteDeclararMaisAnimais"],
       especies: form.especies,
       tiposVacinacao: form.tiposVacinacao,
     };

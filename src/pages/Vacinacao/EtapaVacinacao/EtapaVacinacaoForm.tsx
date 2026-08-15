@@ -21,6 +21,7 @@ import {
   type EspecieEtapaVacinacao,
   type EtapaVacinacao,
   type FaixasEspecieEtapa,
+  type RespostaSimNao,
   type SexoVacinacaoObrigatoria,
   type SituacaoEtapaVacinacao,
   type TipoVacinacaoEtapa,
@@ -35,6 +36,8 @@ export interface EtapaVacinacaoFormValue {
   dataInicio: string;
   dataFim: string;
   doenca: DoencaEtapaVacinacao | null;
+  necessitaAtestadoDeclaracao: RespostaSimNao | "";
+  permiteDeclararMaisAnimais: RespostaSimNao | "";
   especies: EspecieEtapaVacinacao[];
   tiposVacinacao: TipoVacinacaoEtapa[];
   situacao: SituacaoEtapaVacinacao | "";
@@ -94,6 +97,8 @@ export function validarEtapaVacinacaoForm(value: EtapaVacinacaoFormValue) {
   if (!value.dataFim) erros.push("Informe a Data do Fim.");
   if (value.dataInicio && value.dataFim && value.dataFim <= value.dataInicio) erros.push("A Data do Fim deve ser posterior à Data do Início.");
   if (!value.doenca) erros.push("Selecione uma doença.");
+  if (!value.necessitaAtestadoDeclaracao) erros.push("Informe se necessita de atestado na declaração.");
+  if (!value.permiteDeclararMaisAnimais) erros.push("Informe se permite declarar mais animais do que o presente no rebanho.");
   if (!value.especies.length) erros.push("Selecione ao menos uma espécie.");
   if (!value.tiposVacinacao.length) erros.push("Adicione ao menos um tipo de vacinação.");
 
@@ -123,6 +128,8 @@ export function etapaParaForm(etapa?: Partial<EtapaVacinacao> | null): EtapaVaci
     dataInicio: etapa?.dataInicio ?? "",
     dataFim: etapa?.dataFim ?? "",
     doenca: etapa?.doenca ?? null,
+    necessitaAtestadoDeclaracao: etapa?.necessitaAtestadoDeclaracao ?? "",
+    permiteDeclararMaisAnimais: etapa?.permiteDeclararMaisAnimais ?? "",
     especies: etapa?.especies ?? [],
     tiposVacinacao: etapa?.tiposVacinacao?.length ? etapa.tiposVacinacao : [novoTipoVacinacao()],
     situacao: etapa?.situacao ?? "",
@@ -155,15 +162,12 @@ export function EtapaVacinacaoForm({ value, onChange, onVisualizarDoenca, mode, 
       )}
 
       <Section title="Informações básicas">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <FloatInput label="Código" value={value.codigo || "Gerado ao salvar"} disabled />
-          <FloatInput label="Data do Início" required type="date" value={value.dataInicio} icon={<Calendar size={18} color={GREEN} />} onChange={(dataInicio) => setValue({ dataInicio })} disabled={bloqueioGeral} />
-          <FloatInput label="Data do Fim" required type="date" value={value.dataFim} icon={<Calendar size={18} color={GREEN} />} onChange={(dataFim) => setValue({ dataFim })} disabled={somenteLeitura || etapaFinalizada} min={value.dataInicio || undefined} />
-        </div>
-      </Section>
-
-      <Section title="Doença e espécies">
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <FloatInput label="Código" value={value.codigo || "Gerado ao salvar"} disabled />
+            <FloatInput label="Data do Início" required type="date" value={value.dataInicio} icon={<Calendar size={18} color={GREEN} />} onChange={(dataInicio) => setValue({ dataInicio })} disabled={bloqueioGeral} />
+            <FloatInput label="Data do Fim" required type="date" value={value.dataFim} icon={<Calendar size={18} color={GREEN} />} onChange={(dataFim) => setValue({ dataFim })} disabled={somenteLeitura || etapaFinalizada} min={value.dataInicio || undefined} />
+          </div>
           <DoencaInput
             required
             apenasVacinaveis
@@ -177,9 +181,33 @@ export function EtapaVacinacaoForm({ value, onChange, onVisualizarDoenca, mode, 
               tiposVacinacao: value.tiposVacinacao.map((tipo) => ({ ...tipo, faixasPorEspecie: [], vacinasAplicaveis: [] })),
             })}
           />
+        </div>
+      </Section>
 
-          {value.doenca && (
-            <div className="flex flex-col gap-3">
+      <Section title="Informações complementares">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <FloatSelect
+            label="Necessita de atestado na declaração?"
+            required
+            value={value.necessitaAtestadoDeclaracao}
+            onChange={(necessitaAtestadoDeclaracao) => setValue({ necessitaAtestadoDeclaracao: necessitaAtestadoDeclaracao as RespostaSimNao })}
+            options={[{ value: "Sim", label: "Sim" }, { value: "Não", label: "Não" }]}
+            disabled={bloqueioGeral}
+          />
+          <FloatSelect
+            label="Permite declarar mais animais do que presente no rebanho?"
+            required
+            value={value.permiteDeclararMaisAnimais}
+            onChange={(permiteDeclararMaisAnimais) => setValue({ permiteDeclararMaisAnimais: permiteDeclararMaisAnimais as RespostaSimNao })}
+            options={[{ value: "Sim", label: "Sim" }, { value: "Não", label: "Não" }]}
+            disabled={bloqueioGeral}
+          />
+        </div>
+      </Section>
+
+      {value.doenca && (
+        <Section title="Espécies da etapa">
+          <div className="flex flex-col gap-3">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <p className="text-sm text-gray-700">Espécies suscetíveis <span className="text-red-500">*</span></p>
                 {!bloqueioGeral && (
@@ -202,10 +230,9 @@ export function EtapaVacinacaoForm({ value, onChange, onVisualizarDoenca, mode, 
                   }}
                 />
               </div>
-            </div>
-          )}
-        </div>
-      </Section>
+          </div>
+        </Section>
+      )}
 
       <Section title="Tipos de vacinação">
         <DynamicListWrapper

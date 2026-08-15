@@ -11,6 +11,7 @@ import {
 } from "../../../mocks/mockDatabase";
 
 export type SituacaoEtapaVacinacao = "Criada" | "Aberta" | "Finalizada";
+export type RespostaSimNao = "Sim" | "Não";
 export type SexoFaixaEtaria = "Macho" | "Fêmea" | "Único";
 export type SexoVacinacaoObrigatoria = "Macho" | "Fêmea";
 
@@ -55,6 +56,8 @@ export interface EtapaVacinacao {
   dataInicio: string;
   dataFim: string;
   doenca: DoencaEtapaVacinacao;
+  necessitaAtestadoDeclaracao: RespostaSimNao;
+  permiteDeclararMaisAnimais: RespostaSimNao;
   especies: EspecieEtapaVacinacao[];
   tiposVacinacao: TipoVacinacaoEtapa[];
   situacao: SituacaoEtapaVacinacao;
@@ -62,8 +65,8 @@ export interface EtapaVacinacao {
 
 export type EtapaVacinacaoDraft = Omit<EtapaVacinacao, "id" | "codigo" | "situacao">;
 
-const COLECAO = "etapas-vacinacao-us0v6-v2";
-const CHAVE_HISTORICO = (id: number) => `etapa-vacinacao-v2:${id}`;
+const COLECAO = "etapas-vacinacao-us0v6-v3";
+const CHAVE_HISTORICO = (id: number) => `etapa-vacinacao-v3:${id}`;
 
 export const ESPECIES_ETAPA_MOCK: EspecieEtapaVacinacao[] = [
   { id: 1, codigo: "ESP-001", nome: "Bovino", sexoDefinido: true, faixasEtarias: ["De 0 a 12 meses", "De 13 a 24 meses", "De 25 a 36 meses", "Acima de 36 meses"] },
@@ -130,6 +133,8 @@ const ETAPAS_INICIAIS: EtapaVacinacao[] = [
     dataInicio: "2026-01-01",
     dataFim: "2026-06-30",
     doenca: doenca(1),
+    necessitaAtestadoDeclaracao: "Não",
+    permiteDeclararMaisAnimais: "Não",
     especies: [especie(1), especie(2)],
     tiposVacinacao: [
       {
@@ -161,6 +166,8 @@ const ETAPAS_INICIAIS: EtapaVacinacao[] = [
     dataInicio: "2027-05-01",
     dataFim: "2027-06-30",
     doenca: doenca(2),
+    necessitaAtestadoDeclaracao: "Não",
+    permiteDeclararMaisAnimais: "Não",
     especies: [especie(1), especie(2), especie(4)],
     tiposVacinacao: [{ uid: "tipo-inicial-2", nome: "Etapa anual", instrucoes: "", faixasPorEspecie: [faixasCompletas(1), faixasCompletas(2), faixasCompletas(4)], vacinasAplicaveis: ["Bivalente"] }],
     situacao: "Criada",
@@ -171,6 +178,8 @@ const ETAPAS_INICIAIS: EtapaVacinacao[] = [
     dataInicio: "2026-01-01",
     dataFim: "2026-12-31",
     doenca: doenca(3),
+    necessitaAtestadoDeclaracao: "Não",
+    permiteDeclararMaisAnimais: "Não",
     especies: [especie(1), especie(2), especie(6), especie(5), especie(3), especie(8), especie(9)],
     tiposVacinacao: [
       {
@@ -302,6 +311,8 @@ export function copiarEtapaVacinacao(etapa: EtapaVacinacao): EtapaVacinacaoDraft
     dataInicio: "",
     dataFim: "",
     doenca: { ...etapa.doenca, especiesIds: [...etapa.doenca.especiesIds], tiposVacina: [...etapa.doenca.tiposVacina] },
+    necessitaAtestadoDeclaracao: etapa.necessitaAtestadoDeclaracao,
+    permiteDeclararMaisAnimais: etapa.permiteDeclararMaisAnimais,
     especies: etapa.especies.map((item) => ({ ...item, faixasEtarias: [...item.faixasEtarias] })),
     tiposVacinacao: etapa.tiposVacinacao.map((tipo) => ({
       ...tipo,
