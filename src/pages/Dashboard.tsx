@@ -754,17 +754,6 @@ export const secondaryCategories: MenuCategory[] = [
         ),
       },
       {
-        label: "Autorização de Vacinação",
-        route: "autorizacao-vacinacao",
-        icon: (
-          <img
-            src={Icons.iconeAutorizacaoVacinacaoUrl}
-            alt="Autotização de Vacinação"
-            className="w-4 h-4"
-          />
-        ),
-      },
-      {
         label: "Declaração de Vacinação",
         route: "declaracao-vacinacao",
         icon: (
