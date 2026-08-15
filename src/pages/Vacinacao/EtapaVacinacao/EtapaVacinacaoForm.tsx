@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Calendar, Dna, PlusCircle, Syringe } from "lucide-react";
 import {
   CheckboxGroup,
+  CustomRadio,
   FloatInput,
   FloatSelect,
   LargeTextArea,
@@ -106,7 +107,7 @@ export function validarEtapaVacinacaoForm(value: EtapaVacinacaoFormValue) {
     const prefixo = `Tipo de vacinação ${index + 1}`;
     if (!tipo.nome.trim()) erros.push(`${prefixo}: informe o nome.`);
     if (tipo.nome.length > 255) erros.push(`${prefixo}: o nome deve ter no máximo 255 caracteres.`);
-    if (tipo.instrucoes.length > 500) erros.push(`${prefixo}: as instruções devem ter no máximo 500 caracteres.`);
+    if (tipo.instrucoes.length > 1500) erros.push(`${prefixo}: as instruções de vacinação devem ter no máximo 1.500 caracteres.`);
     if (!tipo.vacinasAplicaveis.length) erros.push(`${prefixo}: selecione ao menos uma vacina aplicável.`);
     value.especies.forEach((item) => {
       const faixa = tipo.faixasPorEspecie.find((selecionada) => selecionada.especieId === item.id);
@@ -162,12 +163,12 @@ export function EtapaVacinacaoForm({ value, onChange, onVisualizarDoenca, mode, 
       )}
 
       <Section title="Informações básicas">
-        <div className="flex flex-col gap-4">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <FloatInput label="Código" value={value.codigo || "Gerado ao salvar"} disabled />
-            <FloatInput label="Data do Início" required type="date" value={value.dataInicio} icon={<Calendar size={18} color={GREEN} />} onChange={(dataInicio) => setValue({ dataInicio })} disabled={bloqueioGeral} />
-            <FloatInput label="Data do Fim" required type="date" value={value.dataFim} icon={<Calendar size={18} color={GREEN} />} onChange={(dataFim) => setValue({ dataFim })} disabled={somenteLeitura || etapaFinalizada} min={value.dataInicio || undefined} />
+        <div className="flex flex-col gap-5">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FloatInput label="Data de Início" required type="date" value={value.dataInicio} icon={<Calendar size={18} color={GREEN} />} onChange={(dataInicio) => setValue({ dataInicio })} disabled={bloqueioGeral} />
+            <FloatInput label="Data de Fim" required type="date" value={value.dataFim} icon={<Calendar size={18} color={GREEN} />} onChange={(dataFim) => setValue({ dataFim })} disabled={somenteLeitura || etapaFinalizada} min={value.dataInicio || undefined} />
           </div>
+
           <DoencaInput
             required
             apenasVacinaveis
@@ -186,41 +187,40 @@ export function EtapaVacinacaoForm({ value, onChange, onVisualizarDoenca, mode, 
 
       <Section title="Informações complementares">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <FloatSelect
-            label="Necessita de atestado na declaração?"
-            required
-            value={value.necessitaAtestadoDeclaracao}
-            onChange={(necessitaAtestadoDeclaracao) => setValue({ necessitaAtestadoDeclaracao: necessitaAtestadoDeclaracao as RespostaSimNao })}
-            options={[{ value: "Sim", label: "Sim" }, { value: "Não", label: "Não" }]}
-            disabled={bloqueioGeral}
-          />
-          <FloatSelect
-            label="Permite declarar mais animais do que presente no rebanho?"
-            required
-            value={value.permiteDeclararMaisAnimais}
-            onChange={(permiteDeclararMaisAnimais) => setValue({ permiteDeclararMaisAnimais: permiteDeclararMaisAnimais as RespostaSimNao })}
-            options={[{ value: "Sim", label: "Sim" }, { value: "Não", label: "Não" }]}
-            disabled={bloqueioGeral}
-          />
+          <div>
+            <p className="mb-3 text-sm font-medium text-gray-700">
+              Possui atestado obrigatório na declaração? <span className="text-red-500">*</span>
+            </p>
+            <div className="flex gap-6">
+              <CustomRadio label="Sim" name="atestado-obrigatorio" value="Sim" checked={value.necessitaAtestadoDeclaracao === "Sim"} onChange={() => setValue({ necessitaAtestadoDeclaracao: "Sim" })} disabled={bloqueioGeral} />
+              <CustomRadio label="Não" name="atestado-obrigatorio" value="Não" checked={value.necessitaAtestadoDeclaracao === "Não"} onChange={() => setValue({ necessitaAtestadoDeclaracao: "Não" })} disabled={bloqueioGeral} />
+            </div>
+          </div>
+          <div>
+            <p className="mb-3 text-sm font-medium text-gray-700">
+              Permite declarar mais animais do que presente no rebanho? <span className="text-red-500">*</span>
+            </p>
+            <div className="flex gap-6">
+              <CustomRadio label="Sim" name="mais-animais-rebanho" value="Sim" checked={value.permiteDeclararMaisAnimais === "Sim"} onChange={() => setValue({ permiteDeclararMaisAnimais: "Sim" })} disabled={bloqueioGeral} />
+              <CustomRadio label="Não" name="mais-animais-rebanho" value="Não" checked={value.permiteDeclararMaisAnimais === "Não"} onChange={() => setValue({ permiteDeclararMaisAnimais: "Não" })} disabled={bloqueioGeral} />
+            </div>
+          </div>
         </div>
       </Section>
 
       {value.doenca && (
         <Section title="Espécies da etapa">
           <div className="flex flex-col gap-3">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <p className="text-sm text-gray-700">Espécies suscetíveis <span className="text-red-500">*</span></p>
-                {!bloqueioGeral && (
-                  <button type="button" onClick={() => setEspeciesAberto(true)} className="flex items-center gap-2 rounded-md border border-[#1A7A3C] px-4 py-2.5 text-sm font-semibold text-[#1A7A3C] hover:bg-green-50">
-                    <PlusCircle size={16} /> Selecionar Espécies
-                  </button>
-                )}
-              </div>
               <div className={bloqueioGeral ? "pointer-events-none" : ""}>
                 <SelectedChipsContainer
-                  title="Espécies selecionadas"
+                  title={<>Espécies selecionadas <span className="text-red-500">*</span></>}
                   items={value.especies.map((item) => ({ id: item.id, label: item.nome }))}
                   emptyText="Nenhuma espécie selecionada."
+                  action={!bloqueioGeral && (
+                    <button type="button" onClick={() => setEspeciesAberto(true)} className="flex items-center gap-2 rounded-md border border-[#1A7A3C] px-3 py-1.5 text-xs font-bold text-[#1A7A3C] hover:bg-green-50">
+                      <PlusCircle size={14} /> Selecionar Espécies
+                    </button>
+                  )}
                   onRemoveItem={(id) => {
                     const especies = value.especies.filter((item) => item.id !== id);
                     setValue({
@@ -247,8 +247,8 @@ export function EtapaVacinacaoForm({ value, onChange, onVisualizarDoenca, mode, 
         >
           {(tipo: TipoVacinacaoEtapa) => (
             <div className="flex flex-col gap-5">
-              <FloatInput label="Nome" required maxLength={255} value={tipo.nome} onChange={(nome) => alterarTipo(tipo.uid, { nome })} disabled={bloqueioGeral} />
-              <LargeTextArea label="Instruções" maxLength={500} rows={3} value={tipo.instrucoes} onChange={(instrucoes) => alterarTipo(tipo.uid, { instrucoes })} disabled={bloqueioGeral} />
+              <FloatInput label="Nome do Tipo de Vacinação" required maxLength={255} value={tipo.nome} onChange={(nome) => alterarTipo(tipo.uid, { nome })} disabled={bloqueioGeral} />
+              <LargeTextArea label="Instruções de Vacinação" maxLength={1500} rows={3} value={tipo.instrucoes} onChange={(instrucoes) => alterarTipo(tipo.uid, { instrucoes })} disabled={bloqueioGeral} />
 
               <div className="flex flex-col gap-4">
                 <p className="text-sm font-semibold text-gray-700">Dados da vacinação obrigatória por espécie <span className="text-red-500">*</span></p>
@@ -312,17 +312,17 @@ export function EtapaVacinacaoForm({ value, onChange, onVisualizarDoenca, mode, 
               </div>
 
               <div className="flex flex-col gap-3">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <p className="text-sm font-semibold text-gray-700">Tipos de vacina aplicáveis <span className="text-red-500">*</span></p>
-                  {!bloqueioGeral && value.doenca && (
-                    <button type="button" onClick={() => setVacinasTipoUid(tipo.uid)} className="flex items-center gap-2 rounded-md border border-[#1A7A3C] px-4 py-2 text-sm font-semibold text-[#1A7A3C] hover:bg-green-50">
-                      <Syringe size={16} /> Selecionar Vacinas
+                <SelectedChipsContainer
+                  title={<>Tipos de vacina aplicáveis <span className="text-red-500">*</span></>}
+                  items={tipo.vacinasAplicaveis.map((nome) => ({ id: nome, label: nome }))}
+                  emptyText="Nenhuma vacina selecionada."
+                  action={!bloqueioGeral && value.doenca && (
+                    <button type="button" onClick={() => setVacinasTipoUid(tipo.uid)} className="flex items-center gap-2 rounded-md border border-[#1A7A3C] px-3 py-1.5 text-xs font-bold text-[#1A7A3C] hover:bg-green-50">
+                      <PlusCircle size={14} /> Selecionar Vacinas
                     </button>
                   )}
-                </div>
-                <div className="flex min-h-10 flex-wrap gap-2 rounded-lg border border-gray-200 bg-white p-3">
-                  {tipo.vacinasAplicaveis.length ? tipo.vacinasAplicaveis.map((nome) => <span key={nome} className="rounded-md bg-[#E6F4EA] px-3 py-1.5 text-xs font-semibold text-[#1A7A3C]">{nome}</span>) : <span className="text-xs italic text-gray-400">Nenhuma vacina selecionada.</span>}
-                </div>
+                  onRemoveItem={(id) => alterarTipo(tipo.uid, { vacinasAplicaveis: tipo.vacinasAplicaveis.filter((nome) => nome !== id) })}
+                />
               </div>
             </div>
           )}
@@ -344,9 +344,9 @@ export function EtapaVacinacaoForm({ value, onChange, onVisualizarDoenca, mode, 
         subtitle={`Selecione as espécies suscetíveis a ${value.doenca?.nome ?? "esta doença"}:`}
         icon={<Dna size={20} className="text-[#1A7A3C]" />}
         data={especiesDisponiveis}
-        columns={[{ label: "Código", key: "codigo" }, { label: "Espécie", key: "nome" }]}
-        searchKeys={["codigo", "nome"]}
-        searchPlaceholder="Busque pelo código ou nome da espécie."
+        columns={[{ label: "Espécie", key: "nome" }, { label: "Grupo de Espécie", key: "grupo" }]}
+        searchKeys={["nome", "grupo"]}
+        searchPlaceholder="Busque pelo nome ou grupo da espécie."
         selectedItems={value.especies}
         showResultsOnOpen
         onConfirm={(especies) => setValue({

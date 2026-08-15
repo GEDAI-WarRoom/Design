@@ -248,11 +248,10 @@ export function FinalidadeTransitoPage({ onLogout, onNavigate }: PageProps) {
                     placeholder="Buscar por nome do papel"
                     value={papel ? papel.nome : ""}
                     data={listarPapeis()}
-                    searchKeys={["nome", "tipo", "situacao"]}
+                    searchKeys={["nome", "tipo"]}
                     columns={[
                       { label: "Nome do Papel", key: "nome" },
                       { label: "Tipo", key: "tipo" },
-                      { label: "Situação", key: "situacao" },
                     ]}
                     icon={<img src={Icons.iconePapeisUrl} alt="" className="h-[18px] w-[18px] object-contain" />}
                     title="Buscar Papel"
@@ -351,13 +350,16 @@ export function FinalidadeTransitoPage({ onLogout, onNavigate }: PageProps) {
 												Finalidade de Trânsito
 											</th>
 											<th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-normal uppercase">
-												Tipo de Procedência
+											Tipos de Procedência
 											</th>
 											<th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-normal uppercase">
-												Tipo de Destino
+											Tipos de Destino
 											</th>
 											<th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-normal uppercase">
-												Espécie
+											Espécies
+										</th>
+										<th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-normal uppercase">
+											Papéis
 											</th>
 											<th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-normal uppercase">
 												Situação
@@ -374,13 +376,16 @@ export function FinalidadeTransitoPage({ onLogout, onNavigate }: PageProps) {
 													{f.finalidade}
 												</td>
 												<td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">
-													{f.tipoProcedencia}
+													{f.tiposProcedencia.join(", ") || "N/A"}
 												</td>
 												<td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">
-													{f.tipoDestino}
+													{f.tiposDestino.join(", ") || "N/A"}
 												</td>
 												<td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">
-													{f.especies.at(0)?.nome || "N/A"}
+													{f.especies.map((especie) => especie.nome).join(", ") || "N/A"}
+												</td>
+												<td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">
+													{f.papeis.map((papel) => papel.nome).join(", ") || "N/A"}
 												</td>
 												<td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">
 													{f.situacao}

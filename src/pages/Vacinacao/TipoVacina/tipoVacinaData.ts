@@ -16,6 +16,7 @@ export interface EspecieTipoVacina {
   id: number;
   codigo: string;
   nome: string;
+  grupo: string;
 }
 
 export interface DoencaTipoVacina {
@@ -42,13 +43,13 @@ export const SITUACOES_TIPO_VACINA = [
 ] satisfies Array<{ value: SituacaoTipoVacina; label: string }>;
 
 export const ESPECIES_TIPO_VACINA_MOCK: EspecieTipoVacina[] = [
-  { id: 1, codigo: "ESP-001", nome: "Bovino" },
-  { id: 2, codigo: "ESP-002", nome: "Bubalino" },
-  { id: 3, codigo: "ESP-003", nome: "Equino" },
-  { id: 4, codigo: "ESP-004", nome: "Suíno" },
-  { id: 5, codigo: "ESP-005", nome: "Ovino" },
-  { id: 6, codigo: "ESP-006", nome: "Caprino" },
-  { id: 7, codigo: "ESP-007", nome: "Aves" },
+  { id: 1, codigo: "ESP-001", nome: "Bovino", grupo: "Bovídeos" },
+  { id: 2, codigo: "ESP-002", nome: "Bubalino", grupo: "Bovídeos" },
+  { id: 3, codigo: "ESP-003", nome: "Equino", grupo: "Equídeos" },
+  { id: 4, codigo: "ESP-004", nome: "Suíno", grupo: "Suídeos" },
+  { id: 5, codigo: "ESP-005", nome: "Ovino", grupo: "Ovinos e Caprinos" },
+  { id: 6, codigo: "ESP-006", nome: "Caprino", grupo: "Ovinos e Caprinos" },
+  { id: 7, codigo: "ESP-007", nome: "Aves", grupo: "Aves" },
 ];
 
 export const DOENCAS_TIPO_VACINA_MOCK: DoencaTipoVacina[] = [
@@ -68,6 +69,7 @@ const TIPOS_VACINA_INICIAIS: TipoVacina[] = [
   { id: 2, nome: "RB51", exigeReceituario: true, doencas: [doenca(1)], especies: [especie(1)], situacao: "Ativo" },
   { id: 3, nome: "Antiaftosa bivalente", exigeReceituario: false, doencas: [doenca(2)], especies: [especie(1), especie(2), especie(4)], situacao: "Ativo" },
   { id: 4, nome: "Antirrábica inativada", exigeReceituario: false, doencas: [doenca(3)], especies: [especie(1), especie(3)], situacao: "Inativo" },
+  { id: 5, nome: "Vacina combinada bovina", exigeReceituario: false, doencas: [doenca(2), doenca(3)], especies: [especie(1)], situacao: "Ativo" },
 ];
 
 function instanteHistorico() {
@@ -79,7 +81,26 @@ function instanteHistorico() {
 }
 
 export function listarTiposVacina() {
-  return listarColecaoMock(COLECAO, TIPOS_VACINA_INICIAIS);
+  const tipos = listarColecaoMock(COLECAO, TIPOS_VACINA_INICIAIS);
+  const exemploJaExiste = tipos.some(
+    (tipo) => tipo.nome === "Vacina combinada bovina",
+  );
+
+  if (exemploJaExiste) return tipos;
+
+  const tiposComExemplo = [
+    ...tipos,
+    {
+      id: proximoIdNumerico(tipos),
+      nome: "Vacina combinada bovina",
+      exigeReceituario: false,
+      doencas: [doenca(2), doenca(3)],
+      especies: [especie(1)],
+      situacao: "Ativo" as SituacaoTipoVacina,
+    },
+  ];
+  salvarColecaoMock(COLECAO, tiposComExemplo);
+  return tiposComExemplo;
 }
 
 export function obterTipoVacina(dados?: Partial<TipoVacina> | null) {

@@ -204,7 +204,7 @@ export function LaboratorioPage({ onLogout, onNavigate }: PageProps) {
         {/* 📦 CONTAINER ÚNICO BRANCO */}
         <div className="bg-white rounded-xl shadow-sm p-6 mt-5 overflow-hidden">
           
-          {/* Nome do Comercial do Laboratório + barra principal */}
+          {/* Nome Comercial do Laboratório + barra principal */}
           <div className="flex gap-3 items-stretch w-full">
             <div className={`flex-1 bg-white border rounded-md px-3 h-12 transition-all relative flex items-end pb-1.5 ${
               erroValidacao && !algumFiltroPreenchido
@@ -212,7 +212,7 @@ export function LaboratorioPage({ onLogout, onNavigate }: PageProps) {
                 : "border-gray-200 focus-within:border-[#1A7A3C] focus-within:ring-1 focus-within:ring-[#1A7A3C]"
             }`}>
               <label className={`absolute left-3 transition-all duration-200 pointer-events-none ${focusBusca || busca ? "top-1 text-[10px] text-gray-400 font-medium" : "top-1/2 -translate-y-1/2 text-sm text-gray-400"}`}>
-                Nome do Comercial do Laboratório
+                Nome Comercial do Laboratório
               </label>
               <div className="flex items-center w-full">
                 <input

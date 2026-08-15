@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ArrowLeft, ChevronLeft, ChevronRight, Eye, Pencil, Search, SlidersHorizontal, X } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, Dna, Eye, Pencil, Search, SlidersHorizontal, X } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
 import { FloatSelect } from "../../../components/ui/FormKit";
@@ -68,8 +68,8 @@ export function TipoVacinaPage({ onLogout, onNavigate }: Props) {
           </div>
 
           {filtros && <div className="grid grid-cols-1 items-end gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <EntitySearchInput label="Doença" placeholder="Buscar por doença" value={doenca?.nome ?? ""} data={DOENCAS_TIPO_VACINA_MOCK} searchKeys={["codigo", "nome"]} columns={[{ label: "Código", key: "codigo" }, { label: "Doença", key: "nome" }]} icon={<img src={Icons.iconeDoencaUrl} alt="Doença" className="h-5 w-5 object-contain" />} onChange={setDoenca} title="Buscar Doença" subtitle="Busque por uma doença cadastrada:" />
-            <EntitySearchInput label="Espécie" placeholder="Buscar por espécie" value={especie?.nome ?? ""} data={ESPECIES_TIPO_VACINA_MOCK} searchKeys={["codigo", "nome"]} columns={[{ label: "Código", key: "codigo" }, { label: "Espécie", key: "nome" }]} icon={<Search size={18} className="text-[#1A7A3C]" />} onChange={setEspecie} title="Buscar Espécie" subtitle="Busque por uma espécie cadastrada:" />
+            <EntitySearchInput label="Doença" placeholder="Buscar por doença" value={doenca?.nome ?? ""} data={DOENCAS_TIPO_VACINA_MOCK} searchKeys={["nome"]} columns={[{ label: "Doença", key: "nome" }]} icon={<img src={Icons.iconeDoencaUrl} alt="Doença" className="h-5 w-5 object-contain" />} onChange={setDoenca} title="Buscar Doença" subtitle="Busque por uma doença cadastrada:" />
+            <EntitySearchInput label="Espécie" placeholder="Buscar por espécie" value={especie?.nome ?? ""} data={ESPECIES_TIPO_VACINA_MOCK} searchKeys={["nome", "grupo"]} columns={[{ label: "Espécie", key: "nome" }, { label: "Grupo de Espécie", key: "grupo" }]} icon={<Dna size={18} className="text-[#1A7A3C]" />} onChange={setEspecie} title="Buscar Espécie" subtitle="Busque por uma espécie cadastrada:" />
             <FloatSelect label="Situação" value={situacao} onChange={setSituacao} options={SITUACOES_TIPO_VACINA} />
             <button type="button" onClick={pesquisar} className="h-12 rounded-md bg-[#1A7A3C] text-sm font-semibold text-white hover:bg-[#15612F]">Pesquisar</button>
           </div>}
@@ -82,7 +82,7 @@ export function TipoVacinaPage({ onLogout, onNavigate }: Props) {
           </div>}
 
           {!pesquisou ? <div className="py-12 text-center text-sm text-gray-500">Busque por tipo de vacina utilizando o campo de busca e os filtros acima.</div> : linhas.length === 0 ? <div className="py-12 text-center text-sm text-gray-500">Nenhum resultado foi encontrado.</div> : <div className="w-full overflow-x-auto border-t border-gray-100 pt-2">
-            <table className="w-full border-collapse text-sm"><thead><tr className="border-b border-gray-100"><th className="px-4 py-3 text-left font-semibold uppercase text-gray-600">Nome do Tipo de Vacina</th><th className="px-4 py-3 text-left font-semibold uppercase text-gray-600">Doença</th><th className="px-4 py-3 text-left font-semibold uppercase text-gray-600">Situação</th><th className="w-[100px] px-4 py-3" /></tr></thead>
+            <table className="w-full border-collapse text-sm"><thead><tr className="border-b border-gray-100"><th className="px-4 py-3 text-left font-semibold uppercase text-gray-600">Nome do Tipo de Vacina</th><th className="px-4 py-3 text-left font-semibold uppercase text-gray-600">Doenças</th><th className="px-4 py-3 text-left font-semibold uppercase text-gray-600">Situação</th><th className="w-[100px] px-4 py-3" /></tr></thead>
               <tbody>{linhas.map((item) => <tr key={item.id} className="border-b border-gray-50 hover:bg-gray-50/60"><td className="px-4 py-3 text-gray-500">{item.nome}</td><td className="px-4 py-3 text-gray-500">{formatarNomes(item.doencas)}</td><td className="px-4 py-3 text-gray-500">{item.situacao}</td><td className="px-4 py-3"><div className="flex justify-end gap-1"><button type="button" onClick={() => onNavigate("visualizar-tipo-vacina", item)} className="rounded-md p-2 text-[#1A7A3C] hover:bg-green-50" title="Visualizar"><Eye size={18} /></button><button type="button" onClick={() => onNavigate("editar-tipo-vacina", item)} className="rounded-md p-2 text-[#1A7A3C] hover:bg-green-50" title="Editar"><Pencil size={17} /></button></div></td></tr>)}</tbody>
             </table>
             <div className="flex items-center justify-between pt-4 text-sm text-gray-500"><span>Itens por página: 10</span><div className="flex items-center gap-4"><span>{inicio} - {fim} de {resultados.length}</span><div className="flex gap-2"><button type="button" disabled={paginaAtual === 1} onClick={() => setPagina((value) => Math.max(1, value - 1))} className="disabled:opacity-30"><ChevronLeft size={18} /></button><button type="button" disabled={paginaAtual === totalPaginas} onClick={() => setPagina((value) => Math.min(totalPaginas, value + 1))} className="disabled:opacity-30"><ChevronRight size={18} /></button></div></div></div>

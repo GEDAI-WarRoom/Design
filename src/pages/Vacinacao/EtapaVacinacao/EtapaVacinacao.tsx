@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
-import { ArrowLeft, ChevronLeft, ChevronRight, Dna, Eye, Pencil, Search, SlidersHorizontal, Syringe, X } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, Dna, Eye, Pencil, Search, SlidersHorizontal, X } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatSelect } from "../../../components/ui/FormKit";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
+import * as Icons from "../../../imports/icons";
 import {
   DOENCAS_ETAPA_MOCK,
   ESPECIES_ETAPA_MOCK,
@@ -98,8 +99,8 @@ export function EtapaVacinacaoPage({ onLogout, onNavigate }: PageProps) {
 
             {filtrosAbertos && (
               <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-4">
-                <EntitySearchInput label="Doença" placeholder="Buscar por doença." value={doenca?.nome ?? ""} data={DOENCAS_ETAPA_MOCK} searchKeys={["codigo", "nome"]} columns={[{ label: "Código", key: "codigo" }, { label: "Doença", key: "nome" }]} icon={<Syringe size={18} color={GREEN} />} title="Buscar Doença" subtitle="Busque por uma doença cadastrada:" onChange={setDoenca} />
-                <EntitySearchInput label="Espécie" placeholder="Buscar por espécie." value={especie?.nome ?? ""} data={ESPECIES_ETAPA_MOCK} searchKeys={["codigo", "nome"]} columns={[{ label: "Código", key: "codigo" }, { label: "Espécie", key: "nome" }]} icon={<Dna size={18} color={GREEN} />} title="Buscar Espécie" subtitle="Busque por uma espécie cadastrada:" onChange={setEspecie} />
+                <EntitySearchInput label="Doença" placeholder="Buscar por doença." value={doenca?.nome ?? ""} data={DOENCAS_ETAPA_MOCK} searchKeys={["nome"]} columns={[{ label: "Doença", key: "nome" }]} icon={<img src={Icons.iconeDoencaUrl} alt="Doença" className="h-5 w-5 object-contain" />} title="Buscar Doença" subtitle="Busque por uma doença cadastrada:" onChange={setDoenca} />
+                <EntitySearchInput label="Espécie" placeholder="Buscar por espécie." value={especie?.nome ?? ""} data={ESPECIES_ETAPA_MOCK} searchKeys={["nome", "grupo"]} columns={[{ label: "Espécie", key: "nome" }, { label: "Grupo de Espécie", key: "grupo" }]} icon={<Dna size={18} color={GREEN} />} title="Buscar Espécie" subtitle="Busque por uma espécie cadastrada:" onChange={setEspecie} />
                 <FloatSelect label="Situação" value={situacao} onChange={setSituacao} options={SITUACOES} />
                 <button type="button" onClick={pesquisar} className="h-12 rounded-md bg-[#1A7A3C] px-8 text-sm font-semibold text-white hover:bg-[#15612F]">Pesquisar</button>
               </div>
@@ -124,7 +125,7 @@ export function EtapaVacinacaoPage({ onLogout, onNavigate }: PageProps) {
                 <div className="overflow-x-auto">
                   <table className="w-full border-collapse text-sm">
                     <thead><tr className="border-b border-gray-100 bg-gray-50/50 text-left uppercase text-gray-600">
-                      <th className="px-4 py-3 font-semibold">Código</th><th className="px-4 py-3 font-semibold">Doença</th><th className="px-4 py-3 font-semibold">Espécies</th><th className="px-4 py-3 font-semibold">Data de Início</th><th className="px-4 py-3 font-semibold">Data do Fim</th><th className="px-4 py-3 font-semibold">Situação</th><th className="w-24 px-4 py-3" />
+                      <th className="px-4 py-3 font-semibold">Código</th><th className="px-4 py-3 font-semibold">Doença</th><th className="px-4 py-3 font-semibold">Espécies</th><th className="px-4 py-3 font-semibold">Data de Início</th><th className="px-4 py-3 font-semibold">Data de Fim</th><th className="px-4 py-3 font-semibold">Situação</th><th className="w-24 px-4 py-3" />
                     </tr></thead>
                     <tbody>{itensPagina.map((item) => (
                       <tr key={item.id} className="border-b border-gray-50 text-gray-600 hover:bg-gray-50/60">

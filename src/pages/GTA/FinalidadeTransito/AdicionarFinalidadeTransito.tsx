@@ -145,15 +145,6 @@ export function AdicionarFinalidadeTransitoPage({
 
   const salvar = () => {
     const papelIds = papeis.map((papel) => papel.id);
-    if (
-      !finalidadeTransito.trim() ||
-      !descricao.trim() ||
-      !codigoMapa ||
-      !especies.length ||
-      !papelIds.length ||
-      !tiposProcedencia.length ||
-      !tiposDestino.length
-    ) return;
     const salvo = salvarFinalidadeTransito({
       finalidade: finalidadeTransito.trim(),
       descricao: descricao.trim(),
@@ -247,7 +238,7 @@ export function AdicionarFinalidadeTransitoPage({
         </Section>
 
         {/* --- [2] especies aplicaveis --- */}
-        <Section title="Espécies Aplicáveis (Uma ou mais)">
+        <Section title="Espécies Aplicáveis">
           <div className="pt-5 flex flex-col gap-4">
             {/* Estrutura unificada: Título e Botão lado a lado na mesma linha */}
             <div className="w-full border border-gray-200 rounded-xl bg-[#f9fafb]/50 overflow-hidden mt-2">
@@ -340,7 +331,7 @@ export function AdicionarFinalidadeTransitoPage({
           </div>
         </Section>
 
-        <Section title="Papéis Aplicáveis (Uma ou mais)">
+        <Section title="Papéis Aplicáveis">
           <div className="pt-5 flex flex-col gap-4">
             <div className="w-full border border-gray-200 rounded-xl bg-[#f9fafb]/50 overflow-hidden mt-2">
               <div className="flex items-center justify-between px-5 py-3 border-b border-gray-200 bg-white gap-4">
@@ -365,8 +356,8 @@ export function AdicionarFinalidadeTransitoPage({
               subtitle="Busque por um ou mais papéis cadastrados no sistema:"
               icon={<img src={Icons.iconePapeisUrl} alt="" className="h-[18px] w-[18px] object-contain" />}
               data={listarPapeis()}
-              columns={[{ label: "Nome do Papel", key: "nome" }, { label: "Tipo", key: "tipo" }, { label: "Situação", key: "situacao" }]}
-              searchKeys={["nome", "tipo", "situacao"]}
+              columns={[{ label: "Nome do Papel", key: "nome" }, { label: "Tipo", key: "tipo" }]}
+              searchKeys={["nome", "tipo"]}
               searchPlaceholder="Busque pelo nome do papel."
               selectedItems={papeis}
               confirmLabel="Salvar Selecionados"
@@ -390,20 +381,6 @@ export function AdicionarFinalidadeTransitoPage({
                 defaultValue={tiposProcedencia}
                 onChange={setTiposProcedencia}
               />
-
-              {tiposProcedencia.includes("Estabelecimento Agropecuário") && (
-                <div className="w-full">
-                  <CheckboxGroup
-                    title="Emite GTA por Acesso Externo"
-                    options={EMITE_GTA_ACESSO_EXTERNO.map((item) => ({
-                      value: item,
-                      label: item,
-                    }))}
-                    defaultValue={emiteAcessoExterno}
-                    onChange={setEmiteAcessoExterno}
-                  />
-                </div>
-              )}
             </div>
           </div>
         </Section>

@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { PieChart, Pie, Cell, Sector } from "recharts";
 import { Navbar } from "../../../components/Navbar";
-import { FloatInput, FloatSelect, SearchModal, CustomRadio, MultiSearchModal } from "../../../components/ui/FormKit";
+import { FloatInput, FloatSelect, LargeTextArea, SearchModal, CustomRadio, MultiSearchModal } from "../../../components/ui/FormKit";
 import {
   EntitySearchInput,
   DynamicListWrapper,
@@ -86,6 +86,13 @@ const DOENCAS_MOCK = [
   { id: 1, nome: "Brucelose", tiposVacina: ["B19", "RB51"] },
   { id: 2, nome: "Febre Aftosa", tiposVacina: [] },
   { id: 3, nome: "Raiva", tiposVacina: [] },
+];
+
+const ETAPAS_VACINACAO_MOCK = [
+  { id: 1, codigo: "2026/01", doenca: "Brucelose", nome: "Etapa 2026/01" },
+  { id: 2, codigo: "2026/02", doenca: "Febre Aftosa", nome: "Etapa 2026/02" },
+  { id: 3, codigo: "2026/03", doenca: "Raiva", nome: "Etapa 2026/03" },
+  { id: 4, codigo: "2025/01", doenca: "Brucelose", nome: "Etapa 2025/01", situacao: "Fechada" },
 ];
 
 const LOTES_MOCK = [
@@ -462,6 +469,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
         tiposVacina: [],
       }
     : null);
+  const etapaInicial = dados?.etapaVacinacao ?? ETAPAS_VACINACAO_MOCK.find((item) => item.doenca === nomeDoencaInicial) ?? null;
 
   // ---- Informações Básicas ----
   const [produtor, setProdutor] = useState<any | null>(produtorInicial);
@@ -471,6 +479,8 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
 
   // ---- Informações de Vacinação ----
   const [doenca, setDoenca] = useState<any | null>(doencaInicial);
+  const [etapaVacinacao, setEtapaVacinacao] = useState<any | null>(etapaInicial);
+  const [justificativaAutorizacao, setJustificativaAutorizacao] = useState(dados?.justificativaAutorizacao ?? "");
   const [tipoVacina, setTipoVacina] = useState(dados?.tipoVacina ?? (nomeDoencaInicial === "Brucelose" && preenchendoRegistro ? "B19" : ""));
   const [dataVacinacao, setDataVacinacao] = useState(dados?.dataVacinacao ?? "");
   const [dataAtestado, setDataAtestado] = useState(dados?.dataAtestado ?? (preenchendoRegistro ? dataVacinacaoInicial : ""));
@@ -545,6 +555,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
     !!doenca && regime !== "" && dataVacinacao !== "" && dataAtestado !== "" && !!veterinario &&
     (!isRaiva || mordidaMorcego !== "") &&
     origemNota !== "" && !!revendedora &&
+    (etapaVacinacao?.situacao !== "Fechada" || justificativaAutorizacao.trim() !== "") &&
     dosesValidas && !erroDataVac && !erroDataAtestado;
 
   const tipoVacinaDisponivel = (doenca?.tiposVacina?.length ?? 0) > 0;
@@ -643,6 +654,8 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
         municipio: estabelecimento?.municipio || "",
         exploracaoCodigo: exploracao?.codigo || "",
         especie: exploracao?.especie || "",
+        etapaVacinacao: etapaVacinacao || null,
+        justificativaAutorizacao: justificativaAutorizacao || "",
         doenca: doenca?.nome || "",
         tipoVacina: tipoVacina || "",
         regime: regime || "",
@@ -686,6 +699,12 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
   const onChangeDoenca = (ent: any) => {
     setDoenca(ent); setTipoVacina(""); setVacinadorBrucelose(null); setMordidaMorcego(""); setRegime("");
     setNotasFiscaisOrigem([]); 
+  };
+  const onChangeEtapaVacinacao = (etapa: any) => {
+    setEtapaVacinacao(etapa);
+    if (etapa?.situacao !== "Fechada") setJustificativaAutorizacao("");
+    const entidadeDoenca = DOENCAS_MOCK.find((item) => item.nome === etapa?.doenca) ?? null;
+    onChangeDoenca(entidadeDoenca);
   };
 
   const lotesFiltradosModal = lotesEstoque.filter(item =>
@@ -789,28 +808,28 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
 
             <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
               <EntitySearchInput
-                label="Doença"
+                label="Etapa de Vacinação"
                 required
-                placeholder="Buscar por doença"
-                value={doenca ? doenca.nome : ""}
-                data={DOENCAS_MOCK}
-                searchKeys={["nome"]}
-                columns={[{ label: "Doença", key: "nome" }]}
-                icon={<img src={Icons.iconeDoencaUrl} alt="Doença" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}
-                title="Buscar Doença"
-                subtitle="Busque por uma doença cadastrada:"
-                onChange={onChangeDoenca}
-                error={err(!doenca)}
+                placeholder="Buscar por etapa de vacinação"
+                value={etapaVacinacao ? etapaVacinacao.nome : ""}
+                data={ETAPAS_VACINACAO_MOCK}
+                searchKeys={["codigo", "doenca"]}
+                columns={[{ label: "Código", key: "codigo" }, { label: "Doença", key: "doenca" }]}
+                icon={<img src={Icons.iconeEtapaVacinacaoUrl} alt="Etapa de Vacinação" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}
+                title="Buscar Etapa de Vacinação"
+                subtitle="Busque por uma etapa de vacinação cadastrada:"
+                onChange={onChangeEtapaVacinacao}
+                error={err(!etapaVacinacao)}
               />
             </div>
 
-            {doenca && tipoVacinaDisponivel && (
+            {etapaVacinacao && (
               <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
-                <FloatSelect
-                  label="Tipo de Vacina"
-                  value={tipoVacina}
-                  onChange={setTipoVacina}
-                  options={(doenca?.tiposVacina ?? []).map((t: string) => ({ value: t, label: t }))}
+                <FloatInput
+                  label="Doença"
+                  value={doenca?.nome ?? etapaVacinacao.doenca ?? ""}
+                  disabled
+                  onChange={() => {}}
                 />
               </div>
             )}
@@ -818,7 +837,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
             {doenca && (
               <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
                 <FloatSelect
-                  label="Vacinação"
+                  label="Tipo de Vacinação"
                   required
                   value={regime}
                   onChange={(v: string) => {
@@ -827,6 +846,31 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
                   }}
                   options={opcoesRegime.map((o) => ({ value: o, label: o }))}
                   error={err(regime === "")}
+                />
+              </div>
+            )}
+
+            {etapaVacinacao?.situacao === "Fechada" && (
+              <div className="w-full">
+                <LargeTextArea
+                  label="Justificativa de autorização"
+                  required
+                  maxLength={1500}
+                  rows={4}
+                  value={justificativaAutorizacao}
+                  onChange={setJustificativaAutorizacao}
+                  error={err(justificativaAutorizacao.trim() === "")}
+                />
+              </div>
+            )}
+
+            {doenca && tipoVacinaDisponivel && (
+              <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
+                <FloatSelect
+                  label="Tipo de Vacina"
+                  value={tipoVacina}
+                  onChange={setTipoVacina}
+                  options={(doenca?.tiposVacina ?? []).map((t: string) => ({ value: t, label: t }))}
                 />
               </div>
             )}

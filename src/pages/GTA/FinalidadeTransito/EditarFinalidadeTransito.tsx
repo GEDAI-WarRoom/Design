@@ -204,7 +204,7 @@ export function EditarFinalidadeTransitoPage({
           </div>
         </Section>
 
-        <Section title="Espécies Aplicáveis (Uma ou mais)">
+        <Section title="Espécies Aplicáveis">
           <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
             <div className="flex items-center justify-between gap-4 border-b border-gray-200 px-5 py-3">
               <div className="flex items-center gap-3"><span className="text-sm font-semibold text-gray-500">Espécies Selecionadas <span className="text-red-500">*</span></span><span className="rounded-full bg-[#E6F4EA] px-2.5 py-1 text-xs font-bold text-[#1A7A3C]">{especies.length} {especies.length === 1 ? "Selecionada" : "Selecionadas"}</span></div>
@@ -217,7 +217,7 @@ export function EditarFinalidadeTransitoPage({
           <MultiSearchModal open={modalEspecieAberto} onClose={() => setModalEspecieAberto(false)} title="Buscar Espécies" subtitle="Busque por uma ou mais espécies cadastradas no sistema:" icon={<Dna size={18} color={GREEN} />} data={listarEspecies().filter((item) => item.situacao === "Ativo")} columns={[{ label: "Nome da Espécie", key: "nome" }]} searchKeys={["nome"]} searchPlaceholder="Busque pelo nome da espécie." selectedItems={especies} confirmLabel="Salvar Selecionadas" onConfirm={(selecionadas) => { setEspecies(selecionadas); setModalEspecieAberto(false); }} />
         </Section>
 
-        <Section title="Papéis Aplicáveis (Uma ou mais)">
+        <Section title="Papéis Aplicáveis">
           <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
             <div className="flex items-center justify-between gap-4 border-b border-gray-200 px-5 py-3">
               <div className="flex items-center gap-3"><span className="text-sm font-semibold text-gray-500">Papéis Selecionados <span className="text-red-500">*</span></span>{papeis.length > 0 && <span className="rounded-full bg-[#E6F4EA] px-2.5 py-1 text-xs font-bold text-[#1A7A3C]">{papeis.length} {papeis.length === 1 ? "Selecionado" : "Selecionados"}</span>}</div>
@@ -227,13 +227,12 @@ export function EditarFinalidadeTransitoPage({
               {papeis.length ? papeis.map((papel) => <div key={papel.id} className="flex min-w-[180px] items-center justify-between rounded-xl border border-gray-200 p-3 shadow-sm"><span className="text-sm font-bold text-[#1A7A3C]">{papel.nome}</span><button type="button" onClick={() => setPapeis((items) => items.filter((item) => item.id !== papel.id))} className="text-gray-400 hover:text-red-500"><X size={16} /></button></div>) : <p className="text-xs italic text-gray-400">Nenhum papel selecionado.</p>}
             </div>
           </div>
-          <MultiSearchModal open={modalPapelAberto} onClose={() => setModalPapelAberto(false)} title="Buscar Papéis" subtitle="Busque por um ou mais papéis cadastrados no sistema:" icon={<img src={Icons.iconePapeisUrl} alt="" className="h-[18px] w-[18px] object-contain" />} data={listarPapeis()} columns={[{ label: "Nome do Papel", key: "nome" }, { label: "Tipo", key: "tipo" }, { label: "Situação", key: "situacao" }]} searchKeys={["nome", "tipo", "situacao"]} searchPlaceholder="Busque pelo nome do papel." selectedItems={papeis} confirmLabel="Salvar Selecionados" onConfirm={(selecionados) => { setPapeis(selecionados); setModalPapelAberto(false); }} />
+          <MultiSearchModal open={modalPapelAberto} onClose={() => setModalPapelAberto(false)} title="Buscar Papéis" subtitle="Busque por um ou mais papéis cadastrados no sistema:" icon={<img src={Icons.iconePapeisUrl} alt="" className="h-[18px] w-[18px] object-contain" />} data={listarPapeis()} columns={[{ label: "Nome do Papel", key: "nome" }, { label: "Tipo", key: "tipo" }]} searchKeys={["nome", "tipo"]} searchPlaceholder="Busque pelo nome do papel." selectedItems={papeis} confirmLabel="Salvar Selecionados" onConfirm={(selecionados) => { setPapeis(selecionados); setModalPapelAberto(false); }} />
         </Section>
 
         <Section title="Informações de Procedência">
           <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-2">
             <CheckboxGroup title="Tipo de Procedência" required options={options(TIPOS_LOCAL)} defaultValue={tiposProcedencia} onChange={setTiposProcedencia} />
-            {tiposProcedencia.includes("Estabelecimento Agropecuário") && <CheckboxGroup title="Emite GTA por Acesso Externo" options={options(EMITE_ACESSO)} defaultValue={emiteAcessoExterno} onChange={setEmiteAcessoExterno} />}
           </div>
         </Section>
         <Section title="Informações de Destino">

@@ -28,6 +28,7 @@ export interface EspecieEtapaVacinacao {
   id: number;
   codigo: string;
   nome: string;
+  grupo: string;
   sexoDefinido: boolean;
   faixasEtarias: string[];
 }
@@ -69,15 +70,15 @@ const COLECAO = "etapas-vacinacao-us0v6-v3";
 const CHAVE_HISTORICO = (id: number) => `etapa-vacinacao-v3:${id}`;
 
 export const ESPECIES_ETAPA_MOCK: EspecieEtapaVacinacao[] = [
-  { id: 1, codigo: "ESP-001", nome: "Bovino", sexoDefinido: true, faixasEtarias: ["De 0 a 12 meses", "De 13 a 24 meses", "De 25 a 36 meses", "Acima de 36 meses"] },
-  { id: 2, codigo: "ESP-002", nome: "Bubalino", sexoDefinido: true, faixasEtarias: ["De 0 a 12 meses", "De 13 a 24 meses", "Acima de 24 meses"] },
-  { id: 3, codigo: "ESP-003", nome: "Equino", sexoDefinido: true, faixasEtarias: ["De 0 a 12 meses", "Acima de 12 meses"] },
-  { id: 4, codigo: "ESP-004", nome: "Suíno", sexoDefinido: true, faixasEtarias: ["Leitões", "Recria", "Adultos"] },
-  { id: 5, codigo: "ESP-005", nome: "Ovino", sexoDefinido: true, faixasEtarias: ["De 0 a 6 meses", "De 7 a 12 meses", "Acima de 12 meses"] },
-  { id: 6, codigo: "ESP-006", nome: "Caprino", sexoDefinido: true, faixasEtarias: ["De 0 a 6 meses", "De 7 a 12 meses", "Acima de 12 meses"] },
-  { id: 7, codigo: "ESP-007", nome: "Aves", sexoDefinido: false, faixasEtarias: ["1 dia de vida", "Jovens", "Adultas"] },
-  { id: 8, codigo: "ESP-008", nome: "Asinino", sexoDefinido: true, faixasEtarias: ["De 0 a 12 meses", "Acima de 12 meses"] },
-  { id: 9, codigo: "ESP-009", nome: "Muar", sexoDefinido: true, faixasEtarias: ["De 0 a 12 meses", "Acima de 12 meses"] },
+  { id: 1, codigo: "ESP-001", nome: "Bovino", grupo: "Bovídeos", sexoDefinido: true, faixasEtarias: ["De 0 a 12 meses", "De 13 a 24 meses", "De 25 a 36 meses", "Acima de 36 meses"] },
+  { id: 2, codigo: "ESP-002", nome: "Bubalino", grupo: "Bovídeos", sexoDefinido: true, faixasEtarias: ["De 0 a 12 meses", "De 13 a 24 meses", "Acima de 24 meses"] },
+  { id: 3, codigo: "ESP-003", nome: "Equino", grupo: "Equídeos", sexoDefinido: true, faixasEtarias: ["De 0 a 12 meses", "Acima de 12 meses"] },
+  { id: 4, codigo: "ESP-004", nome: "Suíno", grupo: "Suídeos", sexoDefinido: true, faixasEtarias: ["Leitões", "Recria", "Adultos"] },
+  { id: 5, codigo: "ESP-005", nome: "Ovino", grupo: "Ovinos e Caprinos", sexoDefinido: true, faixasEtarias: ["De 0 a 6 meses", "De 7 a 12 meses", "Acima de 12 meses"] },
+  { id: 6, codigo: "ESP-006", nome: "Caprino", grupo: "Ovinos e Caprinos", sexoDefinido: true, faixasEtarias: ["De 0 a 6 meses", "De 7 a 12 meses", "Acima de 12 meses"] },
+  { id: 7, codigo: "ESP-007", nome: "Aves", grupo: "Aves", sexoDefinido: false, faixasEtarias: ["1 dia de vida", "Jovens", "Adultas"] },
+  { id: 8, codigo: "ESP-008", nome: "Asinino", grupo: "Equídeos", sexoDefinido: true, faixasEtarias: ["De 0 a 12 meses", "Acima de 12 meses"] },
+  { id: 9, codigo: "ESP-009", nome: "Muar", grupo: "Equídeos", sexoDefinido: true, faixasEtarias: ["De 0 a 12 meses", "Acima de 12 meses"] },
 ];
 
 export const DOENCAS_ETAPA_MOCK: DoencaEtapaVacinacao[] = [

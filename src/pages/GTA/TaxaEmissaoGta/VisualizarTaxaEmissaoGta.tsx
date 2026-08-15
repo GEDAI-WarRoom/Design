@@ -160,6 +160,7 @@ export function VisualizarTaxaEmissaoGtaPage({
 
           return (
             <>
+              <span className="hidden" data-current-situacao={taxa.situacao} />
               <div>
                 <button
                   type="button"

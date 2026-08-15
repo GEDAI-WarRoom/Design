@@ -59,11 +59,18 @@ export function hidratarFinalidadeTransito(
     : Array.isArray(legado.especies)
       ? legado.especies.map((especie) => especie.id).filter((id): id is number => typeof id === "number")
       : [];
-  const papelIds = Array.isArray(legado.papelIds)
+  const papeisLegados = Array.isArray(legado.papelIds) && legado.papelIds.length
     ? legado.papelIds
     : Array.isArray(legado.papeis)
-      ? legado.papeis.map((papel) => papel.id).filter((id): id is number => typeof id === "number")
+      ? legado.papeis
       : [];
+  const papelIdsNormalizados = papeisLegados
+    .map((papel: any) => Number(typeof papel === "object" ? papel?.id : papel))
+    .filter((id: number) => Number.isFinite(id));
+  const papelIdsPadrao = FINALIDADES_INICIAIS.find(
+    (item) => item.id === Number(legado.id),
+  )?.papelIds ?? [];
+  const papelIds = papelIdsNormalizados.length ? papelIdsNormalizados : papelIdsPadrao;
   const tiposProcedencia = Array.isArray(legado.tiposProcedencia)
     ? legado.tiposProcedencia
     : [legado.tipoProcedencia].filter((valor): valor is string => Boolean(valor));

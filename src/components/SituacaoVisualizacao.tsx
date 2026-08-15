@@ -29,6 +29,7 @@ const TELAS_GERAIS = new Set([
   "divisao-municipal",
   "estabelecimento-agropecuario",
   "finalidade-transito",
+  "taxa-emissao-gta",
   "instituicao-ensino-pesquisa",
   "pessoa-fisica",
   "pessoa-juridica",

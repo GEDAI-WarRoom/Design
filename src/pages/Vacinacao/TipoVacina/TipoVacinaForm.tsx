@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { ChevronDown, ChevronUp, Info, PlusCircle, Syringe, X } from "lucide-react";
+import { ChevronDown, ChevronUp, Dna, Info, PlusCircle, X } from "lucide-react";
 import { CustomRadio, FloatInput, MultiSearchModal } from "../../../components/ui/FormKit";
 import * as Icons from "../../../imports/icons";
 import {
@@ -107,8 +107,8 @@ export function TipoVacinaForm({ value, onChange, disabled = false }: Props) {
         <SelectionList title="Espécies" empty={value.doencas.length ? "Nenhuma espécie selecionada." : "Selecione ao menos uma doença para consultar as espécies suscetíveis."} items={value.especies} disabled={disabled} onAdd={() => setModalEspecies(true)} onRemove={(id) => onChange({ ...value, especies: value.especies.filter((item) => item.id !== id) })} buttonLabel="Adicionar Espécie" />
       </Section>
 
-      <MultiSearchModal<DoencaTipoVacina> open={modalDoencas} onClose={() => setModalDoencas(false)} title="Buscar Doenças" subtitle="Busque e selecione uma ou mais doenças cadastradas no sistema:" icon={<img src={Icons.iconeDoencaUrl} alt="Doença" className="h-5 w-5 object-contain" />} data={DOENCAS_TIPO_VACINA_MOCK} columns={[{ label: "Código", key: "codigo" }, { label: "Nome da Doença", key: "nome" }]} searchKeys={["codigo", "nome"]} selectedItems={value.doencas} onConfirm={(items) => { alterarDoencas(items); setModalDoencas(false); }} confirmLabel="Salvar Selecionadas" />
-      <MultiSearchModal<EspecieTipoVacina> open={modalEspecies} onClose={() => setModalEspecies(false)} title="Buscar Espécies" subtitle="São exibidas somente as espécies suscetíveis às doenças selecionadas:" icon={<Syringe size={20} className="text-[#1A7A3C]" />} data={especiesDisponiveis} columns={[{ label: "Código", key: "codigo" }, { label: "Espécie", key: "nome" }]} searchKeys={["codigo", "nome"]} selectedItems={value.especies} onConfirm={(especies) => { onChange({ ...value, especies }); setModalEspecies(false); }} confirmLabel="Salvar Selecionadas" />
+      <MultiSearchModal<DoencaTipoVacina> open={modalDoencas} onClose={() => setModalDoencas(false)} title="Buscar Doenças" subtitle="Busque e selecione uma ou mais doenças cadastradas no sistema:" icon={<img src={Icons.iconeDoencaUrl} alt="Doença" className="h-5 w-5 object-contain" />} data={DOENCAS_TIPO_VACINA_MOCK} columns={[{ label: "Nome da Doença", key: "nome" }]} searchKeys={["nome"]} selectedItems={value.doencas} onConfirm={(items) => { alterarDoencas(items); setModalDoencas(false); }} confirmLabel="Salvar Selecionadas" />
+      <MultiSearchModal<EspecieTipoVacina> open={modalEspecies} onClose={() => setModalEspecies(false)} title="Buscar Espécies" subtitle="São exibidas somente as espécies suscetíveis às doenças selecionadas:" icon={<Dna size={20} className="text-[#1A7A3C]" />} data={especiesDisponiveis} columns={[{ label: "Espécie", key: "nome" }, { label: "Grupo de Espécie", key: "grupo" }]} searchKeys={["nome", "grupo"]} selectedItems={value.especies} onConfirm={(especies) => { onChange({ ...value, especies }); setModalEspecies(false); }} confirmLabel="Salvar Selecionadas" />
     </>
   );
 }

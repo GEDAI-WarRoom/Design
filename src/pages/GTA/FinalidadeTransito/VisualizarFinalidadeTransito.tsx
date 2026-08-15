@@ -106,7 +106,7 @@ export function VisualizarFinalidadeTransitoPage({ dados, onLogout, onNavigate }
                 </div>
               </Section>
 
-              <Section title="Espécies Aplicáveis (Uma ou mais)">
+              <Section title="Espécies Aplicáveis">
                 <div className={`overflow-hidden rounded-xl border border-gray-200 bg-white ${classeCampo("Espécies Aplicáveis", finalidade.especieIds.join("|"))}`}>
                   <div className="flex items-center gap-3 border-b border-gray-200 px-5 py-3">
                     <span className="text-sm font-semibold text-gray-500">Espécies Selecionadas</span>
@@ -118,7 +118,7 @@ export function VisualizarFinalidadeTransitoPage({ dados, onLogout, onNavigate }
                 </div>
               </Section>
 
-              <Section title="Papéis Aplicáveis (Uma ou mais)">
+              <Section title="Papéis Aplicáveis">
                 <div className={`overflow-hidden rounded-xl border border-gray-200 bg-white ${classeCampo("Papéis Aplicáveis", finalidade.papelIds.join("|"))}`}>
                   <div className="flex items-center gap-3 border-b border-gray-200 px-5 py-3">
                     <span className="text-sm font-semibold text-gray-500">Papéis Selecionados</span>

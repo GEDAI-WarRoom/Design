@@ -210,8 +210,8 @@ export function TaxaEmissaoGtaPage({ onLogout, onNavigate }: { onLogout: () => v
                 placeholder="Busque por finalidade de trânsito"
                 value={finalidade?.nome ?? ""}
                 data={finalidadesDisponiveis}
-                searchKeys={["codigo", "nome"]}
-                columns={[{ label: "Código", key: "codigo" }, { label: "Finalidade", key: "nome" }]}
+                searchKeys={["nome"]}
+                columns={[{ label: "Finalidade", key: "nome" }]}
                 icon={<Route size={18} color="#1A7A3C" />}
                 onChange={(item) => {
                   setFinalidade(item);

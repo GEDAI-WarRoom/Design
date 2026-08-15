@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowLeft, Check } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import {
@@ -34,6 +34,23 @@ export function EditarTaxaEmissaoGtaPage({
   const [salva, setSalva] = useState(false);
   const draft = paraDraft(taxa);
 
+  useEffect(() => {
+    const atualizarSituacao = (event: Event) => {
+      const detalhe = (event as CustomEvent<{
+        currentScreen: string;
+        situacao: TaxaEmissaoGta["situacao"];
+      }>).detail;
+
+      if (detalhe?.currentScreen === "taxa-emissao-gta") {
+        setTaxa((atual) => ({ ...atual, situacao: detalhe.situacao }));
+      }
+    };
+
+    window.addEventListener("situacao-cadastro-alterada", atualizarSituacao);
+    return () =>
+      window.removeEventListener("situacao-cadastro-alterada", atualizarSituacao);
+  }, []);
+
   const salvar = () => {
     if (!taxaValida(draft)) {
       setErro("Preencha todos os campos obrigatórios antes de prosseguir.");
@@ -58,7 +75,10 @@ export function EditarTaxaEmissaoGtaPage({
         currentScreen="taxa-emissao-gta"
         hideSearch
       />
-      <main className="mx-auto flex max-w-[1088px] flex-col gap-4 px-4 py-6 md:px-6">
+      <main
+        data-current-situacao={taxa.situacao}
+        className="mx-auto flex max-w-[1088px] flex-col gap-4 px-4 py-6 md:px-6"
+      >
         <div>
           <button
             type="button"
