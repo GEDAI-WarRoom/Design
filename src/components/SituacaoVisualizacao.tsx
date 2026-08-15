@@ -34,6 +34,7 @@ const TELAS_GERAIS = new Set([
   "profissional-oficial",
   "revendedora-agropecuario",
   "tipo-veiculo",
+  "tipo-vacina",
   "unidade-administrativa",
   "unidade-medida",
   "venda-propriedade",

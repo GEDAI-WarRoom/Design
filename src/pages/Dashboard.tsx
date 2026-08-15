@@ -779,6 +779,12 @@ export const secondaryCategories: MenuCategory[] = [
       },
 
       {
+        label: "Tipo de Vacina",
+        route: "tipo-vacina",
+        icon: <Syringe size={16} />,
+      },
+
+      {
         label: "Vacinador Contra Brucelose",
         route: "vacinador",
         icon: (
