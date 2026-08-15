@@ -31,7 +31,7 @@ const GREEN = "#1A7A3C";
 
 // Catálogo simplificado de papéis do sistema
 const TODOS_PAPEIS_SISTEMA = [
-  { id: 1, nome: "Administrador", nivel: 1, exigeUnidade: false },
+  { id: 1, nome: "Funcionário do IMA", nivel: 1, exigeUnidade: false },
   { id: 2, nome: "Responsável Técnico", nivel: 2, exigeUnidade: true }, // Exige informar a Unidade regional
   { id: 3, nome: "Emissor de GTA", nivel: 2, exigeUnidade: true },      // Exige informar a Unidade regional
   { id: 4, nome: "Auxiliar de Cadastro", nivel: 2, exigeUnidade: false },
@@ -84,7 +84,7 @@ const USUARIO = {
   nome: "Joaquim da Silva",
   email: "joaquim.silva@sidagro.mg.gov.br",
   situacao: "Ativo" as const,
-  perfil: "Administrador",
+  perfil: "Funcionário do IMA",
   usuarioAlteracao: "Lucas Pedro Conte",
   dataAlteracao: "14/04/2026 07:29",
 };
@@ -107,7 +107,7 @@ export function VisualizarUsuariosPage({
 
   // Estado inicial dos papéis atribuídos ao usuário
   const [papeisAtribuidos, setPapeisAtribuidos] = useState([
-    { id: 1, nome: "Administrador", nivel: 1, exigeUnidade: false },
+    { id: 1, nome: "Funcionário do IMA", nivel: 1, exigeUnidade: false },
     { id: 2, nome: "Responsável Técnico", nivel: 2, exigeUnidade: true, unidadeAtuacao: "Coordenadoria Regional de Lavras" },
     { id: 3, nome: "Emissor de GTA", nivel: 2, exigeUnidade: true, unidadeAtuacao: "Coordenadoria Regional de Lavras" },
     { id: 6, nome: "Pessoa Física", nivel: 3, exigeUnidade: false }

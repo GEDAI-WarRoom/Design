@@ -39,8 +39,10 @@ import {
   Truck,
   User,
   Wallet,
+  Weight,
   Ham,
   Bell,
+  Building2,
   ClipboardType,
 } from "lucide-react";
 import { PendenciasConfirmacaoGta } from "../components/PendenciasConfirmacaoGta";
@@ -78,6 +80,8 @@ const cadastrosCategoriesMescladas: any[] = [
         icon: <TowerControl size={16} />,
       },
       { label: "Açougue", route: "acougue", icon: <Store size={16} /> },
+      { label: "Local de Pesagem", route: "local-pesagem", icon: <Weight size={16} /> },
+      { label: "Estabelecimento Genérico", route: "estabelecimento-generico", icon: <Building2 size={16} /> },
       {
         label: "Divisão Municipal",
         route: "divisao-municipal",
@@ -276,6 +280,8 @@ const cadastrosCategoriesMescladas: any[] = [
             icon: <TowerControl size={16} />,
           },
           { label: "Açougue", route: "acougue", icon: <Ham size={16} /> },
+          { label: "Local de Pesagem", route: "local-pesagem", icon: <Weight size={16} /> },
+          { label: "Estabelecimento Genérico", route: "estabelecimento-generico", icon: <Building2 size={16} /> },
           {
             label: "Divisão Municipal",
             route: "divisao-municipal",

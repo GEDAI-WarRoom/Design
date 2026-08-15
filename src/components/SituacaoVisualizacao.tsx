@@ -22,6 +22,8 @@ interface SituacaoVisualizacaoProps {
 
 const TELAS_GERAIS = new Set([
   "acougue",
+  "local-pesagem",
+  "estabelecimento-generico",
   "aeroporto-porto",
   "classificacao-sanitaria-estado",
   "divisao-municipal",

@@ -23,7 +23,7 @@ export function EditarUsuarioPage({ dados, onLogout, onNavigate }: { dados?: any
   const [nome, setNome] = useState(dados?.nome || "");
   const [cpf, setCpf] = useState(dados?.cpf || "");
   const [email, setEmail] = useState(dados?.email || "");
-  const [perfil, setPerfil] = useState(dados?.perfil || "Administrador");
+  const [perfil, setPerfil] = useState(dados?.perfil || "Funcionário do IMA");
   const [situacao, setSituacao] = useState(dados?.situacao || "Ativo");
 
   return (

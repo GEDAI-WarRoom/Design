@@ -18,23 +18,27 @@ function Section({ title, children, defaultOpen = true }: { title: string; child
   );
 }
 
-export function VisualizarAcouguePage({ dados, onLogout, onNavigate }: { dados?: any; onLogout: () => void; onNavigate: (s: string, d?: any) => void; }) {
+export function VisualizarAcouguePage({ dados, onLogout, onNavigate, localPesagem = false, estabelecimentoGenerico = false }: { dados?: any; onLogout: () => void; onNavigate: (s: string, d?: any) => void; localPesagem?: boolean; estabelecimentoGenerico?: boolean }) {
   const acougue = dados || {};
+  const nomeCadastro = estabelecimentoGenerico ? "Estabelecimento Genérico" : localPesagem ? "Local de Pesagem" : "Açougue";
+  const nomeCadastros = estabelecimentoGenerico ? "Estabelecimentos Genéricos" : localPesagem ? "Locais de Pesagem" : "Açougues";
+  const rota = estabelecimentoGenerico ? "estabelecimento-generico" : localPesagem ? "local-pesagem" : "acougue";
+  const rotaEditar = estabelecimentoGenerico ? "editar-estabelecimento-generico" : localPesagem ? "editar-local-pesagem" : "editar-acougue";
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
-      <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="acougue" hideSearch />
+      <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen={rota} hideSearch />
       <main className="max-w-[1088px] mx-auto px-4 md:px-6 py-6 flex flex-col gap-4">
 
         <div>
-          <button type="button" onClick={() => onNavigate("acougue")} className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70 font-semibold" style={{ color: GREEN }}>
-            <ArrowLeft size={15} /> Todos os Açougues
+          <button type="button" onClick={() => onNavigate(rota)} className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70 font-semibold" style={{ color: GREEN }}>
+            <ArrowLeft size={15} /> Todos os {nomeCadastros}
           </button>
           <div className="flex justify-between items-center w-full">
-            <h1 className="text-2xl font-semibold text-gray-900">Visualizar Açougue</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">Visualizar {nomeCadastro}</h1>
             <button
               type="button"
-              onClick={() => onNavigate("editar-acougue", acougue)}
+              onClick={() => onNavigate(rotaEditar, acougue)}
               className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2"
             >
               Editar
@@ -44,8 +48,8 @@ export function VisualizarAcouguePage({ dados, onLogout, onNavigate }: { dados?:
 
         <Section title="Informações Básicas">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <FloatInput label="Código" value={acougue.codigo || "-"} disabled onChange={() => { }} />
-            <FloatInput label="Nome Comercial do Açougue" value={acougue.nome || "-"} disabled onChange={() => { }} />
+            <FloatInput label={localPesagem || estabelecimentoGenerico ? `Código do ${nomeCadastro}` : "Código"} value={acougue.codigo || "-"} disabled onChange={() => { }} />
+            <FloatInput label={`Nome Comercial do ${nomeCadastro}`} value={acougue.nome || "-"} disabled onChange={() => { }} />
 
           </div>
         </Section>

@@ -619,6 +619,14 @@ export type Screen =
   | "visualizar-indice"
   | "acougue"
   | "adicionar-acougue"
+  | "local-pesagem"
+  | "adicionar-local-pesagem"
+  | "editar-local-pesagem"
+  | "visualizar-local-pesagem"
+  | "estabelecimento-generico"
+  | "adicionar-estabelecimento-generico"
+  | "editar-estabelecimento-generico"
+  | "visualizar-estabelecimento-generico"
   | "evento-pecuario"
   | "adicionar-evento-pecuario"
   | "visualizar-evento-pecuario"
@@ -837,6 +845,14 @@ export type Screen =
 	| "adicionar-acougue"
 	| "editar-acougue"
 	| "visualizar-acougue"
+	| "local-pesagem"
+	| "adicionar-local-pesagem"
+	| "editar-local-pesagem"
+	| "visualizar-local-pesagem"
+	| "estabelecimento-generico"
+	| "adicionar-estabelecimento-generico"
+	| "editar-estabelecimento-generico"
+	| "visualizar-estabelecimento-generico"
 	| "editar-aeroporto-porto"
   | "visualizar-aeroporto-porto";
 
@@ -1111,6 +1127,22 @@ export default function App() {
           onNavigate={handleNavigate}
         />
       );
+    case "local-pesagem":
+      return <AcouguePage onLogout={handleLogout} onNavigate={handleNavigate} localPesagem />;
+    case "adicionar-local-pesagem":
+      return <AdicionarAcouguePage onLogout={handleLogout} onNavigate={handleNavigate} localPesagem />;
+    case "editar-local-pesagem":
+      return <EditarAcouguePage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} localPesagem />;
+    case "visualizar-local-pesagem":
+      return <VisualizarAcouguePage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} localPesagem />;
+    case "estabelecimento-generico":
+      return <AcouguePage onLogout={handleLogout} onNavigate={handleNavigate} estabelecimentoGenerico />;
+    case "adicionar-estabelecimento-generico":
+      return <AdicionarAcouguePage onLogout={handleLogout} onNavigate={handleNavigate} estabelecimentoGenerico />;
+    case "editar-estabelecimento-generico":
+      return <EditarAcouguePage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} estabelecimentoGenerico />;
+    case "visualizar-estabelecimento-generico":
+      return <VisualizarAcouguePage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} estabelecimentoGenerico />;
     case "emissao-ata":
       return <EmissaoATAPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-emissao-ata":

@@ -21,7 +21,7 @@ interface SelecionarUsuarioProps {
 const perfis = [
 	{
 		role: "admin" as const,
-		title: "Administrador",
+		title: "Funcionário do IMA",
 		description: "Acesso completo a todos os cadastros e funcionalidades do sistema.",
 		icon: ShieldCheck,
 	},
