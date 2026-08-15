@@ -62,8 +62,8 @@ export interface EtapaVacinacao {
 
 export type EtapaVacinacaoDraft = Omit<EtapaVacinacao, "id" | "codigo" | "situacao">;
 
-const COLECAO = "etapas-vacinacao-us0v6";
-const CHAVE_HISTORICO = (id: number) => `etapa-vacinacao:${id}`;
+const COLECAO = "etapas-vacinacao-us0v6-v2";
+const CHAVE_HISTORICO = (id: number) => `etapa-vacinacao-v2:${id}`;
 
 export const ESPECIES_ETAPA_MOCK: EspecieEtapaVacinacao[] = [
   { id: 1, codigo: "ESP-001", nome: "Bovino", sexoDefinido: true, faixasEtarias: ["De 0 a 12 meses", "De 13 a 24 meses", "De 25 a 36 meses", "Acima de 36 meses"] },
@@ -73,12 +73,14 @@ export const ESPECIES_ETAPA_MOCK: EspecieEtapaVacinacao[] = [
   { id: 5, codigo: "ESP-005", nome: "Ovino", sexoDefinido: true, faixasEtarias: ["De 0 a 6 meses", "De 7 a 12 meses", "Acima de 12 meses"] },
   { id: 6, codigo: "ESP-006", nome: "Caprino", sexoDefinido: true, faixasEtarias: ["De 0 a 6 meses", "De 7 a 12 meses", "Acima de 12 meses"] },
   { id: 7, codigo: "ESP-007", nome: "Aves", sexoDefinido: false, faixasEtarias: ["1 dia de vida", "Jovens", "Adultas"] },
+  { id: 8, codigo: "ESP-008", nome: "Asinino", sexoDefinido: true, faixasEtarias: ["De 0 a 12 meses", "Acima de 12 meses"] },
+  { id: 9, codigo: "ESP-009", nome: "Muar", sexoDefinido: true, faixasEtarias: ["De 0 a 12 meses", "Acima de 12 meses"] },
 ];
 
 export const DOENCAS_ETAPA_MOCK: DoencaEtapaVacinacao[] = [
-  { id: 1, codigo: "D-001", nome: "Brucelose", especiesIds: [1, 2], tiposVacina: ["B19", "RB51"], vacinavel: true },
+  { id: 1, codigo: "D-001", nome: "Brucelose", especiesIds: [1, 2], tiposVacina: ["Vacina de Brucelose RB51", "Vacina de Brucelose B19"], vacinavel: true },
   { id: 2, codigo: "D-002", nome: "Febre Aftosa", especiesIds: [1, 2, 4], tiposVacina: ["Bivalente", "O1 Campos", "A24 Cruzeiro"], vacinavel: true },
-  { id: 3, codigo: "D-003", nome: "Raiva dos Herbívoros", especiesIds: [1, 2, 3, 5, 6], tiposVacina: ["Inativada"], vacinavel: true },
+  { id: 3, codigo: "D-003", nome: "Raiva", especiesIds: [1, 2, 6, 5, 3, 8, 9], tiposVacina: ["Vacina de Raiva"], vacinavel: true },
   { id: 4, codigo: "D-004", nome: "Doença de Newcastle", especiesIds: [7], tiposVacina: ["Viva atenuada", "Inativada"], vacinavel: true },
 ];
 
@@ -106,15 +108,51 @@ function faixasCompletas(especieId: number): FaixasEspecieEtapa {
   };
 }
 
+function faixasSelecionadas(
+  especieId: number,
+  faixasEtarias: string[],
+  sexos: SexoVacinacaoObrigatoria[],
+): FaixasEspecieEtapa {
+  return {
+    especieId,
+    sexos: [...sexos],
+    faixasEtarias: [...faixasEtarias],
+    macho: sexos.includes("Macho") ? [...faixasEtarias] : [],
+    femea: sexos.includes("Fêmea") ? [...faixasEtarias] : [],
+    unico: [],
+  };
+}
+
 const ETAPAS_INICIAIS: EtapaVacinacao[] = [
   {
     id: 1,
     codigo: "2026/01",
-    dataInicio: "2026-02-11",
-    dataFim: "2026-09-30",
+    dataInicio: "2026-01-01",
+    dataFim: "2026-06-30",
     doenca: doenca(1),
     especies: [especie(1), especie(2)],
-    tiposVacinacao: [{ uid: "tipo-inicial-1", nome: "Vacinação oficial", instrucoes: "Aplicar conforme o calendário oficial e registrar a vacina utilizada.", faixasPorEspecie: [faixasCompletas(1), faixasCompletas(2)], vacinasAplicaveis: ["B19", "RB51"] }],
+    tiposVacinacao: [
+      {
+        uid: "brucelose-oficial",
+        nome: "Vacinação Oficial",
+        instrucoes: "A vacinação oficial deve ocorrer apenas em fêmeas de 03 a 08 meses.",
+        faixasPorEspecie: [
+          faixasSelecionadas(1, ["De 0 a 12 meses"], ["Fêmea"]),
+          faixasSelecionadas(2, ["De 0 a 12 meses"], ["Fêmea"]),
+        ],
+        vacinasAplicaveis: ["Vacina de Brucelose RB51", "Vacina de Brucelose B19"],
+      },
+      {
+        uid: "brucelose-complementar",
+        nome: "Vacinação Complementar",
+        instrucoes: "A vacinação complementar deve ocorrer em fêmeas acima de 8 meses.",
+        faixasPorEspecie: [
+          faixasSelecionadas(1, especie(1).faixasEtarias, ["Fêmea"]),
+          faixasSelecionadas(2, especie(2).faixasEtarias, ["Fêmea"]),
+        ],
+        vacinasAplicaveis: ["Vacina de Brucelose RB51"],
+      },
+    ],
     situacao: "Aberta",
   },
   {
@@ -129,13 +167,28 @@ const ETAPAS_INICIAIS: EtapaVacinacao[] = [
   },
   {
     id: 3,
-    codigo: "2025/01",
-    dataInicio: "2025-09-01",
-    dataFim: "2025-10-15",
+    codigo: "2026/01",
+    dataInicio: "2026-01-01",
+    dataFim: "2026-12-31",
     doenca: doenca(3),
-    especies: [especie(1), especie(3)],
-    tiposVacinacao: [{ uid: "tipo-inicial-3", nome: "Vacinação preventiva", instrucoes: "Priorizar propriedades em áreas de risco.", faixasPorEspecie: [faixasCompletas(1), faixasCompletas(3)], vacinasAplicaveis: ["Inativada"] }],
-    situacao: "Finalizada",
+    especies: [especie(1), especie(2), especie(6), especie(5), especie(3), especie(8), especie(9)],
+    tiposVacinacao: [
+      {
+        uid: "raiva-primeira-dose",
+        nome: "Primeira Dose",
+        instrucoes: "",
+        faixasPorEspecie: [1, 2, 6, 5, 3, 8, 9].map(faixasCompletas),
+        vacinasAplicaveis: ["Vacina de Raiva"],
+      },
+      {
+        uid: "raiva-segunda-dose",
+        nome: "Segunda Dose",
+        instrucoes: "",
+        faixasPorEspecie: [1, 2, 6, 5, 3, 8, 9].map(faixasCompletas),
+        vacinasAplicaveis: ["Vacina de Raiva"],
+      },
+    ],
+    situacao: "Aberta",
   },
 ];
 
