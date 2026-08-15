@@ -6,6 +6,8 @@ import { FloatInput, FloatSelect, FloatCombobox, CustomButton, UploadField, Larg
 import { ProprietarioInput, DynamicListWrapper, BlocoEnderecoFields, BlocoContatoFields, SelectedChipsContainer, } from "../../../components/ui/EntitySearch";
 import * as Icons from "../../../imports/icons";
 import { CadastroVacinacaoHeader, cadastroVacinacaoPageClass, mensagemSucessoCadastro, preencherComExemplo, type CadastroVacinacaoModeProps } from "../shared/CadastroVacinacaoMode";
+import { salvarRegistroMock } from "../../../components/ui/mockCollectionStorage";
+import { registrarEdicaoLaboratorio } from "./laboratorioData";
 
 const GREEN = "#1A7A3C";
 
@@ -66,9 +68,12 @@ function SubGrupo({ titulo, children, comDivisor = false }: { titulo: string; ch
 interface PageProps extends CadastroVacinacaoModeProps {
   onLogout: () => void;
   onNavigate: (screen: any, data?: any) => void;
+  acaoHistorico?: React.ReactNode;
+  avisoHistorico?: React.ReactNode;
+  ocultarNavbar?: boolean;
 }
 
-export function AdicionarLaboratorioPage({ onLogout, onNavigate, mode = "create", dados }: PageProps) {
+export function AdicionarLaboratorioPage({ onLogout, onNavigate, mode = "create", dados, acaoHistorico, avisoHistorico, ocultarNavbar = false }: PageProps) {
   const preenchendoRegistro = mode !== "create";
   const normalizarAtuacao = (valor: string) => {
     const semPrefixo = valor.replace(/^Realiza\s+/i, "");
@@ -112,6 +117,8 @@ export function AdicionarLaboratorioPage({ onLogout, onNavigate, mode = "create"
   // Anexos e Observações
   const [anexos, setAnexos] = useState<any[]>(dados?.anexos ?? []);
   const [isSucesso, setIsSucesso] = useState(false);
+  const [registroSalvo, setRegistroSalvo] = useState<any | null>(null);
+  const [tentouSalvar, setTentouSalvar] = useState(false);
 
   const [endereco, setEndereco] = useState({
     zona: "Urbana",
@@ -150,6 +157,34 @@ export function AdicionarLaboratorioPage({ onLogout, onNavigate, mode = "create"
     });
   };
 
+  const atuacoesSemDoenca = atuacao.filter((item) => (doencasPorAtuacao[item] ?? []).length === 0);
+  const proprietarioPendente = proprietarios.some((item) => !item.proprietario);
+  const formularioInvalido = !nome.trim() || atuacao.length === 0 || atuacoesSemDoenca.length > 0 || proprietarioPendente;
+
+  const handleSubmit = () => {
+    setTentouSalvar(true);
+    if (formularioInvalido) return;
+
+    const registroPersistido = {
+      ...registroAtual,
+      produtor: proprietarios
+        .map((item) => item.proprietario)
+        .filter(Boolean),
+      municipio: endereco.municipio,
+      uf: endereco.estado === "Minas Gerais"
+        ? "MG"
+        : endereco.estado === "São Paulo"
+          ? "SP"
+          : endereco.estado.slice(0, 2).toUpperCase(),
+      situacao: dados?.situacao ?? "Ativo",
+    };
+
+    if (mode === "edit" && dados) registrarEdicaoLaboratorio(dados, registroPersistido);
+    salvarRegistroMock("laboratorios", registroPersistido);
+    setRegistroSalvo(registroPersistido);
+    setIsSucesso(true);
+  };
+
   const registroAtual = preencherComExemplo({
     ...(dados ?? {}),
     id: dados?.id ?? `laboratorio-${Date.now()}`,
@@ -185,7 +220,7 @@ export function AdicionarLaboratorioPage({ onLogout, onNavigate, mode = "create"
 
   return (
     <div className={cadastroVacinacaoPageClass(mode, "min-h-screen bg-[#f2f3f5]")}>
-      <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="laboratorio" hideSearch />
+      {!ocultarNavbar && <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="laboratorio" hideSearch />}
 
       <main className="max-w-[1088px] mx-auto px-4 md:px-6 py-6 flex flex-col gap-4">
         {/* Cabeçalho */}
@@ -194,8 +229,10 @@ export function AdicionarLaboratorioPage({ onLogout, onNavigate, mode = "create"
             <ArrowLeft size={15} />
             Todos os Laboratórios
           </button>
-          <CadastroVacinacaoHeader mode={mode} nomeCadastro="Laboratório" rotaEditar="editar-laboratorio" dados={dados} onNavigate={onNavigate} onSubmit={() => setIsSucesso(true)} />
+          <CadastroVacinacaoHeader mode={mode} nomeCadastro="Laboratório" rotaEditar="editar-laboratorio" dados={dados} onNavigate={onNavigate} onSubmit={handleSubmit} acaoComplementar={acaoHistorico} />
         </div>
+
+        {avisoHistorico}
 
         <div className="w-full bg-white border border-gray-100 rounded-lg p-5 shadow-sm flex items-center gap-3 mt-4 mb-6">
           <div className="text-gray-500 flex-shrink-0">
@@ -205,6 +242,11 @@ export function AdicionarLaboratorioPage({ onLogout, onNavigate, mode = "create"
             Campos indicados com <span className="text-red-500 font-bold">*</span> são obrigatórios e deverão ser preenchidos.
           </p>
         </div>
+        {tentouSalvar && formularioInvalido && (
+          <p role="alert" className="-mt-4 mb-2 text-sm font-medium text-red-500">
+            Preencha todos os campos obrigatórios antes de continuar.
+          </p>
+        )}
 
         {/* 1. Informações Básicas */}
         <Section title="Informações Básicas">
@@ -234,12 +276,14 @@ export function AdicionarLaboratorioPage({ onLogout, onNavigate, mode = "create"
                   <SubGrupo titulo={`${a}`}>
                     
                     {/* Estrutura unificada: Título e Botão lado a lado na mesma linha */}
-                    <div className="w-full border border-gray-200 rounded-xl bg-[#f9fafb]/50 overflow-hidden mt-2">
+                    <div className={`w-full border rounded-xl bg-[#f9fafb]/50 overflow-hidden mt-2 ${tentouSalvar && doencasSelecionadas.length === 0 ? "border-red-400" : "border-gray-200"}`}>
                       
                       {/* Cabeçalho do Bloco Integrado */}
                       <div className="flex items-center justify-between px-5 py-3 border-b border-gray-200 bg-white gap-4">
                         <div className="flex items-center gap-3">
-                          <span className="text-sm font-semibold text-gray-500">Doenças Selecionadas</span>
+                          <span className="text-sm font-semibold text-gray-500">
+                            Doenças Selecionadas <span className="text-red-500">*</span>
+                          </span>
                           {doencasSelecionadas.length > 0 && (
                             <span className="text-xs font-bold bg-[#E6F4EA] text-[#1A7A3C] px-2.5 py-1 rounded-full">
                               {doencasSelecionadas.length} {doencasSelecionadas.length === 1 ? "Selecionada" : "Selecionadas"}
@@ -286,6 +330,11 @@ export function AdicionarLaboratorioPage({ onLogout, onNavigate, mode = "create"
                           ))
                         )}
                       </div>
+                      {tentouSalvar && doencasSelecionadas.length === 0 && (
+                        <p className="px-5 pb-4 text-xs font-medium text-red-500">
+                          Selecione ao menos uma doença para esta atuação.
+                        </p>
+                      )}
                     </div>
 
                     {/* Modal de Seleção Múltipla Dinâmico por Atuação */}
@@ -354,7 +403,7 @@ export function AdicionarLaboratorioPage({ onLogout, onNavigate, mode = "create"
           <div className="flex flex-col gap-6">
             <BlocoEnderecoFields
               title="Endereço"
-              tipoEstado="travado"
+              tipoEstado="normal"
               data={endereco}
               onChange={(key, val) => setEndereco((p) => ({ ...p, [key]: val }))}
               onSetMultipleFields={(fields) => setEndereco((p) => ({ ...p, ...fields }))}
@@ -457,7 +506,7 @@ export function AdicionarLaboratorioPage({ onLogout, onNavigate, mode = "create"
             <p className="text-sm text-gray-500 mt-1">{nome ? `"${nome}"` : "O laboratório"} foi adicionado.</p>
             <div className="flex gap-3 justify-center mt-6">
               <button onClick={() => { setIsSucesso(false); onNavigate("laboratorio"); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50/40 transition">Voltar</button>
-              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-laboratorio", registroAtual); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
+              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-laboratorio", registroSalvo ?? registroAtual); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
             </div>
           </div>
         </div>
