@@ -26,6 +26,7 @@ const TELAS_GERAIS = new Set([
   "classificacao-sanitaria-estado",
   "divisao-municipal",
   "estabelecimento-agropecuario",
+  "finalidade-transito",
   "instituicao-ensino-pesquisa",
   "pessoa-fisica",
   "pessoa-juridica",
@@ -101,7 +102,7 @@ export function SituacaoVisualizacao({ currentScreen }: SituacaoVisualizacaoProp
   };
 
   const ehVendaInsumo = ["venda-entrada-insumos-exames", "venda-saida-insumo"].includes(currentScreen);
-  const permiteSuspensao = currentScreen === "estabelecimento-agropecuario";
+  const permiteSuspensao = ["estabelecimento-agropecuario", "finalidade-transito"].includes(currentScreen);
   const tipoMovimentacao = currentScreen === "venda-saida-insumo" ? "saída" : "entrada";
   const opcoesSituacao = ehVendaInsumo
     ? [

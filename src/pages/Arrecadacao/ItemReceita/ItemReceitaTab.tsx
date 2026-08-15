@@ -16,7 +16,11 @@ import {
   DialogTitle,
 } from "../../../components/ui-1/dialog";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
-import { FloatInput, SimNao } from "../../../components/ui/FormKit";
+import {
+  FloatInput,
+  FloatSelect,
+  SimNao,
+} from "../../../components/ui/FormKit";
 import { listarUnidadesMedida } from "../../Geral/UnidadeMedida/unidadeMedidaData";
 import {
   FUNDOS_ARRECADACAO_MOCK,
@@ -36,6 +40,11 @@ interface ItemReceitaTabProps {
   isModalOpen: boolean;
   setIsModalOpen: (open: boolean) => void;
 }
+
+const SITUACOES_ITEM_RECEITA = [
+  { value: "Ativo", label: "Ativo" },
+  { value: "Inativo", label: "Inativo" },
+];
 
 // Subcomponente local para criar o "Card" colapsável dentro do modal (Informações Básicas)
 function ModalSection({
@@ -92,6 +101,7 @@ export function ItemReceitaTab({
   const [convenio, setConvenio] = useState<Convenio | null>(null);
   const [quantidadeIndiceFundo, setQuantidadeIndiceFundo] = useState("");
   const [erroContribuicaoFundo, setErroContribuicaoFundo] = useState(false);
+  const [situacao, setSituacao] = useState<"Ativo" | "Inativo">("Ativo");
 
   const itens = listarItensReceita().filter(
     (item) => item.receitaId === receitaId,
@@ -128,6 +138,7 @@ export function ItemReceitaTab({
           ? String(selectedItem.quantidadeIndiceFundoPrivado).replace(".", ",")
           : "",
       );
+      setSituacao(selectedItem.situacao);
     } else if (!isModalOpen) {
       // Limpar formulário ao fechar e garantir que o próximo state inicie limpo
       setItemReceita("");
@@ -139,6 +150,7 @@ export function ItemReceitaTab({
       setConvenio(null);
       setQuantidadeIndiceFundo("");
       setErroContribuicaoFundo(false);
+      setSituacao("Ativo");
       setSelectedItem(null);
       setModalMode("add");
     }
@@ -179,7 +191,7 @@ export function ItemReceitaTab({
         : null,
       convenioId: contribuiFundo ? (convenio?.id ?? null) : null,
       quantidadeIndiceFundoPrivado: contribuiFundo ? quantidadeFundo : null,
-      situacao: selectedItem?.situacao ?? "Ativo",
+      situacao,
     });
     setIsModalOpen(false);
   };
@@ -220,13 +232,16 @@ export function ItemReceitaTab({
                 <th className="text-left px-4 py-3 font-semibold text-gray-600 uppercase">
                   Permite contribuição ao fundo privado?
                 </th>
+                <th className="text-left px-4 py-3 font-semibold text-gray-600 uppercase">
+                  Situação
+                </th>
                 <th className="text-right px-4 py-3 w-24">Ações</th>
               </tr>
             </thead>
             <tbody>
               {itens.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="py-8 text-center text-gray-500">
+                  <td colSpan={5} className="py-8 text-center text-gray-500">
                     Nenhum item de receita cadastrado.
                   </td>
                 </tr>
@@ -244,6 +259,9 @@ export function ItemReceitaTab({
                     </td>
                     <td className="px-4 py-3 text-gray-700">
                       {t.contribuicaoFundo}
+                    </td>
+                    <td className="px-4 py-3 text-gray-700">
+                      {t.situacao}
                     </td>
                     <td className="px-4 py-3 text-right whitespace-nowrap">
                       <div className="flex justify-end gap-1">
@@ -377,6 +395,26 @@ export function ItemReceitaTab({
                 onChange={(v) => setQuantidadeIndice(v.replace(/[^0-9,]/g, ""))}
                 disabled={isViewOnly}
               />
+
+              {modalMode !== "add" &&
+                (isViewOnly ? (
+                  <FloatInput
+                    label="Situação"
+                    value={situacao}
+                    disabled
+                    onChange={() => {}}
+                  />
+                ) : (
+                  <FloatSelect
+                    label="Situação"
+                    required
+                    value={situacao}
+                    onChange={(value) =>
+                      setSituacao(value as "Ativo" | "Inativo")
+                    }
+                    options={SITUACOES_ITEM_RECEITA}
+                  />
+                ))}
 
               <div className="md:col-span-2 pt-2">
                 <SimNao

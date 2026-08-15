@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ArrowLeft,
   ChevronDown,
@@ -73,6 +73,9 @@ export function EditarFinalidadeTransitoPage({
   const [finalidade, setFinalidade] = useState(registroOriginal.finalidade || "");
   const [descricao, setDescricao] = useState(registroOriginal.descricao ?? "");
   const [codigoMapa, setCodigoMapa] = useState(registroOriginal.codigoMapa || "");
+  const [situacao, setSituacao] = useState<FinalidadeTransitoVisual["situacao"]>(
+    registroOriginal.situacao ?? "Ativo",
+  );
   const [especies, setEspecies] = useState<Especie[]>(
     registroOriginal.especies?.length
       ? registroOriginal.especies
@@ -96,7 +99,25 @@ export function EditarFinalidadeTransitoPage({
   const [modalEspecieAberto, setModalEspecieAberto] = useState(false);
   const [modalPapelAberto, setModalPapelAberto] = useState(false);
   const [isSucesso, setIsSucesso] = useState(false);
+  const [erroValidacao, setErroValidacao] = useState(false);
   const [registroSalvo, setRegistroSalvo] = useState<FinalidadeTransitoVisual | null>(null);
+
+  useEffect(() => {
+    const atualizarSituacao = (event: Event) => {
+      const detalhe = (event as CustomEvent<{
+        currentScreen: string;
+        situacao: FinalidadeTransitoVisual["situacao"];
+      }>).detail;
+
+      if (detalhe?.currentScreen === "finalidade-transito") {
+        setSituacao(detalhe.situacao);
+      }
+    };
+
+    window.addEventListener("situacao-cadastro-alterada", atualizarSituacao);
+    return () => window.removeEventListener("situacao-cadastro-alterada", atualizarSituacao);
+  }, []);
+
   const papelIds = papeis.map((papel) => papel.id);
   const finalidadeAtualizada = registroSalvo ?? {
     ...registroOriginal,
@@ -111,18 +132,26 @@ export function EditarFinalidadeTransitoPage({
     emiteAcessoExterno,
     tiposDestino,
     tipoDestino: tiposDestino[0],
+    situacao,
   };
 
   const salvar = () => {
-    if (
+    const formularioInvalido =
       !finalidade.trim() ||
       !descricao.trim() ||
       !codigoMapa ||
+      !situacao ||
       !especies.length ||
       !papelIds.length ||
       !tiposProcedencia.length ||
-      !tiposDestino.length
-    ) return;
+      !tiposDestino.length;
+
+    if (formularioInvalido) {
+      setErroValidacao(true);
+      return;
+    }
+
+    setErroValidacao(false);
 
     const salvo = salvarFinalidadeTransito({
       id: registroOriginal.id,
@@ -136,7 +165,7 @@ export function EditarFinalidadeTransitoPage({
       especieIds: especies.map((item) => item.id),
       papelIds,
       procedencias: registroOriginal.procedencias ?? [],
-      situacao: registroOriginal.situacao ?? "Ativo",
+      situacao,
     });
     setRegistroSalvo(salvo);
     setIsSucesso(true);
@@ -145,7 +174,7 @@ export function EditarFinalidadeTransitoPage({
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
       <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="finalidade-transito" hideSearch />
-      <main className="mx-auto flex max-w-5xl flex-col gap-4 px-4 py-6 md:px-6">
+      <main data-situacao={situacao} className="mx-auto flex max-w-5xl flex-col gap-4 px-4 py-6 md:px-6">
         <div>
           <button type="button" onClick={() => onNavigate("visualizar-finalidade-transito", registroOriginal)} className="mb-3 flex items-center gap-1 text-sm font-semibold text-[#1A7A3C] hover:opacity-70">
             <ArrowLeft size={15} />Visualizar Finalidade de Trânsito
@@ -159,6 +188,11 @@ export function EditarFinalidadeTransitoPage({
           <Info size={20} className="text-gray-500" />
           <p className="text-sm font-medium text-gray-600">Campos indicados com <span className="font-bold text-red-500">*</span> são obrigatórios.</p>
         </div>
+        {erroValidacao && (
+          <p role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+            Preencha todos os campos obrigatórios antes de salvar.
+          </p>
+        )}
 
         <Section title="Informações Básicas">
           <div className="flex flex-col gap-4">
