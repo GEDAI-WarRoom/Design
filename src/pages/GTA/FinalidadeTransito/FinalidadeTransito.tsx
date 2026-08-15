@@ -14,7 +14,9 @@ import { Navbar } from "../../../components/Navbar";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
 import { FloatSelect } from "../../../components/ui/FormKit";
 import { listarEspecies } from "../../Animal/Especie/especieData";
+import { listarPapeis } from "../../Controle/Papeis/papeisData";
 import { listarFinalidadesTransito } from "./finalidadeTransitoData";
+import * as Icons from "../../../imports/icons";
 
 const GREEN = "#1A7A3C";
 
@@ -78,6 +80,7 @@ export function FinalidadeTransitoPage({ onLogout, onNavigate }: PageProps) {
   const [tipoProcedencia, setTipoProcedencia] = useState("");
   const [situacao, setSituacao] = useState("");
   const [especie, setEspecie] = useState<any | null>(null);
+  const [papel, setPapel] = useState<any | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [focusFinalidade, setFocusFinalidade] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
@@ -86,7 +89,7 @@ export function FinalidadeTransitoPage({ onLogout, onNavigate }: PageProps) {
   const perPage = 10;
 
   const temFiltroAtivo =
-    finalidade.trim() !== "" || tipoProcedencia !== "" || tipoDestino !== "" || !!especie || situacao !== "";
+    finalidade.trim() !== "" || tipoProcedencia !== "" || tipoDestino !== "" || !!especie || !!papel || situacao !== "";
 
   const handlePesquisar = () => {
     if (!temFiltroAtivo) {
@@ -106,8 +109,9 @@ export function FinalidadeTransitoPage({ onLogout, onNavigate }: PageProps) {
     const matchTipoProcedencia =
       tipoProcedencia === "" || f.tiposProcedencia.includes(tipoProcedencia);
     const matchEspecie = !especie || f.especieIds.includes(especie.id);
+    const matchPapel = !papel || f.papelIds.includes(papel.id);
     const matchSituacao = situacao === "" || f.situacao === situacao;
-    return matchFinalidade && matchTipoProcedencia && matchTipoDestino && matchEspecie && matchSituacao;
+    return matchFinalidade && matchTipoProcedencia && matchTipoDestino && matchEspecie && matchPapel && matchSituacao;
   });
 
   const total = filtrados.length;
@@ -198,8 +202,8 @@ export function FinalidadeTransitoPage({ onLogout, onNavigate }: PageProps) {
           {/* --- filtros internos avancados --- */}
           {showFilters && (
             <div className="animate-fadeIn flex flex-col gap-3 w-full">
-              <div className="flex flex-col lg:flex-row items-end gap-3 w-full">
-                <div className="w-full lg:flex-1">
+              <div className="grid w-full grid-cols-1 items-end gap-3 md:grid-cols-2 xl:grid-cols-3">
+                <div className="w-full">
                   <FloatSelect
                     label="Tipo de Procedência"
                     value={tipoProcedencia}
@@ -208,7 +212,7 @@ export function FinalidadeTransitoPage({ onLogout, onNavigate }: PageProps) {
                   />
                 </div>
 
-                <div className="w-full lg:flex-1">
+                <div className="w-full">
                   <FloatSelect
                     label="Tipo de Destino"
                     value={tipoDestino}
@@ -217,7 +221,7 @@ export function FinalidadeTransitoPage({ onLogout, onNavigate }: PageProps) {
                   />
                 </div>
 
-                <div className="w-full lg:flex-1">
+                <div className="w-full">
                   <EntitySearchInput
                     label="Espécie"
                     placeholder="Buscar por nome da espécie"
@@ -238,7 +242,25 @@ export function FinalidadeTransitoPage({ onLogout, onNavigate }: PageProps) {
                   />
                 </div>
 
-                <div className="w-full lg:flex-1">
+                <div className="w-full">
+                  <EntitySearchInput
+                    label="Papel"
+                    placeholder="Buscar por nome do papel"
+                    value={papel ? papel.nome : ""}
+                    data={listarPapeis()}
+                    searchKeys={["nome", "tipo"]}
+                    columns={[
+                      { label: "Nome do Papel", key: "nome" },
+                      { label: "Tipo", key: "tipo" },
+                    ]}
+                    icon={<img src={Icons.iconePapeisUrl} alt="" className="h-[18px] w-[18px] object-contain" />}
+                    title="Buscar Papel"
+                    subtitle="Busque por um papel cadastrado:"
+                    onChange={setPapel}
+                  />
+                </div>
+
+                <div className="w-full">
                   <FloatSelect
                     label="Situação"
                     value={situacao}
@@ -250,7 +272,7 @@ export function FinalidadeTransitoPage({ onLogout, onNavigate }: PageProps) {
                 {/* --- botao pesquisar compacto --- */}
                 <button
                   onClick={handlePesquisar}
-                  className="h-12 w-full lg:w-fit px-5 rounded-md text-white text-sm font-semibold transition hover:opacity-90 flex items-center justify-center whitespace-nowrap"
+                  className="h-12 w-full px-5 rounded-md text-white text-sm font-semibold transition hover:opacity-90 flex items-center justify-center whitespace-nowrap"
                   style={{ backgroundColor: GREEN }}
                 >
                   Pesquisar
@@ -284,6 +306,12 @@ export function FinalidadeTransitoPage({ onLogout, onNavigate }: PageProps) {
                 <Chip
                   label={`Espécie: ${especie.nome}`}
                   onRemove={() => setEspecie(null)}
+                />
+              )}
+              {papel && (
+                <Chip
+                  label={`Papel: ${papel.nome}`}
+                  onRemove={() => setPapel(null)}
                 />
               )}
               {situacao && (
@@ -322,13 +350,16 @@ export function FinalidadeTransitoPage({ onLogout, onNavigate }: PageProps) {
 												Finalidade de Trânsito
 											</th>
 											<th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-normal uppercase">
-												Tipo de Procedência
+											Tipos de Procedência
 											</th>
 											<th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-normal uppercase">
-												Tipo de Destino
+											Tipos de Destino
 											</th>
 											<th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-normal uppercase">
-												Espécie
+											Espécies
+										</th>
+										<th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-normal uppercase">
+											Papéis
 											</th>
 											<th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-normal uppercase">
 												Situação
@@ -345,13 +376,16 @@ export function FinalidadeTransitoPage({ onLogout, onNavigate }: PageProps) {
 													{f.finalidade}
 												</td>
 												<td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">
-													{f.tipoProcedencia}
+													{f.tiposProcedencia.join(", ") || "N/A"}
 												</td>
 												<td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">
-													{f.tipoDestino}
+													{f.tiposDestino.join(", ") || "N/A"}
 												</td>
 												<td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">
-													{f.especies.at(0)?.nome || "N/A"}
+													{f.especies.map((especie) => especie.nome).join(", ") || "N/A"}
+												</td>
+												<td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">
+													{f.papeis.map((papel) => papel.nome).join(", ") || "N/A"}
 												</td>
 												<td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">
 													{f.situacao}

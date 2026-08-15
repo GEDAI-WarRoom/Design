@@ -22,10 +22,14 @@ interface SituacaoVisualizacaoProps {
 
 const TELAS_GERAIS = new Set([
   "acougue",
+  "local-pesagem",
+  "estabelecimento-generico",
   "aeroporto-porto",
   "classificacao-sanitaria-estado",
   "divisao-municipal",
   "estabelecimento-agropecuario",
+  "finalidade-transito",
+  "taxa-emissao-gta",
   "instituicao-ensino-pesquisa",
   "pessoa-fisica",
   "pessoa-juridica",
@@ -33,6 +37,7 @@ const TELAS_GERAIS = new Set([
   "profissional-oficial",
   "revendedora-agropecuario",
   "tipo-veiculo",
+  "tipo-vacina",
   "unidade-administrativa",
   "unidade-medida",
   "venda-propriedade",
@@ -101,7 +106,7 @@ export function SituacaoVisualizacao({ currentScreen }: SituacaoVisualizacaoProp
   };
 
   const ehVendaInsumo = ["venda-entrada-insumos-exames", "venda-saida-insumo"].includes(currentScreen);
-  const permiteSuspensao = currentScreen === "estabelecimento-agropecuario";
+  const permiteSuspensao = ["estabelecimento-agropecuario", "finalidade-transito"].includes(currentScreen);
   const tipoMovimentacao = currentScreen === "venda-saida-insumo" ? "saída" : "entrada";
   const opcoesSituacao = ehVendaInsumo
     ? [

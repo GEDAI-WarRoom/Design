@@ -5,10 +5,11 @@ import {
   CheckCircle2,
   Info,
   Calendar,
-  FlaskConical, PlusCircle, ChevronUp, ChevronDown, Trash2, Store, Check, RotateCcw, Package, PillBottle
+  FlaskConical, PlusCircle, ChevronUp, ChevronDown, Trash2, Store, Check, RotateCcw, Package, PillBottle, X
 } from "lucide-react";
+import { PieChart, Pie, Cell, Sector } from "recharts";
 import { Navbar } from "../../../components/Navbar";
-import { FloatInput, FloatSelect, SearchModal, CustomRadio, MultiSearchModal } from "../../../components/ui/FormKit";
+import { FloatInput, FloatSelect, LargeTextArea, SearchModal, CustomRadio, MultiSearchModal } from "../../../components/ui/FormKit";
 import {
   EntitySearchInput,
   DynamicListWrapper,
@@ -19,12 +20,12 @@ import {
   ProdutorInput,
   ExploracaoPecuariaInput,
 } from "../../../components/ui/EntitySearch";
-import { PieChart, Pie, Cell, Sector } from "recharts";
 import * as Icons from "../../../imports/icons";
 import { CadastroVacinacaoHeader, cadastroVacinacaoPageClass, mensagemSucessoCadastro, preencherComExemplo, type CadastroVacinacaoModeProps } from "../shared/CadastroVacinacaoMode";
 
 const GREEN = "#1A7A3C";
 const MOCK_KEY = "DECLARACOES_VACINA_DB";
+const ESTOQUE_KEY = "ESTOQUE_VACINA_DECLARACAO_DB_V2";
 
 // ==========================================================
 // MOCKS DE ENTIDADE COM IDS ÚNICOS
@@ -81,19 +82,58 @@ const EXPLORACOES_MOCK = [
   }
 ];
 
-const LOTES_MOCK = [
-  { id: 1, nome: "0013225/24", partida: "1", uf: "MG", dosesDisponiveisTotais: 120, fornecedor: "Comercial AgroVet", revendedoraId: 1, compradorTipo: "Produtor", doenca: "Brucelose", tipoVacina: "B19", laboratorio: "BioMed/MG", validade: "20/12/2026" },
-  { id: 2, nome: "0013225/24", partida: "2", uf: "MG", dosesDisponiveisTotais: 80, fornecedor: "Comercial AgroVet", revendedoraId: 1, compradorTipo: "Produtor", doenca: "Brucelose", tipoVacina: "RB51", laboratorio: "BioMed/MG", validade: "20/12/2026" },
-  { id: 3, nome: "0014589/24", partida: "1", uf: "SP", dosesDisponiveisTotais: 250, fornecedor: "AgroInsumos Sul", revendedoraId: 2, compradorTipo: "Médico Veterinário", doenca: "Raiva", tipoVacina: "", laboratorio: "Zoetis", validade: "15/08/2027" },
-  { id: 4, nome: "0014589/24", partida: "1", uf: "GO", dosesDisponiveisTotais: 50, fornecedor: "Comercial AgroVet", revendedoraId: 1, compradorTipo: "Vacinador", doenca: "Raiva", tipoVacina: "", laboratorio: "Biovet", validade: "15/08/2027" },
-  { id: 5, nome: "0099887/25", partida: "3", uf: "MG", dosesDisponiveisTotais: 500, fornecedor: "Comercial AgroVet", revendedoraId: 1, compradorTipo: "Produtor", doenca: "Febre Aftosa", tipoVacina: "", laboratorio: "OuroFino", validade: "10/10/2026" }
-];
-
 const DOENCAS_MOCK = [
   { id: 1, nome: "Brucelose", tiposVacina: ["B19", "RB51"] },
   { id: 2, nome: "Febre Aftosa", tiposVacina: [] },
   { id: 3, nome: "Raiva", tiposVacina: [] },
 ];
+
+const ETAPAS_VACINACAO_MOCK = [
+  { id: 1, codigo: "2026/01", doenca: "Brucelose", nome: "Etapa 2026/01" },
+  { id: 2, codigo: "2026/02", doenca: "Febre Aftosa", nome: "Etapa 2026/02" },
+  { id: 3, codigo: "2026/03", doenca: "Raiva", nome: "Etapa 2026/03" },
+  { id: 4, codigo: "2025/01", doenca: "Brucelose", nome: "Etapa 2025/01", situacao: "Fechada" },
+];
+
+const LOTES_MOCK = [
+  { compradorTipo: "Produtor", revendedoraId: 1, fornecedor: "Comercial AgroVet", uf: "MG" },
+  { compradorTipo: "Produtor", revendedoraId: 2, fornecedor: "AgroInsumos Sul", uf: "SP" },
+  { compradorTipo: "Médico Veterinário", revendedoraId: 1, fornecedor: "Comercial AgroVet", uf: "MG" },
+  { compradorTipo: "Médico Veterinário", revendedoraId: 2, fornecedor: "AgroInsumos Sul", uf: "SP" },
+  { compradorTipo: "Vacinador", revendedoraId: 1, fornecedor: "Comercial AgroVet", uf: "MG" },
+  { compradorTipo: "Vacinador", revendedoraId: 2, fornecedor: "AgroInsumos Sul", uf: "SP" },
+].flatMap((destino, indiceDestino) =>
+  DOENCAS_MOCK.flatMap((doenca, indiceDoenca) =>
+    [1, 2].map((partida) => {
+      const dosesPerFrasco = 20;
+      const frascosFechadosDisponiveis = 40 + indiceDestino * 5 + indiceDoenca * 3 + partida * 2;
+      const frascosAbertosEstoque = partida === 1
+        ? [{ id: `${indiceDestino}-${indiceDoenca}-${partida}-aberto-1`, saldoDoses: 5 }]
+        : [
+          { id: `${indiceDestino}-${indiceDoenca}-${partida}-aberto-1`, saldoDoses: 8 },
+          { id: `${indiceDestino}-${indiceDoenca}-${partida}-aberto-2`, saldoDoses: 12 },
+        ];
+      const dosesEmFrascosAbertos = frascosAbertosEstoque.reduce((soma, frasco) => soma + frasco.saldoDoses, 0);
+
+      return {
+        ...destino,
+        id: indiceDestino * 6 + indiceDoenca * 2 + partida,
+        nome: `${String(13225 + indiceDestino * 300 + indiceDoenca * 100).padStart(7, "0")}/26`,
+        partida: String(partida),
+        dosesPerFrasco,
+        frascosFechadosDisponiveis,
+        frascosAbertosEstoque,
+        frascosAbertosDisponiveis: frascosAbertosEstoque.length,
+        dosesEmFrascosAbertos,
+        dosesDisponiveisTotais: frascosFechadosDisponiveis * dosesPerFrasco + dosesEmFrascosAbertos,
+        doenca: doenca.nome,
+        tipoVacina: doenca.nome === "Brucelose" ? (partida === 1 ? "B19" : "RB51") : "",
+        laboratorio: doenca.nome === "Raiva" ? "Zoetis" : doenca.nome === "Febre Aftosa" ? "OuroFino" : "BioMed/MG",
+        validade: doenca.nome === "Febre Aftosa" ? "10/10/2026" : doenca.nome === "Raiva" ? "15/08/2027" : "20/12/2026",
+      };
+    }),
+  ),
+);
 
 const VACINADORES_MOCK = [
   { id: 1, vetId: 1, nome: "Pedro Alves", documento: "222.114.558-70" },
@@ -429,6 +469,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
         tiposVacina: [],
       }
     : null);
+  const etapaInicial = dados?.etapaVacinacao ?? ETAPAS_VACINACAO_MOCK.find((item) => item.doenca === nomeDoencaInicial) ?? null;
 
   // ---- Informações Básicas ----
   const [produtor, setProdutor] = useState<any | null>(produtorInicial);
@@ -438,6 +479,8 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
 
   // ---- Informações de Vacinação ----
   const [doenca, setDoenca] = useState<any | null>(doencaInicial);
+  const [etapaVacinacao, setEtapaVacinacao] = useState<any | null>(etapaInicial);
+  const [justificativaAutorizacao, setJustificativaAutorizacao] = useState(dados?.justificativaAutorizacao ?? "");
   const [tipoVacina, setTipoVacina] = useState(dados?.tipoVacina ?? (nomeDoencaInicial === "Brucelose" && preenchendoRegistro ? "B19" : ""));
   const [dataVacinacao, setDataVacinacao] = useState(dados?.dataVacinacao ?? "");
   const [dataAtestado, setDataAtestado] = useState(dados?.dataAtestado ?? (preenchendoRegistro ? dataVacinacaoInicial : ""));
@@ -448,10 +491,32 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
 
   // ---- Saldo de Vacinas e Lotes ----
   const [modalNotaOrigemOpen, setModalNotaOrigemOpen] = useState(false);
+  const [lotesEstoque, setLotesEstoque] = useState<any[]>(() => {
+    if (typeof window === "undefined") return LOTES_MOCK;
+
+    try {
+      const estoqueSalvo = JSON.parse(localStorage.getItem(ESTOQUE_KEY) || "[]");
+      if (!Array.isArray(estoqueSalvo) || estoqueSalvo.length === 0) return LOTES_MOCK;
+
+      return LOTES_MOCK.map((loteBase) => ({
+        ...loteBase,
+        ...(estoqueSalvo.find((loteSalvo: any) => loteSalvo.id === loteBase.id) || {}),
+        quantidadeDoses: 0,
+        quantidadeFrascos: 0,
+        frascosCompletosUtilizados: 0,
+        frascosParciaisNovos: [],
+        usosFrascosAbertos: {},
+      }));
+    } catch {
+      return LOTES_MOCK;
+    }
+  });
   const [notasFiscaisOrigem, setNotasFiscaisOrigem] = useState<any[]>(dados?.notasFiscaisOrigem ?? []);
   const [graficoAtivo, setGraficoAtivo] = useState<{ loteId: string; index: number } | null>(null);
   const [notasListasMinimizadas, setNotasListasMinimizadas] = useState<Record<string, boolean>>({});
   const [lotesMinimizados, setLotesMinimizados] = useState<Record<string, boolean>>({});
+  const [loteOtimizadoAberto, setLoteOtimizadoAberto] = useState<string | null>(null);
+  const [etapaOtimizarFrascos, setEtapaOtimizarFrascos] = useState(0);
   const [vacinados, setVacinados] = useState<VacinadosRow[]>(dados?.vacinados ?? (preenchendoRegistro ? INITIAL_VACINADOS.map((linha, index) => ({ ...linha, machos: index === 0 ? 4 : 0, femeas: index === 0 ? 6 : 0 })) : INITIAL_VACINADOS));
   
   const [origemNota, setOrigemNota] = useState(dados?.origemNota ?? (preenchendoRegistro ? "Produtor" : ""));
@@ -490,6 +555,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
     !!doenca && regime !== "" && dataVacinacao !== "" && dataAtestado !== "" && !!veterinario &&
     (!isRaiva || mordidaMorcego !== "") &&
     origemNota !== "" && !!revendedora &&
+    (etapaVacinacao?.situacao !== "Fechada" || justificativaAutorizacao.trim() !== "") &&
     dosesValidas && !erroDataVac && !erroDataAtestado;
 
   const tipoVacinaDisponivel = (doenca?.tiposVacina?.length ?? 0) > 0;
@@ -525,6 +591,60 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
     setTentouSalvar(true);
 
     if (mode === "create") {
+      const lotesAtualizados = lotesEstoque.map((lote) => {
+        const movimentacao = notasFiscaisOrigem.find((item) => item.id === lote.id);
+        if (!movimentacao) return lote;
+
+        const dosesPorFrasco = lote.dosesPerFrasco || 20;
+        const frascosFechadosAtuais = lote.frascosFechadosDisponiveis || 0;
+        const frascosAbertosAtuais = Array.isArray(lote.frascosAbertosEstoque) ? lote.frascosAbertosEstoque : [];
+        const usosFrascosAbertos = movimentacao.usosFrascosAbertos || {};
+        const frascosAbertosRestantes = frascosAbertosAtuais
+          .map((frasco: any) => ({
+            ...frasco,
+            saldoDoses: Math.max(frasco.saldoDoses - Math.min(frasco.saldoDoses, usosFrascosAbertos[frasco.id] || 0), 0),
+          }))
+          .filter((frasco: any) => frasco.saldoDoses > 0);
+
+        const frascosCompletosUtilizados = Math.min(
+          frascosFechadosAtuais,
+          Math.max(0, movimentacao.frascosCompletosUtilizados || 0),
+        );
+        const limiteParciais = Math.max(frascosFechadosAtuais - frascosCompletosUtilizados, 0);
+        const frascosParciaisNovos = (Array.isArray(movimentacao.frascosParciaisNovos) ? movimentacao.frascosParciaisNovos : [])
+          .slice(0, limiteParciais);
+        const novosFrascosComSaldo = frascosParciaisNovos
+          .map((frasco: any) => ({
+            id: frasco.id,
+            saldoDoses: Math.max(dosesPorFrasco - Math.min(dosesPorFrasco, frasco.dosesUsadas || 0), 0),
+          }))
+          .filter((frasco: any) => frasco.saldoDoses > 0);
+        const frascosAbertosEstoque = [...frascosAbertosRestantes, ...novosFrascosComSaldo];
+        const frascosFechadosDisponiveis = Math.max(
+          frascosFechadosAtuais - frascosCompletosUtilizados - frascosParciaisNovos.length,
+          0,
+        );
+        const dosesEmFrascosAbertos = frascosAbertosEstoque.reduce((soma: number, frasco: any) => soma + frasco.saldoDoses, 0);
+
+        if (frascosCompletosUtilizados === 0 && frascosParciaisNovos.length === 0 && Object.keys(usosFrascosAbertos).length === 0) return lote;
+
+        return {
+          ...lote,
+          frascosFechadosDisponiveis,
+          frascosAbertosEstoque,
+          frascosAbertosDisponiveis: frascosAbertosEstoque.length,
+          dosesEmFrascosAbertos,
+          dosesDisponiveisTotais: frascosFechadosDisponiveis * dosesPorFrasco + dosesEmFrascosAbertos,
+          quantidadeDoses: 0,
+          quantidadeFrascos: 0,
+          frascosCompletosUtilizados: 0,
+          frascosParciaisNovos: [],
+          usosFrascosAbertos: {},
+        };
+      });
+      setLotesEstoque(lotesAtualizados);
+      localStorage.setItem(ESTOQUE_KEY, JSON.stringify(lotesAtualizados));
+
       const novoRegistro = {
         id: Date.now(),
         produtorNome: produtor?.nome || "",
@@ -534,6 +654,8 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
         municipio: estabelecimento?.municipio || "",
         exploracaoCodigo: exploracao?.codigo || "",
         especie: exploracao?.especie || "",
+        etapaVacinacao: etapaVacinacao || null,
+        justificativaAutorizacao: justificativaAutorizacao || "",
         doenca: doenca?.nome || "",
         tipoVacina: tipoVacina || "",
         regime: regime || "",
@@ -578,11 +700,18 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
     setDoenca(ent); setTipoVacina(""); setVacinadorBrucelose(null); setMordidaMorcego(""); setRegime("");
     setNotasFiscaisOrigem([]); 
   };
+  const onChangeEtapaVacinacao = (etapa: any) => {
+    setEtapaVacinacao(etapa);
+    if (etapa?.situacao !== "Fechada") setJustificativaAutorizacao("");
+    const entidadeDoenca = DOENCAS_MOCK.find((item) => item.nome === etapa?.doenca) ?? null;
+    onChangeDoenca(entidadeDoenca);
+  };
 
-  const lotesFiltradosModal = LOTES_MOCK.filter(item => 
-    item.compradorTipo === origemNota && 
+  const lotesFiltradosModal = lotesEstoque.filter(item =>
+    item.compradorTipo === origemNota &&
     item.revendedoraId === revendedora?.id &&
-    item.doenca === doenca?.nome
+    item.doenca === doenca?.nome &&
+    item.dosesDisponiveisTotais > 0
   ).map(item => ({
     ...item,
     doencaComTipo: item.tipoVacina ? `${item.doenca} - ${item.tipoVacina}` : item.doenca
@@ -679,28 +808,28 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
 
             <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
               <EntitySearchInput
-                label="Doença"
+                label="Etapa de Vacinação"
                 required
-                placeholder="Buscar por doença"
-                value={doenca ? doenca.nome : ""}
-                data={DOENCAS_MOCK}
-                searchKeys={["nome"]}
-                columns={[{ label: "Doença", key: "nome" }]}
-                icon={<img src={Icons.iconeDoencaUrl} alt="Doença" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}
-                title="Buscar Doença"
-                subtitle="Busque por uma doença cadastrada:"
-                onChange={onChangeDoenca}
-                error={err(!doenca)}
+                placeholder="Buscar por etapa de vacinação"
+                value={etapaVacinacao ? etapaVacinacao.nome : ""}
+                data={ETAPAS_VACINACAO_MOCK}
+                searchKeys={["codigo", "doenca"]}
+                columns={[{ label: "Código", key: "codigo" }, { label: "Doença", key: "doenca" }]}
+                icon={<img src={Icons.iconeEtapaVacinacaoUrl} alt="Etapa de Vacinação" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}
+                title="Buscar Etapa de Vacinação"
+                subtitle="Busque por uma etapa de vacinação cadastrada:"
+                onChange={onChangeEtapaVacinacao}
+                error={err(!etapaVacinacao)}
               />
             </div>
 
-            {doenca && tipoVacinaDisponivel && (
+            {etapaVacinacao && (
               <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
-                <FloatSelect
-                  label="Tipo de Vacina"
-                  value={tipoVacina}
-                  onChange={setTipoVacina}
-                  options={(doenca?.tiposVacina ?? []).map((t: string) => ({ value: t, label: t }))}
+                <FloatInput
+                  label="Doença"
+                  value={doenca?.nome ?? etapaVacinacao.doenca ?? ""}
+                  disabled
+                  onChange={() => {}}
                 />
               </div>
             )}
@@ -708,7 +837,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
             {doenca && (
               <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
                 <FloatSelect
-                  label="Vacinação"
+                  label="Tipo de Vacinação"
                   required
                   value={regime}
                   onChange={(v: string) => {
@@ -717,6 +846,31 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
                   }}
                   options={opcoesRegime.map((o) => ({ value: o, label: o }))}
                   error={err(regime === "")}
+                />
+              </div>
+            )}
+
+            {etapaVacinacao?.situacao === "Fechada" && (
+              <div className="w-full">
+                <LargeTextArea
+                  label="Justificativa de autorização"
+                  required
+                  maxLength={1500}
+                  rows={4}
+                  value={justificativaAutorizacao}
+                  onChange={setJustificativaAutorizacao}
+                  error={err(justificativaAutorizacao.trim() === "")}
+                />
+              </div>
+            )}
+
+            {doenca && tipoVacinaDisponivel && (
+              <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
+                <FloatSelect
+                  label="Tipo de Vacina"
+                  value={tipoVacina}
+                  onChange={setTipoVacina}
+                  options={(doenca?.tiposVacina ?? []).map((t: string) => ({ value: t, label: t }))}
                 />
               </div>
             )}
@@ -991,42 +1145,70 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start animate-slideDown">
                             {grupo.partidas.map((nfItem: any) => {
                               const DOSES_POR_FRASCO = nfItem.dosesPerFrasco || 20;
-                              const TOTAL_DISPONIVEL = nfItem.dosesDisponiveisTotais || 100;
-                              const validadeLote = nfItem.validade || "20/12/2026";
-
                               const isLoteExpandido = lotesMinimizados[nfItem.id] !== undefined ? lotesMinimizados[nfItem.id] : true;
                               const isLoteMinimizado = !isLoteExpandido;
 
-                              const verificarVencimento = (dataStr: string) => {
-                                if (!dataStr) return false;
-                                const [dia, mes, ano] = dataStr.split("/").map(Number);
-                                const dataValidade = new Date(ano, mes - 1, dia);
-                                return dataValidade < new Date();
-                              };
-                              const isVencido = verificarVencimento(validadeLote);
-
-                              const dadosGrafico = isVencido
-                                ? [
-                                  { name: "Vencidas", value: TOTAL_DISPONIVEL, color: "#ef4444" },
-                                  { name: "Descartadas", value: 0, color: "#9ca3af" },
-                                  { name: "Partilhadas", value: 0, color: "#3b82f6" },
-                                  { name: "Utilizadas", value: 0, color: "#f59e0b" },
-                                  { name: "Disponíveis", value: 0, color: "#22c55e" },
-                                ]
-                                : [
-                                  { name: "Vencidas", value: 0, color: "#ef4444" },
-                                  { name: "Descartadas", value: 10, color: "#9ca3af" },
-                                  { name: "Partilhadas", value: 20, color: "#3b82f6" },
-                                  { name: "Utilizadas", value: 30, color: "#f59e0b" },
-                                  { name: "Disponíveis", value: TOTAL_DISPONIVEL >= 60 ? TOTAL_DISPONIVEL - 60 : 40, color: "#22c55e" },
-                                ];
-
+                              const DOSES_DISPONIVEIS = nfItem.dosesDisponiveisTotais || 0;
+                              const FRASCOS_FECHADOS_ATUAIS = nfItem.frascosFechadosDisponiveis ?? Math.floor(DOSES_DISPONIVEIS / DOSES_POR_FRASCO);
+                              const FRASCOS_ABERTOS_ATUAIS = Array.isArray(nfItem.frascosAbertosEstoque) ? nfItem.frascosAbertosEstoque : [];
+                              const DOSES_NOS_ABERTOS_ATUAIS = FRASCOS_ABERTOS_ATUAIS.reduce((soma: number, frasco: any) => soma + frasco.saldoDoses, 0);
+                              const USOS_FRASCOS_ABERTOS = nfItem.usosFrascosAbertos || {};
+                              const FRASCOS_COMPLETOS_UTILIZADOS = Math.min(
+                                FRASCOS_FECHADOS_ATUAIS,
+                                Math.max(0, nfItem.frascosCompletosUtilizados || 0),
+                              );
+                              const FRASCOS_PARCIAIS_NOVOS = Array.isArray(nfItem.frascosParciaisNovos) ? nfItem.frascosParciaisNovos : [];
+                              const DOSES_USADAS_DOS_ABERTOS = FRASCOS_ABERTOS_ATUAIS.reduce(
+                                (soma: number, frasco: any) => soma + Math.min(frasco.saldoDoses, USOS_FRASCOS_ABERTOS[frasco.id] || 0),
+                                0,
+                              );
+                              const DOSES_USADAS_NOS_PARCIAIS = FRASCOS_PARCIAIS_NOVOS.reduce(
+                                (soma: number, frasco: any) => soma + Math.min(DOSES_POR_FRASCO, frasco.dosesUsadas || 0),
+                                0,
+                              );
+                              const DOSES_UTILIZADAS = FRASCOS_COMPLETOS_UTILIZADOS * DOSES_POR_FRASCO + DOSES_USADAS_DOS_ABERTOS + DOSES_USADAS_NOS_PARCIAIS;
+                              const FRASCOS_ABERTOS_UTILIZADOS = FRASCOS_ABERTOS_ATUAIS.filter(
+                                (frasco: any) => (USOS_FRASCOS_ABERTOS[frasco.id] || 0) > 0,
+                              ).length;
+                              const FRASCOS_PARCIAIS_UTILIZADOS = FRASCOS_PARCIAIS_NOVOS.filter(
+                                (frasco: any) => (frasco.dosesUsadas || 0) > 0,
+                              ).length;
+                              const FRASCOS_DISPONIVEIS = FRASCOS_FECHADOS_ATUAIS + FRASCOS_ABERTOS_ATUAIS.length;
+                              const FRASCOS_UTILIZADOS = FRASCOS_COMPLETOS_UTILIZADOS + FRASCOS_ABERTOS_UTILIZADOS + FRASCOS_PARCIAIS_UTILIZADOS;
+                              const dadosGrafico = [
+                                { name: "Vencidas", value: 0, color: "#ef4444" },
+                                { name: "Descartadas", value: 0, color: "#9ca3af" },
+                                { name: "Utilizadas", value: DOSES_UTILIZADAS, color: "#f59e0b" },
+                                { name: "Disponíveis", value: Math.max(DOSES_DISPONIVEIS - DOSES_UTILIZADAS, 0), color: "#22c55e" },
+                              ];
                               const estaAtivoNesteLote = graficoAtivo?.loteId === nfItem.id;
                               const fatiaAtiva = estaAtivoNesteLote ? dadosGrafico[graficoAtivo.index] : null;
-                              const totalDosesGrafico = dadosGrafico.reduce((s, d) => s + d.value, 0);
-                              const porcentagem = fatiaAtiva ? ((fatiaAtiva.value / totalDosesGrafico) * 100).toFixed(1) : null;
-                              const DOSES_DISPONIVEIS = dadosGrafico.find(d => d.name === "Disponíveis")?.value ?? 0;
-                              const FRASCOS_DISPONIVEIS = Math.floor(DOSES_DISPONIVEIS / DOSES_POR_FRASCO);
+                              const FRASCOS_FECHADOS_APOS = Math.max(FRASCOS_FECHADOS_ATUAIS - FRASCOS_COMPLETOS_UTILIZADOS - FRASCOS_PARCIAIS_NOVOS.length, 0);
+                              // O resumo contabiliza todo frasco aberto: os que já estavam abertos
+                              // e os novos frascos parciais utilizados nesta vacinação.
+                              const FRASCOS_ABERTOS_APOS = FRASCOS_ABERTOS_ATUAIS.length + FRASCOS_PARCIAIS_NOVOS.length;
+                              const atualizarMovimentacao = (mudancas: Record<string, any>) => {
+                                setNotasFiscaisOrigem((itensAtuais) => itensAtuais.map((item) => {
+                                  if (item.id !== nfItem.id) return item;
+                                  const atualizado = { ...item, ...mudancas };
+                                  const completos = Math.max(0, atualizado.frascosCompletosUtilizados || 0);
+                                  const parciais = Array.isArray(atualizado.frascosParciaisNovos) ? atualizado.frascosParciaisNovos : [];
+                                  const usosAbertos = atualizado.usosFrascosAbertos || {};
+                                  const dosesAbertos = FRASCOS_ABERTOS_ATUAIS.reduce(
+                                    (soma: number, frasco: any) => soma + Math.min(frasco.saldoDoses, usosAbertos[frasco.id] || 0),
+                                    0,
+                                  );
+                                  const dosesParciais = parciais.reduce(
+                                    (soma: number, frasco: any) => soma + Math.min(DOSES_POR_FRASCO, frasco.dosesUsadas || 0),
+                                    0,
+                                  );
+                                  return {
+                                    ...atualizado,
+                                    quantidadeDoses: completos * DOSES_POR_FRASCO + dosesAbertos + dosesParciais,
+                                    quantidadeFrascos: completos + parciais.length,
+                                  };
+                                }));
+                              };
 
                               return (
                                 <div
@@ -1070,102 +1252,318 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
 
                                   {!isLoteMinimizado && (
                                     <div className="animate-slideDown">
-                                      <div className="flex items-center gap-4 z-10 mt-3">
-                                        <div className="w-24 h-24 flex items-center justify-center relative select-none">
+                                      <div className="mt-3 flex items-center gap-4">
+                                        <div className="relative flex h-24 w-24 shrink-0 items-center justify-center select-none">
                                           <PieChart width={96} height={96} margin={{ top: 2, right: 2, bottom: 2, left: 2 }}>
-                                            <Pie
-                                              data={dadosGrafico}
-                                              cx="50%" cy="50%" innerRadius={26} outerRadius={35} paddingAngle={2} dataKey="value" stroke="none"
-                                              activeIndex={estaAtivoNesteLote ? graficoAtivo.index : undefined}
-                                              activeShape={renderActiveShape}
-                                              onMouseEnter={(_, index) => setGraficoAtivo({ loteId: nfItem.id, index })}
-                                              onMouseLeave={() => setGraficoAtivo(null)}
-                                            >
-                                              {dadosGrafico.map((entry, idx) => (
-                                                <Cell key={`cell-${idx}`} fill={entry.color} className="cursor-pointer transition-all duration-200 outline-none" />
-                                              ))}
-                                            </Pie>
+                                              <Pie
+                                                data={dadosGrafico}
+                                                cx="50%"
+                                                cy="50%"
+                                                innerRadius={26}
+                                                outerRadius={35}
+                                                paddingAngle={2}
+                                                dataKey="value"
+                                                stroke="none"
+                                                activeIndex={estaAtivoNesteLote ? graficoAtivo.index : undefined}
+                                                activeShape={renderActiveShape}
+                                                onMouseEnter={(_, index) => setGraficoAtivo({ loteId: nfItem.id, index })}
+                                                onMouseLeave={() => setGraficoAtivo(null)}
+                                              >
+                                                {dadosGrafico.map((entry, index) => <Cell key={entry.name} fill={entry.color} className="cursor-pointer outline-none" />)}
+                                              </Pie>
                                           </PieChart>
-                                          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
-                                            {fatiaAtiva ? (
-                                              <div className="flex flex-col items-center justify-center">
-                                                <span className="text-xs font-bold leading-none animate-fadeIn" style={{ color: fatiaAtiva.color }}>{fatiaAtiva.value}</span>
-                                                <span className="text-[7px] text-gray-500 font-semibold leading-tight uppercase truncate max-w-[50px] mt-0.5 animate-fadeIn">{fatiaAtiva.name}</span>
-                                                <span className="text-[8px] font-bold mt-0.5 animate-fadeIn" style={{ color: fatiaAtiva.color }}>{porcentagem}%</span>
-                                              </div>
-                                            ) : (
-                                              <div className="flex flex-col items-center justify-center">
-                                                <span className="text-base font-black text-gray-800 leading-none">{totalDosesGrafico}</span>
-                                                <span className="text-[7px] font-bold text-gray-400 mt-0.5 uppercase tracking-wider">Total</span>
-                                              </div>
-                                            )}
+                                          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                                            <span className="text-base font-black leading-none text-gray-800">{fatiaAtiva ? fatiaAtiva.value : DOSES_DISPONIVEIS}</span>
+                                            <span className="mt-0.5 text-[7px] font-bold uppercase tracking-wide text-gray-400">{fatiaAtiva ? fatiaAtiva.name : "Total"}</span>
                                           </div>
                                         </div>
 
-                                        <div className="flex gap-2 flex-1 justify-start items-stretch">
-                                          <div className="flex flex-col border border-gray-200 rounded-xl px-2.5 py-2 w-full max-w-[130px] gap-1 bg-gray-50/80 justify-between">
-                                            <span className="text-[11px] text-gray-600 font-medium text-center">Disponíveis</span>
-                                            <div className="flex gap-2 items-end justify-center py-0.5">
-                                              <div className="flex flex-col items-center flex-1">
-                                                <span className="text-sm font-bold text-gray-700 leading-none">{FRASCOS_DISPONIVEIS}</span>
-                                                <span className="text-[9px] text-gray-400 font-medium mt-0.5">Frascos</span>
+                                        <div className="flex flex-1 gap-2">
+                                          <div className="flex w-full max-w-[130px] flex-col justify-between gap-1 rounded-xl border border-gray-200 bg-gray-50/80 px-2.5 py-2">
+                                            <p className="text-center text-[11px] font-medium text-gray-600">Disponíveis</p>
+                                            <div className="flex items-end justify-center gap-2 py-0.5">
+                                              <div>
+                                                <p className="text-center text-sm font-bold leading-none text-gray-700">{FRASCOS_DISPONIVEIS}</p>
+                                                <p className="mt-0.5 text-[9px] font-medium text-gray-400">Frascos</p>
                                               </div>
-                                              <div className="flex flex-col items-center flex-1">
-                                                <span className="text-sm font-bold text-gray-700 leading-none">{DOSES_DISPONIVEIS}</span>
-                                                <span className="text-[9px] text-gray-400 font-medium mt-0.5">Doses</span>
+                                              <div>
+                                                <p className="text-center text-sm font-bold leading-none text-gray-700">{DOSES_DISPONIVEIS}</p>
+                                                <p className="mt-0.5 text-[9px] font-medium text-gray-400">Doses</p>
                                               </div>
                                             </div>
                                           </div>
 
-                                          <div className="flex flex-col border border-gray-200 rounded-xl px-2.5 py-2 w-full max-w-[130px] gap-1 bg-white justify-between">
-                                            <span className="text-[11px] text-gray-500 font-medium text-center">Utilizadas</span>
-                                            <div className="flex gap-1.5 items-end justify-center">
-                                              <div className="flex flex-col flex-1 min-w-[40px]">
-                                                <input
-                                                  type="number"
-                                                  min="0"
-                                                  value={nfItem.quantidadeFrascos || ""}
-                                                  placeholder="0"
-                                                  onChange={(e) => {
-                                                    const f = Number(e.target.value);
-                                                    const d = f * DOSES_POR_FRASCO;
-                                                    setNotasFiscaisOrigem(notasFiscaisOrigem.map(item =>
-                                                      item.id === nfItem.id ? { ...item, quantidadeDoses: d, quantidadeFrascos: f } : item
-                                                    ));
-                                                  }}
-                                                  className="w-full text-center bg-white border border-gray-200 rounded-lg text-xs font-black p-1 focus:outline-none focus:border-[#1A7A3C] text-gray-800 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                                />
-                                                <span className="text-[9px] text-gray-400 font-semibold text-center mt-0.5">Frascos</span>
+                                          <div className="flex w-full max-w-[130px] flex-col justify-between gap-1 rounded-xl border border-gray-200 bg-white px-2.5 py-2">
+                                            <p className="text-center text-[11px] font-medium text-gray-500">Utilizadas</p>
+                                            <div className="flex items-end justify-center gap-2 py-0.5">
+                                              <div>
+                                                <p className="text-center text-sm font-bold leading-none text-gray-700">{FRASCOS_UTILIZADOS}</p>
+                                                <p className="mt-0.5 text-[9px] font-medium text-gray-400">Frascos</p>
                                               </div>
-                                              <div className="flex flex-col flex-1 min-w-[40px]">
-                                                <input
-                                                  type="number"
-                                                  min="0"
-                                                  value={nfItem.quantidadeDoses || ""}
-                                                  placeholder="0"
-                                                  onChange={(e) => {
-                                                    const d = Number(e.target.value);
-                                                    const f = Math.ceil(d / DOSES_POR_FRASCO);
-                                                    setNotasFiscaisOrigem(notasFiscaisOrigem.map(item =>
-                                                      item.id === nfItem.id ? { ...item, quantidadeDoses: d, quantidadeFrascos: f } : item
-                                                    ));
-                                                  }}
-                                                  className="w-full text-center bg-white border border-gray-200 rounded-lg text-xs font-black p-1 focus:outline-none focus:border-[#1A7A3C] text-gray-800 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                                />
-                                                <span className="text-[9px] text-gray-400 font-semibold text-center mt-0.5">Doses</span>
+                                              <div>
+                                                <p className="text-center text-sm font-bold leading-none text-gray-700">{DOSES_UTILIZADAS}</p>
+                                                <p className="mt-0.5 text-[9px] font-medium text-gray-400">Doses</p>
                                               </div>
                                             </div>
                                           </div>
                                         </div>
                                       </div>
 
-                                      <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 mt-3 pt-2 border-t border-gray-100 text-[9px] z-10">
-                                        {dadosGrafico.filter((item) => item.name).map((item) => (
-                                          <div key={item.name} className="flex items-center gap-1 bg-gray-50 px-1 py-0.5 rounded border border-gray-100">
-                                            <span className="w-1 h-1 rounded-full" style={{ backgroundColor: item.color }} />
-                                            <span className="text-gray-400 font-medium">{item.name}:</span>
-                                            <span className="font-bold text-gray-600">{item.value}</span>
+                                      {false && <>
+                                      {FRASCOS_ABERTOS_ATUAIS.length > 0 && (
+                                        <details className="group mt-3 rounded-xl border border-amber-200 bg-amber-50/40">
+                                          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-3 [&::-webkit-details-marker]:hidden">
+                                            <span className="text-[10px] font-bold text-gray-700">Usar doses de frascos já abertos</span>
+                                            <span className="text-[9px] font-bold text-amber-700">{DOSES_NOS_ABERTOS_ATUAIS} disponíveis · ver detalhes</span>
+                                          </summary>
+                                          <div className="flex flex-col gap-1.5 border-t border-amber-100 p-3">
+                                            {FRASCOS_ABERTOS_ATUAIS.map((frasco: any, indice: number) => {
+                                              const dosesUsadas = Math.min(frasco.saldoDoses, USOS_FRASCOS_ABERTOS[frasco.id] || 0);
+                                              return (
+                                                <div key={frasco.id} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-100 bg-white px-3 py-2">
+                                                  <span className="text-[10px] font-bold text-gray-700">Frasco aberto #{indice + 1}</span>
+                                                  <div className="flex items-center gap-3">
+                                                    <span className="text-xs font-black text-amber-700">{frasco.saldoDoses} <span className="text-[8px] font-semibold text-gray-400">disponíveis</span></span>
+                                                    <label className="flex items-center gap-1.5">
+                                                      <span className="text-[8px] font-semibold text-gray-500">Usar</span>
+                                                    <input
+                                                      type="number"
+                                                      min="0"
+                                                      max={frasco.saldoDoses}
+                                                      value={dosesUsadas || ""}
+                                                      placeholder="0"
+                                                      onChange={(e) => atualizarMovimentacao({
+                                                        usosFrascosAbertos: {
+                                                          ...USOS_FRASCOS_ABERTOS,
+                                                          [frasco.id]: Math.min(frasco.saldoDoses, Math.max(0, Number(e.target.value))),
+                                                        },
+                                                      })}
+                                                      className="w-14 rounded-md border border-amber-200 bg-white p-1 text-center text-xs font-black text-gray-800 focus:border-amber-500 focus:outline-none"
+                                                    />
+                                                    </label>
+                                                    <span className="text-xs font-black text-blue-700">Restam {frasco.saldoDoses - dosesUsadas}</span>
+                                                  </div>
+                                                </div>
+                                              );
+                                            })}
                                           </div>
+                                        </details>
+                                      )}
+
+                                      <div className="mt-3 rounded-xl border border-gray-200 bg-white p-3">
+                                        <div className="flex items-center justify-between gap-3">
+                                          <div>
+                                            <p className="text-[10px] font-bold text-gray-700">Frascos utilizados por completo</p>
+                                            <p className="text-[9px] text-gray-500">Informe somente os frascos fechados que serão consumidos integralmente.</p>
+                                          </div>
+                                          <div className="flex items-end gap-2">
+                                            <label className="w-16 text-center">
+                                              <input
+                                                type="number"
+                                                min="0"
+                                                max={Math.max(FRASCOS_FECHADOS_ATUAIS - FRASCOS_PARCIAIS_NOVOS.length, 0)}
+                                                value={FRASCOS_COMPLETOS_UTILIZADOS || ""}
+                                                placeholder="0"
+                                                onChange={(e) => atualizarMovimentacao({
+                                                  frascosCompletosUtilizados: Math.min(
+                                                    Math.max(FRASCOS_FECHADOS_ATUAIS - FRASCOS_PARCIAIS_NOVOS.length, 0),
+                                                    Math.max(0, Number(e.target.value)),
+                                                  ),
+                                                })}
+                                                className="w-full rounded-md border border-gray-200 p-1.5 text-center text-sm font-black text-gray-800 focus:border-[#1A7A3C] focus:outline-none"
+                                              />
+                                              <span className="block text-[7px] text-gray-400 mt-0.5">Frascos</span>
+                                            </label>
+                                            <div className="rounded-lg bg-green-50 px-2.5 py-1.5 text-center min-w-[70px]">
+                                              <span className="block text-xs font-black text-green-700">{FRASCOS_COMPLETOS_UTILIZADOS * DOSES_POR_FRASCO}</span>
+                                              <span className="block text-[7px] text-gray-400">Total de doses</span>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                      <details className="group mt-3 rounded-xl border border-dashed border-amber-300 bg-amber-50/30">
+                                        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-3 [&::-webkit-details-marker]:hidden">
+                                          <span className="text-[10px] font-bold text-gray-700">Usar parte de um frasco fechado</span>
+                                          <span className="text-[9px] text-gray-500">opcional · ver detalhes</span>
+                                        </summary>
+                                        <div className="border-t border-amber-100 p-3">
+                                          <div className="flex items-center justify-between gap-3">
+                                            <p className="text-[9px] text-gray-500">Adicione cada frasco parcial separadamente para preservar seu saldo.</p>
+                                          <button
+                                            type="button"
+                                            disabled={FRASCOS_COMPLETOS_UTILIZADOS + FRASCOS_PARCIAIS_NOVOS.length >= FRASCOS_FECHADOS_ATUAIS}
+                                            onClick={() => atualizarMovimentacao({
+                                              frascosParciaisNovos: [
+                                                ...FRASCOS_PARCIAIS_NOVOS,
+                                                { id: `${nfItem.id}-parcial-${Date.now()}-${FRASCOS_PARCIAIS_NOVOS.length}`, dosesUsadas: 0 },
+                                              ],
+                                            })}
+                                            className="inline-flex items-center gap-1 rounded-lg border border-amber-400 bg-white px-2.5 py-1.5 text-[9px] font-bold text-amber-700 hover:bg-amber-50 disabled:cursor-not-allowed disabled:opacity-40"
+                                          >
+                                            <PlusCircle size={13} /> Adicionar frasco parcial
+                                          </button>
+                                        </div>
+
+                                        {FRASCOS_PARCIAIS_NOVOS.length === 0 ? (
+                                          <p className="mt-3 text-center text-[9px] italic text-gray-400">Nenhum frasco parcial adicionado nesta vacinação.</p>
+                                        ) : (
+                                          <div className="mt-3 flex flex-col gap-1.5">
+                                            {FRASCOS_PARCIAIS_NOVOS.map((frasco: any, indice: number) => {
+                                              const dosesUsadas = Math.min(DOSES_POR_FRASCO, Math.max(0, frasco.dosesUsadas || 0));
+                                              return (
+                                                <div key={frasco.id} className="grid grid-cols-[1fr_70px_58px_24px] items-end gap-1.5 rounded-lg border border-amber-100 bg-white p-2">
+                                                  <div>
+                                                    <span className="block text-[9px] font-bold text-gray-700">Novo frasco parcial #{indice + 1}</span>
+                                                    <span className="block text-[8px] text-gray-400">Este saldo ficará disponível na próxima vacinação.</span>
+                                                  </div>
+                                                  <label className="text-center">
+                                                    <input
+                                                      type="number"
+                                                      min="0"
+                                                      max={DOSES_POR_FRASCO}
+                                                      value={dosesUsadas || ""}
+                                                      placeholder="0"
+                                                      onChange={(e) => atualizarMovimentacao({
+                                                        frascosParciaisNovos: FRASCOS_PARCIAIS_NOVOS.map((item: any) =>
+                                                          item.id === frasco.id
+                                                            ? { ...item, dosesUsadas: Math.min(DOSES_POR_FRASCO, Math.max(0, Number(e.target.value))) }
+                                                            : item,
+                                                        ),
+                                                      })}
+                                                      className="w-full rounded-md border border-amber-200 p-1 text-center text-xs font-black text-gray-800 focus:border-amber-500 focus:outline-none"
+                                                    />
+                                                    <span className="block text-[7px] text-gray-400 mt-0.5">Doses usadas</span>
+                                                  </label>
+                                                  <div className="text-center">
+                                                    <span className="block text-xs font-black text-blue-700">{DOSES_POR_FRASCO - dosesUsadas}</span>
+                                                    <span className="block text-[7px] text-gray-400">Sobraram</span>
+                                                  </div>
+                                                  <button
+                                                    type="button"
+                                                    onClick={() => atualizarMovimentacao({
+                                                      frascosParciaisNovos: FRASCOS_PARCIAIS_NOVOS.filter((item: any) => item.id !== frasco.id),
+                                                    })}
+                                                    className="mb-2 rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-500"
+                                                    title="Remover frasco parcial"
+                                                  >
+                                                    <Trash2 size={14} />
+                                                  </button>
+                                                </div>
+                                              );
+                                            })}
+                                          </div>
+                                        )}
+                                        </div>
+                                      </details>
+                                      </>}
+
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setEtapaOtimizarFrascos(0);
+                                          setLoteOtimizadoAberto(String(nfItem.id));
+                                        }}
+                                        className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg bg-[#1A7A3C] px-3 py-2 text-left text-white shadow-sm transition hover:bg-[#15612F]"
+                                      >
+                                        <span className="flex items-center gap-1.5 text-xs font-bold"><PillBottle size={15} />Distribuição por frasco</span>
+                                      </button>
+
+                                      {loteOtimizadoAberto === String(nfItem.id) && (
+                                        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/45 p-4">
+                                          <div className="relative flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+                                            <div className="relative flex justify-center border-b border-gray-100 px-6 py-5 text-center">
+                                              <div>
+                                                <h3 className="text-lg font-bold text-gray-900">Distribuição por frasco</h3>
+                                                <p className="mt-1 text-xs text-gray-500">Distribua a quantidade de vacinas utilizadas. Informe em ao menos uma modalidade de uso.</p>
+                                              </div>
+                                              <button type="button" onClick={() => setLoteOtimizadoAberto(null)} aria-label="Fechar distribuição por frasco" className="absolute right-6 top-5 rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700"><X size={20} /></button>
+                                            </div>
+
+                                            <div className="border-b border-gray-100 px-6 py-4">
+                                              <div className="grid grid-cols-1 overflow-hidden rounded-md border border-gray-200 bg-white text-[10px] text-gray-500 shadow-sm sm:grid-cols-4">
+                                                <div className="flex items-center justify-center gap-2 border-b border-gray-200 px-4 py-3 font-semibold text-gray-700 sm:border-b-0 sm:border-r">
+                                                  <PillBottle size={14} className="text-gray-400" />
+                                                  {nfItem.doenca || "Doença não informada"}
+                                                </div>
+                                                <div className="flex items-center justify-center border-b border-gray-200 px-4 py-3 sm:border-b-0 sm:border-r">Doses em estoque: <strong className="ml-1 text-[#1A7A3C]">{DOSES_DISPONIVEIS}</strong></div>
+                                                <div className="flex items-center justify-center border-b border-gray-200 px-4 py-3 sm:border-b-0 sm:border-r">Frascos fechados: <strong className="ml-1 text-gray-700">{FRASCOS_FECHADOS_ATUAIS}</strong></div>
+                                                <div className="flex items-center justify-center px-4 py-3">Frascos abertos: <strong className="ml-1 text-gray-700">{FRASCOS_ABERTOS_ATUAIS.length}</strong></div>
+                                              </div>
+                                            </div>
+
+                                            <div className="border-b border-gray-100 px-6 py-3">
+                                              <div className="grid grid-cols-3 gap-3">
+                                                {["Frascos abertos", "Uso completo", "Uso parcial"].map((titulo, indice) => (
+                                                  <button key={titulo} type="button" onClick={() => setEtapaOtimizarFrascos(indice)} className={`flex items-center gap-2 rounded-full px-3 py-2 text-left text-xs font-semibold transition ${etapaOtimizarFrascos === indice ? "bg-[#DCFCE7] text-[#168545]" : "text-gray-400 hover:bg-gray-50"}`}>
+                                                    <span className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] ${etapaOtimizarFrascos === indice ? "bg-[#1A7A3C] text-white" : "bg-gray-100 text-gray-500"}`}>{indice + 1}</span>
+                                                    <span className="hidden sm:inline">{titulo}</span>
+                                                  </button>
+                                                ))}
+                                              </div>
+                                            </div>
+
+                                            <div className="min-h-[300px] overflow-y-auto px-6 py-5">
+                                              {etapaOtimizarFrascos === 0 && (
+                                                <div className="flex flex-col gap-3">
+                                                  {FRASCOS_ABERTOS_ATUAIS.length === 0 ? <p className="rounded-lg bg-gray-50 p-4 text-center text-sm text-gray-500">Não há frascos abertos disponíveis.</p> : FRASCOS_ABERTOS_ATUAIS.map((frasco: any, indice: number) => {
+                                                    const dosesUsadas = Math.min(frasco.saldoDoses, USOS_FRASCOS_ABERTOS[frasco.id] || 0);
+                                                    return <div key={frasco.id} className="flex items-center justify-between rounded-xl border border-gray-200 p-3"><div><p className="text-sm font-semibold text-gray-800">Frasco aberto #{indice + 1}</p><p className="text-xs text-gray-500">{frasco.saldoDoses} doses disponíveis</p></div><Stepper value={dosesUsadas} max={frasco.saldoDoses} accentColor="#B45309" onChange={(value) => atualizarMovimentacao({ usosFrascosAbertos: { ...USOS_FRASCOS_ABERTOS, [frasco.id]: value } })} /></div>;
+                                                  })}
+                                                </div>
+                                              )}
+
+                                              {etapaOtimizarFrascos === 1 && (
+                                                <div className="flex flex-col gap-5"><div className="flex items-center justify-between rounded-xl border border-gray-200 p-4"><div><p className="text-sm font-semibold text-gray-800">Frascos fechados</p><p className="text-xs text-gray-500">Até {Math.max(FRASCOS_FECHADOS_ATUAIS - FRASCOS_PARCIAIS_NOVOS.length, 0)} disponíveis</p></div><Stepper value={FRASCOS_COMPLETOS_UTILIZADOS} max={Math.max(FRASCOS_FECHADOS_ATUAIS - FRASCOS_PARCIAIS_NOVOS.length, 0)} accentColor={GREEN} onChange={(value) => atualizarMovimentacao({ frascosCompletosUtilizados: value })} /></div></div>
+                                              )}
+
+                                              {etapaOtimizarFrascos === 2 && (
+                                                <div className="flex flex-col gap-3"><div className="flex justify-end"><button type="button" disabled={FRASCOS_COMPLETOS_UTILIZADOS + FRASCOS_PARCIAIS_NOVOS.length >= FRASCOS_FECHADOS_ATUAIS} onClick={() => atualizarMovimentacao({ frascosParciaisNovos: [...FRASCOS_PARCIAIS_NOVOS, { id: `${nfItem.id}-parcial-${Date.now()}-${FRASCOS_PARCIAIS_NOVOS.length}`, dosesUsadas: 0 }] })} className="shrink-0 rounded-md border border-[#1A7A3C] px-3 py-2 text-xs font-bold text-[#1A7A3C] hover:bg-green-50 disabled:cursor-not-allowed disabled:opacity-40"><PlusCircle size={14} className="mr-1 inline" />Adicionar</button></div>{FRASCOS_PARCIAIS_NOVOS.length === 0 ? <p className="rounded-lg bg-gray-50 p-4 text-center text-sm text-gray-500">Nenhum frasco parcial adicionado.</p> : FRASCOS_PARCIAIS_NOVOS.map((frasco: any, indice: number) => { const dosesUsadas = Math.min(DOSES_POR_FRASCO, Math.max(0, frasco.dosesUsadas || 0)); return <div key={frasco.id} className="flex items-center justify-between rounded-xl border border-gray-200 p-3"><div><p className="text-sm font-semibold text-gray-800">Frasco parcial #{indice + 1}</p><p className="text-xs text-gray-500">Restarão {DOSES_POR_FRASCO - dosesUsadas} doses</p></div><div className="flex items-center gap-2"><Stepper value={dosesUsadas} max={DOSES_POR_FRASCO} accentColor="#B45309" onChange={(value) => atualizarMovimentacao({ frascosParciaisNovos: FRASCOS_PARCIAIS_NOVOS.map((item: any) => item.id === frasco.id ? { ...item, dosesUsadas: value } : item) })} /><button type="button" onClick={() => atualizarMovimentacao({ frascosParciaisNovos: FRASCOS_PARCIAIS_NOVOS.filter((item: any) => item.id !== frasco.id) })} className="rounded-md p-2 text-gray-400 hover:bg-red-50 hover:text-red-500"><Trash2 size={16} /></button></div></div>; })}</div>
+                                              )}
+                                            </div>
+
+                                            <div className="border-t border-gray-100 px-6 py-4">
+                                              <div className="flex items-center justify-between gap-12">
+                                                <div className="min-w-0 flex-1">
+                                                <div className="mb-1.5 flex items-center justify-between text-xs"><span className="font-semibold text-gray-600">{nfItem.doenca ? `Doença: ${nfItem.doenca}` : "Selecionado para esta vacinação"}</span><span className="font-bold text-[#1A7A3C]">{DOSES_UTILIZADAS} de {DOSES_DISPONIVEIS} doses</span></div>
+                                                <div className="h-2 overflow-hidden rounded-full bg-gray-100"><div className="h-full rounded-full bg-[#1A7A3C] transition-all" style={{ width: `${DOSES_DISPONIVEIS ? Math.min((DOSES_UTILIZADAS / DOSES_DISPONIVEIS) * 100, 100) : 0}%` }} /></div>
+                                                <p className="mt-1 text-[10px] text-gray-400">{FRASCOS_COMPLETOS_UTILIZADOS + FRASCOS_PARCIAIS_NOVOS.length} frascos fechados selecionados</p>
+                                                </div>
+                                                <div className="flex shrink-0 gap-2"><button type="button" disabled={etapaOtimizarFrascos === 0} onClick={() => setEtapaOtimizarFrascos((etapa) => etapa - 1)} className="rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-600 disabled:opacity-40">Voltar</button>{etapaOtimizarFrascos < 2 ? <button type="button" onClick={() => setEtapaOtimizarFrascos((etapa) => etapa + 1)} className="rounded-md bg-[#1A7A3C] px-4 py-2 text-sm font-semibold text-white hover:bg-[#15612F]">Próximo</button> : <button type="button" onClick={() => setLoteOtimizadoAberto(null)} className="rounded-md bg-[#1A7A3C] px-4 py-2 text-sm font-semibold text-white hover:bg-[#15612F]">Concluir</button>}</div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      )}
+
+                                      {(DOSES_UTILIZADAS > 0 || FRASCOS_PARCIAIS_NOVOS.length > 0) && (
+                                        <div className="mt-3 rounded-xl border border-gray-200 bg-gray-50 p-3">
+                                          <div className="flex items-start gap-2">
+                                            <Info size={14} className="text-gray-500 mt-0.5 shrink-0" />
+                                            <div className="flex-1">
+                                              <p className="text-[10px] font-bold text-gray-700">Relação de frascos</p>
+                                              <p className="text-[9px] text-gray-500 mt-0.5">Foram registradas {DOSES_UTILIZADAS} doses utilizadas, tendo a seguinte distribuição:</p>
+                                              <div className="grid grid-cols-2 gap-1.5 mt-2">
+                                                <div className="rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-center">
+                                                  <span className="block text-sm font-black text-gray-700">{FRASCOS_FECHADOS_APOS}</span>
+                                                  <span className="block text-[8px] font-semibold text-gray-500">Fechados</span>
+                                                </div>
+                                                <div className="rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-center">
+                                                  <span className="block text-sm font-black text-gray-700">{FRASCOS_ABERTOS_APOS}</span>
+                                                  <span className="block text-[8px] font-semibold text-gray-500">Abertos</span>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      )}
+
+                                      <div className="mt-4 flex flex-wrap gap-2 border-t border-gray-100 pt-3 text-[10px]">
+                                        {dadosGrafico.map((item) => (
+                                          <span key={item.name} className="inline-flex items-center gap-1 rounded-md border border-gray-100 bg-gray-50 px-2 py-1 font-semibold text-gray-500">
+                                            <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: item.color }} />
+                                            {item.name}: <strong className="text-gray-700">{item.value}</strong>
+                                          </span>
                                         ))}
                                       </div>
                                     </div>
@@ -1241,6 +1639,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
         data={lotesFiltradosModal}
         searchKeys={["nome", "partida", "doenca", "tipoVacina", "fornecedor", "uf"]}
         searchPlaceholder="Busque por lote ou doença."
+        showResultsOnOpen
         columns={[
           { label: "Lote/ Nº de Partida", key: "nome" },
           { label: "Vacina", key: "doencaComTipo" },

@@ -32,7 +32,7 @@ export function DashboardAdmin({
 			<main className="mx-auto max-w-5xl px-4 py-6 md:px-6">
 				<div className="mb-6">
 					<h1 className="text-2xl font-semibold text-gray-900">
-						Bem-vindo, {user?.name ?? "administrador"}
+						Bem-vindo, {user?.name ?? "funcionário do IMA"}
 					</h1>
 					<p className="mt-1 text-sm text-gray-600">
 						Acesse seus dados de perfil e gerencie as funcionalidades do sistema.
@@ -58,7 +58,7 @@ export function DashboardAdmin({
 								items={[
 									{
 										id: "administrador-sistema",
-										title: "Administrador do Sistema",
+										title: "Funcionário do IMA",
 										icon: <ShieldCheck size={19} />,
 										details: [
 											{ id: "papel", label: "Papel", value: "Administrativo" },
@@ -83,7 +83,7 @@ export function DashboardAdmin({
 					) : (
 						<section
 							className="w-full rounded-xl border border-green-100 bg-white p-6 text-sm text-gray-500 shadow-sm"
-							aria-label="Perfil do administrador"
+							aria-label="Perfil do funcionário do IMA"
 						>
 							Não foi possível localizar o perfil vinculado a este acesso.
 						</section>

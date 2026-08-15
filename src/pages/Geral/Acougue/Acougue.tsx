@@ -71,7 +71,12 @@ const DADOS_MOCK: Acougue[] = [
   },
 ];
 
-export function AcouguePage({ onLogout, onNavigate }: { onLogout: () => void; onNavigate: (s: string, d?: any) => void; }) {
+export function AcouguePage({ onLogout, onNavigate, localPesagem = false, estabelecimentoGenerico = false }: { onLogout: () => void; onNavigate: (s: string, d?: any) => void; localPesagem?: boolean; estabelecimentoGenerico?: boolean }) {
+  const nomeCadastro = estabelecimentoGenerico ? "Estabelecimento Genérico" : localPesagem ? "Local de Pesagem" : "Açougue";
+  const rota = estabelecimentoGenerico ? "estabelecimento-generico" : localPesagem ? "local-pesagem" : "acougue";
+  const rotaAdicionar = estabelecimentoGenerico ? "adicionar-estabelecimento-generico" : localPesagem ? "adicionar-local-pesagem" : "adicionar-acougue";
+  const rotaVisualizar = estabelecimentoGenerico ? "visualizar-estabelecimento-generico" : localPesagem ? "visualizar-local-pesagem" : "visualizar-acougue";
+  const rotaEditar = estabelecimentoGenerico ? "editar-estabelecimento-generico" : localPesagem ? "editar-local-pesagem" : "editar-acougue";
   const [busca, setBusca] = useState("");
   const [tipoPessoa, setTipoPessoa] = useState("Pessoa física");
   const [proprietario, setProprietario] = useState<ProprietarioEntidade | null>(null);
@@ -106,15 +111,15 @@ export function AcouguePage({ onLogout, onNavigate }: { onLogout: () => void; on
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
-      <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="acougue" hideSearch />
+      <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen={rota} hideSearch />
       <main className="max-w-[1300px] mx-auto px-6 py-6">
         <div className="mb-6">
           <button onClick={() => onNavigate("dashboard")} className="flex items-center gap-1 text-sm text-[#1A7A3C] font-semibold mb-3 hover:opacity-70">
             <ArrowLeft size={15} /> Inicial
           </button>
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-semibold text-gray-900">Açougue</h1>
-            <button onClick={() => onNavigate("adicionar-acougue")} className="px-5 py-3 rounded-md bg-[#1A7A3C] text-white text-sm font-semibold hover:opacity-90">
+            <h1 className="text-2xl font-semibold text-gray-900">{nomeCadastro}</h1>
+            <button onClick={() => onNavigate(rotaAdicionar)} className="px-5 py-3 rounded-md bg-[#1A7A3C] text-white text-sm font-semibold hover:opacity-90">
               Adicionar Novo
             </button>
           </div>
@@ -125,7 +130,7 @@ export function AcouguePage({ onLogout, onNavigate }: { onLogout: () => void; on
             <div className="flex-1 border border-gray-300 rounded-md px-3 h-12 flex items-center bg-white">
               <input
                 type="text"
-                placeholder="Código ou Nome do Açougue"
+                placeholder={localPesagem || estabelecimentoGenerico ? `Nome do ${nomeCadastro}` : `Código ou Nome do ${nomeCadastro}`}
                 value={busca}
                 onChange={(e) => setBusca(e.target.value)}
                 className="w-full h-full text-sm outline-none"
@@ -160,7 +165,7 @@ export function AcouguePage({ onLogout, onNavigate }: { onLogout: () => void; on
               <table className="w-full text-sm text-left">
                 <thead className="text-gray-600 uppercase border-b border-gray-100">
                   <tr>
-                    <th className="px-4 py-3">Código</th>
+                    {!localPesagem && !estabelecimentoGenerico && <th className="px-4 py-3">Código</th>}
                     <th className="px-4 py-3">Nome</th>
                     <th className="px-4 py-3">Proprietários</th>
                     <th className="px-4 py-3">Município - UF</th>
@@ -171,16 +176,16 @@ export function AcouguePage({ onLogout, onNavigate }: { onLogout: () => void; on
                 <tbody>
                   {filtrados.map((r) => (
                     <tr key={r.id} className="border-t border-gray-100 hover:bg-gray-50">
-                      <td className="px-4 py-3 text-gray-600">{r.codigo}</td>
+                      {!localPesagem && !estabelecimentoGenerico && <td className="px-4 py-3 text-gray-600">{r.codigo}</td>}
                       <td className="px-4 py-3 text-gray-600">{r.nome}</td>
                       <td className="px-4 py-3 text-gray-600">{r.proprietarios.join(", ")}</td>
                       <td className="px-4 py-3 text-gray-600">{r.municipio} - {r.uf}</td>
                       <td className="px-4 py-3 text-gray-600">{r.situacao}</td>
                       <td className="px-4 py-3 text-right">
-                        <button onClick={() => onNavigate("visualizar-acougue", r)} className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md">
+                        <button onClick={() => onNavigate(rotaVisualizar, r)} className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md">
                           <ViewIcon size={18} />
                         </button>
-                        <button onClick={() => onNavigate("editar-acougue", r)} className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md">
+                        <button onClick={() => onNavigate(rotaEditar, r)} className="p-2 text-[#1A7A3C] hover:bg-green-50 rounded-md">
                           <Pencil size={18} />
                         </button>
                       </td>

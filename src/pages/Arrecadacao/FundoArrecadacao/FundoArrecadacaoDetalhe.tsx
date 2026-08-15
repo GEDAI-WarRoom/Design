@@ -51,7 +51,7 @@ import {
 } from "./fundoArrecadacaoData";
 
 type Mode = "add" | "edit" | "view";
-type FundoDraft = Omit<FundoArrecadacao, "id" | "nome">;
+type FundoDraft = Omit<FundoArrecadacao, "id">;
 type ConvenioMode = "add" | "edit" | "view";
 
 // Altere ou verifique em seu arquivo "fundoArrecadacaoData.ts":
@@ -150,6 +150,7 @@ function SuccessModal({ title, message, onBack, onView }: { title: string; messa
 }
 
 const newDraft = (): FundoDraft => ({
+  nome: "",
   pessoaJuridica: null as unknown as PessoaJuridicaFundo,
   tipo: "" as TipoFundo,
   endereco: emptyEndereco(),
@@ -217,6 +218,17 @@ function BasicData({ mode, fundo, setFundo, onNavigate }: { mode: Mode; fundo: F
     <div className="flex flex-col gap-4">
       <Section title="Informações Básicas">
         <div className="grid grid-cols-1 items-end gap-4 md:grid-cols-12">
+
+          <div className="md:col-span-12">
+            <FloatInput
+              label="Nome do Fundo de Arrecadação"
+              required
+              value={fundo.nome ?? ""}
+              onChange={(value) => update("nome", value)}
+              maxLength={150}
+              disabled={disabled}
+            />
+          </div>
 
           {/* Bloco da Pessoa Jurídica (Se for "add" usa o componente de busca, se não exibe o input travado) */}
           <div className="md:col-span-12">
@@ -677,7 +689,7 @@ function FundoArrecadacaoDetailPage({ mode, dados, onLogout, onNavigate }: PageP
     const contactValid = fundo.contatos.utilizarContatoProprietario === "Sim"
       ? fundo.contatos.proprietariosSelecionados.length > 0
       : Boolean(fundo.contatos.emailFixo && fundo.contatos.telefoneFixo);
-    return Boolean(fundo.pessoaJuridica && fundo.tipo && locationValid && contactValid && fundo.anexos.every((item) => item.nome));
+    return Boolean((fundo.nome ?? "").trim() && fundo.pessoaJuridica && fundo.tipo && locationValid && contactValid && fundo.anexos.every((item) => item.nome));
   }, [fundo]);
 
   const saveFundo = () => {
@@ -685,7 +697,7 @@ function FundoArrecadacaoDetailPage({ mode, dados, onLogout, onNavigate }: PageP
       const dadosCadastro = valid
         ? fundo as FundoDraft
         : (() => {
-          const { id: _id, nome: _nome, ...exemplo } = cloneFundo(FUNDOS_ARRECADACAO_MOCK[0]);
+          const { id: _id, ...exemplo } = cloneFundo(FUNDOS_ARRECADACAO_MOCK[0]);
           return exemplo;
         })();
       const saved = adicionarFundo(dadosCadastro);

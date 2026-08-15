@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import React, { useState } from "react";
 import { Navbar } from "../../../components/Navbar";
+import * as Icons from "../../../imports/icons";
 import {
   CheckboxGroup,
   FloatInput,
@@ -17,6 +18,7 @@ import {
   MultiSearchModal,
 } from "../../../components/ui/FormKit";
 import { listarEspecies, type Especie } from "../../Animal/Especie/especieData";
+import { listarPapeis, type Papel } from "../../Controle/Papeis/papeisData";
 import {
   salvarFinalidadeTransito,
   type FinalidadeTransitoVisual,
@@ -100,8 +102,6 @@ function SubGrupo({
 }
 
 const toOptions = (arr: string[]) => arr.map((v) => ({ value: v, label: v }));
-const uid = (p: string) =>
-  `${p}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 
 // --- pagina (adicionar finalidade de transito) ---
 interface PageProps {
@@ -121,7 +121,9 @@ export function AdicionarFinalidadeTransitoPage({
   const [emiteAcessoExterno, setEmiteAcessoExterno] = useState<string[]>([]);
   const [tiposDestino, setTiposDestino] = useState<string[]>([]);
   const [especies, setEspecies] = useState<Especie[]>([]);
+  const [papeis, setPapeis] = useState<Papel[]>([]);
   const [modalEspecieAberto, setModalEspecieAberto] = useState(false);
+  const [modalPapelAberto, setModalPapelAberto] = useState(false);
 
   // --- procedencia/especie (RNE001 para zero ou mais instâncias) ---
   const [procedencias, setProcedencias] = useState<any[]>([]);
@@ -142,18 +144,16 @@ export function AdicionarFinalidadeTransitoPage({
   };
 
   const salvar = () => {
-    if (!descricao.trim()) return;
-    const especiesSelecionadas = especies.length
-      ? especies
-      : listarEspecies().filter((item) => item.situacao === "Ativo").slice(0, 1);
+    const papelIds = papeis.map((papel) => papel.id);
     const salvo = salvarFinalidadeTransito({
-      finalidade: finalidadeTransito.trim() || "Abate",
+      finalidade: finalidadeTransito.trim(),
       descricao: descricao.trim(),
-      codigoMapa: codigoMapa || "01",
-      tiposProcedencia: tiposProcedencia.length ? tiposProcedencia : ["Estabelecimento Agropecuário"],
+      codigoMapa,
+      tiposProcedencia,
       emiteAcessoExterno,
-      tiposDestino: tiposDestino.length ? tiposDestino : ["Abatedouro Frigorífico"],
-      especieIds: especiesSelecionadas.map((item) => item.id),
+      tiposDestino,
+      especieIds: especies.map((item) => item.id),
+      papelIds,
       procedencias,
       situacao: "Ativo",
     });
@@ -238,7 +238,7 @@ export function AdicionarFinalidadeTransitoPage({
         </Section>
 
         {/* --- [2] especies aplicaveis --- */}
-        <Section title="Espécies aplicáveis">
+        <Section title="Espécies Aplicáveis">
           <div className="pt-5 flex flex-col gap-4">
             {/* Estrutura unificada: Título e Botão lado a lado na mesma linha */}
             <div className="w-full border border-gray-200 rounded-xl bg-[#f9fafb]/50 overflow-hidden mt-2">
@@ -331,6 +331,41 @@ export function AdicionarFinalidadeTransitoPage({
           </div>
         </Section>
 
+        <Section title="Papéis Aplicáveis">
+          <div className="pt-5 flex flex-col gap-4">
+            <div className="w-full border border-gray-200 rounded-xl bg-[#f9fafb]/50 overflow-hidden mt-2">
+              <div className="flex items-center justify-between px-5 py-3 border-b border-gray-200 bg-white gap-4">
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-semibold text-gray-500">Papéis Selecionados <span className="text-red-500 ml-0.5">*</span></span>
+                  {papeis.length > 0 && <span className="text-xs font-bold bg-[#E6F4EA] text-[#1A7A3C] px-2.5 py-1 rounded-full">{papeis.length} {papeis.length === 1 ? "Selecionado" : "Selecionados"}</span>}
+                </div>
+                <button type="button" onClick={() => setModalPapelAberto(true)} className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-md border border-[#1A7A3C] text-[#1A7A3C] hover:bg-green-50 transition cursor-pointer"><PlusCircle size={14} />Adicionar Papel</button>
+              </div>
+              <div className="p-5 flex flex-wrap gap-4 bg-white">
+                {papeis.length === 0 ? <p className="text-xs text-gray-400 italic">Nenhum papel selecionado.</p> : papeis.map((papel) => (
+                  <div key={papel.id} className="flex flex-col bg-white border border-gray-200 rounded-xl p-2.5 min-w-[180px] shadow-sm transition hover:border-gray-300 relative group">
+                    <div className="flex items-center justify-between gap-4 w-full"><span className="text-sm font-bold" style={{ color: GREEN }}>{papel.nome}</span><button type="button" onClick={() => setPapeis((items) => items.filter((item) => item.id !== papel.id))} className="text-gray-400 hover:text-red-500 transition-colors p-0.5 rounded-md hover:bg-gray-50 cursor-pointer"><X size={16} /></button></div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <MultiSearchModal
+              open={modalPapelAberto}
+              onClose={() => setModalPapelAberto(false)}
+              title="Buscar Papéis"
+              subtitle="Busque por um ou mais papéis cadastrados no sistema:"
+              icon={<img src={Icons.iconePapeisUrl} alt="" className="h-[18px] w-[18px] object-contain" />}
+              data={listarPapeis()}
+              columns={[{ label: "Nome do Papel", key: "nome" }, { label: "Tipo", key: "tipo" }]}
+              searchKeys={["nome", "tipo"]}
+              searchPlaceholder="Busque pelo nome do papel."
+              selectedItems={papeis}
+              confirmLabel="Salvar Selecionados"
+              onConfirm={(selecionados) => { setPapeis(selecionados); setModalPapelAberto(false); }}
+            />
+          </div>
+        </Section>
+
         {/* --- OPÇÃO 1: Alterando a proporção ou estrutura da Grid --- */}
         <Section title="Informações de Procedência">
           <div className="pt-5 flex flex-col gap-5 w-full">
@@ -346,20 +381,6 @@ export function AdicionarFinalidadeTransitoPage({
                 defaultValue={tiposProcedencia}
                 onChange={setTiposProcedencia}
               />
-
-              {tiposProcedencia.includes("Estabelecimento Agropecuário") && (
-                <div className="w-full">
-                  <CheckboxGroup
-                    title="Emite GTA por Acesso Externo"
-                    options={EMITE_GTA_ACESSO_EXTERNO.map((item) => ({
-                      value: item,
-                      label: item,
-                    }))}
-                    defaultValue={emiteAcessoExterno}
-                    onChange={setEmiteAcessoExterno}
-                  />
-                </div>
-              )}
             </div>
           </div>
         </Section>

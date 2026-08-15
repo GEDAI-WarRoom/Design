@@ -248,6 +248,10 @@ import { VisualizarAutorizacaoVacinacaoPage } from "./pages/Vacinacao/Autorizaca
 import { EditarAutorizacaoVacinacaoPage } from "./pages/Vacinacao/AutorizacaoVacinacao/EditarAutorizacaoVacinacao";
 import { VisualizarDoencaPage } from "./pages/Vacinacao/Doenca/VisualizarDoenca";
 import { EditarDoencaPage } from "./pages/Vacinacao/Doenca/EditarDoenca";
+import { AdicionarTipoVacinaPage } from "./pages/Vacinacao/TipoVacina/AdicionarTipoVacina";
+import { EditarTipoVacinaPage } from "./pages/Vacinacao/TipoVacina/EditarTipoVacina";
+import { TipoVacinaPage } from "./pages/Vacinacao/TipoVacina/TipoVacina";
+import { VisualizarTipoVacinaPage } from "./pages/Vacinacao/TipoVacina/VisualizarTipoVacina";
 import { VisualizarVacinadorPage } from "./pages/Vacinacao/Vacinador/VisualizarVacinador";
 import { EditarVacinadorPage } from "./pages/Vacinacao/Vacinador/EditarVacinador";
 
@@ -467,6 +471,10 @@ export type Screen =
   | "adicionar-autorizacao-vacinacao"
   | "doenca"
   | "adicionar-doenca"
+  | "tipo-vacina"
+  | "adicionar-tipo-vacina"
+  | "visualizar-tipo-vacina"
+  | "editar-tipo-vacina"
   | "tipo-insumo-exame"
   | "adicionar-tipo-insumo-exame"
   | "visualizar-tipo-insumo-exame"
@@ -619,6 +627,14 @@ export type Screen =
   | "visualizar-indice"
   | "acougue"
   | "adicionar-acougue"
+  | "local-pesagem"
+  | "adicionar-local-pesagem"
+  | "editar-local-pesagem"
+  | "visualizar-local-pesagem"
+  | "estabelecimento-generico"
+  | "adicionar-estabelecimento-generico"
+  | "editar-estabelecimento-generico"
+  | "visualizar-estabelecimento-generico"
   | "evento-pecuario"
   | "adicionar-evento-pecuario"
   | "visualizar-evento-pecuario"
@@ -837,6 +853,14 @@ export type Screen =
 	| "adicionar-acougue"
 	| "editar-acougue"
 	| "visualizar-acougue"
+	| "local-pesagem"
+	| "adicionar-local-pesagem"
+	| "editar-local-pesagem"
+	| "visualizar-local-pesagem"
+	| "estabelecimento-generico"
+	| "adicionar-estabelecimento-generico"
+	| "editar-estabelecimento-generico"
+	| "visualizar-estabelecimento-generico"
 	| "editar-aeroporto-porto"
   | "visualizar-aeroporto-porto";
 
@@ -926,6 +950,10 @@ export default function App() {
       return <VisualizarDoencaPage key={`visualizar-doenca-${screenData?.id ?? "novo"}`} dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "editar-doenca":
       return <EditarDoencaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-tipo-vacina":
+      return <VisualizarTipoVacinaPage key={`visualizar-tipo-vacina-${screenData?.id ?? "novo"}`} dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-tipo-vacina":
+      return <EditarTipoVacinaPage key={`editar-tipo-vacina-${screenData?.id ?? "novo"}`} dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "visualizar-vacinador-brucelose":
       return <VisualizarVacinadorPage key={`visualizar-vacinador-brucelose-${screenData?.id ?? "novo"}`} dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "editar-vacinador-brucelose":
@@ -1111,6 +1139,22 @@ export default function App() {
           onNavigate={handleNavigate}
         />
       );
+    case "local-pesagem":
+      return <AcouguePage onLogout={handleLogout} onNavigate={handleNavigate} localPesagem />;
+    case "adicionar-local-pesagem":
+      return <AdicionarAcouguePage onLogout={handleLogout} onNavigate={handleNavigate} localPesagem />;
+    case "editar-local-pesagem":
+      return <EditarAcouguePage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} localPesagem />;
+    case "visualizar-local-pesagem":
+      return <VisualizarAcouguePage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} localPesagem />;
+    case "estabelecimento-generico":
+      return <AcouguePage onLogout={handleLogout} onNavigate={handleNavigate} estabelecimentoGenerico />;
+    case "adicionar-estabelecimento-generico":
+      return <AdicionarAcouguePage onLogout={handleLogout} onNavigate={handleNavigate} estabelecimentoGenerico />;
+    case "editar-estabelecimento-generico":
+      return <EditarAcouguePage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} estabelecimentoGenerico />;
+    case "visualizar-estabelecimento-generico":
+      return <VisualizarAcouguePage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} estabelecimentoGenerico />;
     case "emissao-ata":
       return <EmissaoATAPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-emissao-ata":
@@ -1327,6 +1371,7 @@ export default function App() {
 		case "adicionar-etapa-vacinacao":
 			return (
 				<AdicionarEtapaVacinacaoPage
+					dados={screenData}
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
 				/>
@@ -1368,6 +1413,10 @@ export default function App() {
 					onNavigate={handleNavigate}
 				/>
 			);
+		case "tipo-vacina":
+			return <TipoVacinaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+		case "adicionar-tipo-vacina":
+			return <AdicionarTipoVacinaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 		case "tipo-insumo-exame":
 			return (
 				<TipoInsumoExamePage

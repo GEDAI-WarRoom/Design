@@ -204,7 +204,7 @@ export function LaboratorioPage({ onLogout, onNavigate }: PageProps) {
         {/* 📦 CONTAINER ÚNICO BRANCO */}
         <div className="bg-white rounded-xl shadow-sm p-6 mt-5 overflow-hidden">
           
-          {/* Nome do laboratório + barra principal */}
+          {/* Nome Comercial do Laboratório + barra principal */}
           <div className="flex gap-3 items-stretch w-full">
             <div className={`flex-1 bg-white border rounded-md px-3 h-12 transition-all relative flex items-end pb-1.5 ${
               erroValidacao && !algumFiltroPreenchido
@@ -212,7 +212,7 @@ export function LaboratorioPage({ onLogout, onNavigate }: PageProps) {
                 : "border-gray-200 focus-within:border-[#1A7A3C] focus-within:ring-1 focus-within:ring-[#1A7A3C]"
             }`}>
               <label className={`absolute left-3 transition-all duration-200 pointer-events-none ${focusBusca || busca ? "top-1 text-[10px] text-gray-400 font-medium" : "top-1/2 -translate-y-1/2 text-sm text-gray-400"}`}>
-                Nome do laboratório
+                Nome Comercial do Laboratório
               </label>
               <div className="flex items-center w-full">
                 <input
@@ -241,12 +241,12 @@ export function LaboratorioPage({ onLogout, onNavigate }: PageProps) {
     {/* Grid fixo de 4 colunas no Desktop */}
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-end">
       
-      {/* 1. Produtor (Sempre coluna 1) */}
+      {/* 1. Proprietário (Sempre coluna 1) */}
       <div className="w-full">
         <FloatInput
-          label="Produtor"
+          label="Proprietário"
           value={produtor ? produtor.nome : ""} 
-          icon={<img src={Icons.iconeProdutorUrl} alt="Produtor" className="w-5 h-5 object-contain" />} 
+          icon={<img src={Icons.iconeProdutorUrl} alt="Proprietário" className="w-5 h-5 object-contain" />}
           onClick={() => setModalProdutor(true)}
           readOnly
         />            
@@ -311,7 +311,7 @@ export function LaboratorioPage({ onLogout, onNavigate }: PageProps) {
               {produtor && <Chip label={`Proprietário: ${produtor.nome}`} onRemove={() => setProdutor(null)} />}
               {estado && <Chip label={`Estado: ${estado}`} onRemove={() => { setEstado(""); setMunicipio(""); }} />}
               {municipio && <Chip label={`Município: ${municipio}`} onRemove={() => setMunicipio("")} />}
-              {atuacao.map((a) => <Chip key={a} label={a} onRemove={() => setAtuacao((prev) => prev.filter((x) => x !== a))} />)}
+              {atuacao.map((a) => <Chip key={a} label={`Atuação: ${a}`} onRemove={() => setAtuacao((prev) => prev.filter((x) => x !== a))} />)}
               {situacao && <Chip label={`Situação: ${situacao}`} onRemove={() => setSituacao("")} />}
             </div>
           )}
@@ -389,7 +389,7 @@ export function LaboratorioPage({ onLogout, onNavigate }: PageProps) {
         </div>
       </main>
 
-      {/* Modal do Produtor */}
+      {/* Modal do Proprietário */}
       <SearchModal<ProdutorEntidade>
         open={modalProdutor}
         onClose={() => {
@@ -398,7 +398,7 @@ export function LaboratorioPage({ onLogout, onNavigate }: PageProps) {
         }}
         title="Buscar Proprietário"
         subtitle="Busque por um proprietário cadastrado no sistema:"
-        icon={<img src={Icons.iconeProdutorUrl} alt="Produtor" className="w-8 h-8 object-contain" />} 
+        icon={<img src={Icons.iconeProdutorUrl} alt="Proprietário" className="w-8 h-8 object-contain" />}
         data={databaseFiltrada}
         columns={colunasModal}
         searchKeys={["nome", "documento"]}

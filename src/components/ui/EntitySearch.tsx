@@ -1624,7 +1624,7 @@ interface EnderecoState {
 }
 
 interface BlocoEnderecoFieldsProps {
-	title: string;
+	title: React.ReactNode;
 	data: EnderecoState;
 	tipoEstado: "travado" | "normal";
 	onChange: (key: keyof EnderecoState, value: string) => void;
@@ -2483,7 +2483,8 @@ export function BlocoContatoFields({
 // SELECT CHIP
 
 interface SelectedChipsContainerProps {
-	title: string;
+	title: React.ReactNode;
+	action?: React.ReactNode;
 	// 💡 Estendemos o item para opcionalmente receber uma lista de sub-itens (como faixas etárias)
 	items: Array<{
 		id: string | number;
@@ -2496,6 +2497,7 @@ interface SelectedChipsContainerProps {
 
 export function SelectedChipsContainer({
 	title,
+	action,
 	items,
 	onRemoveItem,
 	emptyText = "Nenhum item selecionado.",
@@ -2503,13 +2505,16 @@ export function SelectedChipsContainer({
 	return (
 		<div className="w-full border border-gray-200 rounded-xl bg-[#f9fafb]/50 overflow-hidden">
 			{/* Header do Box */}
-			<div className="flex items-center justify-between px-5 py-3 border-b border-gray-200 bg-white">
+			<div className="flex items-center justify-between gap-3 px-5 py-3 border-b border-gray-200 bg-white">
 				<span className="text-sm font-semibold text-gray-500">{title}</span>
-				{items.length > 0 && (
-					<span className="text-xs font-bold bg-[#E6F4EA] text-[#1A7A3C] px-2.5 py-1 rounded-full">
-						{items.length} {items.length === 1 ? "Selecionada" : "Selecionadas"}
-					</span>
-				)}
+				<div className="flex items-center gap-3">
+					{items.length > 0 && (
+						<span className="text-xs font-bold bg-[#E6F4EA] text-[#1A7A3C] px-2.5 py-1 rounded-full">
+							{items.length} {items.length === 1 ? "Selecionada" : "Selecionadas"}
+						</span>
+					)}
+					{action}
+				</div>
 			</div>
 
 			{/* Conteúdo / Grid dos Chips */}

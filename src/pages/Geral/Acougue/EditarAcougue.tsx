@@ -20,7 +20,11 @@ function Section({ title, children, defaultOpen = true }: { title: string; child
   );
 }
 
-export function EditarAcouguePage({ dados, onLogout, onNavigate }: { dados?: any; onLogout: () => void; onNavigate: (screen: string, data?: any) => void; }) {
+export function EditarAcouguePage({ dados, onLogout, onNavigate, localPesagem = false, estabelecimentoGenerico = false }: { dados?: any; onLogout: () => void; onNavigate: (screen: string, data?: any) => void; localPesagem?: boolean; estabelecimentoGenerico?: boolean }) {
+  const nomeCadastro = estabelecimentoGenerico ? "Estabelecimento Genérico" : localPesagem ? "Local de Pesagem" : "Açougue";
+  const nomeCadastros = estabelecimentoGenerico ? "Estabelecimentos Genéricos" : localPesagem ? "Locais de Pesagem" : "Açougues";
+  const rota = estabelecimentoGenerico ? "estabelecimento-generico" : localPesagem ? "local-pesagem" : "acougue";
+  const rotaVisualizar = estabelecimentoGenerico ? "visualizar-estabelecimento-generico" : localPesagem ? "visualizar-local-pesagem" : "visualizar-acougue";
   const [isSucesso, setIsSucesso] = useState(false);
 
   // Populando os estados com os dados recebidos da listagem
@@ -65,15 +69,15 @@ export function EditarAcouguePage({ dados, onLogout, onNavigate }: { dados?: any
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
-      <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="acougue" hideSearch />
+      <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen={rota} hideSearch />
       <main className="max-w-[1088px] mx-auto px-4 md:px-6 py-6 flex flex-col gap-4">
 
         <div>
-          <button type="button" onClick={() => onNavigate("acougue")} className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70 font-semibold" style={{ color: GREEN }}>
-            <ArrowLeft size={15} /> Todos os Açougues
+          <button type="button" onClick={() => onNavigate(rota)} className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70 font-semibold" style={{ color: GREEN }}>
+            <ArrowLeft size={15} /> Todos os {nomeCadastros}
           </button>
           <div className="flex justify-between items-center w-full">
-            <h1 className="text-2xl font-semibold text-gray-900">Editar Açougue</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">Editar {nomeCadastro}</h1>
             <button type="button" onClick={handleSalvar} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm">
               Salvar
             </button>
@@ -92,7 +96,7 @@ export function EditarAcouguePage({ dados, onLogout, onNavigate }: { dados?: any
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <FloatInput label="Código" value={dados?.codigo || "ACQ-001"} disabled onChange={() => { }} />
             <FloatInput
-              label="Nome Comercial do Açougue" required value={nomeComercial} onChange={setNomeComercial} maxLength={255}
+              label={`Nome Comercial do ${nomeCadastro}`} required value={nomeComercial} onChange={setNomeComercial} maxLength={255}
             />
           </div>
         </Section>
@@ -214,10 +218,10 @@ export function EditarAcouguePage({ dados, onLogout, onNavigate }: { dados?: any
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center animate-fadeIn">
 
             <h3 className="text-lg font-bold text-gray-900">Alterações salvas!</h3>
-            <p className="text-sm text-gray-500 mt-1">O {tipoLocal || "Açougue"} "{nomeComercial}" foi atualizado.</p>
+            <p className="text-sm text-gray-500 mt-1">O {tipoLocal || nomeCadastro} "{nomeComercial}" foi atualizado.</p>
             <div className="flex gap-3 justify-center mt-6">
-              <button onClick={() => { setIsSucesso(false); onNavigate("acougue"); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50 transition">Voltar</button>
-              <button onClick={() => { setIsSucesso(false); onNavigate("visualizar-acougue", dados); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
+              <button onClick={() => { setIsSucesso(false); onNavigate(rota); }} className="px-5 h-11 rounded-md border border-[#1A7A3C] text-[#1A7A3C] text-sm font-semibold hover:bg-green-50 transition">Voltar</button>
+              <button onClick={() => { setIsSucesso(false); onNavigate(rotaVisualizar, dados); }} className="px-5 h-11 rounded-md bg-[#1A7A3C] hover:bg-[#15612F] text-white text-sm font-semibold transition">Visualizar</button>
             </div>
           </div>
         </div>

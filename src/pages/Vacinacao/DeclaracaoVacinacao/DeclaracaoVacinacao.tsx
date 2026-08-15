@@ -7,7 +7,8 @@ import {
   Pencil,
   X,
   Dna,
-  Calendar
+  Calendar,
+  Syringe,
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatSelect, FloatCombobox, FloatInput, SearchModal } from "../../../components/ui/FormKit";
@@ -129,6 +130,19 @@ const DOENCAS_MOCK = [
   { id: 3, nome: "Raiva" },
 ];
 
+const ETAPAS_VACINACAO_MOCK = [
+  { id: 1, codigo: "2026/01", nome: "Campanha de Brucelose 2026", doenca: "Brucelose" },
+  { id: 2, codigo: "2026/02", nome: "Campanha de Febre Aftosa 2026", doenca: "Febre Aftosa" },
+  { id: 3, codigo: "2026/03", nome: "Campanha de Raiva 2026", doenca: "Raiva" },
+];
+
+const TIPOS_VACINACAO = [
+  { value: "Vacina Oficial", label: "Vacina Oficial" },
+  { value: "Vacina Complementar", label: "Vacina Complementar" },
+  { value: "Primeira Dose", label: "Primeira Dose" },
+  { value: "Dose de Reforço", label: "Dose de Reforço" },
+];
+
 const MUNICIPIOS_MG = [
   "Abadia dos Dourados", "Abaeté", "Belo Horizonte", "Campo Belo", "Carrancas",
   "Divino", "Esmeraldas", "Lavras", "Oliveira", "Varginha",
@@ -151,6 +165,8 @@ interface DeclaracaoVacinacao {
   municipio: string;
   especie: string;
   doenca: string;
+  etapaVacinacao: string;
+  tipoVacinacao: string;
   dataVacinacao: string; // ISO AAAA-MM-DD
   situacao: "Ativo" | "Cancelada";
 }
@@ -159,17 +175,17 @@ const DECLARACOES_MOCK: DeclaracaoVacinacao[] = [
   {
     id: 1, produtorNome: "José Aarão Neto", produtorDoc: "555.009.956-40",
     estabCodigo: "31234567891", estabNome: "Fazenda do Rio", municipio: "Lavras",
-    especie: "Bovino", doenca: "Brucelose", dataVacinacao: "2026-02-01", situacao: "Ativo",
+    especie: "Bovino", doenca: "Brucelose", etapaVacinacao: "Campanha de Brucelose 2026", tipoVacinacao: "Vacina Oficial", dataVacinacao: "2026-02-01", situacao: "Ativo",
   },
   {
     id: 2, produtorNome: "Divino de Souza Sobrinho", produtorDoc: "444.009.956-40",
     estabCodigo: "31001040005", estabNome: "Fazenda Rio Preto", municipio: "Lavras",
-    especie: "Bovino", doenca: "Febre Aftosa", dataVacinacao: "2026-01-15", situacao: "Cancelada",
+    especie: "Bovino", doenca: "Febre Aftosa", etapaVacinacao: "Campanha de Febre Aftosa 2026", tipoVacinacao: "Vacina Complementar", dataVacinacao: "2026-01-15", situacao: "Cancelada",
   },
   {
     id: 3, produtorNome: "Agropecuária Vale Verde Ltda.", produtorDoc: "56.338.814/0001-95",
     estabCodigo: "42001040005", estabNome: "Fazenda Vertentes", municipio: "Varginha",
-    especie: "Equino", doenca: "Raiva", dataVacinacao: "2026-03-02", situacao: "Ativo",
+    especie: "Equino", doenca: "Raiva", etapaVacinacao: "Campanha de Raiva 2026", tipoVacinacao: "Primeira Dose", dataVacinacao: "2026-03-02", situacao: "Ativo",
   },
 ];
 
@@ -203,6 +219,8 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
   const [municipio, setMunicipio] = useState("");
   const [especie, setEspecie] = useState<any | null>(null);
   const [doenca, setDoenca] = useState<any | null>(null);
+  const [etapaVacinacao, setEtapaVacinacao] = useState<any | null>(null);
+  const [tipoVacinacao, setTipoVacinacao] = useState("");
   const [periodoDe, setPeriodoDe] = useState("");
   const [periodoAte, setPeriodoAte] = useState("");
   const [situacao, setSituacao] = useState("");
@@ -233,7 +251,7 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
 
   const temFiltroAtivo =
     busca || produtor || estabelecimento || exploracao || nucleo ||
-    municipio || especie || doenca || periodoDe || periodoAte || situacao;
+    municipio || especie || doenca || etapaVacinacao || tipoVacinacao || periodoDe || periodoAte || situacao;
 
   const handlePesquisar = () => {
     if (!temFiltroAtivo) {
@@ -270,11 +288,13 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
     const matchMunicipio = municipio === "" || e.municipio === municipio;
     const matchEspecie = !especie || e.especie === especie.nome;
     const matchDoenca = !doenca || e.doenca === doenca.nome;
+    const matchEtapa = !etapaVacinacao || e.etapaVacinacao === etapaVacinacao.nome;
+    const matchTipo = !tipoVacinacao || e.tipoVacinacao === tipoVacinacao;
     const matchDe = periodoDe === "" || e.dataVacinacao >= periodoDe;
     const matchAte = periodoAte === "" || e.dataVacinacao <= periodoAte;
     const matchSituacao = situacao === "" || e.situacao === situacao;
     return matchBusca && matchProdutor && matchEstab && matchExplor && matchMunicipio &&
-      matchEspecie && matchDoenca && matchDe && matchAte && matchSituacao;
+      matchEspecie && matchDoenca && matchEtapa && matchTipo && matchDe && matchAte && matchSituacao;
   });
 
   const total = filtrados.length;
@@ -304,8 +324,39 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
 
         <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col gap-5">
           <div className="animate-fadeIn flex flex-col gap-3 w-full">
-            <div className="flex flex-col lg:flex-row items-end gap-3 w-full">
-              <div className="w-full lg:flex-1">
+            <div className="grid grid-cols-1 gap-3 w-full items-end lg:grid-cols-5">
+              <EntitySearchInput
+                label="Etapa de Vacinação"
+                placeholder="Buscar por etapa de vacinação"
+                value={etapaVacinacao ? etapaVacinacao.nome : ""}
+                data={ETAPAS_VACINACAO_MOCK}
+                searchKeys={["codigo", "nome", "doenca"]}
+                columns={[{ label: "Código", key: "codigo" }, { label: "Doença", key: "doenca" }]}
+                icon={<img src={Icons.iconeEtapaVacinacaoUrl} alt="Etapa de Vacinação" className="w-5 h-5 object-contain" />}
+                title="Buscar Etapa de Vacinação"
+                subtitle="Busque por uma etapa de vacinação cadastrada no sistema:"
+                onChange={(ent) => {
+                  setEtapaVacinacao(ent);
+                  setTipoVacinacao(ent ? "Vacina Oficial" : "");
+                }}
+              />
+              {etapaVacinacao && (
+                <FloatSelect
+                  label="Tipo de Vacinação"
+                  value={tipoVacinacao}
+                  onChange={setTipoVacinacao}
+                  options={TIPOS_VACINACAO}
+                />
+              )}
+              <button
+                onClick={handlePesquisar}
+                className="order-5 h-12 w-full px-5 rounded-md text-white text-sm font-semibold transition hover:opacity-90 flex items-center justify-center whitespace-nowrap"
+                style={{ backgroundColor: GREEN }}
+              >
+                Pesquisar
+              </button>
+            <div className="contents">
+              <div className="order-3 w-full">
                 <FloatInput
                   label="Produtor"
                   value={produtor ? produtor.nome : ""} 
@@ -315,7 +366,7 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
                 />            
               </div>
 
-              <div className="w-full lg:flex-1">
+              <div className="order-4 w-full">
                 <EntitySearchInput
                   label="Estabelecimento Agropecuário"
                   placeholder="Buscar por código, nome, município ou proprietário."
@@ -334,14 +385,7 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
                   onChange={(ent) => setEstabelecimento(ent)}
                 />
               </div>
-
-              <button
-                onClick={handlePesquisar}
-                className="h-12 w-full lg:w-fit px-5 rounded-md text-white text-sm font-semibold transition hover:opacity-90 flex items-center justify-center whitespace-nowrap"
-                style={{ backgroundColor: GREEN }}
-              >
-                Pesquisar
-              </button>
+            </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 w-full items-end">
@@ -428,6 +472,8 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
               {municipio && <Chip label={`Município: ${municipio}`} onRemove={() => setMunicipio("")} />}
               {especie && <Chip label={`Espécie: ${especie.nome}`} onRemove={() => setEspecie(null)} />}
               {doenca && <Chip label={`Doença: ${doenca.nome}`} onRemove={() => setDoenca(null)} />}
+              {etapaVacinacao && <Chip label={`Etapa: ${etapaVacinacao.nome}`} onRemove={() => { setEtapaVacinacao(null); setTipoVacinacao(""); }} />}
+              {tipoVacinacao && <Chip label={`Tipo de Vacinação: ${tipoVacinacao}`} onRemove={() => setTipoVacinacao("")} />}
               {periodoDe && <Chip label={`De: ${fmtData(periodoDe)}`} onRemove={() => setPeriodoDe("")} />}
               {periodoAte && <Chip label={`Até: ${fmtData(periodoAte)}`} onRemove={() => setPeriodoAte("")} />}
               {situacao && <Chip label={`Situação: ${situacao}`} onRemove={() => setSituacao("")} />}
@@ -450,6 +496,7 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
                 <table className="w-full text-sm border-collapse">
                   <thead>
                     <tr className="border-b">
+                      <th className="text-left px-4 py-3 font-semibold uppercase text-gray-600 whitespace-normal max-w-[150px]">Tipo de Vacinação</th>
                       <th className="text-left px-4 py-3 font-semibold uppercase text-gray-600 whitespace-normal max-w-[170px]">Produtor</th>
                       <th className="text-left px-4 py-3 font-semibold uppercase text-gray-600 whitespace-normal max-w-[180px]">Estabelecimento Agropecuário</th>
                       <th className="text-left px-4 py-3 font-semibold uppercase text-gray-600 whitespace-normal max-w-[100px]">Espécie</th>
@@ -462,6 +509,7 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
                   <tbody>
                     {pagina.map((e) => (
                       <tr key={e.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/60 transition">
+                        <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">{e.tipoVacinacao || "Vacina Oficial"}</td>
                         <td className="px-4 py-3 text-gray-500 text-sm whitespace-normal">
                           <div>{e.produtorDoc}</div>
                           <div>{e.produtorNome}</div>

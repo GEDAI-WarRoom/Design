@@ -30,7 +30,7 @@ export const PERFIS_USUARIO_INICIAIS: PerfilUsuario[] = [
     id: "admin",
     role: "admin",
     nome: "Thomas Anderson",
-    perfil: "Administrador",
+    perfil: "Funcionário do IMA",
     email: "thomas.anderson@ima.mg.gov.br",
     telefone: "(31) 3915-8000",
     pessoaFisicaId: 6,
@@ -85,15 +85,20 @@ export function listarPerfisUsuario() {
 
     const pessoaFisicaId = perfil.pessoaFisicaId ?? perfilInicial.pessoaFisicaId;
     const entityId = perfil.entityId ?? perfilInicial.entityId;
+    const perfilExibicao =
+      perfil.role === "admin" && perfil.perfil === "Administrador"
+        ? "Funcionário do IMA"
+        : perfil.perfil;
     if (
       pessoaFisicaId === perfil.pessoaFisicaId &&
-      entityId === perfil.entityId
+      entityId === perfil.entityId &&
+      perfilExibicao === perfil.perfil
     ) {
       return perfil;
     }
 
     precisaPersistir = true;
-    return { ...perfil, pessoaFisicaId, entityId };
+    return { ...perfil, pessoaFisicaId, entityId, perfil: perfilExibicao };
   });
 
   const perfisFaltantes = PERFIS_USUARIO_INICIAIS.filter(

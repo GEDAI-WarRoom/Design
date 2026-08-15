@@ -45,7 +45,7 @@ const SYSTEM_ROLES: SystemRole[] = [
   { id: "agro", nome: "Agrônomo" },
   { id: "prod", nome: "Produtor Rural" },
   { id: "ges", nome: "Gestor de Cadastros" },
-  { id: "adm", nome: "Administrador" },
+  { id: "adm", nome: "Funcionário do IMA" },
 ];
 
 const TIPOS_PAPEL = ["Complementar", "Intermediário", "Principal"];

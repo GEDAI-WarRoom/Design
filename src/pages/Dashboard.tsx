@@ -1,6 +1,5 @@
 import {
   ArrowRight,
-  BriefcaseBusiness,
   BriefcaseMedical,
   Calendar,
   CalendarCheck,
@@ -40,8 +39,10 @@ import {
   Truck,
   User,
   Wallet,
+  Weight,
   Ham,
   Bell,
+  Building2,
   ClipboardType,
 } from "lucide-react";
 import { PendenciasConfirmacaoGta } from "../components/PendenciasConfirmacaoGta";
@@ -79,6 +80,8 @@ const cadastrosCategoriesMescladas: any[] = [
         icon: <TowerControl size={16} />,
       },
       { label: "Açougue", route: "acougue", icon: <Store size={16} /> },
+      { label: "Local de Pesagem", route: "local-pesagem", icon: <Weight size={16} /> },
+      { label: "Estabelecimento Genérico", route: "estabelecimento-generico", icon: <Building2 size={16} /> },
       {
         label: "Divisão Municipal",
         route: "divisao-municipal",
@@ -277,6 +280,8 @@ const cadastrosCategoriesMescladas: any[] = [
             icon: <TowerControl size={16} />,
           },
           { label: "Açougue", route: "acougue", icon: <Ham size={16} /> },
+          { label: "Local de Pesagem", route: "local-pesagem", icon: <Weight size={16} /> },
+          { label: "Estabelecimento Genérico", route: "estabelecimento-generico", icon: <Building2 size={16} /> },
           {
             label: "Divisão Municipal",
             route: "divisao-municipal",
@@ -749,17 +754,6 @@ export const secondaryCategories: MenuCategory[] = [
         ),
       },
       {
-        label: "Autorização de Vacinação",
-        route: "autorizacao-vacinacao",
-        icon: (
-          <img
-            src={Icons.iconeAutorizacaoVacinacaoUrl}
-            alt="Autotização de Vacinação"
-            className="w-4 h-4"
-          />
-        ),
-      },
-      {
         label: "Declaração de Vacinação",
         route: "declaracao-vacinacao",
         icon: (
@@ -777,6 +771,12 @@ export const secondaryCategories: MenuCategory[] = [
         icon: (
           <img src={Icons.iconeDoencaUrl} alt="Doença" className="w-4 h-4" />
         ),
+      },
+
+      {
+        label: "Tipo de Vacina",
+        route: "tipo-vacina",
+        icon: <Syringe size={16} />,
       },
 
       {
@@ -1040,7 +1040,7 @@ export const fourthCategories: MenuCategory[] = [
       {
         label: "Papéis",
         route: "papeis",
-        icon: <BriefcaseBusiness size={16} />,
+        icon: <img src={Icons.iconePapeisUrl} alt="Papéis" className="w-4 h-4" />,
       },
     ],
   },

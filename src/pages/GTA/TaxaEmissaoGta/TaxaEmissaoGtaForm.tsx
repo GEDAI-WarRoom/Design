@@ -102,10 +102,9 @@ function ItemReceitaField({
             placeholder="Buscar item de receita"
             value={item?.nome ?? ""}
             data={listarItensReceitaTaxa()}
-            searchKeys={["codigo", "nome", "classificacao", "quantidadeIndice"]}
+            searchKeys={["codigo", "nome", "quantidadeIndice"]}
             columns={[
               { label: "Item de Receita", key: "nome" },
-              { label: "Tipo", key: "classificacao" },
               { label: "Quantidade do Índice", key: "quantidadeIndice" },
             ]}
             icon={<ListTree size={18} color="#1A7A3C" />}
@@ -224,9 +223,9 @@ export function TaxaEmissaoGtaForm({
 
   const finalidadesDisponiveis = useMemo(() => {
     const especiesIds = new Set(value.especies.map((especie) => especie.id));
-    return FINALIDADES_TAXA_MOCK.filter((finalidade) =>
-      finalidade.especiesIds.some((id) => especiesIds.has(id)),
-    );
+    return FINALIDADES_TAXA_MOCK
+      .filter((finalidade) => finalidade.especiesIds.some((id) => especiesIds.has(id)))
+      .map((finalidade) => ({ ...finalidade, codigo: "" }));
   }, [value.especies]);
 
   const update = <K extends keyof TaxaEmissaoGtaDraft>(
@@ -385,7 +384,13 @@ export function TaxaEmissaoGtaForm({
             />
           </div>
 
-          <div className="max-w-md">
+          <div
+            className={
+              value.tipoCobranca === "Por Faixas"
+                ? "grid max-w-2xl grid-cols-1 gap-5 md:grid-cols-2"
+                : "max-w-md"
+            }
+          >
             <FloatSelect
               label="Tipo de Cobrança"
               required
@@ -398,6 +403,22 @@ export function TaxaEmissaoGtaForm({
                 value.tipoCobranca,
               )}
             />
+
+            {value.tipoCobranca === "Por Faixas" && (
+              <FloatInput
+                label="Limite de animais entre as faixas"
+                required
+                value={value.limiteFaixa}
+                onChange={(next) =>
+                  update("limiteFaixa", next.replace(/\D/g, ""))
+                }
+                disabled={disabled}
+                className={fieldClassName(
+                  "Limite de animais entre as faixas",
+                  value.limiteFaixa,
+                )}
+              />
+            )}
           </div>
 
           {(value.tipoCobranca === "Por Cabeça" ||
@@ -440,22 +461,6 @@ export function TaxaEmissaoGtaForm({
           {value.tipoCobranca === "Por Faixas" && (
             <div className="flex flex-col gap-5">
               <div className="max-w-md">
-                <FloatInput
-                  label="Limite de animais entre as faixas"
-                  required
-                  value={value.limiteFaixa}
-                  onChange={(next) =>
-                    update("limiteFaixa", next.replace(/\D/g, ""))
-                  }
-                  disabled={disabled}
-                  className={fieldClassName(
-                    "Limite de animais entre as faixas",
-                    value.limiteFaixa,
-                  )}
-                />
-              </div>
-
-              <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                 <FloatSelect
                   label={rotuloLimiteFaixa("ate", value.limiteFaixa)}
                   required
@@ -466,16 +471,6 @@ export function TaxaEmissaoGtaForm({
                   className={fieldClassName(
                     "Cobrança até o limite",
                     value.cobrancaAteLimite,
-                  )}
-                />
-                <FloatInput
-                  label={rotuloLimiteFaixa("acima", value.limiteFaixa)}
-                  required
-                  value={value.cobrancaAcimaLimite}
-                  disabled
-                  className={fieldClassName(
-                    "Cobrança acima do limite",
-                    value.cobrancaAcimaLimite,
                   )}
                 />
               </div>
@@ -491,6 +486,21 @@ export function TaxaEmissaoGtaForm({
                 onChange={(item) => update("itemReceitaAteLimite", item)}
                 fieldClassName={fieldClassName}
               />
+
+              <div className="max-w-md">
+                <FloatSelect
+                  label={rotuloLimiteFaixa("acima", value.limiteFaixa)}
+                  required
+                  value={value.cobrancaAcimaLimite}
+                  onChange={() => {}}
+                  options={MODALIDADES_FAIXA}
+                  disabled
+                  className={fieldClassName(
+                    "Cobrança acima do limite",
+                    value.cobrancaAcimaLimite,
+                  )}
+                />
+              </div>
 
               <ItemReceitaField
                 label={rotuloItemReceitaFaixa(
@@ -542,11 +552,8 @@ export function TaxaEmissaoGtaForm({
         subtitle="São exibidas somente finalidades compatíveis com as espécies selecionadas."
         icon={<Route size={18} className="text-[#1A7A3C]" />}
         data={finalidadesDisponiveis}
-        columns={[
-          { label: "Código", key: "codigo" },
-          { label: "Finalidade de Trânsito", key: "nome" },
-        ]}
-        searchKeys={["codigo", "nome"]}
+        columns={[{ label: "Finalidade de Trânsito", key: "nome" }]}
+        searchKeys={["nome"]}
         selectedItems={value.finalidades}
         confirmLabel="Salvar Selecionadas"
         onConfirm={(finalidades) => {
