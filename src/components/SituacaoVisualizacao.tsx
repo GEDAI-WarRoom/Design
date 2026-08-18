@@ -58,8 +58,10 @@ export function SituacaoVisualizacao({ currentScreen }: SituacaoVisualizacaoProp
   const [situacao, setSituacao] = useState<Situacao>("Ativo");
   const [proximaSituacao, setProximaSituacao] = useState<Situacao | null>(null);
   const [modoPagina, setModoPagina] = useState<ModoPagina>("visualizar");
+  const [abaCadastroAtiva, setAbaCadastroAtiva] = useState(true);
 
   useEffect(() => {
+    let observer: MutationObserver | null = null;
     const frame = window.requestAnimationFrame(() => {
       const main = document.querySelector<HTMLElement>("main[data-situacao-container]")
         ?? document.querySelector<HTMLElement>("main");
@@ -88,13 +90,23 @@ export function SituacaoVisualizacao({ currentScreen }: SituacaoVisualizacaoProp
       setSituacao(situacaoInicial);
       setProximaSituacao(null);
       setModoPagina(ehTelaDeEdicao ? "editar" : "visualizar");
+      setAbaCadastroAtiva(currentScreen !== "exploracao-agricola" || main.dataset.situacaoTab === "cadastro");
       setContainer(main);
+
+      if (currentScreen === "exploracao-agricola") {
+        const atualizarAba = () => setAbaCadastroAtiva(main.dataset.situacaoTab === "cadastro");
+        observer = new MutationObserver(atualizarAba);
+        observer.observe(main, { attributes: true, attributeFilter: ["data-situacao-tab"] });
+      }
     });
 
-    return () => window.cancelAnimationFrame(frame);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      observer?.disconnect();
+    };
   }, [currentScreen]);
 
-  if (!container) return null;
+  if (!container || !abaCadastroAtiva) return null;
 
   const confirmarAlteracao = () => {
     if (proximaSituacao) {

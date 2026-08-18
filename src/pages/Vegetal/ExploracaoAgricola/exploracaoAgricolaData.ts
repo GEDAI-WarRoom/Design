@@ -40,6 +40,14 @@ export interface AnexoExploracao {
   descricao: string;
 }
 
+export interface ManutencaoExploracaoAgricola {
+  id: string;
+  dataCadastro: string;
+  dataManutencao: string;
+  responsavelTecnico: ResponsavelTecnico;
+  situacao: "Ativa" | "Inativa";
+}
+
 export interface ExploracaoAgricola {
   id: string | number;
   codigo: string;
@@ -61,6 +69,7 @@ export interface ExploracaoAgricola {
   anexos: AnexoExploracao[];
   observacao: string;
   situacao: "Ativo" | "Inativo" | "Suspenso";
+  manutencoes?: ManutencaoExploracaoAgricola[];
 }
 
 export const ESTABELECIMENTOS_AGRICOLAS_MOCK: EstabelecimentoAgricola[] = [
@@ -94,6 +103,7 @@ export const EXPLORACOES_AGRICOLAS_MOCK: ExploracaoAgricola[] = [
     dataPlantio: "2026-01-10", localizacaoLivro: "Próximo ao balcão", unidadeProducao: "Sim",
     dataVencimento: "2027-01-10", necessitaResponsavelTecnico: "Sim", responsavelTecnico: RESPONSAVEIS_TECNICOS_MOCK[0],
     latitude: "-21.245817", longitude: "-44.998703", anexos: [], observacao: "Unidade de produção destinada ao cultivo de abóbora.", situacao: "Ativo",
+    manutencoes: [{ id: "manutencao-1", dataCadastro: "2026-01-12", dataManutencao: "2026-02-05", responsavelTecnico: RESPONSAVEIS_TECNICOS_MOCK[0], situacao: "Ativa" }],
   },
   {
     id: 2, codigo: "31001040005260001", estabelecimento: ESTABELECIMENTOS_AGRICOLAS_MOCK[1],
