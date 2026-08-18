@@ -36,6 +36,7 @@ import {
   Store,
   Syringe,
   TowerControl,
+  Tractor,
   User,
   Wallet,
   Weight,
@@ -544,13 +545,7 @@ const cadastrosCategoriesMescladas: any[] = [
           {
             label: "Exploração Agrícola",
             route: "exploracao-agricola",
-            icon: (
-              <img
-                src={Icons.iconeExploracaoUrl}
-                alt="Exploração Agrícola"
-                className="w-4 h-4 object-contain"
-              />
-            ),
+            icon: <Tractor size={16} />,
           },
           {
             label: "Cultura",
@@ -647,13 +642,7 @@ const cadastrosCategoriesMescladas: any[] = [
       {
         label: "Exploração Agrícola",
         route: "exploracao-agricola",
-        icon: (
-          <img
-            src={Icons.iconeExploracaoUrl}
-            alt="Exploração Agrícola"
-            className="w-4 h-4 object-contain"
-          />
-        ),
+        icon: <Tractor size={16} />,
       },
       {
         label: "Cultura",
