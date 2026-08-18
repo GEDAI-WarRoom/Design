@@ -384,7 +384,7 @@ export function AdicionarEventoPecuarioPage({
 
         <Section title="Informações Complementares">
           <div className="flex flex-col gap-5">
-            <SubGrupo titulo="Espécies do Evento (Uma ou mais)">
+            <SubGrupo titulo="Espécies do Evento">
               <DynamicListWrapper
                 items={especies}
                 behavior="at-least-one"
