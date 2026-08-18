@@ -44,6 +44,7 @@ const TELAS_GERAIS = new Set([
   "venda-propriedade",
   "venda-entrada-insumos-exames",
   "venda-saida-insumo",
+  "exploracao-agricola",
 ]);
 
 /**
@@ -108,7 +109,7 @@ export function SituacaoVisualizacao({ currentScreen }: SituacaoVisualizacaoProp
   };
 
   const ehVendaInsumo = ["venda-entrada-insumos-exames", "venda-saida-insumo"].includes(currentScreen);
-  const permiteSuspensao = ["estabelecimento-agropecuario", "finalidade-transito"].includes(currentScreen);
+  const permiteSuspensao = ["estabelecimento-agropecuario", "finalidade-transito", "exploracao-agricola"].includes(currentScreen);
   const tipoMovimentacao = currentScreen === "venda-saida-insumo" ? "saída" : "entrada";
   const opcoesSituacao = ehVendaInsumo
     ? [

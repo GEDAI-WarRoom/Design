@@ -35,7 +35,7 @@ const LABORATORIOS_MOCK = [
 
 const DOENCAS_MOCK = [
   { id: 1, codigo: "D-001", nome: "Brucelose", tiposVacina: ["B19", "RB51"] },
-  { id: 2, codigo: "D-002", nome: "Raiva", tiposVacina: [] },
+  { id: 2, codigo: "D-002", nome: "Raiva", tiposVacina: ["Antirrábica"] },
   { id: 3, codigo: "D-003", nome: "Febre Aftosa", tiposVacina: ["O1 Campos", "A24 Cruzeiro"] },
 ];
 
@@ -84,6 +84,11 @@ const novoLote = () => ({ uid: uid("lt"), numeroPartida: "", laboratorio: null a
 const totalDosesApresentacao = (frascos: string, dosesPorFrasco: string) =>
   (Number(frascos) || 0) * (Number(dosesPorFrasco) || 0);
 
+const formatarNotaFiscal = (valor: string) => {
+  const digitos = valor.replace(/\D/g, "").slice(0, 9);
+  return digitos.replace(/(\d{3})(?=\d)/g, "$1.");
+};
+
 interface LoteCardItemProps {
   lote: any;
   index: number;
@@ -128,10 +133,10 @@ export function LoteCardItem({
         <FloatInput
           label="Número de Partida"
           required
-          placeholder="0013225/19"
+          placeholder="Informe o número da partida"
           value={lote.numeroPartida}
-          onChange={(v) => updateLote(lote.uid, { numeroPartida: v.replace(/[^0-9/]/g, "").slice(0, 10) })}
-          maxLength={10}
+          onChange={(v) => updateLote(lote.uid, { numeroPartida: v.slice(0, 20) })}
+          maxLength={20}
         />
 
         {fornecedorEhLaboratorio ? (
@@ -160,20 +165,8 @@ export function LoteCardItem({
         )}
       </div>
 
-      {/* Grid contendo Doença, Tipo de Vacina (se houver) e Validade alinhados */}
+      {/* Campos complementares do lote, na ordem definida pela história. */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-
-        {/* 💡 Validade movida com sucesso para o Lote inteiro */}
-        <FloatInput
-          label="Validade"
-          required
-          icon={<Calendar size={18} />}
-          type="month"
-          placeholder="mm/aaaa"
-          min={MES_ATUAL}
-          value={lote.validade || ""}
-          onChange={(v) => updateLote(lote.uid, { validade: v })}
-        />
         <EntitySearchInput
           label="Doença"
           placeholder="Buscar doença..."
@@ -188,20 +181,23 @@ export function LoteCardItem({
           onChange={(ent) => updateLote(lote.uid, { doenca: ent, tipoVacina: "" })}
         />
 
-        {doencaTemTipo ? (
-          <FloatSelect
-            label="Tipo de Vacina"
-            required
-            value={lote.tipoVacina}
-            onChange={(v) => updateLote(lote.uid, { tipoVacina: v })}
-            options={lote.doenca.tiposVacina.map((t: string) => ({ value: t, label: t }))}
-          />
-        ) : (
-          /* Elemento fantasma para manter o alinhamento de 3 colunas do grid se a doença não tiver tipo */
-          <div className="hidden md:block" />
-        )}
-
-
+        <FloatSelect
+          label="Tipo de Vacina"
+          required
+          disabled={!doencaTemTipo}
+          value={lote.tipoVacina}
+          onChange={(v) => updateLote(lote.uid, { tipoVacina: v })}
+          options={doencaTemTipo ? lote.doenca.tiposVacina.map((t: string) => ({ value: t, label: t })) : []}
+        />
+        <FloatInput
+          label="Validade"
+          required
+          icon={<Calendar size={18} />}
+          type="month"
+          placeholder="MM/AAAA"
+          value={lote.validade || ""}
+          onChange={(v) => updateLote(lote.uid, { validade: v })}
+        />
       </div>
 
       {laboratorioNaoProduzDoenca && (
@@ -358,7 +354,7 @@ export function AdicionarVendaComEntradaVacinaPage({ onLogout, onNavigate, mode 
     revendedoraNome: "Comercial AgroVat",
     fornecedorEntidade: { id: 1, codigo: "FOR-001", nome: "Laboratório BioMed", tipo: "Laboratório", uf: "SP" },
     fornecedor: "Laboratório BioMed",
-    numeroNotaFiscal: "1234567",
+    numeroNotaFiscal: "123.456.789",
     ufNotaFiscal: "MG",
     dataNotaFiscal: "2026-08-01",
     situacao: "Gravada",
@@ -380,17 +376,17 @@ export function AdicionarVendaComEntradaVacinaPage({ onLogout, onNavigate, mode 
     const novosErros: string[] = [];
     if (!fornecedor) novosErros.push("Selecione o fornecedor de vacina.");
     if (!revendedora) novosErros.push("Selecione a revendedora de produtos agropecuários.");
-    if (!numeroNotaFiscal) novosErros.push("Informe o número da nota fiscal.");
+    if (!/^\d{3}\.\d{3}\.\d{3}$/.test(numeroNotaFiscal)) novosErros.push("Informe o número da nota fiscal no formato 000.000.000.");
     if (!ufNotaFiscal) novosErros.push("Selecione a UF da nota fiscal.");
     if (!dataNotaFiscal) novosErros.push("Informe a data da nota fiscal.");
     if (dataNotaFiscal && dataNotaFiscal > HOJE) novosErros.push("A data da nota fiscal deve ser menor ou igual à data atual.");
 
     lotes.forEach((lote, loteIndex) => {
       const identificacao = `Lote ${loteIndex + 1}`;
-      if (!/^\d{7}\/\d{2}$/.test(lote.numeroPartida)) novosErros.push(`${identificacao}: informe a partida no formato 0000000/00.`);
+      if (!lote.numeroPartida.trim()) novosErros.push(`${identificacao}: informe o número de partida.`);
       if (!(fornecedorEhLaboratorio ? fornecedor : lote.laboratorio)) novosErros.push(`${identificacao}: selecione o laboratório.`);
       if (!lote.doenca) novosErros.push(`${identificacao}: selecione a doença.`);
-      if (lote.doenca?.tiposVacina?.length > 0 && !lote.tipoVacina) novosErros.push(`${identificacao}: selecione o tipo de vacina.`);
+      if (!lote.tipoVacina) novosErros.push(`${identificacao}: selecione o tipo de vacina.`);
       if (!/^\d{2}\/\d{4}$/.test(lote.validade)) novosErros.push(`${identificacao}: informe a validade no formato MM/AAAA.`);
       else {
         const [mes, ano] = lote.validade.split("/").map(Number);
@@ -443,7 +439,7 @@ export function AdicionarVendaComEntradaVacinaPage({ onLogout, onNavigate, mode 
             </div>
           )}
 
-          <div className={`flex flex-col gap-6 ${mode === "edit" ? "pointer-events-none opacity-75" : ""}`}>
+          <div className={`flex flex-col gap-6 ${mode !== "create" ? "pointer-events-none opacity-75" : ""}`}>
           <Section title="Emitente">
             <div className="flex flex-col gap-3">
               <FornecedorVacinaInput
@@ -483,7 +479,9 @@ export function AdicionarVendaComEntradaVacinaPage({ onLogout, onNavigate, mode 
                   required
                   type="text"
                   value={numeroNotaFiscal}
-                  onChange={(v) => setNumeroNotaFiscal(v.replace(/\D/g, "").slice(0, 10))}
+                  placeholder="000.000.000"
+                  maxLength={11}
+                  onChange={(v) => setNumeroNotaFiscal(formatarNotaFiscal(v))}
                 />
                 <FloatCombobox label="UF da Nota Fiscal" required value={ufNotaFiscal} onChange={setUfNotaFiscal} options={ESTADOS_BR} />
                 <FloatInput

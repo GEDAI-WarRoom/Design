@@ -541,6 +541,17 @@ const cadastrosCategoriesMescladas: any[] = [
             ),
           },
           {
+            label: "Exploração Agrícola",
+            route: "exploracao-agricola",
+            icon: (
+              <img
+                src={Icons.iconeExploracaoUrl}
+                alt="Exploração Agrícola"
+                className="w-4 h-4 object-contain"
+              />
+            ),
+          },
+          {
             label: "Cultura",
             route: "cultura",
             icon: (
@@ -628,6 +639,17 @@ const cadastrosCategoriesMescladas: any[] = [
           <img
             src={Icons.iconeUnidadeConsolidacaoUrl}
             alt="Unidade de Consolidação"
+            className="w-4 h-4 object-contain"
+          />
+        ),
+      },
+      {
+        label: "Exploração Agrícola",
+        route: "exploracao-agricola",
+        icon: (
+          <img
+            src={Icons.iconeExploracaoUrl}
+            alt="Exploração Agrícola"
             className="w-4 h-4 object-contain"
           />
         ),

@@ -21,6 +21,10 @@ import { EditarUnidadeConsolidacaoPage } from "./pages/Vegetal/UnidadeConsolidac
 
 import { VisualizarCulturaPage } from "./pages/Vegetal/Cultura/VisualizarCultura";
 import { EditarCulturaPage } from "./pages/Vegetal/Cultura/EditarCultura";
+import { ExploracaoAgricolaPage } from "./pages/Vegetal/ExploracaoAgricola/ExploracaoAgricola";
+import { AdicionarExploracaoAgricolaPage } from "./pages/Vegetal/ExploracaoAgricola/AdicionarExploracaoAgricola";
+import { VisualizarExploracaoAgricolaPage } from "./pages/Vegetal/ExploracaoAgricola/VisualizarExploracaoAgricola";
+import { EditarExploracaoAgricolaPage } from "./pages/Vegetal/ExploracaoAgricola/EditarExploracaoAgricola";
 
 import { VisualizarPragaPage } from "./pages/Vegetal/Praga/VisualizarPraga";
 import { EditarPragaPage } from "./pages/Vegetal/Praga/EditarPraga";
@@ -382,6 +386,10 @@ export type Screen =
   | "visualizar-unidade-consolidacao"
   | "editar-cultura"
   | "visualizar-cultura"
+  | "exploracao-agricola"
+  | "adicionar-exploracao-agricola"
+  | "editar-exploracao-agricola"
+  | "visualizar-exploracao-agricola"
   | "editar-praga"
   | "visualizar-praga"
   | "editar-profissional-vegetal"
@@ -1016,6 +1024,15 @@ export default function App() {
       return <EditarCulturaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "visualizar-cultura":
       return <VisualizarCulturaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+
+    case "exploracao-agricola":
+      return <ExploracaoAgricolaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-exploracao-agricola":
+      return <AdicionarExploracaoAgricolaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-exploracao-agricola":
+      return <EditarExploracaoAgricolaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-exploracao-agricola":
+      return <VisualizarExploracaoAgricolaPage key={`visualizar-exploracao-agricola-${screenData?.id ?? "novo"}`} dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
 
     case "praga":
       return <PragaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
