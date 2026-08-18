@@ -6,6 +6,7 @@ import { DynamicListWrapper, EntitySearchInput } from "../../../components/ui/En
 import { listarRegistrosMock, salvarRegistroMock } from "../../../components/ui/mockCollectionStorage";
 import { registrarVersaoCadastro } from "../../../components/ui/historicoCadastroStorage";
 import * as Icons from "../../../imports/icons";
+import { EntityProfessionalsTab } from "../../../components/ui/EntityProfessionals";
 import {
   COLECAO_EXPLORACOES_AGRICOLAS, ESTABELECIMENTOS_AGRICOLAS_MOCK, EXPLORACOES_AGRICOLAS_MOCK,
   PRODUTORES_AGRICOLAS_MOCK, RESPONSAVEIS_TECNICOS_MOCK, VARIEDADES_CULTURA_MOCK,
@@ -76,6 +77,7 @@ export function ExploracaoAgricolaForm({ mode, dados, onLogout, onNavigate, acao
   const [erros, setErros] = useState<string[]>([]);
   const [sucesso, setSucesso] = useState(false);
   const [registroSalvo, setRegistroSalvo] = useState<ExploracaoAgricola | null>(null);
+  const [addProfessionalRequestKey, setAddProfessionalRequestKey] = useState(0);
 
   const areaProdutivaNumero = estabelecimento ? estabelecimento.areaProdutivaHectares * (unidadeArea === "Metros Quadrados" ? 10000 : 1) : 0;
   const areaProdutiva = estabelecimento ? formatarDecimal(areaProdutivaNumero) : "";
@@ -173,6 +175,7 @@ export function ExploracaoAgricolaForm({ mode, dados, onLogout, onNavigate, acao
   };
   const abas = [
     { id: "cadastro", label: "Cadastro", icon: (ativa: boolean) => <FileText size={18} className={ativa ? "text-[#1A7A3C]" : "text-gray-400"} /> },
+    { id: "profissionais", label: "Profissionais", icon: (ativa: boolean) => <UserRound size={18} className={ativa ? "text-[#1A7A3C]" : "text-gray-400"} /> },
     ...(exibeAbaManutencao ? [
       { id: "vinculacoes", label: "Vinculações", icon: (ativa: boolean) => <Link2 size={18} className={ativa ? "text-[#1A7A3C]" : "text-gray-400"} /> },
       { id: "manutencao", label: "Manutenção", icon: (ativa: boolean) => <ShieldCheck size={18} className={ativa ? "text-[#1A7A3C]" : "text-gray-400"} /> },
@@ -181,7 +184,7 @@ export function ExploracaoAgricolaForm({ mode, dados, onLogout, onNavigate, acao
   return <div className="min-h-screen bg-[#f2f3f5]">
     {!esconderNavbar && <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="exploracao-agricola" hideSearch />}
     <main data-situacao-container data-situacao={situacaoEfetiva} data-situacao-tab={abaAtiva} className="mx-auto flex max-w-[1088px] flex-col gap-4 px-4 py-6 md:px-6">
-      <div><button type="button" onClick={() => onNavigate("exploracao-agricola")} className="mb-3 flex items-center gap-1 text-sm text-[#1A7A3C]"><ArrowLeft size={15} />Todas as Explorações Agrícolas</button><div className="flex items-center justify-between gap-4"><h1 className="text-2xl font-semibold text-gray-900">{titulo}</h1><div className="flex gap-2">{mode === "view" ? <>{abaAtiva === "cadastro" && podeEditar && <button type="button" onClick={() => onNavigate("editar-exploracao-agricola", dados)} className="h-10 rounded-md bg-[#1A7A3C] px-5 text-xs font-bold text-white">Editar</button>}{abaAtiva === "manutencao" && <button type="button" onClick={abrirNovaManutencao} className="h-10 rounded-md bg-[#1A7A3C] px-5 text-xs font-bold text-white hover:bg-[#15612F]">Adicionar Manutenção</button>}{abaAtiva === "cadastro" && acaoHistorico}</> : <><button type="button" onClick={validarESalvar} className="h-10 rounded-md bg-[#1A7A3C] px-5 text-xs font-bold text-white hover:bg-[#15612F]">{mode === "edit" ? "Salvar" : "Adicionar"}</button>{acaoHistorico}</>}</div></div></div>
+      <div><button type="button" onClick={() => onNavigate("exploracao-agricola")} className="mb-3 flex items-center gap-1 text-sm text-[#1A7A3C]"><ArrowLeft size={15} />Todas as Explorações Agrícolas</button><div className="flex items-center justify-between gap-4"><h1 className="text-2xl font-semibold text-gray-900">{titulo}</h1><div className="flex gap-2">{mode === "view" ? <>{abaAtiva === "cadastro" && podeEditar && <button type="button" onClick={() => onNavigate("editar-exploracao-agricola", dados)} className="h-10 rounded-md bg-[#1A7A3C] px-5 text-xs font-bold text-white">Editar</button>}{abaAtiva === "profissionais" && <button type="button" onClick={() => setAddProfessionalRequestKey((value) => value + 1)} className="h-10 rounded-md bg-[#1A7A3C] px-5 text-xs font-bold text-white">Adicionar Profissional</button>}{abaAtiva === "manutencao" && <button type="button" onClick={abrirNovaManutencao} className="h-10 rounded-md bg-[#1A7A3C] px-5 text-xs font-bold text-white hover:bg-[#15612F]">Adicionar Manutenção</button>}{abaAtiva === "cadastro" && acaoHistorico}</> : <><button type="button" onClick={validarESalvar} className="h-10 rounded-md bg-[#1A7A3C] px-5 text-xs font-bold text-white hover:bg-[#15612F]">{mode === "edit" ? "Salvar" : "Adicionar"}</button>{acaoHistorico}</>}</div></div></div>
       {avisoHistorico}
       {exibeAbaManutencao && <Tabs tabs={abas} activeTab={abaAtiva} setActiveTab={(aba) => onMudarAba?.(aba)} />}
 
@@ -205,6 +208,7 @@ export function ExploracaoAgricolaForm({ mode, dados, onLogout, onNavigate, acao
 
       <Section title="Anexos e Observações"><div className="flex flex-col gap-6"><DynamicListWrapper items={anexos} behavior="zero-or-more" variant="plain" itemLabel="Anexo" addButtonLabel="Adicionar Anexo" disabled={somenteLeitura} onAddItem={() => setAnexos((items) => [...items, { id: String(Date.now()), nome: "", descricao: "" }])} onRemoveItem={(index) => setAnexos((items) => items.filter((_, i) => i !== index))}>{(anexo, index) => <div className="flex flex-col gap-3 md:flex-row"><UploadField label="Documento" fileName={anexo.nome} disabled={somenteLeitura} onSelectFile={() => setAnexos((items) => items.map((item, i) => i === index ? { ...item, nome: `documento_exploracao_${index + 1}.pdf` } : item))} /><div className="flex-1"><FloatInput label="Descrição" disabled={somenteLeitura} value={anexo.descricao} onChange={(value) => setAnexos((items) => items.map((item, i) => i === index ? { ...item, descricao: value } : item))} maxLength={255} /></div></div>}</DynamicListWrapper><LargeTextArea label="Observações" disabled={somenteLeitura} value={observacao} onChange={setObservacao} maxLength={1500} /></div></Section>
       </>}
+      {abaAtiva === "profissionais" && <EntityProfessionalsTab entityKey={`exploracao-agricola-${dados?.id || "demo"}`} allowedTypes={["Responsável Técnico Vegetal", "Habilitado para Emissão de PTV"]} onNavigate={onNavigate} addRequestKey={addProfessionalRequestKey} />}
       {exibeAbaManutencao && abaAtiva === "vinculacoes" && <section className="rounded-xl bg-white p-6 text-sm text-gray-600 shadow-sm"><p className="font-semibold text-gray-800">Vinculações da Exploração</p><p className="mt-1">As vinculações relacionadas à unidade de produção serão apresentadas aqui.</p></section>}
       {exibeAbaManutencao && abaAtiva === "manutencao" && <div className="animate-fadeIn"><AccordionCardGroup title="Manutenção da Exploração" icon={<ShieldCheck size={18} />} activeCountText={`${manutencoesAtivas.length} ${manutencoesAtivas.length === 1 ? "Item Ativo" : "Itens Ativos"}`} variant="sem-vinculacao" grid="unico" historicoTitle="Manutenções Inativas" historicoChildren={manutencoesInativas.map((item) => <CardManutencao key={item.id} item={item} onVisualizar={() => { setManutencaoSelecionada(item); setModalManutencao("visualizar"); }} />)} emptyStateText="Nenhuma manutenção ativa.">{manutencoesAtivas.map((item) => <CardManutencao key={item.id} item={item} onVisualizar={() => { setManutencaoSelecionada(item); setModalManutencao("visualizar"); }} />)}</AccordionCardGroup></div>}
     </main>

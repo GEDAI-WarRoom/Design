@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { ArrowLeft, Pencil, UserRound, MapPin, Phone } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
+import { EntityProfessionalsView } from "../../../components/ui/EntityProfessionalsView";
 
 const GREEN = "#1A7A3C";
 
@@ -232,6 +233,17 @@ export function VisualizarInstituicaoEnsinoPesquisaPage({
   }));
 
   return (
+    <EntityProfessionalsView
+      onLogout={onLogout}
+      onNavigate={onNavigate}
+      currentScreen="instituicao-ensino-pesquisa"
+      backRoute="instituicao-ensino-pesquisa"
+      backLabel="Todas as Instituições de Ensino e Pesquisa"
+      title="Visualizar Instituição de Ensino e Pesquisa"
+      entityKey={`instituicao-ensino-pesquisa-${detalhe.id || "demo"}`}
+      allowedTypes={["Responsável Técnico Animal"]}
+      fields={[]}
+      cadastroContent={(
     <div className="min-h-screen bg-[#f2f3f5]">
       <Navbar
         onLogout={onLogout}
@@ -434,5 +446,7 @@ export function VisualizarInstituicaoEnsinoPesquisaPage({
         </Section>
       </main>
     </div>
+      )}
+    />
   );
 }

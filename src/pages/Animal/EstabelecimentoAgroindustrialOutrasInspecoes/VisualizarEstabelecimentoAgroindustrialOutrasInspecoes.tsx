@@ -1,4 +1,5 @@
 import { AdicionarEstabelecimentoAgroindustrialOutrasInspecoesPage } from "./AdicionarEstabelecimentoAgroindustrialOutrasInspecoes";
+import { EntityProfessionalsView } from "../../../components/ui/EntityProfessionalsView";
 
 interface PageProps {
   onLogout: () => void;
@@ -7,12 +8,5 @@ interface PageProps {
 }
 
 export function VisualizarEstabelecimentoAgroindustrialOutrasInspecoesPage({ onLogout, onNavigate, dados }: PageProps) {
-  return (
-    <AdicionarEstabelecimentoAgroindustrialOutrasInspecoesPage
-      onLogout={onLogout}
-      onNavigate={onNavigate}
-      dados={dados}
-      modo="visualizar"
-    />
-  );
+  return <EntityProfessionalsView onLogout={onLogout} onNavigate={onNavigate} currentScreen="estabelecimento-agroindustrial-outras-inspecoes" backRoute="estabelecimento-agroindustrial-outras-inspecoes" backLabel="Todos os Estabelecimentos Agroindustriais" title="Visualizar Estabelecimento Agroindustrial POA - Outras Inspeções" entityKey={`estabelecimento-agroindustrial-outras-${dados?.id || "demo"}`} allowedTypes={["Responsável Técnico Animal"]} fields={[]} cadastroContent={<AdicionarEstabelecimentoAgroindustrialOutrasInspecoesPage onLogout={onLogout} onNavigate={onNavigate} dados={dados} modo="visualizar" />} onEditCadastro={() => onNavigate("editar-estabelecimento-agroindustrial-outras-inspecoes", dados)} />;
 }

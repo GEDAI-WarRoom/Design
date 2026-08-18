@@ -223,9 +223,6 @@ export function VisualizarRevendedoraAgropecuarioPage({ onLogout, onNavigate, da
   const vegetalAtivos = revendedora.profissionais.filter((item) => item.tipo === "Responsável Técnico Vegetal" && item.situacao === "Ativo");
   const vegetalInativos = revendedora.profissionais.filter((item) => item.tipo === "Responsável Técnico Vegetal" && item.situacao === "Inativo");
 
-  const gtaAtivos = revendedora.profissionais.filter((item) => item.tipo === "Habilitado para Emissão de GTA" && item.situacao === "Ativo");
-  const gtaInativos = revendedora.profissionais.filter((item) => item.tipo === "Habilitado para Emissão de GTA" && item.situacao === "Inativo");
-
   const funcionariosAtivos = revendedora.profissionais.filter((item) => item.tipo === "Funcionário" && item.situacao === "Ativo");
   const funcionariosInativos = revendedora.profissionais.filter((item) => item.tipo === "Funcionário" && item.situacao === "Inativo");
 
@@ -506,30 +503,6 @@ export function VisualizarRevendedoraAgropecuarioPage({ onLogout, onNavigate, da
               }
             >
               {vegetalAtivos.map((item) => (
-                <ProfessionalCard key={item.id} item={item} onView={() => abrirProfissional(item)} />
-              ))}
-            </AccordionCardGroup>
-
-            {/* ─── HABILITADOS GTA ─── */}
-            <AccordionCardGroup
-              title="Habilitado para Emissão de GTA"
-              activeCountText={`${gtaAtivos.length} cadastros ativos`}
-              variant="sem-vinculacao"
-              historicoTitle="Histórico de Profissionais Habilitados"
-              icon={
-                <img
-                  src={Icons.iconeHabilitacaoUrl}
-                  alt="Habilitação"
-                  className="w-7 h-7 object-contain invert brightness-0"
-                />
-              }
-              historicoChildren={
-                gtaInativos.map((item) => (
-                  <ProfessionalCard key={item.id} item={item} onView={() => abrirProfissional(item)} />
-                ))
-              }
-            >
-              {gtaAtivos.map((item) => (
                 <ProfessionalCard key={item.id} item={item} onView={() => abrirProfissional(item)} />
               ))}
             </AccordionCardGroup>

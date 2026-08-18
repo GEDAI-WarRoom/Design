@@ -40,6 +40,15 @@ function formatarData(data: string) {
   return new Intl.DateTimeFormat("pt-BR").format(new Date(`${data}T12:00:00`));
 }
 
+function rotuloEntidade(tipo: string) {
+  const tipoSemPrefixo = tipo.replace(/^RT de /, "");
+  if (tipo.includes("Agroindustrial")) return "Estabelecimento Agroindustrial";
+  if (tipo.includes("Revendedora")) return "Revendedora";
+  if (tipo.includes("Integradora")) return "Integradora/Cooperativa";
+  if (tipo.includes("Agropecuário")) return "Estabelecimento Agropecuário";
+  return tipoSemPrefixo;
+}
+
 function IconeEntidade({ tipo }: { tipo: string }) {
   if (tipo.includes("Agroindustrial")) return <img src={Icons.iconeEstabelecimentoAgroindustrialUrl} alt="Estabelecimento Agroindustrial" className="h-5 w-5 object-contain" />;
   if (tipo.includes("Revendedora")) return <Store size={20} className="text-[#1A7A3C]" />;
@@ -77,7 +86,7 @@ function GrupoResponsabilidade({ titulo, itens, numero }: { titulo: string; iten
           <IconeEntidade tipo={item.entidadeTipo} />
           <div>
             <p className="text-sm text-gray-800">{item.entidadeNome || "—"}</p>
-            <p className="text-[10px] text-gray-500">Entidade vinculada</p>
+            <p className="text-[10px] text-gray-500">{rotuloEntidade(item.entidadeTipo)}</p>
           </div>
         </div>}
       </div>

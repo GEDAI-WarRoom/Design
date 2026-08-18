@@ -22,6 +22,7 @@ import {
 import React, { useState } from "react";
 import { Navbar } from "../../../components/Navbar";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
+import { EntityProfessionalsTab } from "../../../components/ui/EntityProfessionals";
 import {
   AccordionCardGroup,
   CheckboxGroup,
@@ -585,9 +586,9 @@ const GRUPOS_CERTIFICADOS_AVES: GrupoCertificado[] = [
 ];
 
 const TIPOS_CERTIFICADOS_BOVINOS = [
+  "Brucelose e Tuberculose",
   "Brucelose",
   "Tuberculose",
-  "Brucelose e Tuberculose",
 ];
 
 const GRUPOS_CERTIFICADOS_BOVINOS: GrupoCertificado[] = [
@@ -600,13 +601,13 @@ const GRUPOS_CERTIFICADOS_BOVINOS: GrupoCertificado[] = [
   },
   {
     id: 2,
-    titulo: "Tuberculose",
+    titulo: "Brucelose",
     certificados: [],
     inativos: [],
   },
   {
     id: 3,
-    titulo: "Brucelose",
+    titulo: "Tuberculose",
     certificados: [],
     inativos: [],
   },
@@ -828,21 +829,23 @@ function CertificadoCard({
   certificado,
   onVisualizar,
   showNucleos = true,
+  inativo = false,
 }: {
   certificado: Certificado;
   onVisualizar: () => void;
   showNucleos?: boolean;
+  inativo?: boolean;
 }) {
   return (
     <div className="flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white">
-      <div className="h-1 bg-[#1A7A3C]" />
+      <div className={`h-1 ${inativo ? "bg-gray-400" : "bg-[#1A7A3C]"}`} />
       <div className="flex flex-1 flex-col gap-3 p-4">
         <div className="flex items-center justify-between">
           <span className="text-[11px] text-gray-500">
             Atualizado em: <span className="font-medium text-gray-700">{certificado.atualizadoEm}</span>
           </span>
-          <span className="text-[11px] font-semibold text-[#1A7A3C]">
-            {certificado.situacao}
+          <span className={`text-[11px] font-semibold ${inativo ? "text-gray-500" : "text-[#1A7A3C]"}`}>
+            {inativo ? "Inativo" : certificado.situacao}
           </span>
         </div>
 
@@ -963,6 +966,7 @@ export function VisualizarExploracaoPecuariaPage({
   const inativos = d.filter((c) => c.situacao === "Inativo");
 
   const [activeTab, setActiveTab] = useState("cadastro");
+  const [addProfessionalRequestKey, setAddProfessionalRequestKey] = useState(0);
   const [biosseguridades, setBiosseguridades] =
     useState<Biosseguridade[]>(BIOSSEGURIDADES_MOCK);
   const [modalBiosseguiradadeAberto, setModalBiosseguiradadeAberto] =
@@ -1207,6 +1211,7 @@ export function VisualizarExploracaoPecuariaPage({
 
   const TABS = [
     { id: "cadastro", label: "Cadastro", icon: <FileText size={16} /> },
+    { id: "profissionais", label: "Profissionais", icon: <Users size={16} /> },
     { id: "acesso-mercado", label: "Acesso ao Mercado", icon: <ShoppingCart size={16} /> },
     ...(isBovinos
       ? [{
@@ -1236,6 +1241,17 @@ export function VisualizarExploracaoPecuariaPage({
             className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2"
           >
             Editar
+          </button>
+        );
+
+      case "profissionais":
+        return (
+          <button
+            type="button"
+            onClick={() => setAddProfessionalRequestKey((value) => value + 1)}
+            className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2"
+          >
+            Adicionar Profissional
           </button>
         );
 
@@ -1834,6 +1850,16 @@ export function VisualizarExploracaoPecuariaPage({
           </div>
         )}
 
+        {/* ================= ABA PROFISSIONAIS ================= */}
+        {activeTab === "profissionais" && (
+          <EntityProfessionalsTab
+            entityKey={`exploracao-pecuaria-${r.estabelecimento?.codigo || r.codigo || "demo"}`}
+            allowedTypes={["Responsável Técnico Animal", "Habilitado para Emissão de GTA"]}
+            onNavigate={onNavigate}
+            addRequestKey={addProfessionalRequestKey}
+          />
+        )}
+
         {/* ================= ABA ACESSO AO MERCADO ================= */}
         {activeTab === "acesso-mercado" && (
           <div className="flex flex-col gap-4 mt-2">
@@ -1926,23 +1952,28 @@ export function VisualizarExploracaoPecuariaPage({
                 variant="sem-vinculacao"
                 grid="duplo"
                 historicoTitle="Histórico de Inativos"
-                historicoChildren={(grupo.inativos ?? []).map((cert) => (
-                  <HistoryCard
-                    key={cert.id}
-                    label={cert.numero}
-                    subLabel={`Validade: ${cert.validade}`}
-                    topBarSvgPath={TOP_BAR_HISTORY}
-                    icon={<BadgeCheck size={18} className="text-gray-500" />}
-                    actionIcon={
-                      <Eye
-                        size={16}
-                        className="text-gray-500 hover:text-[#008446] transition-colors"
-                      />
-                    }
-                    onActionClick={() => onNavigate("visualizar-certificado", cert)}
-                    actionIconPath={""}
-                  />
-                ))}
+                historicoChildren={(grupo.inativos ?? []).map((cert) =>
+                  isBovinos ? (
+                    <CertificadoCard
+                      key={cert.id}
+                      certificado={cert}
+                      inativo
+                      showNucleos={false}
+                      onVisualizar={() => onNavigate("visualizar-certificado", cert)}
+                    />
+                  ) : (
+                    <HistoryCard
+                      key={cert.id}
+                      label={cert.numero}
+                      subLabel={`Validade: ${cert.validade}`}
+                      topBarSvgPath={TOP_BAR_HISTORY}
+                      icon={<BadgeCheck size={18} className="text-gray-500" />}
+                      actionIcon={<Eye size={16} className="text-gray-500 hover:text-[#008446] transition-colors" />}
+                      onActionClick={() => onNavigate("visualizar-certificado", cert)}
+                      actionIconPath={""}
+                    />
+                  ),
+                )}
               >
                 {grupo.certificados.map((certificado) => (
                   <CertificadoCard

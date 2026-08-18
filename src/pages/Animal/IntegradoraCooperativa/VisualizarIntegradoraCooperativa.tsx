@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { ArrowLeft, ChevronUp, ChevronDown, Download, Eye } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, LargeTextArea } from "../../../components/ui/FormKit";
+import { EntityProfessionalsView } from "../../../components/ui/EntityProfessionalsView";
 
 const GREEN = "#1A7A3C";
 
@@ -106,6 +107,17 @@ export function VisualizarIntegradoraCooperativaPage({
   const cont = registro.contato || {};
 
   return (
+    <EntityProfessionalsView
+      onLogout={onLogout}
+      onNavigate={onNavigate}
+      currentScreen="integradora-cooperativa"
+      backRoute="integradora-cooperativa"
+      backLabel="Todas as Integradoras ou Cooperativas"
+      title="Visualizar Integradora / Cooperativa"
+      entityKey={`integradora-cooperativa-${registro.id || "demo"}`}
+      allowedTypes={["Responsável Técnico Animal", "Responsável Técnico Vegetal", "Habilitado para Emissão de GTA", "Responsável Legal"]}
+      fields={[]}
+      cadastroContent={(
     <div className="min-h-screen bg-[#f2f3f5]">
       <Navbar
         onLogout={onLogout}
@@ -369,5 +381,7 @@ export function VisualizarIntegradoraCooperativaPage({
         </Section>
       </main>
     </div>
+      )}
+    />
   );
 }
