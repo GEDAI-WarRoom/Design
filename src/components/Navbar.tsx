@@ -59,6 +59,7 @@ interface NavbarProps {
 
 export function Navbar({ onLogout, onNavigate, currentScreen }: NavbarProps) {
   const [search, setSearch] = useState("");
+  const [activeSearchIndex, setActiveSearchIndex] = useState(-1);
   const [openCategory, setOpenCategory] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const pendingCloseCleanupRef = useRef<(() => void) | null>(null);
@@ -149,6 +150,33 @@ export function Navbar({ onLogout, onNavigate, currentScreen }: NavbarProps) {
   const filtered = search.trim()
     ? allItems.filter((i) => i.label.toLowerCase().includes(search.toLowerCase()))
     : [];
+
+  const abrirResultadoDaBusca = (index: number) => {
+    const item = filtered[index];
+    if (!item?.route) return;
+    onNavigate(item.route);
+    setSearch("");
+    setActiveSearchIndex(-1);
+  };
+
+  const handleSearchKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!filtered.length) return;
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      setActiveSearchIndex((current) => current < filtered.length - 1 ? current + 1 : 0);
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      setActiveSearchIndex((current) => current > 0 ? current - 1 : filtered.length - 1);
+    } else if (event.key === "Enter" || event.key === "Tab") {
+      if (activeSearchIndex >= 0) {
+        event.preventDefault();
+        abrirResultadoDaBusca(activeSearchIndex);
+      }
+    } else if (event.key === "Escape") {
+      setSearch("");
+      setActiveSearchIndex(-1);
+    }
+  };
   const totalPendencias = role === "produtor"
     ? listarPendenciasConfirmacaoGta().length +
       listarAtualizacoesCadastrais().filter(
@@ -267,30 +295,38 @@ export function Navbar({ onLogout, onNavigate, currentScreen }: NavbarProps) {
               <input
                 type="text"
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => { setSearch(e.target.value); setActiveSearchIndex(-1); }}
+                onKeyDown={handleSearchKeyDown}
+                role="combobox"
+                aria-expanded={filtered.length > 0}
+                aria-controls="resultados-pesquisa-global"
+                aria-activedescendant={activeSearchIndex >= 0 ? `resultado-pesquisa-${activeSearchIndex}` : undefined}
                 placeholder="Pesquise"
                 className="w-full border border-gray-300 rounded-md pl-3 pr-9 py-1.5 text-sm outline-none focus:border-[#1A7A3C] focus:ring-1 focus:ring-[#1A7A3C] transition"
               />
               {search && (
-                <button onClick={() => setSearch("")} className="absolute right-8 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                <button onClick={() => { setSearch(""); setActiveSearchIndex(-1); }} className="absolute right-8 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                   <X size={14} />
                 </button>
               )}
               <Search size={15} className="absolute right-2.5 top-1/2 -translate-y-1/2" style={{ color: GREEN }} />
 
               {filtered.length > 0 && (
-                <div className="absolute top-full mt-1 left-0 w-full bg-white rounded-lg shadow-lg border border-gray-100 z-50 max-h-72 overflow-y-auto text-left">
-                  {filtered.map((item) => (
-                    <div
+                <div id="resultados-pesquisa-global" role="listbox" className="absolute top-full mt-1 left-0 w-full bg-white rounded-lg shadow-lg border border-gray-100 z-50 max-h-72 overflow-y-auto text-left">
+                  {filtered.map((item, index) => (
+                    <button
+                      id={`resultado-pesquisa-${index}`}
                       key={item.label + item.category}
-                      className="px-4 py-2.5 hover:bg-gray-50 cursor-pointer border-b border-gray-50 last:border-0"
-                      onClick={() => {
-                        if (item.route) { onNavigate(item.route); setSearch(""); }
-                      }}
+                      type="button"
+                      role="option"
+                      aria-selected={activeSearchIndex === index}
+                      onMouseEnter={() => setActiveSearchIndex(index)}
+                      className={`block w-full px-4 py-2.5 text-left border-b border-gray-50 last:border-0 ${activeSearchIndex === index ? "bg-green-50" : "hover:bg-gray-50"}`}
+                      onClick={() => abrirResultadoDaBusca(index)}
                     >
                       <p className="text-sm text-gray-800">{item.label}</p>
                       <p className="text-xs text-gray-400">{item.category}</p>
-                    </div>
+                    </button>
                   ))}
                 </div>
               )}
