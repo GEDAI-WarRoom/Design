@@ -415,7 +415,7 @@ export function EditarDeclaracaoVacinacaoPage({ onLogout, onNavigate, dados }: {
             </div>
 
             <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
-              <FloatInput label="Data de Atestado de Vacinação" value={registro.dataAtestado || "—"} readOnly disabled icon={<Calendar size={18} color={GREEN} />} />
+              <FloatInput label="Data do Atestado de Vacinação" value={registro.dataAtestado || "—"} readOnly disabled icon={<Calendar size={18} color={GREEN} />} />
             </div>
 
             <div className="w-full mt-2">

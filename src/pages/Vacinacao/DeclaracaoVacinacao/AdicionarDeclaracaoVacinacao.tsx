@@ -913,7 +913,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
 
             <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
               <FloatInput
-                label="Data de Atestado de Vacinação"
+                label="Data do Atestado de Vacinação"
                 required
                 type="date"
                 icon={<Calendar size={18} color={GREEN} />}
