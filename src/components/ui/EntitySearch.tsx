@@ -1448,7 +1448,7 @@ interface MapModalProps {
 	initialLng?: string;
 }
 
-function MapModal({
+export function MapModal({
 	onClose,
 	onConfirm,
 	initialLat,

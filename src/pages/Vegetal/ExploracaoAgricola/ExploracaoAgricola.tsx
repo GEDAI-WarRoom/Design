@@ -84,9 +84,9 @@ export function ExploracaoAgricolaPage({ onLogout, onNavigate }: { onLogout: () 
 
         <div className="flex flex-col gap-5 rounded-xl bg-white p-6 shadow-sm">
           <div className="flex gap-3">
-            <div className="flex-1"><FloatInput label="Código da Exploração Agrícola" value={codigo} onChange={(v) => { setCodigo(v.replace(/\D/g, "").slice(0, 17)); setErro(""); }} maxLength={17} icon={<Search size={16} />} /></div>
+            <div className="relative flex-1"><FloatInput label="Código da Exploração Agrícola" value={codigo} onChange={(v) => { setCodigo(v.replace(/\D/g, "").slice(0, 17)); setErro(""); }} maxLength={17} /><Search size={17} className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#1A7A3C]" aria-hidden="true" /></div>
             <button type="button" onClick={() => setShowFilters((v) => !v)} className="h-12 rounded-md border px-4" style={{ borderColor: GREEN, color: showFilters ? GREEN : "white", backgroundColor: showFilters ? "white" : GREEN }}><SlidersHorizontal size={17} /></button>
-            <button type="button" onClick={pesquisar} className="h-12 rounded-md bg-[#1A7A3C] px-5 text-sm font-semibold text-white">Pesquisar</button>
+            {showFilters && <button type="button" onClick={pesquisar} className="h-12 rounded-md bg-[#1A7A3C] px-5 text-sm font-semibold text-white">Pesquisar</button>}
           </div>
 
           {showFilters && <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">

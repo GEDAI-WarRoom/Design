@@ -21,7 +21,12 @@ export interface EstabelecimentoAgricola extends EntidadeBasica {
 export interface ProdutorAgricola extends EntidadeBasica {
   documento: string;
   tipo: "PF" | "PJ";
+  tipoProdutor?: TipoProdutor;
 }
+
+export type TipoProdutor = "Inquilino" | "Arrendatário" | "Assentado" | "Comodatário" | "Beneficiário de doação com reserva de usufruto" | "Meeiro" | "Parceiro Rural" | "Posseiro" | "Possuidor" | "Proprietário" | "Sócio" | "Usufrutuário";
+
+export const TIPOS_PRODUTOR: TipoProdutor[] = ["Inquilino", "Arrendatário", "Assentado", "Comodatário", "Beneficiário de doação com reserva de usufruto", "Meeiro", "Parceiro Rural", "Posseiro", "Possuidor", "Proprietário", "Sócio", "Usufrutuário"];
 
 export interface VariedadeCultura extends EntidadeBasica {
   cultura: string;
