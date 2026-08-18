@@ -11,6 +11,7 @@ import {
   Syringe,
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
+import { useDemoUser } from "../../../contexts/DemoUserContext";
 import { FloatSelect, FloatCombobox, FloatInput, SearchModal } from "../../../components/ui/FormKit";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
 import * as Icons from "../../../imports/icons";
@@ -149,8 +150,8 @@ const MUNICIPIOS_MG = [
 ];
 
 const SITUACOES = [
-  { value: "Ativo", label: "Ativo" },
-  { value: "Cancelada", label: "Cancelada" },
+  { value: "Gravado", label: "Gravado" },
+  { value: "Cancelado", label: "Cancelado" },
 ];
 
 // ==========================================================
@@ -168,24 +169,24 @@ interface DeclaracaoVacinacao {
   etapaVacinacao: string;
   tipoVacinacao: string;
   dataVacinacao: string; // ISO AAAA-MM-DD
-  situacao: "Ativo" | "Cancelada";
+  situacao: "Gravado" | "Cancelado";
 }
 
 const DECLARACOES_MOCK: DeclaracaoVacinacao[] = [
   {
     id: 1, produtorNome: "José Aarão Neto", produtorDoc: "555.009.956-40",
     estabCodigo: "31234567891", estabNome: "Fazenda do Rio", municipio: "Lavras",
-    especie: "Bovino", doenca: "Brucelose", etapaVacinacao: "Campanha de Brucelose 2026", tipoVacinacao: "Vacina Oficial", dataVacinacao: "2026-02-01", situacao: "Ativo",
+    especie: "Bovino", doenca: "Brucelose", etapaVacinacao: "Campanha de Brucelose 2026", tipoVacinacao: "Vacina Oficial", dataVacinacao: "2026-02-01", situacao: "Gravado",
   },
   {
     id: 2, produtorNome: "Divino de Souza Sobrinho", produtorDoc: "444.009.956-40",
     estabCodigo: "31001040005", estabNome: "Fazenda Rio Preto", municipio: "Lavras",
-    especie: "Bovino", doenca: "Febre Aftosa", etapaVacinacao: "Campanha de Febre Aftosa 2026", tipoVacinacao: "Vacina Complementar", dataVacinacao: "2026-01-15", situacao: "Cancelada",
+    especie: "Bovino", doenca: "Febre Aftosa", etapaVacinacao: "Campanha de Febre Aftosa 2026", tipoVacinacao: "Vacina Complementar", dataVacinacao: "2026-01-15", situacao: "Cancelado",
   },
   {
     id: 3, produtorNome: "Agropecuária Vale Verde Ltda.", produtorDoc: "56.338.814/0001-95",
     estabCodigo: "42001040005", estabNome: "Fazenda Vertentes", municipio: "Varginha",
-    especie: "Equino", doenca: "Raiva", etapaVacinacao: "Campanha de Raiva 2026", tipoVacinacao: "Primeira Dose", dataVacinacao: "2026-03-02", situacao: "Ativo",
+    especie: "Equino", doenca: "Raiva", etapaVacinacao: "Campanha de Raiva 2026", tipoVacinacao: "Primeira Dose", dataVacinacao: "2026-03-02", situacao: "Gravado",
   },
 ];
 
@@ -210,6 +211,7 @@ interface PageProps {
 }
 
 export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
+  const { role, user } = useDemoUser();
   const [declaracoesDB, setDeclaracoesDB] = useState<DeclaracaoVacinacao[]>([]);
   const [busca, setBusca] = useState("");
   const [produtor, setProdutor] = useState<any | null>(null);
@@ -293,7 +295,8 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
     const matchDe = periodoDe === "" || e.dataVacinacao >= periodoDe;
     const matchAte = periodoAte === "" || e.dataVacinacao <= periodoAte;
     const matchSituacao = situacao === "" || e.situacao === situacao;
-    return matchBusca && matchProdutor && matchEstab && matchExplor && matchMunicipio &&
+    const registroDoProdutorLogado = role !== "produtor" || !user?.document || e.produtorDoc === user.document;
+    return registroDoProdutorLogado && matchBusca && matchProdutor && matchEstab && matchExplor && matchMunicipio &&
       matchEspecie && matchDoenca && matchEtapa && matchTipo && matchDe && matchAte && matchSituacao;
   });
 
@@ -316,7 +319,7 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
           </button>
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-semibold text-gray-900">Declaração de Vacinação</h1>
-            <button onClick={() => onNavigate("adicionar-declaracao-vacinacao")} className="px-5 py-3 rounded-md text-white text-sm font-semibold transition hover:opacity-90 active:scale-[0.98]" style={{ backgroundColor: GREEN }}>
+            <button onClick={() => onNavigate(role === "produtor" ? "validar-rebanho-declaracao-vacinacao" : "adicionar-declaracao-vacinacao")} className="px-5 py-3 rounded-md text-white text-sm font-semibold transition hover:opacity-90 active:scale-[0.98]" style={{ backgroundColor: GREEN }}>
               Adicionar Nova
             </button>
           </div>
@@ -324,7 +327,7 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
 
         <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col gap-5">
           <div className="animate-fadeIn flex flex-col gap-3 w-full">
-            <div className="grid grid-cols-1 gap-3 w-full items-end lg:grid-cols-5">
+            <div className="grid grid-cols-1 gap-3 w-full items-end sm:grid-cols-2 lg:grid-cols-4">
               <EntitySearchInput
                 label="Etapa de Vacinação"
                 placeholder="Buscar por etapa de vacinação"
@@ -337,58 +340,37 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
                 subtitle="Busque por uma etapa de vacinação cadastrada no sistema:"
                 onChange={(ent) => {
                   setEtapaVacinacao(ent);
+                  setDoenca(ent ? DOENCAS_MOCK.find((item) => item.nome === ent.doenca) ?? null : null);
                   setTipoVacinacao(ent ? "Vacina Oficial" : "");
                 }}
               />
-              {etapaVacinacao && (
-                <FloatSelect
-                  label="Tipo de Vacinação"
-                  value={tipoVacinacao}
-                  onChange={setTipoVacinacao}
-                  options={TIPOS_VACINACAO}
-                />
-              )}
-              <button
-                onClick={handlePesquisar}
-                className="order-5 h-12 w-full px-5 rounded-md text-white text-sm font-semibold transition hover:opacity-90 flex items-center justify-center whitespace-nowrap"
-                style={{ backgroundColor: GREEN }}
-              >
-                Pesquisar
-              </button>
-            <div className="contents">
-              <div className="order-3 w-full">
-                <FloatInput
-                  label="Produtor"
-                  value={produtor ? produtor.nome : ""} 
-                  icon={<img src={Icons.iconeProdutorUrl} alt="Produtor" className="w-5 h-5 object-contain" />} 
-                  onClick={() => setModalProdutor(true)}
-                  readOnly
-                />            
-              </div>
-
-              <div className="order-4 w-full">
-                <EntitySearchInput
-                  label="Estabelecimento Agropecuário"
-                  placeholder="Buscar por código, nome, município ou proprietário."
-                  value={estabelecimento ? estabelecimento.nome : ""}
-                  data={ESTABELECIMENTOS_MOCK}
-                  searchKeys={["codigo", "nome", "municipio", "proprietario"]}
-                  columns={[
-                    { label: "Código", key: "codigo" },
-                    { label: "Estabelecimento", key: "nome" },
-                    { label: "Município", key: "municipio" },
-                    { label: "Proprietário", key: "proprietario" },
-                  ]}
-                  icon={<img src={Icons.iconeEstabelecimentoUrl} alt="Estabelecimento Agropecuário" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}
-                  title="Buscar Estabelecimento Agropecuário"
-                  subtitle="Busque por um estabelecimento cadastrado:"
-                  onChange={(ent) => setEstabelecimento(ent)}
-                />
-              </div>
-            </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 w-full items-end">
+              <EntitySearchInput
+                label="Doença"
+                placeholder="Buscar por doença"
+                value={doenca ? doenca.nome : ""}
+                data={DOENCAS_MOCK}
+                searchKeys={["nome"]}
+                columns={[{ label: "Doença", key: "nome" }]}
+                icon={<img src={Icons.iconeDoencaUrl} alt="Doença" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}
+                title="Buscar Doença"
+                subtitle="Busque por uma doença cadastrada:"
+                onChange={(ent) => { setDoenca(ent); setTipoVacinacao(""); }}
+                disabled={Boolean(etapaVacinacao)}
+              />
+              <FloatSelect label="Tipo de Vacinação" value={tipoVacinacao} onChange={setTipoVacinacao} options={TIPOS_VACINACAO} disabled={!etapaVacinacao} />
+              <FloatInput label="Produtor" value={produtor ? produtor.nome : ""} icon={<img src={Icons.iconeProdutorUrl} alt="Produtor" className="w-5 h-5 object-contain" />} onClick={() => setModalProdutor(true)} readOnly />
+              <EntitySearchInput
+                label="Estabelecimento Agropecuário"
+                placeholder="Buscar por código, nome, município ou proprietário."
+                value={estabelecimento ? estabelecimento.nome : ""}
+                data={ESTABELECIMENTOS_MOCK}
+                searchKeys={["codigo", "nome", "municipio", "proprietario"]}
+                columns={[{ label: "Código", key: "codigo" }, { label: "Estabelecimento", key: "nome" }, { label: "Município", key: "municipio" }, { label: "Proprietário", key: "proprietario" }]}
+                icon={<img src={Icons.iconeEstabelecimentoUrl} alt="Estabelecimento Agropecuário" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}
+                title="Buscar Estabelecimento Agropecuário"
+                subtitle="Busque por um estabelecimento cadastrado:"
+                onChange={(ent) => setEstabelecimento(ent)}
+              />
               <FloatInput
                 label="Exploração Pecuária"
                 required
@@ -416,8 +398,6 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
                 className="max-w-5xl w-full [&_td]:whitespace-pre-line"
               />
 
-              <FloatCombobox label="Município do Estabelecimento" value={municipio} onChange={setMunicipio} options={MUNICIPIOS_MG} />
-
               <EntitySearchInput
                 label="Espécie"
                 placeholder="Buscar por nome da espécie"
@@ -434,22 +414,14 @@ export function DeclaracaoVacinacaoPage({ onLogout, onNavigate }: PageProps) {
                 onChange={(ent) => setEspecie(ent)}
               />
 
-              <EntitySearchInput
-                label="Doença"
-                placeholder="Buscar por doença"
-                value={doenca ? doenca.nome : ""}
-                data={DOENCAS_MOCK}
-                searchKeys={["nome"]}
-                columns={[{ label: "Doença", key: "nome" }]}
-                icon={<img src={Icons.iconeDoencaUrl} alt="Doença" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}
-                title="Buscar Doença"
-                subtitle="Busque por uma doença cadastrada:"
-                onChange={(ent) => setDoenca(ent)}
-              />
+              <FloatCombobox label="Município do Estabelecimento" value={municipio} onChange={setMunicipio} options={MUNICIPIOS_MG} />
 
               <FloatInput label="Período - De" type="date" max={hoje} value={periodoDe} icon={<Calendar size={18} color={GREEN} />} onChange={setPeriodoDe} />
               <FloatInput label="Período - Até" type="date" min={periodoDe || undefined} value={periodoAte}  icon={<Calendar size={18} color={GREEN} />}onChange={setPeriodoAte} />
               <FloatSelect label="Situação" value={situacao} onChange={setSituacao} options={SITUACOES} />
+            </div>
+            <div className="flex justify-end">
+              <button onClick={handlePesquisar} className="h-12 w-full rounded-md px-8 text-sm font-semibold text-white transition hover:opacity-90 sm:w-auto" style={{ backgroundColor: GREEN }}>Pesquisar</button>
             </div>
 
             {erroDeFuturo && <p className="text-sm text-red-500">A data "De" não pode ser maior que a data atual.</p>}

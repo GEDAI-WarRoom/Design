@@ -202,6 +202,7 @@ import { AdicionarDeclaracaoVacinacaoPage } from "./pages/Vacinacao/DeclaracaoVa
 import { DeclaracaoVacinacaoPage } from "./pages/Vacinacao/DeclaracaoVacinacao/DeclaracaoVacinacao";
 import { VisualizarDeclaracaoVacinacaoPage } from "./pages/Vacinacao/DeclaracaoVacinacao/VisualizarDeclaracaoVacinacao";
 import { EditarDeclaracaoVacinacaoPage } from "./pages/Vacinacao/DeclaracaoVacinacao/EditarDeclaracaoVacinacao";
+import { ValidarRebanhoDeclaracaoVacinacaoPage } from "./pages/Vacinacao/DeclaracaoVacinacao/ValidarRebanhoDeclaracaoVacinacao";
 import { AdicionarDoencaPage } from "./pages/Vacinacao/Doenca/AdicionarDoenca";
 import { DoencaPage } from "./pages/Vacinacao/Doenca/Doenca";
 import { AdicionarEtapaVacinacaoPage } from "./pages/Vacinacao/EtapaVacinacao/AdicionarEtapaVacinacao";
@@ -364,6 +365,7 @@ export type Screen =
   | "editar-declaracao-vacinacao"
   | "declaracao-vacinacao"
   | "adicionar-declaracao-vacinacao"
+  | "validar-rebanho-declaracao-vacinacao"
   | "visualizar-doenca"
   | "editar-doenca"
   | "visualizar-vacinador-brucelose"
@@ -1397,13 +1399,15 @@ export default function App() {
 					onNavigate={handleNavigate}
 				/>
 			);
-		case "adicionar-declaracao-vacinacao":
+    case "adicionar-declaracao-vacinacao":
 			return (
 				<AdicionarDeclaracaoVacinacaoPage
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
 				/>
 			);
+		case "validar-rebanho-declaracao-vacinacao":
+			return <ValidarRebanhoDeclaracaoVacinacaoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 		case "doenca":
 			return <DoencaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 		case "adicionar-doenca":

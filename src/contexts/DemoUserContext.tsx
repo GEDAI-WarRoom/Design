@@ -111,6 +111,7 @@ const produtorAllowedRoutes = new Set([
 	"visualizar-partilha-vacina",
 	"editar-partilha-vacina",
 	"adicionar-declaracao-vacinacao",
+	"validar-rebanho-declaracao-vacinacao",
 	"visualizar-declaracao-vacinacao",
 	"editar-declaracao-vacinacao",
 	"ajuste-rebanho",
