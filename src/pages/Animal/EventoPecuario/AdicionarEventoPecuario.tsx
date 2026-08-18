@@ -29,11 +29,13 @@ import {
 import {
   ATIVIDADES_COMERCIAIS,
   ATIVIDADES_NAO_COMERCIAIS,
+  calcularIsencaoBruceloseSomenteLeitura,
   calcularSituacaoAutomatica,
   criarEventoPecuarioInicial,
   ESPECIES_EVENTO_MOCK,
   ESTABELECIMENTOS_AUXILIARES_MOCK,
   gerarCodigoEvento,
+  isencaoBruceloseEditavel,
   obterAlertasEventoPecuario,
   possuiEspecieBovideos,
   PROMOTORAS_EVENTO_MOCK,
@@ -191,7 +193,8 @@ export function AdicionarEventoPecuarioPage({
   const responsaveisSelecionados = responsaveis
     .map((item) => item.responsavel)
     .filter((item): item is ResponsavelEvento => Boolean(item));
-  const atividadeExigeIsencao = ["Feira", "Leilão"].includes(atividadeEvento);
+  const isencaoEditavel = isencaoBruceloseEditavel(atividadeEvento);
+  const isencaoCalculada = calcularIsencaoBruceloseSomenteLeitura(atividadeEvento, tipoLeilao);
   const exibeTipoLeilao = atividadeEvento === "Leilão" && possuiEspecieBovideos(especiesSelecionadas);
   const atividades = tipoEvento === "Com finalidade comercial"
     ? ATIVIDADES_COMERCIAIS
@@ -215,7 +218,7 @@ export function AdicionarEventoPecuarioPage({
     tipoEventoPecuario: tipoEvento,
     atividadeEvento,
     tipoLeilao: exibeTipoLeilao ? tipoLeilao : "",
-    isencaoBrucelose: (atividadeExigeIsencao ? isencaoBrucelose : "Não") as SimNaoEvento,
+    isencaoBrucelose: (isencaoEditavel ? isencaoBrucelose : isencaoCalculada) as SimNaoEvento,
     promotora,
     recinto,
     possuiAuxilioEstabelecimento: possuiAuxilio,
@@ -257,7 +260,7 @@ export function AdicionarEventoPecuarioPage({
   const alterarAtividade = (valor: string) => {
     setAtividadeEvento(valor);
     if (valor !== "Leilão") setTipoLeilao("");
-    setIsencaoBrucelose(["Feira", "Leilão"].includes(valor) ? "" : "Não");
+    setIsencaoBrucelose(isencaoBruceloseEditavel(valor) ? "" : "Não");
   };
 
   const validarEContinuar = () => {
@@ -453,9 +456,9 @@ export function AdicionarEventoPecuarioPage({
                 <SimNao
                   label="Possui isenção de exame de brucelose/tuberculose?"
                   name={`isencao-brucelose-${mode}`}
-                  value={atividadeExigeIsencao ? isencaoBrucelose : "Não"}
+                  value={isencaoEditavel ? isencaoBrucelose : isencaoCalculada}
                   onChange={(valor) => setIsencaoBrucelose(valor ? "Sim" : "Não")}
-                  disabled={!atividadeExigeIsencao}
+                  disabled={!isencaoEditavel}
                   required
                 />
               )}

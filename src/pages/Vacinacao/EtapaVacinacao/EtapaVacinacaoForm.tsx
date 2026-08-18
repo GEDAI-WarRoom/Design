@@ -38,7 +38,6 @@ export interface EtapaVacinacaoFormValue {
   dataFim: string;
   doenca: DoencaEtapaVacinacao | null;
   necessitaAtestadoDeclaracao: RespostaSimNao | "";
-  permiteDeclararMaisAnimais: RespostaSimNao | "";
   especies: EspecieEtapaVacinacao[];
   tiposVacinacao: TipoVacinacaoEtapa[];
   situacao: SituacaoEtapaVacinacao | "";
@@ -99,7 +98,6 @@ export function validarEtapaVacinacaoForm(value: EtapaVacinacaoFormValue) {
   if (value.dataInicio && value.dataFim && value.dataFim <= value.dataInicio) erros.push("A Data do Fim deve ser posterior à Data do Início.");
   if (!value.doenca) erros.push("Selecione uma doença.");
   if (!value.necessitaAtestadoDeclaracao) erros.push("Informe se necessita de atestado na declaração.");
-  if (!value.permiteDeclararMaisAnimais) erros.push("Informe se permite declarar mais animais do que o presente no rebanho.");
   if (!value.especies.length) erros.push("Selecione ao menos uma espécie.");
   if (!value.tiposVacinacao.length) erros.push("Adicione ao menos um tipo de vacinação.");
 
@@ -130,7 +128,6 @@ export function etapaParaForm(etapa?: Partial<EtapaVacinacao> | null): EtapaVaci
     dataFim: etapa?.dataFim ?? "",
     doenca: etapa?.doenca ?? null,
     necessitaAtestadoDeclaracao: etapa?.necessitaAtestadoDeclaracao ?? "",
-    permiteDeclararMaisAnimais: etapa?.permiteDeclararMaisAnimais ?? "",
     especies: etapa?.especies ?? [],
     tiposVacinacao: etapa?.tiposVacinacao?.length ? etapa.tiposVacinacao : [novoTipoVacinacao()],
     situacao: etapa?.situacao ?? "",
@@ -194,15 +191,6 @@ export function EtapaVacinacaoForm({ value, onChange, onVisualizarDoenca, mode, 
             <div className="flex gap-6">
               <CustomRadio label="Sim" name="atestado-obrigatorio" value="Sim" checked={value.necessitaAtestadoDeclaracao === "Sim"} onChange={() => setValue({ necessitaAtestadoDeclaracao: "Sim" })} disabled={bloqueioGeral} />
               <CustomRadio label="Não" name="atestado-obrigatorio" value="Não" checked={value.necessitaAtestadoDeclaracao === "Não"} onChange={() => setValue({ necessitaAtestadoDeclaracao: "Não" })} disabled={bloqueioGeral} />
-            </div>
-          </div>
-          <div>
-            <p className="mb-3 text-sm font-medium text-gray-700">
-              Permite declarar mais animais do que presente no rebanho? <span className="text-red-500">*</span>
-            </p>
-            <div className="flex gap-6">
-              <CustomRadio label="Sim" name="mais-animais-rebanho" value="Sim" checked={value.permiteDeclararMaisAnimais === "Sim"} onChange={() => setValue({ permiteDeclararMaisAnimais: "Sim" })} disabled={bloqueioGeral} />
-              <CustomRadio label="Não" name="mais-animais-rebanho" value="Não" checked={value.permiteDeclararMaisAnimais === "Não"} onChange={() => setValue({ permiteDeclararMaisAnimais: "Não" })} disabled={bloqueioGeral} />
             </div>
           </div>
         </div>

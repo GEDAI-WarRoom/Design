@@ -326,7 +326,7 @@ export function criarEventoPecuarioInicial(dados: any = {}, usarExemplo = false)
     dados?.estabelecimentoAgropecuario,
     ESTABELECIMENTOS_AUXILIARES_MOCK,
   ) ?? (usarExemplo && possuiAuxilio === "Sim" ? ESTABELECIMENTOS_AUXILIARES_MOCK[0] : null);
-  const atividadeExigeIsencao = ["Feira", "Leilão"].includes(caracterizacao.atividadeEvento);
+  const isencaoEditavel = isencaoBruceloseEditavel(caracterizacao.atividadeEvento);
 
   return {
     ...dados,
@@ -336,9 +336,9 @@ export function criarEventoPecuarioInicial(dados: any = {}, usarExemplo = false)
     periodoAte: texto(dados?.periodoAte ?? dados?.validadeAte, "2026-09-14", usarExemplo),
     especies: normalizarEspecies(dados, usarExemplo),
     ...caracterizacao,
-    isencaoBrucelose: atividadeExigeIsencao
+    isencaoBrucelose: isencaoEditavel
       ? (dados?.isencaoBrucelose === "Sim" ? "Sim" : dados?.isencaoBrucelose === "Não" ? "Não" : usarExemplo ? "Não" : "") as SimNaoEvento
-      : "Não",
+      : calcularIsencaoBruceloseSomenteLeitura(caracterizacao.atividadeEvento, caracterizacao.tipoLeilao),
     promotora,
     recinto,
     possuiAuxilioEstabelecimento: possuiAuxilio,
@@ -354,6 +354,17 @@ export function criarEventoPecuarioInicial(dados: any = {}, usarExemplo = false)
 
 export function possuiEspecieBovideos(especies: EspecieEvento[]) {
   return especies.some((item) => item.grupo?.toLocaleLowerCase("pt-BR").includes("boví"));
+}
+
+const TIPO_LEILAO_ISENCAO_SIM = "Animais com registro genealógico ou com finalidade de reprodução ou produção leiteira";
+
+export function isencaoBruceloseEditavel(atividadeEvento: string) {
+  return atividadeEvento === "Feira" || atividadeEvento === "Esporte";
+}
+
+export function calcularIsencaoBruceloseSomenteLeitura(atividadeEvento: string, tipoLeilao: string): SimNaoEvento {
+  if (atividadeEvento === "Leilão") return tipoLeilao === TIPO_LEILAO_ISENCAO_SIM ? "Sim" : "Não";
+  return "Não";
 }
 
 export function validarEventoPecuario(registro: EventoPecuarioRegistro, editando = false) {
@@ -375,7 +386,7 @@ export function validarEventoPecuario(registro: EventoPecuarioRegistro, editando
   ) {
     erros.push("Informe o tipo de leilão.");
   }
-  if (["Feira", "Leilão"].includes(registro.atividadeEvento) && !registro.isencaoBrucelose) {
+  if (isencaoBruceloseEditavel(registro.atividadeEvento) && !registro.isencaoBrucelose) {
     erros.push("Informe se o evento possui isenção de exame de brucelose/tuberculose.");
   }
   if (!registro.promotora) erros.push("Informe a promotora de eventos pecuários.");
