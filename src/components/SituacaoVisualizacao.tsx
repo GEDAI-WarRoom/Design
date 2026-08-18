@@ -27,6 +27,7 @@ const TELAS_GERAIS = new Set([
   "aeroporto-porto",
   "classificacao-sanitaria-estado",
   "divisao-municipal",
+  "doenca",
   "estabelecimento-agropecuario",
   "finalidade-transito",
   "taxa-emissao-gta",
@@ -61,7 +62,8 @@ export function SituacaoVisualizacao({ currentScreen }: SituacaoVisualizacaoProp
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
-      const main = document.querySelector("main");
+      const main = document.querySelector<HTMLElement>("main[data-situacao-container]")
+        ?? document.querySelector<HTMLElement>("main");
       const titulo = main?.querySelector("h1")?.textContent?.trim() || "";
       const ehTelaGeral = TELAS_GERAIS.has(currentScreen);
       const ehTelaDeVisualizacao = /^visualizar\b/i.test(titulo);
