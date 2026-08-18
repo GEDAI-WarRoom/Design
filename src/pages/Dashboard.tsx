@@ -407,6 +407,18 @@ const cadastrosCategoriesMescladas: any[] = [
             icon: <Dna size={16} />,
           },
           {
+            label: "Doença",
+            route: "doenca",
+            icon: (
+              <img src={Icons.iconeDoencaUrl} alt="Doença" className="w-4 h-4" />
+            ),
+          },
+          {
+            label: "Laboratório",
+            route: "laboratorio",
+            icon: <FlaskConical size={16} />,
+          },
+          {
             label: "Núcleo de Produção",
             route: "nucleo-producao",
             icon: (
@@ -730,11 +742,6 @@ export const secondaryCategories: MenuCategory[] = [
     icon: <Syringe size={28} color={GREEN} />,
     items: [
       {
-        label: "Laboratório",
-        route: "laboratorio",
-        icon: <FlaskConical size={16} />,
-      },
-      {
         label: "Venda com Saída de Vacina",
         route: "venda-saida-vacina",
         icon: <PackageMinus size={16} />,
@@ -784,14 +791,6 @@ export const secondaryCategories: MenuCategory[] = [
             alt="Declaração de Vacinação"
             className="w-4 h-4"
           />
-        ),
-      },
-
-      {
-        label: "Doença",
-        route: "doenca",
-        icon: (
-          <img src={Icons.iconeDoencaUrl} alt="Doença" className="w-4 h-4" />
         ),
       },
 

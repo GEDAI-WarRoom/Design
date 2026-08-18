@@ -63,6 +63,7 @@ const TIPOS_RESPONSAVEL: Array<{ value: TipoProfissional; label: string }> = [
   { value: "Responsável Técnico Animal", label: "Responsável Técnico Animal" },
   { value: "Responsável Técnico Vegetal", label: "Responsável Técnico Vegetal" },
   { value: "Habilitado para Emissão de GTA", label: "Habilitado para Emissão de GTA" },
+  { value: "Funcionário", label: "Funcionário" },
 ];
 
 interface PageProps {
@@ -111,12 +112,16 @@ function Section({ title, children, defaultOpen = true }: { title: string; child
 /* ──────────────────────────────────────────────────────────────────────────
    CARD DO PROFISSIONAL (ADAPTADO COM ÍCONES REQUERIDOS)
    ────────────────────────────────────────────────────────────────────────── */
+function rotuloTipoProfissional(tipo: TipoProfissional | null) {
+  if (tipo === "Funcionário") return "Funcionário";
+  if (tipo === "Responsável Técnico Vegetal") return "Responsável Técnico Vegetal";
+  if (tipo?.toLowerCase().includes("ptv")) return "Habilitado para Emissão de PTV";
+  if (tipo?.toLowerCase().includes("gta")) return "Habilitado para Emissão de GTA";
+  return "Responsável Técnico Animal";
+}
+
 function ProfessionalCard({ item, onView }: { item: ProfissionalVinculado; onView: () => void }) {
-  const rotuloProfissional = item.tipo === "Funcionário"
-    ? "Funcionário"
-    : item.tipo === "Responsável Técnico Vegetal"
-      ? "Profissional da Área Vegetal"
-      : "Profissional da Área Animal";
+  const rotuloProfissional = rotuloTipoProfissional(item.tipo);
 
   return (
     <article className="bg-white border border-gray-100 shadow-sm rounded-sm overflow-hidden min-w-0 w-full">
@@ -142,13 +147,13 @@ function ProfessionalCard({ item, onView }: { item: ProfissionalVinculado; onVie
           </div>
         </div>
 
-        {/* Ícone de Calendário para a data da ART */}
+        {/* Ícone de Calendário para a data da DRT */}
         {item.dataArt && (
           <div className="flex items-start gap-3">
             <Calendar size={19} className="text-[#1A7A3C] shrink-0" />
             <div>
               <p className="text-sm text-gray-800">{formatarData(item.dataArt)}</p>
-              <p className="text-[10px] text-gray-500">Data da ART</p>
+              <p className="text-[10px] text-gray-500">Data da DRT</p>
             </div>
           </div>
         )}
@@ -239,11 +244,7 @@ export function VisualizarRevendedoraAgropecuarioPage({ onLogout, onNavigate, da
         ? PROFISSIONAIS_ANIMAL.filter((item) => item.habilitadoGta)
         : PROFISSIONAIS_ANIMAL;
 
-  const rotuloProfissional = tipo === "Funcionário"
-    ? "Funcionário"
-    : tipo === "Responsável Técnico Vegetal"
-      ? "Profissional da Área Vegetal"
-      : "Profissional da Área Animal";
+  const rotuloProfissional = rotuloTipoProfissional(tipo);
 
   const abrirNovo = (funcionario: boolean) => {
     setProfissionalId("");
@@ -296,12 +297,12 @@ export function VisualizarRevendedoraAgropecuarioPage({ onLogout, onNavigate, da
       return;
     }
     if (isResponsavelArt && (!dataArt || !arquivoArt)) {
-      setErro("Informe a data e o arquivo da ART.");
+      setErro("Informe a data e o arquivo da DRT.");
       return;
     }
     const hoje = new Date().toISOString().slice(0, 10);
     if (dataArt && dataArt > hoje) {
-      setErro("A data da ART não pode ser futura.");
+      setErro("A data da DRT não pode ser futura.");
       return;
     }
     const outroAtivo = revendedora.profissionais.find((item) => item.id !== profissionalId && item.tipo === tipo && item.situacao === "Ativo");
@@ -533,6 +534,24 @@ export function VisualizarRevendedoraAgropecuarioPage({ onLogout, onNavigate, da
               ))}
             </AccordionCardGroup>
 
+            {/* ─── FUNCIONÁRIOS ─── */}
+            <AccordionCardGroup
+              title="Funcionário"
+              activeCountText={`${funcionariosAtivos.length} cadastros ativos`}
+              variant="sem-vinculacao"
+              historicoTitle="Histórico de Funcionários"
+              icon={<User size={21} />}
+              historicoChildren={
+                funcionariosInativos.map((item) => (
+                  <ProfessionalCard key={item.id} item={item} onView={() => abrirProfissional(item)} />
+                ))
+              }
+            >
+              {funcionariosAtivos.map((item) => (
+                <ProfessionalCard key={item.id} item={item} onView={() => abrirProfissional(item)} />
+              ))}
+            </AccordionCardGroup>
+
           </div>
         )}
 
@@ -543,7 +562,7 @@ export function VisualizarRevendedoraAgropecuarioPage({ onLogout, onNavigate, da
               activeCountText={`${funcionariosAtivos.length} cadastros ativos`}
               variant="sem-vinculacao"
               historicoTitle="Histórico de Funcionários"
-              icon={<UsersRound size={21} />}
+              icon={<User size={21} />}
               historicoChildren={
                 funcionariosInativos.map((item) => (
                   <ProfessionalCard key={item.id} item={item} onView={() => abrirProfissional(item)} />
@@ -587,9 +606,7 @@ export function VisualizarRevendedoraAgropecuarioPage({ onLogout, onNavigate, da
                     setProfissional(null);
                     setDataArt(""); // Reseta a data ao mudar o tipo
                   }}
-                  options={tipo === "Funcionário"
-                    ? [{ value: "Funcionário", label: "Funcionário" }]
-                    : TIPOS_RESPONSAVEL}
+                  options={TIPOS_RESPONSAVEL}
                   disabled={!!profissionalId || somenteLeitura}
                 />
               </div>
@@ -664,8 +681,8 @@ export function VisualizarRevendedoraAgropecuarioPage({ onLogout, onNavigate, da
 
               </div>
 
-              {/* Data da ART integrada aqui dentro caso seja Responsável Técnico */}
-              {/* Seção Integrada de ART (Data + Upload) exibida apenas para Responsável Técnico */}
+              {/* Data da DRT integrada aqui dentro caso seja Responsável Técnico */}
+              {/* Seção Integrada de DRT (Data + Upload) exibida apenas para Responsável Técnico */}
               {isResponsavelArt && (
                 <div className="flex flex-col gap-4 w-full animate-fade-in mt-2">
                   {/* Divisor e Subtítulo */}
@@ -679,7 +696,7 @@ export function VisualizarRevendedoraAgropecuarioPage({ onLogout, onNavigate, da
                   {/* Campo de Data */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FloatInput
-                      label="Data da ART"
+                      label="Data da DRT"
                       type="date"
                       icon={<Calendar size={16} color={GREEN} />}
                       value={dataArt}
@@ -689,14 +706,15 @@ export function VisualizarRevendedoraAgropecuarioPage({ onLogout, onNavigate, da
                     />
                   </div>
 
-                  {/* Upload do Arquivo da ART */}
+                  {/* Upload do Arquivo da DRT */}
                   <div className="flex flex-col gap-3">
                     <div className="flex gap-4 items-start relative w-full">
                       <div className="flex-1 flex flex-col gap-4">
                         <div className="flex gap-3 items-start w-full">
 
                           <UploadField
-                            label="ART"
+                            label="DRT"
+                            tooltipText="Documento de Responsabilidade Técnica"
                             required
                             fileName={arquivoArt}
                             onSelectFile={() => setArquivoArt(`documento_vinculo_${Date.now()}.pdf`)}

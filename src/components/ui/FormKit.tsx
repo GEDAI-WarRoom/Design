@@ -56,6 +56,7 @@ interface FloatInputProps {
 	min?: string;
 	max?: string;
 	icon?: React.ReactNode;
+	groupNumber?: number;
 	onClick?: () => void;
 	className?: string;
 	hasTooltip?: boolean;
@@ -76,6 +77,7 @@ export function FloatInput({
 	min,
 	max,
 	icon,
+	groupNumber,
 	onClick,
 	className = "",
 	hasTooltip,
@@ -463,6 +465,7 @@ interface UploadFieldProps {
 	required?: boolean;
 	disabled?: boolean;
 	subtitle?: string;
+	tooltipText?: string;
 }
 
 export function UploadField({
@@ -472,6 +475,7 @@ export function UploadField({
 	required,
 	disabled,
 	subtitle = "Formatos permitidos: PNG, JPG ou PDF de até 50MB.",
+	tooltipText,
 }: UploadFieldProps) {
 	return (
 		<div className="w-[340px] flex flex-col gap-1">
@@ -485,7 +489,10 @@ export function UploadField({
 				/>
 				<div className="flex flex-col justify-center select-none flex-1">
 					<span className="text-[10px] text-gray-400 font-medium leading-none mb-0.5">
-						{label} {required && <span className="text-red-500">*</span>}
+						<span className="inline-flex items-center gap-1">
+							{label} {required && <span className="text-red-500">*</span>}
+							{tooltipText && <FieldTooltip text={tooltipText} />}
+						</span>
 					</span>
 					<span
 						className={`text-sm font-medium truncate max-w-[260px] ${fileName ? "text-gray-700" : "text-gray-500"}`}>
@@ -1551,11 +1558,13 @@ interface AccordionCardGroupProps {
 	activeCountText: string;
 	onAddClick?: () => void;
 	icon?: React.ReactNode;
+	groupNumber?: number;
 	children: React.ReactNode; // Cards ativos (ActiveCard/EvaluationActiveCard)
 	variant?: "com-vinculacao" | "sem-vinculacao";
-	grid?: "unico" | "normal";
+	grid?: "unico" | "normal" | "amplo";
 	historicoTitle?: string;
 	historicoChildren?: React.ReactNode; // Cards de histórico (HistoryCard)
+	emptyStateText?: string;
 }
 
 export function AccordionCardGroup({
@@ -1563,11 +1572,13 @@ export function AccordionCardGroup({
 	activeCountText,
 	onAddClick,
 	icon,
+	groupNumber,
 	children,
 	variant = "com-vinculacao",
 	grid = "normal",
 	historicoTitle,
 	historicoChildren,
+	emptyStateText = "Nenhum item ativo.",
 }: AccordionCardGroupProps) {
 	const [isOpen, setIsOpen] = useState(true);
 	const [isHistoryOpen, setIsHistoryOpen] = useState(true);
@@ -1579,6 +1590,8 @@ export function AccordionCardGroup({
 	const activeContainerClass =
 		grid === "unico"
 			? "w-full max-w-xl mx-auto grid grid-cols-1 gap-4 py-2"
+			: grid === "amplo"
+				? "w-full grid grid-cols-1 gap-4 py-2"
 			: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full py-2";
 
 	return (
@@ -1588,7 +1601,11 @@ export function AccordionCardGroup({
 				onClick={() => setIsOpen(!isOpen)}
 				className="bg-[#fdfcfb] flex items-center justify-between p-5 border-b border-gray-100 cursor-pointer select-none transition hover:bg-gray-50">
 				<div className="flex gap-3 items-center">
-					{icon && (
+					{groupNumber != null ? (
+						<div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#32C47F] to-[#129356] text-lg font-semibold text-white">
+							{groupNumber}
+						</div>
+					) : icon && (
 						<div className="flex items-center justify-center p-2 rounded-lg bg-gradient-to-br from-[#32C47F] to-[#129356] text-white">
 							{icon}
 						</div>
@@ -1631,7 +1648,7 @@ export function AccordionCardGroup({
 						<div className={activeContainerClass}>{children}</div>
 					) : (
 						<p className="text-sm text-gray-500 py-4 text-center w-full">
-							Nenhuma medida de biosseguridade vigente nesta exploração.
+							{emptyStateText}
 						</p>
 					)}
 
