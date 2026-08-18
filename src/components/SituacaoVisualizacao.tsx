@@ -62,6 +62,7 @@ export function SituacaoVisualizacao({ currentScreen }: SituacaoVisualizacaoProp
 
   useEffect(() => {
     let observer: MutationObserver | null = null;
+    let onProfessionalsTabChanged: (() => void) | null = null;
     const frame = window.requestAnimationFrame(() => {
       const main = document.querySelector<HTMLElement>("main[data-situacao-container]")
         ?? document.querySelector<HTMLElement>("main");
@@ -82,6 +83,14 @@ export function SituacaoVisualizacao({ currentScreen }: SituacaoVisualizacaoProp
         || main.querySelector<HTMLElement>("[data-current-situacao]")?.dataset.currentSituacao
         || campoSituacao?.querySelector<HTMLInputElement>("input")?.value;
 
+      const atualizarVisibilidade = () => {
+        const abaProfissionaisAtiva = document.querySelector('[data-profissionais-tab-active="true"]');
+        setContainer(abaProfissionaisAtiva ? null : main);
+      };
+      atualizarVisibilidade();
+      onProfessionalsTabChanged = atualizarVisibilidade;
+      window.addEventListener("professionals-tab-changed", onProfessionalsTabChanged);
+
       const ehVendaInsumo = ["venda-entrada-insumos-exames", "venda-saida-insumo"].includes(currentScreen);
       const situacaoInicial = ehVendaInsumo
         ? valorAtual === "Cancelada" ? "Cancelada" : "Gravada"
@@ -91,7 +100,9 @@ export function SituacaoVisualizacao({ currentScreen }: SituacaoVisualizacaoProp
       setProximaSituacao(null);
       setModoPagina(ehTelaDeEdicao ? "editar" : "visualizar");
       setAbaCadastroAtiva(currentScreen !== "exploracao-agricola" || main.dataset.situacaoTab === "cadastro");
-      setContainer(main);
+      if (!document.querySelector('[data-profissionais-tab-active="true"]')) {
+        setContainer(main);
+      }
 
       if (currentScreen === "exploracao-agricola") {
         const atualizarAba = () => setAbaCadastroAtiva(main.dataset.situacaoTab === "cadastro");
@@ -102,6 +113,9 @@ export function SituacaoVisualizacao({ currentScreen }: SituacaoVisualizacaoProp
 
     return () => {
       window.cancelAnimationFrame(frame);
+      if (onProfessionalsTabChanged) {
+        window.removeEventListener("professionals-tab-changed", onProfessionalsTabChanged);
+      }
       observer?.disconnect();
     };
   }, [currentScreen]);
