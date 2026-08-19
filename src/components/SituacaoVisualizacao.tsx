@@ -42,6 +42,7 @@ const TELAS_GERAIS = new Set([
   "venda-propriedade",
   "venda-entrada-insumos-exames",
   "venda-saida-insumo",
+  "venda-saida-vacina",
   "exploracao-agricola",
 ]);
 
@@ -91,7 +92,7 @@ export function SituacaoVisualizacao({ currentScreen }: SituacaoVisualizacaoProp
       onProfessionalsTabChanged = atualizarVisibilidade;
       window.addEventListener("professionals-tab-changed", onProfessionalsTabChanged);
 
-      const ehVendaInsumo = ["venda-entrada-insumos-exames", "venda-saida-insumo"].includes(currentScreen);
+      const ehVendaInsumo = ["venda-entrada-insumos-exames", "venda-saida-insumo", "venda-saida-vacina"].includes(currentScreen);
       const situacaoInicial = ehVendaInsumo
         ? valorAtual === "Cancelada" ? "Cancelada" : "Gravada"
         : valorAtual === "Suspenso" ? "Suspenso" : valorAtual === "Inativo" ? "Inativo" : "Ativo";
@@ -132,7 +133,7 @@ export function SituacaoVisualizacao({ currentScreen }: SituacaoVisualizacaoProp
     setProximaSituacao(null);
   };
 
-  const ehVendaInsumo = ["venda-entrada-insumos-exames", "venda-saida-insumo"].includes(currentScreen);
+  const ehVendaInsumo = ["venda-entrada-insumos-exames", "venda-saida-insumo", "venda-saida-vacina"].includes(currentScreen);
   const permiteSuspensao = ["estabelecimento-agropecuario", "finalidade-transito", "exploracao-agricola"].includes(currentScreen);
   const tipoMovimentacao = currentScreen === "venda-saida-insumo" ? "saída" : "entrada";
   const opcoesSituacao = ehVendaInsumo

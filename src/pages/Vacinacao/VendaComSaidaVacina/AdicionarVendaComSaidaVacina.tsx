@@ -26,11 +26,12 @@ import {
   Trash2,
   PlusCircle,
   Info,
-  Download,
   Package,
   PillBottle
 } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
+import { salvarRegistroMock } from "../../../components/ui/mockCollectionStorage";
+import { registrarVersaoCadastro } from "../../../components/ui/historicoCadastroStorage";
 import {
   FloatInput,
   FloatSelect,
@@ -141,6 +142,7 @@ function SimNao({
       <div className="flex gap-6 h-8 items-center">
         <CustomRadio label="Sim" name={name} value="Sim" checked={value === "Sim"} onChange={() => onChange("Sim")} />
         <CustomRadio label="Não" name={name} value="Não" checked={value === "Não"} onChange={() => onChange("Não")} />
+        <CustomRadio label="Não sei informar" name={name} value="Não sei informar" checked={value === "Não sei informar"} onChange={() => onChange("Não sei informar")} />
       </div>
     </div>
   );
@@ -160,6 +162,9 @@ interface AdicionarVendaVacinaProps extends CadastroVacinacaoModeProps {
   onLogout: () => void;
   onNavigate: (screen: any, data?: any) => void;
   tipoProduto?: "vacina" | "insumo";
+  acaoHistorico?: React.ReactNode;
+  avisoHistorico?: React.ReactNode;
+  esconderNavbar?: boolean;
 }
 
 
@@ -344,7 +349,7 @@ function DonutChart({ data, size = 110 }: { data: DoseCategory[]; size?: number 
     </div>
   );
 }
-const TIPOS_CONTATO = ["Telefone", "Celular", "WhatsApp", "E-mail"];
+const TIPOS_CONTATO = ["Telefone", "E-mail"];
 
 
 interface ContatoAdicional {
@@ -354,7 +359,7 @@ interface ContatoAdicional {
   observacao: string;
 }
 
-export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = "create", dados, tipoProduto = "vacina" }: AdicionarVendaVacinaProps) {
+export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = "create", dados, tipoProduto = "vacina", acaoHistorico, avisoHistorico, esconderNavbar = false }: AdicionarVendaVacinaProps) {
   const isInsumo = tipoProduto === "insumo";
   const nomeDocumentoObrigatorio = isInsumo ? "Requerimento" : "Receituário";
   const nomeDocumentoObrigatorioMinusculo = nomeDocumentoObrigatorio.toLowerCase();
@@ -384,6 +389,13 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
   const [dataNotaFiscal, setDataNotaFiscal] = useState(dados?.dataNotaFiscal ?? dados?.dataVenda ?? (preenchendoRegistro ? "2026-05-15" : ""));
   const [revendedora, setRevendedora] = useState(dados?.revendedora ?? dados?.fornecedor ?? "");
   const [cnpjRevendedora, setCnpjRevendedora] = useState(dados?.cnpjRevendedora ?? (preenchendoRegistro ? "12.345.678/0001-99" : ""));
+  // Mantém os campos usados pelo salvamento sincronizados com o registro em edição.
+  // Esses estados também são atualizados pelos modais de busca abaixo.
+  const [laboratorio, setLaboratorio] = useState(dados?.laboratorio ?? "");
+  const [doenca, setDoenca] = useState(dados?.doenca ?? "");
+  const [dataValidade, setDataValidade] = useState(dados?.dataValidade ?? dados?.validade ?? "");
+  const [numeroPartida, setNumeroPartida] = useState(dados?.numeroPartida ?? dados?.partida ?? "");
+  const [quantidadeDoses, setQuantidadeDoses] = useState(dados?.quantidadeDoses ?? "");
   const [tipoDestinatario, setTipoDestinatario] = useState(
     dados?.tipoDestinatario === "Médico Veterinário"
       ? "medico_veterinario"
@@ -392,6 +404,7 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
   const [destinatario, setDestinatario] = useState(dados?.destinatario ?? "");
   const [isDentroEstado, setIsDentroEstado] = useState<"sim" | "não" | "">(dados?.isDentroEstado ?? (preenchendoRegistro ? "sim" : ""));
   const [codigoDestinatario, setCodigoDestinatario] = useState(dados?.codigoDestinatario ?? dados?.cpfCnpjDestinatario ?? (preenchendoRegistro ? "555.009.956-40" : ""));
+  const [situacao] = useState(dados?.situacao === "Cancelada" ? "Cancelada" : "Gravada");
   const [modalDestinatarioOpen, setModalDestinatarioOpen] = useState(false);
   const [modalDestinatarioRevendedoraOpen, setModalDestinatarioRevendedoraOpen] = useState(false);
   const [modalNotaOrigemOpen, setModalNotaOrigemOpen] = useState(false);
@@ -423,23 +436,22 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
   const [exploracao, setExploracao] = useState<any[]>(dados?.exploracao?.length ? dados.exploracao : [
     { id: String(Date.now()), codigo: preenchendoRegistro ? "3100104050003" : "", especie: preenchendoRegistro ? "Bovino" : "" }
   ]);
-  // Receituários por doença: { [nomeDoenca]: { nome, descricao } }
+  // Receituários por tipo de vacina: { [nomeTipoVacina]: { nome, descricao } }
   const [receituariosPorDoenca, setReceituariosPorDoenca] = useState<Record<string, { nome: string; descricao: string }>>(dados?.receituariosPorDoenca ?? (preenchendoRegistro && dados?.doenca ? {
     [dados.doenca]: { nome: `receituario_${dados.doenca.toLowerCase().replace(/\s+/g, "_")}.pdf`, descricao: "Receituário vinculado à venda." }
   } : {}));
-
-  // Doenças únicas das partidas selecionadas que exigem receituário para venda de vacina
-  const doencasQueExigemReceituario = React.useMemo(() => {
+  // Tipos únicos das partidas selecionadas que exigem receituário para venda de vacina.
+  const tiposVacinaQueExigemReceituario = React.useMemo(() => {
     const vistas = new Set<string>();
     return notasFiscaisOrigem
-      .filter((item: any) => item?.exigeReceituario && item?.doenca)
+      .filter((item: any) => !isInsumo && item?.exigeReceituario && item?.tipoVacina)
       .filter((item: any) => {
-        if (vistas.has(item.doenca)) return false;
-        vistas.add(item.doenca);
+        if (vistas.has(item.tipoVacina)) return false;
+        vistas.add(item.tipoVacina);
         return true;
       })
-      .map((item: any) => item.doenca as string);
-  }, [notasFiscaisOrigem]);
+      .map((item: any) => item.tipoVacina as string);
+  }, [isInsumo, notasFiscaisOrigem]);
 
 
   // Controle de Modais
@@ -491,7 +503,7 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
       isDentroEstado,
       destinatario: isDentroEstado === "sim" ? destinatario : destinatarioFora,
       codigoDestinatario: isDentroEstado === "sim" ? codigoDestinatario : codigoFora,
-      fornecedor,
+      fornecedor: revendedora,
       laboratorio,
       doenca,
       dataValidade,
@@ -500,11 +512,24 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
       situacao
     };
     console.log(`Salvando venda de ${isInsumo ? "insumo" : "vacina"}:`, payload);
+    salvarRegistroMock(isInsumo ? "vendas-saida-insumo" : "vendas-saida-vacina", {
+      ...registroAtual,
+      situacao,
+    });
+    if (mode === "edit" && dados) {
+      registrarVersaoCadastro({
+        chaveCadastro: `venda-saida-vacina:${dados.id}`,
+        dadosAnteriores: dados,
+        dadosAtuais: registroAtual,
+        alteradoPor: "Usuário do sistema",
+      });
+    }
     onNavigate(rotaLista);
   };
 
   const registroAtual = preencherComExemplo({
     ...(dados ?? {}),
+    situacao,
     id: dados?.id ?? `venda-saida-${Date.now()}`,
     notaFiscal,
     numeroNotaFiscal: notaFiscal,
@@ -520,6 +545,11 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
     notasFiscaisOrigem,
     destinatarioFora,
     codigoFora,
+    laboratorio,
+    doenca,
+    dataValidade,
+    numeroPartida,
+    quantidadeDoses,
     exploracao,
     doencaExigeReceituario,
     outrosContatos,
@@ -554,7 +584,7 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
 
   return (
     <div className={cadastroVacinacaoPageClass(mode, "min-h-screen bg-[#f2f3f5]")}>
-      <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen={rotaLista} hideSearch={true} />
+      {!esconderNavbar && <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen={rotaLista} hideSearch={true} />}
 
       <main className="max-w-[1088px] mx-auto px-4 md:px-6 py-6">
         {/* Cabeçalho */}
@@ -568,7 +598,8 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
             <ArrowLeft size={15} />
             Todas Vendas com Saídas de {isInsumo ? "Insumo" : "Vacina"}
           </button>
-          <CadastroVacinacaoHeader mode={mode} nomeCadastro={nomeCadastro} rotaEditar={rotaEditar} dados={dados} onNavigate={onNavigate} onSubmit={() => setIsSucesso(true)} />
+          {avisoHistorico}
+          <CadastroVacinacaoHeader mode={mode} nomeCadastro={nomeCadastro} rotaEditar={rotaEditar} dados={dados} onNavigate={onNavigate} onSubmit={() => handleSalvar({ preventDefault: () => {} } as React.FormEvent)} acaoComplementar={acaoHistorico} />
         </div>
 
         {/* 🔥 ALERTA CORRIGIDO: Adicionado mb-6 para dar respiro até a próxima seção */}
@@ -781,8 +812,6 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
                       value={codigoDestinatario || ""}
                       onChange={setCodigoDestinatario}
                       className="w-[280px]"
-                      hasTooltip={true}
-                      tooltipText={tipoDestinatario === "revendedora" ? "CNPJ da Empresa" : "CPF/CNPJ do Proprietário Titular"}
                     />
                   </div>
 
@@ -798,7 +827,7 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
                 {/* Bloco de Gerenciamento de Outros Contatos */}
                 <div className="flex flex-col gap-3 w-full">
                   <span className="text-xs font-semibold text-gray-500 ml-1">
-                    Contatos Adicionais (Opcional)
+                    Contato
                   </span>
 
                   {/* Listagem de Contatos Adicionados */}
@@ -871,22 +900,12 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
                 value={notaFiscal}
                 onChange={setNotaFiscal}
               />
-              {isInsumo ? (
-                <FloatInput
-                  label="UF da Nota Fiscal"
-                  required
-                  value="MG"
-                  disabled
-                />
-              ) : (
-                <FloatSelect
-                  label="UF da Nota Fiscal"
-                  required
-                  value={ufNotaFiscal}
-                  onChange={setUfNotaFiscal}
-                  options={UFS.map((uf) => ({ value: uf, label: uf }))}
-                />
-              )}
+              <FloatInput
+                label="UF da Nota Fiscal"
+                required
+                value={ufNotaFiscal || "MG"}
+                disabled
+              />
               <FloatInput
                 label="Data da Nota Fiscal"
                 type="date"
@@ -954,24 +973,28 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
               <div className="flex flex-col gap-6 animate-fadeIn">
                 {Object.values(
                   notasFiscaisOrigem.reduce((acc: Record<string, any>, item) => {
-                    if (!acc[item.nome]) {
-                      acc[item.nome] = { nome: item.nome, partidas: [] };
+                    // Cada saldo é independente: a partida e o tipo de produto
+                    // não podem compartilhar o mesmo card.
+                    const chaveSaldo = `${item.nome}::${item.tipoVacina || item.tipoInsumo || "sem-tipo"}`;
+                    if (!acc[chaveSaldo]) {
+                      acc[chaveSaldo] = { chave: chaveSaldo, nome: item.nome, partidas: [] };
                     }
-                    acc[item.nome].partidas.push(item);
+                    acc[chaveSaldo].partidas.push(item);
                     return acc;
                   }, {})
                 ).map((grupo: any) => {
-                  const isNotaMinimizada = notasListasMinimizadas[grupo.nome] || false;
+                  const chaveGrupo = grupo.chave || grupo.nome;
+                  const isNotaMinimizada = notasListasMinimizadas[chaveGrupo] || false;
 
                   return (
-                    <div key={`grupo-${grupo.nome}`} className="border border-gray-200 rounded-xl p-4 bg-gray-50/30 relative">
+                    <div key={`grupo-${chaveGrupo}`} className="border border-gray-200 rounded-xl p-4 bg-gray-50/30 relative">
 
                       {/* Cabeçalho limpo com gatilho de minimizar a Nota Fiscal inteira */}
                       <div className="flex items-center justify-between mb-4 px-1">
                         <div className="flex items-center gap-2">
                           <div
                             className="flex items-center gap-2 cursor-pointer select-none group/title"
-                            onClick={() => setNotasListasMinimizadas(prev => ({ ...prev, [grupo.nome]: !isNotaMinimizada }))}
+                            onClick={() => setNotasListasMinimizadas(prev => ({ ...prev, [chaveGrupo]: !isNotaMinimizada }))}
                           >
                             <Package size={24} color={GREEN} />
 
@@ -1156,6 +1179,9 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
                                   <div className="flex items-center gap-1.5">
                                     <span className="text-xs font-semibold text-gray-800 select-none">
                                       Apresentação
+                                      <span className="ml-2 text-[11px] font-semibold text-gray-600">
+                                        {nfItem.doenca || "—"}{nfItem.tipoVacina ? ` · ${nfItem.tipoVacina}` : ""}
+                                      </span>
                                     </span>
 
                                     <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-600 text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">
@@ -1346,32 +1372,32 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
         <Section title={nomeDocumentoObrigatorio}>
           <div className="flex flex-col gap-5">
 
-            {/* 1. Receituário — um para cada Doença das partidas que exigem receituário */}
-            {doencasQueExigemReceituario.length === 0 ? (
+            {/* 1. Receituário — um para cada Tipo de Vacina das partidas que exigem receituário */}
+            {tiposVacinaQueExigemReceituario.length === 0 ? (
               <p className="text-sm text-gray-500">
                 Nenhuma das partidas selecionadas exige {nomeDocumentoObrigatorioMinusculo} para venda de {isInsumo ? "insumo" : "vacina"}.
               </p>
             ) : (
               <div className="flex flex-col gap-6">
 
-                {doencasQueExigemReceituario.map((nomeDoenca: string, index: number) => {
-                  const atual = receituariosPorDoenca[nomeDoenca];
+                {tiposVacinaQueExigemReceituario.map((tipoVacinaSelecionado: string, index: number) => {
+                  const atual = receituariosPorDoenca[tipoVacinaSelecionado];
 
                   const setArquivo = (nome: string) =>
                     setReceituariosPorDoenca((prev) => ({
                       ...prev,
-                      [nomeDoenca]: { nome, descricao: prev[nomeDoenca]?.descricao || "" },
+                      [tipoVacinaSelecionado]: { nome, descricao: prev[tipoVacinaSelecionado]?.descricao || "" },
                     }));
 
                   const setDescricao = (descricao: string) =>
                     setReceituariosPorDoenca((prev) => ({
                       ...prev,
-                      [nomeDoenca]: { nome: prev[nomeDoenca]?.nome || "", descricao },
+                      [tipoVacinaSelecionado]: { nome: prev[tipoVacinaSelecionado]?.nome || "", descricao },
                     }));
 
                   return (
-                    <div key={nomeDoenca} className="flex gap-4 items-start w-full">
-                      {/* Numeração da doença */}
+                    <div key={tipoVacinaSelecionado} className="flex gap-4 items-start w-full">
+                      {/* Numeração do tipo de vacina */}
                       <div className="flex items-center justify-center bg-[#1A7A3C] text-white text-xs font-bold rounded-full w-6 h-6 flex-shrink-0 mt-4">
                         {index + 1}
                       </div>
@@ -1380,7 +1406,7 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
                         {/* Identificação da doença */}
                         <div className="flex items-center gap-2">
                           <img src={iconeDoencaUrl} alt="Doença" className="w-4 h-4 object-contain" />
-                          <span className="text-sm font-semibold text-gray-800">{nomeDoenca}</span>
+                          <span className="text-sm font-semibold text-gray-800">{tipoVacinaSelecionado}</span>
                           <span className="text-[11px] font-medium text-amber-700 px-2 py-0.5">
                             * Exige {nomeDocumentoObrigatorioMinusculo}
                           </span>
@@ -1393,7 +1419,7 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
                               required
                               fileName={atual?.nome || ""}
                               onSelectFile={() =>
-                                setArquivo(`${isInsumo ? "requerimento" : "receituario"}_${nomeDoenca.toLowerCase().replace(/\s+/g, "_")}.pdf`)
+                                setArquivo(`${isInsumo ? "requerimento" : "receituario"}_${tipoVacinaSelecionado.toLowerCase().replace(/\s+/g, "_")}.pdf`)
                               }
                             />
                           </div>
@@ -1409,17 +1435,6 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
                                 />
                               </div>
 
-                              <div className="h-12 flex items-center">
-                                <button
-                                  type="button"
-                                  onClick={() => alert(`Fazendo download de: ${atual.nome}`)}
-                                  className="p-2.5 text-[#1A7A3C] hover:bg-green-50 rounded-md transition"
-                                  title={`Baixar ${atual.nome}`}
-                                  aria-label={`Baixar ${nomeDocumentoObrigatorioMinusculo} de ${nomeDoenca}`}
-                                >
-                                  <Download size={20} />
-                                </button>
-                              </div>
                             </>
                           )}
                         </div>
@@ -1448,7 +1463,7 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
               onChange={(v) => {
                 setPrevisaoUso(v);
                 if (v !== "Sim") {
-                  setExploracao("");
+                  setExploracao([]);
                 }
               }}
             />
@@ -1612,9 +1627,9 @@ export function AdicionarVendaComSaidaVacinaPage({ onLogout, onNavigate, mode = 
           { id: 102, nome: "INS-00517/26", partida: "1", uf: "MG", dosesDisponiveisTotais: 80, fornecedor: "Distribuidora VetTest S/A", doenca: "Tuberculose", tipoVacina: "Tuberculina PPD Bovina", laboratorio: "Laboratório Biovet", validade: "15/08/2027" },
           { id: 103, nome: "INS-00518/26", partida: "2", uf: "SP", dosesDisponiveisTotais: 250, fornecedor: "Distribuidora VetTest S/A", doenca: "Tuberculose", tipoVacina: "Tuberculina PPD Aviária", laboratorio: "Laboratório Biovet", validade: "30/09/2027" },
         ] : [
-          { id: 1, nome: "0013225/24", partida: "1", uf: "MG", dosesDisponiveisTotais: 120, fornecedor: "Distribuidora de Vacinas Alfa LTDA", doenca: "Brucelose", tipoVacina: "B19", laboratorio: "BioMed/MG", validade: "20/12/2026" },
-          { id: 2, nome: "0013225/24", partida: "2", uf: "MG", dosesDisponiveisTotais: 80, fornecedor: "Distribuidora de Vacinas Alfa LTDA", doenca: "Brucelose", tipoVacina: "Oleosa", laboratorio: "BioMed/MG", validade: "20/12/2026" },
-          { id: 3, nome: "0014589/24", partida: "1", uf: "SP", dosesDisponiveisTotais: 250, fornecedor: "Comercial Agropecuária Beta S/A", doenca: "Raiva dos Herbívoros", tipoVacina: "", laboratorio: "Zoetis", validade: "15/08/2027" },
+          { id: 1, nome: "0013225/24", partida: "1", uf: "MG", dosesDisponiveisTotais: 120, fornecedor: "Distribuidora de Vacinas Alfa LTDA", doenca: "Brucelose", tipoVacina: "B19", laboratorio: "BioMed/MG", validade: "20/12/2026", exigeReceituario: true },
+          { id: 2, nome: "0013225/24", partida: "2", uf: "MG", dosesDisponiveisTotais: 80, fornecedor: "Distribuidora de Vacinas Alfa LTDA", doenca: "Brucelose", tipoVacina: "Oleosa", laboratorio: "BioMed/MG", validade: "20/12/2026", exigeReceituario: true },
+          { id: 3, nome: "0014589/24", partida: "1", uf: "SP", dosesDisponiveisTotais: 250, fornecedor: "Comercial Agropecuária Beta S/A", doenca: "Raiva dos Herbívoros", tipoVacina: "", laboratorio: "Zoetis", validade: "15/08/2027", exigeReceituario: false },
           { id: 4, nome: "0014589/24", partida: "1", uf: "GO", dosesDisponiveisTotais: 50, fornecedor: "Laboratório Biovet Saúde Animal", doenca: "Raiva dos Herbívoros", tipoVacina: "", laboratorio: "Biovet", validade: "15/08/2027" }
         ]).map((item) => ({
           ...item,

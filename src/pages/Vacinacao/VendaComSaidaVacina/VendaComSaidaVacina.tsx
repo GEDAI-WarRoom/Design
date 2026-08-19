@@ -66,7 +66,7 @@ const VENDAS_MOCK = [
       { numeroPartida: "0013225/24", laboratorio: "Laboratório Biovet", doenca: "Febre Aftosa", tipoVacina: "O1 Campos" },
       { numeroPartida: "0013378/24", laboratorio: "Zoetis Indústria Química", doenca: "Febre Aftosa", tipoVacina: "A24 Cruzeiro" },
     ],
-    situacao: "Ativo" 
+    situacao: "Gravada" 
   },
   { 
     id: "2", 
@@ -83,7 +83,7 @@ const VENDAS_MOCK = [
     lotes: [
       { numeroPartida: "0013225/24", laboratorio: "Zoetis Indústria Química", doenca: "Brucelose", tipoVacina: "B19" },
     ],
-    situacao: "Ativo" 
+    situacao: "Gravada" 
   },
   { 
     id: "3", 
@@ -100,7 +100,7 @@ const VENDAS_MOCK = [
     lotes: [
       { numeroPartida: "0014589/24", laboratorio: "Laboratório Biovet", doenca: "Raiva dos Herbívoros", tipoVacina: "" },
     ],
-    situacao: "Inativo" 
+    situacao: "Cancelada" 
   },
   { 
     id: "4", 
@@ -118,7 +118,7 @@ const VENDAS_MOCK = [
       { numeroPartida: "0013225/24", laboratorio: "Zoetis Indústria Química", doenca: "Febre Aftosa", tipoVacina: "A24 Cruzeiro" },
       { numeroPartida: "0015890/25", laboratorio: "Laboratório Biovet", doenca: "Febre Aftosa", tipoVacina: "O1 Campos" },
     ],
-    situacao: "Ativo" 
+    situacao: "Gravada" 
   },
   { 
     id: "5", 
@@ -135,7 +135,7 @@ const VENDAS_MOCK = [
     lotes: [
       { numeroPartida: "0013225/24", laboratorio: "Laboratório Biovet", doenca: "Brucelose", tipoVacina: "RB51" },
     ],
-    situacao: "Inativo" 
+    situacao: "Cancelada" 
   }
 ];
 
@@ -206,15 +206,18 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate, tipoProduto = "v
   const [tipoVacina, setTipoVacina] = useState("");
   const [tipoInsumo, setTipoInsumo] = useState("");
   const [situacao, setSituacao] = useState("");
-  const tiposVacinaDisponiveis = !isInsumo && doenca
-    ? (DOENCAS_MOCK.find((item) => item.nome === doenca)?.tiposVacina ?? [])
+  const tiposVacinaDisponiveis = !isInsumo
+    ? (doenca
+      ? (DOENCAS_MOCK.find((item) => item.nome === doenca)?.tiposVacina ?? [])
+      : [...new Set(DOENCAS_MOCK.flatMap((item) => item.tiposVacina))])
     : [];
   const tiposInsumoDisponiveis = isInsumo
     ? doenca
       ? (TIPOS_INSUMO_POR_DOENCA[doenca] ?? [])
       : [...new Set(Object.values(TIPOS_INSUMO_POR_DOENCA).flat())]
     : [];
-  const exibirFiltroTipo = isInsumo || tiposVacinaDisponiveis.length > 0;
+  // O tipo de vacina é um filtro permanente da busca, mesmo antes da doença ser informada.
+  const exibirFiltroTipo = true;
 
   // Estado que guarda os filtros aplicados de fato após clicar em "Pesquisar"
   const [filtrosAplicados, setFiltrosAplicados] = useState<any>(null);
@@ -266,7 +269,11 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate, tipoProduto = "v
   const dadosFiltrados = listarRegistrosMock(
     isInsumo ? "vendas-saida-insumo" : "vendas-saida-vacina",
     isInsumo ? vendasInsumo : VENDAS_MOCK,
-  ).filter((venda) => {
+  ).map((venda) => ({
+    ...venda,
+    // Normaliza registros antigos persistidos no navegador.
+    situacao: venda.situacao === "Ativo" ? "Gravada" : venda.situacao === "Inativo" ? "Cancelada" : venda.situacao,
+  })).filter((venda) => {
     if (!filtrosAplicados) return true;
 
     const f = filtrosAplicados;
@@ -415,11 +422,7 @@ export function VendaComSaidaVacinaPage({ onLogout, onNavigate, tipoProduto = "v
                 label="Situação"
                 value={situacao}
                 onChange={setSituacao}
-                options={[
-                  ...(isInsumo
-                    ? [{ value: "Gravada", label: "Gravada" }, { value: "Cancelada", label: "Cancelada" }]
-                    : [{ value: "Ativo", label: "Ativo" }, { value: "Inativo", label: "Inativo" }]),
-                ]}
+                options={[{ value: "Gravada", label: "Gravada" }, { value: "Cancelada", label: "Cancelada" }]}
               />
             </div>
 
