@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ArrowLeft, CalendarClock, ChevronUp, ChevronDown, ClipboardPenLine, FileText, Plus, ShoppingCart } from "lucide-react";
+import { ArrowLeft, CalendarClock, ChevronUp, ChevronDown, ClipboardPenLine, FileText, Plus, ShoppingCart, UsersRound } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import {
   FloatInput,
@@ -16,6 +16,7 @@ import {
 
 // Importação dos mesmos ícones utilizados na Adição
 import * as Icons from "../../../imports/icons";
+import { EntityProfessionalsTab } from "../../../components/ui/EntityProfessionals";
 
 
 const DADOS_EXEMPLO_FIXO = {
@@ -443,6 +444,7 @@ export function VisualizarNucleoProducaoPage({ onLogout, onNavigate, dados: dado
       ? "previsoes-migracao"
       : "cadastro",
   );
+  const [addProfessionalRequestKey, setAddProfessionalRequestKey] = useState(0);
   const [modalAdicionarPrevisao, setModalAdicionarPrevisao] = useState(false);
   const tabs = [
     {
@@ -450,6 +452,11 @@ export function VisualizarNucleoProducaoPage({ onLogout, onNavigate, dados: dado
       label: "Cadastro",
       icon: (isActive: boolean) => <FileText size={19} className={isActive ? "text-[#1A7A3C]" : "text-gray-400"} />
 
+    },
+    {
+      id: "profissionais",
+      label: "Profissionais",
+      icon: (isActive: boolean) => <UsersRound size={19} className={isActive ? "text-[#1A7A3C]" : "text-gray-400"} />,
     },
     ...(permitePrevisaoMigracao
       ? [
@@ -494,6 +501,10 @@ export function VisualizarNucleoProducaoPage({ onLogout, onNavigate, dados: dado
                 className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition flex items-center gap-2 shadow-sm"
               >
                 Editar
+              </button>
+            ) : activeTab === "profissionais" ? (
+              <button type="button" onClick={() => setAddProfessionalRequestKey((value) => value + 1)} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition flex items-center gap-2 shadow-sm">
+                Adicionar Profissional
               </button>
             ) : (
               <button
@@ -903,6 +914,15 @@ export function VisualizarNucleoProducaoPage({ onLogout, onNavigate, dados: dado
             </div>
 
           </>
+        )}
+
+        {activeTab === "profissionais" && (
+          <EntityProfessionalsTab
+            entityKey={`nucleo-producao-${dados?.codigo || dados?.id || "demo"}`}
+            allowedTypes={["Responsável Técnico Animal", "Habilitado para Emissão de GTA"]}
+            onNavigate={onNavigate}
+            addRequestKey={addProfessionalRequestKey}
+          />
         )}
 
         {activeTab === "previsoes-migracao" && permitePrevisaoMigracao && (

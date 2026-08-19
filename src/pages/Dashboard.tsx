@@ -36,7 +36,7 @@ import {
   Store,
   Syringe,
   TowerControl,
-  Truck,
+  Tractor,
   User,
   Wallet,
   Weight,
@@ -172,11 +172,6 @@ const cadastrosCategoriesMescladas: any[] = [
         label: "Instituição de Ensino e Pesquisa",
         route: "instituicao-ensino-pesquisa",
         icon: <Landmark size={16} />,
-      },
-      {
-        label: "Tipo de Veículo",
-        route: "tipo-veiculo",
-        icon: <Truck size={16} />,
       },
     ],
   },
@@ -373,11 +368,6 @@ const cadastrosCategoriesMescladas: any[] = [
             route: "instituicao-ensino-pesquisa",
             icon: <Landmark size={16} />,
           },
-          {
-            label: "Tipo de Veículo",
-            route: "tipo-veiculo",
-            icon: <Truck size={16} />,
-          },
         ],
       },
       {
@@ -405,6 +395,18 @@ const cadastrosCategoriesMescladas: any[] = [
             label: "Espécie",
             route: "especie",
             icon: <Dna size={16} />,
+          },
+          {
+            label: "Doença",
+            route: "doenca",
+            icon: (
+              <img src={Icons.iconeDoencaUrl} alt="Doença" className="w-4 h-4" />
+            ),
+          },
+          {
+            label: "Laboratório",
+            route: "laboratorio",
+            icon: <FlaskConical size={16} />,
           },
           {
             label: "Núcleo de Produção",
@@ -541,6 +543,11 @@ const cadastrosCategoriesMescladas: any[] = [
             ),
           },
           {
+            label: "Exploração Agrícola",
+            route: "exploracao-agricola",
+            icon: <Tractor size={16} />,
+          },
+          {
             label: "Cultura",
             route: "cultura",
             icon: (
@@ -633,6 +640,11 @@ const cadastrosCategoriesMescladas: any[] = [
         ),
       },
       {
+        label: "Exploração Agrícola",
+        route: "exploracao-agricola",
+        icon: <Tractor size={16} />,
+      },
+      {
         label: "Cultura",
         route: "cultura",
         icon: (
@@ -708,11 +720,6 @@ export const secondaryCategories: MenuCategory[] = [
     icon: <Syringe size={28} color={GREEN} />,
     items: [
       {
-        label: "Laboratório",
-        route: "laboratorio",
-        icon: <FlaskConical size={16} />,
-      },
-      {
         label: "Venda com Saída de Vacina",
         route: "venda-saida-vacina",
         icon: <PackageMinus size={16} />,
@@ -762,14 +769,6 @@ export const secondaryCategories: MenuCategory[] = [
             alt="Declaração de Vacinação"
             className="w-4 h-4"
           />
-        ),
-      },
-
-      {
-        label: "Doença",
-        route: "doenca",
-        icon: (
-          <img src={Icons.iconeDoencaUrl} alt="Doença" className="w-4 h-4" />
         ),
       },
 

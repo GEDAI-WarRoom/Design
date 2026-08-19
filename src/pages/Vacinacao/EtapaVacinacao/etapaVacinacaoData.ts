@@ -58,7 +58,6 @@ export interface EtapaVacinacao {
   dataFim: string;
   doenca: DoencaEtapaVacinacao;
   necessitaAtestadoDeclaracao: RespostaSimNao;
-  permiteDeclararMaisAnimais: RespostaSimNao;
   especies: EspecieEtapaVacinacao[];
   tiposVacinacao: TipoVacinacaoEtapa[];
   situacao: SituacaoEtapaVacinacao;
@@ -135,7 +134,6 @@ const ETAPAS_INICIAIS: EtapaVacinacao[] = [
     dataFim: "2026-06-30",
     doenca: doenca(1),
     necessitaAtestadoDeclaracao: "Não",
-    permiteDeclararMaisAnimais: "Não",
     especies: [especie(1), especie(2)],
     tiposVacinacao: [
       {
@@ -168,7 +166,6 @@ const ETAPAS_INICIAIS: EtapaVacinacao[] = [
     dataFim: "2027-06-30",
     doenca: doenca(2),
     necessitaAtestadoDeclaracao: "Não",
-    permiteDeclararMaisAnimais: "Não",
     especies: [especie(1), especie(2), especie(4)],
     tiposVacinacao: [{ uid: "tipo-inicial-2", nome: "Etapa anual", instrucoes: "", faixasPorEspecie: [faixasCompletas(1), faixasCompletas(2), faixasCompletas(4)], vacinasAplicaveis: ["Bivalente"] }],
     situacao: "Criada",
@@ -180,7 +177,6 @@ const ETAPAS_INICIAIS: EtapaVacinacao[] = [
     dataFim: "2026-12-31",
     doenca: doenca(3),
     necessitaAtestadoDeclaracao: "Não",
-    permiteDeclararMaisAnimais: "Não",
     especies: [especie(1), especie(2), especie(6), especie(5), especie(3), especie(8), especie(9)],
     tiposVacinacao: [
       {
@@ -313,7 +309,6 @@ export function copiarEtapaVacinacao(etapa: EtapaVacinacao): EtapaVacinacaoDraft
     dataFim: "",
     doenca: { ...etapa.doenca, especiesIds: [...etapa.doenca.especiesIds], tiposVacina: [...etapa.doenca.tiposVacina] },
     necessitaAtestadoDeclaracao: etapa.necessitaAtestadoDeclaracao,
-    permiteDeclararMaisAnimais: etapa.permiteDeclararMaisAnimais,
     especies: etapa.especies.map((item) => ({ ...item, faixasEtarias: [...item.faixasEtarias] })),
     tiposVacinacao: etapa.tiposVacinacao.map((tipo) => ({
       ...tipo,

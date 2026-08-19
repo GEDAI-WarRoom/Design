@@ -5,10 +5,12 @@ import {
   CheckCircle2,
   Info,
   Calendar,
-  FlaskConical, PlusCircle, ChevronUp, ChevronDown, Trash2, Store, Check, RotateCcw, Package, PillBottle, X
+  FlaskConical, PlusCircle, ChevronUp, ChevronDown, Trash2, Check, RotateCcw, Package, PillBottle, X
 } from "lucide-react";
 import { PieChart, Pie, Cell, Sector } from "recharts";
 import { Navbar } from "../../../components/Navbar";
+import { useDemoUser } from "../../../contexts/DemoUserContext";
+import { listarColecaoMock, salvarColecaoMock } from "../../../mocks/mockDatabase";
 import { FloatInput, FloatSelect, LargeTextArea, SearchModal, CustomRadio, MultiSearchModal } from "../../../components/ui/FormKit";
 import {
   EntitySearchInput,
@@ -52,11 +54,6 @@ const LABORATORIOS_MOCK = [
 const ESTABELECIMENTOS_MOCK = [
   { id: 1, produtorId: 1, codigo: "31234567891", nome: "Fazenda do Rio", municipio: "Lavras", proprietario: "555.009.956-40\n-\nJosé Aarão Neto" },
   { id: 2, produtorId: 2, codigo: "31001040005", nome: "Fazenda Rio Preto", municipio: "Varginha", proprietario: "444.009.956-40\n-\nDivino de Souza Sobrinho" },
-];
-
-const REVENDEDORAS_MOCK = [
-  { id: 1, nome: "Comercial AgroVet", documento: "12.345.678/0001-90" },
-  { id: 2, nome: "AgroInsumos Sul", documento: "98.765.432/0001-10" },
 ];
 
 const EXPLORACOES_MOCK = [
@@ -432,6 +429,9 @@ interface PageProps extends CadastroVacinacaoModeProps {
 }
 
 export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = "create", dados }: PageProps) {
+  const { role } = useDemoUser();
+  const isProdutor = role === "produtor";
+  const isFuncionarioIma = role === "admin";
   const preenchendoRegistro = mode !== "create";
   const nomeDoencaInicial = dados?.doencaEntidade?.nome ?? dados?.doenca ?? "";
   const dataVacinacaoInicial = dados?.dataVacinacao ?? "";
@@ -520,7 +520,6 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
   const [vacinados, setVacinados] = useState<VacinadosRow[]>(dados?.vacinados ?? (preenchendoRegistro ? INITIAL_VACINADOS.map((linha, index) => ({ ...linha, machos: index === 0 ? 4 : 0, femeas: index === 0 ? 6 : 0 })) : INITIAL_VACINADOS));
   
   const [origemNota, setOrigemNota] = useState(dados?.origemNota ?? (preenchendoRegistro ? "Produtor" : ""));
-  const [revendedora, setRevendedora] = useState<any | null>(dados?.revendedora ?? (preenchendoRegistro ? { id: 1, codigo: "3120938028", nome: "Comercial AgroVet" } : null));
 
   const [modalProdutor, setModalProdutor] = useState(false);
   const [tipoPessoa, setTipoPessoa] = useState("");
@@ -554,7 +553,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
     !!produtor && !!estabelecimento && !!exploracao && (!exigeNucleo || !!nucleo) &&
     !!doenca && regime !== "" && dataVacinacao !== "" && dataAtestado !== "" && !!veterinario &&
     (!isRaiva || mordidaMorcego !== "") &&
-    origemNota !== "" && !!revendedora &&
+    origemNota !== "" &&
     (etapaVacinacao?.situacao !== "Fechada" || justificativaAutorizacao.trim() !== "") &&
     dosesValidas && !erroDataVac && !erroDataAtestado;
 
@@ -665,17 +664,40 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
         vacinadorNome: vacinadorBrucelose?.nome || "",
         mordidaMorcego: mordidaMorcego || "",
         origemNota: origemNota || "",
-        revendedoraNome: revendedora?.nome || "",
         notasFiscaisOrigem: notasFiscaisOrigem || [],
         vacinados: vacinados || [],
         nucleo: nucleo ? { nome: nucleo.nome, codigo: nucleo.codigo } : null,
-        situacao: "Ativo"
+        situacao: "Gravado"
       };
 
       const saved = localStorage.getItem(MOCK_KEY);
       const parsed = saved ? JSON.parse(saved) : [];
       const newData = [novoRegistro, ...parsed];
       localStorage.setItem(MOCK_KEY, JSON.stringify(newData));
+
+      if (role === "veterinario") {
+        const pendencias = listarColecaoMock<any>("pendencias-central-v2", []);
+        const proximoId = pendencias.reduce((maior, item) => Math.max(maior, Number(item.id) || 0), 0) + 1;
+        const novasPendencias: any[] = [{
+          id: proximoId,
+          destinatario: "produtor",
+          tipo: "declaracao-vacinacao",
+          titulo: "Confirmação de declaração de vacinação",
+          descricao: `Confirme a declaração de ${doenca?.nome ?? "vacinação"} registrada pelo médico veterinário.`,
+          situacao: "Pendente",
+          entidadeRelacionada: { rota: "visualizar-declaracao-vacinacao", id: novoRegistro.id },
+        }];
+        if (utilizadas > 200) novasPendencias.push({
+          id: proximoId + 1,
+          destinatario: "produtor",
+          tipo: "declaracao-vacinacao",
+          titulo: "Atualização de rebanho necessária",
+          descricao: "A quantidade declarada é superior ao rebanho demonstrativo informado.",
+          situacao: "Pendente",
+          entidadeRelacionada: { rota: "atualizacao-cadastral-rebanho" },
+        });
+        salvarColecaoMock("pendencias-central-v2", [...pendencias, ...novasPendencias]);
+      }
       
       // 🚀 SALVA O REGISTRO PARA ENVIAR PARA A VISUALIZAÇÃO
       setRegistroSalvo(novoRegistro);
@@ -709,8 +731,8 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
 
   const lotesFiltradosModal = lotesEstoque.filter(item =>
     item.compradorTipo === origemNota &&
-    item.revendedoraId === revendedora?.id &&
     item.doenca === doenca?.nome &&
+    (!tipoVacina || item.tipoVacina === tipoVacina) &&
     item.dosesDisponiveisTotais > 0
   ).map(item => ({
     ...item,
@@ -812,7 +834,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
                 required
                 placeholder="Buscar por etapa de vacinação"
                 value={etapaVacinacao ? etapaVacinacao.nome : ""}
-                data={ETAPAS_VACINACAO_MOCK}
+                data={isProdutor ? ETAPAS_VACINACAO_MOCK.filter((etapa) => etapa.situacao !== "Fechada") : ETAPAS_VACINACAO_MOCK}
                 searchKeys={["codigo", "doenca"]}
                 columns={[{ label: "Código", key: "codigo" }, { label: "Doença", key: "doenca" }]}
                 icon={<img src={Icons.iconeEtapaVacinacaoUrl} alt="Etapa de Vacinação" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}
@@ -834,23 +856,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
               </div>
             )}
 
-            {doenca && (
-              <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
-                <FloatSelect
-                  label="Tipo de Vacinação"
-                  required
-                  value={regime}
-                  onChange={(v: string) => {
-                    setRegime(v);
-                    setVacinados(AGE_RANGES.map(() => ({ machos: 0, femeas: 0 })));
-                  }}
-                  options={opcoesRegime.map((o) => ({ value: o, label: o }))}
-                  error={err(regime === "")}
-                />
-              </div>
-            )}
-
-            {etapaVacinacao?.situacao === "Fechada" && (
+            {isFuncionarioIma && etapaVacinacao?.situacao === "Fechada" && (
               <div className="w-full">
                 <LargeTextArea
                   label="Justificativa de autorização"
@@ -864,12 +870,29 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
               </div>
             )}
 
+            {doenca && (
+              <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
+                <FloatSelect
+                  label="Tipo de Vacinação"
+                  required
+                  value={regime}
+                  onChange={(v: string) => {
+                    setRegime(v);
+                    setVacinados(AGE_RANGES.map(() => ({ machos: 0, femeas: 0 })));
+                    setNotasFiscaisOrigem([]);
+                  }}
+                  options={opcoesRegime.map((o) => ({ value: o, label: o }))}
+                  error={err(regime === "")}
+                />
+              </div>
+            )}
+
             {doenca && tipoVacinaDisponivel && (
               <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
                 <FloatSelect
                   label="Tipo de Vacina"
                   value={tipoVacina}
-                  onChange={setTipoVacina}
+                  onChange={(valor) => { setTipoVacina(valor); setNotasFiscaisOrigem([]); }}
                   options={(doenca?.tiposVacina ?? []).map((t: string) => ({ value: t, label: t }))}
                 />
               </div>
@@ -890,7 +913,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
 
             <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
               <FloatInput
-                label="Data de Atestado de Vacinação"
+                label="Data do Atestado de Vacinação"
                 required
                 type="date"
                 icon={<Calendar size={18} color={GREEN} />}
@@ -964,8 +987,7 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
           <Section title="Saldo de Vacinas">
             <div className="flex flex-col gap-4">
 
-              {/* Origem e Revendedora */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 max-w-md">
                 <FloatSelect
                   label="Origem do Saldo"
                   required
@@ -980,27 +1002,6 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
                     { value: "Vacinador", label: "Vacinador" },
                   ]}
                   error={err(origemNota === "")}
-                />
-                
-                <EntitySearchInput
-                  label="Revendedora de Insumos"
-                  required
-                  placeholder="Buscar revendedora..."
-                  value={revendedora ? revendedora.nome : ""}
-                  data={REVENDEDORAS_MOCK}
-                  searchKeys={["nome", "documento"]}
-                  columns={[
-                    { label: "Nome", key: "nome" },
-                    { label: "CNPJ", key: "documento" }
-                  ]}
-                  icon={<Store size={18} color={GREEN} />}
-                  title="Buscar Revendedora"
-                  subtitle="Busque por uma revendedora cadastrada:"
-                  onChange={(ent) => {
-                    setRevendedora(ent);
-                    setNotasFiscaisOrigem([]); // Limpa as notas se a revendedora mudar
-                  }}
-                  error={err(!revendedora)}
                 />
               </div>
 
@@ -1023,13 +1024,13 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
 
                 <button
                   type="button"
-                  disabled={!origemNota || !revendedora}
+                  disabled={!origemNota || !tipoVacina && tipoVacinaDisponivel}
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     setModalNotaOrigemOpen(true);
                   }}
-                  className={`flex items-center gap-2 text-sm font-semibold px-4 h-11 rounded-lg border w-fit transition shadow-sm ${origemNota && revendedora
+                  className={`flex items-center gap-2 text-sm font-semibold px-4 h-11 rounded-lg border w-fit transition shadow-sm ${origemNota && (!tipoVacinaDisponivel || tipoVacina)
                     ? "border-[#1A7A3C] text-[#1A7A3C] hover:bg-green-50 cursor-pointer"
                     : "border-gray-200 text-gray-300 bg-gray-100 cursor-not-allowed"
                     }`}
@@ -1040,13 +1041,13 @@ export function AdicionarDeclaracaoVacinacaoPage({ onLogout, onNavigate, mode = 
               </div>
 
               {/* Lotes vinculados e Dashboard */}
-              {(!origemNota || !revendedora) && (
+              {(!origemNota || (tipoVacinaDisponivel && !tipoVacina)) && (
                 <div className="text-left py-4">
-                  <p className="text-xs text-gray-400 italic">É necessário selecionar a Origem do Saldo e a Revendedora para pesquisar notas fiscais.</p>
+                  <p className="text-xs text-gray-400 italic">É necessário selecionar a Origem do Saldo e, quando aplicável, o Tipo de Vacina para pesquisar lotes.</p>
                 </div>
               )}
 
-              {(origemNota && revendedora && notasFiscaisOrigem.length === 0) && (
+              {(origemNota && (!tipoVacinaDisponivel || tipoVacina) && notasFiscaisOrigem.length === 0) && (
                 <div className="w-full border border-dashed border-gray-200 rounded-xl py-8 px-4 text-center bg-gray-50/20">
                   <p className="text-sm text-gray-400 italic">Nenhum lote vinculado até o momento.</p>
                 </div>

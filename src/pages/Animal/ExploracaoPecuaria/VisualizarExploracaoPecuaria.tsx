@@ -14,12 +14,15 @@ import {
   BadgeCheck,
   MoreVertical,
   PlusCircle,
+  ShoppingCart,
+  Users,
   X,
   Trash2,
 } from "lucide-react";
 import React, { useState } from "react";
 import { Navbar } from "../../../components/Navbar";
 import { EntitySearchInput } from "../../../components/ui/EntitySearch";
+import { EntityProfessionalsTab } from "../../../components/ui/EntityProfessionals";
 import {
   AccordionCardGroup,
   CheckboxGroup,
@@ -494,7 +497,7 @@ interface Certificado {
   atualizadoEm: string;
   numero: string;
   validade: string;
-  situacao: "Ativa" | "Vencida" | "Suspensa";
+  situacao: "Ativa" | "Inativa" | "Vencida" | "Suspensa";
   nucleos: string[];
 }
 
@@ -583,19 +586,86 @@ const GRUPOS_CERTIFICADOS_AVES: GrupoCertificado[] = [
 ];
 
 const TIPOS_CERTIFICADOS_BOVINOS = [
+  "Brucelose e Tuberculose",
   "Brucelose",
   "Tuberculose",
-  "Tuberculose e Brucelose",
 ];
 
 const GRUPOS_CERTIFICADOS_BOVINOS: GrupoCertificado[] = [
   {
     id: 1,
-    titulo: "Tuberculose e Brucelose",
+    titulo: "Brucelose e Tuberculose",
     certificados: [
       { id: "bv1", atualizadoEm: "14/04/2012", numero: "213465", validade: "20/04/2025", situacao: "Ativa", nucleos: ["Núcleo Setor A", "Núcleo Setor B", "Núcleo Setor C"] },
     ],
   },
+  {
+    id: 2,
+    titulo: "Brucelose",
+    certificados: [],
+    inativos: [],
+  },
+  {
+    id: 3,
+    titulo: "Tuberculose",
+    certificados: [],
+    inativos: [],
+  },
+];
+
+const REBANHO_BOVINO_MOCK = [
+  { faixa: "De 0 a 12 meses", machos: 12, femeas: 12 },
+  { faixa: "De 13 a 24 meses", machos: 18, femeas: 18 },
+  { faixa: "De 25 a 36 meses", machos: 12, femeas: 12 },
+  { faixa: "Acima de 36 meses", machos: 16, femeas: 16 },
+];
+
+type TipoAcessoMercado = "Produtor Independente" | "Produtor Integrado" | "Produtor Cooperado";
+
+interface AcessoMercado {
+  id: string;
+  atualizadoEm: string;
+  tipo: TipoAcessoMercado;
+  situacao: "Ativo" | "Inativo";
+  entidade?: string;
+  documento?: string;
+  entidadeTipo?: "Integradora" | "Cooperativa";
+}
+
+const TIPOS_ACESSO_MERCADO: TipoAcessoMercado[] = [
+  "Produtor Independente",
+  "Produtor Integrado",
+  "Produtor Cooperado",
+];
+
+const ENTIDADES_MERCADO_MOCK = [
+  { id: 1, nome: "Integradora ABC", documento: "12.345.678/0001-90", tipo: "Integradora" },
+  { id: 2, nome: "Cooperativa do Campo", documento: "98.765.432/0001-10", tipo: "Cooperativa" },
+];
+
+const ACESSOS_MERCADO_MOCK: AcessoMercado[] = [
+  { id: "am1", atualizadoEm: "14/04/2012", tipo: "Produtor Independente", situacao: "Ativo" },
+  { id: "am2", atualizadoEm: "14/04/2012", tipo: "Produtor Integrado", situacao: "Ativo", entidade: "Integradora ABC", documento: "123456789", entidadeTipo: "Integradora" },
+  { id: "am3", atualizadoEm: "14/04/2012", tipo: "Produtor Cooperado", situacao: "Ativo", entidade: "Cooperativa do Campo", documento: "987654321", entidadeTipo: "Cooperativa" },
+];
+
+const PERGUNTAS_BIOSSEGURIDADE_SUIDEOS = [
+  { key: "granjaProxima", label: "Granja de Suídeos Mais Próxima", options: ["Menos de 500 metros", "De 500 metros a 2 quilômetros", "De 2 a 4 quilômetros", "Mais de 4 quilômetros"] },
+  { key: "densidadeRebanho", label: "Densidade de Rebanho Suídeo em um Raio de 4 Quilômetros", options: ["1 rebanho", "2 a 3 rebanhos", "4 ou mais rebanhos"] },
+  { key: "fornecedorSuideos", label: "Fornecedor de Suídeos para Reposição", options: ["Auto Reposição", "Um único fornecedor", "2 a 4 fornecedores", "Mais que 4 fornecedores"] },
+  { key: "rodovias", label: "Rodovias que transportam suídeos", options: ["Menos de 500 metros", "De 500 metros a 1 quilômetro", "Mais de 1 quilômetro"] },
+  { key: "isolamento", label: "Qualidade do Isolamento da Granja", options: ["BOA - Cerca telada e Cordão vegetal-proteção", "RAZOÁVEL - Cerca telada ou Cordão vegetal-proteção", "RUIM - Nenhum isolamento"] },
+  { key: "entradaGranja", label: "Controle de Entrada na Granja", options: ["Período negativo de 72 horas e sistema de banho", "Sistema de banho com troca de roupas e calçados", "Somente troca de roupas e calçados", "Sem sistema de controle"] },
+  { key: "alimentacao", label: "Alimentação Fornecida aos Animais", options: ["Usa farinha de origem animal com controle biológico", "Usa farinha de origem animal sem controle biológico", "Não usa farinhas de origem animal"] },
+  { key: "transporteAlimento", label: "Transporte de Alimento Usado na Granja", options: ["Adequado - Caminhão que não transporta suídeos", "Inadequado - Caminhão que transporta suídeos"] },
+  { key: "controleVetores", label: "Controle de Vetores", options: ["Pouco ou sem controle", "Controle eficiente"] },
+  { key: "quarentenario", label: "Existência no Quarentenário", options: ["Sim - Distante mínimo de 500 M e dentro das recomendações técnicas ou não introduz suínos no rebanho", "Sim - Mas fora das recomendações técnicas", "Introduz animais diretamente no rebanho"] },
+];
+
+const PROFISSIONAIS_BIOSSEGURIDADE_MOCK = [
+  { id: 1, nome: "Luiz da Silva Neto", documento: "555.009.956-40" },
+  { id: 2, nome: "Miriam Souza Sabino", documento: "123.456.789-00" },
+  { id: 3, nome: "Jailton Antônio Silveira", documento: "987.654.321-00" },
 ];
 
 // ==========================================================
@@ -611,7 +681,7 @@ interface Biosseguridade {
   dataImplantacao: string;
   dataVencimento: string;
   vulnerabilidade: NivelVulnerabilidade;
-  situacao: "Ativa" | "Vencida" | "Suspensa";
+  situacao: "Ativa" | "Inativa" | "Vencida" | "Suspensa";
   vigente: boolean;
   pontuacao?: string;
   nivel?: string;
@@ -758,24 +828,24 @@ interface PageProps {
 function CertificadoCard({
   certificado,
   onVisualizar,
+  showNucleos = true,
+  inativo = false,
 }: {
   certificado: Certificado;
   onVisualizar: () => void;
+  showNucleos?: boolean;
+  inativo?: boolean;
 }) {
-  const MAX_CHIPS = 4;
-  const nucleosVisiveis = certificado.nucleos.slice(0, MAX_CHIPS);
-  const extras = certificado.nucleos.length - MAX_CHIPS;
-
   return (
     <div className="flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white">
-      <div className="h-1 bg-[#1A7A3C]" />
+      <div className={`h-1 ${inativo ? "bg-gray-400" : "bg-[#1A7A3C]"}`} />
       <div className="flex flex-1 flex-col gap-3 p-4">
         <div className="flex items-center justify-between">
           <span className="text-[11px] text-gray-500">
             Atualizado em: <span className="font-medium text-gray-700">{certificado.atualizadoEm}</span>
           </span>
-          <span className="text-[11px] font-semibold text-[#1A7A3C]">
-            {certificado.situacao}
+          <span className={`text-[11px] font-semibold ${inativo ? "text-gray-500" : "text-[#1A7A3C]"}`}>
+            {inativo ? "Inativo" : certificado.situacao}
           </span>
         </div>
 
@@ -795,32 +865,22 @@ function CertificadoCard({
           </div>
         </div>
 
-        <div className="flex items-start gap-2">
-          <img
-            src={Icons.iconeNucleoProducaoUrl}
-            alt="Núcleo de Produção"
-            className="w-5 h-5"
-          />
-
-          <div className="min-w-0">
-            <p className="mb-1.5 flex items-center gap-1 text-[11px] text-gray-500">
-              Núcleos do certificado:
-              {extras > 0 && (
-                <span className="font-semibold text-gray-400">+{extras}</span>
-              )}
-            </p>
-            <div className="flex flex-wrap gap-1.5">
-              {nucleosVisiveis.map((nucleo) => (
-                <span
-                  key={nucleo}
-                  className="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-0.5 text-[11px] text-gray-600"
-                >
-                  {nucleo}
-                </span>
-              ))}
+        {showNucleos && (
+          <div className="flex items-start gap-2">
+            <img src={Icons.iconeNucleoProducaoUrl} alt="Núcleo de Produção" className="w-5 h-5" />
+            <div className="min-w-0">
+              <p className="mb-1.5 text-[11px] text-gray-500">Núcleos do certificado:</p>
+              <div className="flex flex-wrap gap-1.5">
+                {certificado.nucleos.map((nucleo) => (
+                  <span key={nucleo} className="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-0.5 text-[11px] text-gray-600">
+                    {nucleo}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
+        )}
+
       </div>
 
       <div className="flex items-center gap-2 border-t border-gray-100 p-3">
@@ -843,6 +903,58 @@ function CertificadoCard({
   );
 }
 
+function AcessoMercadoCard({
+  acesso,
+  onVisualizar,
+}: {
+  acesso: AcessoMercado;
+  onVisualizar: () => void;
+}) {
+  return (
+    <div className="flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+      <div className="h-2 bg-[#008446]" />
+      <div className="flex flex-1 flex-col gap-4 p-4">
+        <div className="flex items-center justify-between text-[11px] text-gray-800">
+          <span>Atualizado em: {acesso.atualizadoEm}</span>
+          <span>{acesso.situacao}</span>
+        </div>
+
+        <div className="flex items-start gap-3">
+          <ShoppingCart size={22} className="mt-0.5 flex-shrink-0 text-[#008446]" />
+          <div>
+            <p className="text-sm font-semibold text-gray-900">{acesso.tipo === "Produtor Independente" ? acesso.tipo : acesso.tipo.replace("Produtor ", "")}</p>
+            <p className="text-[11px] text-gray-500">Tipo de Acesso ao Mercado</p>
+          </div>
+        </div>
+
+        {acesso.entidade && (
+          <div className="flex items-start gap-3">
+            <Users size={22} className="mt-0.5 flex-shrink-0 text-[#008446]" />
+            <div>
+              <p className="text-sm font-semibold text-gray-900">{acesso.entidade}</p>
+              <p className="text-[11px] text-gray-700">{acesso.documento}</p>
+              <p className="text-[11px] text-gray-500">{acesso.entidadeTipo}</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="flex items-center gap-2 border-t border-gray-100 p-3">
+        <button
+          type="button"
+          onClick={onVisualizar}
+          className="flex-1 h-10 rounded-md bg-[#008446] text-sm font-semibold text-white transition hover:bg-[#006d39]"
+        >
+          Visualizar
+        </button>
+        <button type="button" title="Mais opções" className="flex h-10 w-9 items-center justify-center rounded-md text-gray-400 hover:bg-gray-50">
+          <MoreVertical size={18} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function VisualizarExploracaoPecuariaPage({
   onLogout = () => { },
   onNavigate = (screen: any) => console.log("navigate:", screen),
@@ -854,14 +966,22 @@ export function VisualizarExploracaoPecuariaPage({
   const inativos = d.filter((c) => c.situacao === "Inativo");
 
   const [activeTab, setActiveTab] = useState("cadastro");
+  const [addProfessionalRequestKey, setAddProfessionalRequestKey] = useState(0);
   const [biosseguridades, setBiosseguridades] =
     useState<Biosseguridade[]>(BIOSSEGURIDADES_MOCK);
   const [modalBiosseguiradadeAberto, setModalBiosseguiradadeAberto] =
     useState(false);
   const [modalCicloAberto, setModalCicloAberto] = useState(false);
   const [modalCertificadoAberto, setModalCertificadoAberto] = useState(false);
-  const [grupoCertificadoBovino, setGrupoCertificadoBovino] =
-    useState<GrupoCertificado>(GRUPOS_CERTIFICADOS_BOVINOS[0]);
+  const [modalAcessoMercadoAberto, setModalAcessoMercadoAberto] = useState(false);
+  const [acessosMercado, setAcessosMercado] = useState<AcessoMercado[]>(ACESSOS_MERCADO_MOCK);
+  const [tipoAcessoMercado, setTipoAcessoMercado] = useState<TipoAcessoMercado>("Produtor Independente");
+  const [entidadeMercado, setEntidadeMercado] = useState<any>(null);
+  const [possuiContratoParceria, setPossuiContratoParceria] = useState<boolean | null>(null);
+  const [contratoParceria, setContratoParceria] = useState("");
+  const [nucleosAcessoMercado, setNucleosAcessoMercado] = useState<any[]>([null]);
+  const [gruposCertificadosBovinos, setGruposCertificadosBovinos] =
+    useState<GrupoCertificado[]>(GRUPOS_CERTIFICADOS_BOVINOS);
   const [certTipo, setCertTipo] = useState("");
   const [certValidade, setCertValidade] = useState("");
   const [certNumero, setCertNumero] = useState("");
@@ -870,6 +990,7 @@ export function VisualizarExploracaoPecuariaPage({
   const [certNucleos, setCertNucleos] = useState<any[]>([null]);
 
   const [profissional, setProfissional] = useState("");
+  const [profissionalSelecionado, setProfissionalSelecionado] = useState<any>(null);
   const [dataLevantamento, setDataLevantamento] = useState("");
   const [livreAnimais, setLivreAnimais] = useState<boolean | null>(null);
   const [assistenciaSanitaria, setAssistenciaSanitaria] = useState<boolean | null>(null);
@@ -883,6 +1004,7 @@ export function VisualizarExploracaoPecuariaPage({
   const [protegidaInundacoes, setProtegidaInundacoes] = useState<boolean | null>(null);
   const [recebeImportados, setRecebeImportados] = useState<boolean | null>(null);
   const [recebeAlimentoVivo, setRecebeAlimentoVivo] = useState<boolean | null>(null);
+  const [respostasSuideos, setRespostasSuideos] = useState<Record<string, string>>({});
 
   const profissionaisOficiais = [
     { value: "Miriam Souza Sabino", label: "Miriam Souza Sabino" },
@@ -904,43 +1026,84 @@ export function VisualizarExploracaoPecuariaPage({
   const gruposCertificados = isAves
     ? GRUPOS_CERTIFICADOS_AVES
     : isBovinos
-      ? [grupoCertificadoBovino]
+      ? gruposCertificadosBovinos
       : GRUPOS_CERTIFICADOS_SUIDEOS;
   const opcoesCertificado = (isBovinos
     ? TIPOS_CERTIFICADOS_BOVINOS
     : gruposCertificados.map((grupo) => grupo.titulo)
   ).map((titulo) => ({ value: titulo, label: titulo }));
 
-  const abrirModalCertificado = () => {
-    setCertTipo(isBovinos ? grupoCertificadoBovino.titulo : "");
+  const abrirModalCertificado = (tipoInicial = "") => {
+    setCertTipo(isBovinos ? tipoInicial || TIPOS_CERTIFICADOS_BOVINOS[0] : "");
     setModalCertificadoAberto(true);
   };
 
   const salvarCertificado = () => {
     if (isBovinos && certTipo) {
-      const certificadoAtual = grupoCertificadoBovino.certificados[0];
-      const nucleosSelecionados = certNucleos
-        .filter(Boolean)
-        .map((nucleo) => nucleo.nome);
+      const grupoSelecionado = gruposCertificadosBovinos.find(
+        (grupo) => grupo.titulo === certTipo,
+      );
+      const certificadoAtual = grupoSelecionado?.certificados[0];
       const validadeFormatada = certValidade
         ? certValidade.split("-").reverse().join("/")
-        : certificadoAtual.validade;
+        : certificadoAtual?.validade || "";
 
-      setGrupoCertificadoBovino({
-        id: 1,
-        titulo: certTipo,
-        certificados: [{
-          ...certificadoAtual,
-          atualizadoEm: new Date().toLocaleDateString("pt-BR"),
-          numero: certNumero || certificadoAtual.numero,
-          validade: validadeFormatada,
-          nucleos: nucleosSelecionados.length
-            ? nucleosSelecionados
-            : certificadoAtual.nucleos,
-        }],
-      });
+      const novoCertificado: Certificado = {
+        id: `bv-${Date.now()}`,
+        atualizadoEm: new Date().toLocaleDateString("pt-BR"),
+        numero: certNumero || certificadoAtual?.numero || "-",
+        validade: validadeFormatada,
+        situacao: "Ativa",
+        nucleos: [],
+      };
+
+      setGruposCertificadosBovinos((gruposAtuais) =>
+        gruposAtuais.map((grupo) => {
+          const ativosAnteriores = grupo.certificados.map((certificado) => ({
+            ...certificado,
+            situacao: "Inativa" as const,
+          }));
+
+          return grupo.titulo === certTipo
+            ? {
+                ...grupo,
+                certificados: [novoCertificado],
+                inativos: [...(grupo.inativos ?? []), ...ativosAnteriores],
+              }
+            : {
+                ...grupo,
+                certificados: [],
+                inativos: [...(grupo.inativos ?? []), ...ativosAnteriores],
+              };
+        }),
+      );
     }
     setModalCertificadoAberto(false);
+  };
+
+  const abrirModalAcessoMercado = () => {
+    setTipoAcessoMercado("Produtor Independente");
+    setEntidadeMercado(null);
+    setPossuiContratoParceria(null);
+    setContratoParceria("");
+    setNucleosAcessoMercado([null]);
+    setModalAcessoMercadoAberto(true);
+  };
+
+  const salvarAcessoMercado = () => {
+    setAcessosMercado((prev) => [
+      ...prev,
+      {
+        id: `am-${Date.now()}`,
+        atualizadoEm: new Date().toLocaleDateString("pt-BR"),
+        tipo: tipoAcessoMercado,
+        situacao: "Ativo",
+        entidade: entidadeMercado?.nome,
+        documento: entidadeMercado?.documento,
+        entidadeTipo: entidadeMercado?.tipo,
+      },
+    ]);
+    setModalAcessoMercadoAberto(false);
   };
 
   const isOrnamental =
@@ -964,12 +1127,15 @@ export function VisualizarExploracaoPecuariaPage({
   const [unidadeMedida, setUnidadeMedida] = useState("");
 
   const limparModal = () => {
+    setProfissional("");
+    setProfissionalSelecionado(null);
     setNovoTipo("");
     setNovaMedida("");
     setNovoResponsavel("");
     setNovaData("");
     setNovaVulnerabilidade("");
     setNovaObs("");
+    setRespostasSuideos({});
   };
 
   const abrirModalBiosseguridade = () => {
@@ -982,6 +1148,33 @@ export function VisualizarExploracaoPecuariaPage({
   };
 
   const salvarBiosseguridade = () => {
+    if (isSuideos) {
+      if (!profissional || !dataLevantamento || PERGUNTAS_BIOSSEGURIDADE_SUIDEOS.some((pergunta) => !respostasSuideos[pergunta.key])) {
+        alert("Preencha todos os campos da avaliação de biosseguridade.");
+        return;
+      }
+
+      setBiosseguridades((prev) => [
+        ...prev.map((item) => ({ ...item, vigente: false, situacao: "Inativa" as const })),
+        {
+          id: `b-su-${Date.now()}`,
+          medida: respostasSuideos.vulnerabilidade || "Bem Protegida",
+          tipo: profissional,
+          responsavel: profissional,
+          dataImplantacao: new Date(dataLevantamento).toLocaleDateString("pt-BR", { timeZone: "UTC" }),
+          dataVencimento: "—",
+          vulnerabilidade: "Bem Protegida",
+          situacao: "Ativa",
+          vigente: true,
+          pontuacao: "3.5",
+          nivel: "B",
+        },
+      ]);
+      setModalBiosseguiradadeAberto(false);
+      limparModal();
+      return;
+    }
+
     if (!novoTipo || !novaMedida) {
       alert("Informe o tipo e a medida de biosseguridade.");
       return;
@@ -1018,10 +1211,19 @@ export function VisualizarExploracaoPecuariaPage({
 
   const TABS = [
     { id: "cadastro", label: "Cadastro", icon: <FileText size={16} /> },
+    { id: "profissionais", label: "Profissionais", icon: <Users size={16} /> },
+    { id: "acesso-mercado", label: "Acesso ao Mercado", icon: <ShoppingCart size={16} /> },
+    ...(isBovinos
+      ? [{
+        id: "rebanho",
+        label: "Rebanho",
+        icon: <Dna size={18} />,
+      }]
+      : []),
     ...(temCertificados
       ? [{ id: "certificados", label: "Certificados", icon: <BadgeCheck size={16} /> }]
       : []),
-    ...(isPeixes
+    ...(isPeixes || isSuideos
       ? [
         { id: "biosseguridade", label: "Biosseguridade", icon: <ShieldCheck size={16} /> },
         { id: "producao/distribuicao", label: "Ciclo de produção/distribuição", icon: <History size={16} /> },
@@ -1042,6 +1244,17 @@ export function VisualizarExploracaoPecuariaPage({
           </button>
         );
 
+      case "profissionais":
+        return (
+          <button
+            type="button"
+            onClick={() => setAddProfessionalRequestKey((value) => value + 1)}
+            className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2"
+          >
+            Adicionar Profissional
+          </button>
+        );
+
       case "certificados":
         return (
           <button
@@ -1050,6 +1263,17 @@ export function VisualizarExploracaoPecuariaPage({
             className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2"
           >
             Adicionar Certificado
+          </button>
+        );
+
+      case "acesso-mercado":
+        return (
+          <button
+            type="button"
+            onClick={abrirModalAcessoMercado}
+            className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2"
+          >
+            Adicionar Acesso ao Mercado
           </button>
         );
 
@@ -1626,41 +1850,136 @@ export function VisualizarExploracaoPecuariaPage({
           </div>
         )}
 
+        {/* ================= ABA PROFISSIONAIS ================= */}
+        {activeTab === "profissionais" && (
+          <EntityProfessionalsTab
+            entityKey={`exploracao-pecuaria-${r.estabelecimento?.codigo || r.codigo || "demo"}`}
+            allowedTypes={["Responsável Técnico Animal", "Habilitado para Emissão de GTA"]}
+            onNavigate={onNavigate}
+            addRequestKey={addProfessionalRequestKey}
+          />
+        )}
+
+        {/* ================= ABA ACESSO AO MERCADO ================= */}
+        {activeTab === "acesso-mercado" && (
+          <div className="flex flex-col gap-4 mt-2">
+            <AccordionCardGroup
+              title="Acesso ao Mercado"
+              activeCountText={`${acessosMercado.length} Acessos ao Mercado Ativos`}
+              icon={<ShoppingCart className="h-5 w-5" />}
+              onAddClick={abrirModalAcessoMercado}
+              variant="sem-vinculacao"
+              grid="normal"
+              historicoTitle="Histórico Inativos"
+            >
+              {acessosMercado.filter((acesso) => acesso.situacao === "Ativo").map((acesso) => (
+                <AcessoMercadoCard
+                  key={acesso.id}
+                  acesso={acesso}
+                  onVisualizar={() => onNavigate("visualizar-acesso-mercado", acesso)}
+                />
+              ))}
+            </AccordionCardGroup>
+          </div>
+        )}
+
+        {/* ================= ABA REBANHO ================= */}
+        {activeTab === "rebanho" && isBovinos && (
+          <div className="flex flex-col gap-4 mt-2">
+            <AccordionCardGroup
+              title="Rebanho"
+              activeCountText="1 Rebanho Ativo"
+              variant="sem-vinculacao"
+              grid="amplo"
+              icon={
+                <img
+                  src={Icons.iconeRebanhoBrancoUrl}
+                  alt=""
+                  className="h-6 w-6 object-contain"
+                />
+              }
+              historicoTitle="Histórico de Atualização"
+            >
+              <div className="w-full overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+                <div className="h-2 bg-[#008446]" />
+                <div className="p-6">
+                  <div className="mb-8 flex items-center justify-between text-xs text-gray-800">
+                    <span>Atualizado em: 14/04/2012</span>
+                    <span>Ativo</span>
+                  </div>
+
+                  <div className="w-full overflow-x-auto rounded-3xl border border-gray-200">
+                    <div className="min-w-[620px]">
+                      <div className="grid grid-cols-[1fr_1fr_1fr] border-b border-gray-200 bg-gray-50 text-xs font-bold uppercase tracking-wider text-gray-500">
+                        <div className="px-6 py-5 text-center">Faixa etária</div>
+                        <div className="border-l border-gray-200 px-6 py-5 text-center text-blue-600">Machos</div>
+                        <div className="border-l border-gray-200 px-6 py-5 text-center text-pink-600">Fêmeas</div>
+                      </div>
+                      {REBANHO_BOVINO_MOCK.map((linha) => (
+                        <div key={linha.faixa} className="grid grid-cols-[1fr_1fr_1fr] border-b border-gray-100 text-sm font-semibold text-gray-600">
+                          <div className="px-6 py-5 text-center">{linha.faixa}</div>
+                          <div className="border-l border-gray-100 px-6 py-5 text-center">{linha.machos}</div>
+                          <div className="border-l border-gray-100 px-6 py-5 text-center">{linha.femeas}</div>
+                        </div>
+                      ))}
+                      <div className="grid grid-cols-[1fr_1fr_1fr] bg-gray-50 text-sm font-bold text-gray-700">
+                        <div className="px-6 py-5 text-center uppercase">Total</div>
+                        <div className="border-l border-gray-200 px-6 py-5 text-center text-blue-600">82</div>
+                        <div className="border-l border-gray-200 px-6 py-5 text-center text-pink-600">143</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </AccordionCardGroup>
+          </div>
+        )}
+
         {/* ================= ABA CERTIFICADOS ================= */}
         {activeTab === "certificados" && (
           <div className="flex flex-col gap-4 mt-2">
-            {gruposCertificados.map((grupo) => (
+            {gruposCertificados.map((grupo, index) => (
               <AccordionCardGroup
                 key={grupo.id}
-                title={grupo.titulo}
+                title={
+                  grupo.titulo === "Tuberculose e Brucelose"
+                    ? "Brucelose e Tuberculose"
+                    : grupo.titulo
+                }
                 activeCountText={`${grupo.certificados.length} Certificados Ativos`}
-                icon={<BadgeCheck className="w-5 h-5" />}
-                onAddClick={abrirModalCertificado}
+                groupNumber={index + 1}
+                onAddClick={() => abrirModalCertificado(grupo.titulo)}
                 variant="sem-vinculacao"
                 grid="duplo"
                 historicoTitle="Histórico de Inativos"
-                historicoChildren={(grupo.inativos ?? []).map((cert) => (
-                  <HistoryCard
-                    key={cert.id}
-                    label={cert.numero}
-                    subLabel={`Validade: ${cert.validade}`}
-                    topBarSvgPath={TOP_BAR_HISTORY}
-                    icon={<BadgeCheck size={18} className="text-gray-500" />}
-                    actionIcon={
-                      <Eye
-                        size={16}
-                        className="text-gray-500 hover:text-[#008446] transition-colors"
-                      />
-                    }
-                    onActionClick={() => onNavigate("visualizar-certificado", cert)}
-                    actionIconPath={""}
-                  />
-                ))}
+                historicoChildren={(grupo.inativos ?? []).map((cert) =>
+                  isBovinos ? (
+                    <CertificadoCard
+                      key={cert.id}
+                      certificado={cert}
+                      inativo
+                      showNucleos={false}
+                      onVisualizar={() => onNavigate("visualizar-certificado", cert)}
+                    />
+                  ) : (
+                    <HistoryCard
+                      key={cert.id}
+                      label={cert.numero}
+                      subLabel={`Validade: ${cert.validade}`}
+                      topBarSvgPath={TOP_BAR_HISTORY}
+                      icon={<BadgeCheck size={18} className="text-gray-500" />}
+                      actionIcon={<Eye size={16} className="text-gray-500 hover:text-[#008446] transition-colors" />}
+                      onActionClick={() => onNavigate("visualizar-certificado", cert)}
+                      actionIconPath={""}
+                    />
+                  ),
+                )}
               >
                 {grupo.certificados.map((certificado) => (
                   <CertificadoCard
                     key={certificado.id}
                     certificado={certificado}
+                    showNucleos={!isBovinos}
                     onVisualizar={() =>
                       onNavigate("visualizar-certificado", certificado)
                     }
@@ -2124,23 +2443,53 @@ export function VisualizarExploracaoPecuariaPage({
       >
         <div className="w-full flex flex-col gap-6">
           <Section title="Informações Gerais" defaultOpen={true}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 w-full">
-              <FloatSelect
-                label="Profissional da Área Animal Oficial *"
-                required
-                value={profissional}
-                onChange={setProfissional}
-                options={profissionaisOficiais}
-              />
-              <FloatInput
-                label="Data de Levantamento *"
-                type="date"
-                icon={<Calendar size={20} color={GREEN} />}
-                value={dataLevantamento}
-                onChange={(e: any) =>
-                  setDataLevantamento(e?.target ? e.target.value : e)
-                }
-              />
+            <div className="flex flex-col gap-5 w-full">
+              <div className="flex w-full items-end gap-3">
+                <div className="min-w-0 flex-1">
+                  <EntitySearchInput
+                    label="Profissional da Área Animal Oficial"
+                    placeholder="Buscar por nome ou CPF"
+                    required
+                    value={profissionalSelecionado?.nome || ""}
+                    data={PROFISSIONAIS_BIOSSEGURIDADE_MOCK}
+                    searchKeys={["nome", "documento"]}
+                    columns={[{ label: "Nome", key: "nome" }, { label: "CPF", key: "documento" }]}
+                    icon={<img src={Icons.iconeProfissionalAnimalUrl} alt="Profissional Animal" className="h-5 w-5 object-contain" />}
+                    title="Buscar Profissional da Área Animal Oficial"
+                    subtitle="Busque por um profissional oficial cadastrado no sistema:"
+                    confirmLabel="Selecionar"
+                    onChange={(entidade: any) => {
+                      setProfissionalSelecionado(entidade);
+                      setProfissional(entidade?.nome || "");
+                    }}
+                  />
+                </div>
+                {profissionalSelecionado && (
+                  <>
+                    <div className="w-56 shrink-0">
+                      <FloatInput label="CPF" value={profissionalSelecionado.documento || ""} disabled />
+                    </div>
+                    <button
+                      type="button"
+                      title="Visualizar cadastro"
+                      onClick={() => onNavigate("visualizar-profissional-animal", profissionalSelecionado)}
+                      className="mb-1 flex h-10 shrink-0 items-center p-2 text-[#1A7A3C] transition hover:bg-green-50"
+                    >
+                      <Eye size={20} />
+                    </button>
+                  </>
+                )}
+              </div>
+              <div className="w-full md:w-1/3">
+                <FloatInput
+                  label="Data de Levantamento"
+                  type="date"
+                  required
+                  icon={<Calendar size={20} color={GREEN} />}
+                  value={dataLevantamento}
+                  onChange={(e: any) => setDataLevantamento(e?.target ? e.target.value : e)}
+                />
+              </div>
             </div>
           </Section>
 
@@ -2148,7 +2497,7 @@ export function VisualizarExploracaoPecuariaPage({
             title="Perguntas de Avaliação de Biosseguridade"
             defaultOpen={true}
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5 w-full">
+            <div className={`grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5 w-full ${isSuideos ? "hidden" : ""}`}>
               <SimNao
                 label="Livre de animais alheios à produção? *"
                 name="livreAnimais"
@@ -2222,6 +2571,20 @@ export function VisualizarExploracaoPecuariaPage({
                 onChange={setRecebeAlimentoVivo}
               />
             </div>
+            {isSuideos && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5 w-full">
+                {PERGUNTAS_BIOSSEGURIDADE_SUIDEOS.map((pergunta) => (
+                  <FloatSelect
+                    key={pergunta.key}
+                    label={`${pergunta.label} *`}
+                    required
+                    value={respostasSuideos[pergunta.key] || ""}
+                    onChange={(value) => setRespostasSuideos((prev) => ({ ...prev, [pergunta.key]: value }))}
+                    options={pergunta.options.map((option) => ({ value: option, label: option }))}
+                  />
+                ))}
+              </div>
+            )}
           </Section>
 
           <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm relative overflow-hidden">
@@ -2286,6 +2649,129 @@ export function VisualizarExploracaoPecuariaPage({
               </div>
             </div>
           </div>
+        </div>
+      </ModalBase>
+
+      {/* MODAL — ADICIONAR ACESSO AO MERCADO */}
+      <ModalBase
+        open={modalAcessoMercadoAberto}
+        onClose={() => setModalAcessoMercadoAberto(false)}
+        title="Acesso ao Mercado"
+        subtitle="Preencha os campos para adicionar um acesso ao mercado da exploração."
+        icon={<ShoppingCart size={24} />}
+        saveText="Salvar"
+        cancelText="Cancelar"
+        onSave={salvarAcessoMercado}
+      >
+        <div className="w-full flex flex-col gap-6">
+          <Section title="Acesso ao Mercado" defaultOpen={true}>
+            <div className="flex flex-col gap-6 w-full">
+              <FloatSelect
+                label="Tipo de Acesso ao Mercado"
+                required
+                value={tipoAcessoMercado}
+                onChange={(value) => {
+                  setTipoAcessoMercado(value as TipoAcessoMercado);
+                  setEntidadeMercado(null);
+                  setPossuiContratoParceria(null);
+                  setContratoParceria("");
+                }}
+                options={TIPOS_ACESSO_MERCADO.map((tipo) => ({ value: tipo, label: tipo }))}
+              />
+
+              {(tipoAcessoMercado === "Produtor Integrado" || tipoAcessoMercado === "Produtor Cooperado") && (
+                <>
+                  <div className="border-t border-gray-200 pt-6">
+                    <h3 className="mb-5 text-lg font-semibold text-gray-900">
+                      {tipoAcessoMercado === "Produtor Integrado" ? "Dados da Integradora" : "Dados da Cooperativa"}
+                    </h3>
+                    <EntitySearchInput
+                      label={tipoAcessoMercado === "Produtor Integrado" ? "Integradora" : "Cooperativa"}
+                      placeholder="Buscar entidade"
+                      required
+                      value={entidadeMercado?.nome ?? ""}
+                      data={ENTIDADES_MERCADO_MOCK.filter((item) =>
+                        tipoAcessoMercado === "Produtor Integrado"
+                          ? item.tipo === "Integradora"
+                          : item.tipo === "Cooperativa",
+                      )}
+                      searchKeys={["nome", "documento"]}
+                      columns={[
+                        { label: "Nome", key: "nome" },
+                        { label: "Documento", key: "documento" },
+                      ]}
+                      title="Buscar entidade"
+                      subtitle="Selecione uma entidade vinculada ao acesso ao mercado:"
+                      confirmLabel="Selecionar"
+                      icon={<Users size={20} color={GREEN} />}
+                      onChange={setEntidadeMercado}
+                    />
+                  </div>
+                </>
+              )}
+
+              {(tipoAcessoMercado === "Produtor Independente" || tipoAcessoMercado === "Produtor Cooperado") && (
+                <div className="border-t border-gray-200 pt-6">
+                  <h3 className="mb-5 text-lg font-semibold text-gray-900">Contrato de Parceria</h3>
+                  <SimNao
+                    label="Possui Contrato de Parceria?"
+                    required
+                    value={possuiContratoParceria}
+                    onChange={setPossuiContratoParceria}
+                  />
+                </div>
+              )}
+
+              {(tipoAcessoMercado === "Produtor Integrado" || possuiContratoParceria === true) && (
+                <div className="border-t border-gray-200 pt-6">
+                  <UploadField
+                    label="Contrato de Parceria"
+                    required
+                    fileName={contratoParceria}
+                    onSelectFile={() => setContratoParceria("contrato_parceria.pdf")}
+                  />
+                </div>
+              )}
+
+              <div className="border-t border-gray-200 pt-6">
+                <h3 className="mb-5 text-lg font-semibold text-gray-900">Núcleos de Produção</h3>
+                <div className="flex flex-col gap-4">
+                  {nucleosAcessoMercado.map((nucleo, index) => (
+                    <div key={index} className="flex items-center gap-3">
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#008446] text-xs font-semibold text-white">{index + 1}</span>
+                      <EntitySearchInput
+                        label="Núcleo de Produção"
+                        placeholder="Buscar núcleo de produção"
+                        required
+                        value={nucleo?.nome ?? ""}
+                        data={NUCLEOS_CERTIFICADO_MOCK}
+                        searchKeys={["nome", "codigo"]}
+                        columns={[{ label: "Núcleo", key: "nome" }, { label: "Código", key: "codigo" }]}
+                        title="Buscar Núcleo de Produção"
+                        subtitle="Selecione um núcleo de produção da exploração:"
+                        confirmLabel="Selecionar"
+                        icon={<img src={Icons.iconeNucleoProducaoUrl} alt="" className="h-5 w-5" />}
+                        onChange={(ent: any) => setNucleosAcessoMercado((prev) => prev.map((item, i) => i === index ? ent : item))}
+                      />
+                      {nucleosAcessoMercado.length > 1 && (
+                        <button type="button" onClick={() => setNucleosAcessoMercado((prev) => prev.filter((_, i) => i !== index))} className="text-red-500">
+                          <Trash2 size={18} />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => setNucleosAcessoMercado((prev) => [...prev, null])}
+                    className="flex w-fit items-center gap-2 rounded-md border border-[#008446] px-4 py-2.5 text-sm font-semibold text-[#008446] hover:bg-green-50"
+                  >
+                    <PlusCircle size={18} />
+                    Adicionar Núcleo
+                  </button>
+                </div>
+              </div>
+            </div>
+          </Section>
         </div>
       </ModalBase>
 
@@ -2374,84 +2860,50 @@ export function VisualizarExploracaoPecuariaPage({
             </div>
           </Section>
 
-          <Section title="Núcleo de Produção" defaultOpen={true}>
-            <div className="flex flex-col gap-4 w-full">
-              {certNucleos.map((nucleo, index) => (
-                <div key={index} className="flex items-end gap-3">
-                  <div className="flex-1">
-                    <EntitySearchInput
-                      label="Núcleo de Produção"
-                      placeholder="Buscar núcleo de produção"
-                      required
-                      value={nucleo?.nome ?? ""}
-                      data={NUCLEOS_CERTIFICADO_MOCK}
-                      searchKeys={["nome", "codigo"]}
-                      columns={[
-                        { label: "Núcleo", key: "nome" },
-                        { label: "Código", key: "codigo" },
-                      ]}
-                      title="Buscar Núcleo de Produção"
-                      subtitle="Selecione um núcleo de produção da exploração:"
-                      confirmLabel="Selecionar"
-                      icon={
-                        <img
-                          src={Icons.iconeNucleoProducaoUrl}
-                          alt=""
-                          className="w-5 h-5 object-contain"
-                        />
-                      }
-                      onChange={(ent: any) =>
-                        setCertNucleos((prev) =>
-                          prev.map((n, i) => (i === index ? ent : n)),
-                        )
-                      }
-                    />
-                  </div>
-
-                  {nucleo?.codigo && (
-                    <div className="w-32 flex-shrink-0">
-                      <FloatInput label="Código" value={nucleo.codigo} disabled />
+          {!isBovinos && (
+            <Section title="Núcleo de Produção" defaultOpen={true}>
+              <div className="flex flex-col gap-4 w-full">
+                {certNucleos.map((nucleo, index) => (
+                  <div key={index} className="flex items-end gap-3">
+                    <div className="flex-1">
+                      <EntitySearchInput
+                        label="Núcleo de Produção"
+                        placeholder="Buscar núcleo de produção"
+                        required
+                        value={nucleo?.nome ?? ""}
+                        data={NUCLEOS_CERTIFICADO_MOCK}
+                        searchKeys={["nome", "codigo"]}
+                        columns={[{ label: "Núcleo", key: "nome" }, { label: "Código", key: "codigo" }]}
+                        title="Buscar Núcleo de Produção"
+                        subtitle="Selecione um núcleo de produção da exploração:"
+                        confirmLabel="Selecionar"
+                        icon={<img src={Icons.iconeNucleoProducaoUrl} alt="" className="h-5 w-5" />}
+                        onChange={(ent: any) => setCertNucleos((prev) => prev.map((item, i) => i === index ? ent : item))}
+                      />
                     </div>
-                  )}
-
-                  <div className="flex items-center gap-1">
-                    {nucleo && (
-                      <button
-                        type="button"
-                        title="Visualizar detalhes do núcleo"
-                        onClick={() => {
-                          console.log("Visualizar núcleo:", nucleo);
-                        }}
-                        className="flex h-11 w-11 items-center justify-center text-[#1A7A3C]"
-                      >
-                        <Eye size={18} />
-                      </button>
-                    )}
-
+                    {nucleo?.codigo && <div className="w-32 flex-shrink-0"><FloatInput label="Código" value={nucleo.codigo} disabled /></div>}
                     <button
                       type="button"
                       title="Remover núcleo"
-                      onClick={() =>
-                        setCertNucleos((prev) => prev.filter((_, i) => i !== index))
-                      }
-                      className="flex h-11 w-11 items-center justify-center bg-white text-red-500 transition"
+                      onClick={() => setCertNucleos((prev) => prev.filter((_, i) => i !== index))}
+                      className="flex h-11 w-11 items-center justify-center text-red-500"
                     >
                       <Trash2 size={18} />
                     </button>
                   </div>
-                </div>
-              ))}
+                ))}
+                <button
+                  type="button"
+                  onClick={() => setCertNucleos((prev) => [...prev, null])}
+                  className="flex w-fit items-center gap-2 rounded-md border border-[#1A7A3C] px-4 py-2.5 text-sm font-semibold text-[#1A7A3C] hover:bg-green-50"
+                >
+                  <PlusCircle size={18} />
+                  Adicionar Núcleo
+                </button>
+              </div>
+            </Section>
+          )}
 
-              <button
-                type="button"
-                onClick={() => setCertNucleos((prev) => [...prev, null])}
-                className="flex w-fit items-center gap-2 rounded-md border border-[#1A7A3C] px-4 py-2.5 text-sm font-semibold text-[#1A7A3C] transition hover:bg-green-50 mt-1"
-              >
-                <PlusCircle size={18} />
-                Adicionar Núcleo
-              </button>
-            </div>
-          </Section>
         </div>
       </ModalBase>
     </div>

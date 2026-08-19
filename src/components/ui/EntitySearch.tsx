@@ -841,11 +841,11 @@ export function RevendedoraInput({
 					data={data} // <-- Passando a lista correta
 					searchKeys={["codigo", "nome"]}
 					title="Buscar Revendedora"
-					subtitle="Busque por uma revendedora de produtos agropecuários cadastrada:"
+					 subtitle="Busque por uma revendedora de produtos agropecuários cadastrada:"
 					icon={<Store size={20} color={GREEN} />}
-					columns={[
-						{ label: "Código", key: "codigo" },
-						{ label: "Nome", key: "nome" },
+					 columns={[
+						{ label: "Revendedora de Produtos Agropecuários", key: "nome" },
+						{ label: "Código da Revendedora", key: "codigo" },
 					]}
 					confirmLabel="Confirmar"
 					onChange={onChange}
@@ -855,7 +855,7 @@ export function RevendedoraInput({
 					<div className="flex items-center gap-2 animate-fadeIn w-full">
 						<div className="flex-1">
 							<FloatInput
-								label="Código"
+								label="Código da Revendedora"
 								required={required}
 								value={entidadeSelecionada.codigo}
 								onChange={() => { }}
@@ -923,10 +923,9 @@ export function FornecedorVacinaInput({
 							/>
 						}
 						columns={[
-							{ label: "Tipo", key: "tipo" },
-							{ label: "Nome", key: "nome" },
-							{ label: "Código", key: "codigo" },
-							{ label: "UF", key: "uf" },
+							{ label: "Tipo de Fornecedor", key: "tipo" },
+							{ label: "Fornecedor", key: "nome" },
+							{ label: "Código do Fornecedor", key: "codigo" },
 						]}
 						confirmLabel="Confirmar"
 						onChange={onChange}
@@ -1448,7 +1447,7 @@ interface MapModalProps {
 	initialLng?: string;
 }
 
-function MapModal({
+export function MapModal({
 	onClose,
 	onConfirm,
 	initialLat,
@@ -1681,7 +1680,7 @@ export function BlocoEnderecoFields({
 				estado:
 					tipoEstado === "travado"
 						? "Minas Gerais"
-						: data.estado || "Minas Gerais",
+						: data.estado,
 				cep: "",
 				bairro: "",
 				numero: "",

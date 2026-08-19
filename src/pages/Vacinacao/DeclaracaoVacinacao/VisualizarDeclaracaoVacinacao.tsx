@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { ArrowLeft, Syringe, Calendar, Store, Check, Package, PillBottle, Eye, ChevronUp, ChevronDown } from "lucide-react";
+import { ArrowLeft, Syringe, Calendar, Check, Package, PillBottle, Eye, ChevronUp, ChevronDown } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, CustomRadio } from "../../../components/ui/FormKit";
+import { HistoricoCadastroLayout, type HistoricoCadastroItem } from "../../../components/ui/HistoricoCadastroLayout";
+import { carregarHistoricoCadastro } from "../../../components/ui/historicoCadastroStorage";
 import { PieChart, Pie, Cell, Sector } from "recharts";
 import * as Icons from "../../../imports/icons";
 
@@ -240,7 +242,7 @@ export function VisualizarDeclaracaoVacinacaoPage({ onLogout, onNavigate, dados 
     "1": {
       tipoVacina: "B19", regime: "Vacina Oficial", dataAtestado: "2026-02-05", 
       veterinarioNome: "Dr. Roberto Silva", vacinadorNome: "Eloiza Silva",
-      origemNota: "Produtor", revendedoraNome: "Comercial AgroVet",
+      origemNota: "Produtor",
       notasFiscaisOrigem: [
         { id: 1, nome: "0013225/24", partida: "1", uf: "MG", dosesDisponiveisTotais: 120, fornecedor: "Comercial AgroVet", doenca: "Brucelose", tipoVacina: "B19", laboratorio: "BioMed/MG", validade: "20/12/2026", quantidadeDoses: 10, quantidadeFrascos: 1, dosesPerFrasco: 10 }
       ],
@@ -249,8 +251,8 @@ export function VisualizarDeclaracaoVacinacaoPage({ onLogout, onNavigate, dados 
     "2": {
       tipoVacina: "", regime: "Primeira Dose", dataAtestado: "2026-01-20", 
       veterinarioNome: "Dr. Carlos Mendes", vacinadorNome: "",
-      origemNota: "Médico Veterinário", revendedoraNome: "AgroInsumos Sul",
-      situacao: "Cancelada",
+      origemNota: "Médico Veterinário",
+      situacao: "Cancelado",
       notasFiscaisOrigem: [
         { id: 5, nome: "0099887/25", partida: "3", uf: "MG", dosesDisponiveisTotais: 500, fornecedor: "Comercial AgroVet", doenca: "Febre Aftosa", tipoVacina: "", laboratorio: "OuroFino", validade: "10/10/2026", quantidadeDoses: 30, quantidadeFrascos: 3, dosesPerFrasco: 10 }
       ],
@@ -259,7 +261,7 @@ export function VisualizarDeclaracaoVacinacaoPage({ onLogout, onNavigate, dados 
     "3": {
       tipoVacina: "", regime: "Dose de Reforço", dataAtestado: "2026-03-02", 
       veterinarioNome: "Dra. Ana Paula", vacinadorNome: "", mordidaMorcego: "Não",
-      origemNota: "Produtor", revendedoraNome: "Comercial AgroVet",
+      origemNota: "Produtor",
       notasFiscaisOrigem: [
         { id: 3, nome: "0014589/24", partida: "1", uf: "SP", dosesDisponiveisTotais: 250, fornecedor: "AgroInsumos Sul", doenca: "Raiva", tipoVacina: "", laboratorio: "Zoetis", validade: "15/08/2027", quantidadeDoses: 5, quantidadeFrascos: 1, dosesPerFrasco: 5 }
       ],
@@ -273,6 +275,15 @@ export function VisualizarDeclaracaoVacinacaoPage({ onLogout, onNavigate, dados 
   const registro = isMockPadrao 
     ? { ...registroOriginal, ...REGISTROS_RICOS[dados.id.toString()] }
     : { ...registroOriginal };
+  const agora = new Date();
+  const historico = carregarHistoricoCadastro<any>(`declaracao-vacinacao:${registro.id ?? "novo"}`, [{
+    id: `criacao-${registro.id ?? "novo"}`,
+    data: new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "short", year: "numeric" }).format(agora),
+    hora: new Intl.DateTimeFormat("pt-BR", { hour: "2-digit", minute: "2-digit", hour12: false }).format(agora),
+    alteradoPor: "Sistema",
+    atual: true,
+    dados: registro,
+  }]) as HistoricoCadastroItem<any>[];
 
   // Condicionais
   const isRaiva = registro.doenca === "Raiva";
@@ -300,7 +311,8 @@ export function VisualizarDeclaracaoVacinacaoPage({ onLogout, onNavigate, dados 
     <div className="min-h-screen bg-[#f2f3f5] pb-24">
       <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen="declaracao-vacinacao" hideSearch />
 
-      <main className="max-w-[1088px] mx-auto px-4 md:px-6 py-6 flex flex-col gap-4">
+      <HistoricoCadastroLayout itens={historico} resetKey={registro.id} tituloHistorico="Histórico da Declaração de Vacinação" conteudoClassName="px-4 py-6 md:px-6">
+        {({ botaoHistorico, avisoVersao }) => <main className="flex flex-col gap-4">
         
         {/* ============ HEADER ============ */}
         <div className="mb-4">
@@ -310,15 +322,10 @@ export function VisualizarDeclaracaoVacinacaoPage({ onLogout, onNavigate, dados 
           
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-semibold text-gray-900">Visualizar Declaração de Vacinação</h1>
-            <button
-              onClick={() => onNavigate("editar-declaracao-vacinacao", registro)}
-              className="px-5 py-3 rounded-md text-white text-sm font-semibold transition hover:opacity-90 active:scale-[0.98]"
-              style={{ backgroundColor: GREEN }}
-            >
-              Editar
-            </button>
+            <div className="flex items-center gap-3"><button onClick={() => onNavigate("editar-declaracao-vacinacao", registro)} className="px-5 py-3 rounded-md text-white text-sm font-semibold transition hover:opacity-90 active:scale-[0.98]" style={{ backgroundColor: GREEN }}>Editar</button>{botaoHistorico}</div>
           </div>
         </div>
+        {avisoVersao}
 
         {/* ============ INFORMAÇÕES BÁSICAS ============ */}
         <SectionCard title="Informações Básicas">
@@ -415,7 +422,7 @@ export function VisualizarDeclaracaoVacinacaoPage({ onLogout, onNavigate, dados 
             </div>
 
             <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
-              <FloatInput label="Data de Atestado de Vacinação" value={registro.dataAtestado || "—"} readOnly disabled icon={<Calendar size={18} color={GREEN} />} />
+              <FloatInput label="Data do Atestado de Vacinação" value={registro.dataAtestado || "—"} readOnly disabled icon={<Calendar size={18} color={GREEN} />} />
             </div>
 
             <div className="w-full mt-2">
@@ -449,7 +456,6 @@ export function VisualizarDeclaracaoVacinacaoPage({ onLogout, onNavigate, dados 
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
               <FloatInput label="Origem do Saldo" value={registro.origemNota || "—"} readOnly disabled />
-              <FloatInput label="Revendedora de Insumos" value={registro.revendedoraNome || "—"} readOnly disabled icon={<Store size={18} color={GREEN} />} />
             </div>
 
             <div className="flex flex-col gap-6">
@@ -610,11 +616,12 @@ export function VisualizarDeclaracaoVacinacaoPage({ onLogout, onNavigate, dados 
         {/* ============ SITUAÇÃO DO CADASTRO (Ao Final) ============ */}
         <Section title="Situação do Cadastro">
           <div className="w-full">
-             <FloatInput label="Situação" value={registro.situacao || "Ativo"} readOnly disabled />
+             <FloatInput label="Situação" value={registro.situacao || "Gravado"} readOnly disabled />
           </div>
         </Section>
         
-      </main>
+        </main>}
+      </HistoricoCadastroLayout>
     </div>
   );
 }

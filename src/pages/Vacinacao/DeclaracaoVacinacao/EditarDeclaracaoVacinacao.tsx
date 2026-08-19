@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Syringe, Calendar, Store, Check, Package, PillBottle, Eye, ChevronUp, ChevronDown } from "lucide-react";
+import { ArrowLeft, Syringe, Calendar, Check, Package, PillBottle, Eye, ChevronUp, ChevronDown } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
 import { FloatInput, CustomRadio } from "../../../components/ui/FormKit";
 import { PieChart, Pie, Cell, Sector } from "recharts";
@@ -234,12 +234,13 @@ const GRUPOS_COM_NUCLEO = ["Abelhas", "Aves", "Suídeos"];
 // ==========================================================
 export function EditarDeclaracaoVacinacaoPage({ onLogout, onNavigate, dados }: { onLogout: () => void; onNavigate: (screen: any, data?: any) => void; dados?: any }) {
   const [graficoAtivo, setGraficoAtivo] = useState<{ loteId: string; index: number } | null>(null);
+  const [cancelado, setCancelado] = useState(false);
 
   const REGISTROS_RICOS: Record<string, any> = {
     "1": {
       tipoVacina: "B19", regime: "Vacina Oficial", dataAtestado: "2026-02-05", 
       veterinarioNome: "Dr. Roberto Silva", vacinadorNome: "Eloiza Silva",
-      origemNota: "Produtor", revendedoraNome: "Comercial AgroVet",
+      origemNota: "Produtor",
       notasFiscaisOrigem: [
         { id: 1, nome: "0013225/24", partida: "1", uf: "MG", dosesDisponiveisTotais: 120, fornecedor: "Comercial AgroVet", doenca: "Brucelose", tipoVacina: "B19", laboratorio: "BioMed/MG", validade: "20/12/2026", quantidadeDoses: 10, quantidadeFrascos: 1, dosesPerFrasco: 10 }
       ],
@@ -248,8 +249,8 @@ export function EditarDeclaracaoVacinacaoPage({ onLogout, onNavigate, dados }: {
     "2": {
       tipoVacina: "", regime: "Primeira Dose", dataAtestado: "2026-01-20", 
       veterinarioNome: "Dr. Carlos Mendes", vacinadorNome: "",
-      origemNota: "Médico Veterinário", revendedoraNome: "AgroInsumos Sul",
-      situacao: "Cancelada",
+      origemNota: "Médico Veterinário",
+      situacao: "Cancelado",
       notasFiscaisOrigem: [
         { id: 5, nome: "0099887/25", partida: "3", uf: "MG", dosesDisponiveisTotais: 500, fornecedor: "Comercial AgroVet", doenca: "Febre Aftosa", tipoVacina: "", laboratorio: "OuroFino", validade: "10/10/2026", quantidadeDoses: 30, quantidadeFrascos: 3, dosesPerFrasco: 10 }
       ],
@@ -258,7 +259,7 @@ export function EditarDeclaracaoVacinacaoPage({ onLogout, onNavigate, dados }: {
     "3": {
       tipoVacina: "", regime: "Dose de Reforço", dataAtestado: "2026-03-02", 
       veterinarioNome: "Dra. Ana Paula", vacinadorNome: "", mordidaMorcego: "Não",
-      origemNota: "Produtor", revendedoraNome: "Comercial AgroVet",
+      origemNota: "Produtor",
       notasFiscaisOrigem: [
         { id: 3, nome: "0014589/24", partida: "1", uf: "SP", dosesDisponiveisTotais: 250, fornecedor: "AgroInsumos Sul", doenca: "Raiva", tipoVacina: "", laboratorio: "Zoetis", validade: "15/08/2027", quantidadeDoses: 5, quantidadeFrascos: 1, dosesPerFrasco: 5 }
       ],
@@ -272,7 +273,14 @@ export function EditarDeclaracaoVacinacaoPage({ onLogout, onNavigate, dados }: {
     ? { ...registroOriginal, ...REGISTROS_RICOS[dados.id.toString()] }
     : { ...registroOriginal };
 
-  const registro = registroInicial;
+  const registro = { ...registroInicial, situacao: cancelado ? "Cancelado" : (registroInicial.situacao || "Gravado") };
+
+  const cancelarDeclaracao = () => {
+    if (registro.situacao === "Cancelado") return;
+    const registros = JSON.parse(localStorage.getItem("DECLARACOES_VACINA_DB") || "[]");
+    localStorage.setItem("DECLARACOES_VACINA_DB", JSON.stringify(registros.map((item: any) => item.id === registro.id ? { ...item, situacao: "Cancelado" } : item)));
+    setCancelado(true);
+  };
 
   const isRaiva = registro.doenca === "Raiva";
   const isBrucelose = registro.doenca === "Brucelose";
@@ -308,6 +316,7 @@ export function EditarDeclaracaoVacinacaoPage({ onLogout, onNavigate, dados }: {
           
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-semibold text-gray-900">Editar Declaração de Vacinação</h1>
+            <button type="button" onClick={cancelarDeclaracao} disabled={registro.situacao === "Cancelado"} className="rounded-md border border-red-300 px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50">{registro.situacao === "Cancelado" ? "Declaração cancelada" : "Cancelar declaração"}</button>
           </div>
         </div>
 
@@ -406,7 +415,7 @@ export function EditarDeclaracaoVacinacaoPage({ onLogout, onNavigate, dados }: {
             </div>
 
             <div className="flex-1 min-w-[280px] max-w-full sm:max-w-[calc(33.333%-11px)]">
-              <FloatInput label="Data de Atestado de Vacinação" value={registro.dataAtestado || "—"} readOnly disabled icon={<Calendar size={18} color={GREEN} />} />
+              <FloatInput label="Data do Atestado de Vacinação" value={registro.dataAtestado || "—"} readOnly disabled icon={<Calendar size={18} color={GREEN} />} />
             </div>
 
             <div className="w-full mt-2">
@@ -440,7 +449,6 @@ export function EditarDeclaracaoVacinacaoPage({ onLogout, onNavigate, dados }: {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
               <FloatInput label="Origem do Saldo" value={registro.origemNota || "—"} readOnly disabled />
-              <FloatInput label="Revendedora de Insumos" value={registro.revendedoraNome || "—"} readOnly disabled icon={<Store size={18} color={GREEN} />} />
             </div>
 
             <div className="flex flex-col gap-6">
@@ -600,7 +608,7 @@ export function EditarDeclaracaoVacinacaoPage({ onLogout, onNavigate, dados }: {
 
         {/* ============ SITUAÇÃO DO CADASTRO ============ */}
         <Section title="Situação do Cadastro">
-          <FloatInput label="Situação" value={registro.situacao || "Ativo"} readOnly disabled />
+          <FloatInput label="Situação" value={registro.situacao || "Gravado"} readOnly disabled />
         </Section>
         
       </main>

@@ -1,7 +1,10 @@
 import React, { useState } from "react";
-import { ArrowLeft, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronUp, FileText } from "lucide-react";
 import { Navbar } from "../../../components/Navbar";
-import { FloatInput, LargeTextArea } from "../../../components/ui/FormKit";
+import { FloatInput, LargeTextArea, Tabs } from "../../../components/ui/FormKit";
+import { ResponsabilidadesTecnicasTab } from "../../../components/ResponsabilidadesTecnicasTab";
+import { ResponsabilidadeTecnicaModal } from "../../../components/ResponsabilidadeTecnicaModal";
+import * as Icons from "../../../imports/icons";
 
 const GREEN = "#1A7A3C";
 
@@ -21,7 +24,13 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 export function VisualizarProfissionalVegetalPage({ dados, onLogout, onNavigate }: { dados?: any; onLogout: () => void; onNavigate: (s: string, d?: any) => void; }) {
+  const [activeTab, setActiveTab] = useState("cadastro");
+  const [modalResponsabilidadeAberto, setModalResponsabilidadeAberto] = useState(false);
   const profissional = { ...(dados || {}), nome: dados?.nome || EXEMPLO_PROFISSIONAL.nome, cpf: dados?.cpf || dados?.documento || EXEMPLO_PROFISSIONAL.cpf, formacao: dados?.formacao || EXEMPLO_PROFISSIONAL.formacao, crea: dados?.crea || dados?.registro || EXEMPLO_PROFISSIONAL.crea, coordenadoria: dados?.coordenadoria || EXEMPLO_PROFISSIONAL.coordenadoria, habilitacao: dados?.habilitacao || EXEMPLO_PROFISSIONAL.habilitacao, numeroHabilitacao: dados?.numeroHabilitacao || EXEMPLO_PROFISSIONAL.numeroHabilitacao, situacao: dados?.situacao || EXEMPLO_PROFISSIONAL.situacao, anexos: dados?.anexos?.length ? dados.anexos : EXEMPLO_PROFISSIONAL.anexos, observacao: dados?.observacao || EXEMPLO_PROFISSIONAL.observacao };
+  const tabs = [
+    { id: "cadastro", label: "Cadastro", icon: (isActive: boolean) => <FileText size={18} className={isActive ? "text-[#1A7A3C]" : "text-gray-400"} /> },
+    { id: "responsabilidades", label: "Responsabilidades Técnicas", icon: (isActive: boolean) => <img src={Icons.iconeFormularioUrl} alt="Responsabilidades Técnicas" className={`h-[18px] w-[18px] object-contain ${isActive ? "opacity-100" : "grayscale opacity-50"}`} /> },
+  ];
 
   return (
     <div className="min-h-screen bg-[#f2f3f5]">
@@ -33,12 +42,13 @@ export function VisualizarProfissionalVegetalPage({ dados, onLogout, onNavigate 
           </button>
           <div className="flex justify-between items-center w-full">
             <h1 className="text-2xl font-semibold text-gray-900">Visualizar Profissional</h1>
-            <button type="button" onClick={() => onNavigate("editar-profissional-vegetal", profissional)} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2">
-              Editar
-            </button>
+            {activeTab === "responsabilidades" ? <button type="button" onClick={() => setModalResponsabilidadeAberto(true)} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm">Adicionar Responsabilidade Técnica</button> : <button type="button" onClick={() => onNavigate("editar-profissional-vegetal", profissional)} className="px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm flex items-center gap-2">Editar</button>}
           </div>
         </div>
 
+        <Tabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
+
+        {activeTab === "cadastro" && <>
         <Section title="Informações Básicas">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <FloatInput label="Nome Completo" value={profissional.nome} disabled onChange={() => {}} />
@@ -61,7 +71,11 @@ export function VisualizarProfissionalVegetalPage({ dados, onLogout, onNavigate 
         <Section title="Observações">
           <LargeTextArea label="Observações" value={profissional.observacao} disabled onChange={() => {}} />
         </Section>
+        </>}
+
+        {activeTab === "responsabilidades" && <ResponsabilidadesTecnicasTab cpf={profissional.cpf} />}
       </main>
+      <ResponsabilidadeTecnicaModal open={modalResponsabilidadeAberto} onClose={() => setModalResponsabilidadeAberto(false)} />
     </div>
   );
 }

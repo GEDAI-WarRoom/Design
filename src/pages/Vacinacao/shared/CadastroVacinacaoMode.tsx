@@ -41,6 +41,7 @@ interface CadastroVacinacaoHeaderProps {
   onNavigate: (screen: any, data?: any) => void;
   onSubmit: () => void;
   acaoComplementar?: React.ReactNode;
+  podeEditar?: boolean;
 }
 
 const GREEN = "#1A7A3C";
@@ -53,6 +54,7 @@ export function CadastroVacinacaoHeader({
   onNavigate,
   onSubmit,
   acaoComplementar,
+  podeEditar = true,
 }: CadastroVacinacaoHeaderProps) {
   const headerRef = useRef<HTMLDivElement>(null);
 
@@ -106,7 +108,7 @@ export function CadastroVacinacaoHeader({
       <h1 className="text-2xl font-semibold text-gray-900">{titulo}</h1>
       {mode === "view" ? (
         <div className="flex items-center gap-3">
-          <button
+          {podeEditar && <button
             data-cadastro-header-action
             type="button"
             onClick={() => onNavigate(rotaEditar, dados)}
@@ -114,7 +116,7 @@ export function CadastroVacinacaoHeader({
             style={{ backgroundColor: GREEN }}
           >
             <Pencil size={14} /> Editar
-          </button>
+          </button>}
           {acaoComplementar}
         </div>
       ) : (

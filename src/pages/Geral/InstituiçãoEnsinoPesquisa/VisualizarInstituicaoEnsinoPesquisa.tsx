@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { ArrowLeft, Pencil, UserRound, MapPin, Phone } from "lucide-react";
-import { Navbar } from "../../../components/Navbar";
+import { EntityProfessionalsView } from "../../../components/ui/EntityProfessionalsView";
 
 const GREEN = "#1A7A3C";
 
@@ -232,42 +232,19 @@ export function VisualizarInstituicaoEnsinoPesquisaPage({
   }));
 
   return (
+    <EntityProfessionalsView
+      onLogout={onLogout}
+      onNavigate={onNavigate}
+      currentScreen="instituicao-ensino-pesquisa"
+      backRoute="instituicao-ensino-pesquisa"
+      backLabel="Todas as Instituições de Ensino e Pesquisa"
+      title="Visualizar Instituição de Ensino e Pesquisa"
+      entityKey={`instituicao-ensino-pesquisa-${detalhe.id || "demo"}`}
+      allowedTypes={["Responsável Técnico Animal"]}
+      fields={[]}
+      cadastroContent={(
     <div className="min-h-screen bg-[#f2f3f5]">
-      <Navbar
-        onLogout={onLogout}
-        onNavigate={onNavigate}
-        currentScreen="instituicao-ensino-pesquisa"
-        hideSearch
-      />
-
       <main className="max-w-[1088px] mx-auto px-4 md:px-6 py-6 flex flex-col gap-4">
-        {/* Cabeçalho */}
-        <div>
-          <button
-            type="button"
-            onClick={() => onNavigate("instituicao-ensino-pesquisa")}
-            className="flex items-center gap-1 text-sm mb-3 transition hover:opacity-70"
-            style={{ color: GREEN }}
-          >
-            <ArrowLeft size={15} />
-            Todas as Instituições de Ensino e Pesquisa
-          </button>
-          <div className="flex justify-between items-center w-full">
-            <h1 className="text-2xl font-semibold text-gray-900">
-              Visualizar Instituição de Ensino e Pesquisa
-            </h1>
-            <button
-              type="button"
-              onClick={() =>
-                onNavigate("editar-instituicao-ensino-pesquisa", detalhe)
-              }
-              className="flex items-center gap-2 px-5 h-10 bg-[#1A7A3C] hover:bg-[#15612F] text-white text-xs font-bold rounded-md transition shadow-sm"
-            >
-              Editar
-            </button>
-          </div>
-        </div>
-
         {/* 1. Informações Básicas — Proprietários */}
         <Section title="Informações Básicas">
           <SubGrupo titulo="Proprietários">
@@ -434,5 +411,7 @@ export function VisualizarInstituicaoEnsinoPesquisaPage({
         </Section>
       </main>
     </div>
+      )}
+    />
   );
 }

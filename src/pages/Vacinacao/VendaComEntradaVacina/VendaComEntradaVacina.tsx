@@ -34,14 +34,19 @@ const FORNECEDORES_VACINA_MOCK = [
 
 const DOENCAS_MOCK = [
   { id: 1, codigo: "D-001", nome: "Brucelose", tiposVacina: ["B19", "RB51"] },
-  { id: 2, codigo: "D-002", nome: "Raiva", tiposVacina: [] },
-  { id: 3, codigo: "D-003", nome: "Febre Aftosa", tiposVacina: [] },
+  { id: 2, codigo: "D-002", nome: "Raiva", tiposVacina: ["Antirrábica"] },
+  { id: 3, codigo: "D-003", nome: "Febre Aftosa", tiposVacina: ["O1 Campos", "A24 Cruzeiro"] },
 ];
 
 const SITUACOES = [
-  { value: "Gravada", label: "Gravada" },
-  { value: "Cancelada", label: "Cancelada" },
+  { value: "Gravado", label: "Gravado" },
+  { value: "Cancelado", label: "Cancelado" },
 ];
+
+const formatarNotaFiscal = (valor: string) => {
+  const digitos = valor.replace(/\D/g, "").slice(0, 9);
+  return digitos.replace(/(\d{3})(?=\d)/g, "$1.");
+};
 
 interface VendaEntrada {
   id: number;
@@ -52,24 +57,25 @@ interface VendaEntrada {
   fornecedor: string;
   doenca: string;
   tipoVacina: string;
-  situacao: "Gravada" | "Cancelada";
+  situacao: "Gravado" | "Cancelado";
+  lotes?: Array<{ numeroPartida: string; laboratorio?: { nome?: string } | string; doenca?: { nome?: string } | string; tipoVacina?: string }>;
 }
 
 const VENDAS_MOCK: VendaEntrada[] = [
   {
     id: 1, revendedoraCodigo: "3120938028", revendedoraNome: "Comercial AgroVat",
-    numeroNotaFiscal: "1234567", numeroPartida: "0013225/24",
-    fornecedor: "Laboratório BioMed", doenca: "Brucelose", tipoVacina: "B19", situacao: "Gravada",
+    numeroNotaFiscal: "123.456.789", numeroPartida: "0013225/24",
+    fornecedor: "Laboratório BioMed", doenca: "Brucelose", tipoVacina: "B19", situacao: "Gravado",
   },
   {
     id: 2, revendedoraCodigo: "3120938045", revendedoraNome: "Agropecuária Vale Verde",
-    numeroNotaFiscal: "7654321", numeroPartida: "0044120/23",
-    fornecedor: "AgroVet Distribuidora", doenca: "Febre Aftosa", tipoVacina: "O1 Campos", situacao: "Cancelada",
+    numeroNotaFiscal: "765.432.109", numeroPartida: "0044120/23",
+    fornecedor: "AgroVet Distribuidora", doenca: "Febre Aftosa", tipoVacina: "O1 Campos", situacao: "Cancelado",
   },
   {
     id: 3, revendedoraCodigo: "3120938090", revendedoraNome: "Casa do Produtor Lavras",
-    numeroNotaFiscal: "9080706", numeroPartida: "0099001/24",
-    fornecedor: "Vacinas Imunotech", doenca: "Raiva", tipoVacina: "", situacao: "Gravada",
+    numeroNotaFiscal: "908.070.601", numeroPartida: "0099001/24",
+    fornecedor: "Vacinas Imunotech", doenca: "Raiva", tipoVacina: "", situacao: "Gravado",
   },
 ];
 
@@ -82,6 +88,18 @@ function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
       </button>
     </div>
   );
+}
+
+function descricaoLotes(venda: VendaEntrada) {
+  const lotes = venda.lotes?.length
+    ? venda.lotes
+    : [{ numeroPartida: venda.numeroPartida, laboratorio: venda.fornecedor, doenca: venda.doenca, tipoVacina: venda.tipoVacina }];
+
+  return lotes.map((lote) => {
+    const laboratorio = typeof lote.laboratorio === "string" ? lote.laboratorio : lote.laboratorio?.nome;
+    const doenca = typeof lote.doenca === "string" ? lote.doenca : lote.doenca?.nome;
+    return [lote.numeroPartida, laboratorio, doenca, lote.tipoVacina].filter(Boolean).join(" - ");
+  });
 }
 
 interface PageProps {
@@ -185,7 +203,8 @@ export function VendaComEntradaVacinaPage({ onLogout, onNavigate }: PageProps) {
           <div className="p-6 border-b border-gray-100 bg-white">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.2fr_0.8fr_1.2fr] gap-3 items-end">
 
-              {/* Revendedora */}
+              {/* A ordem visual segue os filtros definidos na história. */}
+              <div className="order-2">
               <EntitySearchInput
                 label="Revendedora de Produtos Agropecuários"
                 placeholder="Buscar por código ou nome."
@@ -193,19 +212,21 @@ export function VendaComEntradaVacinaPage({ onLogout, onNavigate }: PageProps) {
                 data={REVENDEDORAS_MG_MOCK}
                 searchKeys={["codigo", "nome"]}
                 columns={[
-                  { label: "Código", key: "codigo" },
-                  { label: "Nome", key: "nome" },
+					{ label: "Revendedora de Produtos Agropecuários", key: "nome" },
+					{ label: "Código da Revendedora", key: "codigo" },
                 ]}
                 icon={<Store size={20} color={GREEN} />}
                 title="Buscar Revendedora"
-                subtitle="Busque por uma revendedora cadastrada:"
+                subtitle="Busque por uma revendedora de produtos agropecuários cadastrada:"
                 onChange={(ent) => {
                   setRevendedora(ent);
                   limparErro();
                 }}
               />
+              </div>
 
               {/* Fornecedor */}
+              <div className="order-1">
               <EntitySearchInput
                 label="Fornecedor"
                 placeholder="Buscar por nome ou código."
@@ -213,23 +234,23 @@ export function VendaComEntradaVacinaPage({ onLogout, onNavigate }: PageProps) {
                 data={FORNECEDORES_VACINA_MOCK}
                 searchKeys={["codigo", "nome", "tipo"]}
                 columns={[
-                  { label: "Tipo", key: "tipo" },
-                  { label: "Nome", key: "nome" },
-                  { label: "Código", key: "codigo" },
-                  { label: "UF", key: "uf" },
+					{ label: "Tipo de Fornecedor", key: "tipo" },
+					{ label: "Fornecedor", key: "nome" },
+					{ label: "Código do Fornecedor", key: "codigo" },
                 ]}
                 icon={<img src={Icons.iconeFornecedorUrl} alt="Fornecedor" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}
                 title="Buscar Fornecedor de Vacina"
-                subtitle="Busque por laboratórios ou revendedoras cadastrados:"
+                subtitle="Busque por laboratórios ou revendedoras de produtos agropecuários cadastrados:"
                 onChange={(ent) => {
                   setFornecedor(ent);
                   limparErro();
                 }}
               />
+              </div>
 
 
               {/*+ Botão Pesquisar */}
-              <div className="flex items-end gap-2 w-full">
+              <div className="order-3 flex items-end gap-2 w-full">
                 {/* Número da Nota Fiscal */}
                 <div className="relative border border-gray-300 rounded-md h-12 flex items-end px-3 pb-1.5 bg-white focus-within:border-[#1A7A3C] focus-within:ring-1 focus-within:ring-[#1A7A3C]">
                   <label className={`absolute left-3 transition-all ${numeroNotaFiscal ? "top-1 text-[10px] text-gray-400 font-medium" : "top-1/2 -translate-y-1/2 text-sm text-gray-400"}`}>
@@ -238,10 +259,10 @@ export function VendaComEntradaVacinaPage({ onLogout, onNavigate }: PageProps) {
                   <input
                     type="text"
                     inputMode="numeric"
-                    maxLength={10}
+                    maxLength={11}
                     value={numeroNotaFiscal}
                     onChange={(e) => {
-                      setNumeroNotaFiscal(e.target.value.replace(/\D/g, ""));
+                      setNumeroNotaFiscal(formatarNotaFiscal(e.target.value));
                       limparErro();
                     }}
                     className="w-full bg-transparent text-sm text-gray-800 outline-none h-6"
@@ -262,23 +283,23 @@ export function VendaComEntradaVacinaPage({ onLogout, onNavigate }: PageProps) {
 
 
               {/* Número da Partida */}
-              <div className="relative border border-gray-300 rounded-md h-12 flex items-end px-3 pb-1.5 bg-white focus-within:border-[#1A7A3C] focus-within:ring-1 focus-within:ring-[#1A7A3C]">
+              <div className="order-4 relative border border-gray-300 rounded-md h-12 flex items-end px-3 pb-1.5 bg-white focus-within:border-[#1A7A3C] focus-within:ring-1 focus-within:ring-[#1A7A3C]">
                 <label className={`absolute left-3 transition-all ${numeroPartida ? "top-1 text-[10px] text-gray-400 font-medium" : "top-1/2 -translate-y-1/2 text-sm text-gray-400"}`}>
                   Número de Partida
                 </label>
                 <input
                   type="text"
-                  maxLength={10}
+                  maxLength={20}
                   value={numeroPartida}
                   onChange={(e) => {
-                    setNumeroPartida(e.target.value.replace(/[^0-9/]/g, "").slice(0, 10));
+                    setNumeroPartida(e.target.value.slice(0, 20));
                     limparErro();
                   }}
                   className="w-full bg-transparent text-sm text-gray-800 outline-none h-6"
                 />
               </div>
 
-              <div className="flex-1">
+              <div className="order-5 flex-1">
                 <EntitySearchInput
                   label="Doença"
                   placeholder="Buscar pelo nome da doença."
@@ -300,9 +321,10 @@ export function VendaComEntradaVacinaPage({ onLogout, onNavigate }: PageProps) {
               </div>
 
               {/* Tipo de Vacina */}
-              {doencaTemTipoVacina ? (
+              <div className="order-6">
                 <FloatSelect
                   label="Tipo de Vacina"
+                  disabled={!doencaTemTipoVacina}
                   value={tipoVacina}
                   onChange={(val) => {
                     setTipoVacina(val);
@@ -310,9 +332,10 @@ export function VendaComEntradaVacinaPage({ onLogout, onNavigate }: PageProps) {
                   }}
                   options={tiposVacinaDisponiveis}
                 />
-              ) : null}
+              </div>
 
               {/* Situação */}
+              <div className="order-7">
               <FloatSelect
                 label="Situação"
                 value={situacao}
@@ -322,6 +345,7 @@ export function VendaComEntradaVacinaPage({ onLogout, onNavigate }: PageProps) {
                 }}
                 options={SITUACOES}
               />
+              </div>
             </div>
 
             {/* Mensagem de validação */}
@@ -373,10 +397,7 @@ export function VendaComEntradaVacinaPage({ onLogout, onNavigate }: PageProps) {
                           Número da <br /> Nota Fiscal
                         </th>
                         <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap uppercase text-xs tracking-wider">
-                          Número da <br /> Partida
-                        </th>
-                        <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap uppercase text-xs tracking-wider">
-                          Doença
+                          Lotes
                         </th>
                         <th className="text-left px-4 py-3 font-semibold text-gray-600 whitespace-nowrap uppercase text-xs tracking-wider">
                           Situação
@@ -398,10 +419,11 @@ export function VendaComEntradaVacinaPage({ onLogout, onNavigate }: PageProps) {
                               </span>
                             </div>
                           </td>
-                          <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{v.numeroNotaFiscal}</td>
-                          <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{v.numeroPartida}</td>
-                          <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
-                            {v.doenca}{v.tipoVacina ? ` (${v.tipoVacina})` : ""}
+                          <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{formatarNotaFiscal(v.numeroNotaFiscal)}</td>
+                          <td className="px-4 py-3 text-gray-500">
+                            <div className="flex flex-col gap-1 min-w-[250px]">
+                              {descricaoLotes(v).map((lote, index) => <span key={`${v.id}-${index}`}>{lote}</span>)}
+                            </div>
                           </td>
                           <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{v.situacao}</td>
 

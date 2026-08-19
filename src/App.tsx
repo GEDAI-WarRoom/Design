@@ -21,6 +21,10 @@ import { EditarUnidadeConsolidacaoPage } from "./pages/Vegetal/UnidadeConsolidac
 
 import { VisualizarCulturaPage } from "./pages/Vegetal/Cultura/VisualizarCultura";
 import { EditarCulturaPage } from "./pages/Vegetal/Cultura/EditarCultura";
+import { ExploracaoAgricolaPage } from "./pages/Vegetal/ExploracaoAgricola/ExploracaoAgricola";
+import { AdicionarExploracaoAgricolaPage } from "./pages/Vegetal/ExploracaoAgricola/AdicionarExploracaoAgricola";
+import { VisualizarExploracaoAgricolaPage } from "./pages/Vegetal/ExploracaoAgricola/VisualizarExploracaoAgricola";
+import { EditarExploracaoAgricolaPage } from "./pages/Vegetal/ExploracaoAgricola/EditarExploracaoAgricola";
 
 import { VisualizarPragaPage } from "./pages/Vegetal/Praga/VisualizarPraga";
 import { EditarPragaPage } from "./pages/Vegetal/Praga/EditarPraga";
@@ -202,6 +206,7 @@ import { AdicionarDeclaracaoVacinacaoPage } from "./pages/Vacinacao/DeclaracaoVa
 import { DeclaracaoVacinacaoPage } from "./pages/Vacinacao/DeclaracaoVacinacao/DeclaracaoVacinacao";
 import { VisualizarDeclaracaoVacinacaoPage } from "./pages/Vacinacao/DeclaracaoVacinacao/VisualizarDeclaracaoVacinacao";
 import { EditarDeclaracaoVacinacaoPage } from "./pages/Vacinacao/DeclaracaoVacinacao/EditarDeclaracaoVacinacao";
+import { ValidarRebanhoDeclaracaoVacinacaoPage } from "./pages/Vacinacao/DeclaracaoVacinacao/ValidarRebanhoDeclaracaoVacinacao";
 import { AdicionarDoencaPage } from "./pages/Vacinacao/Doenca/AdicionarDoenca";
 import { DoencaPage } from "./pages/Vacinacao/Doenca/Doenca";
 import { AdicionarEtapaVacinacaoPage } from "./pages/Vacinacao/EtapaVacinacao/AdicionarEtapaVacinacao";
@@ -364,6 +369,7 @@ export type Screen =
   | "editar-declaracao-vacinacao"
   | "declaracao-vacinacao"
   | "adicionar-declaracao-vacinacao"
+  | "validar-rebanho-declaracao-vacinacao"
   | "visualizar-doenca"
   | "editar-doenca"
   | "visualizar-vacinador-brucelose"
@@ -380,6 +386,10 @@ export type Screen =
   | "visualizar-unidade-consolidacao"
   | "editar-cultura"
   | "visualizar-cultura"
+  | "exploracao-agricola"
+  | "adicionar-exploracao-agricola"
+  | "editar-exploracao-agricola"
+  | "visualizar-exploracao-agricola"
   | "editar-praga"
   | "visualizar-praga"
   | "editar-profissional-vegetal"
@@ -1015,6 +1025,15 @@ export default function App() {
     case "visualizar-cultura":
       return <VisualizarCulturaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
 
+    case "exploracao-agricola":
+      return <ExploracaoAgricolaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "adicionar-exploracao-agricola":
+      return <AdicionarExploracaoAgricolaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "editar-exploracao-agricola":
+      return <EditarExploracaoAgricolaPage dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+    case "visualizar-exploracao-agricola":
+      return <VisualizarExploracaoAgricolaPage key={`visualizar-exploracao-agricola-${screenData?.id ?? "novo"}`} dados={screenData} onLogout={handleLogout} onNavigate={handleNavigate} />;
+
     case "praga":
       return <PragaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
     case "adicionar-praga":
@@ -1397,13 +1416,15 @@ export default function App() {
 					onNavigate={handleNavigate}
 				/>
 			);
-		case "adicionar-declaracao-vacinacao":
+    case "adicionar-declaracao-vacinacao":
 			return (
 				<AdicionarDeclaracaoVacinacaoPage
 					onLogout={handleLogout}
 					onNavigate={handleNavigate}
 				/>
 			);
+		case "validar-rebanho-declaracao-vacinacao":
+			return <ValidarRebanhoDeclaracaoVacinacaoPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 		case "doenca":
 			return <DoencaPage onLogout={handleLogout} onNavigate={handleNavigate} />;
 		case "adicionar-doenca":

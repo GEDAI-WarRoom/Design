@@ -25,6 +25,7 @@ export type TipoProfissionalEntidade =
   | "Responsável Técnico Vegetal"
   | "Habilitado para Emissão de GTA"
   | "Habilitado para Emissão de PTV"
+  | "Responsável Legal"
   | "Funcionário";
 
 export interface ProfissionalEntidade {
@@ -53,6 +54,7 @@ const TITULOS: Record<TipoProfissionalEntidade, string> = {
   "Responsável Técnico Vegetal": "Responsável Técnico da Área Vegetal",
   "Habilitado para Emissão de GTA": "Habilitado para Emissão de GTA",
   "Habilitado para Emissão de PTV": "Habilitado para Emissão de PTV",
+  "Responsável Legal": "Responsável Legal",
   Funcionário: "Funcionários",
 };
 
@@ -61,6 +63,7 @@ const ROTULOS_BUSCA: Record<TipoProfissionalEntidade, string> = {
   "Responsável Técnico Vegetal": "Profissional da Área Vegetal",
   "Habilitado para Emissão de GTA": "Profissional da Área Animal",
   "Habilitado para Emissão de PTV": "Profissional da Área Vegetal",
+  "Responsável Legal": "Responsável Legal",
   Funcionário: "Funcionário",
 };
 
@@ -93,7 +96,7 @@ function iconeTipo(tipo: TipoProfissionalEntidade, branco = false) {
       />
     );
   }
-  if (tipo === "Funcionário") return <UsersRound size={21} className={branco ? "text-white" : ""} />;
+  if (tipo === "Funcionário" || tipo === "Responsável Legal") return <UsersRound size={21} className={branco ? "text-white" : ""} />;
   return (
     <img
       src={Icons.iconeProfissionalAnimalUrl}
@@ -185,7 +188,7 @@ export function EntityProfessionalsTab({
     habilitacao: item.habilitacao,
   }));
 
-  const dadosBusca = tipo === "Funcionário"
+  const dadosBusca = tipo === "Funcionário" || tipo === "Responsável Legal"
     ? PESSOAS_FISICAS_DISPONIVEIS
     : tipo === "Responsável Técnico Vegetal"
       ? profissionaisVegetal
@@ -278,7 +281,7 @@ export function EntityProfessionalsTab({
 
   const visualizarCadastro = () => {
     if (!profissional) return;
-    if (tipo === "Funcionário") onNavigate("visualizar-pessoa-fisica", profissional);
+    if (tipo === "Funcionário" || tipo === "Responsável Legal") onNavigate("visualizar-pessoa-fisica", profissional);
     else if (tipo === "Responsável Técnico Vegetal" || tipo === "Habilitado para Emissão de PTV") {
       onNavigate("visualizar-profissional-vegetal", profissional);
     } else onNavigate("visualizar-profissional-area-animal", profissional);
@@ -334,7 +337,7 @@ export function EntityProfessionalsTab({
                     setDataArt("");
                     setArquivoArt("");
                   }}
-                  options={allowedTypes.map((item) => ({ value: item, label: item }))}
+                  options={allowedTypes.map((item) => ({ value: item, label: TITULOS[item] }))}
                   disabled={!!profissionalId || somenteLeitura}
                 />
               </div>

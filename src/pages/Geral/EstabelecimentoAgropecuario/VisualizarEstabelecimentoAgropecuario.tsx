@@ -183,7 +183,7 @@ export function VisualizarEstabelecimentoAgropecuarioPage({ onLogout, onNavigate
       backLabel="Todos os Estabelecimentos Agropecuários"
       title="Visualizar Estabelecimento Agropecuário"
       entityKey={`estabelecimento-agropecuario-${registro.id || registro.codigo}`}
-      allowedTypes={["Responsável Técnico Animal", "Responsável Técnico Vegetal"]}
+      allowedTypes={["Responsável Técnico Animal", "Responsável Técnico Vegetal", "Habilitado para Emissão de GTA", "Habilitado para Emissão de PTV"]}
       cadastroContent={cadastroContent}
       onEditCadastro={() => onNavigate("editar-estabelecimento-agropecuario", registro)}
       historicoCadastros={historico}

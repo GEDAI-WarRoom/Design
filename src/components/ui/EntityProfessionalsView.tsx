@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { ArrowLeft, ChevronDown, FileText, UsersRound } from "lucide-react";
 import { motion } from "motion/react";
 import { Navbar } from "../Navbar";
@@ -73,13 +73,17 @@ export function EntityProfessionalsView({
   const [activeTab, setActiveTab] = useState("cadastro");
   const [addProfessionalRequestKey, setAddProfessionalRequestKey] = useState(0);
   const editAction = onEditCadastro ?? onEdit;
+  useEffect(() => {
+    window.dispatchEvent(new Event("professionals-tab-changed"));
+    return () => window.dispatchEvent(new Event("professionals-tab-changed"));
+  }, [activeTab]);
   const tabs = [
     { id: "cadastro", label: "Cadastro", icon: (active: boolean) => <FileText size={19} className={active ? "text-[#1A7A3C]" : "text-gray-400"} /> },
     { id: "profissionais", label: "Profissionais", icon: (active: boolean) => <UsersRound size={19} className={active ? "text-[#1A7A3C]" : "text-gray-400"} /> },
   ];
 
   return (
-    <div className="min-h-screen bg-[#f2f3f5]">
+    <div className="min-h-screen bg-[#f2f3f5]" data-profissionais-tab-active={activeTab === "profissionais" ? "true" : "false"}>
       <Navbar onLogout={onLogout} onNavigate={onNavigate} currentScreen={currentScreen as any} hideSearch />
       <HistoricoCadastroLayout
         itens={historicoCadastros}
