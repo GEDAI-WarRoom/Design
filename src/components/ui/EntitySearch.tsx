@@ -1681,7 +1681,7 @@ export function BlocoEnderecoFields({
 				estado:
 					tipoEstado === "travado"
 						? "Minas Gerais"
-						: data.estado || "Minas Gerais",
+						: data.estado,
 				cep: "",
 				bairro: "",
 				numero: "",

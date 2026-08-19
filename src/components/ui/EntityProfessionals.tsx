@@ -337,7 +337,7 @@ export function EntityProfessionalsTab({
                     setDataArt("");
                     setArquivoArt("");
                   }}
-                  options={allowedTypes.map((item) => ({ value: item, label: item }))}
+                  options={allowedTypes.map((item) => ({ value: item, label: TITULOS[item] }))}
                   disabled={!!profissionalId || somenteLeitura}
                 />
               </div>

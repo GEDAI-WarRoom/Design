@@ -43,9 +43,9 @@ export function AdicionarAeroportoPorto({ onLogout, onNavigate }: PageProps) {
   // 2. Proprietários
   const [proprietarios, setProprietarios] = useState<any[]>([{ uid: uid("prop"), entidade: null }]);
 
-  // 3. Endereço (travado em MG)
+  // 3. Endereço
   const [endereco, setEndereco] = useState({
-    zona: "Urbana", cep: "", estado: "Minas Gerais", municipio: "", bairro: "",
+    zona: "Urbana", cep: "", estado: "", municipio: "", bairro: "",
     endereco: "", numero: "", complemento: "", localidade: "", distrito: "",
     latitude: "", longitude: ""
   });
@@ -101,7 +101,7 @@ export function AdicionarAeroportoPorto({ onLogout, onNavigate }: PageProps) {
         email: item.entidade.email,
         telefone: item.entidade.telefone,
       })),
-      endereco: { ...endereco, estado: "Minas Gerais" },
+      endereco: { ...endereco },
       contatos,
       anexos,
       observacao,
@@ -184,7 +184,6 @@ export function AdicionarAeroportoPorto({ onLogout, onNavigate }: PageProps) {
           <BlocoEnderecoFields
             title="Endereço Principal"
             tipoEstado="normal"
-            estadoFixo="Minas Gerais"
             data={endereco}
             onChange={(key, val) => setEndereco((p) => ({ ...p, [key]: val }))}
             onSetMultipleFields={(fields) => setEndereco((p) => ({ ...p, ...fields }))}

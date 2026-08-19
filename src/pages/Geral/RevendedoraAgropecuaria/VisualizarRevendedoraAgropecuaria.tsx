@@ -60,8 +60,8 @@ const PROFISSIONAIS_VEGETAL = PROFISSIONAIS_VEGETAL_CADASTRADOS.map((profissiona
 const PESSOAS_FISICAS = PESSOAS_FISICAS_DISPONIVEIS;
 
 const TIPOS_RESPONSAVEL: Array<{ value: TipoProfissional; label: string }> = [
-  { value: "Responsável Técnico Animal", label: "Responsável Técnico Animal" },
-  { value: "Responsável Técnico Vegetal", label: "Responsável Técnico Vegetal" },
+  { value: "Responsável Técnico Animal", label: "Responsável Técnico da Área Animal" },
+  { value: "Responsável Técnico Vegetal", label: "Responsável Técnico da Área Vegetal" },
   { value: "Habilitado para Emissão de GTA", label: "Habilitado para Emissão de GTA" },
   { value: "Funcionário", label: "Funcionário" },
 ];
@@ -114,10 +114,10 @@ function Section({ title, children, defaultOpen = true }: { title: string; child
    ────────────────────────────────────────────────────────────────────────── */
 function rotuloTipoProfissional(tipo: TipoProfissional | null) {
   if (tipo === "Funcionário") return "Funcionário";
-  if (tipo === "Responsável Técnico Vegetal") return "Responsável Técnico Vegetal";
+  if (tipo === "Responsável Técnico Vegetal") return "Responsável Técnico da Área Vegetal";
   if (tipo?.toLowerCase().includes("ptv")) return "Habilitado para Emissão de PTV";
   if (tipo?.toLowerCase().includes("gta")) return "Habilitado para Emissão de GTA";
-  return "Responsável Técnico Animal";
+  return "Responsável Técnico da Área Animal";
 }
 
 function ProfessionalCard({ item, onView }: { item: ProfissionalVinculado; onView: () => void }) {
@@ -147,13 +147,13 @@ function ProfessionalCard({ item, onView }: { item: ProfissionalVinculado; onVie
           </div>
         </div>
 
-        {/* Ícone de Calendário para a data da DRT */}
+        {/* Ícone de Calendário para a data do DRT */}
         {item.dataArt && (
           <div className="flex items-start gap-3">
             <Calendar size={19} className="text-[#1A7A3C] shrink-0" />
             <div>
               <p className="text-sm text-gray-800">{formatarData(item.dataArt)}</p>
-              <p className="text-[10px] text-gray-500">Data da DRT</p>
+              <p className="text-[10px] text-gray-500">Data do DRT</p>
             </div>
           </div>
         )}
@@ -299,7 +299,7 @@ export function VisualizarRevendedoraAgropecuarioPage({ onLogout, onNavigate, da
     }
     const hoje = new Date().toISOString().slice(0, 10);
     if (dataArt && dataArt > hoje) {
-      setErro("A data da DRT não pode ser futura.");
+      setErro("A data do DRT não pode ser futura.");
       return;
     }
     const outroAtivo = revendedora.profissionais.find((item) => item.id !== profissionalId && item.tipo === tipo && item.situacao === "Ativo");
@@ -654,7 +654,7 @@ export function VisualizarRevendedoraAgropecuarioPage({ onLogout, onNavigate, da
 
               </div>
 
-              {/* Data da DRT integrada aqui dentro caso seja Responsável Técnico */}
+              {/* Data do DRT integrada aqui dentro caso seja Responsável Técnico */}
               {/* Seção Integrada de DRT (Data + Upload) exibida apenas para Responsável Técnico */}
               {isResponsavelArt && (
                 <div className="flex flex-col gap-4 w-full animate-fade-in mt-2">
@@ -669,7 +669,7 @@ export function VisualizarRevendedoraAgropecuarioPage({ onLogout, onNavigate, da
                   {/* Campo de Data */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FloatInput
-                      label="Data da DRT"
+                      label="Data do DRT"
                       type="date"
                       icon={<Calendar size={16} color={GREEN} />}
                       value={dataArt}

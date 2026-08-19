@@ -38,8 +38,8 @@ export function EditarAeroportoPortoPage({ dados, onLogout, onNavigate }: { dado
     unidade.proprietarios.map((entidade, index) => ({ uid: `prop-${index + 1}`, entidade })),
   );
 
-  // Exemplo fixo - Localização
-  const [endereco, setEndereco] = useState({ ...unidade.endereco, estado: "Minas Gerais" });
+  // Localização
+  const [endereco, setEndereco] = useState({ ...unidade.endereco });
 
   // Exemplo fixo - Contatos
   const [contatos, setContatos] = useState(unidade.contatos);
@@ -72,7 +72,7 @@ export function EditarAeroportoPortoPage({ dados, onLogout, onNavigate }: { dado
       email: item.entidade.email,
       telefone: item.entidade.telefone,
     })),
-    endereco: { ...endereco, estado: "Minas Gerais" },
+    endereco: { ...endereco },
     contatos,
     anexos,
     observacao,
@@ -174,7 +174,6 @@ export function EditarAeroportoPortoPage({ dados, onLogout, onNavigate }: { dado
           <BlocoEnderecoFields
             title="Endereço Principal"
             tipoEstado="normal"
-            estadoFixo="Minas Gerais"
             data={endereco}
             onChange={(key, val) => setEndereco((p) => ({ ...p, [key]: val }))}
             onSetMultipleFields={(fields) => setEndereco((p) => ({ ...p, ...fields }))}
