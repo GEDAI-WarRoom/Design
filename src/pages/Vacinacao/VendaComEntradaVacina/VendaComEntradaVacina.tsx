@@ -39,8 +39,8 @@ const DOENCAS_MOCK = [
 ];
 
 const SITUACOES = [
-  { value: "Gravada", label: "Gravada" },
-  { value: "Cancelada", label: "Cancelada" },
+  { value: "Gravado", label: "Gravado" },
+  { value: "Cancelado", label: "Cancelado" },
 ];
 
 const formatarNotaFiscal = (valor: string) => {
@@ -57,7 +57,7 @@ interface VendaEntrada {
   fornecedor: string;
   doenca: string;
   tipoVacina: string;
-  situacao: "Gravada" | "Cancelada";
+  situacao: "Gravado" | "Cancelado";
   lotes?: Array<{ numeroPartida: string; laboratorio?: { nome?: string } | string; doenca?: { nome?: string } | string; tipoVacina?: string }>;
 }
 
@@ -65,17 +65,17 @@ const VENDAS_MOCK: VendaEntrada[] = [
   {
     id: 1, revendedoraCodigo: "3120938028", revendedoraNome: "Comercial AgroVat",
     numeroNotaFiscal: "123.456.789", numeroPartida: "0013225/24",
-    fornecedor: "Laboratório BioMed", doenca: "Brucelose", tipoVacina: "B19", situacao: "Gravada",
+    fornecedor: "Laboratório BioMed", doenca: "Brucelose", tipoVacina: "B19", situacao: "Gravado",
   },
   {
     id: 2, revendedoraCodigo: "3120938045", revendedoraNome: "Agropecuária Vale Verde",
     numeroNotaFiscal: "765.432.109", numeroPartida: "0044120/23",
-    fornecedor: "AgroVet Distribuidora", doenca: "Febre Aftosa", tipoVacina: "O1 Campos", situacao: "Cancelada",
+    fornecedor: "AgroVet Distribuidora", doenca: "Febre Aftosa", tipoVacina: "O1 Campos", situacao: "Cancelado",
   },
   {
     id: 3, revendedoraCodigo: "3120938090", revendedoraNome: "Casa do Produtor Lavras",
     numeroNotaFiscal: "908.070.601", numeroPartida: "0099001/24",
-    fornecedor: "Vacinas Imunotech", doenca: "Raiva", tipoVacina: "", situacao: "Gravada",
+    fornecedor: "Vacinas Imunotech", doenca: "Raiva", tipoVacina: "", situacao: "Gravado",
   },
 ];
 
@@ -212,12 +212,12 @@ export function VendaComEntradaVacinaPage({ onLogout, onNavigate }: PageProps) {
                 data={REVENDEDORAS_MG_MOCK}
                 searchKeys={["codigo", "nome"]}
                 columns={[
-                  { label: "Código", key: "codigo" },
-                  { label: "Nome", key: "nome" },
+					{ label: "Revendedora de Produtos Agropecuários", key: "nome" },
+					{ label: "Código da Revendedora", key: "codigo" },
                 ]}
                 icon={<Store size={20} color={GREEN} />}
                 title="Buscar Revendedora"
-                subtitle="Busque por uma revendedora cadastrada:"
+                subtitle="Busque por uma revendedora de produtos agropecuários cadastrada:"
                 onChange={(ent) => {
                   setRevendedora(ent);
                   limparErro();
@@ -234,14 +234,13 @@ export function VendaComEntradaVacinaPage({ onLogout, onNavigate }: PageProps) {
                 data={FORNECEDORES_VACINA_MOCK}
                 searchKeys={["codigo", "nome", "tipo"]}
                 columns={[
-                  { label: "Tipo", key: "tipo" },
-                  { label: "Nome", key: "nome" },
-                  { label: "Código", key: "codigo" },
-                  { label: "UF", key: "uf" },
+					{ label: "Tipo de Fornecedor", key: "tipo" },
+					{ label: "Fornecedor", key: "nome" },
+					{ label: "Código do Fornecedor", key: "codigo" },
                 ]}
                 icon={<img src={Icons.iconeFornecedorUrl} alt="Fornecedor" className="w-[24px] h-[24px] object-contain mr-2 -ml-1 flex-shrink-0" />}
                 title="Buscar Fornecedor de Vacina"
-                subtitle="Busque por laboratórios ou revendedoras cadastrados:"
+                subtitle="Busque por laboratórios ou revendedoras de produtos agropecuários cadastrados:"
                 onChange={(ent) => {
                   setFornecedor(ent);
                   limparErro();

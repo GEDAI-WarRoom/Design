@@ -280,7 +280,7 @@ export function AdicionarVendaComEntradaVacinaPage({ onLogout, onNavigate, mode 
   const [numeroNotaFiscal, setNumeroNotaFiscal] = useState(dados?.numeroNotaFiscal ?? "");
   const [ufNotaFiscal, setUfNotaFiscal] = useState(dados?.ufNotaFiscal ?? (preenchendoRegistro ? "MG" : ""));
   const [dataNotaFiscal, setDataNotaFiscal] = useState(dados?.dataNotaFiscal ?? (preenchendoRegistro ? "2026-08-01" : ""));
-  const [situacao, setSituacao] = useState<"Gravada" | "Cancelada">(dados?.situacao ?? "Gravada");
+  const [situacao, setSituacao] = useState<"Gravado" | "Cancelado">(dados?.situacao === "Cancelada" ? "Cancelado" : "Gravado");
   const [lotes, setLotes] = useState<any[]>(dados?.lotes?.length
     ? dados.lotes
     : dados?.numeroPartida
@@ -357,7 +357,7 @@ export function AdicionarVendaComEntradaVacinaPage({ onLogout, onNavigate, mode 
     numeroNotaFiscal: "123.456.789",
     ufNotaFiscal: "MG",
     dataNotaFiscal: "2026-08-01",
-    situacao: "Gravada",
+    situacao: "Gravado",
     lotes: [{
       uid: "lote-exemplo", numeroPartida: "0013225/24", laboratorio: { id: 1, nome: "Laboratório Biovet" },
       doenca: { id: 1, nome: "Brucelose", tiposVacina: ["B19", "RB51"] }, tipoVacina: "B19", validade: "12/2026",
@@ -544,11 +544,11 @@ export function AdicionarVendaComEntradaVacinaPage({ onLogout, onNavigate, mode 
                 <FloatSelect
                   label="Situação"
                   value={situacao}
-                  onChange={(v) => setSituacao(v as "Gravada" | "Cancelada")}
-                  options={[{ value: "Gravada", label: "Gravada" }, { value: "Cancelada", label: "Cancelada" }]}
+                  onChange={(v) => setSituacao(v as "Gravado" | "Cancelado")}
+                  options={[{ value: "Gravado", label: "Gravado" }, { value: "Cancelado", label: "Cancelado" }]}
                   disabled={mode === "view"}
                 />
-                {mode === "edit" && situacao === "Cancelada" && (
+                {mode === "edit" && situacao === "Cancelado" && (
                   <p className="mt-2 text-xs text-amber-700">O cancelamento é irreversível e só pode ser realizado se não houver venda posterior.</p>
                 )}
               </div>
